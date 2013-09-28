@@ -1,0 +1,8 @@
+QLineEdit {
+	background: transparent;
+	font-family: Envy Code R;
+	font-size: 11pt;
+	border: none;
+	border-radius: 5px;
+	color: <textcolor>;
+}

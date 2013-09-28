@@ -1,0 +1,24 @@
+QWidget#guiBase {
+	background-image: url(:/icons/<bg>.png);
+	border: 1px solid <bordercolor>;
+	border-radius: 5px;
+}
+
+QWidget#previewBase {
+	background: transparent;
+}
+
+QWidget {
+	color: <textcolor>;
+}
+
+QToolButton:hover {
+	background: transparent;
+	border: 0px;
+	color: red;
+}
+
+QLabel {
+	font-family: Architects Daughter;
+	font-size: 9;
+}

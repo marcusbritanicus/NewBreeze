@@ -1,0 +1,19 @@
+QWidget {
+	color: <textcolor>;
+	font-weight: bold;
+	border-radius: 5px;
+}
+
+QWidget:hover {
+	color: lightblue;
+	background: rbga( <72> );
+}
+
+QToolTip {
+	border: none;
+	color: <textcolor>;
+	background-color: rbga( <27> );
+	font-weight: bold;
+	padding: 2px;
+	border-radius: 5px;
+}

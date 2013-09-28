@@ -1,0 +1,116 @@
+QWidget#mainWidget {
+	background-image: url(:/icons/<bg>.png);
+	background-color: <bgcolor>;
+	color: <textcolor>;
+	border: 1px solid <bordercolor>;
+	border-radius: 5px;
+}
+
+QListView#mainList {
+	background-color: <bgcolor>;
+	color: <textcolor>;
+	border: none;
+}
+
+QTreeView#mainList {
+	background-color: <bgcolor>;
+	alternate-background-color: rgba( <27> );
+	color: <textcolor>;
+	border: none;
+}
+
+QScrollBar:vertical {
+	background-color: <bgcolor>;
+	max-width: 8px;
+	border-radius: 4px;
+	padding: 1px;
+}
+
+QScrollBar::handle:vertical {
+	background-color: <scrollcolor>;
+	max-width: 6px;
+	border-radius: 3px;
+}
+
+QScrollBar::sub-page:vertical {
+	background-color: <bgcolor>;
+}
+
+QScrollBar::add-page:vertical {
+	background-color: <bgcolor>;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+	width: 0px;
+	height: 0px;
+}
+
+QScrollBar:horizontal {
+	background-color: <scrollcolor>;
+	max-height: 8px;
+	border-radius: 4px;
+	padding: 1px;
+}
+
+QScrollBar::handle:horizontal {
+	background-color: silver;
+	max-height: 6px;
+	border-radius: 3px;
+}
+
+QScrollBar::sub-page:horizontal {
+	background-color: <bgcolor>;
+}
+
+QScrollBar::add-page:horizontal {
+	background-color: <bgcolor>;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+	width: 0px;
+	height: 0px;
+}
+
+QMenu::item {
+	margin: 2px;
+	padding: 0px 18px 0px 27px;
+}
+
+QMenu::item:selected {
+	border-radius: 5px;
+	background: rgba( 100, 100, 100, 150 );
+}
+
+QMenu::icon:checked {
+	background: rgba( 222, 222, 222, 18% );
+	border: 1px solid darkblue;
+	border-radius: 2px;
+	padding: 2px;
+}
+
+QMenu::separator {
+	height: 1px;
+	background: gray;
+	margin: 5px 27% 5px 27%;
+}
+
+QFrame#hsep {
+	border: 1px solid gray;
+}
+
+QFrame#vsep {
+	border: 1px solid gray;
+}
+
+QSizeGrip {
+	width: 16px;
+	height: 16px;
+}
+
+QToolTip {
+	border: none;
+	color: <textcolor>;
+	background-color: rbga( <27> );
+	padding: 2px;
+	border-radius: 5px;
+}

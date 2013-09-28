@@ -1,0 +1,42 @@
+QWidget {
+	color: <textcolor>;
+	background: rgba( 0, 0, 0, 0 );
+	border: none;
+}
+
+QListView {
+	background: transparent;
+	color: <textcolor>;
+	border: none;
+}
+
+QScrollArea QFrame {
+	background: transparent;
+	border: none;
+}
+
+QScrollBar:vertical {
+	background-color: transparent;
+	max-width: 8px;
+	border-radius: 4px;
+	padding: 1px;
+}
+
+QScrollBar::handle:vertical {
+	background-color: lightgray;
+	max-width: 6px;
+	border-radius: 3px;
+}
+
+QScrollBar::sub-page:vertical {
+	background-color: transparent;
+}
+
+QScrollBar::add-page:vertical {
+	background-color: transparent;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+	width: 0px;
+	height: 0px;
+}

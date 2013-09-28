@@ -1,0 +1,50 @@
+QWidget {
+	color: <textcolor>;
+}
+
+QRadioButton {
+	min-width:150px;
+	min-height: 20px;
+	padding-left: 2px;
+}
+
+QRadioButton::indicator:unchecked {
+	image: url(:/icons/radiobutton_unchecked.png);
+}
+
+QRadioButton::indicator:checked {
+	image: url(:/icons/radiobutton_checked.png);
+}
+
+QMenu {
+	background-color: rgba( <72> );
+	border-radius: 5px;
+	border: 1px solid <bordercolor>;
+	font-family: Architects Daughter;
+	font-size: 9pt;
+	color: <textcolor>;
+	menu-scrollable: 1;
+}
+
+QMenu::item {
+	margin: 2px;
+	padding: 0px 18px 0px 27px;
+}
+
+QMenu::item:selected {
+	border-radius: 5px;
+	background: rgba( 100, 100, 100, 150 );
+}
+
+QMenu::icon:checked {
+	background: rgba( 222, 222, 222, 18% );
+	border: 1px solid darkblue;
+	border-radius: 2px;
+	padding: 2px;
+}
+
+QMenu::separator {
+	height: 1px;
+	background: gray;
+	margin: 5px 27% 5px 27%;
+}

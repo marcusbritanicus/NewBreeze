@@ -1,0 +1,157 @@
+Version 2.0.0-alpha
+    - GUI design changes
+    - Delete is now a threaded Core IO
+    - All dialogs are now based on NBDialog base class
+    - Added NBFileSystemModel, a subclass of QAbstractItemModel
+    - Added NBFileSystemWatcher, a inotify based file system watcher
+    - NBHistory is now redundant, functionality is inbuilt into NBFileSystemModel
+    - NBIcon class now converted to NBIconProvider Core class
+    - Added server class, enabling resource sharing
+    - Dynamic StyleSheet generation
+    - You can open a previewed file in the default external application from NBPreview
+
+Version 1.2.4
+    - Once the focus reaches the end of the visual row, pressing the right button goes to the next row, first element
+    - Once the focus is at the start of the visual row, pressing the left button goes to the previous row, last element
+    - Fixed the icon problems in the NBToolButton class
+
+Version 1.2.3
+    - Fixed the erroneous AboutNB Shortcut
+
+Version 1.2.2
+    - Added support for native title bar
+    - Corresponding setting in Settings Dialog
+
+Version 1.2.1
+    - Enabled complete DnD support: to USB and to folders
+    - Added a new theme, Transparent Light
+    - Changed the theme name Natural to Light Gray
+    - Added QComboBox based icon theme choosing
+
+Version 1.2.0-bugfix1
+    - Enabled handling of function keys in key bindings editor
+    - Separators are now QWidgets rather than QFrames
+    - SideBar now uses system font resulting in compact and smaller size
+
+Version 1.2.0
+    - Enabled changing of custom keyboard shortcuts through Settings dialog
+    - Added code for name filtering. Shortcut: Ctrl+F to focus, Ctrl+Shift+F to clear
+    - Minor changes to NBSideBar and allied classes
+
+Version 1.1.9
+    - Repaired the code for adding the missing Shortcuts.conf file
+    - SidePanel now has a smaller default width; expands depending on the device name widths
+    - StatusBar shows extra info about files and folders
+    - Added code for setting of folder icons
+    - Fixed the bug causing devices with spaces in labels getting filtered out
+
+Version 1.1.8-bugfix1
+    - Added the code for adding the missing Shortcuts.conf file
+    - Fixed the NBFileDialog filter issue
+    - Improved the rendering of icons/thumbnails
+
+Version 1.1.8
+    - Enabled Custom KeyBoard Shortcuts
+    - Updated NBFileDialog
+    - Enabled Setting of Folder Icons
+
+Version 1.1.7
+    - Enabled thumbnail regeneration on editing in external application
+    - Thumbnails are no longer disfigured, they maintain aspect ratio of the original image
+    - Fixed Archive creation issue: Its now possible to choose the format
+    - Fixed NBLzma compression issue, now it compresses all the data properly
+    - NewBreeze now uses QMimeType for mime detection, xdg-utils dependency removed
+    - New windows created are opened from the same instance rather than a new instance
+    - File/Folder deletion code rewritten
+
+Version 1.1.6
+    - Added inline terminal, invocation: Shift+F4
+
+Version 1.1.5
+    - New Model Based Device and Bookmarks View
+    - Manual Bookmark sorting
+    - Added Actions Menu with Create Archive, Extract Archive, Open as root
+    - Added Custom Actions Dialog to enable the user to add and remove custom actions
+
+Version 1.1.4-bugfix1
+    - Fixed the SegmentationFault on device add/remove
+
+Version 1.1.4
+    - Fixed Properties dialog: File/Folder Permissions
+    - Added resizable side panel
+    - Several View Modes
+    - Sort files and folders
+    - Devices detection is no longer based on UDisks :)
+    - Better bookmarks and devices display
+
+Version 1.1.3-bugfix4
+    - Added debian packaging support
+    - Added newbreeze.desktop, lowercase executable and make install support
+
+Version 1.1.3-bugifx3
+    - Speeded up the desktop files parsing
+    - BreadCrumbsBar arrow is now using inbuilt png
+
+Version 1.1.3-bugifx2
+    - Fixed several small bugs
+    - Several small improvements here and there
+
+Version 1.1.3-bugfix
+    - Fixed the bug that caused the compile time conversion error.
+
+Version 1.1.3
+    - Improved settings dialog with better icon theme chooser
+    - Fixed the bug that caused the application to segfault for some themes
+    - Added BreadCrumbs Navigation Bar
+    - Image previews is now optional. You can set it in Settings > Icons > Show Image Previews
+
+Version 1.1.2
+    - Added mime-icon support and option to change icon theme
+
+Version 1.1.1
+    - Improved the thumbnail support by adding a thumbnail cache directory. The thumbnails load much faster now.
+    - Added first run support to handle missing config variables - Your first run will now give you a polished look.
+    - Disabled the maximized start - now starts with the size ( 800, 600 )
+
+Version 1.1.0
+    - Added support for thumbnail preview and displaying (only) custom folder icons
+
+Version 1.0.9-bugfix
+    - Fixed the minor bug that caused the mimetype to be displayed incorrectly.
+
+Version 1.0.9
+    - Added html preview support through QWebView
+    - Various other small beautifications
+
+Version 1.0.8-bugfix
+    - Added the missing NewBreeze.qrc
+
+Version 1.0.8
+    - Added history support. Now you can go back and forth as you like
+
+Version 1.0.7 - Windows
+    - Major Bug Fix and Functionality Upgrade Version - Now this windows version is nearly equal to the linux version. Only missing functionality is "Open with" menu.
+
+Version 1.0.7
+    - Switching to xdg-mime to determine the mimetypes of the files from mimetype
+
+Version 1.0.6
+    - "Open With" dialog lists the installed applications
+
+Version 1.0.5
+    - Fixed an annoying bug that resulted in improper opening of terminal windows
+
+Version 1.0.4
+    - Updated support for device detection - auto detect device mount and unmount
+
+Version 1.0.3
+    - Added partial QtDBus Support - drive detection
+
+Version 1.0.2
+    - Fixed an annoying issue of Open With menu.
+    - Separated Drives and Bookmarks sidebar
+
+Version 1.0.1
+    - Added Settings dialog (Shortcut: [Ctrl]+[S])
+    - Added Bookmarks support (Shortcut: [Ctrl]+[D])
+    - Added Windows support

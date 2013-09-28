@@ -1,0 +1,41 @@
+QPushButton {
+	background: transparent;
+	font-family: Architects Daughter;
+	text-align: center;
+	color: <textcolor>;
+	border: 0px;
+	margin-top: 5px;
+}
+
+QPushButton:hover {
+	color: lightblue;
+}
+
+QPushButton:pressed {
+	color: blue;
+}
+
+QPushButton:disabled {
+	color: <disabled>;
+}
+
+QToolButton {
+	background: transparent;
+	text-align: center;
+	border: 0px;
+}
+
+QToolButton:hover {
+	border: 1px solid skyblue;
+	border-radius: 5px;
+}
+
+QToolButton:pressed {
+	border: 1px solid gray;
+}
+
+QToolButton:checked {
+	border: 1px solid gray;
+	border-radius: 5px;
+	background: rgba( <27> );
+}
