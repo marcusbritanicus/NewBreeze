@@ -1,5 +1,5 @@
 #NewBreeze
-## A fst and light-weight file manager based on Qt4
+## A fast and light-weight file manager based on Qt4
 
 Built on top of the Powerful Qt4 GUI Toolkit, this file manager is sleek, stylish and fast.
 Some of its features are
