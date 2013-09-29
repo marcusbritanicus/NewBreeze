@@ -7,7 +7,7 @@ Some of its features are
 * Folder, text, html and image quick preview
 * File Association support
 * Provides List and Icon View
-* Lists the drives/boomarks in the sidebar
+* Lists the drives/bookmarks in the sidebar
 * Full drag and drop support
 * Bookmark Support
 * Auto update devices list
