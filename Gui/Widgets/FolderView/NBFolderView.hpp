@@ -113,8 +113,8 @@ class NBFolderView : public QStackedWidget {
 		void newWindow( QString );
 		void selectionChanged( const QItemSelection&, const QItemSelection& );
 
-		void move( QStringList, QString, NBIOMode::Mode, NBJobMode::Mode );
-		void copy( QStringList, QString, NBIOMode::Mode, NBJobMode::Mode );
+		void move( QStringList, QString, NBIOMode::Mode );
+		void copy( QStringList, QString, NBIOMode::Mode );
 
 		void focusSearchBar();
 		void clearSearchBar();

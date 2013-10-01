@@ -9,24 +9,27 @@
 
 #include <Global.hpp>
 
-class NBFileIO : public QThread {
+class NBFileIO : public QObject, public QRunnable {
 	Q_OBJECT
 
 	public:
 		// Init all the variables
-		NBFileIO( quint64 );
+		NBFileIO();
 
 		// Mode: copy or move
 		void setMode( NBIOMode::Mode mode );
 
 		// Sources
 		void setSources( QStringList );
+		QStringList sources();
 
 		// Target
 		void setTarget( QString );
+		QString target();
 
 		// JobID
-		quint64 jobID();
+		void setJobID( QString );
+		QString jobID();
 
 		// Thread running
 		void run();
@@ -34,20 +37,36 @@ class NBFileIO : public QThread {
 		// Cancel the copy/move
 		void cancelIO();
 
-		// Percentage copied/moved
-		float progress();
+		// Wait for done
+		bool wait( int );
+
+		// Total number of nodes to be copied
+		quint64 totalNodes();
+
+		// Total bytes to be copied
+		quint64 totalBytes();
+
+		// Total bytes copied so far
+		quint64 copiedBytes();
+
+		// Current target file being copied
+		QString currentFileCopied();
+
+		// Bytes to be copied of this file
+		quint64 cfileTotalBytes();
+
+		// Bytes copied so far of this file
+		quint64 cfileCopiedBytes();
+
+		// Progress fraction: ( @ bytesCopied() ) /  ( @f totalBytes() )
+		float totalProgress();
+		float cfileProgress();
 
 		// Puase and resume
 		void pause();
 		void resume();
 
 	private:
-		// Copy items in SourceList to Target
-		void copyItems( QStringList, QString );
-
-		// Move items from of SourceList to Target
-		void moveItems( QStringList, QString );
-
 		// Copy a directory
 		bool copyDir( QString, QString );
 
@@ -55,13 +74,13 @@ class NBFileIO : public QThread {
 		bool copyFile( QString, QString );
 
 		// jobID
-		quint64 m_jobID;
+		QString m_jobID;
 
 		// Variables to store the source list and target
 		QStringList m_sourceList;
 		QString m_target;
 
-		// Class variable for progressClick
+		// Variable for progressClick
 		QString m_tgtFile;
 
 		// Variable to store the mode
@@ -76,6 +95,8 @@ class NBFileIO : public QThread {
 		// Cancel flag
 		bool canceled;
 
+		// How many nodes to be copies
+		quint64 nodes;
 		// How many bytes to be copied in all
 		quint64 totalBytesToBeCopied;
 		// Hoy many bytes to be copied for this file
@@ -87,28 +108,8 @@ class NBFileIO : public QThread {
 		// Hoy many bytes copied for this file
 		quint64 cfileBytesCopied;
 
-		// Progress timer
-		QTimer *timer;
-
-	public slots:
-		void start();
-
-	private slots:
-		// Slot to produce progress signals
-		void progressClick();
-
 	Q_SIGNALS:
-		// emit complete( jobID, errorNodes );
-		void complete( quint64, QStringList );
-
-		// emit copied( jobID, cFileName, cfileF, totalF );
-		void copied( quint64, QString, float, float );
-
-		// emit newNode( targetNode );
-		void newNode( QString );
-
-		// emit ioVolume( jobID, files, totalBytesToBeCopied );
-		void ioVolume( quint64, quint64, quint64 );
+		void complete( QString, QStringList );
 };
 
 #endif

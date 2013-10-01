@@ -131,6 +131,12 @@ void NBViewsWidget::createGUI() {
 	nativeTitleBarCB->setChecked( Settings.General.NativeTitleBar );
 	connect( nativeTitleBarCB, SIGNAL( toggled( bool ) ), this, SLOT( handleNativeTitleBarToggle( bool ) ) );
 
+	maxIOJobsSB = new QSpinBox();
+	maxIOJobsSB->setRange( 2, 100 );
+	maxIOJobsSB->setSingleStep( 1 );
+	maxIOJobsSB->setValue( Settings.General.MaxIOJobs );
+	connect( maxIOJobsSB, SIGNAL( valueChanged( int ) ), this, SLOT( handleMaxIOJobsChanged( int ) ) );
+
 	if ( Settings.General.Style == QString( "TransLight" ) ) {
 		tlRB->setChecked( true );
 		imageLbl->setPixmap( QPixmap( ":/icons/TransLight.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
@@ -157,6 +163,8 @@ void NBViewsWidget::createGUI() {
 	themeLyt->addWidget( ntRB, 0, 3 );
 	themeLyt->addWidget( imageLbl, 1, 0, 1, 4, Qt::AlignCenter );
 	themeLyt->addWidget( nativeTitleBarCB, 2, 0, 1, 4, Qt::AlignLeft );
+	themeLyt->addWidget( new QLabel( "Maximum number of cuncurrent IO Jobs:" ), 3, 0, 1, 3 );
+	themeLyt->addWidget( maxIOJobsSB, 3, 3 );
 
 	setLayout( themeLyt );
 };
@@ -192,6 +200,12 @@ void NBViewsWidget::handleNativeTitleBarToggle( bool useNative ) {
 
 	settings.setValue( "NativeTitleBar", useNative );
 	Settings.General.NativeTitleBar = useNative;
+};
+
+void NBViewsWidget::handleMaxIOJobsChanged( int value ) {
+
+	settings.setValue( "MaxIOJobs", value );
+	Settings.General.MaxIOJobs = value;
 };
 
 NBIconThemeWidget::NBIconThemeWidget() {

@@ -177,7 +177,7 @@ bool isReadable( QString path ) {
 
 	struct stat fileMode;
 	QList<int> groupList;
-	gid_t *groups;
+	gid_t *groups = 0;
 
 	if ( stat( qPrintable( path ), &fileMode ) != 0 )
 		return false;

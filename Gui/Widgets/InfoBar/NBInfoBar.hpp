@@ -9,7 +9,7 @@
 
 #include <Global.hpp>
 #include <NBGuiWidgets.hpp>
-#include <NBProgressWidget.hpp>
+#include <NBIOManager.hpp>
 
 class NBInfoBar : public QWidget {
 	Q_OBJECT
@@ -24,7 +24,7 @@ class NBInfoBar : public QWidget {
 
 		QLabel *iconLbl, *nameLbl;
 		NBInfoLabel *infoLbl;
-		NBProgressWidget *pWidget;
+		NBIOManager *ioManager;
 
 	private:
 		void setIcon( QPixmap );

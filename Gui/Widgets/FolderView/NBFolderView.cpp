@@ -601,12 +601,14 @@ void NBFolderView::copy( QStringList srcList, QString tgt ) {
 	if ( qobject_cast<NBIconView*>( sender() ) == IconView )
 		qDebug() << "Drag drop copy";
 
-	NBPasteDialog *pasteDialog = new NBPasteDialog();
-	pasteDialog->setSources( srcList );
-	pasteDialog->setTarget( tgt );
-	pasteDialog->setIOMode( NBIOMode::Copy );
+	// NBPasteDialog *pasteDialog = new NBPasteDialog();
+	// pasteDialog->setSources( srcList );
+	// pasteDialog->setTarget( tgt );
+	// pasteDialog->setIOMode( NBIOMode::Copy );
 
-	pasteDialog->show();
+	// pasteDialog->show();
+
+	emit copy( srcList, tgt, NBIOMode::Copy );
 };
 
 void NBFolderView::move( QStringList srcList, QString tgt ) {
@@ -614,12 +616,14 @@ void NBFolderView::move( QStringList srcList, QString tgt ) {
 	if ( qobject_cast<NBIconView*>( sender() ) == IconView )
 		qDebug() << "Drag drop copy";
 
-	NBPasteDialog *pasteDialog = new NBPasteDialog();
-	pasteDialog->setSources( srcList );
-	pasteDialog->setTarget( tgt );
-	pasteDialog->setIOMode( NBIOMode::Move );
+	// NBPasteDialog *pasteDialog = new NBPasteDialog();
+	// pasteDialog->setSources( srcList );
+	// pasteDialog->setTarget( tgt );
+	// pasteDialog->setIOMode( NBIOMode::Move );
 
-	pasteDialog->show();
+	// pasteDialog->show();
+
+	emit move( srcList, tgt, NBIOMode::Move );
 };
 
 void NBFolderView::link( QStringList linkList, QString path ) {
@@ -645,13 +649,13 @@ void NBFolderView::prepareIO() {
 		if ( moveItems ) {
 			// Techinically NewBreeze class will catch this move signal and process it
 			// Now we have issues with this format, so handle it the old school
-			move( srcList, target );
+			emit move( srcList, target, NBIOMode::Move );
 		}
 
 		else {
 			// Technically NewBreeze class will catch this copy signal and process it
 			// Now we have issues with this format, so handle it the old school
-			copy( srcList, target );
+			emit copy( srcList, target, NBIOMode::Move );
 		}
 	}
 

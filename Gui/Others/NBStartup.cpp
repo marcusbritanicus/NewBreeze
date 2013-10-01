@@ -7,6 +7,7 @@
 #include <Global.hpp>
 #include <NBTools.hpp>
 #include <NBConfigParser.hpp>
+#include <NBSystemInfo.hpp>
 
 NBSettings Settings;
 void NBStartup() {
@@ -29,8 +30,7 @@ void NBStartup() {
 		* Icon Theme
 		*
 	*/
-	QIcon::setThemeName( settings.value( QObject::tr( "IconTheme" ) ).toString() );
-
+	QIcon::setThemeName( NBSystemIconTheme() );
 
 	/*
 		*
@@ -46,8 +46,17 @@ void NBStartup() {
 	if ( settings.value( QObject::tr( "FolderView" ) ).isNull() )
 		settings.setValue( QObject::tr( "FolderView" ), QObject::tr( "NormalIconsView" ) );
 
+	if ( settings.value( QObject::tr( "FolderView" ) ).isNull() )
+		settings.setValue( QObject::tr( "FolderView" ), QObject::tr( "NormalIconsView" ) );
+
+	if ( settings.value( QObject::tr( "IconTheme" ) ).isNull() )
+		settings.setValue( QObject::tr( "IconTheme" ), QIcon::themeName() );
+
 	if ( settings.value( QObject::tr( "NativeTitleBar" ) ).isNull() )
 		settings.setValue( QObject::tr( "NativeTitleBar" ), false );
+
+	if ( settings.value( QObject::tr( "MaxIOJobs" ) ).isNull() )
+		settings.setValue( QObject::tr( "MaxIOJobs" ), 5 );
 
 	if ( settings.value( QObject::tr( "SymLinkPenColorAlt" ) ).isNull() )
 		settings.setValue( QObject::tr( "SymLinkPenColorAlt" ), QColor( 124, 104, 238, 255 ) );
@@ -72,9 +81,6 @@ void NBStartup() {
 
 	if ( settings.value( QObject::tr( "TextPenColor" ) ).isNull() )
 		settings.setValue( QObject::tr( "TextPenColor" ), QColor( 255, 255, 255, 255 ) );
-
-	if ( settings.value( QObject::tr( "IconTheme" ) ).isNull() )
-		settings.setValue( QObject::tr( "IconTheme" ), QIcon::themeName() );
 
 	if ( settings.value( QObject::tr( "FocusPenColor" ) ).isNull() )
 		settings.setValue( QObject::tr( "FocusPenColor" ), QColor( 255, 255, 255, 255 ) );

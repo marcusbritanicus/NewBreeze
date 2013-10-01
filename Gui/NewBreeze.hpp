@@ -76,7 +76,7 @@ class NewBreeze : public QMainWindow {
 		void filterFiles( QString );
 		void clearFilters();
 
-		void initiateIO( QStringList, QString, NBIOMode::Mode, NBJobMode::Mode );
+		void initiateIO( QStringList, QString, NBIOMode::Mode );
 
 		void updateInfoBar();
 		void updateVarious( QString );

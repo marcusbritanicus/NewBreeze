@@ -111,7 +111,7 @@ void NewBreeze::setWindowProperties() {
 	setWindowTitle( tr( "NewBreeze" ) );
 	setWindowIcon( QIcon( ":/icons/newbreeze.png" ) );
 
-	setMinimumSize( 800, 600 );
+	setMinimumSize( 900, 600 );
 
 	setGeometry( Settings.Session.Geometry);
 
@@ -201,11 +201,11 @@ void NewBreeze::createAndSetupActions() {
 	connect( SidePanel, SIGNAL( driveClicked( QString ) ),
 		FolderView, SLOT( doOpen( QString ) ) );
 
-	connect( FolderView, SIGNAL( copy( QStringList, QString, NBIOMode::Mode, NBJobMode::Mode ) ),
-		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode, NBJobMode::Mode ) ) );
+	connect( FolderView, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ),
+		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
 
-	connect( FolderView, SIGNAL( move( QStringList, QString, NBIOMode::Mode, NBJobMode::Mode ) ),
-		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode, NBJobMode::Mode ) ) );
+	connect( FolderView, SIGNAL( move( QStringList, QString, NBIOMode::Mode ) ),
+		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
 
 	connect( FolderView, SIGNAL( focusSearchBar() ),
 		this, SLOT( focusSearch() ) );
@@ -585,9 +585,9 @@ void NewBreeze::clearFilters() {
 	// FolderView->fsModel->setNameFilters( QStringList() );
 };
 
-void NewBreeze::initiateIO( QStringList sourceList, QString target, NBIOMode::Mode iomode, NBJobMode::Mode jobmode ) {
+void NewBreeze::initiateIO( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {
 
-	InfoBar->pWidget->addJob( sourceList, target, iomode, jobmode );
+	InfoBar->ioManager->addJob( sourceList, target, iomode );
 };
 
 void NewBreeze::openWithList() {

@@ -24,10 +24,12 @@ class NBViewsWidget : public QWidget {
 		QRadioButton *tlRB, *tdRB, *dbRB, *ntRB;
 		QLabel *imageLbl;
 		QCheckBox *nativeTitleBarCB;
+		QSpinBox *maxIOJobsSB;
 
 	private slots:
 		void handleThemeChanged();
 		void handleNativeTitleBarToggle( bool );
+		void handleMaxIOJobsChanged( int );
 };
 
 class NBIconThemeWidget : public QWidget {

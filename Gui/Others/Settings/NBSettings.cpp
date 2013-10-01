@@ -27,6 +27,7 @@ void NBSettings::readSettings() {
 	General.IconTheme  = gSettings.value( "IconTheme" ).toString();
 	General.ImagePreviews  = gSettings.value( "ImagePreviews" ).toBool();
 	General.NativeTitleBar = gSettings.value( "NativeTitleBar" ).toBool();
+	General.MaxIOJobs = gSettings.value( "MaxIOJobs" ).toLongLong();
 
 	Session.Geometry  = gSettings.value( "Session/Geometry" ).toRect();
 	Session.LastDir  = gSettings.value( "Session/LastDir" ).toString();
