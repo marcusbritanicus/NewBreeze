@@ -110,7 +110,8 @@ QSizeGrip {
 QToolTip {
 	border: none;
 	color: <textcolor>;
-	background-color: rbga( <27> );
+	background: rgba( <81> );
 	padding: 2px;
 	border-radius: 5px;
+	font-weight: bold;
 }

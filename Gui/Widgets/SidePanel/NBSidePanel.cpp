@@ -5,70 +5,73 @@
 */
 
 #include <NBSidePanel.hpp>
-#include <NBSPDeviceView.hpp>
-#include <NBSPBookmarksView.hpp>
-#include <NBShowHideWidget.hpp>
 #include <NBTools.hpp>
 
-NBSidePanel::NBSidePanel() : QWidget() {
-
-	createGUI();
-	setPanelProperties();
-};
-
-void NBSidePanel::createGUI() {
-
-	// No Focus
-	setFocusPolicy( Qt::NoFocus );
-
-	NBSPDeviceView *deviceView = new NBSPDeviceView();
-	NBShowHideWidget *deviceBase = new NBShowHideWidget( "Devices", deviceView );
-
-	NBSPBookmarksView *bookmarksView = new NBSPBookmarksView();
-	NBShowHideWidget *bookmarksBase = new NBShowHideWidget( "Bookmarks", bookmarksView );
-
-	connect( deviceView, SIGNAL( mountDrive( QString ) ), this, SIGNAL( driveClicked( QString) ) );
-	connect( bookmarksView, SIGNAL( mountDrive( QString ) ), this, SIGNAL( driveClicked( QString) ) );
-
-	int devWidth = deviceView->sizeHint().width();
-	int bmkWidth = bookmarksView->sizeHint().width();
-
+/*
 	if ( devWidth > bmkWidth )
 		sidePanelWidth = devWidth > 200 ? 200 : devWidth;
 
 	else
 		sidePanelWidth = bmkWidth > 200 ? 200 : bmkWidth;
+*/
 
-	// Layout
-	QVBoxLayout *scrollLyt = new QVBoxLayout();
-	scrollLyt->setContentsMargins( QMargins() );
-	scrollLyt->addWidget( deviceBase );
-	scrollLyt->addWidget( bookmarksBase );
-	scrollLyt->addStretch( 0 );
+NBSidePanel::NBSidePanel() {
 
-	QWidget *base = new QWidget();
-	base->setContentsMargins( QMargins() );
-	base->setLayout( scrollLyt );
+	spModel = new NBSidePanelModel();
+	setModel( spModel );
 
-	// Static Scroller
-	QScrollArea *scroll = new QScrollArea();
-	scroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	scroll->setContentsMargins( QMargins() );
-	scroll->setWidgetResizable( true );
-	scroll->setWidget( base );
+	setRootIndex( spModel->rootIndex() );
+	connect( this, SIGNAL( clicked( const QModelIndex ) ), this, SLOT( handleClick( const QModelIndex ) ) );
+
+	setupView();
+}
+
+void NBSidePanel::setupView() {
+
 	// No Focus
-	scroll->setFocusPolicy( Qt::NoFocus );
+	setFocusPolicy( Qt::NoFocus );
 
-	QVBoxLayout *sidePanelLyt = new QVBoxLayout();
-	sidePanelLyt->addWidget( scroll );
+	// StyleSheet
+	setStyleSheet( getStyleSheet( "NBSidePanel", Settings.General.Style ) );
 
-	setLayout( sidePanelLyt );
+	// No Header
+	setHeaderHidden( true );
+
+	// By default expand both Devices and Bookmarks
+	setExpanded( spModel->index( 0, 0 ), true );
+	setExpanded( spModel->index( 1, 0 ), true );
+
+	setFixedWidth( sizeHintForColumn( 0 ) );
 };
 
-void NBSidePanel::setPanelProperties() {
+void NBSidePanel::updateDevices() {
 
-	setStyleSheet( getStyleSheet( "NBSidePanel", Settings.General.Style ) );
-	setFixedWidth( sidePanelWidth + 30 );
+	setExpanded( spModel->index( 0, 0 ), false );
+	spModel->updateDeviceData();
+	setExpanded( spModel->index( 0, 0 ), true );
 
-	setMouseTracking( true );
+	setFixedWidth( sizeHintForColumn( 0 ) );
+};
+
+void NBSidePanel::updateBookmarks() {
+
+	setExpanded( spModel->index( 1, 0 ), false );
+	spModel->updateBookmarkData();
+	setExpanded( spModel->index( 1, 0 ), true );
+
+	setFixedWidth( sizeHintForColumn( 0 ) );
+};
+
+void NBSidePanel::handleClick( const QModelIndex clickedIndex ) {
+
+	if ( clickedIndex.parent().data() == "Devices" ) {
+		QVariant devVar = clickedIndex.data( Qt::UserRole + 1 );
+		NBDeviceInfo info = devVar.value<NBDeviceInfo>();
+		emit driveClicked( info.mountPoint() );
+	}
+
+	else if ( clickedIndex.parent().data() == "Bookmarks" ) {
+
+		emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
+	}
 };

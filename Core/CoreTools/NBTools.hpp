@@ -66,7 +66,7 @@ bool isArchiveAlt( QString mimeType );
 QString formatSize( qint64 );
 
 /*  */
-QString getStyleSheet( QString, QString Style = "Natural" );
+QString getStyleSheet( QString, QString Style = "LightGray" );
 
 /*  */
 QStringList getTerminal();

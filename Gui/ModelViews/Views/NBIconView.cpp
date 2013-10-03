@@ -217,13 +217,13 @@ void NBIconView::keyPressEvent( QKeyEvent *keyEvent) {
 		// If the current selected item is the last in the visual row
 		if ( ( curIndex.row() + 1 ) % itemsPerRow == 0 ) {
 			// then, move the cursor to the first item of the next visual row
-			setCurrentIndex( fsModel->index( curIndex.row() + 1, 0, curIndex.parent() ) );
+			selectionModel()->setCurrentIndex( fsModel->index( curIndex.row() + 1, 0, curIndex.parent() ), QItemSelectionModel::NoUpdate );
 		}
 
 		// If its the last item in the whole list
 		else if ( ( curIndex.row() + 1 ) == fsModel->rowCount() ) {
 			// Then go to the first one
-			setCurrentIndex( fsModel->index( 0, 0, curIndex.parent() ) );
+			selectionModel()->setCurrentIndex( fsModel->index( 0, 0, curIndex.parent() ), QItemSelectionModel::NoUpdate );
 		}
 
 		else {
@@ -237,13 +237,13 @@ void NBIconView::keyPressEvent( QKeyEvent *keyEvent) {
 		// If its the first item in the whole list
 		if ( ( curIndex.row() ) == 0 ) {
 			// Then go to the last one
-			setCurrentIndex( fsModel->index( fsModel->rowCount() - 1, 0, curIndex.parent() ) );
+			selectionModel()->setCurrentIndex( fsModel->index( fsModel->rowCount() - 1, 0, curIndex.parent() ), QItemSelectionModel::NoUpdate );
 		}
 
 		// If the current selected item is the first in the visual row
 		else if ( ( curIndex.row() ) % itemsPerRow == 0 ) {
 			// then, move the cursor to the last item of the previous visual row
-			setCurrentIndex( fsModel->index( curIndex.row() - 1, 0, curIndex.parent() ) );
+			selectionModel()->setCurrentIndex( fsModel->index( curIndex.row() - 1, 0, curIndex.parent() ), QItemSelectionModel::NoUpdate );
 		}
 
 		else {

@@ -89,16 +89,30 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 	}
 
 	// If it is an executable
+	else if ( mimetype.name() == QString( "application/x-desktop" ) ) {
+		// I won't use @v mimeIcon from mimetype, 'coz the icons for
+		// application/x-executable is always application-x-executable
+		QSettings dSettings( path, QSettings::NativeFormat );
+		QString icoStr = dSettings.value( "Desktop Entry/Icon" ).toString();
+
+		if ( hasIcon( icoStr ) )
+			return QString( icoStr );
+
+		else if ( hasIcon( "application-x-desktop" ) )
+			return QString( "application-x-desktop" );
+
+		else if ( hasIcon( "application-x-executable" ) )
+			return QString( "application-x-executable" );
+
+		else
+			return QString( ":/icons/exec.png" );
+	}
+
 	else if ( mimetype.name() == QString( "application/x-executable" ) ) {
 		// I won't use @v mimeIcon from mimetype, 'coz the icons for
 		// application/x-executable is always application-x-executable
 
 		if ( hasIcon( "application-x-executable" ) )
-			/*
-				*
-				* FIXME: QIcon( getIconPath( "application-x-executable" ) )
-				*
-			*/
 			return QString( "application-x-executable" );
 
 		else
@@ -166,6 +180,7 @@ bool NBIconProvider::hasIcon( QString icon ) {
 
 	QStringList themes = QStringList() << NBSystemIconTheme();
 	themes << getInheritedThemes( themes.at( 0 ) );
+	themes << "hicolor";
 	themes.removeDuplicates();
 
 	// Folders

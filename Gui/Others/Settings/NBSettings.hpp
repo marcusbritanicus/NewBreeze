@@ -26,7 +26,7 @@ class NBSettings {
 				QString IconTheme;
 				bool ImagePreviews;
 				bool NativeTitleBar;
-				quint64 MaxIOJobs;
+				int MaxIOJobs;
 		} General;
 
 		// Session Settings

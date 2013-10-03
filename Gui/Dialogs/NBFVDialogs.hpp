@@ -55,6 +55,9 @@ class NBNewFileFolderDialog : public NBDialog {
 		void createFileFolder();
 		void cancel();
 		void handleTextChanged( QString newText );
+
+	Q_SIGNALS:
+		void nodeCreated( QString );
 };
 
 class NBRunCmdDialog : public NBDialog {

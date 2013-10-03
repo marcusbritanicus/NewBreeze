@@ -9,7 +9,7 @@
 
 #include <Global.hpp>
 
-class NBFileIO : public QObject, public QRunnable {
+class NBFileIO : public QThread {
 	Q_OBJECT
 
 	public:

@@ -51,6 +51,9 @@ void NBIconDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 		QString text = model->data( index, Qt::DisplayRole ).toString();
 		QPixmap icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize );
 
+		if ( ( icon.size().width() > iconSize.width() ) or ( icon.size().height() > iconSize.height() ) )
+			icon = icon.scaled( iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+
 		QSize iSize = icon.size();
 
 		QRect textRect;

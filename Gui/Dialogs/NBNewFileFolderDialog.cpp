@@ -100,26 +100,42 @@ void NBNewFileFolderDialog::handleTextChanged( QString newText ) {
 void NBNewFileFolderDialog::createFileFolder() {
 
 	if ( windowTitle() == QString( "New Folder" ) ) {
-		if ( !dir.mkdir( le->text() ) )
+		if ( !dir.mkdir( le->text() ) ) {
 			NBMessageDialog::critical( "Access Error",
 				"There was an error creating the folder. May be you donot have sufficient permission to write here." );
+
+			return;
+		}
+
+		emit nodeCreated( dir.filePath( le->text() ) );
 	}
 
 	else if ( windowTitle() == QString( "New File" ) ) {
 		QFile file( dir.filePath( le->text() ) );
-		if ( !file.open( QFile::WriteOnly ) )
+		if ( !file.open( QFile::WriteOnly ) ) {
 			NBMessageDialog::critical( "Access Error",
 				"There was an error creating the file. May be you donot have sufficient permission to write here." );
+
+			return;
+		}
+
+		emit nodeCreated( dir.filePath( le->text() ) );
 		file.close();
 	}
 
 	else {
 		QFile file( dir.filePath( le->text() ) );
-		if ( !file.open( QFile::WriteOnly ) )
+		if ( !file.open( QFile::WriteOnly ) ) {
 			NBMessageDialog::critical( "Access Error",
 				"There was an error creating the file. May be you donot have sufficient permission to write here." );
+
+			return;
+		}
+
 		file.write( data.toStdString().c_str(), data.length() );
 		file.close();
+
+		emit nodeCreated( dir.filePath( le->text() ) );
 	}
 
 	close();
@@ -127,5 +143,6 @@ void NBNewFileFolderDialog::createFileFolder() {
 
 void NBNewFileFolderDialog::cancel() {
 
+	le->clear();
 	close();
 }

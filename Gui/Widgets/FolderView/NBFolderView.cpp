@@ -306,12 +306,14 @@ void NBFolderView::doOpenHome() {
 void NBFolderView::newFile() {
 
 	NBNewFileFolderDialog *newFile = new NBNewFileFolderDialog( "file", QDir( fsModel->currentDir() ) );
+	connect( newFile, SIGNAL( nodeCreated( QString ) ), this, SLOT( updateModel( QString ) ) );
 	newFile->exec();
 };
 
 void NBFolderView::newFolder() {
 
 	NBNewFileFolderDialog *newFolder = new NBNewFileFolderDialog( "dir", QDir( fsModel->currentDir() ) );
+	connect( newFolder, SIGNAL( nodeCreated( QString ) ), this, SLOT( updateModel( QString ) ) );
 	newFolder->exec();
 };
 

@@ -51,6 +51,8 @@ class NBDeviceInfo : public NBDeviceInfoPrivate {
 		quint64 dSz;		// Drive Size
 };
 
+Q_DECLARE_METATYPE(NBDeviceInfo);
+
 class NBDeviceManager {
 	public:
 		NBDeviceManager();

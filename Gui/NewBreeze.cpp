@@ -268,6 +268,11 @@ void NewBreeze::createAndSetupActions() {
 	addBookMarkAct->setShortcuts( Settings.Shortcuts.AddBookmark );
 	connect( addBookMarkAct, SIGNAL( triggered() ), this, SLOT( addBookMark() ) );
 
+	// Update devices list
+	int mountsFD = open( "/proc/self/mounts", O_RDONLY, 0 );
+	QSocketNotifier *devWatcher = new QSocketNotifier( mountsFD, QSocketNotifier::Write );
+	connect( devWatcher, SIGNAL( activated( int ) ), SidePanel, SLOT( updateDevices() ) );
+
 	QAction *termWidgetAct = new QAction( this );
 	termWidgetAct->setShortcuts( Settings.Shortcuts.InlineTerminal );
 	connect( termWidgetAct, SIGNAL( triggered() ), this, SLOT( showHideTermWidget() ) );
@@ -405,10 +410,11 @@ void NewBreeze::addBookMark() {
 
 	QStringList order = bookmarkSettings.value( "Order" ).toStringList();
 
-	QString bmkPath, label;
+	QString bmkPath = FolderView->fsModel->currentDir();
+	if ( bmkPath.endsWith( "/" ) )
+		bmkPath.chop( 1 );
 
-	bmkPath = FolderView->fsModel->currentDir();
-	label = QFileInfo( bmkPath ).isRoot() ? "FileSystem" : QFileInfo( bmkPath ).fileName();
+	QString label = QFileInfo( bmkPath ).isRoot() ? "FileSystem" : baseName( bmkPath );
 
 	order << bmkPath;
 	order.removeDuplicates();
@@ -416,6 +422,8 @@ void NewBreeze::addBookMark() {
 	bookmarkSettings.setValue( QUrl::toPercentEncoding( bmkPath ), label );
 	bookmarkSettings.setValue( "Order", order );
 	bookmarkSettings.sync();
+
+	SidePanel->updateBookmarks();
 };
 
 void NewBreeze::showHideTermWidget() {

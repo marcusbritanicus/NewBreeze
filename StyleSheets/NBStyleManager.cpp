@@ -12,9 +12,9 @@ NBStyleManager::NBStyleManager() {
 	variableMap[ "<bg>" ] = QStringList() << QString( "bg" ) << QString( "bg2" ) << QString( "" ) << QString( "bg" );
 	variableMap[ "<bgcolor>" ] = QStringList() << QString( "transparent" ) << QString( "transparent" ) << QString( "lightgray" ) << QString( "transparent" );
 	variableMap[ "<textcolor>" ] = QStringList() << QString( "white" ) << QString( "black" ) << QString( "black" ) << QString( "white" );
-	variableMap[ "<81>" ] = QStringList() << QString( "0, 0, 0, 81%" ) << QString( "255, 255, 255, 81%" ) << QString( "255, 255, 255, 100%" ) << QString( "0, 0, 0, 81%" );
-	variableMap[ "<72>" ] = QStringList() << QString( "0, 0, 0, 72%" ) << QString( "255, 255, 255, 72%" ) << QString( "255, 255, 255, 100%" ) << QString( "0, 0, 0, 72%" );
-	variableMap[ "<27>" ] = QStringList() << QString( "0, 0, 0, 27%" ) << QString( "255, 255, 255, 27%" ) << QString( "255, 255, 255, 100%" ) << QString( "0, 0, 0, 27%" );
+	variableMap[ "<81>" ] = QStringList() << QString( "0, 0, 0, 206" ) << QString( "255, 255, 255, 206" ) << QString( "255, 255, 255, 255" ) << QString( "0, 0, 0, 255" );
+	variableMap[ "<72>" ] = QStringList() << QString( "0, 0, 0, 183" ) << QString( "255, 255, 255, 183" ) << QString( "255, 255, 255, 255" ) << QString( "0, 0, 0, 255" );
+	variableMap[ "<27>" ] = QStringList() << QString( "0, 0, 0,  68" ) << QString( "255, 255, 255,  68" ) << QString( "255, 255, 255, 255" ) << QString( "0, 0, 0, 255" );
 	variableMap[ "<bordercolor>" ] = QStringList() << QString( "white" ) << QString( "black" ) << QString( "black" ) << QString( "white" );
 	variableMap[ "<disabled>" ] = QStringList() << QString( "lightgray" ) << QString( "gray" ) << QString( "gray" ) << QString( "lightgray" );
 	variableMap[ "<checked>" ] = QStringList() << QString( "checked" ) << QString( "checkedn" ) << QString( "checkedn" ) << QString( "checked" );
@@ -33,7 +33,7 @@ QString NBStyleManager::getStyleSheet( QString widget, QString style ) {
 	else if ( style == QString( "LightGray" ) )
 		return getStyleSheetLG( widget );
 
-	else
+	else // DullBlack
 		return getStyleSheetDB( widget );
 };
 

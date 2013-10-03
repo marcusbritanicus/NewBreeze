@@ -77,7 +77,7 @@ class NBIOManager : public QFrame {
 
 	private:
 		QMap<QString, NBFileIO*> jobList;
-		QThreadPool *threadPool;
+		QMap<QString, NBFileIO*> pendingJobs;
 
 		QPainter *painter;
 		float totalF, cfileF;

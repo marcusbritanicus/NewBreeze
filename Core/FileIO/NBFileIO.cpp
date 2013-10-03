@@ -8,7 +8,7 @@
 #include <NBTools.hpp>
 #include <NBDeleteManager.hpp>
 
-NBFileIO::NBFileIO() : QObject(), QRunnable() {
+NBFileIO::NBFileIO() : QThread() {
 
 	nodes = 0;
 	totalBytesToBeCopied = 0;

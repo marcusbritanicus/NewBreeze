@@ -11,9 +11,6 @@ NBIOManager::NBIOManager() : QFrame() {
 	checked = false;
 	jobList.clear();
 
-	threadPool = QThreadPool::globalInstance();
-	threadPool->setMaxThreadCount( Settings.General.MaxIOJobs );
-
 	progressPopup = new NBProgressPopup();
 
 	totalF = 0;
@@ -61,11 +58,16 @@ void NBIOManager::addJob( QStringList sourceList, QString target, NBIOMode::Mode
 		this, SLOT( handleJobComplete( QString, QStringList ) )
 	);
 
-	jobList[ jobid ] = fileIO;
+	if ( jobList.count() < Settings.General.MaxIOJobs ) {
+		jobList[ jobid ] = fileIO;
+		fileIO->start();
+	}
+
+	else {
+		pendingJobs[ jobid ] = fileIO;
+	}
 
 	manageTimer();
-
-	threadPool->start( fileIO );
 };
 
 bool NBIOManager::cancelJob( QString jobID ) {
@@ -102,7 +104,7 @@ float NBIOManager::totalProgress() {
 
 int NBIOManager::activeJobs() {
 
-	return threadPool->activeThreadCount();
+	return jobList.count();
 };
 
 void NBIOManager::paintEvent( QPaintEvent *pEvent ) {
@@ -194,8 +196,6 @@ void NBIOManager::manageTimer() {
 		// And timer is not active, activate it
 		if ( not timer->isActive() )
 			timer->start( 500 );
-
-		qDebug() << "Timer activated:" << timer->isActive();
 	}
 
 	// If there are no active jobs,
@@ -226,10 +226,25 @@ void NBIOManager::updateProgress() {
 
 void NBIOManager::handleJobComplete( QString jobID, QStringList errorNodes ) {
 
+	/*
+		*
+		* This must be used to show the error dialog. Currently we
+		* are struggling with other issues, so we are skipping it.
+		*
+	*/
+	#warning "Show the error dialog";
 	Q_UNUSED( errorNodes );
 
 	jobList.value( jobID )->deleteLater();
 	jobList.remove( jobID );
+
+	if ( ( pendingJobs.count() ) and ( jobList.count() < Settings.General.MaxIOJobs ) ) {
+		QString id = pendingJobs.keys().at( 0 );
+		NBFileIO *io = pendingJobs.value( id );
+
+		io->start();
+		jobList[ id ] = io;
+	}
 };
 
 NBProgressDisplay::NBProgressDisplay( QStringList sourceList, QString target ) : QWidget() {

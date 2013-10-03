@@ -4,6 +4,13 @@ QWidget {
 	border: none;
 }
 
+QTreeView {
+	background-color: <bgcolor>;
+	alternate-background-color: rgba( <27> );
+	color: <textcolor>;
+	border: none;
+}
+
 QListView {
 	background: transparent;
 	color: <textcolor>;

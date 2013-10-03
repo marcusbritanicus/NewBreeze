@@ -35,6 +35,7 @@
 int main( int argc, char **argv ) {
 
 	qInstallMsgHandler( NBMessageOutput );
+	qRegisterMetaType<NBDeviceInfo>( "NBDeviceInfo" );
 
 	QApplication app( argc, argv );
 	app.setOrganizationName( "NewBreeze" );
