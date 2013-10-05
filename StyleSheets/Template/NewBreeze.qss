@@ -19,6 +19,27 @@ QTreeView#mainList {
 	border: none;
 }
 
+QHeaderView {
+	background: <bgcolor>;
+}
+
+QHeaderView::section {
+	background: <bgcolor>;
+	border-bottom: 1px solid gray;
+	border-top: none;
+	font-weight: bold;
+	color: <textcolor>;
+	height: 20px;
+}
+
+QHeaderView::down-arrow {
+	image: url(:/icons/arrow-down.png);
+}
+
+QHeaderView::up-arrow {
+	image: url(:/icons/arrow-up.png);
+}
+
 QScrollBar:vertical {
 	background-color: <bgcolor>;
 	max-width: 8px;

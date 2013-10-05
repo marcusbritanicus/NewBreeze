@@ -15,16 +15,20 @@ class NBTitleBar : public QWidget {
 
 	public:
 		NBTitleBar();
+		~NBTitleBar();
+
 		void setTitle( QString );
 		void setIcon( QIcon );
 
 		bool isMaximized;
-		NBTitleIcon *iconLbl;
 
 	private:
-		QLabel *titleLbl;
+		QString m_title;
+		QIcon m_icon;
 
 		QToolButton *closeBtn, *maxBtn, *minBtn;
+
+		QPainter *painter;
 
 	public slots:
 		void closeBtnClicked();
@@ -35,14 +39,19 @@ class NBTitleBar : public QWidget {
 		void mouseDoubleClickEvent( QMouseEvent * );
 		void mousePressEvent( QMouseEvent * );
 		void mouseMoveEvent( QMouseEvent * );
+		void paintEvent( QPaintEvent * );
 
 	signals:
 		void restoreWindow();
 		void maximizeWindow();
 		void minimizeWindow();
+
 		void closeWindow();
 		void titlebarMousePress( QMouseEvent * );
 		void titlebarMouseMove( QMouseEvent * );
+
+		void aboutNB();
+		void aboutQt4();
 };
 
 #endif

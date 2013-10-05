@@ -71,6 +71,7 @@ int NBFileSystemNode::columnCount() {
 		*
 	*/
 
+	qDebug() << nodeData.count() - 3;
 	return nodeData.count() - 3;
 };
 

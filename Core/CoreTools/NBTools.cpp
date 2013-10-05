@@ -339,6 +339,9 @@ bool isExec( QString path ) {
 	if ( execMimes.contains( getMimeTypeAlt( path ) ) )
 		return true;
 
+	if ( QFileInfo( path ).isExecutable() )
+		return true;
+
 	return false;
 };
 

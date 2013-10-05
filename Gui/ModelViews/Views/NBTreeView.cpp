@@ -15,6 +15,9 @@ NBTreeView::NBTreeView( NBFileSystemModel *fsm ) : QTreeView(), fsModel( fsm ) {
 	// iDelegate = new NBTreeDelegate();
 	// setItemDelegate( iDelegate );
 
+	// No Editing
+	setEditTriggers( NoEditTriggers );
+
 	// View, Sizes and Resize Modes
 	updateViewMode();
 
@@ -49,22 +52,24 @@ NBTreeView::NBTreeView( NBFileSystemModel *fsm ) : QTreeView(), fsModel( fsm ) {
 	// Selection
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 
+	// Header bg
+	header()->setAttribute( Qt::WA_TranslucentBackground );
+
+	// Default section width
+	header()->setMinimumSectionSize( 75 );
+
 	// Column Sizes
 	header()->setStretchLastSection( false );
 	header()->setResizeMode( 0, QHeaderView::Stretch );
-	header()->setResizeMode( 1, QHeaderView::Fixed );
-	header()->setResizeMode( 2, QHeaderView::Fixed );
-	header()->setResizeMode( 3, QHeaderView::Fixed );
-	header()->setResizeMode( 4, QHeaderView::Fixed );
-	header()->setResizeMode( 5, QHeaderView::Fixed );
-	header()->setResizeMode( 6, QHeaderView::Fixed );
 
-	header()->resizeSection( 1, 50 );
-	header()->resizeSection( 2, 100 );
-	header()->resizeSection( 3, 100 );
+	// Hide 2 and 5: File type verbose and Permissions
+	header()->setSectionHidden( 2, true );
+	header()->setSectionHidden( 5, true );
+
+	header()->resizeSection( 1, 75 );
+	header()->resizeSection( 3, 150 );
 	header()->resizeSection( 4, 150 );
-	header()->resizeSection( 5, 150 );
-	header()->resizeSection( 6, 150 );
+	header()->resizeSection( 6, 75 );
 
 	// Context Menu
 	setContextMenuPolicy( Qt::CustomContextMenu );
@@ -74,9 +79,6 @@ NBTreeView::NBTreeView( NBFileSystemModel *fsm ) : QTreeView(), fsModel( fsm ) {
 
 	// Give this object a name
 	setObjectName( "mainList" );
-
-	// StyleSheet
-	setStyleSheet(  getStyleSheet( "NewBreeze", Settings.General.Style ) );
 };
 
 void NBTreeView::updateViewMode() {

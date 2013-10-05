@@ -9,17 +9,15 @@
 
 NBTitleBar::NBTitleBar() : QWidget() {
 
+	painter = new QPainter();
+
 	setObjectName( tr( "TitleBar") );
 	setFixedHeight( 24 );
 
 	isMaximized = true;
 
-	iconLbl = new NBTitleIcon( ":/icons/newbreeze.png" );
-	iconLbl->setPixmap( QPixmap() );
-
-	titleLbl = new QLabel();
-	titleLbl->setText( QString() );
-	titleLbl->setFont( QFont( "Architects Daughter", 10 ) );
+	m_icon = QIcon( ":/icons/newbreeze.png" );
+	m_title = QString( "NewBreeze" );
 
 	closeBtn = new QToolButton();
 	closeBtn->setObjectName( tr( "closeBtn" ) );
@@ -43,9 +41,6 @@ NBTitleBar::NBTitleBar() : QWidget() {
 	QHBoxLayout *lyt = new QHBoxLayout();
 	lyt->setContentsMargins( 0, 2, 0, 0 );
 
-	lyt->addWidget( iconLbl );
-	lyt->addStretch( 0 );
-	lyt->addWidget( titleLbl );
 	lyt->addStretch( 0 );
 	lyt->addWidget( minBtn );
 	lyt->addWidget( maxBtn );
@@ -54,16 +49,34 @@ NBTitleBar::NBTitleBar() : QWidget() {
 	setLayout( lyt );
 
 	setStyleSheet( getStyleSheet( "NBTitleBar", Settings.General.Style ) );
+
+	QAction *aboutNBAct = new QAction( "About NewBreeze", this );
+	aboutNBAct->setShortcuts( Settings.Shortcuts.AboutNB );
+	connect( aboutNBAct, SIGNAL( triggered() ), this, SIGNAL( aboutNB() ) );
+
+	QAction *aboutQt4Act = new QAction( "About Qt4", this );
+	aboutQt4Act->setShortcuts( Settings.Shortcuts.AboutQt );
+	connect( aboutQt4Act, SIGNAL( triggered() ), this, SIGNAL( aboutQt4() ) );
+};
+
+NBTitleBar::~NBTitleBar() {
+
+	if ( painter->isActive() )
+		painter->end();
+
+	delete painter;
 };
 
 void NBTitleBar::setTitle( QString title ) {
 
-	titleLbl->setText( title );
+	m_title = title;
+	repaint();
 };
 
 void NBTitleBar::setIcon( QIcon icon ) {
 
-	iconLbl->setPixmap( icon.pixmap( 21, 21, QIcon::Normal, QIcon::Off ) );
+	m_icon = icon;
+	repaint();
 };
 
 void NBTitleBar::closeBtnClicked() {
@@ -106,4 +119,20 @@ void NBTitleBar::mouseMoveEvent( QMouseEvent *mmEvent ) {
 		emit titlebarMouseMove( mmEvent );
 		mmEvent->accept();
 	}
+};
+
+void NBTitleBar::paintEvent( QPaintEvent *pEvent ) {
+
+	painter->begin( this );
+	painter->setRenderHints( QPainter::Antialiasing );
+
+	// We leave 5 pixels each on the top bottom and left
+	// Vertically we need to drop 7 to make it appear VCentered
+	QPixmap iconPix = m_icon.pixmap( 20, 20 );
+	painter->drawPixmap( 5, 7, iconPix );
+
+	painter->drawText( 0, 0, width(), height(), Qt::AlignCenter, m_title );
+
+	painter->end();
+	pEvent->accept();
 };

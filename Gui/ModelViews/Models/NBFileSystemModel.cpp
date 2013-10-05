@@ -58,11 +58,8 @@ int NBFileSystemModel::rowCount( const QModelIndex & parent ) const {
 
 int NBFileSystemModel::columnCount( const QModelIndex & parent ) const {
 
-	if ( parent.isValid() )
-		return static_cast<NBFileSystemNode*>( parent.internalPointer() )->columnCount();
-
-	else
-		return rootNode->columnCount();
+	Q_UNUSED( parent );
+	return 7;
 };
 
 Qt::ItemFlags NBFileSystemModel::flags( const QModelIndex & index ) const {

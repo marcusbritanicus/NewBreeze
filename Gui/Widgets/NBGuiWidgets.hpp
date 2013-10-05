@@ -142,7 +142,7 @@ class NBDriveLabel : public QWidget {
 		QString label;
 
 	protected:
-		virtual void paintEvent( QPaintEvent * );
+		void paintEvent( QPaintEvent * );
 };
 
 class NBDriveInfo : public QFrame {

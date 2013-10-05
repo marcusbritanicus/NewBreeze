@@ -277,7 +277,7 @@ void NBFolderView::createAndSetupActions() {
 QModelIndexList NBFolderView::getSelection() {
 
 	if ( currentIndex() )
-		return TreeView->selectionModel()->selectedIndexes();
+		return TreeView->selectionModel()->selectedRows();
 
 	else
 		return IconView->selectionModel()->selectedIndexes();
@@ -319,20 +319,10 @@ void NBFolderView::newFolder() {
 
 void NBFolderView::doOpen( QString loc ) {
 
-	if ( !QFileInfo( loc ).isAbsolute() )
-		loc = QFileInfo( loc ).absoluteFilePath();
-
-	QFileInfo info( loc );
-
-	bool hasPermission = true;
-	hasPermission &= info.isReadable();
-	if ( info.isDir() )
-		hasPermission &= info.isExecutable();
-
-	if ( !hasPermission ) {
+	if ( not isReadable( loc ) ) {
 		QString title = tr( "Access Error" );
-		QString text = tr( "You do not have enough permissions to open the <b>%1</b>. " ).arg( info.fileName() );
-		if ( info.isDir() )
+		QString text = tr( "You do not have enough permissions to open <b>%1</b>. " ).arg( baseName( loc ) );
+		if ( isDir( loc ) )
 			text += tr( "Please change the permissions of the directory to enter it." );
 
 		else
@@ -342,12 +332,12 @@ void NBFolderView::doOpen( QString loc ) {
 		return;
 	}
 
-	if ( info.isDir() ) {
+	if ( isDir( loc ) ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", qPrintable( loc ) );
 		fsModel->setRootPath( loc );
 	}
 
-	else if ( info.isFile() ) {
+	else if ( isFile( loc ) ) {
 		NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s", qPrintable( loc ) );
 		NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( "xdg-open", QStringList() << loc ) ? "[DONE]" : " [FAILED]" ) );
 	}
@@ -369,18 +359,12 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 	QList<QModelIndex> selectedList = getSelection();
 
 	foreach( QModelIndex index, selectedList ) {
-		QFileInfo info = fsModel->nodeInfo( index );
-		QString fileToBeOpened = info.absoluteFilePath();
+		QString fileToBeOpened = fsModel->nodePath( index );
 
-		bool hasPermission = true;
-		hasPermission &= info.isReadable();
-		if ( info.isDir() )
-			hasPermission &= info.isExecutable();
-
-		if ( !hasPermission ) {
+		if ( not isReadable( fileToBeOpened ) ) {
 			QString title = tr( "Access Error" );
-			QString text = tr( "You do not have enough permissions to open the <b>%1</b>. " ).arg( index.data().toString() );
-			if ( info.isDir() )
+			QString text = tr( "You do not have enough permissions to open <b>%1</b>. " ).arg( baseName( fileToBeOpened ) );
+			if ( isDir( fileToBeOpened ) )
 				text += tr( "Please change the permissions of the directory to enter it." );
 
 			else
@@ -390,13 +374,13 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			return;
 		}
 
-		if ( info.isDir() ) {
+		if ( isDir( fileToBeOpened ) ) {
 			NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", qPrintable( fileToBeOpened ) );
 			fsModel->setRootPath( fileToBeOpened );
 		}
 
-		else if ( info.isFile() ) {
-			if ( info.isExecutable() and isExec( fileToBeOpened ) ) {
+		else if ( isFile( fileToBeOpened ) ) {
+			if ( isExec( fileToBeOpened ) ) {
 				/*
 					*
 					* We make sure that @v fileToBeOpened is really an executable file,
@@ -405,7 +389,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 					*
 				*/
 				NBDebugMsg( DbgMsgPart::HEAD, "Executing: %s... ", qPrintable( fileToBeOpened ) );
-				NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( info.absoluteFilePath() ) ? "[DONE]" : "[FAILED]" ) );
+				NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( fileToBeOpened ) ? "[DONE]" : "[FAILED]" ) );
 			}
 
 			else {

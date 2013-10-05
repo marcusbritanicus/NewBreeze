@@ -138,10 +138,10 @@ void NewBreeze::setWindowIcon( QIcon icon ) {
 
 void NewBreeze::createAndSetupActions() {
 
-	connect( TitleBar->iconLbl, SIGNAL( aboutNB() ),
+	connect( TitleBar, SIGNAL( aboutNB() ),
 		this, SLOT( showAboutNB() ) );
 
-	connect( TitleBar->iconLbl, SIGNAL( aboutQt4() ),
+	connect( TitleBar, SIGNAL( aboutQt4() ),
 		this, SLOT( showAboutQt4() ) );
 
 	connect( TitleBar, SIGNAL( titlebarMousePress( QMouseEvent * ) ),
@@ -298,11 +298,11 @@ void NewBreeze::createAndSetupActions() {
 
 void NewBreeze::updateGUI() {
 
-	TitleBar->setStyleSheet( getStyleSheet( "NBTitleBar", Settings.General.Style ) );
-	AddressBar->setStyleSheet( getStyleSheet( "NBTooBar", Settings.General.Style ) );
-	SidePanel->setStyleSheet( getStyleSheet( "NBSidePanel", Settings.General.Style ) );
-	Terminal->setStyleSheet( getStyleSheet( "NBTerminal", Settings.General.Style ) );
-	InfoBar->setStyleSheet( getStyleSheet( "NBInfoBar", Settings.General.Style ) );
+	// TitleBar->setStyleSheet( getStyleSheet( "NBTitleBar", Settings.General.Style ) );
+	// AddressBar->setStyleSheet( getStyleSheet( "NBTooBar", Settings.General.Style ) );
+	// SidePanel->setStyleSheet( getStyleSheet( "NBSidePanel", Settings.General.Style ) );
+	// Terminal->setStyleSheet( getStyleSheet( "NBTerminal", Settings.General.Style ) );
+	// InfoBar->setStyleSheet( getStyleSheet( "NBInfoBar", Settings.General.Style ) );
 
 	setWindowProperties();
 };
@@ -480,7 +480,7 @@ void NewBreeze::showInfoDlg() {
 
 	dlgLyt->addWidget( widget );
 	shortcutDlg->setLayout( dlgLyt );
-	shortcutDlg->setStyleSheet( getStyleSheet( "NBDialog", Settings.General.Style ) );
+	// shortcutDlg->setStyleSheet( getStyleSheet( "NBDialog", Settings.General.Style ) );
 
 	shortcutDlg->setFixedSize( QSize( 720, 630 ) );
 

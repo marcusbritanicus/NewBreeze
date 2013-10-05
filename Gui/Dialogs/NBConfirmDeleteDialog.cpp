@@ -73,7 +73,6 @@ void NBConfirmDeleteDialog::setupGUI( bool permanent ) {
 
 	setFixedSize( 480, 200 );
 
-	table->setStyleSheet( getStyleSheet( "NBConfirmDeleteDialog", settings.value( "Style" ).toString() ) );
 	cancelBtn->setFocus();
 };
 

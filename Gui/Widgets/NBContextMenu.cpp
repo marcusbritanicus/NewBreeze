@@ -288,14 +288,14 @@ void NBFolderView::showContextMenu( QPoint position ) {
 	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
 		menu->setAttribute( Qt::WA_TranslucentBackground );
 
-    menu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+    // menu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
 
 	if ( selectedList.isEmpty() ) {
 
 		// Create a new file/directory
 		QMenu *createNewMenu = new QMenu( "Create &New" );
 		createNewMenu->setAttribute( Qt::WA_TranslucentBackground );
-		createNewMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+		// createNewMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
 		createNewMenu->setIcon( QIcon::fromTheme( "archive-insert" ) );
 
 		createNewMenu->addAction( actNewDir );
@@ -306,7 +306,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
 		if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
 			sortMenu->setAttribute( Qt::WA_TranslucentBackground );
-		sortMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+		// sortMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
 
 		sortMenu->addAction( sortByNameAct );
 		sortMenu->addAction( sortBySizeAct );
@@ -355,7 +355,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
 		if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
 			sortMenu->setAttribute( Qt::WA_TranslucentBackground );
-		sortMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+		// sortMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
 
 		sortMenu->addAction( sortByNameAct );
 		sortMenu->addAction( sortBySizeAct );
@@ -400,7 +400,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
 		if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
 			sortMenu->setAttribute( Qt::WA_TranslucentBackground );
-		sortMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+		// sortMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
 
 		sortMenu->addAction( sortByNameAct );
 		sortMenu->addAction( sortBySizeAct );

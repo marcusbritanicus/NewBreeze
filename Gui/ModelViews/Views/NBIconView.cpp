@@ -19,6 +19,9 @@ NBIconView::NBIconView( NBFileSystemModel *fsm ) : QListView(), fsModel( fsm ) {
 	iDelegate = new NBIconDelegate();
 	setItemDelegate( iDelegate );
 
+	// No Editing
+	setEditTriggers( NoEditTriggers );
+
 	// View, Sizes and Resize Modes
 	updateViewMode();
 
@@ -38,11 +41,11 @@ NBIconView::NBIconView( NBFileSystemModel *fsm ) : QListView(), fsModel( fsm ) {
 	setMouseTracking( true );
 
 	// DragAndDrop
-	viewport()->setAcceptDrops(true);
-	setDragDropMode( QListView::DragDrop );
-	setDropIndicatorShown( true );
+	viewport()->setAcceptDrops( true );
 	setDragEnabled( true );
 	setAcceptDrops( true );
+	setDragDropMode( QListView::DragDrop );
+	setDropIndicatorShown( true );
 
 	// Selection
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
@@ -184,6 +187,7 @@ void NBIconView::createAndSetupActions() {
 		this, SIGNAL( contextMenuRequested( QPoint ) )
 	);
 };
+
 QSize NBIconView::getGridSize( QSize mSize ) {
 
 	// These are the items per row
@@ -215,20 +219,34 @@ void NBIconView::keyPressEvent( QKeyEvent *keyEvent) {
 
 	if ( keyEvent->key() == Qt::Key_Right ) {
 		// If the current selected item is the last in the visual row
-		if ( ( curIndex.row() + 1 ) % itemsPerRow == 0 ) {
-			// then, move the cursor to the first item of the next visual row
-			selectionModel()->setCurrentIndex( fsModel->index( curIndex.row() + 1, 0, curIndex.parent() ), QItemSelectionModel::NoUpdate );
-		}
-
-		// If its the last item in the whole list
-		else if ( ( curIndex.row() + 1 ) == fsModel->rowCount() ) {
+		if ( ( curIndex.row() + 1 ) == fsModel->rowCount() ) {
 			// Then go to the first one
-			selectionModel()->setCurrentIndex( fsModel->index( 0, 0, curIndex.parent() ), QItemSelectionModel::NoUpdate );
+			QModelIndex newIndex( fsModel->index( 0, 0, curIndex.parent() ) );
+			// If the user is using control key, meaning using extended selection, then no update
+			if ( qApp->queryKeyboardModifiers() & Qt::ControlModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::NoUpdate );
+
+			else if ( qApp->queryKeyboardModifiers() & Qt::ShiftModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::Select );
+
+			// otherwise, select it
+			else
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::ClearAndSelect );
 		}
 
 		else {
-			// Otherwise do the usual moves
-			QListView::keyPressEvent( keyEvent );
+			// then, move the selection/current index to the next item
+			QModelIndex newIndex( fsModel->index( curIndex.row() + 1, 0, curIndex.parent() ) );
+			// If the user is using control key, meaning using extended selection, then no update
+			if ( qApp->queryKeyboardModifiers() & Qt::ControlModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::NoUpdate );
+
+			else if ( qApp->queryKeyboardModifiers() & Qt::ShiftModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::Select );
+
+			// otherwise, select it
+			else
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::ClearAndSelect );
 		}
 	}
 
@@ -237,18 +255,33 @@ void NBIconView::keyPressEvent( QKeyEvent *keyEvent) {
 		// If its the first item in the whole list
 		if ( ( curIndex.row() ) == 0 ) {
 			// Then go to the last one
-			selectionModel()->setCurrentIndex( fsModel->index( fsModel->rowCount() - 1, 0, curIndex.parent() ), QItemSelectionModel::NoUpdate );
+			QModelIndex newIndex( fsModel->index( fsModel->rowCount() - 1, 0, curIndex.parent() ) );
+			// If the user is using control key, meaning using extended selection, then no update
+			if ( qApp->queryKeyboardModifiers() & Qt::ControlModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::NoUpdate );
+
+			else if ( qApp->queryKeyboardModifiers() & Qt::ShiftModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::Select );
+
+			// otherwise, select it
+			else
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::ClearAndSelect );
 		}
 
 		// If the current selected item is the first in the visual row
-		else if ( ( curIndex.row() ) % itemsPerRow == 0 ) {
-			// then, move the cursor to the last item of the previous visual row
-			selectionModel()->setCurrentIndex( fsModel->index( curIndex.row() - 1, 0, curIndex.parent() ), QItemSelectionModel::NoUpdate );
-		}
-
 		else {
-			// Otherwise do the usual moves
-			QListView::keyPressEvent( keyEvent );
+			// then, move the cursor to the last item of the previous visual row
+			QModelIndex newIndex( fsModel->index( curIndex.row() - 1, 0, curIndex.parent() ) );
+			// If the user is using control key, meaning using extended selection, then no update
+			if ( qApp->queryKeyboardModifiers() & Qt::ControlModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::NoUpdate );
+
+			else if ( qApp->queryKeyboardModifiers() & Qt::ShiftModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::Select );
+
+			// otherwise, select it
+			else
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::ClearAndSelect );
 		}
 	}
 
