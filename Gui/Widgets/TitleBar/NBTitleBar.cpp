@@ -19,44 +19,20 @@ NBTitleBar::NBTitleBar() : QWidget() {
 	m_icon = QIcon( ":/icons/newbreeze.png" );
 	m_title = QString( "NewBreeze" );
 
-	closeBtn = new QToolButton();
-	closeBtn->setObjectName( tr( "closeBtn" ) );
-	closeBtn->setText( trUtf8( "\u2718" ) );
-	connect( closeBtn, SIGNAL( clicked() ), this, SLOT( closeBtnClicked() ) );
-
-	minBtn = new QToolButton();
-	minBtn->setObjectName( tr( "minBtn" ) );
-	minBtn->setText( trUtf8( "\u25AC" ) );
-	connect( minBtn, SIGNAL( clicked() ), this, SLOT( minBtnClicked() ) );
-
-	maxBtn = new QToolButton();
-	maxBtn->setObjectName( tr( "maxBtn" ) );
-	maxBtn->setText( trUtf8( "\u25A1" ) );
-	connect( maxBtn, SIGNAL( clicked() ), this, SLOT( maxBtnClicked() ) );
-
-	closeBtn->setFocusPolicy( Qt::NoFocus );
-	minBtn->setFocusPolicy( Qt::NoFocus );
-	maxBtn->setFocusPolicy( Qt::NoFocus );
+	NBActionButtons *actBtns = new NBActionButtons( true, true, true );
+	connect( actBtns, SIGNAL( minimizeWindow() ), this, SIGNAL( minimizeWindow() ) );
+	connect( actBtns, SIGNAL( maximizeWindow() ), this, SLOT( maxBtnClicked() ) );
+	connect( actBtns, SIGNAL( closeWindow() ), this, SIGNAL( closeWindow() ) );
 
 	QHBoxLayout *lyt = new QHBoxLayout();
 	lyt->setContentsMargins( 0, 2, 0, 0 );
 
 	lyt->addStretch( 0 );
-	lyt->addWidget( minBtn );
-	lyt->addWidget( maxBtn );
-	lyt->addWidget( closeBtn );
+	lyt->addWidget( actBtns );
 
 	setLayout( lyt );
 
 	setStyleSheet( getStyleSheet( "NBTitleBar", Settings.General.Style ) );
-
-	QAction *aboutNBAct = new QAction( "About NewBreeze", this );
-	aboutNBAct->setShortcuts( Settings.Shortcuts.AboutNB );
-	connect( aboutNBAct, SIGNAL( triggered() ), this, SIGNAL( aboutNB() ) );
-
-	QAction *aboutQt4Act = new QAction( "About Qt4", this );
-	aboutQt4Act->setShortcuts( Settings.Shortcuts.AboutQt );
-	connect( aboutQt4Act, SIGNAL( triggered() ), this, SIGNAL( aboutQt4() ) );
 };
 
 NBTitleBar::~NBTitleBar() {
@@ -79,20 +55,11 @@ void NBTitleBar::setIcon( QIcon icon ) {
 	repaint();
 };
 
-void NBTitleBar::closeBtnClicked() {
-
-	emit closeWindow();
-};
-
-void NBTitleBar::minBtnClicked() {
-
-	emit minimizeWindow();
-};
-
 void NBTitleBar::maxBtnClicked() {
 
 	if ( isMaximized )
 		emit restoreWindow();
+
 	else
 		emit maximizeWindow();
 };
@@ -101,6 +68,7 @@ void NBTitleBar::mouseDoubleClickEvent( QMouseEvent * ) {
 
 	if ( isMaximized )
 		emit restoreWindow();
+
 	else
 		emit maximizeWindow();
 };
@@ -119,6 +87,8 @@ void NBTitleBar::mouseMoveEvent( QMouseEvent *mmEvent ) {
 		emit titlebarMouseMove( mmEvent );
 		mmEvent->accept();
 	}
+
+	QWidget::mouseMoveEvent( mmEvent );
 };
 
 void NBTitleBar::paintEvent( QPaintEvent *pEvent ) {
@@ -131,7 +101,130 @@ void NBTitleBar::paintEvent( QPaintEvent *pEvent ) {
 	QPixmap iconPix = m_icon.pixmap( 20, 20 );
 	painter->drawPixmap( 5, 7, iconPix );
 
-	painter->drawText( 0, 0, width(), height(), Qt::AlignCenter, m_title );
+	painter->drawText( 0, 2, width(), height(), Qt::AlignCenter, m_title );
+
+	painter->end();
+	pEvent->accept();
+};
+
+NBActionButtons::NBActionButtons( bool minBtn, bool maxBtn, bool closeBtn ) : QWidget() {
+
+	painter = new QPainter();
+
+	minBtnEnabled = minBtn;
+	maxBtnEnabled = maxBtn;
+	closeBtnEnabled = closeBtn;
+
+	widgetWidth = 0;
+	int startx = 5;
+
+	if ( minBtn ) {
+		widgetWidth += 16 + 5;
+		minRect = QRect( startx, 2, 16, 16 );
+		startx += 16 + 5;
+	}
+
+	if ( maxBtn ) {
+		widgetWidth += 16 + 5;
+		maxRect = QRect( startx, 2, 16, 16 );
+		startx += 16 + 5;
+	}
+
+	if ( closeBtn ) {
+		widgetWidth += 16 + 5;
+		clsRect = QRect( startx, 2, 16, 16 );
+	}
+
+	if ( widgetWidth )
+		widgetWidth += 5;
+
+	setFixedSize( widgetWidth, 20 );
+
+	setMouseTracking( true );
+};
+
+NBActionButtons::~NBActionButtons() {
+
+	if ( painter->isActive() )
+		painter->end();
+
+	delete painter;
+};
+
+void NBActionButtons::mousePressEvent( QMouseEvent *mEvent ) {
+
+	if ( mEvent->button() == Qt::LeftButton ) {
+		if ( minRect.contains( mEvent->pos() ) )
+			emit minimizeWindow();
+
+		else if ( maxRect.contains( mEvent->pos() ) )
+			emit maximizeWindow();
+
+		else if ( clsRect.contains( mEvent->pos() ) )
+			emit closeWindow();
+
+		else
+			QWidget::mousePressEvent( mEvent );
+	}
+
+	else {
+		QWidget::mousePressEvent( mEvent );
+	}
+
+	mEvent->accept();
+};
+
+void NBActionButtons::mouseMoveEvent( QMouseEvent *mEvent ) {
+
+	repaint();
+	mEvent->accept();
+};
+
+void NBActionButtons::paintEvent( QPaintEvent *pEvent ) {
+
+	if ( not widgetWidth ) {
+		pEvent->ignore();
+		return;
+	}
+
+	painter->begin( this );
+	painter->setRenderHints( QPainter::Antialiasing );
+	painter->setPen( Qt::NoPen );
+
+	QPoint mousePos = mapFromGlobal( QCursor::pos() );
+
+	int startx = 5;
+	if ( minBtnEnabled ) {
+		if ( minRect.contains( mousePos ) ) {
+			painter->setBrush( QBrush( QColor( 0, 100, 0, 180 ) ) );
+			painter->drawRoundedRect( startx -1, 1, 18, 18, 3, 3 );
+			painter->setBrush( Qt::NoBrush );
+		}
+		QPixmap minIcon = QIcon( ":/icons/arrow-down.png" ).pixmap( 16, 16 );
+		painter->drawPixmap( startx, 2, 16, 16, minIcon );
+		startx += 16 + 5;
+	}
+
+	if ( maxBtnEnabled ) {
+		if ( maxRect.contains( mousePos ) ) {
+			painter->setBrush( QBrush( QColor( 0, 0, 100, 180 ) ) );
+			painter->drawRoundedRect( startx -1, 1, 18, 18, 3, 3 );
+			painter->setBrush( Qt::NoBrush );
+		}
+		QPixmap maxIcon = QIcon( ":/icons/arrow-up.png" ).pixmap( 16, 16 );
+		painter->drawPixmap( startx, 2, 16, 16, maxIcon );
+		startx += 16 + 5;
+	}
+
+	if ( closeBtnEnabled ) {
+		if ( clsRect.contains( mousePos ) ) {
+			painter->setBrush( QBrush( QColor( 100, 0, 0, 180 ) ) );
+			painter->drawRoundedRect( startx -1, 1, 18, 18, 3, 3 );
+			painter->setBrush( Qt::NoBrush );
+		}
+		QPixmap closeIcon = QIcon( ":/icons/delete.png" ).pixmap( 16, 16 );
+		painter->drawPixmap( startx, 2, 16, 16, closeIcon );
+	}
 
 	painter->end();
 	pEvent->accept();

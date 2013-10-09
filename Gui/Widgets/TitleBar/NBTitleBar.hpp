@@ -31,8 +31,6 @@ class NBTitleBar : public QWidget {
 		QPainter *painter;
 
 	public slots:
-		void closeBtnClicked();
-		void minBtnClicked();
 		void maxBtnClicked();
 
 	protected:
@@ -41,7 +39,7 @@ class NBTitleBar : public QWidget {
 		void mouseMoveEvent( QMouseEvent * );
 		void paintEvent( QPaintEvent * );
 
-	signals:
+	Q_SIGNALS:
 		void restoreWindow();
 		void maximizeWindow();
 		void minimizeWindow();
@@ -52,6 +50,37 @@ class NBTitleBar : public QWidget {
 
 		void aboutNB();
 		void aboutQt4();
+};
+
+class NBActionButtons : public QWidget {
+	Q_OBJECT
+
+	public:
+		NBActionButtons( bool, bool, bool );
+		~NBActionButtons();
+
+	private:
+		QPainter *painter;
+
+		bool maxBtnEnabled;
+		bool minBtnEnabled;
+		bool closeBtnEnabled;
+
+		quint64 widgetWidth;
+
+		QRect minRect = QRect( 0, 0, 0, 0 );
+		QRect maxRect = QRect( 0, 0, 0, 0 );
+		QRect clsRect = QRect( 0, 0, 0, 0 );
+
+	protected:
+		void mousePressEvent( QMouseEvent * );
+		void mouseMoveEvent( QMouseEvent * );
+		void paintEvent( QPaintEvent * );
+
+	Q_SIGNALS:
+		void maximizeWindow();
+		void minimizeWindow();
+		void closeWindow();
 };
 
 #endif
