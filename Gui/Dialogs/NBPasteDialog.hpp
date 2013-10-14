@@ -11,7 +11,6 @@
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
 #include <NBDialog.hpp>
-#include <NBFileIO.hpp>
 #include <NBMessageDialog.hpp>
 #include <NBIconProvider.hpp>
 
@@ -32,8 +31,6 @@ class NBPasteDialog : public NBDialog {
 		QLabel *nameLbl, *fromToLbl;
 		QProgressBar *totalPB, *filePB;
 		QPushButton *pauseBtn, *cancelBtn;
-
-		NBFileIO *fileio;
 
 		QString srcFile, tgtFile, tgtDir, srcDir;
 		NBIOMode::Mode mode;

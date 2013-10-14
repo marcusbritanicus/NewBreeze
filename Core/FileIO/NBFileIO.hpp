@@ -9,107 +9,40 @@
 
 #include <Global.hpp>
 
-class NBFileIO : public QThread {
-	Q_OBJECT
+typedef struct _Job {
 
-	public:
-		// Init all the variables
-		NBFileIO();
+	// JobID - Unique string that identifies the job
+	QString jobID = QString();
 
-		// Mode: copy or move
-		void setMode( NBIOMode::Mode mode );
+	// Source and target
+	QStringList sources = QStringList();
+	QString target = QString();
 
-		// Sources
-		void setSources( QStringList );
-		QStringList sources();
+	// IO Mode
+	NBIOMode::Mode mode = NBIOMode::Copy;
 
-		// Target
-		void setTarget( QString );
-		QString target();
+	// Sizes
+	quint64 totalNodes = 0;
+	quint64 totalBytes = 0;
+	quint64 totalBytesCopied = 0;
+	quint64 cfileBytes = 0;
+	quint64 cfileBytesCopied = 0;
 
-		// JobID
-		void setJobID( QString );
-		QString jobID();
+	// Current file
+	QString currentFile = QString();
 
-		// Thread running
-		void run();
+	// IO Operation Input
+	bool canceled = false;
+	bool paused = false;
 
-		// Cancel the copy/move
-		void cancelIO();
+	// IO Operation Output
+	bool running = false;
 
-		// Wait for done
-		bool wait( int );
+	// Result
+	bool completed = false;
+	QStringList errorNodes = QStringList();
+} Job;
 
-		// Total number of nodes to be copied
-		quint64 totalNodes();
-
-		// Total bytes to be copied
-		quint64 totalBytes();
-
-		// Total bytes copied so far
-		quint64 copiedBytes();
-
-		// Current target file being copied
-		QString currentFileCopied();
-
-		// Bytes to be copied of this file
-		quint64 cfileTotalBytes();
-
-		// Bytes copied so far of this file
-		quint64 cfileCopiedBytes();
-
-		// Progress fraction: ( @ bytesCopied() ) /  ( @f totalBytes() )
-		float totalProgress();
-		float cfileProgress();
-
-		// Puase and resume
-		void pause();
-		void resume();
-
-	private:
-		// Copy a directory
-		bool copyDir( QString, QString );
-
-		// Copy a file
-		bool copyFile( QString, QString );
-
-		// jobID
-		QString m_jobID;
-
-		// Variables to store the source list and target
-		QStringList m_sourceList;
-		QString m_target;
-
-		// Variable for progressClick
-		QString m_tgtFile;
-
-		// Variable to store the mode
-		NBIOMode::Mode m_mode;
-
-		// List of falied i/o nodes
-		QStringList failedNodes;
-
-		// Pause flag
-		bool paused;
-
-		// Cancel flag
-		bool canceled;
-
-		// How many nodes to be copies
-		quint64 nodes;
-		// How many bytes to be copied in all
-		quint64 totalBytesToBeCopied;
-		// Hoy many bytes to be copied for this file
-		quint64 cfileBytesToBeCopied;
-
-		// Hoy many bytes copied in all
-		quint64 totalBytesCopied;
-
-		// Hoy many bytes copied for this file
-		quint64 cfileBytesCopied;
-
-	Q_SIGNALS:
-		void complete( QString, QStringList );
-};
+void performIO( Job *job );
 
 #endif

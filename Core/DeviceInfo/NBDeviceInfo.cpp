@@ -5,6 +5,7 @@
 */
 
 #include <NBDeviceInfo.hpp>
+#include <NBTools.hpp>
 
 NBDeviceManager::NBDeviceManager() {
 };
@@ -193,10 +194,42 @@ QString NBDeviceManager::getDevType( QString dev, QString vfsType ) {
 		QFileInfo info( disks.filePath( disk ) );
 		if ( info.symLinkTarget() == dev ) {
 			if ( info.absoluteFilePath().contains( "usb" ) )
-				devType = QString( "usb" );
+				return QString( "usb" );
 
 			else
-				devType = QString( "hdd" );
+				return QString( "hdd" );
+		}
+	}
+
+	if ( devType == "unknown" ) {
+		/*
+			*
+			* Lets try /sys/block approach
+			*
+			* Take /dev/<dev> part of the /dev/<dev> and check if 'usb' ia part of
+			* target of /sys/block/<dev>. Else check the starting of <dev> and determine the type
+			*
+		*/
+		QString sysfsPath = QString( "/sys/block/%1" ).arg( baseName( dev ) );
+		if ( readLink( sysfsPath ).contains( "usb" ) )
+			return QString( "usb" );
+
+		else {
+			if ( baseName( dev ).startsWith( "sd" ) )
+			// We have a generic mass storage device
+				return QString( "hdd" );
+
+			else if ( baseName( dev ).startsWith( "sr" ) )
+				return QString( "optical" );
+
+			else if ( baseName( dev ).startsWith( "se" ) or baseName( dev ).startsWith( "ses" ) )
+				return QString( "enclosure" );
+
+			else if ( baseName( dev ).startsWith( "st" ) )
+				return QString( "tape" );
+
+			else
+				return devType;
 		}
 	}
 

@@ -67,10 +67,8 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 		QString icoStr = QSettings( QDir( path ).filePath( ".directory" ), QSettings::NativeFormat ).value( "Desktop Entry/Icon" ).toString();
 		if ( !icoStr.isNull() and ( hasIcon( icoStr ) or exists( icoStr ) ) ) {
 			/* This means we have a file named @v icoStr or a theme icon named @v icoStr */
-			/* FIXME: Check is icoStr is a suitable icon path */
 			return icoStr;
 		}
-
 
 		else {
 			if ( hasIcon( "folder" ) )

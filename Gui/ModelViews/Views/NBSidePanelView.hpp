@@ -4,11 +4,12 @@
 	*
 */
 
-#ifndef NBSIDEPANEL_HPP
-#define NBSIDEPANEL_HPP
+#ifndef NBSIDEPANELVIEW_HPP
+#define NBSIDEPANELVIEW_HPP
 
 #include <Global.hpp>
 #include <NBSidePanelModel.hpp>
+#include <NBSidePanelDelegate.hpp>
 
 class NBSidePanel : public QTreeView {
 	Q_OBJECT
@@ -20,6 +21,7 @@ class NBSidePanel : public QTreeView {
 		void setupView();
 
 		NBSidePanelModel *spModel;
+		NBSidePanelDelegate *iDelegate;
 
 	public slots:
 		void updateBookmarks();

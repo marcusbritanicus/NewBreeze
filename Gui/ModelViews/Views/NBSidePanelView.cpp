@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBSidePanel.hpp>
+#include <NBSidePanelView.hpp>
 #include <NBTools.hpp>
 
 /*
@@ -22,6 +22,9 @@ NBSidePanel::NBSidePanel() {
 
 	setRootIndex( spModel->rootIndex() );
 	connect( this, SIGNAL( clicked( const QModelIndex ) ), this, SLOT( handleClick( const QModelIndex ) ) );
+
+	iDelegate = new NBSidePanelDelegate();
+	setItemDelegate( iDelegate );
 
 	setupView();
 }
@@ -41,6 +44,7 @@ void NBSidePanel::setupView() {
 	setExpanded( spModel->index( 0, 0 ), true );
 	setExpanded( spModel->index( 1, 0 ), true );
 
+	// Fixed Width
 	setFixedWidth( sizeHintForColumn( 0 ) );
 };
 

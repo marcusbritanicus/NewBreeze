@@ -45,37 +45,28 @@ void NBIOManager::addJob( QStringList sourceList, QString target, NBIOMode::Mode
 	QString sourceDir = dirName( sourceList.at( 0 ) );
 	QString datetime = QString::number( QDateTime::currentDateTime().toTime_t() );
 
-	QString jobid = QString::fromStdString( MD5( qPrintable( sourceDir + target + datetime ) ).hexdigest() );
+	Job newJob;
+	newJob.jobID = QString::fromStdString( MD5( qPrintable( sourceDir + target + datetime ) ).hexdigest() );
+	newJob.sources << sourceList;
+	newJob.target = QString( target );
+	newJob.mode = iomode;
 
-	NBFileIO *fileIO = new NBFileIO();
-	fileIO->setMode( iomode );
-	fileIO->setSources( sourceList );
-	fileIO->setTarget( target );
-	fileIO->setJobID( jobid );
+	// if ( jobList.count() > Settings.General.MaxIOJobs )
+		// pendingJobs << newJob;
 
-	connect(
-		fileIO, SIGNAL( complete( QString, QStringList ) ),
-		this, SLOT( handleJobComplete( QString, QStringList ) )
-	);
-
-	if ( jobList.count() < Settings.General.MaxIOJobs ) {
-		jobList[ jobid ] = fileIO;
-		fileIO->start();
-	}
-
-	else {
-		pendingJobs[ jobid ] = fileIO;
-	}
+	// else
+	jobList[ newJob.jobID ] = newJob;
+	QtConcurrent::run( performIO, &newJob );
 
 	manageTimer();
 };
 
 bool NBIOManager::cancelJob( QString jobID ) {
 
-	NBFileIO *io = jobList.value( jobID );
-	io->cancelIO();
+	Job _job = jobList.value( jobID );
+	_job.canceled = true;
 
-	return io->wait( 5000 );
+	return true;
 };
 
 bool NBIOManager::hasPendingJobs() {
@@ -88,16 +79,20 @@ quint64 NBIOManager::pendingJobsCount() {
 	return 0;
 };
 
-float NBIOManager::jobProgress( QString jobID ) {
+qreal NBIOManager::jobProgress( QString jobID ) {
 
-	return jobList.value( jobID )->totalProgress();
+	if ( jobList.value( jobID ).totalBytes > 0 )
+		return jobList.value( jobID ).totalBytesCopied / jobList.value( jobID ).totalBytes;
+
+	else
+		return 0;
 };
 
-float NBIOManager::totalProgress() {
+qreal NBIOManager::totalProgress() {
 
-	float progress = 0;
+	qreal progress = 0;
 	foreach( QString id, jobList.keys() )
-		progress += jobList.value( id )->totalProgress();
+		progress += jobProgress( id );
 
 	return progress / jobList.count();
 };
@@ -208,23 +203,24 @@ void NBIOManager::manageTimer() {
 
 void NBIOManager::updateProgress() {
 
-	float fracTotals = 0;
 	QStringList jobIDs = jobList.keys();
 
 	if ( activeJobs() ) {
+		totalF = totalProgress();
 		foreach( QString id, jobIDs ) {
-			NBFileIO *io = jobList.value( id );
-			fracTotals += io->totalProgress();
-			cfileF = io->cfileProgress();
+			if ( jobList.value( id ).completed )
+				QTimer::singleShot( 100, this, SLOT( handleJobComplete( jobList.value( id ) ) ) );
+
+			else
+				cfileF = 1.0 * jobList.value( id ).cfileBytes / jobList.value( id ).cfileBytesCopied;
 		}
 	}
 
-	totalF = fracTotals / jobIDs.count();
-
+	manageTimer();
 	repaint();
 };
 
-void NBIOManager::handleJobComplete( QString jobID, QStringList errorNodes ) {
+void NBIOManager::handleJobComplete( Job *job ) {
 
 	/*
 		*
@@ -233,18 +229,10 @@ void NBIOManager::handleJobComplete( QString jobID, QStringList errorNodes ) {
 		*
 	*/
 	#warning "Show the error dialog";
-	Q_UNUSED( errorNodes );
 
-	jobList.value( jobID )->deleteLater();
-	jobList.remove( jobID );
-
-	if ( ( pendingJobs.count() ) and ( jobList.count() < Settings.General.MaxIOJobs ) ) {
-		QString id = pendingJobs.keys().at( 0 );
-		NBFileIO *io = pendingJobs.value( id );
-
-		io->start();
-		jobList[ id ] = io;
-	}
+	jobList.remove( job->jobID );
+	manageTimer();
+	repaint();
 };
 
 NBProgressDisplay::NBProgressDisplay( QStringList sourceList, QString target ) : QWidget() {
@@ -277,7 +265,7 @@ void NBProgressDisplay::updateInfo( quint64 totalFiles, quint64 totalBytes ) {
 	sourceLbl->setText( newTxt + QString( "(%1 files, %2)" ).arg( totalFiles ).arg( formatSize( totalBytes ) ) );
 };
 
-void NBProgressDisplay::updateProgress( QString curFile, float totalProgress, float cfileProgress ) {
+void NBProgressDisplay::updateProgress( QString curFile, qreal totalProgress, qreal cfileProgress ) {
 
 	curFileLbl->setText( curFile );
 	totalPBar->setValue( totalProgress );

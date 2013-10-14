@@ -11,6 +11,20 @@ QTreeView {
 	border: none;
 }
 
+QTreeView::branch:!has-children {
+	image: none;
+}
+
+QTreeView::branch:open:has-children {
+	border-image: none;
+	image: url(:/icons/arrow-down.png);
+}
+
+QTreeView::branch:closed:has-children {
+	border-image: none;
+	image: url(:/icons/arrow-right.png);
+}
+
 QListView {
 	background: transparent;
 	color: <textcolor>;

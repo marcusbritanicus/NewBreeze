@@ -8,59 +8,95 @@
 #include <NBTools.hpp>
 #include <NBDeleteManager.hpp>
 
-NBFileIO::NBFileIO() : QThread() {
+bool copyFile( Job *job, QString srcFile, QString tgtFile ) {
 
-	nodes = 0;
-	totalBytesToBeCopied = 0;
-	totalBytesCopied = 0;
+	QFile iFile( srcFile );
+	QFile oFile( tgtFile );
 
-	paused = false;
-	canceled = false;
+	job->cfileBytesCopied = 0;
+	job->currentFile = QString( tgtFile );
+	job->cfileBytes = getSize( srcFile );
+
+	if ( not iFile.open( QFile::ReadOnly ) ) {
+		job->errorNodes << srcFile;
+		return false;
+	}
+
+	if ( not oFile.open( QFile::WriteOnly ) ) {
+		job->errorNodes << srcFile;
+		return false;
+	}
+
+	while( not iFile.atEnd() ) {
+		if ( job->canceled ) {
+			job->errorNodes << srcFile;
+
+			iFile.close();
+			oFile.close();
+
+			return false;
+		}
+
+		while ( job->paused )
+			continue;
+
+		char block[ 4096 ] = { 0 };
+		qint64 inBytes = iFile.read( block, sizeof( block ) );
+		oFile.write( block, inBytes );
+		job->totalBytesCopied += inBytes;
+		job->cfileBytesCopied += inBytes;
+	}
+
+	iFile.close();
+	oFile.close();
+
+	oFile.setPermissions( iFile.permissions() );
+
+	return true;
 };
 
-void NBFileIO::setMode( NBIOMode::Mode mode ) {
+bool copyDir( Job *job, QString srcDir, QString tgtDir ) {
+	/*
+		*
+		* All nodes in srcDir are to be copied to tgtDir
+		* If tgtDir does not exist, create it
+		*
+	*/
 
-	m_mode = mode;
+	bool success = true;
+
+	if ( not exists( tgtDir ) )
+		QDir( "." ).mkpath( tgtDir );
+
+	foreach( QFileInfo info, QDir( srcDir ).entryInfoList( QDir::NoDotAndDotDot | QDir::System | QDir::Hidden | QDir::AllDirs | QDir::Files, QDir::DirsFirst ) ) {
+		if ( job->canceled ) {
+			job->errorNodes << info.absoluteFilePath();
+			success &= false;
+			continue;
+		}
+
+		QString source = info.absoluteFilePath();
+		QString target = QDir( tgtDir ).filePath( baseName( source ) ) ;
+
+		if ( info.isDir() )
+			success &= copyDir( job, source, target );
+
+		else
+			success &= copyFile( job, source, target );
+	}
+
+	return success;
 };
 
-void NBFileIO::setSources( QStringList srcList ) {
+void performIO( Job *job ) {
 
-	m_sourceList << srcList;
-};
-
-QStringList NBFileIO::sources() {
-
-	return m_sourceList;
-};
-
-void NBFileIO::setTarget( QString target ) {
-
-	m_target = QString( target );
-};
-
-QString NBFileIO::target() {
-
-	return m_target;
-};
-
-void NBFileIO::setJobID( QString jobID ) {
-
-	m_jobID = QString( jobID );
-};
-
-QString NBFileIO::jobID() {
-
-	return m_jobID;
-};
-
-void NBFileIO::run() {
+	job->running = true;
 
 	// Compute IO amount: totalBytes, totalnodes etc
-	quint64 nodes = 0;
-	foreach( QString path, m_sourceList ) {
+	foreach( QString path, job->sources ) {
 		QDirIterator it( path, QDir::AllEntries | QDir::System | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::Hidden, QDirIterator::Subdirectories );
 		while ( it.hasNext() ) {
-			if( canceled )
+			if( job->canceled )
 				return;
 
 			it.next();
@@ -70,14 +106,15 @@ void NBFileIO::run() {
 			}
 
 			else {
-				nodes++;
-				totalBytesToBeCopied += it.fileInfo().size();
+				job->totalNodes++;
+				job->totalBytes += it.fileInfo().size();
 			}
 		}
 	}
 
-	if ( m_mode == NBIOMode::Copy ) {
-		foreach( QString src, m_sourceList ) {
+	// We have a Copy Operation to do
+	if ( job->mode == NBIOMode::Copy ) {
+		foreach( QString src, job->sources ) {
 			/*
 				*
 				* If the files from the current folder are being pasted into the same folder
@@ -92,18 +129,18 @@ void NBFileIO::run() {
 				*
 			*/
 
-			if ( dirName( src ) == m_target ) {
+			if ( dirName( src ) == job->target ) {
 				QString source = src;
-				QString target = QDir( m_target ).filePath( "Copy of " + baseName( src ) );
+				QString target = QDir( job->target ).filePath( "Copy of " + baseName( src ) );
 
 				if ( isFile( src ) )
-					copyFile( source, target );
+					copyFile( job, source, target );
 
 				else if ( isDir( src ) )
-					copyDir( source, target );
+					copyDir( job, source, target );
 
 				else
-					failedNodes << source;
+					job->errorNodes << source;
 			}
 
 			/*
@@ -113,18 +150,18 @@ void NBFileIO::run() {
 				* If similarly named files/folders exist, then we follow the above procedure.
 				*
 			*/
-			else if ( exists( QDir( m_target ).filePath( baseName( src ) ) ) ) {
+			else if ( exists( QDir( job->target ).filePath( baseName( src ) ) ) ) {
 				QString source = src;
-				QString target = QDir( m_target ).filePath( "Copy of " + baseName( src ) );
+				QString target = QDir( job->target ).filePath( "Copy of " + baseName( src ) );
 
 				if ( isFile( src ) )
-					copyFile( source, target );
+					copyFile( job, source, target );
 
 				else if ( isDir( src ) )
-					copyDir( source, target );
+					copyDir( job, source, target );
 
 				else
-					failedNodes << source;
+					job->errorNodes << source;
 			}
 
 			/*
@@ -136,32 +173,33 @@ void NBFileIO::run() {
 
 			else {
 				QString source = src;
-				QString target = QDir( m_target ).filePath( baseName( src ) );
+				QString target = QDir( job->target ).filePath( baseName( src ) );
 
 				if ( isFile( src ) )
-					copyFile( source, target );
+					copyFile( job, source, target );
 
 				else if ( isDir( src ) )
-					copyDir( source, target );
+					copyDir( job, source, target );
 
 				else
-					failedNodes << src;
+					job->errorNodes << src;
 			}
 		}
 	}
 
+	// We need to move the files
 	else {
-		NBDeleteManager *deleter = new NBDeleteManager( this, false );
+		NBDeleteManager *deleter = new NBDeleteManager( NULL, false );
 
-		foreach( QString src, m_sourceList ) {
+		foreach( QString src, job->sources ) {
 			/*
 				*
 				* If the files from the current folder are being pasted into the same folder
 				* then we have a problem
 				*
 			*/
-			if ( dirName( src ) == m_target ) {
-				failedNodes << src;
+			if ( dirName( src ) == job->target ) {
+				job->errorNodes << src;
 			}
 
 			/*
@@ -171,22 +209,22 @@ void NBFileIO::run() {
 				* If similarly named files/folders exist, then we follow the above procedure.
 				*
 			*/
-			else if ( exists( QDir( m_target ).filePath( baseName( src ) ) ) ) {
+			else if ( exists( QDir( job->target ).filePath( baseName( src ) ) ) ) {
 				QString source = src;
-				QString target = QDir( m_target ).filePath( "Copy of " + baseName( src ) );
+				QString target = QDir( job->target ).filePath( "Copy of " + baseName( src ) );
 
 				if ( isFile( src ) ) {
-					if ( copyFile( source, target ) )
+					if ( copyFile( job, source, target ) )
 						QFile::remove( source );
 				}
 
 				else if ( isDir( src ) ) {
-					if ( copyDir( source, target ) )
+					if ( copyDir( job, source, target ) )
 						deleter->deleteFromDisk( QStringList() << source );
 				}
 
 				else {
-					failedNodes << source;
+					job->errorNodes << source;
 				}
 			}
 
@@ -199,178 +237,25 @@ void NBFileIO::run() {
 
 			else {
 				QString source = src;
-				QString target = QDir( m_target ).filePath( baseName( src ) );
+				QString target = QDir( job->target ).filePath( baseName( src ) );
 
 				if ( isFile( src ) ) {
-					if ( copyFile( source, target ) )
+					if ( copyFile( job, source, target ) )
 						QFile::remove( source );
 				}
 
 				else if ( isDir( src ) ) {
-					if ( copyDir( source, target ) )
+					if ( copyDir( job, source, target ) )
 						deleter->deleteFromDisk( QStringList() << source );
 				}
 
 				else {
-					failedNodes << source;
+					job->errorNodes << source;
 				}
 			}
 		}
 	}
 
-	emit complete( m_jobID, failedNodes );
-};
-
-void NBFileIO::cancelIO() {
-
-	canceled = true;
-};
-
-bool NBFileIO::wait( int msec ) {
-
-	QTimer timer;
-	QEventLoop loop;
-
-	connect( &timer, SIGNAL( timeout() ), &loop, SLOT( quit() ) );
-	connect( this, SIGNAL( complete( QString, QStringList ) ), &loop, SLOT( quit() ) );
-
-	timer.start( msec );
-	loop.exec();
-
-	if ( timer.isActive() )
-		return true;
-
-	else
-		return false;
-};
-
-quint64 NBFileIO::totalNodes() {
-
-	return nodes;
-};
-
-quint64 NBFileIO::totalBytes() {
-
-	return totalBytesToBeCopied;
-};
-
-QString NBFileIO::currentFileCopied() {
-
-	return m_tgtFile;
-};
-
-quint64 NBFileIO::copiedBytes() {
-
-	return totalBytesCopied;
-};
-
-quint64 NBFileIO::cfileTotalBytes() {
-
-	return cfileBytesToBeCopied;
-};
-
-quint64 NBFileIO::cfileCopiedBytes() {
-
-	return cfileBytesCopied;
-};
-
-float NBFileIO::totalProgress() {
-
-	if ( totalBytesToBeCopied )
-		return totalBytesCopied / totalBytesToBeCopied;
-
-	else
-		return 0;
-};
-
-float NBFileIO::cfileProgress() {
-
-	if ( cfileBytesToBeCopied )
-		return cfileBytesCopied / cfileBytesToBeCopied;
-
-	else
-		return 0;
-};
-
-void NBFileIO::pause() {
-
-	paused = true;
-};
-
-void NBFileIO::resume() {
-
-	paused = false;
-};
-
-bool NBFileIO::copyDir( QString srcDir, QString tgtDir ) {
-	/*
-		*
-		* All nodes in srcDir are to be copied to tgtDir
-		* If tgtDir does not exist, create it
-		*
-	*/
-
-	bool success = true;
-
-	if ( not exists( tgtDir ) )
-		QDir( "." ).mkpath( tgtDir );
-
-	foreach( QFileInfo info, QDir( srcDir ).entryInfoList( QDir::NoDotAndDotDot | QDir::System | QDir::Hidden | QDir::AllDirs | QDir::Files, QDir::DirsFirst ) ) {
-		QString source = info.absoluteFilePath();
-		QString target = QDir( tgtDir ).filePath( baseName( source ) ) ;
-
-		if ( info.isDir() )
-			success &= copyDir( source, target );
-
-		else
-			success &= copyFile( source, target );
-	}
-
-	return success;
-};
-
-bool NBFileIO::copyFile( QString srcFile, QString tgtFile ) {
-
-	QFile iFile( srcFile );
-	QFile oFile( tgtFile );
-
-	m_tgtFile = QString( tgtFile );
-
-	cfileBytesToBeCopied = iFile.size();
-	cfileBytesCopied = 0;
-
-	if ( not iFile.open( QFile::ReadOnly ) ) {
-		failedNodes << srcFile;
-		return false;
-	}
-
-	if ( not oFile.open( QFile::WriteOnly ) ) {
-		failedNodes << srcFile;
-		return false;
-	}
-
-	while( not iFile.atEnd() ) {
-		if ( canceled ) {
-			iFile.close();
-			oFile.close();
-
-			return false;
-		}
-
-		while ( paused )
-			continue;
-
-		char block[ 4096 ] = { 0 };
-		qint64 inBytes = iFile.read( block, sizeof( block ) );
-		oFile.write( block, inBytes );
-		totalBytesCopied += inBytes;
-		cfileBytesCopied += inBytes;
-	}
-
-	iFile.close();
-	oFile.close();
-
-	oFile.setPermissions( iFile.permissions() );
-
-	return true;
+	job->running = false;
+	job->completed = true;
 };

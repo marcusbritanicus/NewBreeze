@@ -320,6 +320,34 @@ void NBFileSystemModel::setReadOnly( bool ro ) {
 	__readOnly = ro;
 };
 
+Qt::DropActions NBFileSystemModel::supportedDragActions() const {
+
+	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
+};
+
+Qt::DropActions NBFileSystemModel::supportedDropActions() const {
+
+	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
+};
+
+Qt::ItemFlags NBFileSystemModel::flags( const QModelIndex index ) const {
+
+	qDebug() << nodePath( index ) << "\t\t\t: " << ( isReadable( nodePath( index ) ) ? "Can read" : "Can't read" );
+
+	if ( isReadable( nodePath( index ) ) )
+		return Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEnabled;
+
+	else
+		return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+};
+
+QStringList NBFileSystemModel::mimeTypes() const {
+
+	QStringList types;
+	types << "text/uri-list";
+	return types;
+};
+
 bool NBFileSystemModel::filter( Filters filter ) {
 
 	Q_UNUSED( filter );

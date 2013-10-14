@@ -5,8 +5,6 @@
 */
 
 #include <NBTools.hpp>
-#include <NBMimeDatabase.hpp>
-#include <NBMimeType.hpp>
 #include <NBStyleManager.hpp>
 
 QDir NBDir( QString path ) {
@@ -39,16 +37,12 @@ QString getMimeType( QString path ) {
 
 inline QMimeType getMime( QString path ) {
 
-	QMimeDatabase *mdb = new QMimeDatabase();
-	return mdb->mimeTypeForFile( path );
+	return mimeDb.mimeTypeForFile( path );
 };
 
 QString getMimeTypeAlt( QString path ) {
 
-	QMimeDatabase *mdb = new QMimeDatabase();
-	QMimeType mimeType = mdb->mimeTypeForFile( path );
-
-	return mimeType.name();
+	return mimeDb.mimeTypeForFile( path ).name();
 };
 
 QStringList getDesktopEntries( QString path ) {

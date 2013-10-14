@@ -157,8 +157,7 @@ void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
 		sizeTxt = formatSize( getSize( itemPath ) );
 
 	// Type
-	QMimeDatabase mdb;
-	QString typeTxt = mdb.mimeTypeForFile( itemPath ).comment();
+	QString typeTxt = mimeDb.mimeTypeForFile( itemPath ).comment();
 
 	// Perm
 	QString permTxt = getPermissions( itemPath );

@@ -8,13 +8,6 @@
 #define NBICONPROVIDER_HPP
 
 #include <Global.hpp>
-#if QT_VERSION < 0x050000
-	#include <NBMimeDatabase.hpp>
-	#include <NBMimeType.hpp>
-#else
-	#include <QMimeDatabase>
-	#include <QMimeType>
-#endif
 
 class NBIconProvider {
 

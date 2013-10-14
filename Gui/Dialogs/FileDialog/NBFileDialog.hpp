@@ -10,7 +10,7 @@
 #include <Global.hpp>
 #include <NBAddressBar.hpp>
 #include <NBFDFolderView.hpp>
-#include <NBSidePanel.hpp>
+#include <NBSidePanelView.hpp>
 #include <NBDialog.hpp>
 
 class NBFileDialog : public NBDialog {

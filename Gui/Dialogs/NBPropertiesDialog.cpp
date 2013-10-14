@@ -18,6 +18,7 @@ NBPropertiesDialog::NBPropertiesDialog( QStringList paths ) : NBDialog() {
 NBPropertiesDialog::~NBPropertiesDialog() {
 
 	terminate = true;
+	thread.waitForFinished();
 };
 
 void NBPropertiesDialog::createGUI() {
@@ -276,13 +277,16 @@ void NBPropertiesDialog::folderProperties( QStringList paths ) {
 	Q_UNUSED( paths );
 
 	foreach( QString path, pathsList ) {
-		if ( QFileInfo( path ).isDir() ) {
+		if( terminate )
+			return;
+
+		if ( isDir( path ) ) {
 			recurseProperties( path );
 		}
 
 		else {
 			files++;
-			totalSize += QFileInfo( path ).size();
+			totalSize += getSize( path );
 		}
 	}
 

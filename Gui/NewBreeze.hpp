@@ -10,7 +10,7 @@
 #include <Global.hpp>
 
 #include <NBTitleBar.hpp>
-#include <NBSidePanel.hpp>
+#include <NBSidePanelView.hpp>
 #include <NBFolderView.hpp>
 #include <NBAddressBar.hpp>
 #include <NBQuickMenuBar.hpp>

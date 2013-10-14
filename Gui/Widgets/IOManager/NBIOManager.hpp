@@ -22,7 +22,7 @@ class NBProgressDisplay : public QWidget {
 		void updateInfo( quint64, quint64 );
 
 		// updateProgress( curFile, totalProgress, cfileProgress )
-		void updateProgress( QString, float, float );
+		void updateProgress( QString, qreal, qreal );
 
 	private:
 		QLabel *sourceLbl, *targetLbl;
@@ -67,20 +67,20 @@ class NBIOManager : public QFrame {
 		quint64 pendingJobsCount();
 
 		// progress of job @jobID
-		float jobProgress( QString jobID );
+		qreal jobProgress( QString jobID );
 
 		// total percentage completed ( of all jobs )
-		float totalProgress();
+		qreal totalProgress();
 
 		// Number of active jobs
 		int activeJobs();
 
 	private:
-		QMap<QString, NBFileIO*> jobList;
-		QMap<QString, NBFileIO*> pendingJobs;
+		QMap<QString, Job> jobList;
+		QMap<QString, Job> pendingJobs;
 
 		QPainter *painter;
-		float totalF, cfileF;
+		qreal totalF, cfileF;
 
 		bool checked;
 
@@ -101,8 +101,8 @@ class NBIOManager : public QFrame {
 		void updateProgress();
 
 		// Intimate the user about completion of a job
-		// handleAllJobsCompleted( jobID, errorNodes )
-		void handleJobComplete( QString, QStringList );
+		// handleJobComplete( job )
+		void handleJobComplete( Job * );
 };
 
 #endif

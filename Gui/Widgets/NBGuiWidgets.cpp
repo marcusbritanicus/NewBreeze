@@ -43,16 +43,18 @@ void NBSearchBar::searchChanged( QString query ) {
 
 NBMenu::NBMenu( QWidget *parent ) : QMenu( parent ) {
 
-	if ( settings.value( "Style" ).toString() == "Transparent" )
+	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
-	setStyleSheet( getStyleSheet( "NBMenu", settings.value( "Style" ).toString() ) );
+
+	setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
 };
 
 NBMenu::NBMenu( QString title, QWidget *parent ) : QMenu( title, parent ) {
 
-	if ( settings.value( "Style" ).toString() == "Transparent" )
+	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
-	setStyleSheet( getStyleSheet( "NBMenu", settings.value( "Style" ).toString() ) );
+
+	setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
 };
 
 NBToolButton::NBToolButton( QString themeIcon, QString customIcon ) : QToolButton() {

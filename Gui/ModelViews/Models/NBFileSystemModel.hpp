@@ -69,6 +69,12 @@ class NBFileSystemModel : public QAbstractItemModel {
 		bool readOnly() const;
 		void setReadOnly( bool );
 
+		// Drag and Drop
+		Qt::DropActions supportedDropActions() const;
+		Qt::DropActions supportedDragActions() const;
+		Qt::ItemFlags flags( const QModelIndex index ) const;
+		QStringList mimeTypes() const;
+
 		// Filters
 		bool filter( Filters filter );
 		void setFilter( Filters filter, bool );
