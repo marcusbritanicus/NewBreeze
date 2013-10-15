@@ -52,6 +52,11 @@ NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QS
 
 	addSeparator();
 	buildCustomActionsMenu();
+
+	QAction *addActionAct = new QAction( QIcon( ":/icons/list-add.png" ), tr( "Add custo&m action" ), this );
+	connect( addActionAct, SIGNAL( triggered() ), this, SLOT( showCustomActionsDialog() ) );
+	addSeparator();
+	addAction( addActionAct );
 };
 
 void NBCustomActionsMenu::buildCustomActionsMenu() {
@@ -147,18 +152,6 @@ void NBCustomActionsMenu::buildCustomActionsMenu() {
 	}
 };
 
-void NBCustomActionsMenu::doCustomAction() {
-
-	QAction *customAct = qobject_cast<QAction*>( sender() );
-
-	QStringList cmdList = customAct->data().toStringList();
-	if ( cmdList.count() == 1 )
-		QProcess::startDetached( cmdList.at( 0 ) );
-
-	else
-		QProcess::startDetached( cmdList.takeFirst(), cmdList );
-};
-
 void NBCustomActionsMenu::extract() {
 
 	emit extractArchive( QDir( workingDir ).filePath( selection.at( 0 ).data().toString() ) );
@@ -171,6 +164,24 @@ void NBCustomActionsMenu::compress() {
 		archiveList << QDir( workingDir ).filePath( idx.data().toString() );
 
 	emit addToArchive( archiveList );
+};
+
+void NBCustomActionsMenu::showCustomActionsDialog() {
+
+	NBCustomActions *customActions = new NBCustomActions();
+	customActions->exec();
+};
+
+void NBCustomActionsMenu::doCustomAction() {
+
+	QAction *customAct = qobject_cast<QAction*>( sender() );
+
+	QStringList cmdList = customAct->data().toStringList();
+	if ( cmdList.count() == 1 )
+		QProcess::startDetached( cmdList.at( 0 ) );
+
+	else
+		QProcess::startDetached( cmdList.takeFirst(), cmdList );
 };
 
 NBOpenWithMenu::NBOpenWithMenu( QString icon, QString name, QWidget *parent ) : QMenu( parent ) {

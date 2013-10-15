@@ -24,6 +24,7 @@ class NBCustomActionsMenu : public QMenu {
 	private slots:
 		void extract();
 		void compress();
+		void showCustomActionsDialog();
 		void doCustomAction();
 
 	Q_SIGNALS:

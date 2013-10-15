@@ -167,7 +167,7 @@ bool isReadable( QString path ) {
 		*
 	*/
 
-	// FIXME: Check the validity of this code below: L209
+	// FIXME: Check the validity of this code below: L203
 
 	struct stat fileMode;
 	QList<int> groupList;
@@ -229,6 +229,87 @@ bool isReadable( QString path ) {
 
 		else {
 			if ( fileMode.st_mode & S_IROTH )
+				return true;
+
+			else
+				return false;
+		}
+	}
+
+	return false;
+};
+
+bool isWritable( QString path ) {
+
+	/*
+		*
+		* If the path is a folder, then both read bit and exec bit must be set
+		* If the path is a file, then only read bit is sufficient
+		*
+	*/
+
+	// FIXME: Check the validity of this code below: L283
+
+	struct stat fileMode;
+	QList<int> groupList;
+	gid_t *groups = 0;
+
+	if ( stat( qPrintable( path ), &fileMode ) != 0 )
+		return false;
+
+	int ngrps = getgroups( getgroups( 0, groups ), groups );
+	if ( ngrps > 0 )
+		for( int i = 0; i < ngrps; i++ )
+			groupList << groups[ i ];
+
+	if ( geteuid() == fileMode.st_uid ) {
+		if ( S_ISDIR( fileMode.st_mode ) ) {
+			if ( ( fileMode.st_mode & S_IWUSR ) and ( fileMode.st_mode & S_IXUSR ) )
+				return true;
+
+			else
+				return false;
+		}
+
+		else {
+			if ( fileMode.st_mode & S_IWUSR )
+				return true;
+
+			else
+				return false;
+		}
+	}
+
+	// Possible erroneous code
+	else if ( groupList.contains( fileMode.st_gid ) ) {
+		if ( S_ISDIR( fileMode.st_mode ) ) {
+			if ( ( fileMode.st_mode & S_IWGRP ) and ( fileMode.st_mode & S_IXGRP ) )
+				return true;
+
+			else
+				return false;
+		}
+
+		else {
+			if ( fileMode.st_mode & S_IWGRP )
+				return true;
+
+			else
+				return false;
+		}
+	}
+
+	else {
+		if ( S_ISDIR( fileMode.st_mode ) ) {
+			if ( ( fileMode.st_mode & S_IWOTH ) and ( fileMode.st_mode & S_IXOTH ) )
+				return true;
+
+			else
+				return false;
+		}
+
+		else {
+			if ( fileMode.st_mode & S_IWOTH )
 				return true;
 
 			else

@@ -204,6 +204,56 @@ QSize NBIconView::getGridSize( QSize mSize ) {
 	return QSize( gWidth, mSize.height() );
 };
 
+void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
+
+	if ( ( mpEvent->button() == Qt::LeftButton ) )
+		dragStartPosition = mpEvent->pos();
+
+	else
+		dragStartPosition = QPoint();
+
+	QListView::mousePressEvent( mpEvent );
+};
+
+void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
+
+	if ( not ( mmEvent->buttons() & Qt::LeftButton ) ) {
+
+		QListView::mouseMoveEvent( mmEvent );
+		return;
+	}
+
+	else if ( dragStartPosition.isNull() ) {
+
+		QListView::mouseMoveEvent( mmEvent );
+		return;
+	}
+
+	else if ( ( mmEvent->pos() - dragStartPosition ).manhattanLength() < QApplication::startDragDistance() ) {
+
+		QListView::mouseMoveEvent( mmEvent );
+		return;
+	}
+
+	if ( selectionModel()->hasSelection() ) {
+
+		QDrag *drag = new QDrag( this );
+
+		QList<QUrl> urlList;
+		foreach( QModelIndex item, selectionModel()->selectedIndexes() )
+			urlList << QUrl( fsModel->nodePath( item.data().toString() ) );
+
+		QMimeData *mimedata = new QMimeData();
+		mimedata->setUrls( urlList );
+
+		drag->setMimeData( mimedata );
+
+		Qt::DropAction dropAction = drag->exec( Qt::CopyAction | Qt::MoveAction | Qt::LinkAction );
+	}
+
+	mmEvent->accept();
+};
+
 void NBIconView::mouseDoubleClickEvent( QMouseEvent *mouseEvent) {
 
 	QModelIndex idx = indexAt( mouseEvent->pos() );
@@ -299,11 +349,28 @@ void NBIconView::dragEnterEvent( QDragEnterEvent *deEvent ) {
 
 void NBIconView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 
-	if ( indexAt( dmEvent->pos() ).isValid() ) {
+	const QMimeData *mData = dmEvent->mimeData();
+	if ( not mData->hasUrls() )
+		return;
+
+	QString source = dirName( mData->urls().at( 0 ).toLocalFile() );
+	source += ( source.endsWith( "/" ) ? "" : "/" );
+
+	if ( source != fsModel->currentDir() ) {
+		if ( isWritable( fsModel->currentDir() ) ) {
+			dmEvent->setDropAction( Qt::CopyAction );
+			dmEvent->accept();
+		}
+
+		else
+			dmEvent->ignore();
+	}
+
+	else if ( indexAt( dmEvent->pos() ).isValid() ) {
 		QModelIndex idx = indexAt( dmEvent->pos() );
 		QString mtpt = fsModel->nodePath( fsModel->data( idx ).toString() );
 
-		if ( QFileInfo( mtpt ).isWritable() ) {
+		if ( isWritable( mtpt ) and isDir( mtpt ) ) {
 			dmEvent->setDropAction( Qt::CopyAction );
 			dmEvent->accept();
 		}
@@ -321,6 +388,11 @@ void NBIconView::dropEvent( QDropEvent *dpEvent ) {
 	QModelIndex idx = indexAt( dpEvent->pos() );
 	QString mtpt = fsModel->nodePath( fsModel->data( idx ).toString() );
 
+	if ( not isDir( mtpt ) ) {
+		dpEvent->ignore();
+		return;
+	}
+
 	const QMimeData *mData = dpEvent->mimeData();
 	if ( mData->hasUrls() ) {
 
@@ -334,7 +406,7 @@ void NBIconView::dropEvent( QDropEvent *dpEvent ) {
 			emit move( args, mtpt );
 		}
 
-		else if ( ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) or ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) ) {
+		else if ( ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) or ( dpEvent->keyboardModifiers() == Qt::NoModifier ) ) {
 
 			qDebug() << "DnD Copy";
 			emit copy( args, mtpt );

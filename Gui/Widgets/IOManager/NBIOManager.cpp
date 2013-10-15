@@ -11,10 +11,7 @@ NBIOManager::NBIOManager() : QFrame() {
 	checked = false;
 	jobList.clear();
 
-	progressPopup = new NBProgressPopup();
-
 	totalF = 0;
-	cfileF = 0;
 
 	painter = new QPainter();
 	setFixedSize( QSize( 128, 52 ) );
@@ -34,70 +31,21 @@ NBIOManager::~NBIOManager() {
 
 void NBIOManager::addJob( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {
 
-	/*
-		*
-		*  Calculate the Job ID
-		*
-		* JobID is the MD5 has of the sourceDir + target + QString( datetime )
-		* This a gauranteed to produce a unique string
-		*
-	*/
-	QString sourceDir = dirName( sourceList.at( 0 ) );
-	QString datetime = QString::number( QDateTime::currentDateTime().toTime_t() );
+	NBPasteDialog *pasteDialog = new NBPasteDialog();
+	pasteDialog->setSources( sourceList );
+	pasteDialog->setTarget( target );
+	pasteDialog->setIOMode( iomode );
 
-	Job newJob;
-	newJob.jobID = QString::fromStdString( MD5( qPrintable( sourceDir + target + datetime ) ).hexdigest() );
-	newJob.sources << sourceList;
-	newJob.target = QString( target );
-	newJob.mode = iomode;
+	connect( pasteDialog, SIGNAL( IOComplete() ), this, SLOT( handleJobComplete() ) );
 
-	// if ( jobList.count() > Settings.General.MaxIOJobs )
-		// pendingJobs << newJob;
+	jobList << pasteDialog;
 
-	// else
-	jobList[ newJob.jobID ] = newJob;
-	QtConcurrent::run( performIO, &newJob );
+	QTimer::singleShot( 100, pasteDialog, SLOT( startWork() ) );
 
 	manageTimer();
 };
 
-bool NBIOManager::cancelJob( QString jobID ) {
-
-	Job _job = jobList.value( jobID );
-	_job.canceled = true;
-
-	return true;
-};
-
-bool NBIOManager::hasPendingJobs() {
-
-	return false;
-};
-
-quint64 NBIOManager::pendingJobsCount() {
-
-	return 0;
-};
-
-qreal NBIOManager::jobProgress( QString jobID ) {
-
-	if ( jobList.value( jobID ).totalBytes > 0 )
-		return jobList.value( jobID ).totalBytesCopied / jobList.value( jobID ).totalBytes;
-
-	else
-		return 0;
-};
-
-qreal NBIOManager::totalProgress() {
-
-	qreal progress = 0;
-	foreach( QString id, jobList.keys() )
-		progress += jobProgress( id );
-
-	return progress / jobList.count();
-};
-
-int NBIOManager::activeJobs() {
+quint64 NBIOManager::activeJobs() {
 
 	return jobList.count();
 };
@@ -126,18 +74,6 @@ void NBIOManager::paintEvent( QPaintEvent *pEvent ) {
 		painter->drawText( 0, 0, 128, 52, Qt::AlignCenter, QString( "No active Jobs" ) );
 	}
 
-	else if ( jobs == 1 ) {
-		// Draw the total progress indicator
-		painter->setPen( Qt::gray );
-		painter->setBrush( Qt::darkGreen );
-		painter->drawRoundedRect( 5, 6, 118 * totalF, 17, 5, 5 );
-
-		// Draw the current file progress indicator
-		painter->setPen( Qt::gray );
-		painter->setBrush( Qt::darkGreen );
-		painter->drawRoundedRect( 5, 29, 118 * cfileF, 17, 5, 5 );
-	}
-
 	else {
 		// Draw text indicating total active jobs
 		painter->setBrush( Qt::transparent );
@@ -147,7 +83,7 @@ void NBIOManager::paintEvent( QPaintEvent *pEvent ) {
 		else
 			painter->setPen( Qt::black );
 
-		painter->drawText( 0, 6, 128, 17, Qt::AlignCenter, QString( "%1 active Jobs" ).arg( jobs ) );
+		painter->drawText( 0, 6, 128, 17, Qt::AlignCenter, QString( "%1 active Job%2" ).arg( jobs ).arg( ( jobs == 1 ) ? "" : "s" ) );
 
 		// Draw the total progress indicator
 		painter->setPen( Qt::gray );
@@ -162,14 +98,18 @@ void NBIOManager::paintEvent( QPaintEvent *pEvent ) {
 void NBIOManager::mousePressEvent( QMouseEvent *mEvent ) {
 
 	if ( checked ) {
-		// pDialog->hide();
+		foreach( NBPasteDialog *pDialog, jobList )
+			pDialog->hide();
+
 		checked = false;
 		repaint();
 	}
 
 	else {
 		if ( jobList.count() ) {
-			// pDialog->show();
+			foreach( NBPasteDialog *pDialog, jobList )
+				pDialog->show();
+
 			checked = true;
 			repaint();
 		}
@@ -190,7 +130,7 @@ void NBIOManager::manageTimer() {
 	if ( activeJobs() ) {
 		// And timer is not active, activate it
 		if ( not timer->isActive() )
-			timer->start( 500 );
+			timer->start( 1000 );
 	}
 
 	// If there are no active jobs,
@@ -203,74 +143,49 @@ void NBIOManager::manageTimer() {
 
 void NBIOManager::updateProgress() {
 
-	QStringList jobIDs = jobList.keys();
-
+	qreal totalP = 0;
 	if ( activeJobs() ) {
-		totalF = totalProgress();
-		foreach( QString id, jobIDs ) {
-			if ( jobList.value( id ).completed )
-				QTimer::singleShot( 100, this, SLOT( handleJobComplete( jobList.value( id ) ) ) );
-
-			else
-				cfileF = 1.0 * jobList.value( id ).cfileBytes / jobList.value( id ).cfileBytesCopied;
+		foreach( NBPasteDialog *pDialog, jobList ) {
+			totalP += pDialog->progress();
 		}
+		totalF = ( totalP / 100.0 ) / jobList.count();
 	}
 
 	manageTimer();
 	repaint();
 };
 
-void NBIOManager::handleJobComplete( Job *job ) {
+void NBIOManager::handleJobComplete() {
 
-	/*
-		*
-		* This must be used to show the error dialog. Currently we
-		* are struggling with other issues, so we are skipping it.
-		*
-	*/
-	#warning "Show the error dialog";
+	NBPasteDialog *pDialog = qobject_cast<NBPasteDialog*>( sender() );
+	pDialog->close();
+	QStringList errors = pDialog->errorNodes();
+	NBIOMode::Mode mode = pDialog->ioMode();
 
-	jobList.remove( job->jobID );
+	if ( errors.count() ) {
+		QString title = QString( "Error %1 files" ).arg( ( mode == NBIOMode::Copy ) ? "copying" : "moving" );
+		QString text = QString(
+			"<p>Some errors were encountered while %1 the files. Please check the copied data.</p>"		\
+			"<p>These errors were mostly caused due to insufficient permissions or invalid characters "	\
+			"in files names. You can rectify these problems and try again.</p>"
+		).arg( ( mode == NBIOMode::Copy ) ? "copying" : "moving" );
+
+		QListWidget *errorList = new QListWidget();
+		errorList->setFocusPolicy( Qt::NoFocus );
+		errorList->setIconSize( QSize( 32, 32 ) );
+
+		foreach( QString errorNode, errors ) {
+			QString iconName = NBIconProvider::icon( errorNode );
+			QListWidgetItem *item = new QListWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), errorNode );
+			errorList->addItem( item );
+		}
+
+		NBMessageDialog::error( title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok, errorList );
+	}
+
+	pDialog->deleteLater();
+	jobList.removeOne( pDialog );
+
 	manageTimer();
 	repaint();
-};
-
-NBProgressDisplay::NBProgressDisplay( QStringList sourceList, QString target ) : QWidget() {
-
-	sourceLbl = new QLabel( QString( "%1 (Computing sizes)" ).arg( dirName( sourceList.at( 0 ) ) ) );
-	targetLbl = new QLabel( target );
-
-	curFileLbl = new QLabel();
-
-	totalPBar = new QProgressBar();
-	totalPBar->setRange( 0, 100 );
-
-	cfilePBar = new QProgressBar();
-	cfilePBar->setRange( 0, 100 );
-
-	QVBoxLayout *lyt = new QVBoxLayout();
-	lyt->addWidget( sourceLbl );
-	lyt->addWidget( targetLbl );
-	lyt->addWidget( totalPBar );
-	lyt->addWidget( curFileLbl );
-	lyt->addWidget( cfilePBar );
-
-	setLayout( lyt );
-};
-
-void NBProgressDisplay::updateInfo( quint64 totalFiles, quint64 totalBytes ) {
-
-	QString srcTxt = sourceLbl->text();
-	QString newTxt = srcTxt.left( srcTxt.count() - 17 );
-	sourceLbl->setText( newTxt + QString( "(%1 files, %2)" ).arg( totalFiles ).arg( formatSize( totalBytes ) ) );
-};
-
-void NBProgressDisplay::updateProgress( QString curFile, qreal totalProgress, qreal cfileProgress ) {
-
-	curFileLbl->setText( curFile );
-	totalPBar->setValue( totalProgress );
-	cfilePBar->setValue( cfileProgress );
-};
-
-NBProgressPopup::NBProgressPopup() {
 };

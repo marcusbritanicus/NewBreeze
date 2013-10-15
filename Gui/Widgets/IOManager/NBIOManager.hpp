@@ -9,40 +9,8 @@
 
 #include <Global.hpp>
 #include <NBTools.hpp>
-#include <NBProgressDialog.hpp>
+#include <NBPasteDialog.hpp>
 #include <NBFileIO.hpp>
-
-class NBProgressDisplay : public QWidget {
-	Q_OBJECT
-
-	public:
-		NBProgressDisplay( QStringList sourceList, QString target );
-
-		// updateIndo( totalFiles, totalBytes );
-		void updateInfo( quint64, quint64 );
-
-		// updateProgress( curFile, totalProgress, cfileProgress )
-		void updateProgress( QString, qreal, qreal );
-
-	private:
-		QLabel *sourceLbl, *targetLbl;
-		QLabel *curFileLbl;
-		QProgressBar *totalPBar, *cfilePBar;
-};
-
-class NBProgressPopup : public QScrollArea {
-	Q_OBJECT
-
-	public:
-		NBProgressPopup();
-
-		// addLob( jobID, sourceList, target, iomode )
-		void addJob( quint64, QStringList, QString, NBIOMode::Mode );
-		NBProgressDisplay* job( quint64 );
-
-	private:
-		QList<NBProgressDisplay*> jobProgressList;
-};
 
 class NBIOManager : public QFrame {
 	Q_OBJECT
@@ -57,34 +25,17 @@ class NBIOManager : public QFrame {
 		// addJob( sourceList, target, IOMode, JobMode );
 		void addJob( QStringList, QString, NBIOMode::Mode );
 
-		// cancelJob( jobID );
-		bool cancelJob( QString );
-
-		// hasPendingJobs();
-		bool hasPendingJobs();
-
 		// pendingJobsCount();
-		quint64 pendingJobsCount();
-
-		// progress of job @jobID
-		qreal jobProgress( QString jobID );
-
-		// total percentage completed ( of all jobs )
-		qreal totalProgress();
-
-		// Number of active jobs
-		int activeJobs();
+		quint64 activeJobs();
 
 	private:
-		QMap<QString, Job> jobList;
-		QMap<QString, Job> pendingJobs;
+		QList<NBPasteDialog *> jobList;
 
 		QPainter *painter;
-		qreal totalF, cfileF;
+		qreal totalF;
 
 		bool checked;
 
-		NBProgressPopup *progressPopup;
 		QTimer *timer;
 
 	protected:
@@ -101,8 +52,8 @@ class NBIOManager : public QFrame {
 		void updateProgress();
 
 		// Intimate the user about completion of a job
-		// handleJobComplete( job )
-		void handleJobComplete( Job * );
+		// handleJobComplete()
+		void handleJobComplete();
 };
 
 #endif

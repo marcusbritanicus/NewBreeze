@@ -19,15 +19,30 @@ NBPasteDialog::NBPasteDialog() : NBDialog( QString( "n" ) ) {
 	setWindowProperties();
 }
 
+QStringList NBPasteDialog::sources() {
+
+	return srcList;
+};
+
 void NBPasteDialog::setSources( QStringList sourceList ) {
 
 	srcList.clear();
 	srcList << sourceList;
 };
 
+QString NBPasteDialog::target() {
+
+	return tgtDir;
+};
+
 void NBPasteDialog::setTarget( QString target ) {
 
 	tgtDir = QString( target );
+};
+
+NBIOMode::Mode NBPasteDialog::ioMode() {
+
+	return mode;
 };
 
 void NBPasteDialog::setIOMode( NBIOMode::Mode iomode ) {
@@ -38,6 +53,16 @@ void NBPasteDialog::setIOMode( NBIOMode::Mode iomode ) {
 
 	else
 		nameLbl->setText( "Copying files... ( Computing sizes )" );
+};
+
+qreal NBPasteDialog::progress() {
+
+	return totalPB->value();
+};
+
+QStringList NBPasteDialog::errorNodes() {
+
+	return errors;
 };
 
 void NBPasteDialog::createGUI() {
@@ -83,8 +108,6 @@ void NBPasteDialog::createAndSetupActions() {
 
 	connect( pauseBtn, SIGNAL( clicked() ), this, SLOT( togglePauseResume() ) );
 	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( setCanceled() ) );
-
-	connect( this, SIGNAL( IOComplete() ), this, SLOT( handleErrors() ) );
 }
 
 void NBPasteDialog::setWindowProperties() {
@@ -106,9 +129,8 @@ void NBPasteDialog::setWindowProperties() {
 	setFixedSize( 450, 240 );
 }
 
-void NBPasteDialog::show() {
+void NBPasteDialog::startWork() {
 
-	NBDialog::show();
 	qApp->processEvents();
 
 	preCopy();
@@ -120,46 +142,8 @@ void NBPasteDialog::show() {
 		nameLbl->setText( tr( "Moving files (%1)" ).arg( formatSize( totalSize ) ) );
 
 	qApp->processEvents();
-	QTimer::singleShot( 100, this, SLOT( performIO() ) );
+	performIO();
 }
-
-void NBPasteDialog::handleErrors() {
-
-	if ( errors.count() ) {
-		QString title, text, wTitle;
-
-		if ( mode == NBIOMode::Copy ) {
-			title = QString( "Error copying files" );
-			text = QString(
-				"<p>Some errors were encountered while copying the files. Please check the copied data.</p>"		\
-				"<p>These errors were mostly caused due to insufficient permissions or invalid characters "	\
-				"in files names. You can rectify these problems and try again.</p>"
-			);
-		}
-
-		else {
-			title = QString( "Error moving files" );
-			text = QString(
-				"<p>Some errors were encountered while moving the files. Please check the copied data.</p>"		\
-				"<p>These errors were mostly caused due to insufficient permissions or invalid characters "	\
-				"in files names. You can rectify these problems and try again.</p>"
-			);
-		}
-
-		QListWidget *errorList = new QListWidget();
-		errorList->setFocusPolicy( Qt::NoFocus );
-
-		errorList->setIconSize( QSize( 32, 32 ) );
-
-		foreach( QString errorNode, errors ) {
-			QString iconName = NBIconProvider::icon( errorNode );
-			QListWidgetItem *item = new QListWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), errorNode );
-			errorList->addItem( item );
-		}
-
-		NBMessageDialog::error( title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok, errorList );
-	}
-};
 
 void NBPasteDialog::togglePauseResume() {
 
@@ -228,8 +212,10 @@ void NBPasteDialog::preCopy() {
 void NBPasteDialog::performIO() {
 
 	foreach( srcFile, srcList ) {
-		if ( wasCanceled )
+		if ( wasCanceled ) {
+			emit IOComplete();
 			return;
+		}
 
 		// If source is a dir, create the dir tree, then iterate through the dir and copy the files
 		if ( QFileInfo( srcFile ).isDir() ) {
@@ -238,8 +224,10 @@ void NBPasteDialog::performIO() {
 
 			QDirIterator it( srcDir, QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 			while ( it.hasNext() ) {
-				if ( wasCanceled )
+				if ( wasCanceled ) {
+					emit IOComplete();
 					return;
+				}
 
 				srcFile = it.next();
 				tgtFile = QDir( tgtDir ).filePath( QString( srcFile ).remove( QFileInfo( srcDir ).path() ).remove( 0, 1 ) );
@@ -247,9 +235,10 @@ void NBPasteDialog::performIO() {
 				if ( srcFile == tgtFile ) {
 					QString tgtDir = QFileInfo( srcFile ).absolutePath();
 					QString tgtBase = QFileInfo( srcFile ).baseName();
-				QString tgtSfx = QFileInfo( srcFile ).completeSuffix().isEmpty() ? "" : "." + QFileInfo( srcFile ).completeSuffix();
+					QString tgtSfx = mimeDb.suffixForFileName( srcFile );
+					tgtSfx = tgtSfx.isEmpty() ? QFileInfo( srcFile ).completeSuffix() : tgtSfx;
 
-					tgtFile = QDir( tgtDir ).filePath( tgtBase + " - copy" + tgtSfx );
+					tgtFile = QDir( tgtDir ).filePath( tgtBase + " - copy." + tgtSfx );
 
 					copyFile();
 				}
@@ -264,8 +253,10 @@ void NBPasteDialog::performIO() {
 
 		// Otherwise it is a file ( hopefully ) set the tgtFile and begin copy
 		else if ( QFileInfo( srcFile ).isFile() ) {
-			if ( wasCanceled )
+			if ( wasCanceled ) {
+				emit IOComplete();
 				return;
+			}
 
 			tgtFile = QDir( tgtDir ).filePath( QFileInfo( srcFile ).fileName() );
 			if ( srcFile == tgtFile ) {

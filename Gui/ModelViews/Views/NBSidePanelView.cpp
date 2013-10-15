@@ -7,14 +7,6 @@
 #include <NBSidePanelView.hpp>
 #include <NBTools.hpp>
 
-/*
-	if ( devWidth > bmkWidth )
-		sidePanelWidth = devWidth > 200 ? 200 : devWidth;
-
-	else
-		sidePanelWidth = bmkWidth > 200 ? 200 : bmkWidth;
-*/
-
 NBSidePanel::NBSidePanel() {
 
 	spModel = new NBSidePanelModel();
@@ -40,12 +32,25 @@ void NBSidePanel::setupView() {
 	// No Header
 	setHeaderHidden( true );
 
+	// Selection
+	setSelectionMode( QTreeView::NoSelection );
+
 	// By default expand both Devices and Bookmarks
 	setExpanded( spModel->index( 0, 0 ), true );
 	setExpanded( spModel->index( 1, 0 ), true );
 
 	// Fixed Width
 	setFixedWidth( sizeHintForColumn( 0 ) );
+
+	// Mouse Tracking
+	setMouseTracking( true );
+
+	// DragAndDrop
+	viewport()->setAcceptDrops(true);
+	setDragDropMode( QListView::DragDrop );
+	setDropIndicatorShown( true );
+	setDragEnabled( true );
+	setAcceptDrops( true );
 };
 
 void NBSidePanel::updateDevices() {
@@ -68,14 +73,70 @@ void NBSidePanel::updateBookmarks() {
 
 void NBSidePanel::handleClick( const QModelIndex clickedIndex ) {
 
-	if ( clickedIndex.parent().data() == "Devices" ) {
-		QVariant devVar = clickedIndex.data( Qt::UserRole + 1 );
-		NBDeviceInfo info = devVar.value<NBDeviceInfo>();
-		emit driveClicked( info.mountPoint() );
+	emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
+};
+
+void NBSidePanel::dragEnterEvent( QDragEnterEvent *deEvent ) {
+
+	deEvent->acceptProposedAction();
+};
+
+void NBSidePanel::dragMoveEvent( QDragMoveEvent *dmEvent ) {
+
+	if ( indexAt( dmEvent->pos() ).isValid() ) {
+		QModelIndex idx = indexAt( dmEvent->pos() );
+		QString mtpt = spModel->data( idx, Qt::UserRole + 1 ).toString();
+
+		if ( QFileInfo( mtpt ).isWritable() ) {
+			dmEvent->setDropAction( Qt::CopyAction );
+			dmEvent->accept();
+		}
+
+		else
+			dmEvent->ignore();
 	}
 
-	else if ( clickedIndex.parent().data() == "Bookmarks" ) {
+	else
+		dmEvent->ignore();
+};
 
-		emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
+void NBSidePanel::dropEvent( QDropEvent *dpEvent ) {
+
+	QModelIndex idx = indexAt( dpEvent->pos() );
+	QString mtpt = spModel->data( idx, Qt::UserRole + 1 ).toString();
+
+	const QMimeData *mData = dpEvent->mimeData();
+	if ( mData->hasUrls() ) {
+
+		QStringList args;
+		foreach( QUrl url, mData->urls() )
+			args << url.toLocalFile();
+
+		// Copy -> Ctrl
+		// Move -> Shift
+		// Link -> Ctrl + Shift
+		if ( dpEvent->keyboardModifiers() == Qt::ShiftModifier ) {
+
+			emit move( args, mtpt, NBIOMode::Move );
+		}
+
+		else if ( ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) or ( dpEvent->keyboardModifiers() == Qt::NoModifier ) ) {
+
+			emit copy( args, mtpt, NBIOMode::Copy );
+		}
+
+		else if ( dpEvent->keyboardModifiers() == ( Qt::ControlModifier | Qt::ShiftModifier ) ) {
+
+			foreach( QString node, args )
+				QFile::link( node, QDir( mtpt ).filePath( baseName( node ) ) );
+		}
+
+		else {
+
+			dpEvent->ignore();
+			return;
+		}
 	}
+
+	dpEvent->accept();
 };

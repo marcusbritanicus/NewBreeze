@@ -36,6 +36,8 @@ class NBIconView : public QListView {
 		int itemsPerRow;
 		int numberOfRows;
 
+		QPoint dragStartPosition;
+
 	Q_SIGNALS :
 		void open( QModelIndex );
 		void contextMenuRequested( QPoint );
@@ -44,6 +46,9 @@ class NBIconView : public QListView {
 		void link( QStringList, QString );
 
 	protected:
+		void mousePressEvent( QMouseEvent * );
+		void mouseMoveEvent( QMouseEvent * );
+
 		void mouseDoubleClickEvent( QMouseEvent * );
 		void keyPressEvent( QKeyEvent * );
 

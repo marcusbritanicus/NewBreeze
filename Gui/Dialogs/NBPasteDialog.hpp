@@ -19,9 +19,18 @@ class NBPasteDialog : public NBDialog {
 
 	public:
 		NBPasteDialog();
+
+		QStringList sources();
 		void setSources( QStringList );
+
+		QString target();
 		void setTarget( QString );
+
+		NBIOMode::Mode ioMode();
 		void setIOMode( NBIOMode::Mode iomode = NBIOMode::Copy );
+
+		qreal progress();
+		QStringList errorNodes();
 
 	private:
 		void createGUI();
@@ -38,14 +47,14 @@ class NBPasteDialog : public NBDialog {
 		QTimer *progressCheckTimer;
 
 		QStringList srcList;
-		qint64 totalSize, copiedSize;
+		quint64 totalSize, copiedSize;
 		bool wasCanceled;
 		bool isPaused;
 
 		QStringList errors;
 
 	public slots:
-		void show();
+		void startWork();
 
 	private slots:
 		void preCopy();
@@ -56,7 +65,6 @@ class NBPasteDialog : public NBDialog {
 		void togglePauseResume();
 		void setCanceled();
 
-		void handleErrors();
 		void handleFinished( int, QProcess::ExitStatus );
 
 		void setProgress();

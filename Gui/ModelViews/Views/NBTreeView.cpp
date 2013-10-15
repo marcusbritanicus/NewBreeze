@@ -148,7 +148,7 @@ void NBTreeView::dropEvent( QDropEvent *dpEvent ) {
 			emit move( args, mtpt );
 		}
 
-		else if ( ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) or ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) ) {
+		else if ( ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) or ( dpEvent->keyboardModifiers() == Qt::NoModifier ) ) {
 
 			emit copy( args, mtpt );
 		}

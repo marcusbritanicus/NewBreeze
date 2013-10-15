@@ -30,8 +30,15 @@ class NBSidePanel : public QTreeView {
 	private slots:
 		void handleClick( const QModelIndex );
 
+	protected:
+		void dragEnterEvent( QDragEnterEvent* );
+		void dragMoveEvent( QDragMoveEvent* );
+		void dropEvent( QDropEvent* );
+
 	Q_SIGNALS:
 		void driveClicked( QString );
+		void copy( QStringList, QString, NBIOMode::Mode );
+		void move( QStringList, QString, NBIOMode::Mode );
 };
 
 #endif

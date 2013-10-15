@@ -62,13 +62,6 @@ namespace NBIOMode {
 	};
 };
 
-namespace NBJobMode {
-	enum Mode {
-		Concurrent,
-		Queued
-	};
-};
-
 static QMimeDatabase mimeDb;
 
 // MimeType and Progams mapping cache location

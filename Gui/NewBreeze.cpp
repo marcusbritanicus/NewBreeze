@@ -201,6 +201,12 @@ void NewBreeze::createAndSetupActions() {
 	connect( SidePanel, SIGNAL( driveClicked( QString ) ),
 		FolderView, SLOT( doOpen( QString ) ) );
 
+	connect( SidePanel, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ),
+		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
+
+	connect( SidePanel, SIGNAL( move( QStringList, QString, NBIOMode::Mode ) ),
+		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
+
 	connect( FolderView, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ),
 		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
 

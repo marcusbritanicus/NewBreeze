@@ -42,6 +42,14 @@ QVariant NBSidePanelModel::data( const QModelIndex &index, int role ) const {
 				return item->data( Qt::UserRole + 1 );
 		}
 
+		case Qt::UserRole + 1 : {
+			if ( index.parent().data() == "Devices" )
+				return item->data( Qt::UserRole + 1 ).value<NBDeviceInfo>().mountPoint();
+
+			else
+				return item->data( Qt::UserRole + 1 );
+		}
+
 		default :
 			return item->data( role );
 	}
