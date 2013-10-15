@@ -1,3 +1,9 @@
+Version 2.0.0
+    - Enabled drag and drop support
+    - Copy and Move are now background processes
+    - NBSidePanel is now NBSidePanelView, with cusom delegate NBSidePanelDelegate
+    - NBTreeView is now stable, except for drag and drop
+
 Version 2.0.0-preview
     - GUI design changes
     - Delete is now a threaded Core IO
