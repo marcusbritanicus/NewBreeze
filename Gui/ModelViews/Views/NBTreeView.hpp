@@ -31,6 +31,8 @@ class NBTreeView : public QTreeView {
 		void createAndSetupActions();
 		QSize getGridSize( QSize );
 
+		QPoint dragStartPosition;
+
 	Q_SIGNALS :
 		void open( QModelIndex );
 		void newWindow( QString );
@@ -40,7 +42,11 @@ class NBTreeView : public QTreeView {
 		void link( QStringList, QString );
 
 	protected:
+		void mousePressEvent( QMouseEvent * );
+		void mouseMoveEvent( QMouseEvent * );
+
 		void mouseDoubleClickEvent( QMouseEvent * );
+		void keyPressEvent( QKeyEvent * );
 
 		void dragEnterEvent( QDragEnterEvent* );
 		void dragMoveEvent( QDragMoveEvent* );

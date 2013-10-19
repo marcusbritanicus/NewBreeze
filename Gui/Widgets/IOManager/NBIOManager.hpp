@@ -25,8 +25,11 @@ class NBIOManager : public QFrame {
 		// addJob( sourceList, target, IOMode, JobMode );
 		void addJob( QStringList, QString, NBIOMode::Mode );
 
-		// pendingJobsCount();
+		// activeJobs();
 		quint64 activeJobs();
+
+		// showAllIODialogs();
+		void showAllIODialogs();
 
 	private:
 		QList<NBPasteDialog *> jobList;

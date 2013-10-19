@@ -32,7 +32,7 @@ class NBCustomActionsMenu : public QMenu {
 		void addToArchive( QStringList );
 };
 
-class NBOpenWithMenu :public QMenu {
+class NBOpenWithMenu : public QMenu {
 	Q_OBJECT
 
 	public:

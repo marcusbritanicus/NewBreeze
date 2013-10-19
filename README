@@ -6,7 +6,7 @@ Some of its features are
     - Fast startup and browsing
     - Folder, text, html and image quick preview
     - File Association support
-    - Provides List and Icon View
+    - Provides List, Icon and Details View
     - Lists the drives/boomarks in the sidebar
     - Full drag and drop support
     - Bookmark Support
@@ -15,6 +15,7 @@ Some of its features are
     - Complete mime-icon support
     - BreadCrumbs Navigation Bar
     - Inline terminal
+    - Server for resource sharing
 
 NOTE: Due to changes in theme names, you'll have to run the settings once to fix
 theme related issues. Or make changes in NewBreeze.conf

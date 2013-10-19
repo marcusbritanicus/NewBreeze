@@ -149,7 +149,7 @@ QString NBFileDialog::selectedItem() {
 	QString ext = selectedFilter();
 
 	if ( nameLE->text().isEmpty() ) {
-		QString item = mainView->fsModel->nodePath( mainView->selectionModel()->selectedIndexes().at( 0 ).data().toString() );
+		QString item = mainView->fsModel->nodePath( mainView->selectionModel()->selectedRows().at( 0 ).data().toString() );
 		if ( not item.endsWith( ext ) )
 			return item += ext;
 
@@ -173,7 +173,7 @@ QStringList NBFileDialog::selectedItems() {
 
 	if ( nameLE->text().isEmpty() ) {
 		QStringList selected;
-		foreach( QModelIndex idx, mainView->selectionModel()->selectedIndexes() ) {
+		foreach( QModelIndex idx, mainView->selectionModel()->selectedRows() ) {
 			QString item = mainView->fsModel->nodePath( idx.data().toString() );
 			if ( not item.endsWith( ext ) )
 				selected << item += ext;

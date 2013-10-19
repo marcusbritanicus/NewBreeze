@@ -50,6 +50,12 @@ quint64 NBIOManager::activeJobs() {
 	return jobList.count();
 };
 
+void NBIOManager::showAllIODialogs() {
+
+	foreach( NBPasteDialog *pDialog, jobList )
+		pDialog->show();
+};
+
 void NBIOManager::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->begin( this );

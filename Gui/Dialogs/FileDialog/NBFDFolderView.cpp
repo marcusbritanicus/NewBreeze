@@ -167,10 +167,9 @@ void NBFDFolderView::createAndSetupActions() {
 	addAction( toggleSideBar );
 };
 
-QList<QModelIndex> NBFDFolderView::getSelection() {
+QModelIndexList NBFDFolderView::getSelection() {
 
-	QList<QModelIndex> fileList = selectedIndexes();
-	return fileList;
+	return selectionModel()->selectedRows();;
 };
 
 void NBFDFolderView::goUp() {
@@ -212,7 +211,7 @@ void NBFDFolderView::newFolder() {
 void NBFDFolderView::doOpen( QModelIndex idx ) {
 
 	Q_UNUSED( idx );
-	QList<QModelIndex> selectedList = selectedIndexes();
+	QModelIndexList selectedList = getSelection();
 
 	foreach( QModelIndex index, selectedList ) {
 		QFileInfo info = fsModel->nodeInfo( index );
@@ -261,7 +260,7 @@ void NBFDFolderView::doOpen( QModelIndex idx ) {
 		}
 
 		else {
-			if ( selectedIndexes().count() ) {
+			if ( getSelection().count() ) {
 				NBMessageDialog::critical( "NewBreeze - Error", "I really do not have any idea how to open this file." );
 				return;
 			}
@@ -309,7 +308,7 @@ void NBFDFolderView::doOpen( QString loc ) {
 	}
 
 	else {
-		if ( selectedIndexes().count() ) {
+		if ( getSelection().count() ) {
 			NBMessageDialog::critical( "NewBreeze - Error", "I really do not have any idea how to open this file." );
 			return;
 		}

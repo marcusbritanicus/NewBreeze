@@ -17,7 +17,7 @@ class NBFDFolderView : public QListView {
 
 	public :
 		NBFDFolderView( QString location );
-		QList<QModelIndex> getSelection();
+		QModelIndexList getSelection();
 
 		void updateViewMode();
 		void setContentsWidth( int );

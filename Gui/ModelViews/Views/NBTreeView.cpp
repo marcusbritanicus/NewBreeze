@@ -44,7 +44,7 @@ NBTreeView::NBTreeView( NBFileSystemModel *fsm ) : QTreeView(), fsModel( fsm ) {
 
 	// DragAndDrop
 	viewport()->setAcceptDrops(true);
-	setDragDropMode( QListView::DragDrop );
+	setDragDropMode( QTreeView::DragDrop );
 	setDropIndicatorShown( true );
 	setDragEnabled( true );
 	setAcceptDrops( true );
@@ -95,6 +95,56 @@ void NBTreeView::updateViewMode() {
 	}
 };
 
+void NBTreeView::mousePressEvent( QMouseEvent *mpEvent ) {
+
+	if ( ( mpEvent->button() == Qt::LeftButton ) )
+		dragStartPosition = mpEvent->pos();
+
+	else
+		dragStartPosition = QPoint();
+
+	QTreeView::mousePressEvent( mpEvent );
+};
+
+void NBTreeView::mouseMoveEvent( QMouseEvent *mmEvent ) {
+
+	if ( not ( mmEvent->buttons() & Qt::LeftButton ) ) {
+
+		QTreeView::mouseMoveEvent( mmEvent );
+		return;
+	}
+
+	else if ( dragStartPosition.isNull() ) {
+
+		QTreeView::mouseMoveEvent( mmEvent );
+		return;
+	}
+
+	else if ( ( mmEvent->pos() - dragStartPosition ).manhattanLength() < QApplication::startDragDistance() ) {
+
+		QTreeView::mouseMoveEvent( mmEvent );
+		return;
+	}
+
+	if ( selectionModel()->hasSelection() ) {
+
+		QDrag *drag = new QDrag( this );
+
+		QList<QUrl> urlList;
+		foreach( QModelIndex item, selectionModel()->selectedRows() )
+			urlList << QUrl( fsModel->nodePath( item.data().toString() ) );
+
+		QMimeData *mimedata = new QMimeData();
+		mimedata->setUrls( urlList );
+
+		drag->setMimeData( mimedata );
+
+		drag->exec( Qt::CopyAction | Qt::MoveAction | Qt::LinkAction );
+	}
+
+	mmEvent->accept();
+};
+
 void NBTreeView::mouseDoubleClickEvent( QMouseEvent *mouseEvent) {
 
 	QModelIndex idx = indexAt( mouseEvent->pos() );
@@ -104,6 +154,85 @@ void NBTreeView::mouseDoubleClickEvent( QMouseEvent *mouseEvent) {
 	qDebug() << idx.data().toString();
 
 	mouseEvent->accept();
+};
+
+void NBTreeView::keyPressEvent( QKeyEvent *keyEvent ) {
+
+	QModelIndex curIndex( currentIndex() );
+
+	if ( keyEvent->key() == Qt::Key_Down ) {
+		// If the current selected item is the last in the visual row
+		if ( ( curIndex.row() + 1 ) == fsModel->rowCount() ) {
+			// Then go to the first one
+			QModelIndex newIndex( fsModel->index( 0, 0, curIndex.parent() ) );
+			// If the user is using control key, meaning using extended selection, then no update
+			if ( qApp->queryKeyboardModifiers() & Qt::ControlModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::NoUpdate );
+
+			else if ( qApp->queryKeyboardModifiers() & Qt::ShiftModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::Select );
+
+			// otherwise, select it
+			else
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::ClearAndSelect );
+		}
+
+		else {
+			// then, move the selection/current index to the next item
+			QModelIndex newIndex( fsModel->index( curIndex.row() + 1, 0, curIndex.parent() ) );
+			// If the user is using control key, meaning using extended selection, then no update
+			if ( qApp->queryKeyboardModifiers() & Qt::ControlModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::NoUpdate );
+
+			else if ( qApp->queryKeyboardModifiers() & Qt::ShiftModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::Select );
+
+			// otherwise, select it
+			else
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::ClearAndSelect );
+		}
+	}
+
+	else if ( keyEvent->key() == Qt::Key_Up ) {
+
+		// If its the first item in the whole list
+		if ( ( curIndex.row() ) == 0 ) {
+			// Then go to the last one
+			QModelIndex newIndex( fsModel->index( fsModel->rowCount() - 1, 0, curIndex.parent() ) );
+			// If the user is using control key, meaning using extended selection, then no update
+			if ( qApp->queryKeyboardModifiers() & Qt::ControlModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::NoUpdate );
+
+			else if ( qApp->queryKeyboardModifiers() & Qt::ShiftModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::Select );
+
+			// otherwise, select it
+			else
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::ClearAndSelect );
+		}
+
+		// If the current selected item is the first in the visual row
+		else {
+			// then, move the cursor to the last item of the previous visual row
+			QModelIndex newIndex( fsModel->index( curIndex.row() - 1, 0, curIndex.parent() ) );
+			// If the user is using control key, meaning using extended selection, then no update
+			if ( qApp->queryKeyboardModifiers() & Qt::ControlModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::NoUpdate );
+
+			else if ( qApp->queryKeyboardModifiers() & Qt::ShiftModifier )
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::Select );
+
+			// otherwise, select it
+			else
+				selectionModel()->setCurrentIndex( newIndex, QItemSelectionModel::ClearAndSelect );
+		}
+	}
+
+	else {
+		QTreeView::keyPressEvent( keyEvent );
+	}
+
+	keyEvent->accept();
 };
 
 void NBTreeView::dragEnterEvent( QDragEnterEvent *deEvent ) {

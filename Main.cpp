@@ -126,7 +126,6 @@ int main( int argc, char **argv ) {
 		NBServer *server = new NBServer();
 		server->start();
 
-		qDebug() << "Starting gui";
 		NewBreeze *Gui;
 		if ( argc >= 2 )
 			Gui = new NewBreeze( app.tr( argv[ 1 ] ) );

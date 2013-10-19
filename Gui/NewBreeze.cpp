@@ -17,7 +17,6 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 			loc.chop( 1 );
 	}
 
-	qDebug() << "\t Creating gui...";
 	createGUI();
 	createAndSetupActions();
 	setWindowProperties();
@@ -78,8 +77,6 @@ void NewBreeze::createGUI() {
 
 	BodyWidget->setLayout( BodyLayout );
 
-	qDebug() << "\tNativeTitleBar:\n";
-	// qDebug() << Settings->General.NativeTitleBar;
 	if ( not Settings->General.NativeTitleBar ) {
 		MainLayout->addWidget( TitleBar );
 		MainLayout->addWidget( Separator::horizontal() );
@@ -368,6 +365,9 @@ void NewBreeze::showCustomActionsDialog() {
 };
 
 void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
+
+	// If there are background FileIO jobs, bring them to front
+	InfoBar->ioManager->showAllIODialogs();
 
 	// Store the previous session - geometry, and open directory.
 	Settings->setValue( "Session/Geometry", geometry() );

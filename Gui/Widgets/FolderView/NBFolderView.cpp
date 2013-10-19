@@ -276,11 +276,22 @@ void NBFolderView::createAndSetupActions() {
 
 QModelIndexList NBFolderView::getSelection() {
 
-	if ( currentIndex() )
-		return TreeView->selectionModel()->selectedRows();
+	QModelIndexList selectedList;
+	if ( currentIndex() ) {
+		selectedList << TreeView->selectionModel()->selectedIndexes();
+			foreach( QModelIndex idx, selectedList )
+				if ( idx.column() )
+					selectedList.removeAt( selectedList.indexOf( idx ) );
+	}
 
-	else
-		return IconView->selectionModel()->selectedIndexes();
+	else {
+		selectedList << IconView->selectionModel()->selectedIndexes();
+			foreach( QModelIndex idx, selectedList )
+				if ( idx.column() )
+					selectedList.removeAt( selectedList.indexOf( idx ) );
+	}
+
+	return selectedList;
 };
 
 void NBFolderView::goUp() {
@@ -654,6 +665,8 @@ void NBFolderView::doDelete() {
 	foreach( QModelIndex idx, selectedList )
 		toBeDeleted << QDir( fsModel->rootPath() ).filePath( idx.data().toString() );
 
+	toBeDeleted.removeDuplicates();
+
 	NBConfirmDeleteDialog *deleteMsg = new NBConfirmDeleteDialog( toBeDeleted, true );
 	if ( not deleteMsg->exec() )
 		return;
@@ -910,7 +923,11 @@ void NBFolderView::compress( QStringList archiveList ) {
 
 void NBFolderView::updateModel( QString nodePath ) {
 
-	if ( dirName( nodePath ) == fsModel->currentDir() ) {
+	if ( dirName( nodePath ) + "/" == fsModel->currentDir() ) {
+		fsModel->insertNode( baseName( nodePath ) );
+	}
+
+	if ( dirName( nodePath ) + "/" == fsModel->currentDir() ) {
 		fsModel->insertNode( baseName( nodePath ) );
 	}
 };
@@ -927,10 +944,9 @@ void NBFolderView::updateProgress( QString nodePath, float fileCopied, float tot
 
 void NBFolderView::handleDeleteFailure( QStringList files, QStringList dirs ) {
 
-	if ( ( not files.count() ) and ( not dirs.count() ) ) {
-		doReload();
+	doReload();
+	if ( ( not files.count() ) and ( not dirs.count() ) )
 		return;
-	}
 
 	QTableWidget *table = new QTableWidget( 0, 2 );
 	table->setFocusPolicy( Qt::NoFocus );

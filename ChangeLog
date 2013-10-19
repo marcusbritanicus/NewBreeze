@@ -1,11 +1,16 @@
 Version 2.0.1
     - Fixed major bugs in NBSettings and NBStartup that was causing Settings file to be wrongly written
+    - NBTreeView now has drag and drop enabled
+    - NBStatusBar now shows proper multi-selection label
+    - When closing NewBreeze, the FileIO running in the background comes to front
 
 Version 2.0.0
     - Enabled drag and drop support
     - Copy and Move are now background processes
     - NBSidePanel is now NBSidePanelView, with cusom delegate NBSidePanelDelegate
     - NBTreeView is now stable, except for drag and drop
+    - An improved NBInfoBar now replaces obsolete NBStatusBar
+    - File Copy and Paste now runs in the background
 
 Version 2.0.0-preview
     - GUI design changes

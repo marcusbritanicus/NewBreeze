@@ -241,7 +241,7 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 		QDrag *drag = new QDrag( this );
 
 		QList<QUrl> urlList;
-		foreach( QModelIndex item, selectionModel()->selectedIndexes() )
+		foreach( QModelIndex item, selectionModel()->selectedRows() )
 			urlList << QUrl( fsModel->nodePath( item.data().toString() ) );
 
 		QMimeData *mimedata = new QMimeData();
@@ -264,7 +264,7 @@ void NBIconView::mouseDoubleClickEvent( QMouseEvent *mouseEvent) {
 	mouseEvent->accept();
 };
 
-void NBIconView::keyPressEvent( QKeyEvent *keyEvent) {
+void NBIconView::keyPressEvent( QKeyEvent *keyEvent ) {
 
 	QModelIndex curIndex( currentIndex() );
 
