@@ -120,28 +120,28 @@ void NBFDFolderView::createAndSetupActions() {
 
 	// New Folder
 	actNewDir = new QAction( QIcon::fromTheme( "folder-new" ), "New folder", this );
-	actNewDir->setShortcuts( Settings.Shortcuts.NewFolder );
+	actNewDir->setShortcuts( Settings->Shortcuts.NewFolder );
 
 	connect( actNewDir, SIGNAL( triggered() ), this, SLOT( newFolder() ) );
 	addAction( actNewDir );
 
 	// New file
 	actNewFile = new QAction( QIcon::fromTheme( "document-new" ), "New File", this );
-	actNewFile->setShortcuts( Settings.Shortcuts.NewFile );
+	actNewFile->setShortcuts( Settings->Shortcuts.NewFile );
 
 	connect( actNewFile, SIGNAL( triggered() ), this, SLOT( newFile() ) );
 	addAction( actNewFile );
 
 	// Reload
 	reload = new QAction( QIcon( ":/icons/reload.png" ), "Re&fresh", this );
-	reload->setShortcuts( Settings.Shortcuts.Reload );
+	reload->setShortcuts( Settings->Shortcuts.Reload );
 
 	connect( reload, SIGNAL( triggered() ), this, SLOT( doReload() ) );
 	addAction( reload );
 
 	// showDotFiles
 	showHideDotFiles = new QAction( QIcon( ":/icons/showDotFiles.png" ), "Show &Hidden", this );
-	showHideDotFiles->setShortcuts( Settings.Shortcuts.ToggleHidden );
+	showHideDotFiles->setShortcuts( Settings->Shortcuts.ToggleHidden );
 
 	connect( showHideDotFiles, SIGNAL( triggered() ), this, SLOT( doShowHideDotFiles() ) );
 	addAction( showHideDotFiles );
@@ -161,7 +161,7 @@ void NBFDFolderView::createAndSetupActions() {
 
 	// Show/Hide side bar
 	QAction *toggleSideBar = new QAction( "Toggle Sidebar", this );
-	toggleSideBar->setShortcuts( Settings.Shortcuts.ToggleSideBar );
+	toggleSideBar->setShortcuts( Settings->Shortcuts.ToggleSideBar );
 
 	connect( toggleSideBar, SIGNAL( triggered() ), this, SIGNAL( showHideSideBar() ) );
 	addAction( toggleSideBar );
@@ -333,8 +333,8 @@ void NBFDFolderView::doShowHideDotFiles() {
 		fsModel->setShowHidden( true );
 	}
 
-	settings.setValue( "Session/ShowHidden", showHidden );
-	settings.sync();
+	// Settings->setValue( "Session/ShowHidden", showHidden );
+	Settings->reload();
 };
 
 void NBFDFolderView::sortByName() {

@@ -5,7 +5,6 @@
 */
 
 #include <NBTools.hpp>
-#include <NBThumbsCache.hpp>
 #include <NBInfoBar.hpp>
 #include <NBMimeDatabase.hpp>
 
@@ -73,7 +72,7 @@ NBInfoBar::NBInfoBar() : QWidget() {
 	baseLyt->addWidget( ioManager );
 	baseLyt->addStretch( 0 );
 
-	setStyleSheet( getStyleSheet( "NBInfoBar", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBInfoBar", Settings->General.Style ) );
 
 	setLayout( baseLyt );
 };
@@ -140,7 +139,8 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
 
 	// Icon
-	setIcon( NBIcon::icon( QFileInfo( itemPath ), QSize( 48, 48 ) ) );
+	QString icoStr = NBIconProvider::icon( itemPath );
+	setIcon( QIcon::fromTheme( icoStr, QIcon( icoStr ) ) );
 
 	// Name
 	QString name = itemPath.split( "/", QString::SkipEmptyParts ).takeLast();

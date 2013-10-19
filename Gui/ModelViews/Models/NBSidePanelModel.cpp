@@ -28,7 +28,7 @@ QVariant NBSidePanelModel::data( const QModelIndex &index, int role ) const {
 	NBSidePanelItem *item = static_cast<NBSidePanelItem*>( index.internalPointer() );
 	switch( role ) {
 		case Qt::ForegroundRole : {
-			if ( ( Settings.General.Style == QString( "TransLight" ) ) or ( Settings.General.Style == QString( "LightGray" ) ) )
+			if ( ( Settings->General.Style == QString( "TransLight" ) ) or ( Settings->General.Style == QString( "LightGray" ) ) )
 				return Qt::black;
 
 			else

@@ -73,7 +73,7 @@ void NBDialog::setupGUI() {
 	if ( buttons.count( "c" ) )
 		titleLyt->addWidget( closeBtn );
 
-	if ( not Settings.General.NativeTitleBar ) {
+	if ( not Settings->General.NativeTitleBar ) {
 		baseLyt->addLayout( titleLyt );
 		// baseLyt->addWidget( Separator::horizontal() );
 	}
@@ -90,10 +90,10 @@ void NBDialog::setupGUI() {
 
 void NBDialog::setupDialogProperties() {
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-	if ( not Settings.General.NativeTitleBar )
+	if ( not Settings->General.NativeTitleBar )
 		setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
 
 	else
@@ -103,7 +103,7 @@ void NBDialog::setupDialogProperties() {
 
 	setMinimumSize( 600, 200 );
 
-	setStyleSheet( getStyleSheet( "NBDialog", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBDialog", Settings->General.Style ) );
 };
 
 void NBDialog::setLayout( QLayout *lyt ) {

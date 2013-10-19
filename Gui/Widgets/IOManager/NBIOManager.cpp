@@ -65,7 +65,7 @@ void NBIOManager::paintEvent( QPaintEvent *pEvent ) {
 
 	if ( not jobs ) {
 		painter->setBrush( Qt::transparent );
-		if ( Settings.General.Style == QString( "TransDark" ) or Settings.General.Style == QString( "DullBlack" ) )
+		if ( Settings->General.Style == QString( "TransDark" ) or Settings->General.Style == QString( "DullBlack" ) )
 			painter->setPen( Qt::white );
 
 		else
@@ -77,7 +77,7 @@ void NBIOManager::paintEvent( QPaintEvent *pEvent ) {
 	else {
 		// Draw text indicating total active jobs
 		painter->setBrush( Qt::transparent );
-		if ( Settings.General.Style == QString( "TransDark" ) or Settings.General.Style == QString( "DullBlack" ) )
+		if ( Settings->General.Style == QString( "TransDark" ) or Settings->General.Style == QString( "DullBlack" ) )
 			painter->setPen( Qt::white );
 
 		else

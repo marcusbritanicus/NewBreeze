@@ -392,7 +392,7 @@ void NBPropertiesDialog::setWindowProperties() {
 	setDialogTitle( tr( "Properties" ) );
 	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
 
-	if ( Settings.General.Style == "Transparent" )
+	if ( Settings->General.Style == "Transparent" )
 		setAttribute( Qt::WA_TranslucentBackground );
 	setWindowFlags( Qt::FramelessWindowHint );
 

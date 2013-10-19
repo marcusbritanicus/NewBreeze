@@ -65,27 +65,25 @@ namespace NBIOMode {
 static QMimeDatabase mimeDb;
 
 // MimeType and Progams mapping cache location
-const QString mimeProgsCache( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/NBMimeProgs-unstable.cache" ) );
+const QString mimeProgsCache( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/NBMimeProgs.cache" ) );
 
 // Thumbnails Storage Directory
-const QString thumbsDir( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/Thumbs-unstable/" ) );
+const QString thumbsDir( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/Thumbs/" ) );
 
 // Suffix and Icon mapping cache location
-const QString suffixIconPath( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/NBSuffixIcon-unstable.cache" ) );
+const QString suffixIconPath( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/NBSuffixIcon.cache" ) );
 
 // Suffix-Icon Map
 static QMap<QString, QStringList> suffixIconMap;
 
 // NewBreeze Preferences
-static QSettings settings( "NewBreeze", "NewBreeze-unstable" );
-static QSettings actionSettings( "NewBreeze", "CustomActions-unstable" );
-static QSettings bookmarkSettings( "NewBreeze", "Bookmarks-unstable" );
-static QSettings shortcutSettings( "NewBreeze", "Shortcuts-unstable" );
+static QSettings actionSettings( "NewBreeze", "CustomActions" );
+static QSettings bookmarkSettings( "NewBreeze", "Bookmarks" );
 static QSettings thumbsInfo( thumbsDir + "Thumbs.cache", QSettings::NativeFormat );
 
 typedef QMap<QString, QString> DeviceInfo;
 typedef QPair<QString, QString> BookMark;
 
-extern NBSettings Settings;
+static NBSettings *Settings = NBSettings::instance();
 
 #endif

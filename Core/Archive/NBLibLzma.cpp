@@ -37,6 +37,7 @@ QString NBLzma::fileName = QString();
 NBLzma::NBLzma( QString archive, NBLzma::Mode openmode, QString file ) {
 
 	NBLzma::Mode mode = openmode;
+	lzma_ret ret_xz;
 	switch( mode ) {
 		case NBLzma::READ : {
 			xzFileName = QString( archive );
@@ -57,7 +58,7 @@ NBLzma::NBLzma( QString archive, NBLzma::Mode openmode, QString file ) {
 			}
 
 			strm = LZMA_STREAM_INIT;
-			lzma_stream_decoder( &strm, UINT64_MAX, LZMA_CONCATENATED );
+			ret_xz = lzma_stream_decoder( &strm, UINT64_MAX, LZMA_CONCATENATED );
 
 			fdin = fopen( qPrintable( xzFileName ), "rb" );
 			fdout = fopen( qPrintable( fileName ), "wb" );
@@ -72,13 +73,15 @@ NBLzma::NBLzma( QString archive, NBLzma::Mode openmode, QString file ) {
 			lzma_check check = LZMA_CHECK_CRC64;
 			strm = LZMA_STREAM_INIT;
 
-			lzma_easy_encoder( &strm, preset, check );
+			ret_xz = lzma_easy_encoder( &strm, preset, check );
 
 			fdin = fopen( qPrintable( fileName ), "rb" );
 			fdout = fopen( qPrintable( xzFileName ), "wb" );
 			break;
 		}
 	}
+
+	Q_UNUSED( ret_xz );
 };
 
 void NBLzma::create() {

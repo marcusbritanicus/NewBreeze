@@ -58,25 +58,25 @@ void NBFDItemDelegate::paint( QPainter *painter, const QStyleOptionViewItem &opt
 		painter->setPen( QPen( Qt::NoPen ) );
 		painter->setPen( QPen( Qt::NoPen ) );
 		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings.Colors.SelectionMouseBrushColor.darker() );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setBrush( Settings->Colors.SelectionMouseBrushColor.darker() );
 
 			else
-				painter->setBrush( Settings.Colors.SelectionMouseBrushColor );
+				painter->setBrush( Settings->Colors.SelectionMouseBrushColor );
 
 		else if ( option.state & QStyle::State_Selected )
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings.Colors.SelectionBrushColor.darker() );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setBrush( Settings->Colors.SelectionBrushColor.darker() );
 
 			else
-				painter->setBrush( Settings.Colors.SelectionBrushColor );
+				painter->setBrush( Settings->Colors.SelectionBrushColor );
 
 		else if ( option.state & QStyle::State_MouseOver )
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings.Colors.MouseBrushColor.darker() );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setBrush( Settings->Colors.MouseBrushColor.darker() );
 
 			else
-				painter->setBrush( Settings.Colors.MouseBrushColor );
+				painter->setBrush( Settings->Colors.MouseBrushColor );
 
 		else
 			painter->setBrush( QBrush( Qt::transparent ) );
@@ -88,14 +88,14 @@ void NBFDItemDelegate::paint( QPainter *painter, const QStyleOptionViewItem &opt
 			painter->setBrush( Qt::NoBrush );
 			QPoint bl = option.rect.bottomLeft() + QPoint( 7, 0 );
 			QPoint br = option.rect.bottomRight() - QPoint( 7, 0 );
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) ) {
-				painter->setPen(  Settings.Colors.FocusPenColorAlt );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) ) {
+				painter->setPen(  Settings->Colors.FocusPenColorAlt );
 				painter->drawLine( bl, br );
 				painter->drawLine( bl + QPoint( 0, -1 ), br - QPoint( 0, 1 ) );
 			}
 
 			else {
-				painter->setPen( Settings.Colors.FocusPenColor );
+				painter->setPen( Settings->Colors.FocusPenColor );
 				painter->drawLine( bl, br );
 				painter->drawLine( bl + QPoint( 0, -1 ), br - QPoint( 0, 1 ) );
 			}
@@ -106,33 +106,33 @@ void NBFDItemDelegate::paint( QPainter *painter, const QStyleOptionViewItem &opt
 
 		// Text Painter Settings
 		if ( ftype.isSymLink() ) {
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings.Colors.SymLinkPenColorAlt );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setPen( Settings->Colors.SymLinkPenColorAlt );
 
 			else
-				painter->setPen( Settings.Colors.SymLinkPenColor );
+				painter->setPen( Settings->Colors.SymLinkPenColor );
 		}
 
 		else if ( ftype.isExecutable() && ftype.isFile() )
-			painter->setPen( Settings.Colors.ExecPenColor );
+			painter->setPen( Settings->Colors.ExecPenColor );
 
 		else if ( ftype.isHidden() ) {
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings.Colors.HiddenPenColorAlt );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setPen( Settings->Colors.HiddenPenColorAlt );
 
 			else
-				painter->setPen( Settings.Colors.HiddenPenColor );
+				painter->setPen( Settings->Colors.HiddenPenColor );
 		}
 
 		else if ( !ftype.isReadable() )
-			painter->setPen( Settings.Colors.NoReadPenColor );
+			painter->setPen( Settings->Colors.NoReadPenColor );
 
 		else {
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings.Colors.TextPenColorAlt );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setPen( Settings->Colors.TextPenColorAlt );
 
 			else
-				painter->setPen( Settings.Colors.TextPenColor );
+				painter->setPen( Settings->Colors.TextPenColor );
 		}
 
 		painter->drawText( textRect, Qt::AlignHCenter, text );

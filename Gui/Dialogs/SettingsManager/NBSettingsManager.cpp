@@ -17,7 +17,7 @@ void NBSettingsManager::createGUI() {
 
 	// Widget and Layout Base
 	QVBoxLayout *guiLyt = new QVBoxLayout();
-	if ( not Settings.General.NativeTitleBar )
+	if ( not Settings->General.NativeTitleBar )
 		guiLyt->addWidget( Separator::horizontal() );
 	guiLyt->addLayout( createBodyLayout() );
 	guiLyt->addWidget( Separator::horizontal() );
@@ -128,26 +128,26 @@ void NBViewsWidget::createGUI() {
 	imageLbl->setAlignment( Qt::AlignCenter );
 
 	nativeTitleBarCB = new QCheckBox( "&Use native title bar" );
-	nativeTitleBarCB->setChecked( Settings.General.NativeTitleBar );
+	nativeTitleBarCB->setChecked( Settings->General.NativeTitleBar );
 	connect( nativeTitleBarCB, SIGNAL( toggled( bool ) ), this, SLOT( handleNativeTitleBarToggle( bool ) ) );
 
 	maxIOJobsSB = new QSpinBox();
 	maxIOJobsSB->setRange( 2, 100 );
 	maxIOJobsSB->setSingleStep( 1 );
-	maxIOJobsSB->setValue( Settings.General.MaxIOJobs );
+	maxIOJobsSB->setValue( Settings->General.MaxIOJobs );
 	connect( maxIOJobsSB, SIGNAL( valueChanged( int ) ), this, SLOT( handleMaxIOJobsChanged( int ) ) );
 
-	if ( Settings.General.Style == QString( "TransLight" ) ) {
+	if ( Settings->General.Style == QString( "TransLight" ) ) {
 		tlRB->setChecked( true );
 		imageLbl->setPixmap( QPixmap( ":/icons/TransLight.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 	}
 
-	else if ( Settings.General.Style == QString( "TransDark" ) ) {
+	else if ( Settings->General.Style == QString( "TransDark" ) ) {
 		tdRB->setChecked( true );
 		imageLbl->setPixmap( QPixmap( ":/icons/TransDark.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 	}
 
-	else if ( Settings.General.Style == QString( "DullBlack" ) ) {
+	else if ( Settings->General.Style == QString( "DullBlack" ) ) {
 		dbRB->setChecked( true );
 		imageLbl->setPixmap( QPixmap( ":/icons/DullBlack.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 	}
@@ -172,40 +172,40 @@ void NBViewsWidget::createGUI() {
 void NBViewsWidget::handleThemeChanged() {
 
 	if ( tlRB->isChecked() ) {
-		settings.setValue( "Style", QVariant( QString( "TransLight" ) ) );
+		Settings->setValue( "Style", QVariant( QString( "TransLight" ) ) );
 		imageLbl->setPixmap( QPixmap( ":/icons/TransLight.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-		Settings.General.Style = QString( "TransLight" );
+		Settings->General.Style = QString( "TransLight" );
 	}
 
 	else if ( tdRB->isChecked() ) {
-		settings.setValue( "Style", QVariant( QString( "TransDark" ) ) );
+		Settings->setValue( "Style", QVariant( QString( "TransDark" ) ) );
 		imageLbl->setPixmap( QPixmap( ":/icons/TransDark.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-		Settings.General.Style = QString( "TransDark" );
+		Settings->General.Style = QString( "TransDark" );
 	}
 
 	else if ( dbRB->isChecked() ) {
-		settings.setValue( "Style", QVariant( QString( "DullBlack" ) ) );
+		Settings->setValue( "Style", QVariant( QString( "DullBlack" ) ) );
 		imageLbl->setPixmap( QPixmap( ":/icons/DullBlack.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-		Settings.General.Style = QString( "DullBlack" );
+		Settings->General.Style = QString( "DullBlack" );
 	}
 
 	else {
-		settings.setValue( "Style", QVariant( QString( "LightGray" ) ) );
+		Settings->setValue( "Style", QVariant( QString( "LightGray" ) ) );
 		imageLbl->setPixmap( QPixmap( ":/icons/LightGray.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-		Settings.General.Style = QString( "LightGray" );
+		Settings->General.Style = QString( "LightGray" );
 	}
 };
 
 void NBViewsWidget::handleNativeTitleBarToggle( bool useNative ) {
 
-	settings.setValue( "NativeTitleBar", useNative );
-	Settings.General.NativeTitleBar = useNative;
+	Settings->setValue( "NativeTitleBar", useNative );
+	Settings->General.NativeTitleBar = useNative;
 };
 
 void NBViewsWidget::handleMaxIOJobsChanged( int value ) {
 
-	settings.setValue( "MaxIOJobs", value );
-	Settings.General.MaxIOJobs = value;
+	Settings->setValue( "MaxIOJobs", value );
+	Settings->General.MaxIOJobs = value;
 };
 
 NBIconThemeWidget::NBIconThemeWidget() {
@@ -219,7 +219,7 @@ void NBIconThemeWidget::createGUI() {
 	folderViewWidget = new NBIconThemeViewerWidget();
 
 	imagePreviewCB = new QCheckBox( "&Show Image Previews" );
-	imagePreviewCB->setChecked( Settings.General.ImagePreviews );
+	imagePreviewCB->setChecked( Settings->General.ImagePreviews );
 
 	connect( iconThemesWidget, SIGNAL( reloadIcons() ), folderViewWidget, SLOT( loadIcons() ) );
 	connect( imagePreviewCB, SIGNAL( stateChanged( int ) ), this, SLOT( handleCheckStateChanged( int ) ) );
@@ -240,14 +240,14 @@ void NBIconThemeWidget::handleCheckStateChanged( int state ) {
 
 	switch( state ) {
 		case Qt::Unchecked :
-			settings.setValue( "ImagePreviews", false );
-			Settings.General.ImagePreviews = false;
+			Settings->setValue( "ImagePreviews", false );
+			Settings->General.ImagePreviews = false;
 			break;
 
 		case Qt::PartiallyChecked :
 		case Qt::Checked :
-			settings.setValue( "ImagePreviews", true );
-			Settings.General.ImagePreviews = true;
+			Settings->setValue( "ImagePreviews", true );
+			Settings->General.ImagePreviews = true;
 			break;
 	}
 }

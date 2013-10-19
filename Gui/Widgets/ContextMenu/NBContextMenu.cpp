@@ -24,10 +24,10 @@ NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QS
 	setTitle( tr( "&Actions" ) );
 	setIcon( QIcon( ":/icons/archive.png" ) );
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-    setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+    setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 
 	// Actions
 	if ( selectedIndexes.count() == 1 ) {
@@ -189,10 +189,10 @@ NBOpenWithMenu::NBOpenWithMenu( QString icon, QString name, QWidget *parent ) : 
 	setIcon( QIcon( icon ) );
 	setTitle( name );
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-    setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+    setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 };
 
 void NBOpenWithMenu::setWorkingDirectory( QString wDir ) {
@@ -308,9 +308,9 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		// File/directory sorting
 		NBMenu *sortMenu = new NBMenu( "&Sort by" );
 		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
-		if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+		if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 			sortMenu->setAttribute( Qt::WA_TranslucentBackground );
-		sortMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+		sortMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 
 		sortMenu->addAction( sortByNameAct );
 		sortMenu->addAction( sortBySizeAct );

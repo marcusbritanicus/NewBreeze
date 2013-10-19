@@ -13,7 +13,7 @@ NBSearchBar::NBSearchBar() : QWidget() {
 	searchLE->setFocusPolicy( Qt::ClickFocus );
 	QLabel *searchLbl = new QLabel();
 
-	if ( Settings.General.Style == "Natural" )
+	if ( Settings->General.Style == "Natural" )
 		searchLbl->setPixmap( QPixmap( ":icons/searchn.png" ).scaled( 20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 
 	else
@@ -28,7 +28,7 @@ NBSearchBar::NBSearchBar() : QWidget() {
 	setLayout( srchLyt );
 
 	setFixedWidth( 150 );
-	setStyleSheet( getStyleSheet( "NBAddressBar", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBAddressBar", Settings->General.Style ) );
 	connect( searchLE, SIGNAL( textEdited( QString ) ), this, SLOT( searchChanged( QString ) ) );
 };
 
@@ -43,18 +43,18 @@ void NBSearchBar::searchChanged( QString query ) {
 
 NBMenu::NBMenu( QWidget *parent ) : QMenu( parent ) {
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-	setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 };
 
 NBMenu::NBMenu( QString title, QWidget *parent ) : QMenu( title, parent ) {
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-	setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 };
 
 NBToolButton::NBToolButton( QString themeIcon, QString customIcon ) : QToolButton() {
@@ -67,8 +67,7 @@ NBToolButton::NBToolButton( QString themeIcon, QString customIcon ) : QToolButto
 	setAutoRaise( true );
 
 	setIcon( QIcon::fromTheme( themeIcon, QIcon( customIcon ) ) );
-
-	setStyleSheet( getStyleSheet( "NBToolButton", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
 }
 
 NBPushButton::NBPushButton( QIcon icon, QString text ) : QPushButton() {
@@ -80,7 +79,7 @@ NBPushButton::NBPushButton( QIcon icon, QString text ) : QPushButton() {
 	setIcon( icon );
 	setText( text );
 
-	setStyleSheet( getStyleSheet( "NBToolButton", settings.value( "Style" ).toString() ) );
+	setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
 };
 
 NBTitleIcon::NBTitleIcon( QString icon ) : QLabel() {
@@ -89,7 +88,7 @@ NBTitleIcon::NBTitleIcon( QString icon ) : QLabel() {
 	setContextMenuPolicy( Qt::CustomContextMenu );
 
 	menu.setAttribute( Qt::WA_TranslucentBackground );
-	menu.setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+	menu.setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 
 	QAction *aboutNBAct = new QAction( QIcon( ":/icons/info.png" ), "&About NewBreeze", this );
 	connect( aboutNBAct, SIGNAL( triggered() ), this, SIGNAL( aboutNB() ) );
@@ -168,13 +167,13 @@ QWidget* Separator::horizontal() {
 
 NBViewModeButton::NBViewModeButton() : QToolButton() {
 
-	setStyleSheet( getStyleSheet( "NBToolButton", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
 
 	setFixedHeight( 24 );
 	setMinimumWidth( 32 );
 
 	setIcon( QIcon( ":/icons/view-choose.png" ) );
-	setShortcut( Settings.Shortcuts.ViewMode.at( 0 ) );
+	setShortcut( Settings->Shortcuts.ViewMode.at( 0 ) );
 	setPopupMode( QToolButton::DelayedPopup );
 
 	QMenu *menu = new QMenu( this );
@@ -238,7 +237,7 @@ NBViewModeButton::NBViewModeButton() : QToolButton() {
 	connect( normalDetailsBtn, SIGNAL( clicked() ), this, SIGNAL( changeViewMode() ) );
 	connect( normalDetailsBtn, SIGNAL( clicked() ), menu, SLOT( close() ) );
 
-	menu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+	menu->setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 
 	menu->addAction( smallListAct );
 	menu->addAction( mediumListAct );
@@ -252,31 +251,31 @@ NBViewModeButton::NBViewModeButton() : QToolButton() {
 
 	setMenu( menu );
 
-	if ( Settings.General.FolderView == QString( "SmallListView" ) )
+	if ( Settings->General.FolderView == QString( "SmallListView" ) )
 		smallListBtn->setChecked( true );
 
-	else if ( Settings.General.FolderView == QString( "NormalListView" ) )
+	else if ( Settings->General.FolderView == QString( "NormalListView" ) )
 		mediumListBtn->setChecked( true );
 
-	else if ( Settings.General.FolderView == QString( "TilesView" ) )
+	else if ( Settings->General.FolderView == QString( "TilesView" ) )
 		tilesBtn->setChecked( true );
 
-	else if ( Settings.General.FolderView == QString( "SmallIconsView" ) )
+	else if ( Settings->General.FolderView == QString( "SmallIconsView" ) )
 		smallIconsBtn->setChecked( true );
 
-	else if ( Settings.General.FolderView == QString( "NormalIconsView" ) )
+	else if ( Settings->General.FolderView == QString( "NormalIconsView" ) )
 		normalIconsBtn->setChecked( true );
 
-	else if ( Settings.General.FolderView == QString( "LargeIconsView" ) )
+	else if ( Settings->General.FolderView == QString( "LargeIconsView" ) )
 		largeIconsBtn->setChecked( true );
 
-	else if ( Settings.General.FolderView == QString( "HugeIconsView" ) )
+	else if ( Settings->General.FolderView == QString( "HugeIconsView" ) )
 		hugeIconsBtn->setChecked( true );
 
-	else if ( Settings.General.FolderView == QString( "SDetailsView" ) )
+	else if ( Settings->General.FolderView == QString( "SDetailsView" ) )
 		smallDetailsBtn->setChecked( true );
 
-	else if ( Settings.General.FolderView == QString( "NDetailsView" ) )
+	else if ( Settings->General.FolderView == QString( "NDetailsView" ) )
 		normalDetailsBtn->setChecked( true );
 };
 
@@ -326,7 +325,7 @@ void NBDriveLabel::paintEvent( QPaintEvent *pEvent ) {
 
 	QPixmap pix = QIcon::fromTheme( "drive-harddisk" ).pixmap( 28, 28 );
 
-	if ( Settings.General.Style == "Natural" )
+	if ( Settings->General.Style == "Natural" )
 		painter->setPen( QColor( 0, 0, 0 ) );
 
 	else
@@ -417,7 +416,7 @@ QDialog *getMessageDialog( QString title, QString icon, QString text, QString wT
 
 	QDialog *msgDlg = new QDialog();
 	msgDlg->setAttribute( Qt::WA_TranslucentBackground );
-	if ( not Settings.General.NativeTitleBar )
+	if ( not Settings->General.NativeTitleBar )
 		msgDlg->setWindowFlags( Qt::FramelessWindowHint );
 
 	QHBoxLayout *dlgLyt = new QHBoxLayout();
@@ -479,7 +478,7 @@ QDialog *getMessageDialog( QString title, QString icon, QString text, QString wT
 	}
 	btnLyt->addStretch( 0 );
 
-	if ( not Settings.General.NativeTitleBar )
+	if ( not Settings->General.NativeTitleBar )
 		baseLyt->addLayout( ttlLyt );
 	baseLyt->addLayout( txtLyt );
 	baseLyt->addWidget( Separator::horizontal() );
@@ -491,7 +490,7 @@ QDialog *getMessageDialog( QString title, QString icon, QString text, QString wT
 
 	dlgLyt->addWidget( widget );
 	msgDlg->setLayout( dlgLyt );
-	msgDlg->setStyleSheet( getStyleSheet( "NBDialog", Settings.General.Style ) );
+	msgDlg->setStyleSheet( getStyleSheet( "NBDialog", Settings->General.Style ) );
 
 	msgDlg->setWindowTitle( wTitle);
 	msgDlg->setWindowIcon( QIcon( wIcon ) );

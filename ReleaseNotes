@@ -1,30 +1,27 @@
 NewBreeze v2.0.0
 ================
 
-NOTE: This is just a preview release. Some code is non functional, but mostly usabe. Important functionality like cut/copy/paste,
-delete, properties are working smoothly. Some of the minor functions like drag-drop or Detailed View are non functional.
-
 NOTE: With the NewBreeze2 series, I have moved on to the Major:Minor:Patch versioning system.
 
 While retaining all the functionality of NewBreeze series, I present to you the new and improved version NewBreeze2 series.
 This version is a preview release. Some of the functionality may be missing, or buggy. Here is a summary of changes.
 
-- The main UI was redesigned from scratch. While the NBSideBar and the NBInfoBar (formerly NBStatusBar) have retained the same code,
-NBFolderView has been rewritten. NBToolBar has been scrapped, and replaced by NBAddressBar and NBQuickMenuBar.
+- The main UI was redesigned from scratch. NBFolderView has been rewritten. NBToolBar has been scrapped, and replaced by NBAddressBar and
+NBQuickMenuBar. NBSidePanel has been moved to NBSidePanelView/NBSidePanelModel. NBStatusBar has been replaced by NBInfoBar, which has an
+inbuilt progress indicator.
 
 - NBFolderView is now a QStackWidget, with NBListView and NBTreeView being the file system viewer. NBFolderView mostly acts as an interface
-between NBIconView/NBTreeView.
+between NBIconView/NBTreeView and other IO functions, and NB calls like Properties/Rename/Delete etc
 
-- QFileSystemWatcher which was the ItemModel in the NewBreeze series has been replaced b NBFileSystemModel, a subclass of QAbstractItemModel.
+- QFileSystemWatcher which was the ItemModel in the NewBreeze series has been replaced by NBFileSystemModel, a subclass of QAbstractItemModel.
 It incorporates all the necessary functionality like mimetype based icon rendering, history, etc.
 
-- The DragDrop functionality is broken. It is not possible to drag items, nor do the dropped items cause any signals to be emitted.
+- The DragDrop functionality has been restored. Complete drag-and-drop with support for internal copy/move, drag/drop to drives/bookmarks.
 
-- I have tried to add DetailsView based on QTreeView, though it is not completely functional and buggy. In the following releases, namely,
-alpha and beta I intend to fix this.
+- A functional DetailsView, which supports all the functionality except drag and drop.
 
-- NBThumbsCache which was causing delays in loading of directories containing large number of files slow has been scrapped. NBFileSystemModel
-by default does the work.
+- NBThumbsCache which was causing delays in loading of directories containing large number of files has been scrapped. NBFileSystemModel by
+default does the work.
 
 - NBIcon class has been renamed as NBIconProvider, but in no way similar to QIconProvider.
 
@@ -34,7 +31,7 @@ by default does the work.
 
 - All dialogs are now a subclass of NBDialog.
 
-- Cut-Copy-Paste in this release has the same code as NewBreeze series. It will be separated into CoreIO and GUI classes.
+- Cut-Copy-Paste is now QtConcurrent based IO. The GUI itself manages the CoreIO.
 
 - Added server class, enabling resource sharing and fast startup of subsequent windows, once a window is opened.
 

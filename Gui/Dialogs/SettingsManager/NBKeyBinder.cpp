@@ -169,9 +169,9 @@ void NBKeyBinder::setWindowProperties() {
 
 	setFixedSize( 450, 180 );
 
-	// if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	// if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		// setAttribute( Qt::WA_TranslucentBackground );
-	// if ( not Settings.General.NativeTitleBar )
+	// if ( not Settings->General.NativeTitleBar )
 		// setWindowFlags( Qt::FramelessWindowHint );
 };
 

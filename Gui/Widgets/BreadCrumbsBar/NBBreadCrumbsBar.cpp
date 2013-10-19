@@ -16,7 +16,7 @@ NBBreadCrumbMenu::NBBreadCrumbMenu( QWidget *parent, QString path ) : QLabel( pa
 	// Create the GUI, i.e., an arrow
 	setPixmap( QIcon::fromTheme( "arrow-right" ).pixmap( QSize( 16, 16 ) ) );
 	menu = new QMenu();
-	// menu->setStyleSheet( getStyleSheet( "NBMenu", Settings.General.Style ) );
+	// menu->setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 	connect( menu, SIGNAL( aboutToHide() ), this, SLOT( onMenuHidden() ) );
 };
 
@@ -82,7 +82,7 @@ NBBreadCrumb::NBBreadCrumb( QWidget *parent, QString path, bool current ) : QLab
 			setStyleSheet( "QLabel { border: 1px solid gray; border-radius: 5px; background: gray; }" );
 
 		else {
-			if ( ( Settings.General.Style == "LightGray" ) or ( Settings.General.Style == "TransLight" ) )
+			if ( ( Settings->General.Style == "LightGray" ) or ( Settings->General.Style == "TransLight" ) )
 				setStyleSheet( "QLabel { font-weight: bold; color: black; }" );
 
 			else
@@ -92,7 +92,7 @@ NBBreadCrumb::NBBreadCrumb( QWidget *parent, QString path, bool current ) : QLab
 
 	// The crumb is not the current dir
 	else {
-		if ( ( Settings.General.Style == "LightGray" ) or ( Settings.General.Style == "TransLight" ) )
+		if ( ( Settings->General.Style == "LightGray" ) or ( Settings->General.Style == "TransLight" ) )
 			setStyleSheet( "QLabel { font-weight: none; color: black; } QLabel:hover{ color: darkblue; }" );
 
 		else
@@ -246,7 +246,7 @@ void NBBreadCrumbsBar::setCurrentDirectory( QString path ) {
 				}
 
 				else {
-					if ( ( Settings.General.Style == "LightGray" ) or ( Settings.General.Style == "TransLight" ) )
+					if ( ( Settings->General.Style == "LightGray" ) or ( Settings->General.Style == "TransLight" ) )
 						crumb->setStyleSheet( "QLabel { font-weight: bold; color: black; }" );
 
 					else
@@ -254,7 +254,7 @@ void NBBreadCrumbsBar::setCurrentDirectory( QString path ) {
 				}
 
 			else {
-				if ( ( Settings.General.Style == "LightGray" ) or ( Settings.General.Style == "TransLight" ) )
+				if ( ( Settings->General.Style == "LightGray" ) or ( Settings->General.Style == "TransLight" ) )
 					crumb->setStyleSheet( "QLabel { font-weight: none; color: black; } QLabel:hover{ color: darkblue; }" );
 
 				else

@@ -129,7 +129,7 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 
 	else {
 		// If it is a image (save thumbnail) and image previews are set
-		if ( ( mimetype.name().startsWith( "image" ) or mimetype.name().startsWith( "video/mng" ) ) /*and ( Settings.General.ImagePreviews )*/ ) {
+		if ( ( mimetype.name().startsWith( "image" ) or mimetype.name().startsWith( "video/mng" ) ) and ( Settings->General.ImagePreviews ) ) {
 			QString hashPath = QDir( thumbsDir ).absoluteFilePath( md5( path.toStdString() ).c_str() );
 			if ( hasStoredThumb( path, hashPath ) )
 				return hashPath;

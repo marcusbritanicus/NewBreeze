@@ -44,7 +44,7 @@ void NBCustomActions::createGUI() {
 	setupTable();
 
 	addBtn = new NBToolButton( ":/icons/list-add.png" );
-	addBtn->setShortcut( Settings.Shortcuts.AddCustomAction.at( 0 ) );
+	addBtn->setShortcut( Settings->Shortcuts.AddCustomAction.at( 0 ) );
 	connect( addBtn, SIGNAL( clicked() ), this, SLOT( addCustomAction() ) );
 
 	delBtn = new NBToolButton( ":/icons/list-remove.png" );
@@ -128,10 +128,10 @@ void NBCustomActions::setWidgetProperties() {
 	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
 	setWindowModality( Qt::ApplicationModal );
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-	setStyleSheet( getStyleSheet( "NBCustomActions", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBCustomActions", Settings->General.Style ) );
 };
 
 void NBCustomActions::addCustomAction() {
@@ -306,13 +306,13 @@ NBNewAction::NBNewAction() {
 	widgetLyt->setContentsMargins( QMargins() );
 	setLayout( widgetLyt );
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
 
 	setFixedWidth( 360 );
 
-	setStyleSheet( getStyleSheet( "NBCustomActions", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBCustomActions", Settings->General.Style ) );
 };
 
 QString NBNewAction::actionName() {

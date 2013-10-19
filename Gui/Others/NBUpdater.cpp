@@ -61,34 +61,34 @@ void NewBreeze::changeViewMode() {
 	viewModes << "SDetailsView" << "NDetailsView";
 
 	if ( AddressBar->viewModeBtn->smallListBtn->isChecked() )
-		Settings.General.FolderView = viewModes.at( 0 );
+		Settings->General.FolderView = viewModes.at( 0 );
 
 	else if ( AddressBar->viewModeBtn->mediumListBtn->isChecked() )
-		Settings.General.FolderView = viewModes.at( 1 );
+		Settings->General.FolderView = viewModes.at( 1 );
 
 	else if ( AddressBar->viewModeBtn->tilesBtn->isChecked() )
-		Settings.General.FolderView = viewModes.at( 2 );
+		Settings->General.FolderView = viewModes.at( 2 );
 
 	else if ( AddressBar->viewModeBtn->smallIconsBtn->isChecked() )
-		Settings.General.FolderView = viewModes.at( 3 );
+		Settings->General.FolderView = viewModes.at( 3 );
 
 	else if ( AddressBar->viewModeBtn->normalIconsBtn->isChecked() )
-		Settings.General.FolderView = viewModes.at( 4 );
+		Settings->General.FolderView = viewModes.at( 4 );
 
 	else if ( AddressBar->viewModeBtn->largeIconsBtn->isChecked() )
-		Settings.General.FolderView = viewModes.at( 5 );
+		Settings->General.FolderView = viewModes.at( 5 );
 
 	else if ( AddressBar->viewModeBtn->hugeIconsBtn->isChecked() )
-		Settings.General.FolderView = viewModes.at( 6 );
+		Settings->General.FolderView = viewModes.at( 6 );
 
 	else if ( AddressBar->viewModeBtn->smallDetailsBtn->isChecked() )
-		Settings.General.FolderView = viewModes.at( 7 );
+		Settings->General.FolderView = viewModes.at( 7 );
 
 	else if ( AddressBar->viewModeBtn->normalDetailsBtn->isChecked() )
-		Settings.General.FolderView = viewModes.at( 8 );
+		Settings->General.FolderView = viewModes.at( 8 );
 
-	settings.setValue( "FolderView", Settings.General.FolderView );
-	settings.sync();
+	Settings->setValue( "FolderView", Settings->General.FolderView );
+	Settings->reload();
 
 	int fvcWidth = FolderView->size().width();
 
@@ -117,14 +117,14 @@ void NewBreeze::switchToNextView() {
 	viewModes << "SmallIconsView" << "NormalIconsView" << "LargeIconsView" << "HugeIconsView";
 	viewModes << "SDetailsView" << "NDetailsView";
 
-	QString currentMode = Settings.General.FolderView;
+	QString currentMode = Settings->General.FolderView;
 
 	int curIndex = viewModes.indexOf( currentMode );
 	int newIndex = ( curIndex == ( viewModes.size() - 1 ) ) ? 0 : curIndex + 1;
 
-	Settings.General.FolderView = viewModes.at( newIndex );
-	settings.setValue( "FolderView", viewModes.at( newIndex ) );
-	settings.sync();
+	Settings->General.FolderView = viewModes.at( newIndex );
+	Settings->setValue( "FolderView", viewModes.at( newIndex ) );
+	Settings->reload();
 
 	int fvcWidth = FolderView->size().width();
 

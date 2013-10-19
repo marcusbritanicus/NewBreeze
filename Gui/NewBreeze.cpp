@@ -17,6 +17,7 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 			loc.chop( 1 );
 	}
 
+	qDebug() << "\t Creating gui...";
 	createGUI();
 	createAndSetupActions();
 	setWindowProperties();
@@ -26,8 +27,8 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	}
 
 	else {
-		if ( exists( Settings.Session.LastDir ) )
-			FolderView->doOpen( Settings.Session.LastDir );
+		if ( exists( Settings->Session.LastDir ) )
+			FolderView->doOpen( Settings->Session.LastDir );
 
 		else
 			FolderView->doOpen( QDir::homePath() );
@@ -35,7 +36,7 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 
 	// By default we do not show hidden files, but if the user
 	// had closed while viewing the hidden files, let's show it.
-	if ( Settings.Session.ShowHidden )
+	if ( Settings->Session.ShowHidden )
 		FolderView->fsModel->setShowHidden( true );
 
 	FolderView->currentWidget()->setFocus();
@@ -77,7 +78,9 @@ void NewBreeze::createGUI() {
 
 	BodyWidget->setLayout( BodyLayout );
 
-	if ( not Settings.General.NativeTitleBar ) {
+	qDebug() << "\tNativeTitleBar:\n";
+	// qDebug() << Settings->General.NativeTitleBar;
+	if ( not Settings->General.NativeTitleBar ) {
 		MainLayout->addWidget( TitleBar );
 		MainLayout->addWidget( Separator::horizontal() );
 	}
@@ -96,7 +99,7 @@ void NewBreeze::createGUI() {
 	Terminal->setFixedHeight( 270 );
 	Terminal->hide();
 
-	if ( not Settings.Session.SidePanel )
+	if ( not Settings->Session.SidePanel )
 		SidePanel->hide();
 
 	TitleBar->setFocusPolicy( Qt::NoFocus );
@@ -113,15 +116,15 @@ void NewBreeze::setWindowProperties() {
 
 	setMinimumSize( 900, 600 );
 
-	setGeometry( Settings.Session.Geometry);
+	setGeometry( Settings->Session.Geometry);
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-	if ( not Settings.General.NativeTitleBar )
+	if ( not Settings->General.NativeTitleBar )
 		setWindowFlags( Qt::FramelessWindowHint );
 
-	setStyleSheet( getStyleSheet( "NewBreeze", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NewBreeze", Settings->General.Style ) );
 };
 
 void NewBreeze::setWindowTitle( QString title ) {
@@ -239,39 +242,39 @@ void NewBreeze::createAndSetupActions() {
 
 	// About NB
 	QAction *aboutNBAct = new QAction( this );
-	aboutNBAct->setShortcuts( Settings.Shortcuts.AboutNB );
+	aboutNBAct->setShortcuts( Settings->Shortcuts.AboutNB );
 	connect( aboutNBAct, SIGNAL( triggered() ), this, SLOT( showAboutNB() ) );
 
 	// About Qt4
 	QAction *aboutQtAct = new QAction( this );
-	aboutQtAct->setShortcuts( Settings.Shortcuts.AboutQt );
+	aboutQtAct->setShortcuts( Settings->Shortcuts.AboutQt );
 	connect( aboutQtAct, SIGNAL( triggered() ), this, SLOT( showAboutQt4() ) );
 
 	// NB Info
 	QAction *showInfoAct = new QAction( this );
-	showInfoAct->setShortcuts( Settings.Shortcuts.NBInfo );
+	showInfoAct->setShortcuts( Settings->Shortcuts.NBInfo );
 	connect( showInfoAct, SIGNAL( triggered() ), this, SLOT( showInfoDlg() ) );
 
 	// Custom Actions
 	QAction *showCustomActionsAct = new QAction( this );
-	showCustomActionsAct->setShortcuts( Settings.Shortcuts.CustomActions );
+	showCustomActionsAct->setShortcuts( Settings->Shortcuts.CustomActions );
 	connect( showCustomActionsAct, SIGNAL( triggered() ), this, SLOT( showCustomActionsDialog() ) );
 
 	// Focus AddressBar
 	QAction *focusAddressBarAct = new QAction( this );
-	focusAddressBarAct->setShortcuts( Settings.Shortcuts.FocusAddressBar );
+	focusAddressBarAct->setShortcuts( Settings->Shortcuts.FocusAddressBar );
 	connect( focusAddressBarAct, SIGNAL( triggered() ), AddressBar->addressWidget->addressEdit, SLOT( setFocus() ) );
 
 	QAction *showSettingsAct = new QAction( this );
-	showSettingsAct->setShortcuts( Settings.Shortcuts.Settings );
+	showSettingsAct->setShortcuts( Settings->Shortcuts.Settings );
 	connect( showSettingsAct, SIGNAL( triggered() ), this, SLOT( showSettingsDialog() ) );
 
 	QAction *newWindowAct = new QAction( this );
-	newWindowAct->setShortcuts( Settings.Shortcuts.NewWindow );
+	newWindowAct->setShortcuts( Settings->Shortcuts.NewWindow );
 	connect( newWindowAct, SIGNAL( triggered() ), this, SLOT( openNewWindow() ) );
 
 	addBookMarkAct = new QAction( this );
-	addBookMarkAct->setShortcuts( Settings.Shortcuts.AddBookmark );
+	addBookMarkAct->setShortcuts( Settings->Shortcuts.AddBookmark );
 	connect( addBookMarkAct, SIGNAL( triggered() ), this, SLOT( addBookMark() ) );
 
 	// Update devices list
@@ -280,13 +283,13 @@ void NewBreeze::createAndSetupActions() {
 	connect( devWatcher, SIGNAL( activated( int ) ), SidePanel, SLOT( updateDevices() ) );
 
 	QAction *termWidgetAct = new QAction( this );
-	termWidgetAct->setShortcuts( Settings.Shortcuts.InlineTerminal );
+	termWidgetAct->setShortcuts( Settings->Shortcuts.InlineTerminal );
 	connect( termWidgetAct, SIGNAL( triggered() ), this, SLOT( showHideTermWidget() ) );
 	connect (Terminal, SIGNAL( shown( bool ) ), addBookMarkAct, SLOT( setDisabled( bool ) ) );
 
 	// Show/Hide side bar
 	QAction *toggleSideBar = new QAction( "Toggle Sidebar", this );
-	toggleSideBar->setShortcuts( Settings.Shortcuts.ToggleSideBar );
+	toggleSideBar->setShortcuts( Settings->Shortcuts.ToggleSideBar );
 
 	connect( toggleSideBar, SIGNAL( triggered() ), this, SLOT( toggleSideBarVisible() ) );
 	addAction( toggleSideBar );
@@ -304,11 +307,11 @@ void NewBreeze::createAndSetupActions() {
 
 void NewBreeze::updateGUI() {
 
-	// TitleBar->setStyleSheet( getStyleSheet( "NBTitleBar", Settings.General.Style ) );
-	// AddressBar->setStyleSheet( getStyleSheet( "NBTooBar", Settings.General.Style ) );
-	// SidePanel->setStyleSheet( getStyleSheet( "NBSidePanel", Settings.General.Style ) );
-	// Terminal->setStyleSheet( getStyleSheet( "NBTerminal", Settings.General.Style ) );
-	// InfoBar->setStyleSheet( getStyleSheet( "NBInfoBar", Settings.General.Style ) );
+	// TitleBar->setStyleSheet( getStyleSheet( "NBTitleBar", Settings->General.Style ) );
+	// AddressBar->setStyleSheet( getStyleSheet( "NBTooBar", Settings->General.Style ) );
+	// SidePanel->setStyleSheet( getStyleSheet( "NBSidePanel", Settings->General.Style ) );
+	// Terminal->setStyleSheet( getStyleSheet( "NBTerminal", Settings->General.Style ) );
+	// InfoBar->setStyleSheet( getStyleSheet( "NBInfoBar", Settings->General.Style ) );
 
 	setWindowProperties();
 };
@@ -334,7 +337,7 @@ void NewBreeze::toggleSideBarVisible() {
 	else
 		SidePanel->show();
 
-	settings.setValue( "Session/SidePanel", SidePanel->isVisible() );
+	Settings->setValue( "Session/SidePanel", SidePanel->isVisible() );
 };
 
 void NewBreeze::showAboutNB() {
@@ -367,10 +370,10 @@ void NewBreeze::showCustomActionsDialog() {
 void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 
 	// Store the previous session - geometry, and open directory.
-	settings.setValue( "Session/Geometry", geometry() );
-	settings.setValue( "Session/LastDir", FolderView->fsModel->currentDir() );
-	settings.setValue( "Session/ShowHidden", FolderView->fsModel->showHidden() );
-	settings.setValue( "Session/Maximized", isMaximized() );
+	Settings->setValue( "Session/Geometry", geometry() );
+	Settings->setValue( "Session/LastDir", FolderView->fsModel->currentDir() );
+	Settings->setValue( "Session/ShowHidden", FolderView->fsModel->showHidden() );
+	Settings->setValue( "Session/Maximized", isMaximized() );
 
 	qDebug() << "Good Bye!";
 
@@ -449,10 +452,10 @@ void NewBreeze::showInfoDlg() {
 
 	QDialog *shortcutDlg = new QDialog();
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		shortcutDlg->setAttribute( Qt::WA_TranslucentBackground );
 
-	if ( not Settings.General.NativeTitleBar )
+	if ( not Settings->General.NativeTitleBar )
 		shortcutDlg->setWindowFlags( Qt::FramelessWindowHint );
 
 	QHBoxLayout *dlgLyt = new QHBoxLayout();
@@ -474,7 +477,7 @@ void NewBreeze::showInfoDlg() {
 
 	btnLyt->addWidget( okBtn );
 
-	if ( not Settings.General.NativeTitleBar )
+	if ( not Settings->General.NativeTitleBar )
 		baseLyt->addWidget( new QLabel( "<h3>NewBreeze Info</h3>" ), 0, Qt::AlignCenter );
 	baseLyt->addWidget( nbInfo );
 	baseLyt->addWidget( Separator::horizontal() );
@@ -486,7 +489,7 @@ void NewBreeze::showInfoDlg() {
 
 	dlgLyt->addWidget( widget );
 	shortcutDlg->setLayout( dlgLyt );
-	// shortcutDlg->setStyleSheet( getStyleSheet( "NBDialog", Settings.General.Style ) );
+	// shortcutDlg->setStyleSheet( getStyleSheet( "NBDialog", Settings->General.Style ) );
 
 	shortcutDlg->setFixedSize( QSize( 720, 630 ) );
 
@@ -543,7 +546,7 @@ void NewBreeze::newWindow( QString path ) {
 		path = QDir::homePath();
 
 	NewBreeze *newbreeze = new NewBreeze( path );
-	if ( Settings.Session.Maximized )
+	if ( Settings->Session.Maximized )
 		newbreeze->showMaximized();
 
 	else
@@ -556,7 +559,7 @@ void NewBreeze::openNewWindow() {
 	qDebug() << "Opening new window at " << location;
 
 	NewBreeze *newbreeze = new NewBreeze( location );
-	if ( Settings.Session.Maximized )
+	if ( Settings->Session.Maximized )
 		newbreeze->showMaximized();
 
 	else
@@ -568,7 +571,7 @@ void NewBreeze::openInNewWindow( QString location ) {
 	qDebug() << "Opening new window at " << location;
 
 	NewBreeze *newbreeze = new NewBreeze( location );
-	if ( Settings.Session.Maximized )
+	if ( Settings->Session.Maximized )
 		newbreeze->showMaximized();
 
 	else

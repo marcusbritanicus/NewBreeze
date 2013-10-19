@@ -6,8 +6,6 @@
 
 #include <NBQuickMenuBar.hpp>
 
-using namespace std;
-
 NBQuickMenuBar::NBQuickMenuBar() : QWidget() {
 
 	openWithBtn = new NBPushButton( QIcon( ":/icons/open.png" ), tr( "&Open With" ) );
@@ -27,11 +25,11 @@ NBQuickMenuBar::NBQuickMenuBar() : QWidget() {
 	deleteBtn->setDisabled( true );
 	permsBtn->setDisabled( true );
 
-	openWithBtn->setStyleSheet( getStyleSheet( "NBToolButton", settings.value( "Style" ).toString() ) );
-	moveToBtn->setStyleSheet( getStyleSheet( "NBToolButton", settings.value( "Style" ).toString() ) );
-	deleteBtn->setStyleSheet( getStyleSheet( "NBToolButton", settings.value( "Style" ).toString() ) );
-	propsBtn->setStyleSheet( getStyleSheet( "NBToolButton", settings.value( "Style" ).toString() ) );
-	permsBtn->setStyleSheet( getStyleSheet( "NBToolButton", settings.value( "Style" ).toString() ) );
+	openWithBtn->setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
+	moveToBtn->setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
+	deleteBtn->setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
+	propsBtn->setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
+	permsBtn->setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
 
 	setContentsMargins( QMargins() );
 	QHBoxLayout *toolsLyt = new QHBoxLayout();

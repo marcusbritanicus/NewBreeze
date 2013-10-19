@@ -61,7 +61,7 @@ void NBFolderViewRestricted::updateViewMode() {
 		*
 	*/
 
-	if ( Settings.General.FolderView == QString( "SmallListView" ) ) {
+	if ( Settings->General.FolderView == QString( "SmallListView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::ListMode );
 		setFlow( QListView::TopToBottom );
@@ -74,7 +74,7 @@ void NBFolderViewRestricted::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings.General.FolderView == QString( "NormalListView" ) ) {
+	else if ( Settings->General.FolderView == QString( "NormalListView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::ListMode );
 		setFlow( QListView::TopToBottom );
@@ -87,7 +87,7 @@ void NBFolderViewRestricted::updateViewMode() {
 		setWrapping( false );
 	}
 
-	else if ( Settings.General.FolderView == QString( "TilesView" ) ) {
+	else if ( Settings->General.FolderView == QString( "TilesView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::ListMode );
 		setFlow( QListView::LeftToRight );
@@ -100,7 +100,7 @@ void NBFolderViewRestricted::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings.General.FolderView == QString( "SmallIconsView" ) ) {
+	else if ( Settings->General.FolderView == QString( "SmallIconsView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::IconMode );
 		setFlow( QListView::LeftToRight );
@@ -113,7 +113,7 @@ void NBFolderViewRestricted::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings.General.FolderView == QString( "NormalIconsView" ) ) {
+	else if ( Settings->General.FolderView == QString( "NormalIconsView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::IconMode );
 		setFlow( QListView::LeftToRight );
@@ -126,7 +126,7 @@ void NBFolderViewRestricted::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings.General.FolderView == QString( "LargeIconsView" ) ) {
+	else if ( Settings->General.FolderView == QString( "LargeIconsView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::IconMode );
 		setFlow( QListView::LeftToRight );
@@ -139,7 +139,7 @@ void NBFolderViewRestricted::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings.General.FolderView == QString( "HugeIconsView" ) ) {
+	else if ( Settings->General.FolderView == QString( "HugeIconsView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::IconMode );
 		setFlow( QListView::LeftToRight );

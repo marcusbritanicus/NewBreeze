@@ -68,7 +68,7 @@ void NBRunCmdDialog::setWindowProperties() {
 	setAttribute( Qt::WA_TranslucentBackground );
 	setWindowFlags( Qt::FramelessWindowHint );
 
-	setStyleSheet( getStyleSheet( "NBDialog", settings.value( "Style" ).toString() ) );
+	setStyleSheet( getStyleSheet( "NBDialog", Settings->General.Style ) );
 
 	QDesktopWidget dw;
 	int hpos = ( int )( ( dw.width() - 450 ) / 2 );

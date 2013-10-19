@@ -27,25 +27,25 @@ void NBTreeDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 
 		// Get icon size
 		QSize iconSize;
-		if ( Settings.General.FolderView == QString( "SmallListView" ) )
+		if ( Settings->General.FolderView == QString( "SmallListView" ) )
 			iconSize = QSize( 24, 24 );
 
-		else if ( Settings.General.FolderView == QString( "NormalListView" ) )
+		else if ( Settings->General.FolderView == QString( "NormalListView" ) )
 			iconSize = QSize( 48, 48 );
 
-		else if ( Settings.General.FolderView == QString( "TilesView" ) )
+		else if ( Settings->General.FolderView == QString( "TilesView" ) )
 			iconSize = QSize( 48, 48 );
 
-		else if ( Settings.General.FolderView == QString( "SmallIconsView" ) )
+		else if ( Settings->General.FolderView == QString( "SmallIconsView" ) )
 			iconSize = QSize( 24, 24 );
 
-		else if ( Settings.General.FolderView == QString( "NormalIconsView" ) )
+		else if ( Settings->General.FolderView == QString( "NormalIconsView" ) )
 			iconSize = QSize( 48, 48 );
 
-		else if ( Settings.General.FolderView == QString( "LargeIconsView" ) )
+		else if ( Settings->General.FolderView == QString( "LargeIconsView" ) )
 			iconSize = QSize( 64, 64 );
 
-		else if ( Settings.General.FolderView == QString( "HugeIconsView" ) )
+		else if ( Settings->General.FolderView == QString( "HugeIconsView" ) )
 			iconSize = QSize( 128, 128 );
 
 		QString text = model->data( index, Qt::DisplayRole ).toString();
@@ -54,7 +54,7 @@ void NBTreeDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 		QSize iSize = icon.size();
 
 		QRect textRect;
-		if ( ListView.contains( Settings.General.FolderView ) ) {
+		if ( ListView.contains( Settings->General.FolderView ) ) {
 			// Original X + Image Left Border + Image Width + Image-Text Gap
 			textRect.setX( option.rect.x() + 3 + iconSize.width() + 5 );
 			// Vertical Centering, so don't bother
@@ -80,7 +80,7 @@ void NBTreeDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 		}
 
 		QRect iconRect;
-		if ( ListView.contains( Settings.General.FolderView ) ) {
+		if ( ListView.contains( Settings->General.FolderView ) ) {
 			if ( iSize.width() > iSize.height() ) {
 				/*
 					*
@@ -162,34 +162,34 @@ void NBTreeDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 		// Background Painter Settings and Background
 		painter->setPen( QPen( Qt::NoPen ) );
 		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings.Colors.SelectionMouseBrushColor.darker() );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setBrush( Settings->Colors.SelectionMouseBrushColor.darker() );
 
 			else
-				painter->setBrush( Settings.Colors.SelectionMouseBrushColor );
+				painter->setBrush( Settings->Colors.SelectionMouseBrushColor );
 
 		else if ( option.state & QStyle::State_Selected )
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings.Colors.SelectionBrushColor.darker() );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setBrush( Settings->Colors.SelectionBrushColor.darker() );
 
 			else
-				painter->setBrush( Settings.Colors.SelectionBrushColor );
+				painter->setBrush( Settings->Colors.SelectionBrushColor );
 
 		else if ( option.state & QStyle::State_MouseOver )
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings.Colors.MouseBrushColor.darker() );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setBrush( Settings->Colors.MouseBrushColor.darker() );
 
 			else
-				painter->setBrush( Settings.Colors.MouseBrushColor );
+				painter->setBrush( Settings->Colors.MouseBrushColor );
 
 		else
 			painter->setBrush( QBrush( Qt::transparent ) );
 
 		// Paint Background
-		if ( TinyView.contains( Settings.General.FolderView ) )
+		if ( TinyView.contains( Settings->General.FolderView ) )
 			painter->drawRoundedRect( option.rect, 5, 5 );
 
-		else if ( HugeView.contains( Settings.General.FolderView ) )
+		else if ( HugeView.contains( Settings->General.FolderView ) )
 			painter->drawRoundedRect( option.rect, 15, 15 );
 
 		else
@@ -200,21 +200,21 @@ void NBTreeDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 			painter->setBrush( Qt::NoBrush );
 			QPoint bl = option.rect.bottomLeft() + QPoint( 7, 0 );
 			QPoint br = option.rect.bottomRight() - QPoint( 7, 0 );
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) ) {
-				painter->setPen(  Settings.Colors.FocusPenColorAlt );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) ) {
+				painter->setPen(  Settings->Colors.FocusPenColorAlt );
 				painter->drawLine( bl, br );
 				painter->drawLine( bl + QPoint( 0, -1 ), br - QPoint( 0, 1 ) );
 			}
 
 			else {
-				painter->setPen( Settings.Colors.FocusPenColor );
+				painter->setPen( Settings->Colors.FocusPenColor );
 				painter->drawLine( bl, br );
 				painter->drawLine( bl + QPoint( 0, -1 ), br - QPoint( 0, 1 ) );
 			}
 		}
 
 		// In NormalListView paint an arrow to show its a directory
-		if ( ( ftype.isDir() ) and ( Settings.General.FolderView == QString( "NormalListView" ) ) ) {
+		if ( ( ftype.isDir() ) and ( Settings->General.FolderView == QString( "NormalListView" ) ) ) {
 			QPixmap arrowPix = QPixmap( ":/icons/arrow-right.png" ).scaled( 24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 			QRect arrowRect = QRect( option.rect.width() - 32, option.rect.y() + 12, 24, 24 );
 			painter->drawPixmap( arrowRect, arrowPix );
@@ -225,36 +225,36 @@ void NBTreeDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 
 		// Text Painter Settings
 		if ( ftype.isSymLink() ) {
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings.Colors.SymLinkPenColorAlt );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setPen( Settings->Colors.SymLinkPenColorAlt );
 
 			else
-				painter->setPen( Settings.Colors.SymLinkPenColor );
+				painter->setPen( Settings->Colors.SymLinkPenColor );
 		}
 
 		else if ( ftype.isExecutable() && ftype.isFile() )
-			painter->setPen( Settings.Colors.ExecPenColor );
+			painter->setPen( Settings->Colors.ExecPenColor );
 
 		else if ( ftype.isHidden() ) {
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings.Colors.HiddenPenColorAlt );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setPen( Settings->Colors.HiddenPenColorAlt );
 
 			else
-				painter->setPen( Settings.Colors.HiddenPenColor );
+				painter->setPen( Settings->Colors.HiddenPenColor );
 		}
 
 		else if ( !ftype.isReadable() )
-			painter->setPen( Settings.Colors.NoReadPenColor );
+			painter->setPen( Settings->Colors.NoReadPenColor );
 
 		else {
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings.Colors.TextPenColorAlt );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setPen( Settings->Colors.TextPenColorAlt );
 
 			else
-				painter->setPen( Settings.Colors.TextPenColor );
+				painter->setPen( Settings->Colors.TextPenColor );
 		}
 
-		if ( ListView.contains( Settings.General.FolderView ) )
+		if ( ListView.contains( Settings->General.FolderView ) )
 			painter->drawText( textRect, Qt::AlignLeft | Qt::AlignVCenter, text );
 
 		else
@@ -269,25 +269,25 @@ QSize NBTreeDelegate::sizeHint( const QStyleOptionViewItem &optItem, const QMode
 	Q_UNUSED( optItem );
 	Q_UNUSED( mIndex );
 
-	if ( Settings.General.FolderView == QString( "SmallListView" ) )
+	if ( Settings->General.FolderView == QString( "SmallListView" ) )
 		return QSize( 248, 26 );
 
-	else if ( Settings.General.FolderView == QString( "NormalListView" ) )
+	else if ( Settings->General.FolderView == QString( "NormalListView" ) )
 		return QSize( 248, 52 );
 
-	else if ( Settings.General.FolderView == QString( "TilesView" ) )
+	else if ( Settings->General.FolderView == QString( "TilesView" ) )
 		return QSize( 248, 56 );
 
-	else if ( Settings.General.FolderView == QString( "SmallIconsView" ) )
+	else if ( Settings->General.FolderView == QString( "SmallIconsView" ) )
 		return QSize( 74, 46 );
 
-	else if ( Settings.General.FolderView == QString( "NormalIconsView" ) )
+	else if ( Settings->General.FolderView == QString( "NormalIconsView" ) )
 		return QSize( 110, 70 );
 
-	else if ( Settings.General.FolderView == QString( "LargeIconsView" ) )
+	else if ( Settings->General.FolderView == QString( "LargeIconsView" ) )
 		return QSize( 150, 90 );
 
-	else if ( Settings.General.FolderView == QString( "HugeIconsView" ) )
+	else if ( Settings->General.FolderView == QString( "HugeIconsView" ) )
 		return QSize( 290, 170 );
 
 	return QSize( 120, 90 );

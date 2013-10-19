@@ -60,10 +60,10 @@ void NBWebWatch::setWindowProperties() {
 	setFixedSize( 1024, 640 );
 	setWindowFlags( Qt::Popup );
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-	setStyleSheet( getStyleSheet( "NBPreview", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
 
 	QDesktopWidget dw;
 	int hpos = (int)( ( dw.width() - 1024 ) / 2 );

@@ -32,7 +32,7 @@ NBTitleBar::NBTitleBar() : QWidget() {
 
 	setLayout( lyt );
 
-	setStyleSheet( getStyleSheet( "NBTitleBar", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBTitleBar", Settings->General.Style ) );
 };
 
 NBTitleBar::~NBTitleBar() {

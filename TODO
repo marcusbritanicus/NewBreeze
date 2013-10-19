@@ -8,9 +8,8 @@ Widgets
 
     ☐ MyComputer: NBDeviceView, NBDeviceDelegate, NBDeviceModel( QStringListModel )													[ 0 of 2 ]
 
-    ⊟ ProgressWidget
-        ⊟ InfoBar ProgressWidget: Widget, Realtime progress updates																	[ 1 of 2 ]
-        ☐ ProgressPopup: Multiple ProgressDisplay, Realtime progress updates															[ 0 of 2 ]
+    ☑ ProgressWidget
+        ☑ InfoBar ProgressWidget: Widget, Realtime progress updates																	[ 2 of 2 ]
 
 Views
     ☑ NBFolderView
@@ -22,4 +21,4 @@ Models
     ☑ NBFileSystemModel( QAbstractItemModel )																						[ 1 of 1 ]
 
 SidePanel
-    ☑ Migrated to NBSidePanel/NBSidePanelModel from NBDeviceModel+NBBookmarkModel+NBDeviceView+NBBookmarksView						[ 1 of 1 ]
+    ☑ Migrated to NBSidePanelView/NBSidePanelModel from NBDeviceModel+NBBookmarkModel+NBDeviceView+NBBookmarksView					[ 1 of 1 ]

@@ -110,7 +110,7 @@ int main( int argc, char **argv ) {
 				else
 					Gui = new NewBreeze();
 
-				if ( Settings.Session.Maximized )
+				if ( Settings->Session.Maximized )
 					Gui->showMaximized();
 
 				else
@@ -126,6 +126,7 @@ int main( int argc, char **argv ) {
 		NBServer *server = new NBServer();
 		server->start();
 
+		qDebug() << "Starting gui";
 		NewBreeze *Gui;
 		if ( argc >= 2 )
 			Gui = new NewBreeze( app.tr( argv[ 1 ] ) );
@@ -133,7 +134,7 @@ int main( int argc, char **argv ) {
 		else
 			Gui = new NewBreeze();
 
-		if ( Settings.Session.Maximized )
+		if ( Settings->Session.Maximized )
 			Gui->showMaximized();
 
 		else

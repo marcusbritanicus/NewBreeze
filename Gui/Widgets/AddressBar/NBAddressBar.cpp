@@ -53,11 +53,11 @@ void NBAddressWidget::setWidgetProperties() {
 	toggleBtn->setCheckable( true );
 	toggleBtn->setChecked( false );
 	toggleBtn->setFocusPolicy( Qt::NoFocus );
-	toggleBtn->setShortcut( Settings.Shortcuts.ToggleCrumbLE.at( 0 ) );
+	toggleBtn->setShortcut( Settings->Shortcuts.ToggleCrumbLE.at( 0 ) );
 
 	connect( toggleBtn, SIGNAL( clicked() ), this, SLOT( toggleCrumbsBarAndEdit() ) );
 
-	setStyleSheet( getStyleSheet( "NBAddressBar", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBAddressBar", Settings->General.Style ) );
 };
 
 void NBAddressWidget::toggleCrumbsBarAndEdit() {
@@ -65,7 +65,7 @@ void NBAddressWidget::toggleCrumbsBarAndEdit() {
 	if ( toggleBtn->isChecked() ) {
 		crumbsBar->hide();
 		addressEdit->show();
-		if ( Settings.Session.ShowHidden )
+		if ( Settings->Session.ShowHidden )
 			dModel->setFilter(  QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden );
 
 		else

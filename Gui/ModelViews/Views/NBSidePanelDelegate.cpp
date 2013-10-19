@@ -93,25 +93,25 @@ void NBSidePanelDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
 		// Background Painter Settings and Background
 		painter->setPen( QPen( Qt::NoPen ) );
 		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings.Colors.SelectionMouseBrushColor.darker() );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setBrush( Settings->Colors.SelectionMouseBrushColor.darker() );
 
 			else
-				painter->setBrush( Settings.Colors.SelectionMouseBrushColor );
+				painter->setBrush( Settings->Colors.SelectionMouseBrushColor );
 
 		else if ( option.state & QStyle::State_Selected )
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings.Colors.SelectionBrushColor.darker() );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setBrush( Settings->Colors.SelectionBrushColor.darker() );
 
 			else
-				painter->setBrush( Settings.Colors.SelectionBrushColor );
+				painter->setBrush( Settings->Colors.SelectionBrushColor );
 
 		else if ( option.state & QStyle::State_MouseOver )
-			if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings.Colors.MouseBrushColor.darker() );
+			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				painter->setBrush( Settings->Colors.MouseBrushColor.darker() );
 
 			else
-				painter->setBrush( Settings.Colors.MouseBrushColor );
+				painter->setBrush( Settings->Colors.MouseBrushColor );
 
 		else
 			painter->setBrush( QBrush( Qt::transparent ) );
@@ -123,11 +123,11 @@ void NBSidePanelDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
 		painter->drawPixmap( iconRect, icon );
 
 		// Text Painter Settings
-		if ( ( Settings.General.Style == QString( "LightGray" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
-			painter->setPen( Settings.Colors.TextPenColorAlt );
+		if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+			painter->setPen( Settings->Colors.TextPenColorAlt );
 
 		else
-			painter->setPen( Settings.Colors.TextPenColor );
+			painter->setPen( Settings->Colors.TextPenColor );
 
 		painter->drawText( textRect, Qt::AlignLeft, text );
 		painter->restore();

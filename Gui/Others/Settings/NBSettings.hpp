@@ -96,7 +96,19 @@ class NBSettings {
 				QColor SelectionMouseBrushColor;
 		} Colors;
 
-		void readSettings();
+		static NBSettings* defaultInstance();
+		static NBSettings* instance();
+
+		void reload();
+		void setValue( QString, QVariant );
+
+	private:
+		NBSettings() {};
+
+		bool init = false;
+
+		static NBSettings *settings;
+		static NBSettings *defaultSettings;
 };
 
 #endif

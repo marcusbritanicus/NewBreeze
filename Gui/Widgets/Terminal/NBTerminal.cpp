@@ -63,17 +63,17 @@ void NBTerminal::openNewTerminal() {
 
 NBTerminalWidget::NBTerminalWidget( QString wDir ) : QTermWidget( 0 ) {
 
-	if ( Settings.General.Style == QString( "TransDark" ) ) {
+	if ( Settings->General.Style == QString( "TransDark" ) ) {
 		setTerminalOpacity( 0.81 );
 		setColorScheme( "WhiteOnBlack" );
 	}
 
-	else if ( Settings.General.Style == QString( "TransLight" ) ) {
+	else if ( Settings->General.Style == QString( "TransLight" ) ) {
 		setTerminalOpacity( 0.81 );
 		setColorScheme( "BlackOnWhite" );
 	}
 
-	else if ( Settings.General.Style == QString( "DullBlack" ) ) {
+	else if ( Settings->General.Style == QString( "DullBlack" ) ) {
 		setTerminalOpacity( 1 );
 		setColorScheme( "DarkPastels" );
 	}
@@ -82,9 +82,6 @@ NBTerminalWidget::NBTerminalWidget( QString wDir ) : QTermWidget( 0 ) {
 		setTerminalOpacity( 1 );
 		setColorScheme( "BlackOnLightGray" );
 	}
-
-	if ( settings.value( "EnableTransparency" ).toBool() )
-		setTerminalOpacity( settings.value( "Opacity" ).toReal() );
 
 	QAction *clearAct = new QAction( "Clear Terminal", this );
 	clearAct->setShortcut( tr( "Ctrl+Shift+X" ) );

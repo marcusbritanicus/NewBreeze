@@ -51,6 +51,7 @@ NBTreeView::NBTreeView( NBFileSystemModel *fsm ) : QTreeView(), fsModel( fsm ) {
 
 	// Selection
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
+	setSelectionBehavior( QAbstractItemView::SelectRows );
 
 	// Header bg
 	header()->setAttribute( Qt::WA_TranslucentBackground );
@@ -83,7 +84,7 @@ NBTreeView::NBTreeView( NBFileSystemModel *fsm ) : QTreeView(), fsModel( fsm ) {
 
 void NBTreeView::updateViewMode() {
 
-	if ( Settings.General.FolderView == QString( "SDetailsView" ) ) {
+	if ( Settings->General.FolderView == QString( "SDetailsView" ) ) {
 
 		setIconSize( QSize( 24, 24 ) );
 	}

@@ -36,7 +36,7 @@ void NBFolderView::setContentsWidth( int cWidth ) {
 
 void NBFolderView::updateViewMode() {
 
-	if ( Settings.General.FolderView.contains( "DetailsView" ) ) {
+	if ( Settings->General.FolderView.contains( "DetailsView" ) ) {
 		setCurrentIndex( 1 );
 		TreeView->updateViewMode();
 	}
@@ -124,126 +124,126 @@ void NBFolderView::createAndSetupActions() {
 
 	// Home
 	actHomeDir = new QAction( QIcon( ":/icons/home.png" ), "&Home", this );
-	actHomeDir->setShortcuts( Settings.Shortcuts.GoHome );
+	actHomeDir->setShortcuts( Settings->Shortcuts.GoHome );
 
 	connect( actHomeDir, SIGNAL( triggered() ), this, SLOT( doOpenHome() ) );
 	addAction( actHomeDir );
 
 	// Up
 	actParDir = new QAction( QIcon( ":/icons/up.png" ), "&Up", this );
-	actParDir->setShortcuts( Settings.Shortcuts.GoUp );
+	actParDir->setShortcuts( Settings->Shortcuts.GoUp );
 
 	connect( actParDir, SIGNAL( triggered() ), this, SLOT( goUp() ) );
 	addAction( actParDir );
 
 	// Back
 	actPrevDir = new QAction( QIcon( ":/icons/prev.png" ), "&Back", this );
-	actPrevDir->setShortcuts( Settings.Shortcuts.GoLeft );
+	actPrevDir->setShortcuts( Settings->Shortcuts.GoLeft );
 
 	connect( actPrevDir, SIGNAL( triggered() ), this, SLOT( goBack() ) );
 	addAction( actPrevDir );
 
 	// Forward
 	actNextDir = new QAction( QIcon( ":/icons/next.png" ), "&Forward", this );
-	actNextDir->setShortcuts( Settings.Shortcuts.GoRight );
+	actNextDir->setShortcuts( Settings->Shortcuts.GoRight );
 
 	connect( actNextDir, SIGNAL( triggered() ), this, SLOT( goForward() ) );
 	addAction( actNextDir );
 
 	// New Folder
 	actNewDir = new QAction( QIcon::fromTheme( "folder-new" ), "New folder", this );
-	actNewDir->setShortcuts( Settings.Shortcuts.NewFolder );
+	actNewDir->setShortcuts( Settings->Shortcuts.NewFolder );
 
 	connect( actNewDir, SIGNAL( triggered() ), this, SLOT( newFolder() ) );
 	addAction( actNewDir );
 
 	// New file
 	actNewFile = new QAction( QIcon::fromTheme( "document-new" ), "New File", this );
-	actNewFile->setShortcuts( Settings.Shortcuts.NewFile );
+	actNewFile->setShortcuts( Settings->Shortcuts.NewFile );
 
 	connect( actNewFile, SIGNAL( triggered() ), this, SLOT( newFile() ) );
 	addAction( actNewFile );
 
 	// Peek
 	peekAct = new QAction( QIcon( ":/icons/peek.png" ), "Pee&k", this );
-	peekAct->setShortcuts( Settings.Shortcuts.Peek );
+	peekAct->setShortcuts( Settings->Shortcuts.Peek );
 
 	connect( peekAct, SIGNAL( triggered() ), this, SLOT( doPeek() ) );
 	addAction( peekAct );
 
 	// Copy
 	copyAct = new QAction( QIcon( ":/icons/copy.png" ), "&Copy", this );
-	copyAct->setShortcuts( Settings.Shortcuts.Copy );
+	copyAct->setShortcuts( Settings->Shortcuts.Copy );
 
 	connect( copyAct, SIGNAL( triggered() ), this, SLOT( prepareCopy() ) );
 	addAction( copyAct );
 
 	// Move
 	moveAct = new QAction( QIcon( ":/icons/cut.png" ), "Cu&t", this );
-	moveAct->setShortcuts( Settings.Shortcuts.Cut );
+	moveAct->setShortcuts( Settings->Shortcuts.Cut );
 
 	connect( moveAct, SIGNAL( triggered() ), this, SLOT( prepareMove() ) );
 	addAction( moveAct );
 
 	// Paste
 	pasteAct = new QAction( QIcon( ":/icons/paste.png" ), "&Paste", this );
-	pasteAct->setShortcuts( Settings.Shortcuts.Paste );
+	pasteAct->setShortcuts( Settings->Shortcuts.Paste );
 
 	connect( pasteAct, SIGNAL( triggered() ), this, SLOT( prepareIO() ) );
 	addAction( pasteAct );
 
 	// Rename
 	renameAct = new QAction( QIcon( ":/icons/rename.png" ), "&Rename", this );
-	renameAct->setShortcuts( Settings.Shortcuts.Rename );
+	renameAct->setShortcuts( Settings->Shortcuts.Rename );
 
 	connect( renameAct, SIGNAL( triggered() ), this, SLOT( doRename() ) );
 	addAction( renameAct );
 
 	// Reload
 	reloadAct = new QAction( QIcon( ":/icons/reload.png" ), "Re&fresh", this );
-	reloadAct->setShortcuts( Settings.Shortcuts.Reload );
+	reloadAct->setShortcuts( Settings->Shortcuts.Reload );
 
 	connect( reloadAct, SIGNAL( triggered() ), this, SLOT( doReload() ) );
 	addAction( reloadAct );
 
 	// showDotFiles
 	showHideDotFiles = new QAction( QIcon( ":/icons/showDotFiles.png" ), "Show &Hidden", this );
-	showHideDotFiles->setShortcuts( Settings.Shortcuts.ToggleHidden );
+	showHideDotFiles->setShortcuts( Settings->Shortcuts.ToggleHidden );
 
 	connect( showHideDotFiles, SIGNAL( triggered() ), this, SLOT( doToggleHidden() ) );
 	addAction( showHideDotFiles );
 
 	// Trash
 	trashAct = new QAction( QIcon( ":/icons/trash.png" ), "Move to trash", this );
-	// trashAct->setShortcuts( Settings.Shortcuts.Trash );
+	// trashAct->setShortcuts( Settings->Shortcuts.Trash );
 
 	connect( trashAct, SIGNAL( triggered() ), this, SLOT( doSendToTrash() ) );
 	addAction( trashAct );
 
 	// Delete
 	delAct = new QAction( QIcon( ":/icons/delete.png" ), "Delete", this );
-	delAct->setShortcuts( Settings.Shortcuts.Delete );
+	delAct->setShortcuts( Settings->Shortcuts.Delete );
 
 	connect( delAct, SIGNAL( triggered() ), this, SLOT( doDelete() ) );
 	addAction( delAct );
 
 	// Properties
 	propertiesAct = new QAction( QIcon( ":/icons/props.png" ), "&Properties", this );
-	propertiesAct->setShortcuts( Settings.Shortcuts.Properties );
+	propertiesAct->setShortcuts( Settings->Shortcuts.Properties );
 
 	connect( propertiesAct, SIGNAL( triggered() ), this, SLOT( showProperties() ) );
 	addAction( propertiesAct );
 
 	// Open a virtual terminal emulator
 	openVTE = new QAction( "Open &VTE", this );
-	openVTE->setShortcuts( Settings.Shortcuts.Terminal );
+	openVTE->setShortcuts( Settings->Shortcuts.Terminal );
 
 	connect( openVTE, SIGNAL( triggered() ), this, SLOT( openTerminal() ) );
 	addAction( openVTE );
 
 	// Select All
 	QAction *selectAllAct = new QAction( "&Select All", this );
-	selectAllAct->setShortcuts( Settings.Shortcuts.SelectAll );
+	selectAllAct->setShortcuts( Settings->Shortcuts.SelectAll );
 
 	connect( selectAllAct, SIGNAL( triggered() ), this, SLOT( selectAll() ) );
 	addAction( selectAllAct );
@@ -262,13 +262,13 @@ void NBFolderView::createAndSetupActions() {
 	connect( sortByDateAct, SIGNAL( triggered() ), this, SLOT( sortByDate() ) );
 
 	QAction *focusSearchAct = new QAction( "Focus SearchBar", this );
-	focusSearchAct->setShortcuts( Settings.Shortcuts.FocusSearchBar );
+	focusSearchAct->setShortcuts( Settings->Shortcuts.FocusSearchBar );
 
 	connect( focusSearchAct, SIGNAL( triggered() ), this, SIGNAL( focusSearchBar() ) );
 	addAction( focusSearchAct );
 
 	QAction *clearSearchAct = new QAction( "Clear SearchBar", this );
-	clearSearchAct->setShortcuts( Settings.Shortcuts.ClearSearchBar );
+	clearSearchAct->setShortcuts( Settings->Shortcuts.ClearSearchBar );
 
 	connect( clearSearchAct, SIGNAL( triggered() ), this, SIGNAL( clearSearchBar() ) );
 	addAction( clearSearchAct );
@@ -540,8 +540,7 @@ void NBFolderView::doToggleHidden() {
 		fsModel->setShowHidden( true );
 	}
 
-	settings.setValue( "Session/ShowHidden", fsModel->showHidden() );
-	settings.sync();
+	Settings->setValue( "Session/ShowHidden", fsModel->showHidden() );
 };
 
 void NBFolderView::prepareCopy() {

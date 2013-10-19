@@ -6,8 +6,8 @@
 
 #include <NBCustomPeek.hpp>
 #include <NBTools.hpp>
-#include <NBThumbsCache.hpp>
 #include <NBGuiWidgets.hpp>
+#include <NBIconProvider.hpp>
 
 NBCustomPeek::NBCustomPeek( QWidget *parent, QString pth ) : QWidget( parent ) {
 
@@ -95,10 +95,10 @@ void NBCustomPeek::setWindowProperties() {
 	setFixedSize( 720, 540 );
 	setWindowFlags( Qt::Popup );
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-	setStyleSheet( getStyleSheet( "NBPreview", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
 
 	QDesktopWidget dw;
 	int hpos = (int)( ( dw.width() - 720 ) / 2 );
@@ -118,7 +118,8 @@ void NBCustomPeek::keyPressEvent( QKeyEvent *keyEvent ) {
 
 void NBCustomPeek::getFileProps() {
 
-	iconLbl->setPixmap( NBIcon::icon( QFileInfo( path ), QSize( 64, 64 ) ) );
+	QString icoStr = NBIconProvider::icon( path );
+	iconLbl->setPixmap( QIcon::fromTheme( icoStr, QIcon( icoStr ) ).pixmap( QSize( 64, 64 ) ) );
 	QFileInfo info( path );
 
 	QFontMetrics fm( nameLbl->font() );

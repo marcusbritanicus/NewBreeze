@@ -27,7 +27,7 @@ void NBSidePanel::setupView() {
 	setFocusPolicy( Qt::NoFocus );
 
 	// StyleSheet
-	setStyleSheet( getStyleSheet( "NBSidePanel", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBSidePanel", Settings->General.Style ) );
 
 	// No Header
 	setHeaderHidden( true );

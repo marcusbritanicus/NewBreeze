@@ -49,6 +49,7 @@ NBIconView::NBIconView( NBFileSystemModel *fsm ) : QListView(), fsModel( fsm ) {
 
 	// Selection
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
+	setSelectionBehavior( QAbstractItemView::SelectRows );
 
 	// Context Menu
 	setContextMenuPolicy( Qt::CustomContextMenu );
@@ -78,7 +79,7 @@ void NBIconView::updateViewMode() {
 		*
 	*/
 
-	if ( Settings.General.FolderView == QString( "SmallListView" ) ) {
+	if ( Settings->General.FolderView == QString( "SmallListView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::ListMode );
 		setFlow( QListView::TopToBottom );
@@ -91,7 +92,7 @@ void NBIconView::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings.General.FolderView == QString( "NormalListView" ) ) {
+	else if ( Settings->General.FolderView == QString( "NormalListView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::ListMode );
 		setFlow( QListView::TopToBottom );
@@ -104,7 +105,7 @@ void NBIconView::updateViewMode() {
 		setWrapping( false );
 	}
 
-	else if ( Settings.General.FolderView == QString( "TilesView" ) ) {
+	else if ( Settings->General.FolderView == QString( "TilesView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::ListMode );
 		setFlow( QListView::LeftToRight );
@@ -117,7 +118,7 @@ void NBIconView::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings.General.FolderView == QString( "SmallIconsView" ) ) {
+	else if ( Settings->General.FolderView == QString( "SmallIconsView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::IconMode );
 		setFlow( QListView::LeftToRight );
@@ -130,7 +131,7 @@ void NBIconView::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings.General.FolderView == QString( "NormalIconsView" ) ) {
+	else if ( Settings->General.FolderView == QString( "NormalIconsView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::IconMode );
 		setFlow( QListView::LeftToRight );
@@ -143,7 +144,7 @@ void NBIconView::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings.General.FolderView == QString( "LargeIconsView" ) ) {
+	else if ( Settings->General.FolderView == QString( "LargeIconsView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::IconMode );
 		setFlow( QListView::LeftToRight );
@@ -156,7 +157,7 @@ void NBIconView::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings.General.FolderView == QString( "HugeIconsView" ) ) {
+	else if ( Settings->General.FolderView == QString( "HugeIconsView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::IconMode );
 		setFlow( QListView::LeftToRight );
@@ -248,7 +249,7 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 
 		drag->setMimeData( mimedata );
 
-		Qt::DropAction dropAction = drag->exec( Qt::CopyAction | Qt::MoveAction | Qt::LinkAction );
+		drag->exec( Qt::CopyAction | Qt::MoveAction | Qt::LinkAction );
 	}
 
 	mmEvent->accept();

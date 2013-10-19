@@ -10,6 +10,7 @@
 #include <Global.hpp>
 #include <NBGuiWidgets.hpp>
 #include <NBKeyBinder.hpp>
+#include <NBIconProvider.hpp>
 
 class NBSettingChooserWidget : public QListWidget {
 	Q_OBJECT
@@ -61,6 +62,7 @@ class NBShortcutsWidget: public QWidget {
 
 	public:
 		NBShortcutsWidget( QString );
+		static QSettings shortcutSettings;
 
 	private:
 		QPushButton *setKeyBindingBtn;

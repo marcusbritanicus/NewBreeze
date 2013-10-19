@@ -18,10 +18,10 @@ NBExpanderLabel::NBExpanderLabel( QString text ) : QToolButton() {
 	setText( text );
 	setArrowType( Qt::DownArrow );
 
-	if ( ( Settings.General.Style == QString( "TransDark" ) ) or ( Settings.General.Style == QString( "TransLight" ) ) )
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-	setStyleSheet( getStyleSheet( "NBShowHideButton", Settings.General.Style ) );
+	setStyleSheet( getStyleSheet( "NBShowHideButton", Settings->General.Style ) );
 
 	if ( QStyleFactory::keys().contains( "Oxygen" ) )
 		setStyle( QStyleFactory::create( "Oxygen" ) );

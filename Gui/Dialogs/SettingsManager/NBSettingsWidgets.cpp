@@ -6,12 +6,12 @@
 
 #include <NBTools.hpp>
 #include <NBSettingsWidgets.hpp>
-#include <NBThumbsCache.hpp>
 
+QSettings NBShortcutsWidget::shortcutSettings( "NewBreeze", "Shortcuts" );
 inline QStringList getShortcutList( QString actionName ) {
 
-	if ( not shortcutSettings.value( actionName ).isNull() )
-		return shortcutSettings.value( actionName ).toStringList();
+	if ( not NBShortcutsWidget::shortcutSettings.value( actionName ).isNull() )
+		return NBShortcutsWidget::shortcutSettings.value( actionName ).toStringList();
 
 	else
 		return QStringList();
@@ -88,7 +88,7 @@ void NBIconThemeChooserWidget::loadThemes() {
 	}
 
 	themeCB->addItems( themesList );
-	current = themesList.indexOf( Settings.General.IconTheme );
+	current = themesList.indexOf( Settings->General.IconTheme );
 	themeCB->setCurrentIndex( current );
 };
 
@@ -97,8 +97,7 @@ void NBIconThemeChooserWidget::switchTheme( int idx ) {
 	current = idx;
 
 	QIcon::setThemeName( themesList[ current ] );
-	settings.setValue( "IconTheme", themesList[ current ] );
-	Settings.General.IconTheme = themesList[ current ];
+	Settings->setValue( "IconTheme", themesList[ current ] );
 
 	emit reloadIcons();
 };
@@ -115,8 +114,7 @@ void NBIconThemeChooserWidget::nextTheme() {
 	}
 
 	QIcon::setThemeName( themesList[ current ] );
-	settings.setValue( "IconTheme", themesList[ current ] );
-	Settings.General.IconTheme = themesList[ current ];
+	Settings->setValue( "IconTheme", themesList[ current ] );
 	emit reloadIcons();
 };
 
@@ -132,8 +130,7 @@ void NBIconThemeChooserWidget::previousTheme() {
 	}
 
 	QIcon::setThemeName( themesList[ current ] );
-	settings.setValue( "IconTheme", themesList[ current ] );
-	Settings.General.IconTheme = themesList[ current ];
+	Settings->setValue( "IconTheme", themesList[ current ] );
 	emit reloadIcons();
 };
 
@@ -183,31 +180,6 @@ void NBIconThemeViewerWidget::loadIcons() {
 		* image/png, image/jpeg, image/gif
 		*
 	*/
-
-	clear();
-	qApp->processEvents();
-
-	// Update the icon cache only if this function was called for as a SIGNAL response
-	// i.e. if it was invoked by a SIGNAL-SLOT connection.
-	if ( qobject_cast<NBIconThemeChooserWidget*>( sender() ) ) {
-		QLabel *lbl = new QLabel( "Reloading the icon cache. Please wait" );
-		lbl->setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
-		lbl->setWindowModality( Qt::ApplicationModal );
-		lbl->setAlignment( Qt::AlignCenter );
-		lbl->setFont( QFont( "Envy Code R", 12 ) );
-		lbl->setFixedSize( 450, 75 );
-
-		QSize sSize = QDesktopWidget().size();
-		lbl->move( ( sSize.width() - 450 ) / 2, ( sSize.height() - 100 ) / 2 );
-
-		lbl->show();
-		qApp->processEvents();
-
-		NBIcon::loadCacheToMemory();
-
-		lbl->close();
-	}
-
 	QStringList mimetypes;
 	mimetypes << "inode/directory" << "text/plain" << "text/html" << "text/x-c++src" << "text/x-c++hdr";
 	mimetypes << "text/x-csrc" << "text/x-chdr" << "text/x-python";
@@ -229,7 +201,8 @@ void NBIconThemeViewerWidget::loadIcons() {
 	names << "PNG File" << "JPG File" << "GIF File";
 
 	for( int i = 0; i < suffixes.count(); i++ ) {
-		QIcon icon = NBIcon::icon( suffixes[ i ], mimetypes[ i ] );
+		QString icoStr = NBIconProvider::icon( QString( "filename.%1" ).arg( suffixes[ i ] ) );
+		QIcon icon = QIcon::fromTheme( icoStr, QIcon( icoStr ) );
 		QListWidgetItem *item = new QListWidgetItem( icon, names[ i ] );
 
 		addItem( item );
@@ -272,7 +245,7 @@ void NBShortcutsWidget::changeKeySequence() {
 		shortcutSettings.setValue( action, keyBinder->keyBinding() );
 		shortcutSettings.sync();
 
-		Settings.readSettings();
+		Settings->reload();
 	}
 };
 
@@ -282,7 +255,7 @@ void NBShortcutsWidget::clearBinding() {
 	shortcutSettings.setValue( action , QVariant() );
 	shortcutSettings.sync();
 
-	Settings.readSettings();
+	Settings->reload();
 };
 
 void NBShortcutsWidget::resetBinding() {
@@ -290,8 +263,8 @@ void NBShortcutsWidget::resetBinding() {
 	QSettings defaultSettings( ":/Shortcuts.conf", QSettings::NativeFormat );
 
 	setKeyBindingBtn->setText( defaultSettings.value( action ).toString() );
-	shortcutSettings.setValue( action , defaultSettings.value( action ) );
+	shortcutSettings.remove( action );
 	shortcutSettings.sync();
 
-	Settings.readSettings();
+	Settings->reload();
 };
