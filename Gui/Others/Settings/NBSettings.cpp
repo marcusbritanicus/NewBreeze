@@ -40,6 +40,8 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->Session.Maximized = true;
 	defaultSettings->Session.SidePanel = true;
 	defaultSettings->Session.ShowHidden = false;
+	defaultSettings->Session.ExpandDevices = true;
+	defaultSettings->Session.ExpandBookmarks = true;
 
 	defaultSettings->Shortcuts.AboutNB = QList<QKeySequence>() << QKeySequence( "Shift+F1" );
 	defaultSettings->Shortcuts.AboutQt = QList<QKeySequence>() << QKeySequence( "Shift+F2" );
@@ -137,6 +139,12 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "Session/ShowHidden" ) ) )
 		settings->Session.ShowHidden = gSettings.value( "Session/ShowHidden" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/ExpandDevices" ) ) )
+		settings->Session.ExpandDevices = gSettings.value( "Session/ExpandDevices" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/ExpandBookmarks" ) ) )
+		settings->Session.ExpandBookmarks = gSettings.value( "Session/ExpandBookmarks" ).toBool();
 
 	if ( saKeys.contains( QString( "AboutNB" ) ) )
 		settings->Shortcuts.AboutNB = getShortcuts( "AboutNB" );
@@ -286,6 +294,12 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "Session/ShowHidden" ) ) )
 		Session.ShowHidden = gSettings.value( "Session/ShowHidden" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/ExpandDevices" ) ) )
+		Session.ExpandDevices = gSettings.value( "Session/ExpandDevices" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/ExpandBookmarks" ) ) )
+		Session.ExpandBookmarks = gSettings.value( "Session/ExpandBookmarks" ).toBool();
 
 	if ( saKeys.contains( QString( "AboutNB" ) ) )
 		Shortcuts.AboutNB = getShortcuts( "AboutNB" );

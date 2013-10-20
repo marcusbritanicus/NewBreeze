@@ -85,39 +85,46 @@ void NBSidePanelDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
 
 		painter->save();
 
-		// Basic Painter Settings
-		painter->setRenderHint( QPainter::Antialiasing, true );
-		painter->setRenderHint( QPainter::HighQualityAntialiasing, true );
-		painter->setRenderHint( QPainter::TextAntialiasing, true );
+		if ( index.flags() != Qt::NoItemFlags ) {
+			// Basic Painter Settings
+			painter->setRenderHint( QPainter::Antialiasing, true );
+			painter->setRenderHint( QPainter::HighQualityAntialiasing, true );
+			painter->setRenderHint( QPainter::TextAntialiasing, true );
 
-		// Background Painter Settings and Background
-		painter->setPen( QPen( Qt::NoPen ) );
-		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.SelectionMouseBrushColor.darker() );
+			// Background Painter Settings and Background
+			QRect bgRect;
+			bgRect.setX( iconRect.x() - 2 );
+			bgRect.setY( iconRect.y() );
+			bgRect.setSize( option.rect.size() + QSize( 4, 0 ) );
+
+			painter->setPen( QPen( Qt::NoPen ) );
+			if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+				if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+					painter->setBrush( Settings->Colors.SelectionMouseBrushColor.darker() );
+
+				else
+					painter->setBrush( Settings->Colors.SelectionMouseBrushColor );
+
+			else if ( option.state & QStyle::State_Selected )
+				if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+					painter->setBrush( Settings->Colors.SelectionBrushColor.darker() );
+
+				else
+					painter->setBrush( Settings->Colors.SelectionBrushColor );
+
+			else if ( option.state & QStyle::State_MouseOver )
+				if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+					painter->setBrush( Settings->Colors.MouseBrushColor.darker() );
+
+				else
+					painter->setBrush( Settings->Colors.MouseBrushColor );
 
 			else
-				painter->setBrush( Settings->Colors.SelectionMouseBrushColor );
+				painter->setBrush( QBrush( Qt::transparent ) );
 
-		else if ( option.state & QStyle::State_Selected )
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.SelectionBrushColor.darker() );
-
-			else
-				painter->setBrush( Settings->Colors.SelectionBrushColor );
-
-		else if ( option.state & QStyle::State_MouseOver )
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.MouseBrushColor.darker() );
-
-			else
-				painter->setBrush( Settings->Colors.MouseBrushColor );
-
-		else
-			painter->setBrush( QBrush( Qt::transparent ) );
-
-		// Paint Background
-		painter->drawRoundedRect( option.rect, 5, 5 );
+			// Paint Background
+			painter->drawRoundedRect( bgRect, 5, 5 );
+		}
 
 		// Paint Icon
 		painter->drawPixmap( iconRect, icon );

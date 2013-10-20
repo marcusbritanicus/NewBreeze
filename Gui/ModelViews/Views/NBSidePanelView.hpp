@@ -17,10 +17,11 @@ class NBSidePanel : public QTreeView {
 	public:
 		NBSidePanel();
 
+		NBSidePanelModel *spModel;
+
 	private:
 		void setupView();
 
-		NBSidePanelModel *spModel;
 		NBSidePanelDelegate *iDelegate;
 
 	public slots:

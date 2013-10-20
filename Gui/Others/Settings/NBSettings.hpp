@@ -38,6 +38,8 @@ class NBSettings {
 				QSize Splitter;
 				bool SidePanel;
 				bool ShowHidden;
+				bool ExpandDevices;
+				bool ExpandBookmarks;
 		} Session;
 
 		// Shortcut Settings

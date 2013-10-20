@@ -36,8 +36,8 @@ void NBSidePanel::setupView() {
 	setSelectionMode( QTreeView::NoSelection );
 
 	// By default expand both Devices and Bookmarks
-	setExpanded( spModel->index( 0, 0 ), true );
-	setExpanded( spModel->index( 1, 0 ), true );
+	setExpanded( spModel->index( 0, 0 ), Settings->Session.ExpandDevices );
+	setExpanded( spModel->index( 1, 0 ), Settings->Session.ExpandBookmarks );
 
 	// Fixed Width
 	setFixedWidth( sizeHintForColumn( 0 ) );
@@ -73,7 +73,8 @@ void NBSidePanel::updateBookmarks() {
 
 void NBSidePanel::handleClick( const QModelIndex clickedIndex ) {
 
-	emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
+	if ( clickedIndex.parent() != spModel->parent() )
+		emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
 };
 
 void NBSidePanel::dragEnterEvent( QDragEnterEvent *deEvent ) {

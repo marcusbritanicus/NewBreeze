@@ -304,11 +304,11 @@ void NewBreeze::createAndSetupActions() {
 
 void NewBreeze::updateGUI() {
 
-	// TitleBar->setStyleSheet( getStyleSheet( "NBTitleBar", Settings->General.Style ) );
-	// AddressBar->setStyleSheet( getStyleSheet( "NBTooBar", Settings->General.Style ) );
-	// SidePanel->setStyleSheet( getStyleSheet( "NBSidePanel", Settings->General.Style ) );
-	// Terminal->setStyleSheet( getStyleSheet( "NBTerminal", Settings->General.Style ) );
-	// InfoBar->setStyleSheet( getStyleSheet( "NBInfoBar", Settings->General.Style ) );
+	TitleBar->setStyleSheet( getStyleSheet( "NBTitleBar", Settings->General.Style ) );
+	AddressBar->setStyleSheet( getStyleSheet( "NBTooBar", Settings->General.Style ) );
+	SidePanel->setStyleSheet( getStyleSheet( "NBSidePanel", Settings->General.Style ) );
+	Terminal->setStyleSheet( getStyleSheet( "NBTerminal", Settings->General.Style ) );
+	InfoBar->setStyleSheet( getStyleSheet( "NBInfoBar", Settings->General.Style ) );
 
 	setWindowProperties();
 };
@@ -374,6 +374,8 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	Settings->setValue( "Session/LastDir", FolderView->fsModel->currentDir() );
 	Settings->setValue( "Session/ShowHidden", FolderView->fsModel->showHidden() );
 	Settings->setValue( "Session/Maximized", isMaximized() );
+	Settings->setValue( "Session/ExpandDevices", SidePanel->isExpanded( SidePanel->spModel->index( 0, 0 ) ) );
+	Settings->setValue( "Session/ExpandBookmarks", SidePanel->isExpanded( SidePanel->spModel->index( 1, 0 ) ) );
 
 	qDebug() << "Good Bye!";
 
@@ -489,7 +491,7 @@ void NewBreeze::showInfoDlg() {
 
 	dlgLyt->addWidget( widget );
 	shortcutDlg->setLayout( dlgLyt );
-	// shortcutDlg->setStyleSheet( getStyleSheet( "NBDialog", Settings->General.Style ) );
+	shortcutDlg->setStyleSheet( getStyleSheet( "NBDialog", Settings->General.Style ) );
 
 	shortcutDlg->setFixedSize( QSize( 720, 630 ) );
 

@@ -24,6 +24,8 @@ class NBSidePanelModel : public QAbstractItemModel {
 		QModelIndex rootIndex() const;
 		QModelIndex parent( const QModelIndex &index = QModelIndex() ) const;
 
+		Qt::ItemFlags flags( const QModelIndex &) const;
+
 		int rowCount( const QModelIndex &parent = QModelIndex() ) const;
 		int columnCount( const QModelIndex &parent = QModelIndex() ) const;
 

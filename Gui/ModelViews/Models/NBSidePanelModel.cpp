@@ -72,6 +72,18 @@ QModelIndex NBSidePanelModel::index( int row, int column, const QModelIndex &par
 		return QModelIndex();
 };
 
+Qt::ItemFlags NBSidePanelModel::flags( const QModelIndex & index ) const {
+
+	if ( not index.isValid() )
+		return Qt::NoItemFlags;
+
+	if ( index.parent() == parent() )
+		return Qt::NoItemFlags;
+
+	else
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+};
+
 QModelIndex NBSidePanelModel::rootIndex() const {
 
 	return createIndex( 0, 0, rootItem );
