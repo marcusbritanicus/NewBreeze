@@ -231,7 +231,7 @@ void NBFolderView::createAndSetupActions() {
 	propertiesAct = new QAction( QIcon( ":/icons/props.png" ), "&Properties", this );
 	propertiesAct->setShortcuts( Settings->Shortcuts.Properties );
 
-	connect( propertiesAct, SIGNAL( triggered() ), this, SLOT( showProperties() ) );
+	connect( propertiesAct, SIGNAL( triggered() ), this, SIGNAL( showProperties() ) );
 	addAction( propertiesAct );
 
 	// Open a virtual terminal emulator
@@ -317,14 +317,13 @@ void NBFolderView::doOpenHome() {
 void NBFolderView::newFile() {
 
 	NBNewFileFolderDialog *newFile = new NBNewFileFolderDialog( "file", QDir( fsModel->currentDir() ) );
-	connect( newFile, SIGNAL( nodeCreated( QString ) ), this, SLOT( updateModel( QString ) ) );
 	newFile->exec();
 };
 
 void NBFolderView::newFolder() {
 
+	qDebug() << "Updating model";
 	NBNewFileFolderDialog *newFolder = new NBNewFileFolderDialog( "dir", QDir( fsModel->currentDir() ) );
-	connect( newFolder, SIGNAL( nodeCreated( QString ) ), this, SLOT( updateModel( QString ) ) );
 	newFolder->exec();
 };
 
@@ -473,12 +472,12 @@ void NBFolderView::doPeek() {
 	QModelIndex curIndex = ( currentIndex() ? TreeView->currentIndex() : IconView->currentIndex() );
 
 	if ( !curIndex.isValid() ) {
-		showProperties();
+		emit showProperties();
 		return;
 	}
 
 	if ( getSelection().count() > 1 ) {
-		showProperties();
+		emit showProperties();
 		return;
 	}
 
@@ -599,15 +598,13 @@ void NBFolderView::copy( QStringList srcList, QString tgt ) {
 
 void NBFolderView::move( QStringList srcList, QString tgt ) {
 
-	emit copy( srcList, tgt, NBIOMode::Copy );
+	emit copy( srcList, tgt, NBIOMode::Move );
 };
 
 void NBFolderView::link( QStringList linkList, QString path ) {
 
-	foreach( QString node, linkList ) {
+	foreach( QString node, linkList )
 		QFile::link( node, QDir( path ).filePath( baseName( node ) ) );
-		updateModel( QDir( path ).filePath( baseName( node ) ) );
-	}
 };
 
 void NBFolderView::prepareIO() {
@@ -764,22 +761,6 @@ void NBFolderView::selectAll() {
 		IconView->selectAll();
 };
 
-void NBFolderView::showProperties() {
-
-	QList<QModelIndex> selectedList = getSelection();
-	QStringList paths;
-
-	if ( !selectedList.count() )
-		paths << fsModel->currentDir();
-
-	else
-		foreach( QModelIndex idx, selectedList )
-			paths << fsModel->nodePath( idx );
-
-	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths );
-	propsDlg->show();
-};
-
 void NBFolderView::openTerminal() {
 
 	NBDebugMsg( DbgMsgPart::HEAD, "Opening the console at %s... ", qPrintable( fsModel->currentDir() ) );
@@ -921,17 +902,6 @@ void NBFolderView::compress( QStringList archiveList ) {
 	}
 };
 
-void NBFolderView::updateModel( QString nodePath ) {
-
-	if ( dirName( nodePath ) + "/" == fsModel->currentDir() ) {
-		fsModel->insertNode( baseName( nodePath ) );
-	}
-
-	if ( dirName( nodePath ) + "/" == fsModel->currentDir() ) {
-		fsModel->insertNode( baseName( nodePath ) );
-	}
-};
-
 void NBFolderView::updateProgress( QString nodePath, float fileCopied, float totalCopied ) {
 
 	Q_UNUSED( fileCopied );
@@ -944,7 +914,6 @@ void NBFolderView::updateProgress( QString nodePath, float fileCopied, float tot
 
 void NBFolderView::handleDeleteFailure( QStringList files, QStringList dirs ) {
 
-	doReload();
 	if ( ( not files.count() ) and ( not dirs.count() ) )
 		return;
 
@@ -1000,3 +969,5 @@ void NBFolderView::handleDeleteFailure( QStringList files, QStringList dirs ) {
 		QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok, table
 	);
 };
+
+void NBFolderView::updateModel( QString ) {};

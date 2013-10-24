@@ -29,12 +29,9 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 
 	watcher = new NBFileSystemWatcher();
 
-	connect( watcher, SIGNAL( dirCreated( QString ) ), this, SLOT( handleDirChanged( QString ) ) );
-	connect( watcher, SIGNAL( dirChanged( QString ) ), this, SLOT( handleDirChanged( QString ) ) );
-	connect( watcher, SIGNAL( dirDeleted( QString ) ), this, SLOT( handleDirChanged( QString ) ) );
-	connect( watcher, SIGNAL( fileCreated( QString ) ), this, SLOT( handleFileChanged( QString ) ) );
-	connect( watcher, SIGNAL( fileChanged( QString ) ), this, SLOT( handleFileChanged( QString ) ) );
-	connect( watcher, SIGNAL( fileDeleted( QString ) ), this, SLOT( handleFileChanged( QString ) ) );
+	connect( watcher, SIGNAL( nodeCreated( QString ) ), this, SLOT( handleNodeCreated( QString ) ) );
+	connect( watcher, SIGNAL( nodeChanged( QString ) ), this, SLOT( handleNodeChanged( QString ) ) );
+	connect( watcher, SIGNAL( nodeDeleted( QString ) ), this, SLOT( handleNodeDeleted( QString ) ) );
 	connect( watcher, SIGNAL( watchPathDeleted() ), this, SLOT( loadHome() ) );
 
 	connect( this, SIGNAL( loadFileInfo() ), this, SLOT( gatherFileInfo() ) );
@@ -183,6 +180,11 @@ bool NBFileSystemModel::insertNode( QString nodeName ) {
 		*
 	*/
 
+	if ( not exists( __rootPath + nodeName ) )
+		return false;
+
+	beginResetModel();
+	beginInsertRows( parent(), __childNames.count(), __childNames.count() );
 	if ( __showHidden ) {
 		if ( __nameFilters.count() ) {
 			if ( matchesFilter( __nameFilters, nodeName ) ) {
@@ -209,8 +211,10 @@ bool NBFileSystemModel::insertNode( QString nodeName ) {
 			}
 		}
 	}
+	endInsertRows();
 
 	sort( prevSort.column, prevSort.cs, prevSort.dirsFirst );
+	endResetModel();
 
 	NBFileInfoGatherer *ig = new NBFileInfoGatherer();
 	connect(
@@ -223,15 +227,13 @@ bool NBFileSystemModel::insertNode( QString nodeName ) {
 	return true;
 };
 
-bool NBFileSystemModel::removeNode( QString name ) {
-
-	Q_UNUSED( name );
-	// I have no idea what to do here
-
-	return false;
-};
-
 void NBFileSystemModel::updateNode( QString nodeName ) {
+
+	if ( not exists( __rootPath + nodeName ) )
+		return;
+
+	if ( not __childNames.contains( nodeName ) )
+		return;
 
 	NBFileInfoGatherer *ig = new NBFileInfoGatherer();
 	connect(
@@ -242,6 +244,25 @@ void NBFileSystemModel::updateNode( QString nodeName ) {
 	ig->gatherInfo( QStringList() << nodeName, __rootPath );
 
 	return;
+};
+
+bool NBFileSystemModel::removeNode( QString nodeName ) {
+
+	if ( not __childNames.contains( nodeName ) )
+		return false;
+
+	__childNames.removeAll( nodeName );
+	NBFileSystemNode *removedNode = rootNode->child( nodeName );
+
+	beginResetModel();
+	beginRemoveRows( parent(), removedNode->row(), removedNode->row() );
+
+	rootNode->removeChild( removedNode );
+
+	endRemoveRows();
+	endResetModel();
+
+	return false;
 };
 
 QModelIndex NBFileSystemModel::index( int row, int column, const QModelIndex &parent ) const {
@@ -331,8 +352,6 @@ Qt::DropActions NBFileSystemModel::supportedDropActions() const {
 };
 
 Qt::ItemFlags NBFileSystemModel::flags( const QModelIndex index ) const {
-
-	qDebug() << nodePath( index ) << "\t\t\t: " << ( isReadable( nodePath( index ) ) ? "Can read" : "Can't read" );
 
 	if ( isReadable( nodePath( index ) ) )
 		return Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEnabled;
@@ -607,6 +626,7 @@ void NBFileSystemModel::setupModelData() {
 				* Do not show . and ..
 				*
 			*/
+
 			QString nodeName = QString::fromLocal8Bit( ent->d_name );
 			if ( ( nodeName.compare( "." ) == 0 ) or ( nodeName.compare( ".." ) == 0 ) )
 				continue;
@@ -678,7 +698,7 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 		return;
 
 	QModelIndex idx = index( entry );
-	NBFileSystemNode *node = rootNode->child( idx.row() );
+	NBFileSystemNode *node = rootNode->child( entry );
 
 	node->setData( 2, info.at( 0 ), true );
 	node->setData( 2, info.at( 1 ), false );
@@ -687,25 +707,25 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 	emit dataChanged( idx, idx );
 };
 
-void NBFileSystemModel::handleDirChanged( QString dir ) {
+void NBFileSystemModel::handleNodeCreated( QString node ) {
 
-	if ( ( not showHidden() ) and baseName( dir ).startsWith( "." ) )
-		return;
-
-	reload();
+	if ( dirName( node ) == currentDir() )
+		insertNode( baseName( node ) );
 };
 
-void NBFileSystemModel::handleFileChanged( QString file ) {
+void NBFileSystemModel::handleNodeChanged( QString node ) {
 
-	if ( ( not showHidden() ) and baseName( file ).startsWith( "." ) )
-		return;
+	if ( dirName( node ) == currentDir() )
+		updateNode( baseName( node ) );
+};
 
-	reload();
+void NBFileSystemModel::handleNodeDeleted( QString node ) {
+
+	if ( dirName( node ) == currentDir() )
+		removeNode( baseName( node ) );
 };
 
 void NBFileSystemModel::loadHome() {
-
-	qDebug() << "Current dir was deleted. Going back home.";
 
 	emit runningHome( currentDir() );
 	goHome();

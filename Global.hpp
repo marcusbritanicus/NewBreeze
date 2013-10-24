@@ -15,6 +15,7 @@
 #include <QtCore>
 #include <QtDBus>
 #include <QtNetwork>
+#include <QCryptographicHash>
 
 // C++ Standard Library
 #include <fstream>
@@ -43,7 +44,6 @@
 #include <sys/inotify.h>
 #include <limits.h>
 
-#include <MD5.hpp>
 #include <NBSettings.hpp>
 
 #if QT_VERSION >= 0x050000

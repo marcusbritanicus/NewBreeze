@@ -7,7 +7,8 @@
 #include <NBArchive.hpp>
 
 inline QString getTempArchiveName( QString name ) {
-	return QDir::temp().filePath( md5( name.toStdString() ).c_str() );
+
+	return QDir::temp().filePath( MD5( name ) );
 };
 
 QString NBArchive::archiveName = QString();

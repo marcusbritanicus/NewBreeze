@@ -29,6 +29,7 @@ class NBFileSystemWatcher : public QThread {
 		void setWatchPath( QString );
 
 		void startWatch();
+		void restartWatch();
 		void stopWatch();
 
 	protected:
@@ -43,21 +44,16 @@ class NBFileSystemWatcher : public QThread {
 
 		QString watchPath;
 
-		bool __quitQNotify;
-		bool __watchChanging;
-		bool __watching;
-		bool __canStartNewWatch;
+		bool __stopWatch = false;
 
 	Q_SIGNALS :
-		void fileCreated( QString );
-		void fileDeleted( QString );
-		void fileChanged( QString );
-
-		void dirCreated( QString );
-		void dirDeleted( QString );
-		void dirChanged( QString );
+		void nodeCreated( QString );
+		void nodeDeleted( QString );
+		void nodeChanged( QString );
 
 		void watchPathDeleted();
+
+		void watchFailed();
 };
 
 #endif

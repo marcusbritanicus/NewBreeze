@@ -35,7 +35,10 @@ QStringList getDesktopEntries( QString mimeType );
 /* Format a string so that it can be used in bash as an argument */
 QString termFormatString( QString file );
 
-/*  */
+/* MD5 Cryptographic hash */
+QString MD5( QString data );
+
+/* Node recognition tools */
 bool isFile( QString path );
 bool isDir( QString path );
 bool isLink( QString path );

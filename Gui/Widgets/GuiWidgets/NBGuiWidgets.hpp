@@ -116,7 +116,6 @@ class NBViewModeButton: public QToolButton {
 	// private slots:
 		// void actionHandler();
 
-
 	Q_SIGNALS:
 		void changeViewMode();
 		void switchToNextView();

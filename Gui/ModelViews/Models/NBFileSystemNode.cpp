@@ -39,6 +39,11 @@ void NBFileSystemNode::removeChildAt( int row ) {
 	delete childNodes.takeAt( row );
 };
 
+void NBFileSystemNode::removeChild( NBFileSystemNode *node ) {
+
+	delete childNodes.takeAt( node->row() );
+};
+
 NBFileSystemNode* NBFileSystemNode::child( int row ) {
 
 	return childNodes.at( row );
@@ -150,10 +155,9 @@ void NBFileSystemNode::sort( int column, bool cs, bool dirsFirst ) {
 bool columnSort( const NBFileSystemNode *first, const NBFileSystemNode *second )  {
 
 	// dir/file/system, rawsize, icon
-	// name, size, type, mime, time, perm, ownr
+	// name, size, type, mime, time, perm, owner
 
 	if ( __sortDirs ) {
-
 		if ( ( first->data( 0, true ) == "dir" ) and ( second->data( 0, true ) == "dir" ) ) {
 
 			switch( __sortColumn ) {

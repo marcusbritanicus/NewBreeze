@@ -73,6 +73,9 @@ class NewBreeze : public QMainWindow {
 		void focusSearch();
 		void clearSearch();
 
+		void showProperties();
+		void showPermissions();
+
 		void filterFiles( QString );
 		void clearFilters();
 

@@ -8,9 +8,10 @@
 #define NBCUSTOMACTIONS_HPP
 
 #include <Global.hpp>
+#include <NBDialog.hpp>
 #include <NBGuiWidgets.hpp>
 
-class NBCustomActions : public QDialog {
+class NBCustomActions : public NBDialog {
 	Q_OBJECT
 
 	public:
@@ -36,7 +37,7 @@ class NBCustomActions : public QDialog {
 		void updateButtons();
 };
 
-class NBNewAction : public QDialog {
+class NBNewAction : public NBDialog {
 	Q_OBJECT
 
 	public:

@@ -1,3 +1,9 @@
+Version 2.0.2
+    - NBFileSystemWatcher has undergone major changes
+    - The inode changes will be reflected immediately in the views
+    - NBPermissionsDialog has been peeled away from NBPropertiesDialog
+    - Several minor bugs were fixed
+
 Version 2.0.1
     - Fixed major bugs in NBSettings and NBStartup that was causing Settings file to be wrongly written
     - NBTreeView now has drag and drop enabled

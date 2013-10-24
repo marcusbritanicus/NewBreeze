@@ -92,7 +92,6 @@ class NBFolderView : public QStackedWidget {
 		void sortBySize();
 		void sortByDate();
 
-		void showProperties();
 		void openTerminal();
 		void showContextMenu( QPoint );
 
@@ -118,6 +117,8 @@ class NBFolderView : public QStackedWidget {
 
 		void focusSearchBar();
 		void clearSearchBar();
+
+		void showProperties();
 };
 
 #endif

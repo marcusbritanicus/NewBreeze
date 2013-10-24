@@ -231,7 +231,7 @@ void NBMessageDialog::buttonClickHandler() {
 
 void NBMessageDialog::aboutNewBreeze() {
 
-	QString title = QString( "About NewBreeze v2.0.1" );
+	QString title = QString( "About NewBreeze v2.0.2" );
 	QString text = QString(
 		"<p><b><center>Fast and light-weight File Manager</center></b></p>"		\
 		"<p>Built on top of the Powerful Qt4 GUI Toolkit, this file manager "	\

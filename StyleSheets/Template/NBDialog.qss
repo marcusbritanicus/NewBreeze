@@ -222,9 +222,12 @@ QRadioButton::indicator:checked {
 }
 
 QComboBox {
-	background: transparent;
-	border: 1px solid gray;
+	background: rgba( 0, 0, 0, 0 );
+	border: 1px solid <bordercolor>;
 	color: <textcolor>;
+
+	font-family: Envy Code R, Monospace, Courier 10 Pitch, Courier New;
+	font-size: 9pt;
 
 	padding: 3px;
 	border-radius: 5px;
@@ -259,4 +262,18 @@ QComboBox QAbstractItemView {
 
 	border: 1px solid gray;
 	border-top: none;
+}
+
+QTableWidget {
+	background: transparent;
+	color: <textcolor>;
+	border: none;
+}
+
+QHeaderView::section {
+	background-color: transparent;
+	border: none;
+	border-bottom: 1px solid gray;
+	font-weight: bold;
+	color: <textcolor>;
 }

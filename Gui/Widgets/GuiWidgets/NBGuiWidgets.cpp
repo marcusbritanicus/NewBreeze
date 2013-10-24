@@ -173,8 +173,7 @@ NBViewModeButton::NBViewModeButton() : QToolButton() {
 	setMinimumWidth( 32 );
 
 	setIcon( QIcon( ":/icons/view-choose.png" ) );
-	setShortcut( Settings->Shortcuts.ViewMode.at( 0 ) );
-	setPopupMode( QToolButton::DelayedPopup );
+	setPopupMode( QToolButton::InstantPopup );
 
 	QMenu *menu = new QMenu( this );
 	connect( this, SIGNAL( clicked() ), this, SIGNAL( switchToNextView() ) );

@@ -14,6 +14,7 @@
 #include <NBLibLzma.hpp>
 #include <NBLibTar.hpp>
 #include <NBLibZip.hpp>
+#include <NBTools.hpp>
 
 class NBArchive {
 

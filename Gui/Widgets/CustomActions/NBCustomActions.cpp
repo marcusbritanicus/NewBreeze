@@ -5,11 +5,8 @@
 */
 
 #include <NBCustomActions.hpp>
-#include <NBFolderView.hpp>
-#include <NBDesktopFile.hpp>
-#include <NBTools.hpp>
 
-NBCustomActions::NBCustomActions() : QDialog() {
+NBCustomActions::NBCustomActions() : NBDialog() {
 
 	createGUI();
 	setWidgetProperties();
@@ -17,28 +14,8 @@ NBCustomActions::NBCustomActions() : QDialog() {
 
 void NBCustomActions::createGUI() {
 
-	QHBoxLayout *lblBtnLyt = new QHBoxLayout();
 	QVBoxLayout *layout = new QVBoxLayout();
 	QHBoxLayout *btnsLyt = new QHBoxLayout();
-	QHBoxLayout *widgetLyt = new QHBoxLayout();
-
-	// Widget Base
-	QWidget *baseWidget = new QWidget();
-	baseWidget->setObjectName( tr( "guiBase" ) );
-
-	// TitleBar
-	QLabel *lbl = new QLabel( tr( "Properties" ) );
-
-	QToolButton *closeBtn = new QToolButton();
-	closeBtn->setText( trUtf8( "\u2718" ) );
-	closeBtn->setAutoRaise( true );
-	closeBtn->setFocusPolicy( Qt::NoFocus );
-
-	connect( closeBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
-
-	lblBtnLyt->addWidget( lbl );
-	lblBtnLyt->addStretch( 0 );
-	lblBtnLyt->addWidget( closeBtn );
 
 	actionsTable = new QTableWidget();
 	setupTable();
@@ -59,17 +36,13 @@ void NBCustomActions::createGUI() {
 	btnsLyt->addStretch( 0 );
 	btnsLyt->addWidget( quitBtn );
 
-	layout->addLayout( lblBtnLyt );
 	layout->addWidget( Separator::horizontal() );
 	layout->addWidget( actionsTable );
 	layout->addWidget( Separator::horizontal() );
 	layout->addLayout( btnsLyt );
 
 	// Final Layout
-	baseWidget->setLayout( layout );
-	widgetLyt->addWidget( baseWidget );
-	widgetLyt->setContentsMargins( QMargins() );
-	setLayout( widgetLyt );
+	setLayout( layout );
 };
 
 void NBCustomActions::setupTable() {
@@ -124,14 +97,14 @@ void NBCustomActions::setupTable() {
 
 void NBCustomActions::setWidgetProperties() {
 
+	setDialogTitle( "Custom Actions" );
+
 	setFixedSize( 720, 540 );
 	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
 	setWindowModality( Qt::ApplicationModal );
 
 	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
-
-	setStyleSheet( getStyleSheet( "NBCustomActions", Settings->General.Style ) );
 };
 
 void NBCustomActions::addCustomAction() {
@@ -255,7 +228,7 @@ NBNewAction::NBNewAction() {
 	QWidget *baseWidget = new QWidget();
 	baseWidget->setObjectName( tr( "guiBase" ) );
 
-	QLabel *lbl = new QLabel( tr( "Properties" ) );
+	QLabel *lbl = new QLabel( tr( "Add Custom Action" ) );
 
 	QToolButton *closeBtn = new QToolButton();
 	closeBtn->setText( trUtf8( "\u2718" ) );
@@ -311,8 +284,6 @@ NBNewAction::NBNewAction() {
 	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
 
 	setFixedWidth( 360 );
-
-	setStyleSheet( getStyleSheet( "NBCustomActions", Settings->General.Style ) );
 };
 
 QString NBNewAction::actionName() {

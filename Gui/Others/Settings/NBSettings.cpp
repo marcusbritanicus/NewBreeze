@@ -54,7 +54,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->Shortcuts.GoRight = QList<QKeySequence>() << QKeySequence( "Alt+Right" );
 	defaultSettings->Shortcuts.NewFolder = QList<QKeySequence>() << QKeySequence( "F10" );
 	defaultSettings->Shortcuts.NewFile = QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+N" );
-	defaultSettings->Shortcuts.Peek = QList<QKeySequence>() << QKeySequence( "Alt+Return" );
+	defaultSettings->Shortcuts.Peek = QList<QKeySequence>() << QKeySequence( "Ctrl+Return" );
 	defaultSettings->Shortcuts.Reload = QList<QKeySequence>() << QKeySequence( "F5" ) << QKeySequence( "Ctrl+R" );
 	defaultSettings->Shortcuts.ToggleHidden = QList<QKeySequence>() << QKeySequence( "Alt+." ) << QKeySequence( "Ctrl+H" );
 	defaultSettings->Shortcuts.SelectAll = QList<QKeySequence>() << QKeySequence( "Ctrl+A" );
@@ -65,7 +65,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->Shortcuts.Rename = QList<QKeySequence>() << QKeySequence( "F2" );
 	defaultSettings->Shortcuts.Delete = QList<QKeySequence>() << QKeySequence( "Shift+Delete" );
 	defaultSettings->Shortcuts.Trash = QList<QKeySequence>() << QKeySequence( "Delete" );
-	defaultSettings->Shortcuts.Properties = QList<QKeySequence>() << QKeySequence( "Ctrl+Return" );
+	defaultSettings->Shortcuts.Properties = QList<QKeySequence>() << QKeySequence( "Alt+Return" );
 	defaultSettings->Shortcuts.Terminal = QList<QKeySequence>() << QKeySequence( "F4" );
 	defaultSettings->Shortcuts.InlineTerminal = QList<QKeySequence>() << QKeySequence( "Shift+F4" );
 	defaultSettings->Shortcuts.NBInfo = QList<QKeySequence>() << QKeySequence( "Ctrl+I" );

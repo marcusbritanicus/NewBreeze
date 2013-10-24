@@ -196,7 +196,10 @@ void NewBreeze::createAndSetupActions() {
 		FolderView, SLOT( doDelete() ) );
 
 	connect( QuickMenuBar->propsBtn, SIGNAL( clicked() ),
-		FolderView, SLOT( showProperties() ) );
+		this, SLOT( showProperties() ) );
+
+	connect( QuickMenuBar->permsBtn, SIGNAL( clicked() ),
+		this, SLOT( showPermissions() ) );
 
 	connect( SidePanel, SIGNAL( driveClicked( QString ) ),
 		FolderView, SLOT( doOpen( QString ) ) );
@@ -212,6 +215,9 @@ void NewBreeze::createAndSetupActions() {
 
 	connect( FolderView, SIGNAL( move( QStringList, QString, NBIOMode::Mode ) ),
 		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
+
+	connect( FolderView, SIGNAL( showProperties() ),
+		this, SLOT( showProperties() ) );
 
 	connect( FolderView, SIGNAL( focusSearchBar() ),
 		this, SLOT( focusSearch() ) );
@@ -262,14 +268,17 @@ void NewBreeze::createAndSetupActions() {
 	focusAddressBarAct->setShortcuts( Settings->Shortcuts.FocusAddressBar );
 	connect( focusAddressBarAct, SIGNAL( triggered() ), AddressBar->addressWidget->addressEdit, SLOT( setFocus() ) );
 
+	// Show settings
 	QAction *showSettingsAct = new QAction( this );
 	showSettingsAct->setShortcuts( Settings->Shortcuts.Settings );
 	connect( showSettingsAct, SIGNAL( triggered() ), this, SLOT( showSettingsDialog() ) );
 
+	// Open new window
 	QAction *newWindowAct = new QAction( this );
 	newWindowAct->setShortcuts( Settings->Shortcuts.NewWindow );
 	connect( newWindowAct, SIGNAL( triggered() ), this, SLOT( openNewWindow() ) );
 
+	// Add bookmark
 	addBookMarkAct = new QAction( this );
 	addBookMarkAct->setShortcuts( Settings->Shortcuts.AddBookmark );
 	connect( addBookMarkAct, SIGNAL( triggered() ), this, SLOT( addBookMark() ) );
@@ -279,6 +288,7 @@ void NewBreeze::createAndSetupActions() {
 	QSocketNotifier *devWatcher = new QSocketNotifier( mountsFD, QSocketNotifier::Write );
 	connect( devWatcher, SIGNAL( activated( int ) ), SidePanel, SLOT( updateDevices() ) );
 
+	// Display terminal widget
 	QAction *termWidgetAct = new QAction( this );
 	termWidgetAct->setShortcuts( Settings->Shortcuts.InlineTerminal );
 	connect( termWidgetAct, SIGNAL( triggered() ), this, SLOT( showHideTermWidget() ) );
@@ -287,9 +297,12 @@ void NewBreeze::createAndSetupActions() {
 	// Show/Hide side bar
 	QAction *toggleSideBar = new QAction( "Toggle Sidebar", this );
 	toggleSideBar->setShortcuts( Settings->Shortcuts.ToggleSideBar );
-
 	connect( toggleSideBar, SIGNAL( triggered() ), this, SLOT( toggleSideBarVisible() ) );
-	addAction( toggleSideBar );
+
+	// Change View Mode
+	QAction *viewModeAct = new QAction( "Change View Mode", this );
+	viewModeAct->setShortcuts( Settings->Shortcuts.ViewMode );
+	connect( viewModeAct, SIGNAL( triggered() ), this, SLOT( switchToNextView() ) );
 
 	addAction( aboutNBAct );
 	addAction( aboutQtAct );
@@ -300,6 +313,8 @@ void NewBreeze::createAndSetupActions() {
 	addAction( newWindowAct );
 	addAction( addBookMarkAct );
 	addAction( termWidgetAct );
+	addAction( toggleSideBar );
+	addAction( viewModeAct );
 };
 
 void NewBreeze::updateGUI() {
@@ -593,15 +608,46 @@ void NewBreeze::clearSearch() {
 	FolderView->setFocus();
 };
 
+void NewBreeze::showProperties() {
+
+	QList<QModelIndex> selectedList = FolderView->getSelection();
+	QStringList paths;
+
+	if ( !selectedList.count() )
+		paths << FolderView->fsModel->currentDir();
+
+	else
+		foreach( QModelIndex idx, selectedList )
+			paths << FolderView->fsModel->nodePath( idx );
+
+	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths );
+	propsDlg->show();
+};
+
+void NewBreeze::showPermissions() {
+
+	QList<QModelIndex> selectedList = FolderView->getSelection();
+	QStringList paths;
+
+	if ( !selectedList.count() )
+		paths << FolderView->fsModel->currentDir();
+
+	else
+		foreach( QModelIndex idx, selectedList )
+			paths << FolderView->fsModel->nodePath( idx );
+
+	NBPermissionsDialog *permsDlg = new NBPermissionsDialog( paths );
+	permsDlg->show();
+};
+
 void NewBreeze::filterFiles( QString filter ) {
 
-	Q_UNUSED( filter );
-	// FolderView->fsModel->setNameFilters( QStringList() << QString( "*%1*" ).arg( filter ) );
+	FolderView->fsModel->setNameFilters( QStringList() << QString( "*%1*" ).arg( filter ) );
 };
 
 void NewBreeze::clearFilters() {
 
-	// FolderView->fsModel->setNameFilters( QStringList() );
+	FolderView->fsModel->setNameFilters( QStringList() );
 };
 
 void NewBreeze::initiateIO( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {

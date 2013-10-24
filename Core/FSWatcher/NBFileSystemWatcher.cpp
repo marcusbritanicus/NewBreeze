@@ -8,10 +8,6 @@
 
 NBFileSystemWatcher::NBFileSystemWatcher() : QThread() {
 
-	__quitQNotify = false;
-	__watchChanging = false;
-	__watching = false;
-
 	inotifyFD = inotify_init();
 	if ( inotifyFD < 0 )
 		qCritical() << "Failed initialize inotify";
@@ -19,7 +15,7 @@ NBFileSystemWatcher::NBFileSystemWatcher() : QThread() {
 
 NBFileSystemWatcher::~NBFileSystemWatcher() {
 
-	__quitQNotify = true;
+	__stopWatch = true;
 
 	inotify_rm_watch( inotifyFD, WD );
 	close( inotifyFD );
@@ -27,119 +23,76 @@ NBFileSystemWatcher::~NBFileSystemWatcher() {
 
 void NBFileSystemWatcher::setWatchPath( QString wPath ) {
 
+	// Set @v watchPath
 	watchPath = QString( wPath );
-	__watchChanging = true;
+
+	// Save the old Watch Descriptor
+	int oldWD = WD;
+
+	// Add anew watch
+	WD = inotify_add_watch( inotifyFD, qPrintable( watchPath ), IN_ALL_EVENTS );
+	if ( WD == -1 ) {
+		qCritical() << "Couldn't add watch: " << qPrintable( watchPath );
+		emit watchFailed();
+	}
+
+	// Now delete the old watch
+	inotify_rm_watch( inotifyFD, oldWD );
 };
 
 void NBFileSystemWatcher::startWatch() {
 
-	__quitQNotify = false;
+	__stopWatch = false;
 	start();
 };
 
 void NBFileSystemWatcher::stopWatch() {
 
-	__quitQNotify = true;
-	__watching = false;
+	__stopWatch = true;
 };
 
 void NBFileSystemWatcher::run() {
 
-	bool __watchPathDeleted = false;
-
-	while ( not __quitQNotify ) {
-
-		while ( __watchPathDeleted )
-			usleep( 100 );
-
-		WD = inotify_add_watch( inotifyFD, qPrintable( watchPath ), IN_CREATE | IN_MODIFY | IN_DELETE | IN_DELETE_SELF );
-		if ( WD == -1 ) {
-			qCritical() << "Couldn't add watch: " << qPrintable( watchPath );
-			close( inotifyFD );
-			continue;
-		}
-
-		__watchChanging = false;
+	while ( not __stopWatch ) {
 		int length = 0, i = 0;
-
-		while( not __watchChanging ) {
+		while( true ) {
 			i = 0;
 			length = read( inotifyFD, buffer, BUF_LEN );
 
+			// If for some reason length < 0, continue with trying to read.
 			if ( length < 0 )
-				qDebug() << "Could not read changes.";
+				continue;
 
-			if ( __watchChanging ) {
-				inotify_rm_watch( inotifyFD, WD );
-				break;
-			}
+			if ( __stopWatch )
+				return;
 
 			while ( i < length ) {
-				if ( __quitQNotify ) {
-					inotify_rm_watch( inotifyFD, WD );
+				if ( __stopWatch )
 					return;
-				}
-
-				if ( __watchChanging ) {
-					inotify_rm_watch( inotifyFD, WD );
-					break;
-				}
 
 				struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
+				// If this is a transition between two watches, ignore the old watch events
+				if ( event->wd != WD )
+					break;
 
 				if ( event->mask & IN_DELETE_SELF ) {
-					__watchPathDeleted = true;
-
 					emit watchPathDeleted();
-
-					/*
-						*
-						* The folder which was being watched was itself deleted, so we have
-						* nothing else to watch for. So break out of the while read loop
-						*
-					*/
-					inotify_rm_watch( inotifyFD, WD );
-					break;
 				}
 
-				if ( event->mask & IN_CREATE ) {
-					if ( event->mask & IN_ISDIR )
-						emit dirCreated( event->name );
-
-					else
-						emit fileCreated( event->name );
+				if ( ( event->mask & IN_CREATE ) or ( event->mask & IN_MOVED_TO ) ) {
+					emit nodeCreated( watchPath + "/" + event->name );
 				}
 
 				if ( event->mask & IN_MODIFY ) {
-					if ( event->mask & IN_ISDIR )
-						emit dirChanged( event->name );
-
-					else
-						emit fileChanged( event->name );
+					emit nodeChanged( watchPath + "/" + event->name );
 				}
 
-				if ( event->mask & IN_DELETE ) {
-					if ( event->mask & IN_ISDIR )
-						emit dirDeleted( event->name );
-
-					else
-						emit fileDeleted( event->name );
+				if ( ( event->mask & IN_DELETE ) or ( event->mask & IN_MOVED_FROM ) ) {
+					emit nodeDeleted( watchPath + "/" + event->name );
 				}
 
 				i += EVENT_SIZE + event->len;
 			}
-
-			if ( __quitQNotify ) {
-				inotify_rm_watch( inotifyFD, WD );
-				return;
-			}
-
-			if ( __watchChanging ) {
-				inotify_rm_watch( inotifyFD, WD );
-				break;
-			}
 		}
-
-		inotify_rm_watch( inotifyFD, WD );
 	}
 };

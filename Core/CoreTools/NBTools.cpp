@@ -19,7 +19,7 @@ QDir NBDir( QString path ) {
 
 QString dirName( QString path ) {
 
-	return QString( dirname( strdup( qPrintable( path ) ) ) );
+	return QString( dirname( strdup( qPrintable( path ) ) ) ) + "/";
 };
 
 QString baseName( QString path ) {
@@ -71,6 +71,11 @@ QString termFormatString( QString file ) {
 		file.replace( ch, "\\" + ch );
 
 	return file;
+};
+
+QString MD5( QString data ) {
+
+	return QString::fromLocal8Bit( QCryptographicHash::hash( data.toLocal8Bit(), QCryptographicHash::Md5 ).toHex() );
 };
 
 bool isFile( QString path ) {

@@ -67,14 +67,20 @@ class NBRunCmdDialog : public NBDialog {
 		NBRunCmdDialog( QString );
 		QLineEdit *le;
 		QPushButton *okBtn, *cancelBtn;
+		QListWidget *appList;
+		QString fileName;
 		bool runOk;
 
 	private:
+		void createGUI();
+		void createAndSetupActions();
 		void setWindowProperties();
+		void loadApplications();
 
 	private slots :
 		void runCommand();
 		void cancel();
+		void appSelected( QListWidgetItem* );
 		void handleTextChanged( QString newText );
 };
 

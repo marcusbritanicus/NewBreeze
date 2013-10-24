@@ -21,6 +21,7 @@ class NBFileSystemNode {
 
 		void appendChild( NBFileSystemNode* );
 		void insertChildAt( int, NBFileSystemNode* );
+		void removeChild( NBFileSystemNode* );
 		void removeChildAt( int );
 
 		NBFileSystemNode* child( int );

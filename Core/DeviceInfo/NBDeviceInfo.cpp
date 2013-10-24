@@ -6,6 +6,7 @@
 
 #include <NBDeviceInfo.hpp>
 #include <NBTools.hpp>
+#include <sys/statvfs.h>
 
 NBDeviceManager::NBDeviceManager() {
 };
@@ -27,8 +28,8 @@ NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
 
 	NBDeviceInfoPrivate devInfoP;
 
-	struct statfs info;
-	statfs( path.toLocal8Bit(), &info );
+	struct statvfs info;
+	statvfs( path.toLocal8Bit(), &info );
 
 	struct stat info2;
 	stat( path.toLocal8Bit(), &info2 );
@@ -42,11 +43,10 @@ NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
 
 	// Get the device name
 	QString devById = QString( "/sys/dev/block/" ) + QString::number( major( info2.st_dev ) ) + ":" + QString::number( minor( info2.st_dev ) );
-	QString device = "/dev/" + QFileInfo( devById ).symLinkTarget().split( "/" ).takeLast();
 
 	// Get the mount point
 	QRegExp mountsRx( "(\\S+) (\\S+) ([a-z0-9-.]+)" );
-	QString mountsInfo = getMountsInfo( device );
+	QString mountsInfo = getMountsInfo( path );
 
 	if ( mountsRx.indexIn( mountsInfo ) == -1 )
 		return NBDeviceInfo();
@@ -56,13 +56,13 @@ NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
 
 	// If the disk is identified using uuid, get the /dev/ version
 	if ( devInfoP.dN.startsWith( "/dev/disk/by-uuid" ) )
-		devInfoP.dN = QFileInfo( device ).symLinkTarget();
+		devInfoP.dN = QFileInfo( "/dev/" + baseName( QFileInfo( devById ).symLinkTarget() ) ).symLinkTarget();
 
 	if ( QFileInfo( devInfoP.mP ).isRoot() )
 		devInfoP.dL = QString( "FileSystem" );
 
 	else
-		devInfoP.dL = getDevLabel( devInfoP.dN ).isEmpty() ? devInfoP.mP.split( "/" ).last() : getDevLabel( devInfoP.dN );
+		devInfoP.dL = getDevLabel( devInfoP.dN ).isEmpty() ? baseName( devInfoP.mP ) : getDevLabel( devInfoP.dN );
 
 	devInfoP.fS = mountsRx.cap( 3 );
 	if ( vfsTypes.contains( devInfoP.fS ) )
@@ -71,10 +71,10 @@ NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
 	else
 		return NBDeviceInfo();
 
-	devInfoP.fSz = ( quint64 ) ( info.f_bfree ) * 4096;
-	devInfoP.aSz = ( quint64 ) ( info.f_bavail ) * 4096;
-	devInfoP.uSz = ( quint64 ) ( info.f_blocks - info.f_bfree ) * 4096;
-	devInfoP.dSz = ( quint64 ) ( info.f_blocks ) * 4096;
+	devInfoP.fSz = ( quint64 ) ( info.f_bfree ) * info.f_frsize;
+	devInfoP.aSz = ( quint64 ) ( info.f_bavail ) * info.f_frsize;
+	devInfoP.uSz = ( quint64 ) ( info.f_blocks - info.f_bfree ) * info.f_frsize;
+	devInfoP.dSz = ( quint64 ) ( info.f_blocks ) * info.f_frsize;
 
 	return NBDeviceInfo( devInfoP );
 };
@@ -118,13 +118,13 @@ NBDeviceInfo NBDeviceManager::deviceInfoForDevice( QString dev ) {
 	else
 		return NBDeviceInfo();
 
-	struct statfs info;
-	statfs( devInfoP.mP.toLocal8Bit(), &info );
+	struct statvfs info;
+	statvfs( devInfoP.mP.toLocal8Bit(), &info );
 
-	devInfoP.fSz = ( quint64 ) ( info.f_bfree ) * 4096;
-	devInfoP.aSz = ( quint64 ) ( info.f_bavail ) * 4096;
-	devInfoP.uSz = ( quint64 ) ( info.f_blocks - info.f_bfree ) * 4096;
-	devInfoP.dSz = ( quint64 ) ( info.f_blocks ) * 4096;
+	devInfoP.fSz = ( quint64 ) ( info.f_bfree ) * info.f_frsize;
+	devInfoP.aSz = ( quint64 ) ( info.f_bavail ) * info.f_frsize;
+	devInfoP.uSz = ( quint64 ) ( info.f_blocks - info.f_bfree ) * info.f_frsize;
+	devInfoP.dSz = ( quint64 ) ( info.f_blocks ) * info.f_frsize;
 
 	return NBDeviceInfo( devInfoP );
 };
@@ -150,14 +150,34 @@ QString NBDeviceManager::getMountsInfo( QString dev ) {
 
 	QStringList devList = getMounts();
 
-	foreach( QString devLine, devList ) {
-		// From /proc/self/mounts - Starting with @p dev
-		if ( devLine.contains( dev ) )
-			return devLine;
+	// Regular device
+	if ( dev.startsWith( "/dev/" ) ) {
+		foreach( QString devLine, devList ) {
+			// From /proc/self/mounts - Starting with @p dev
+			if ( devLine.contains( dev ) )
+				return devLine;
 
-		// From /proc/self/mounts - Starting with /dev/disk/bu-uuid
-		if ( QFileInfo( devLine.split( " " ).at( 0 ) ).symLinkTarget() == dev )
-			return devLine;
+			// From /proc/self/mounts - Starting with /dev/disk/bu-uuid
+			if ( QFileInfo( devLine.split( " " ).at( 0 ) ).symLinkTarget() == dev )
+				return devLine;
+		}
+	}
+
+	// Special device: we provide path
+	else {
+		QString retPt;
+		foreach( QString devLine, devList ) {
+			if ( not devLine.count() )
+				continue;
+
+			QString mount = devLine.split( " " ).at( 1 );
+			if ( dev.contains( mount ) ) {
+				if ( not retPt.contains( mount ) )
+					retPt = devLine;
+			}
+		}
+
+		return ( retPt.size() ? retPt : QString() );
 	}
 
 	return QString();

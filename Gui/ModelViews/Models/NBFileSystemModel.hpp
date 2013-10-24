@@ -152,8 +152,9 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void gatherFileInfo();
 		void saveInfo( QString, QString, QStringList );
 
-		void handleDirChanged( QString );
-		void handleFileChanged( QString );
+		void handleNodeCreated( QString );
+		void handleNodeChanged( QString );
+		void handleNodeDeleted( QString );
 		void loadHome();
 
 	Q_SIGNALS:

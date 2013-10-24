@@ -18,8 +18,8 @@ NBTerminal::NBTerminal( QString wDir ) : QWidget() {
 	QVBoxLayout *lyt = new QVBoxLayout();
 	Terminal = new NBTerminalWidget( currentPath );
 
-	lyt->addWidget( Terminal );
 	lyt->addWidget( Separator::horizontal() );
+	lyt->addWidget( Terminal );
 	setLayout( lyt );
 
 	setFocusPolicy( Qt::NoFocus );
@@ -56,7 +56,7 @@ void NBTerminal::openNewTerminal() {
 	Terminal = new NBTerminalWidget( currentPath );
 	connect( Terminal, SIGNAL( finished() ), this, SLOT( openNewTerminal() ) );
 
-	qobject_cast<QVBoxLayout *>( layout() )->insertWidget( 0, Terminal );
+	qobject_cast<QVBoxLayout *>( layout() )->insertWidget( 1, Terminal );
 
 	hide();
 };

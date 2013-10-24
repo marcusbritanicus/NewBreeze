@@ -8,6 +8,8 @@
 #define NBBREADCRUMBSBAR_HPP
 
 #include <Global.hpp>
+#include <NBGuiWidgets.hpp>
+#include <NBTools.hpp>
 
 class NBBreadCrumbMenu : public QLabel {
 	Q_OBJECT
@@ -19,7 +21,7 @@ class NBBreadCrumbMenu : public QLabel {
 		void createMenu();
 
 		QDir cwd;
-		QMenu *menu;
+		NBMenu *menu;
 
 	private slots:
 		void onMenuHidden();

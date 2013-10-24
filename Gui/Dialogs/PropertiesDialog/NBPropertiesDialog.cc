@@ -189,7 +189,6 @@ NBShowHideWidget* NBPropertiesDialog::getGeneralInfoWidget() {
 NBShowHideWidget* NBPropertiesDialog::getPermissionsWidget() {
 
 	QGridLayout *permsLyt = new QGridLayout();
-	// permissionsNumeric = new QLineEdit();
 
 	QStringList permsList;
 	if ( pathsList.count() > 1 )
@@ -238,28 +237,6 @@ NBShowHideWidget* NBPropertiesDialog::getPermissionsWidget() {
 };
 
 NBShowHideWidget* NBPropertiesDialog::getDeviceInfoWidget() {
-
-	NBDriveLabel *driveIcon;
-	QLabel *driveName = new QLabel();
-	NBDriveInfo *driveInfo;
-
-	NBDeviceManager devMgr;
-	NBDeviceInfo deviceInfo = devMgr.deviceInfoForPath( pathsList.at( 0 ) );
-
-	driveIcon = new NBDriveLabel( deviceInfo.driveLabel() );
-	driveName->setText( deviceInfo.driveName() );
-	driveInfo = new NBDriveInfo( deviceInfo.usedSpace(), deviceInfo.driveSize() );
-
-	QVBoxLayout *driveLyt = new QVBoxLayout();
-	QGridLayout *subLytDrive1 = new QGridLayout();
-	QHBoxLayout *subLytDrive2 = new QHBoxLayout();
-
-	subLytDrive1->addWidget( driveIcon, 0, 0, Qt::AlignLeft );
-	subLytDrive1->addWidget( driveName, 0, 1, Qt::AlignRight );
-	subLytDrive2->addWidget( driveInfo );
-
-	driveLyt->addLayout( subLytDrive1 );
-	driveLyt->addLayout( subLytDrive2 );
 
 	QWidget *driveFrame = new QWidget( this );
 	driveFrame->setObjectName( "infoFrame" );

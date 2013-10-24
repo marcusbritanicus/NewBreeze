@@ -180,7 +180,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 
 	info << QDateTime::fromTime_t( statbuf.st_mtime ).toString( "ddd, dd MMM, yyyy" );
 	info << permStr( statbuf.st_mode );
-	info << pwdinfo->pw_name;
+	info << ( ( pwdinfo == NULL ) ? QString::number( statbuf.st_uid ) : pwdinfo->pw_name );
 
 	return info;
 };
