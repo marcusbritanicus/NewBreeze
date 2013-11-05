@@ -1,0 +1,478 @@
+/*
+	*
+	* NBAppFile.cpp - NewBreeze Application File Class
+	*
+*/
+
+#include <NBAppFile.hpp>
+
+inline QString findIn( QString what, QString where ) {
+
+	QRegExp rx( what );
+	rx.setMinimal( true );
+
+	if ( rx.indexIn( where ) >= 0 )
+		return rx.cap( 1 );
+
+	return QString();
+};
+
+inline QString dirName( QString path ) {
+
+	if ( path.endsWith( "/" ) )
+		path.chop( 1 );
+
+	return QString( dirname( strdup( qPrintable( path ) ) ) ) + "/";
+};
+
+inline QString baseName( QString path ) {
+
+	if ( path.endsWith( "/" ) )
+		path.chop( 1 );
+
+	return QString( basename( strdup( qPrintable( path ) ) ) );
+};
+
+NBAppFile::NBAppFile( QString path ) {
+
+	fileUrl = QString( path );
+	parseDesktopFile();
+};
+
+QVariant NBAppFile::value( NBAppFile::Fields field ) const {
+
+	switch( field ) {
+		case Name:
+			return __name;
+
+		case Type:
+			return __type;
+
+		case Exec:
+			return __exec;
+
+		case Icon:
+			return __icon;
+
+		case MimeTypes:
+			return __mimeTypes;
+
+		case WorkPath:
+			return __workPath;
+
+		case TerminalMode:
+			return __terminalMode;
+
+		case Categories:
+			return __categories;
+
+		case Comment:
+			return __comment;
+
+		case NoDisplay:
+			return __nodisplay;
+
+		default:
+			return QVariant();
+	};
+};
+
+QStringList NBAppFile::execArgs() const {
+
+	return __execArgs;
+};
+
+bool NBAppFile::multipleArgs() const {
+
+	return __multipleFiles;
+};
+
+bool NBAppFile::takesArgs() const {
+
+	return __takesArgs;
+};
+
+short NBAppFile::grade() const {
+
+	return __grade;
+};
+
+QString NBAppFile::desktopFileName() const {
+
+	return baseName( fileUrl );
+};
+
+int NBAppFile::compare( NBAppFile other ) const {
+
+	if ( __execArgs.at( 0 ) == other.execArgs().at( 0 ) )
+		return __grade - other.grade();
+
+	return INT_MAX;
+};
+
+QString NBAppFile::category() const {
+
+	QStringList Accessories = QStringList() << "Utility" << "Utilities" << "Accessory" << "Accessories";
+	QStringList Development = QStringList() << "Development";
+	QStringList Education = QStringList() << "Education";
+	QStringList Games = QStringList() << "Games" << "Game" << "ArcadeGame" << "StrategyGame" << "LogicGame";
+	QStringList Graphics = QStringList() << "Graphics";
+	QStringList Internet = QStringList() << "Network" << "Internet";
+	QStringList Multimedia = QStringList() << "Audio" << "Video" << "AudioVideo" << "Multimedia";
+	QStringList Office = QStringList() << "Office";
+	QStringList ScienceMath = QStringList() << "Science" << "Math";
+	QStringList Settings = QStringList() << "Settings";
+	QStringList System = QStringList() << "System";
+
+	/*
+		*
+		* Some applications that declare themselves as Education are also Science and Math are also Educational
+		* So we prefer them to be in Science and Math category. So Science and Math categories are checked for
+		* before Education.
+		*
+		* Some applications that are Office applications are also Graphics applications, like okular
+		* We want them to be in Office. So we check for Office category first and then Graphics.
+		*
+	*/
+
+	foreach( QString cate, __categories ) {
+		if ( Accessories.contains( cate ) )
+			return "Accessories";
+
+		else if ( Development.contains( cate ) )
+			return "Development";
+
+		else if ( ScienceMath.contains( cate ) )
+			return "Science and Math";
+
+		else if ( Education.contains( cate ) )
+			return "Education";
+
+		else if ( Games.contains( cate ) )
+			return "Games";
+
+		else if ( Office.contains( cate ) )
+			return "Office";
+
+		else if ( Graphics.contains( cate ) )
+			return "Graphics";
+
+		else if ( Internet.contains( cate ) )
+			return "Internet";
+
+		else if ( Multimedia.contains( cate ) )
+			return "Multimedia";
+
+		else if ( Settings.contains( cate ) )
+			return "Settings";
+
+		else if ( System.contains( cate ) )
+			return "System";
+
+		else
+			continue;
+	}
+
+	return "Uncategorized";
+};
+
+bool NBAppFile::operator==( const NBAppFile& other ) const {
+
+	bool truth = true;
+	truth &= ( value( NBAppFile::Name ) == other.value( NBAppFile::Name ) );
+	truth &= ( value( NBAppFile::Type ) == other.value( NBAppFile::Type ) );
+	truth &= ( value( NBAppFile::Exec ) == other.value( NBAppFile::Exec ) );
+	truth &= ( value( NBAppFile::Icon ) == other.value( NBAppFile::Icon ) );
+	truth &= ( value( NBAppFile::MimeTypes ) == other.value( NBAppFile::MimeTypes ) );
+	truth &= ( value( NBAppFile::WorkPath ) == other.value( NBAppFile::WorkPath ) );
+	truth &= ( value( NBAppFile::TerminalMode ) == other.value( NBAppFile::TerminalMode ) );
+	truth &= ( value( NBAppFile::Categories ) == other.value( NBAppFile::Categories ) );
+	truth &= ( value( NBAppFile::Comment ) == other.value( NBAppFile::Comment ) );
+	truth &= ( grade() == other.grade() );
+
+	return truth;
+};
+
+void NBAppFile::parseDesktopFile() {
+
+	QString rxName( "\nName=(.*)(\n|\r\n)" );
+	QString rxType( "\nType=(.*)(\n|\r\n)" );
+	QString rxExec( "\nExec=(.*)(\n|\r\n)" );
+	QString rxIcon( "\nIcon=(.*)(\n|\r\n)" );
+	QString rxPath( "\nPath=(.*)(\n|\r\n)" );
+	QString rxMime( "\nMimeType=(.*)(\n|\r\n)" );
+	QString rxTerm( "\nTerminal=(.*)(\n|\r\n)" );
+	QString rxCate( "\nCategories=(.*)(\n|\r\n)" );
+	QString rxComm( "\nComment=(.*)(\n|\r\n)" );
+	QString rxDisp( "\nNoDisplay=(.*)(\n|\r\n)" );
+
+	// Grade - location
+	// 100   - ".local/share/applications/"
+	// 099   - "/usr/local/share/applications/"
+	// 098   - "/usr/share/applications"
+	// 097   - "/usr/share/applications/kde4"
+	// 097   - "/usr/share/gnome/applications/"
+
+	QFile dFile( fileUrl );
+	if ( !dFile.exists() )
+		return;
+
+	if ( !dFile.open( QFile::ReadOnly ) )
+		return;
+
+	QString entry = QString( dFile.readAll() );
+	dFile.close();
+
+	__name = findIn( rxName, entry );
+
+	if ( __name.isEmpty() )
+		qDebug() << "Nameless monster:" << fileUrl;
+
+	__type = findIn( rxType, entry );
+	__exec = findIn( rxExec, entry );
+
+	__icon = findIn( rxIcon, entry );
+	if ( __icon.isEmpty() )
+		__icon = QString( "application-x-desktop" );
+	__workPath = findIn( rxPath, entry );
+	__mimeTypes = findIn( rxMime, entry ).split( ";", QString::SkipEmptyParts );
+	QString __terminal = findIn( rxTerm, entry );
+	__terminalMode = ( __terminal.toLower() == "true" ? true : false );
+
+	__categories << findIn( rxCate, entry ).split( ";", QString::SkipEmptyParts );
+	__comment = findIn( rxComm, entry );
+	__nodisplay = ( findIn( rxDisp, entry ).toLower() == "true" ? true : false );
+
+	// By default set @v __multipleFiles to false
+	__multipleFiles = false;
+	__takesArgs = false;
+
+	QStringList args = __exec.split( " " );
+	foreach( QString arg, args ) {
+		if ( arg == "%f" or arg == "%u" ) {
+			__multipleFiles = false;
+			__takesArgs = true;
+			__execArgs << "<#NEWBREEZE-ARG-FILE#>";
+		}
+
+		else if ( arg == "%F" or arg == "%U" ) {
+			__multipleFiles = true;
+			__takesArgs = true;
+			__execArgs << "<#NEWBREEZE-ARG-FILES#>";
+		}
+
+		else if ( arg == "%i" ) {
+			if ( !__icon.isEmpty() )
+				__execArgs << "--icon" << __icon;
+		}
+
+		else if ( arg == "%c" )
+			__execArgs << __name;
+
+		else if ( arg == "%k" )
+			__execArgs << QUrl( fileUrl ).toLocalFile();
+
+		else
+			__execArgs << arg;
+	}
+
+	// Grade calculation
+	if ( dirName( fileUrl ) == QDir::home().filePath( ".local/share/applications/" ) )
+		__grade = 100;
+
+	else if ( dirName( fileUrl ) == "/usr/local/share/applications/" )
+		__grade = 99;
+
+	else if ( dirName( fileUrl ) == "/usr/share/applications/" )
+		__grade = 98;
+
+	else if ( dirName( fileUrl ) == "/usr/share/applications/kde4/" )
+		__grade = 97;
+
+	else if ( dirName( fileUrl ) == "/usr/share/gnome/applications/" )
+		__grade = 97;
+
+	else {
+		qDebug() << dirName( fileUrl );
+		__grade = 96;
+	}
+};
+
+NBAppsList::NBAppsList() {
+
+	clear();
+};
+
+void NBAppsList::clear() {
+
+	__appsList.clear();
+};
+
+quint64 NBAppsList::count() {
+
+	return __appsList.count();
+};
+
+NBAppFile NBAppsList::at( quint64 pos ) {
+
+	return __appsList.at( pos );
+};
+
+bool NBAppsList::contains( NBAppFile app ) {
+
+	return __appsList.contains( app );
+};
+
+void NBAppsList::remove( NBAppFile app ) {
+
+	__appsList.removeAt( __appsList.indexOf( app ) );
+};
+
+void NBAppsList::remove( quint64 pos ) {
+
+	__appsList.removeAt( pos );
+};
+
+QList<NBAppFile> NBAppsList::toQList() {
+
+	return __appsList;
+};
+
+QList<NBAppFile> NBAppsList::toQList() const {
+
+	return __appsList;
+};
+
+void NBAppsList::removeDuplicates() {
+
+	if ( __clearedOfDuplicates )
+		return;
+
+	foreach( NBAppFile thisApp, __appsList ) {
+		foreach( NBAppFile other, __appsList ) {
+			if ( __appsList.indexOf( thisApp ) == __appsList.indexOf( other ) ) {
+				continue;
+			}
+
+			if ( thisApp.compare( other ) == INT_MAX ) {
+				continue;
+			}
+
+			else if ( thisApp.compare( other ) < 0 ) {
+				__appsList.removeAt( __appsList.indexOf( thisApp ) );
+				break;
+			}
+
+			else if ( thisApp.compare( other ) > 0 ) {
+				/*
+					*
+					* Since @other is deleted, we have more to compare @thisApp with
+					*
+				*/
+				__appsList.removeAt( __appsList.indexOf( other ) );
+			}
+
+			else if ( thisApp.compare( other ) == 0 ) {
+				// Same location multiple files
+				qDebug() << thisApp.value( NBAppFile::Name ).toString();
+				qDebug() << thisApp.grade();
+			}
+		}
+	}
+
+	__clearedOfDuplicates = true;
+};
+
+NBAppsList NBAppsList::operator<<( NBAppsList newList ) {
+
+	__appsList << newList.toQList();
+
+	return *this;
+};
+
+NBAppsList NBAppsList::operator<<( NBAppFile app ) {
+
+	// If app is not an Application type,do not add it.
+	if ( app.value( NBAppFile::Type ).toString() != QString( "Application" ) )
+		return *this;
+
+	// If app is not to be displayed, do not add it.
+	if ( app.value( NBAppFile::NoDisplay ).toBool() )
+		return *this;
+
+	foreach( NBAppFile other, __appsList ) {
+		if ( app.compare( other ) == INT_MAX ) {
+			// This means nothing. Just that the other app is not the same as this.
+			// So we continue the search.
+			continue;
+		}
+
+		else if ( app.compare( other ) < 0 ) {
+			// This has less priority than the one existing.
+			// So no more checks. We do not include this at all.
+
+			return *this;
+		}
+
+		else if ( app.compare( other ) > 0 ) {
+			// This has a higher priority than the one existing.
+			// We delete the other and append this.
+			__appsList.removeAt( __appsList.indexOf( other ) );
+			__appsList << app;
+
+			return *this;
+		}
+
+		else if ( app.compare( other ) == 0 ) {
+			// We already have an equivalent application.
+			// We'll try to merge the two and return.
+
+			/// ===========> Unimplemented <=========== ///
+
+			return *this;
+		}
+	}
+
+	// This means no application was found similar to the one being added.
+	// We add this application
+	__appsList << app;
+
+	return *this;
+};
+
+NBAppsList NBAppsList::operator=( NBAppsList newList ) {
+
+	__appsList = newList.toQList();
+
+	return *this;
+};
+
+bool NBAppsList::operator==( NBAppsList newList ) {
+
+	if ( count() != newList.count() )
+		return false;
+
+	return __appsList == newList.toQList();
+};
+
+NBAppFile NBAppsList::operator[]( int pos ) {
+
+	return __appsList.at( pos );
+};
+
+uint qHash( const NBAppFile &app ) {
+
+	QString hashString;
+	hashString += app.value( NBAppFile::Name ).toString();
+	hashString += app.value( NBAppFile::Type ).toString();
+	hashString += app.value( NBAppFile::Exec ).toString();
+	hashString += app.value( NBAppFile::Icon ).toString();
+	hashString += app.value( NBAppFile::MimeTypes ).toStringList().join( " " );
+	hashString += app.value( NBAppFile::WorkPath ).toString();
+	hashString += app.value( NBAppFile::TerminalMode ).toString();
+	hashString += app.value( NBAppFile::Categories ).toStringList().join( " " );
+	hashString += app.value( NBAppFile::Comment ).toString();
+	hashString += app.value( NBAppFile::NoDisplay ).toString();
+
+	return qChecksum( qPrintable( hashString ), hashString.count() );
+};

@@ -2,6 +2,7 @@
 	<qresource>
 		<file>icons/abort.png</file>
 		<file>icons/appearance.png</file>
+		<file>icons/applications.png</file>
 		<file>icons/archive.png</file>
 		<file>icons/arrow-down.png</file>
 		<file>icons/arrow-left.png</file>
@@ -14,6 +15,8 @@
 		<file>icons/blank.png</file>
 		<file>icons/bookmark.png</file>
 		<file>icons/cancel.png</file>
+		<file>icons/catalogs-alt.png</file>
+		<file>icons/catalogs.png</file>
 		<file>icons/checkbox_checkedn.png</file>
 		<file>icons/checkbox_checked.png</file>
 		<file>icons/checkbox_uncheckedn.png</file>
@@ -35,7 +38,6 @@
 		<file>icons/exec.png</file>
 		<file>icons/extract.png</file>
 		<file>icons/file.png</file>
-		<file>icons/files.png</file>
 		<file>icons/folder-locked.png</file>
 		<file>icons/folder.png</file>
 		<file>icons/folders.png</file>
@@ -80,11 +82,15 @@
 		<file>icons/search.png</file>
 		<file>icons/select1.png</file>
 		<file>icons/selectall.png</file>
+		<file>icons/square-minus.png</file>
+		<file>icons/square-plus.png</file>
 		<file>icons/stop.png</file>
 		<file>icons/text.png</file>
 		<file>icons/TransDark.png</file>
 		<file>icons/TransLight.png</file>
 		<file>icons/trash.png</file>
+		<file>icons/tree-hidden.png</file>
+		<file>icons/tree-shown.png</file>
 		<file>icons/unknown.png</file>
 		<file>icons/up.png</file>
 		<file>icons/usb.png</file>

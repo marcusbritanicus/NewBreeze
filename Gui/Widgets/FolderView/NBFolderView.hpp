@@ -23,7 +23,6 @@
 #include <NBPropertiesDialog.hpp>
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
-#include <NBDesktopFile.hpp>
 #include <NBArchive.hpp>
 #include <NBCustomActions.hpp>
 #include <NBMessageDialog.hpp>
@@ -43,7 +42,7 @@ class NBFolderView : public QStackedWidget {
 		QModelIndexList getSelection();
 		bool hasSelection();
 
-		QAction *peekAct, *moveAct, *copyAct, *pasteAct, *renameAct, *reloadAct, *trashAct, *delAct, *propertiesAct;
+		QAction *peekAct, *moveAct, *copyAct, *pasteAct, *renameAct, *reloadAct, *trashAct, *delAct, *propertiesAct, *permissionsAct;
 		QAction *actPrevDir, *actNextDir, *actParDir, *actHomeDir, *showHideDotFiles, *openVTE;
 		QAction *actNewDir, *actNewFile;
 		QAction *sortByNameAct, *sortByTypeAct, *sortBySizeAct, *sortByDateAct;
@@ -119,6 +118,9 @@ class NBFolderView : public QStackedWidget {
 		void clearSearchBar();
 
 		void showProperties();
+		void showPermissions();
+
+		void reloadCatalogs();
 };
 
 #endif

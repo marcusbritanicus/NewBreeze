@@ -138,7 +138,7 @@ void NBCustomPeek::getFileProps() {
 
 	nameLbl->setText( fm.elidedText( "<tt>Name:</tt> " + info.fileName(), Qt::ElideMiddle, 540 ) );
 	pathLbl->setText( fm.elidedText( "<tt>Path:</tt> " + info.absolutePath(), Qt::ElideMiddle, 540 ) );
-	mimeLbl->setText( "<tt>MimeType:</tt> " + getMimeTypeAlt( path ) );
+	mimeLbl->setText( "<tt>MimeType:</tt> " + getMimeType( path ) );
 	sizeLbl->setText( "<tt>Size:</tt> " + formatSize( info.size() ) );
 
 	timeLbl->setText( QString(

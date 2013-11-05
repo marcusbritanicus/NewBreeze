@@ -19,20 +19,23 @@ QDir NBDir( QString path ) {
 
 QString dirName( QString path ) {
 
+	if ( path.endsWith( "/" ) )
+		path.chop( 1 );
+
 	return QString( dirname( strdup( qPrintable( path ) ) ) ) + "/";
 };
 
 QString baseName( QString path ) {
+
+	if ( path.endsWith( "/" ) )
+		path.chop( 1 );
 
 	return QString( basename( strdup( qPrintable( path ) ) ) );
 };
 
 QString getMimeType( QString path ) {
 
-	magic_t mgcMime = magic_open( MAGIC_MIME_TYPE );
-	magic_load( mgcMime, NULL );
-
-	return QString( magic_file( mgcMime, qPrintable( path ) ) );
+	return mimeDb.mimeTypeForFile( path ).name();
 };
 
 inline QMimeType getMime( QString path ) {
@@ -42,25 +45,10 @@ inline QMimeType getMime( QString path ) {
 
 QString getMimeTypeAlt( QString path ) {
 
-	return mimeDb.mimeTypeForFile( path ).name();
-};
+	magic_t mgcMime = magic_open( MAGIC_MIME_TYPE );
+	magic_load( mgcMime, NULL );
 
-QStringList getDesktopEntries( QString path ) {
-
-	QSettings dCache( mimeProgsCache, QSettings::NativeFormat );
-
-	QMimeType mime = getMime( path );
-
-	QStringList entriesList;
-	QStringList mimeTypes = QStringList() << mime.name() << mime.allAncestors();
-
-	foreach( QString mimeType, mimeTypes )
-		entriesList << dCache.value( mimeType ).toStringList();
-
-	entriesList.removeDuplicates();
-	entriesList.sort();
-
-	return entriesList;
+	return QString( magic_file( mgcMime, qPrintable( path ) ) );
 };
 
 QString termFormatString( QString file ) {
@@ -399,10 +387,10 @@ bool isText( QString path ) {
 				<< "application/x-php"
 				<< "application/x-ruby";
 
-	if ( ( plainMimes.count( getMimeTypeAlt( path ) ) ) > 0 )
+	if ( ( plainMimes.count( getMimeType( path ) ) ) > 0 )
 		return true;
 
-	else if ( getMimeTypeAlt( path ).startsWith( "text" ) )
+	else if ( getMimeType( path ).startsWith( "text" ) )
 		return true;
 
 	return false;
@@ -416,10 +404,10 @@ bool isExec( QString path ) {
 				<< "application/x-shellscript"
 				<< "application/x-install";
 
-	if ( execMimes.contains( getMimeTypeAlt( path ) ) )
+	if ( execMimes.contains( getMimeType( path ) ) )
 		return true;
 
-	if ( QFileInfo( path ).isExecutable() )
+	if ( getMime( path ).allAncestors().contains( "application/x-executable" ) )
 		return true;
 
 	return false;
@@ -427,7 +415,7 @@ bool isExec( QString path ) {
 
 bool isImage( QString path ) {
 
-	QString mime = getMimeTypeAlt( path );
+	QString mime = getMimeType( path );
 
 	// image/vnd.djvu, image/x-djvu: May not be an image but a Multipage DjVu Document
 	// So we ignore this. Anyway, no thumbnailing djvu documents is done at all.
@@ -462,7 +450,7 @@ bool isArchive( QString path ) {
 				<< "application/x-war" << "application/x-xz" << "application/x-gzip"
 				<< "application/x-compress" << "application/zip" << "application/x-zoo";
 
-	return archiveMimes.contains( getMimeTypeAlt( path ) );
+	return archiveMimes.contains( getMimeType( path ) );
 }
 
 bool isArchiveAlt( QString mimeType ) {

@@ -6,8 +6,6 @@
 
 #include <NBContextMenu.hpp>
 #include <NBFolderView.hpp>
-#include <NBDesktopFile.hpp>
-#include <NBTools.hpp>
 
 NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QString dir ) : QMenu() {
 	/*
@@ -27,7 +25,7 @@ NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QS
 	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-    setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
+	setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 
 	// Actions
 	if ( selectedIndexes.count() == 1 ) {
@@ -192,7 +190,7 @@ NBOpenWithMenu::NBOpenWithMenu( QString icon, QString name, QWidget *parent ) : 
 	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
-    setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
+	setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 };
 
 void NBOpenWithMenu::setWorkingDirectory( QString wDir ) {
@@ -205,26 +203,114 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 	NBFolderView *FolderView = qobject_cast<NBFolderView *>( parent() );
 
 	if ( selection.count() > 1 ) {
-		QStringList files;
-		foreach( QModelIndex idx, selection )
-			files << QDir( workingDir ).absoluteFilePath( idx.data().toString() );
+		/*
+			*
+			* In a multi selection if we have both files, folders and system nodes, then we do nothing.
+			* We do something only when we have multiple files
+			*
+			* So,
+			* 	=> Step 1: List all nodes and check if all are files
+			* 	=> Step 2: If all nodes are not files, then add open
+			* 		with and finish our business
+			*   => Step 3: If all the files are nodes, then list all
+			*		apps that handle the node for each file
+			*   => Step 4: Get an intersection of all the apps via QSet
+			* 	=> Step 5: If the app handles multiple files, add it to
+			* 		the context menu, otherwise skip it.
+			*
+		*/
 
-		QAction *openWithCmdAct = new QAction( QIcon( ":/icons/openWith.png" ), "&Open with...", this );
-		openWithCmdAct->setData( QVariant( files ) );
-		connect( openWithCmdAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWithCmd() ) );
-		addAction( openWithCmdAct );
+		QStringList nodes;
+		NBAppEngine *engine = NBAppEngine::instance();
+
+		bool allNodesAreFiles = true;
+		for ( int i = selection.count() - 1; i >= 0; i-- ) {
+			QString node = QDir( workingDir ).absoluteFilePath( selection[ i ].data().toString() );
+			nodes << node;
+			allNodesAreFiles = allNodesAreFiles and isFile( node );
+		}
+
+		if ( not allNodesAreFiles ) {
+			QAction *openWithCmdAct = new QAction( QIcon( ":/icons/openWith.png" ), "&Open with...", this );
+			openWithCmdAct->setData( QVariant( nodes ) );
+			connect( openWithCmdAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWithCmd() ) );
+			addAction( openWithCmdAct );
+		}
+
+		else {
+			QSet<NBAppFile> finalAppsList;
+			QList<NBAppsList> appsPerNode;
+			foreach( QString file, nodes )
+				appsPerNode << engine->appsForMimeType( mimeDb.mimeTypeForFile( file ) );
+
+			// Creating a set of unique applications that can handle all the files
+			finalAppsList = appsPerNode.at( 0 ).toQList().toSet();
+			for( int i = 1; i < appsPerNode.count(); i++ ) {
+				QList<NBAppFile> aList = appsPerNode.at( i ).toQList();
+				finalAppsList = finalAppsList.intersect( aList.toSet() );
+			}
+
+			// Adding them to the context menu
+			foreach( NBAppFile app, finalAppsList ) {
+				QString name = app.value( NBAppFile::Name ).toString();
+				QStringList exec = app.execArgs();
+				QString icon = app.value( NBAppFile::Icon ).toString();
+
+				QIcon progIcon = QIcon::fromTheme( icon, QIcon( icon ) );
+				if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+					progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".png" );
+
+				if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+					progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".xpm" );
+
+				if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+					progIcon = QIcon( ":/icons/exec.png" );
+
+				// Prepare @v exec
+				if ( app.takesArgs() ) {
+					if ( app.multipleArgs() ) {
+						int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
+						exec.removeAt( idx );
+						foreach( QString node, nodes )
+							exec.insert( idx, node );
+					}
+
+					else {
+						// We are intereseted only in multiple arg takers
+						continue;
+					}
+				}
+				else {
+					// We are intereseted only in multiple arg takers
+					continue;
+				}
+
+				QAction *openWithAct = new QAction( progIcon, name, this );
+				openWithAct->setData( QVariant( QStringList() << exec ) );
+				connect( openWithAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
+				addAction( openWithAct );
+			}
+
+			// Add
+			addSeparator();
+
+			QAction *openWithCmdAct = new QAction( QIcon( ":/icons/openWith.png" ), "&Open with...", this );
+			openWithCmdAct->setData( QVariant( nodes ) );
+			connect( openWithCmdAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWithCmd() ) );
+			addAction( openWithCmdAct );
+		}
 	}
 
 	else {
 		QFileInfo fInfo( QDir( workingDir ).absoluteFilePath( selection[ 0 ].data().toString() ) );
 		QString file = termFormatString( fInfo.absoluteFilePath() );
 
-		foreach( QString desktopEntry, getDesktopEntries( fInfo.absoluteFilePath() ) ) {
-			NBDesktopFile dFile( desktopEntry );
-
-			QString name = dFile.name;
-			QStringList exec = dFile.execArgs;
-			QString icon = dFile.icon;
+		NBAppEngine *engine = NBAppEngine::instance();
+		NBAppsList apps = engine->appsForMimeType( mimeDb.mimeTypeForFile( fInfo.absoluteFilePath() ) );
+		foreach( NBAppFile app, apps.toQList() ) {
+			QString name = app.value( NBAppFile::Name ).toString();
+			QStringList exec = app.execArgs();
+			QString icon = app.value( NBAppFile::Icon ).toString();
 
 			QIcon progIcon = QIcon::fromTheme( icon, QIcon( icon ) );
 			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
@@ -237,15 +323,15 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 				progIcon = QIcon( ":/icons/exec.png" );
 
 			// Prepare @v exec
-			if ( dFile.takesArgs() )
-				if ( dFile.multipleInputFiles ) {
-					int idx = dFile.execArgs.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
+			if ( app.takesArgs() )
+				if ( app.multipleArgs() ) {
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
 					exec.removeAt( idx );
 					exec.insert( idx, fInfo.absoluteFilePath() );
 				}
 
 				else {
-					int idx = dFile.execArgs.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
 					exec.removeAt( idx );
 					exec.insert( idx, fInfo.absoluteFilePath() );
 				}
@@ -291,11 +377,72 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 	}
 };
 
+NBAddToCatalogMenu::NBAddToCatalogMenu( QString wNode, QModelIndexList nodeList ) : QMenu() {
+
+	setTitle( "Add to Catalo&g" );
+	setIcon( QIcon( ":/icons/catalogs.png" ) );
+
+	workNode = QString( wNode );
+	sNodes << nodeList;
+
+	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+		setAttribute( Qt::WA_TranslucentBackground );
+
+	setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
+
+	QAction *addToDocumentsAct = new QAction( QIcon( ":/icons/documents.png" ), "&Documents", this );
+	connect( addToDocumentsAct, SIGNAL( triggered() ), this, SLOT( addToCatalog() ) );
+	addAction( addToDocumentsAct );
+
+	QAction *addToMusicAct = new QAction( QIcon::fromTheme( "folder-sound" ), "&Music", this );
+	connect( addToMusicAct, SIGNAL( triggered() ), this, SLOT( addToCatalog() ) );
+	addAction( addToMusicAct );
+
+	QAction *addToPicturesAct = new QAction( QIcon::fromTheme( "folder-image" ), "&Pictures", this );
+	connect( addToPicturesAct, SIGNAL( triggered() ), this, SLOT( addToCatalog() ) );
+	addAction( addToPicturesAct );
+
+	QAction *addToVideosAct = new QAction( QIcon::fromTheme( "folder-video" ), "&Videos", this );
+	connect( addToVideosAct, SIGNAL( triggered() ), this, SLOT( addToCatalog() ) );
+	addAction( addToVideosAct );
+};
+
+void NBAddToCatalogMenu::addToCatalog() {
+
+	QAction *action = qobject_cast<QAction*>( sender() );
+	if ( not action )
+		return;
+
+	QString catalog = action->text().replace( "&", "" );
+
+	QSettings catalogsConf( "NewBreeze", "Catalogs" );
+	QStringList existing = catalogsConf.value( catalog ).toStringList();
+
+	if ( sNodes.count() ) {
+		foreach( QModelIndex idx, sNodes ) {
+			QString node = QDir( workNode ).filePath( idx.data().toString() );
+			if ( isDir( node ) )
+				existing << node;
+		}
+	}
+
+	else {
+		existing << workNode;
+	}
+
+	existing.removeDuplicates();
+
+	catalogsConf.setValue( catalog, existing );
+	catalogsConf.sync();
+
+	emit reloadCatalogs();
+};
+
 void NBFolderView::showContextMenu( QPoint position ) {
 
 	QList<QModelIndex> selectedList = getSelection();
 
-    NBMenu *menu = new NBMenu();
+	NBMenu *menu = new NBMenu();
 	if ( selectedList.isEmpty() ) {
 
 		// Create a new file/directory
@@ -304,6 +451,10 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 		createNewMenu->addAction( actNewDir );
 		createNewMenu->addAction( actNewFile );
+
+		// Add this folder to catalog
+		NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList );
+		connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 
 		// File/directory sorting
 		NBMenu *sortMenu = new NBMenu( "&Sort by" );
@@ -320,6 +471,9 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		menu->addMenu( createNewMenu );
 		menu->addSeparator();
 
+		menu->addMenu( addToCatalogMenu );
+		menu->addSeparator();
+
 		menu->addAction( pasteAct );
 		menu->addSeparator();
 
@@ -331,6 +485,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 		menu->addSeparator();
 		menu->addAction( propertiesAct );
+		menu->addAction( permissionsAct );
 	}
 
 	else if ( selectedList.count() == 1 ) {
@@ -366,6 +521,14 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		menu->addMenu( openWithMenu );
 		menu->addSeparator();
 
+		// Add this node to catalog only if its a folder
+		if ( fInfo.isDir() ) {
+			NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList );
+			connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
+			menu->addMenu( addToCatalogMenu );
+			menu->addSeparator();
+		}
+
 		menu->addMenu( customMenu );
 		menu->addSeparator();
 
@@ -385,12 +548,17 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 		menu->addSeparator();
 		menu->addAction( propertiesAct );
+		menu->addAction( permissionsAct );
 	}
 
 	else {
 		NBOpenWithMenu *openWithMenu = new NBOpenWithMenu( ":/icons/openWith.png", "&Open With", this );
 		openWithMenu->setWorkingDirectory( fsModel->currentDir() );
 		openWithMenu->buildMenu( selectedList );
+
+		// Add this folder to catalog
+		NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList );
+		connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 
 		customMenu = new NBCustomActionsMenu( selectedList, fsModel->currentDir() );
 		connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
@@ -408,6 +576,9 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		menu->addMenu( openWithMenu );
 		menu->addSeparator();
 
+		menu->addMenu( addToCatalogMenu );
+		menu->addSeparator();
+
 		menu->addMenu( customMenu );
 		menu->addSeparator();
 
@@ -423,7 +594,8 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 		menu->addSeparator();
 		menu->addAction( propertiesAct );
+		menu->addAction( permissionsAct );
 	}
 
-    menu->exec( mapToGlobal( position ) );
+	menu->exec( mapToGlobal( position ) );
 };

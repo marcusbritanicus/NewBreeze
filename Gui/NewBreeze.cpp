@@ -62,6 +62,8 @@ void NewBreeze::createGUI() {
 	FolderView = new NBFolderView();
 	InfoBar = new NBInfoBar();
 	Terminal = new NBTerminal();
+	ApplicationsView = new NBApplicationsView();
+	CatalogView = new NBCatalogView();
 
 	// Widgets layout
 	ViewLayout->addWidget( AddressBar );
@@ -69,6 +71,8 @@ void NewBreeze::createGUI() {
 	ViewLayout->addWidget( QuickMenuBar );
 	ViewLayout->addWidget( Separator::horizontal() );
 	ViewLayout->addWidget( FolderView );
+	ViewLayout->addWidget( ApplicationsView );
+	ViewLayout->addWidget( CatalogView );
 
 	BodyLayout->setContentsMargins( QMargins() );
 	BodyLayout->addWidget( SidePanel );
@@ -95,6 +99,8 @@ void NewBreeze::createGUI() {
 	FolderView->setObjectName( "mainList" );
 	Terminal->setFixedHeight( 270 );
 	Terminal->hide();
+	ApplicationsView->hide();
+	CatalogView->hide();
 
 	if ( not Settings->Session.SidePanel )
 		SidePanel->hide();
@@ -181,7 +187,7 @@ void NewBreeze::createAndSetupActions() {
 		this, SLOT( openAddressBar() ) );
 
 	connect( AddressBar->addressWidget->crumbsBar, SIGNAL( openLocation( QString ) ),
-		this, SLOT( openAddressBar( QString ) ) );
+		this, SLOT( openAddress( QString ) ) );
 
 	// connect( AddressBar->searchBar, SIGNAL( searchString( QString ) ),
 		// this, SLOT( filterFiles( QString ) ) );
@@ -204,6 +210,9 @@ void NewBreeze::createAndSetupActions() {
 	connect( SidePanel, SIGNAL( driveClicked( QString ) ),
 		FolderView, SLOT( doOpen( QString ) ) );
 
+	connect( SidePanel, SIGNAL( specialUrl( QString ) ),
+		this, SLOT( handleSpecialUrls( QString ) ) );
+
 	connect( SidePanel, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ),
 		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
 
@@ -218,6 +227,9 @@ void NewBreeze::createAndSetupActions() {
 
 	connect( FolderView, SIGNAL( showProperties() ),
 		this, SLOT( showProperties() ) );
+
+	connect( FolderView, SIGNAL( showPermissions() ),
+		this, SLOT( showPermissions() ) );
 
 	connect( FolderView, SIGNAL( focusSearchBar() ),
 		this, SLOT( focusSearch() ) );
@@ -234,6 +246,9 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ),
 		this, SLOT( updateQuickMenuBar() ) );
 
+	connect( FolderView, SIGNAL( reloadCatalogs() ),
+		CatalogView, SLOT( reload() ) );
+
 	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ),
 		this, SLOT( updateVarious( QString ) ) );
 
@@ -242,6 +257,9 @@ void NewBreeze::createAndSetupActions() {
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ),
 		this, SLOT( updateQuickMenuBar() ) );
+
+	connect( CatalogView, SIGNAL( openLocation( QString ) ),
+		this, SLOT( openAddress( QString ) ) );
 
 	// About NB
 	QAction *aboutNBAct = new QAction( this );
@@ -551,10 +569,14 @@ void NewBreeze::openAddressBar() {
 	FolderView->doOpen( AddressBar->addressWidget->addressEdit->text() );
 };
 
-void NewBreeze::openAddressBar( QString path ) {
+void NewBreeze::openAddress( QString path ) {
 
-	FolderView->setFocus();
+	ApplicationsView->hide();
+	CatalogView->hide();
+	FolderView->show();
+
 	FolderView->doOpen( path );
+	FolderView->setFocus();
 };
 
 void NewBreeze::newWindow( QString path ) {
@@ -622,6 +644,51 @@ void NewBreeze::showProperties() {
 
 	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths );
 	propsDlg->show();
+};
+
+void NewBreeze::handleSpecialUrls( QString specialUrl ) {
+
+	if ( specialUrl == "NB://Applications" )
+		showApplications();
+
+	else if ( specialUrl == "NB://Catalogs" )
+		showCatalogs();
+};
+
+void NewBreeze::showApplications() {
+
+	if ( ApplicationsView->isVisible() ) {
+		FolderView->show();
+		CatalogView->hide();
+
+		ApplicationsView->hide();
+	}
+
+	else {
+		FolderView->hide();
+		CatalogView->hide();
+
+		ApplicationsView->show();
+		ApplicationsView->setFocus();
+	}
+};
+
+void NewBreeze::showCatalogs() {
+
+	if ( CatalogView->isVisible() ) {
+		FolderView->show();
+		CatalogView->hide();
+
+		ApplicationsView->hide();
+	}
+
+	else {
+		FolderView->hide();
+		ApplicationsView->hide();
+
+		CatalogView->show();
+		CatalogView->setFocus();
+	}
 };
 
 void NewBreeze::showPermissions() {

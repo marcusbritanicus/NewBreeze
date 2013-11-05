@@ -16,7 +16,7 @@ QList<NBDeviceInfo> NBDeviceManager::allDevices() {
 	QList<NBDeviceInfo> devInfoList;
 
 	foreach( QString devLine, getMounts() ) {
-		NBDeviceInfo devInfo = deviceInfoForDevice( devLine.split( " " ).at( 0 ) );
+		NBDeviceInfo devInfo = deviceInfoForDevice( devLine );
 		if ( devInfo.driveName() != "unknown" )
 				devInfoList << devInfo;
 	}
@@ -92,10 +92,12 @@ NBDeviceInfo NBDeviceManager::deviceInfoForDevice( QString dev ) {
 
 	// Get the mount point
 	QRegExp mountsRx( "(\\S+) (\\S*) ([a-z0-9-.]+)" );
-	QString mountsInfo = getMountsInfo( dev );
+	QString mountsInfo = dev.contains( " " ) ? dev : getMountsInfo( dev );
+	dev = dev.contains( " " ) ? dev.split( " " ).at( 0 ) : dev;
 
-	if ( mountsRx.indexIn( mountsInfo ) == -1 )
+	if ( mountsRx.indexIn( mountsInfo ) == -1 ) {
 		return NBDeviceInfo();
+	}
 
 	devInfoP.dN = mountsRx.cap( 1 );
 	devInfoP.mP = mountsRx.cap( 2 );

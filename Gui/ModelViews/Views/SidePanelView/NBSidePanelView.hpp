@@ -37,6 +37,7 @@ class NBSidePanel : public QTreeView {
 		void dropEvent( QDropEvent* );
 
 	Q_SIGNALS:
+		void specialUrl( QString );
 		void driveClicked( QString );
 		void copy( QStringList, QString, NBIOMode::Mode );
 		void move( QStringList, QString, NBIOMode::Mode );

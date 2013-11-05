@@ -37,7 +37,7 @@ void NBPropertiesDialog::createGUI() {
 
 	// Location
 	QLabel *loc1Label = new QLabel( "Location:" );
-	QLabel *loc2Label = new QLabel( QFileInfo( pathsList.at( 0 ) ).absolutePath() );
+	QLabel *loc2Label = new QLabel( dirName( pathsList.at( 0 ) ) );
 
 	// Size
 	QLabel *size1Label = new QLabel( "Size" );
@@ -60,24 +60,24 @@ void NBPropertiesDialog::createGUI() {
 	QLabel *time22Label = new QLabel( info.lastRead().toString( "ddd, MMM dd, yyyy hh:mm:ss AP" ) );
 
 	if ( pathsList.count() == 1 ) {
-		QString iconName = NBIconProvider::icon( info.absoluteFilePath() );
+		QString iconName = NBIconProvider::icon( pathsList.at( 0 ) );
 		iconLabel->setPixmap( QIcon::fromTheme( iconName, QIcon( iconName ) ).pixmap( 48, 48 ) );
-		if ( info.isDir() ) {
+		if ( isDir( pathsList.at( 0 ) ) ) {
 			iconLabel->setClickable( true );
 			type2Label->setText( "inode/directory" );
 		}
 		else {
 			iconLabel->setClickable( false );
-			type2Label->setText( getMimeTypeAlt( pathsList.at( 0 ) ) );
+			type2Label->setText( getMimeType( pathsList.at( 0 ) ) );
 		}
-		nameLabel->setText( info.fileName() );
+		nameLabel->setText( baseName( pathsList.at( 0 ) ) );
 	}
 
 	else {
 		qint64 sFiles = 0, sFolders = 0;
 
 		foreach( QString path, pathsList ) {
-			if ( QFileInfo( path ).isDir() )
+			if ( isDir( path ) )
 				sFolders++;
 
 			else
@@ -121,7 +121,7 @@ void NBPropertiesDialog::createGUI() {
 	fileLyt->addWidget( size1Label, 4, 0, Qt::AlignLeft );
 	fileLyt->addWidget( size2Label, 4, 1, Qt::AlignRight );
 
-	if ( ( pathsList.count() > 1 ) or ( QFileInfo( pathsList.at( 0 ) ).isDir() ) ) {
+	if ( ( pathsList.count() > 1 ) or ( isDir( pathsList.at( 0 ) ) ) ) {
 		fileLyt->addWidget( cont1Label, 5, 0, Qt::AlignLeft );
 		fileLyt->addWidget( cont2Label, 5, 1, Qt::AlignRight );
 	}
@@ -425,6 +425,7 @@ void NBPermissionsDialog::createGUI() {
 		permsFrame->setDisabled( 1 );
 
 	QVBoxLayout *baseLyt = new QVBoxLayout();
+	baseLyt->addWidget( Separator::horizontal() );
 	baseLyt->addLayout( iconLyt );
 	baseLyt->addWidget( Separator::horizontal() );
 	baseLyt->addWidget( permsFrame );

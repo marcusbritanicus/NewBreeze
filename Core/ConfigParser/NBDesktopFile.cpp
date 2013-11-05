@@ -23,6 +23,92 @@ NBDesktopFile::NBDesktopFile( QString path ) {
 	parseDesktopFile();
 };
 
+QString NBDesktopFile::name() {
+
+	return __name;
+};
+
+QString NBDesktopFile::type() {
+
+	return __type;
+};
+
+QString NBDesktopFile::exec() {
+
+	return __exec;
+};
+
+QString NBDesktopFile::icon() {
+
+	return __icon;
+};
+
+QStringList NBDesktopFile::mimeTypes() {
+
+	return __mimeTypes;
+};
+
+QString NBDesktopFile::workPath() {
+
+	return __workPath;
+};
+
+bool NBDesktopFile::terminalMode() {
+
+	return __terminalMode;
+};
+
+QStringList NBDesktopFile::categories() {
+
+	return __categories;
+};
+
+QString NBDesktopFile::comment() {
+
+	return __comment;
+};
+
+QStringList NBDesktopFile::execArgs() {
+
+	return __execArgs;
+};
+
+bool NBDesktopFile::multipleArgs() {
+
+	return __multipleFiles;
+};
+
+bool NBDesktopFile::takesArgs() {
+
+	return __takesArgs;
+};
+
+short NBDesktopFile::grade() {
+
+	return __grade;
+};
+
+QString NBDesktopFile::desktopFileName() {
+
+	return baseName( fileUrl );
+};
+
+bool NBDesktopFile::isSameAs( NBDesktopFile other ) {
+
+	if ( __execArgs.at( 0 ) == other.execArgs().at( 0 ) )
+		return true;
+
+	return false;
+};
+
+bool NBDesktopFile::areSame( NBDesktopFile dEntry1, NBDesktopFile dEntry2 ) {
+
+	if ( dEntry1.execArgs().at( 0 ) == dEntry2.execArgs().at( 0 ) )
+		return true;
+
+	return false;
+};
+
 void NBDesktopFile::parseDesktopFile() {
 
 	QString rxName( "\nName=(.*)(\n|\r\n)" );
@@ -32,6 +118,8 @@ void NBDesktopFile::parseDesktopFile() {
 	QString rxPath( "\nPath=(.*)(\n|\r\n)" );
 	QString rxMime( "\nMimeType=(.*)(\n|\r\n)" );
 	QString rxTerm( "\nTerminal=(.*)(\n|\r\n)" );
+	QString rxCate( "\nCategories=(.*)(\n|\r\n)" );
+	QString rxComm( "\nComment=(.*)(\n|\r\n)" );
 
 	QFile dFile( fileUrl );
 	if ( !dFile.exists() )
@@ -43,95 +131,53 @@ void NBDesktopFile::parseDesktopFile() {
 	QString entry = QString( dFile.readAll() );
 	dFile.close();
 
-	name = findIn( rxName, entry );
+	__name = findIn( rxName, entry );
 
-	if ( name.isEmpty() )
-		qDebug() << fileUrl;
+	if ( __name.isEmpty() )
+		qDebug() << "Nameless monster:" << fileUrl;
 
-	type = findIn( rxType, entry );
-	exec = findIn( rxExec, entry );
+	__type = findIn( rxType, entry );
+	__exec = findIn( rxExec, entry );
 
-	icon = findIn( rxIcon, entry );
-	path = findIn( rxPath, entry );
-	mimetypes = findIn( rxMime, entry ).split( ";", QString::SkipEmptyParts );
-	terminal = findIn( rxTerm, entry );
+	__icon = findIn( rxIcon, entry );
+	__workPath = findIn( rxPath, entry );
+	__mimeTypes = findIn( rxMime, entry ).split( ";", QString::SkipEmptyParts );
+	QString __terminal = findIn( rxTerm, entry );
+	__terminalMode = ( __terminal.toLower() == "true" ? true : false );
 
-	generateExecArgs();
-};
+	__categories << findIn( rxCate, entry ).split( ";", QString::SkipEmptyParts );
+	__comment = findIn( rxComm, entry );
 
-void NBDesktopFile::getMimeTypeList() {
+	// By default set @v __multipleFiles to false
+	__multipleFiles = false;
+	__takesArgs = false;
 
-	QFile dFile( fileUrl );
-	dFile.open( QFile::ReadOnly );
-	QStringList lines = QString( dFile.readAll() ).split( "\n", QString::SkipEmptyParts );
-	dFile.close();
-
-	foreach( QString line, lines ) {
-		if ( line.startsWith( "MimeType" ) ) {
-			mimetypes = line.split( "=" )[ 1 ].split( ";", QString::SkipEmptyParts );
-			break;
-		}
-	}
-
-};
-
-void NBDesktopFile::generateExecArgs() {
-
-	// By default set @v multipleInputFiles to false
-	multipleInputFiles = false;
-	canTakeArgs = false;
-
-	QStringList args = exec.split( " " );
+	QStringList args = __exec.split( " " );
 	foreach( QString arg, args ) {
 		if ( arg == "%f" or arg == "%u" ) {
-			multipleInputFiles = false;
-			canTakeArgs = true;
-			execArgs << "<#NEWBREEZE-ARG-FILE#>";
+			__multipleFiles = false;
+			__takesArgs = true;
+			__execArgs << "<#NEWBREEZE-ARG-FILE#>";
 		}
 
 		else if ( arg == "%F" or arg == "%U" ) {
-			multipleInputFiles = true;
-			canTakeArgs = true;
-			execArgs << "<#NEWBREEZE-ARG-FILES#>";
+			__multipleFiles = true;
+			__takesArgs = true;
+			__execArgs << "<#NEWBREEZE-ARG-FILES#>";
 		}
 
 		else if ( arg == "%i" ) {
-			if ( !icon.isEmpty() )
-				execArgs << "--icon" << icon;
+			if ( !__icon.isEmpty() )
+				__execArgs << "--icon" << __icon;
 		}
 
 		else if ( arg == "%c" )
-			execArgs << name;
+			__execArgs << __name;
 
 		else if ( arg == "%k" )
-			execArgs << QUrl( fileUrl ).toLocalFile();
+			__execArgs << QUrl( fileUrl ).toLocalFile();
 
 		else
-			execArgs << arg;
+			__execArgs << arg;
 	}
-};
-
-bool NBDesktopFile::takesArgs() {
-
-	return canTakeArgs;
-};
-
-bool NBDesktopFile::sameProgram( QString desktopEntry ) {
-
-	NBDesktopFile dEntry( desktopEntry );
-
-	if ( execArgs[ 0 ] == dEntry.execArgs[ 0 ] )
-		return true;
-
-	return false;
-};
-bool NBDesktopFile::sameProgram( QString desktopEntry1, QString desktopEntry2 ) {
-
-	NBDesktopFile dEntry1( desktopEntry1 );
-	NBDesktopFile dEntry2( desktopEntry2 );
-
-	if ( dEntry1.execArgs[ 0 ] == dEntry2.execArgs[ 0 ] )
-		return true;
-
-	return false;
 };

@@ -30,7 +30,6 @@
 #include <NewBreeze.hpp>
 #include <NBPasteDialog.hpp>
 #include <NBSettingsManager.hpp>
-#include <NBFileDialog.hpp>
 
 int main( int argc, char **argv ) {
 
@@ -40,8 +39,6 @@ int main( int argc, char **argv ) {
 	QApplication app( argc, argv );
 	app.setOrganizationName( "NewBreeze" );
 	app.setApplicationName( "NewBreeze" );
-
-	NBStartup();
 
 	if ( ( argc >= 3 ) and ( app.arguments().indexOf( QRegExp( "^--(cut|copy)pastemode$" ) ) != -1 ) ) {
 		/*
@@ -73,8 +70,6 @@ int main( int argc, char **argv ) {
 			qDebug() << "Running server found";
 			qDebug() << "Requesting server for new window";
 
-			isServerRunning();
-
 			QTcpSocket *client = new QTcpSocket();
 			client->connectToHost( QHostAddress::LocalHost, 14928 );
 			client->waitForConnected( 100 );
@@ -103,6 +98,7 @@ int main( int argc, char **argv ) {
 				qCritical() << "Unable to communicate with Server.";
 				qCritical() << "Starting separate process";
 
+				NBStartup();
 				NewBreeze *Gui;
 				if ( argc >= 2 )
 					Gui = new NewBreeze( app.tr( argv[ 1 ] ) );
@@ -123,6 +119,7 @@ int main( int argc, char **argv ) {
 		qDebug() << "Server not found.";
 		qDebug() << "Starting new server.";
 
+		NBStartup();
 		NBServer *server = new NBServer();
 		server->start();
 

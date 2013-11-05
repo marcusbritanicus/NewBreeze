@@ -11,18 +11,18 @@ QTreeView {
 	border: none;
 }
 
-QTreeView::branch:!has-children {
+QTreeView::branch {
 	image: none;
 }
 
-QTreeView::branch:open:has-children {
+QTreeView::branch:open {
+	image: none;
 	border-image: none;
-	image: url(:/icons/arrow-down.png);
 }
 
-QTreeView::branch:closed:has-children {
+QTreeView::branch:closed {
 	border-image: none;
-	image: url(:/icons/arrow-right.png);
+	image: none;
 }
 
 QListView {

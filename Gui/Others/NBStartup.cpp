@@ -6,7 +6,6 @@
 
 #include <Global.hpp>
 #include <NBTools.hpp>
-#include <NBConfigParser.hpp>
 #include <NBSystemInfo.hpp>
 
 void NBStartup() {
@@ -15,7 +14,6 @@ void NBStartup() {
 		* Check if each of the fields have a value. If not set them.
 		*
 	*/
-
 	if ( !QFileInfo( thumbsDir ).exists() ) {
 		bool out = QDir::home().mkpath( thumbsDir );
 		if ( !out ) {
@@ -33,10 +31,9 @@ void NBStartup() {
 
 	/*
 		*
-		* Handle CustomActions
+		* Set basic CustomActions
 		*
 	*/
-
 	if ( actionSettings.value( "OpenAsSuperUser/Name" ).toString().isEmpty() ) {
 		actionSettings.setValue( "OpenAsSuperUser/Name", "Open as SuperUser" );
 		actionSettings.setValue( "OpenAsSuperUser/Exec", "sudo xdg-open %f" );
@@ -48,17 +45,6 @@ void NBStartup() {
 		actionSettings.setValue( "OpenInTerminal/Exec", "%term" );
 		actionSettings.setValue( "OpenInTerminal/Glob", QStringList() << "folder" );
 	}
-
-	/*
-		*
-		* Detect and parse various .desktop files for appications-mimetype cache
-		*
-	*/
-
-	QStringList paths = QStringList() << "/usr/share/applications" << QDir::home().filePath( ".local/share/applications/" );
-	paths << "/usr/share/applications/kde4" << "/usr/share/gnome/applications/" << "/usr/local/share/applications/";
-	NBConfigParser::dirPaths << paths;
-	QtConcurrent::run( NBConfigParser::createCache );
 
 	/*
 		*

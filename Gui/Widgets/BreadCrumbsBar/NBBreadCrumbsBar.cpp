@@ -111,7 +111,6 @@ NBBreadCrumbsBar::NBBreadCrumbsBar( QWidget *parent, QString address ) : QWidget
 	cwd.setFilter( QDir::NoDotAndDotDot | QDir::Dirs );
 
 	autoLoad = true;
-	hasTrailing = false;
 
 	// We want this bar to be as small as possible. Hence we remove all the margins.
 	setContentsMargins( QMargins() );
@@ -227,15 +226,6 @@ void NBBreadCrumbsBar::setCurrentDirectory( QString path ) {
 	// This is a very ugly hack :(
 
 	QDir d( path );
-
-	if ( cwd.absolutePath() == path )
-		hasTrailing = false;
-
-	else if ( cwd.absolutePath().contains( path ) )
-		hasTrailing = true;
-
-	else
-		hasTrailing = false;
 
 	if ( cwd.absolutePath().contains( path ) ) {
 		foreach( NBBreadCrumb *crumb, findChildren<NBBreadCrumb *>() ) {

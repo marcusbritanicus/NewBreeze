@@ -1,24 +1,38 @@
 Widgets
-    ⊟ NBFolderView:
-        ☑ NBIconView: NBIconView, NBIconDelegate, NBFileSystemModel( QAbstractItemModel )												[ 2 of 2 ]
-        ☑ NBTreeView: NBTreeView, NBTreeDelegate, NBFileSystemModel( QAbstractItemModel )												[ 2 of 2 ]
-        ☐ NBPicsView: NBPicsView, NBPicsDelegate, NBFileSystemModel( QAbstractItemModel )												[ 1 of 2 ]
+	⊟ NBFolderView:
+		☑ NBIconView: NBIconView, NBIconDelegate, NBFileSystemModel( QAbstractItemModel )											[ 3 of 3 ]
+		☑ NBTreeView: NBTreeView, NBTreeDelegate, NBFileSystemModel( QAbstractItemModel )											[ 3 of 3 ]
+		☐ NBPicsView: NBPicsView, NBPicsDelegate, NBFileSystemModel( QAbstractItemModel )											[ 1 of 3 ]
 
-    ☐ NBCatalog: NBCatalogView, NBCatalogDelegate, NBCatalogModel( QStringListModel )												[ 0 of 2 ]
+	☐ NBCatalog: NBCatalogView, NBCatalogDelegate, NBCatalogModel( QStringListModel )												[ 0 of 3 ]
 
-    ☐ MyComputer: NBDeviceView, NBDeviceDelegate, NBDeviceModel( QStringListModel )													[ 0 of 2 ]
+	☐ MyComputer: NBDeviceView, NBDeviceDelegate, NBDeviceModel( QStringListModel )													[ 0 of 3 ]
 
-    ☑ ProgressWidget
-        ☑ InfoBar ProgressWidget: Widget, Realtime progress updates																	[ 2 of 2 ]
+	☐ NBTrash: NBTrashView, NBTrashDelegate, NBTrashModel( QStringListModel )														[ 0 of 3 ]
+
+	☑ ProgressWidget
+		☑ InfoBar ProgressWidget: Widget, Realtime progress updates																	[ 2 of 2 ]
 
 Views
-    ☑ NBFolderView
-        ☑ NBIconView -> Handles ListViews and Icon views -> Current capabilities														[ 2 of 2 ]
-        ☑ NBTreeView -> Handles the detailed list style (Small and large)																[ 2 of 2 ]
-    ☐ NBCatalogView -> Groups to hold various folders together. This is a parallel of Windows Vista/7/8 Libraries					[ 0 of 1 ]
+	☑ NBFolderView
+		☑ NBIconView -> Handles ListViews and Icon views -> Current capabilities													[ 2 of 2 ]
+		☑ NBTreeView -> Handles the detailed list style (Small and large)															[ 2 of 2 ]
+	☐ NBCatalogView -> Groups to hold various folders together. This is a equivalent of Windows 7/8 Libraries						[ 0 of 1 ]
 
 Models
-    ☑ NBFileSystemModel( QAbstractItemModel )																						[ 1 of 1 ]
+	☑ NBFileSystemModel( QAbstractItemModel )																						[ 1 of 1 ]
+	☑ NBSidePanelModel( QAbstractItemModel )																						[ 1 of 1 ]
+	☐ NBCatalogModel( QAbstractItemModel )																							[ 0 of 1 ]
+	☐ NBOpenWithModel( QAbstractItemModel )																							[ 0 of 1 ]
+	☐ NBTrashModel( QAbstractItemModel )																							[ 0 of 1 ]
+	☑ Put each of the models and allied files into separated sub-directories														[ 4 of 4 ]
 
 SidePanel
-    ☑ Migrated to NBSidePanelView/NBSidePanelModel from NBDeviceModel+NBBookmarkModel+NBDeviceView+NBBookmarksView					[ 1 of 1 ]
+	☑ Migrated to NBSidePanelView/NBSidePanelModel from NBDeviceModel+NBBookmarkModel+NBDeviceView+NBBookmarksView					[ 1 of 1 ]
+	☐ No arrows for any of the items. Only Icons																					[ 0 of 1 ]
+
+Undo-Redo Sequences
+	☐ Undo/Redo Rename, IO, Trash etc
+
+Trash
+	☐ TrashView

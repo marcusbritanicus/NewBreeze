@@ -8,6 +8,9 @@
 #define NBCONTEXTMENU_HPP
 
 #include <Global.hpp>
+#include <NBAppEngine.hpp>
+#include <NBAppFile.hpp>
+#include <NBTools.hpp>
 
 class NBCustomActionsMenu : public QMenu {
 	Q_OBJECT
@@ -42,6 +45,23 @@ class NBOpenWithMenu : public QMenu {
 
 	private:
 		QString workingDir;
+};
+
+class NBAddToCatalogMenu : public QMenu {
+	Q_OBJECT
+
+	public:
+		NBAddToCatalogMenu( QString, QModelIndexList );
+
+	private:
+		QString workNode;
+		QModelIndexList sNodes;
+
+	private slots:
+		void addToCatalog();
+
+	Q_SIGNALS:
+		void reloadCatalogs();
 };
 
 #endif

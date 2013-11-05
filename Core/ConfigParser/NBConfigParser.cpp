@@ -42,9 +42,9 @@ QMap<QString, QStringList> NBConfigParser::parseDir( QString dirPath ) {
 
 	foreach( QString file, files ) {
 		NBDesktopFile dFile( dir.absoluteFilePath( file ) );
-		foreach( QString mimetype, dFile.mimetypes ) {
+		foreach( QString mimetype, dFile.mimeTypes() ) {
 			QStringList dList = mimeDesktopMap.value( mimetype );
-			dList << dFile.fileUrl;
+			dList << dir.absoluteFilePath( file );
 			dList.removeDuplicates();
 			mimeDesktopMap.insert( mimetype, dList );
 		}

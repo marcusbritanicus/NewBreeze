@@ -9,7 +9,7 @@
 NBIconView::NBIconView( NBFileSystemModel *fsm ) : QListView(), fsModel( fsm ) {
 
 	contentsWidth = 640;
-	itemsPerRow = 0;
+	itemsPerRow = 1;
 	numberOfRows = 0;
 
 	// Set Data Model
@@ -39,6 +39,10 @@ NBIconView::NBIconView( NBFileSystemModel *fsm ) : QListView(), fsModel( fsm ) {
 
 	// Mouse Tracking
 	setMouseTracking( true );
+
+	// Enable batched layout
+	setLayoutMode( QListView::Batched );
+	setBatchSize( 50 );
 
 	// DragAndDrop
 	viewport()->setAcceptDrops( true );

@@ -91,10 +91,14 @@ QVariant NBFileSystemModel::data( const QModelIndex &index, int role ) const {
 			if ( index.column() == 0 ) {
 				// Unknown theme+inbuilt icon
 				QIcon unknown = QIcon::fromTheme( "unknown", QIcon( ":/icons/unknown.png" ) );
+
+				// Icon String
+				QString icoStr( node->data( 2, true ).toString() );
+
 				// The inbuilt icon or from the file system
-				QIcon savedIcon = QIcon( node->data( 2, true ).toString() );
+				QIcon savedIcon = QIcon( icoStr );
 				// Icon we got from the theme
-				QIcon themeIcon = QIcon::fromTheme( node->data( 2, true ).toString() );
+				QIcon themeIcon = QIcon::fromTheme( icoStr );
 
 				if ( themeIcon.isNull() and savedIcon.isNull() )
 					return unknown;
@@ -709,17 +713,26 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 
 void NBFileSystemModel::handleNodeCreated( QString node ) {
 
+	if ( baseName( node ).startsWith( "." ) )
+		return;
+
 	if ( dirName( node ) == currentDir() )
 		insertNode( baseName( node ) );
 };
 
 void NBFileSystemModel::handleNodeChanged( QString node ) {
 
+	if ( baseName( node ).startsWith( "." ) )
+		return;
+
 	if ( dirName( node ) == currentDir() )
 		updateNode( baseName( node ) );
 };
 
 void NBFileSystemModel::handleNodeDeleted( QString node ) {
+
+	if ( baseName( node ).startsWith( "." ) )
+		return;
 
 	if ( dirName( node ) == currentDir() )
 		removeNode( baseName( node ) );

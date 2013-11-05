@@ -29,9 +29,6 @@ QString baseName( QString path );
 QString getMimeType( QString path );
 QString getMimeTypeAlt( QString path );
 
-/* Get the names of the desktop files which handle @mimeType */
-QStringList getDesktopEntries( QString mimeType );
-
 /* Format a string so that it can be used in bash as an argument */
 QString termFormatString( QString file );
 

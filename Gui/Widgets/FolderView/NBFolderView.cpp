@@ -234,6 +234,14 @@ void NBFolderView::createAndSetupActions() {
 	connect( propertiesAct, SIGNAL( triggered() ), this, SIGNAL( showProperties() ) );
 	addAction( propertiesAct );
 
+	// Permissions
+	permissionsAct = new QAction( QIcon::fromTheme( "users" ), "P&ermissions", this );
+	// permissionsAct->setShortcuts( Settings->Shortcuts.Permissions );
+	permissionsAct->setShortcuts( QList<QKeySequence>() << tr( "Alt+Shift+Return" ) );
+
+	connect( permissionsAct, SIGNAL( triggered() ), this, SIGNAL( showPermissions() ) );
+	addAction( permissionsAct );
+
 	// Open a virtual terminal emulator
 	openVTE = new QAction( "Open &VTE", this );
 	openVTE->setShortcuts( Settings->Shortcuts.Terminal );
@@ -423,11 +431,9 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 void NBFolderView::doOpenWith() {
 
 	QStringList cmdList = qobject_cast<QAction *>( sender() )->data().toStringList();
-	if ( cmdList.count() == 1 )
-		QProcess::startDetached( cmdList[ 0 ] );
+	QString cmd = cmdList.takeFirst();
 
-	else
-		QProcess::startDetached( cmdList.takeFirst(), cmdList );
+	QProcess::startDetached( cmd, cmdList );
 };
 
 void NBFolderView::doOpenInNewWindow() {
@@ -482,7 +488,7 @@ void NBFolderView::doPeek() {
 	}
 
 	QString currentNode = QDir( fsModel->currentDir() ).absoluteFilePath( curIndex.data().toString() );
-	QString mimeType = getMimeTypeAlt( currentNode );
+	QString mimeType = getMimeType( currentNode );
 
 	if ( not isReadable( currentNode ) ) {
 
@@ -497,7 +503,7 @@ void NBFolderView::doPeek() {
 		return;
 	}
 
-	if ( getMimeTypeAlt( "/" ) == mimeType ) {
+	if ( getMimeType( "/" ) == mimeType ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing folder: %s", qPrintable( currentNode ) );
 		NBFolderFlash *previewer = new NBFolderFlash( this, currentNode );
 		previewer->show();

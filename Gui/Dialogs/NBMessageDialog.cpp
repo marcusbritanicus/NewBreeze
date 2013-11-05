@@ -231,7 +231,7 @@ void NBMessageDialog::buttonClickHandler() {
 
 void NBMessageDialog::aboutNewBreeze() {
 
-	QString title = QString( "About NewBreeze v2.0.2" );
+	QString title = QString( "About NewBreeze v2.1.0-preview" );
 	QString text = QString(
 		"<p><b><center>Fast and light-weight File Manager</center></b></p>"		\
 		"<p>Built on top of the Powerful Qt4 GUI Toolkit, this file manager "	\
@@ -244,6 +244,7 @@ void NBMessageDialog::aboutNewBreeze() {
 		"	<li>Lists the dives in the sidebar</li>"							\
 		"	<li>Full drag and drop support</li>"								\
 		"	<li>Bookmarks</li>"													\
+		"	<li>Applications and Catalog View</li>"								\
 		"   <li>Custom Folder Icons and Thumbnail Preview</li>"					\
 		"   <li>Mime-Icon Support</li>"											\
 		"   <li>BreadCrumbs Navigation</li>"									\

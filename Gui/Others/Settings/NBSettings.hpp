@@ -68,6 +68,7 @@ class NBSettings {
 				QList<QKeySequence> Delete;
 				QList<QKeySequence> Trash;
 				QList<QKeySequence> Properties;
+				QList<QKeySequence> Permissions;
 				QList<QKeySequence> Terminal;
 				QList<QKeySequence> InlineTerminal;
 				QList<QKeySequence> NBInfo;

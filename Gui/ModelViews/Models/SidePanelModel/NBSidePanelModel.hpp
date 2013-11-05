@@ -29,16 +29,11 @@ class NBSidePanelModel : public QAbstractItemModel {
 		int rowCount( const QModelIndex &parent = QModelIndex() ) const;
 		int columnCount( const QModelIndex &parent = QModelIndex() ) const;
 
-		QList<NBDeviceInfo> deviceData();
-		QList<BookMark> bookmarks();
-
 	private:
 		void prepareRootItems();
 
-		QList<NBDeviceInfo> deviceInfos;
-		QList<BookMark> bookmarkList;
-
-		NBSidePanelItem  *rootItem, *devRootItem, *bmkRootItem;
+		NBSidePanelItem *rootItem, *devRootItem, *bmkRootItem;
+		NBSidePanelItem *appRootItem, *catalogRootItem;
 		QStringList bmkList, devList;
 
 	public slots:

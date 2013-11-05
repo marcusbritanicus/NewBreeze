@@ -10,6 +10,8 @@ Some of its features are
 * Lists the drives/bookmarks in the sidebar
 * Full drag and drop support
 * Bookmark Support
+* Applications View
+* Catalog View
 * Auto update devices list
 * Custom Folder Icons and Thumbnail Preview
 * Complete mime-icon support
@@ -46,7 +48,8 @@ Some of its features are
 * Large paths run away from BreadCrumbs Bar
 * Some issues with cut-copy-paste files and folders
 * Issues with delete folders
-
+* Tree View does not handle custom menu events
+* Okular doesnot show up in the context menu (because of the .desktop structure)
 
 ### Upcoming
 * File/folder delete GUI

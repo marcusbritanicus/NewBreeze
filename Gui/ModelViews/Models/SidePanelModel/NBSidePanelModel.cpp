@@ -13,8 +13,6 @@ NBSidePanelModel::NBSidePanelModel() : QAbstractItemModel() {
 };
 
 NBSidePanelModel::~NBSidePanelModel() {
-
-	delete &deviceInfos;
 }
 
 QVariant NBSidePanelModel::data( const QModelIndex &index, int role ) const {
@@ -34,6 +32,7 @@ QVariant NBSidePanelModel::data( const QModelIndex &index, int role ) const {
 			else
 				return Qt::white;
 		}
+
 		case Qt::ToolTipRole : {
 			if ( index.parent().data() == "Devices" )
 				return item->data( Qt::UserRole + 1 ).value<NBDeviceInfo>().mountPoint();
@@ -62,7 +61,7 @@ QModelIndex NBSidePanelModel::index( int row, int column, const QModelIndex &par
 		parentItem = rootItem;
 
 	else
-		parentItem = (NBSidePanelItem *)parent.internalPointer();
+		parentItem = ( NBSidePanelItem * )parent.internalPointer();
 
 	NBSidePanelItem *childItem = parentItem->child( row );
 	if ( childItem )
@@ -78,10 +77,22 @@ Qt::ItemFlags NBSidePanelModel::flags( const QModelIndex & index ) const {
 		return Qt::NoItemFlags;
 
 	if ( index.parent() == parent() )
-		return Qt::NoItemFlags;
+		switch( index.row() ) {
+			case 0:
+			case 1:
+				return Qt::NoItemFlags;
+
+			case 2:
+				return Qt::ItemIsEnabled;
+
+			case 3:
+				return Qt::ItemIsEnabled;
+		}
 
 	else
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled;
+
+	return Qt::NoItemFlags;
 };
 
 QModelIndex NBSidePanelModel::rootIndex() const {
@@ -105,8 +116,9 @@ QModelIndex NBSidePanelModel::parent( const QModelIndex &index ) const {
 
 int NBSidePanelModel::rowCount( const QModelIndex &parent ) const {
 
-	if ( not parent.isValid() )
-		return 0;
+	if ( parent == QModelIndex() ) {
+		return rootItem->childCount();
+	}
 
 	NBSidePanelItem *item = ( NBSidePanelItem * )parent.internalPointer();
 	return item->childCount();
@@ -114,7 +126,7 @@ int NBSidePanelModel::rowCount( const QModelIndex &parent ) const {
 
 int NBSidePanelModel::columnCount( const QModelIndex &parent ) const {
 
-	if ( parent == index( 0, 0, QModelIndex() ) )
+	if ( parent == QModelIndex() )
 		return 1;
 
 	if ( not parent.isValid() )
@@ -123,29 +135,31 @@ int NBSidePanelModel::columnCount( const QModelIndex &parent ) const {
 	return 1;
 };
 
-QList<NBDeviceInfo> NBSidePanelModel::deviceData() {
-
-	return deviceInfos;
-};
-
 void NBSidePanelModel::prepareRootItems() {
 
 	rootItem = new NBSidePanelItem( QVariantList() );
-	devRootItem = new NBSidePanelItem( QVariantList() << "Devices" << QIcon() << "", rootItem );
-	bmkRootItem = new NBSidePanelItem( QVariantList() << "Bookmarks" << QIcon() << "", rootItem );
+	devRootItem = new NBSidePanelItem( QVariantList() << "Devices" << QIcon( ":/icons/comp.png" ) << "", rootItem );
+	bmkRootItem = new NBSidePanelItem( QVariantList() << "Bookmarks" << QIcon( ":/icons/bookmark.png" ) << "", rootItem );
+
+	appRootItem = new NBSidePanelItem( QVariantList() << "Applications" << QIcon( ":/icons/applications.png" ) << "NB://Applications", rootItem );
+	catalogRootItem = new NBSidePanelItem( QVariantList() << "Catalogs" << QIcon( ":/icons/catalogs.png" ) << "NB://Catalogs", rootItem );
 
 	rootItem->appendChild( devRootItem );
 	rootItem->appendChild( bmkRootItem );
+
+	rootItem->appendChild( appRootItem );
+	rootItem->appendChild( catalogRootItem );
 };
 
 void NBSidePanelModel::updateDeviceData() {
 
+	NBDeviceManager dm;
+	QList<NBDeviceInfo> deviceInfos = dm.allDevices();
+
+	beginResetModel();
+
 	devList.clear();
 	devRootItem->clearChildren();
-
-	NBDeviceManager dm;
-	deviceInfos = dm.allDevices();
-
 	foreach( NBDeviceInfo devInfo, deviceInfos ) {
 
 		QVariantList data;
@@ -156,16 +170,17 @@ void NBSidePanelModel::updateDeviceData() {
 		data << QIcon( ":/icons/" + devInfo.driveType() + ".png" );
 		data << var;
 
-		deviceInfos << devInfo;
 		devRootItem->appendChild( new NBSidePanelItem( data, devRootItem ) );
 	}
+	endResetModel();
 };
 
 void NBSidePanelModel::updateBookmarkData() {
 
+	beginResetModel();
+
 	bmkList.clear();
 	bmkRootItem->clearChildren();
-
 	foreach( QString bookmark, bookmarkSettings.value( "Order" ).toStringList() ) {
 		QString label = bookmarkSettings.value( QUrl::toPercentEncoding( bookmark ) ).toString();
 
@@ -174,9 +189,9 @@ void NBSidePanelModel::updateBookmarkData() {
 		data << QIcon::fromTheme( "bookmarks", QIcon( ":/icons/bookmarks.png" ) );
 		data << bookmark;
 
-		bookmarkList << BookMark( label, bookmark );
 		bmkRootItem->appendChild( new NBSidePanelItem( data, bmkRootItem ) );
 	}
+	endResetModel();
 };
 
 void NBSidePanelModel::updateModelData() {

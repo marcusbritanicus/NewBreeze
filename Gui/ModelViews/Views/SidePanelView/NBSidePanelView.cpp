@@ -35,7 +35,7 @@ void NBSidePanel::setupView() {
 	// Selection
 	setSelectionMode( QTreeView::NoSelection );
 
-	// By default expand both Devices and Bookmarks
+	// By default set both Devices and Bookmarks to previous state
 	setExpanded( spModel->index( 0, 0 ), Settings->Session.ExpandDevices );
 	setExpanded( spModel->index( 1, 0 ), Settings->Session.ExpandBookmarks );
 
@@ -59,6 +59,7 @@ void NBSidePanel::updateDevices() {
 	spModel->updateDeviceData();
 	setExpanded( spModel->index( 0, 0 ), true );
 
+	resizeColumnToContents( 0 );
 	setFixedWidth( sizeHintForColumn( 0 ) );
 };
 
@@ -68,12 +69,19 @@ void NBSidePanel::updateBookmarks() {
 	spModel->updateBookmarkData();
 	setExpanded( spModel->index( 1, 0 ), true );
 
+	resizeColumnToContents( 0 );
 	setFixedWidth( sizeHintForColumn( 0 ) );
 };
 
 void NBSidePanel::handleClick( const QModelIndex clickedIndex ) {
 
-	if ( clickedIndex.parent() != spModel->parent() )
+	if ( ( clickedIndex.parent() == spModel->parent() ) and ( clickedIndex.row() == 2 ) )
+		emit specialUrl( clickedIndex.data( Qt::UserRole + 1 ).toString() );
+
+	else if ( ( clickedIndex.parent() == spModel->parent() ) and ( clickedIndex.row() == 3 ) )
+		emit specialUrl( clickedIndex.data( Qt::UserRole + 1 ).toString() );
+
+	else if ( clickedIndex.parent() != spModel->parent() )
 		emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
 };
 
@@ -87,6 +95,12 @@ void NBSidePanel::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 	if ( indexAt( dmEvent->pos() ).isValid() ) {
 		QModelIndex idx = indexAt( dmEvent->pos() );
 		QString mtpt = spModel->data( idx, Qt::UserRole + 1 ).toString();
+
+		if ( idx.parent() == spModel->parent() ) {
+			if ( not isExpanded( idx ) ) {
+				setExpanded( idx, true );
+			}
+		}
 
 		if ( QFileInfo( mtpt ).isWritable() ) {
 			dmEvent->setDropAction( Qt::CopyAction );

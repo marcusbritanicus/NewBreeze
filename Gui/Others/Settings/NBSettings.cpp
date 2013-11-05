@@ -66,6 +66,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->Shortcuts.Delete = QList<QKeySequence>() << QKeySequence( "Shift+Delete" );
 	defaultSettings->Shortcuts.Trash = QList<QKeySequence>() << QKeySequence( "Delete" );
 	defaultSettings->Shortcuts.Properties = QList<QKeySequence>() << QKeySequence( "Alt+Return" );
+	defaultSettings->Shortcuts.Permissions = QList<QKeySequence>() << QKeySequence( "Alt+Return" );
 	defaultSettings->Shortcuts.Terminal = QList<QKeySequence>() << QKeySequence( "F4" );
 	defaultSettings->Shortcuts.InlineTerminal = QList<QKeySequence>() << QKeySequence( "Shift+F4" );
 	defaultSettings->Shortcuts.NBInfo = QList<QKeySequence>() << QKeySequence( "Ctrl+I" );
@@ -214,6 +215,9 @@ NBSettings* NBSettings::instance() {
 
 	if ( saKeys.contains( QString( "Properties" ) ) )
 		settings->Shortcuts.Properties = getShortcuts( "Properties" );
+
+	if ( saKeys.contains( QString( "Permissions" ) ) )
+		settings->Shortcuts.Permissions = getShortcuts( "Permissions" );
 
 	if ( saKeys.contains( QString( "Terminal" ) ) )
 		settings->Shortcuts.Terminal = getShortcuts( "Terminal" );
@@ -369,6 +373,9 @@ void NBSettings::reload() {
 
 	if ( saKeys.contains( QString( "Properties" ) ) )
 		Shortcuts.Properties = getShortcuts( "Properties" );
+
+	if ( saKeys.contains( QString( "Permissions" ) ) )
+		Shortcuts.Permissions = getShortcuts( "Permissions" );
 
 	if ( saKeys.contains( QString( "Terminal" ) ) )
 		Shortcuts.Terminal = getShortcuts( "Terminal" );

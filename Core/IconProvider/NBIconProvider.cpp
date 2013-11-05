@@ -160,12 +160,6 @@ bool NBIconProvider::hasIcon( QString icon ) {
 
 	/*
 		*
-		*
-		*
-	*/
-
-	/*
-		*
 		* List of themes
 		*
 		* First we input our stored theme.
@@ -175,6 +169,9 @@ bool NBIconProvider::hasIcon( QString icon ) {
 		* Else, add the system theme and
 		*
 	*/
+
+	if ( exists( icon ) )
+		return true;
 
 	QStringList themes = QStringList() << NBSystemIconTheme();
 	themes << getInheritedThemes( themes.at( 0 ) );
@@ -200,10 +197,28 @@ bool NBIconProvider::hasIcon( QString icon ) {
 
 			if ( exists( iconDir + theme + "/" + str + "/" + icon + ".svg" ) )
 				return true;
+
+			if ( exists( iconDir + theme + "/" + str + "/" + icon ) )
+				return true;
 		}
 	}
 
 	return false;
+};
+
+QString NBIconProvider::pixmapIcon( QString icon ) {
+
+	if ( exists( QString( "/usr/share/pixmaps/%1.png" ).arg( icon ) ) )
+		return QString( "/usr/share/pixmaps/%1.png" ).arg( icon );
+
+	else if ( exists( QString( "/usr/share/pixmaps/%1.xpm" ).arg( icon ) ) )
+		return QString( "/usr/share/pixmaps/%1.xpm" ).arg( icon );
+
+	else if ( exists( QString( "/usr/share/pixmaps/%1" ).arg( icon ) ) )
+		return QString( "/usr/share/pixmaps/%1" ).arg( icon );
+
+	else
+		return QString();
 };
 
 bool NBIconProvider::hasStoredThumb( QString path, QString hashPath ) {

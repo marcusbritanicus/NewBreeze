@@ -79,7 +79,7 @@ void NBFileSystemWatcher::run() {
 					emit watchPathDeleted();
 				}
 
-				if ( ( event->mask & IN_CREATE ) or ( event->mask & IN_MOVED_TO ) ) {
+				if ( ( event->mask & IN_CREATE ) ) {
 					emit nodeCreated( watchPath + "/" + event->name );
 				}
 
@@ -87,7 +87,7 @@ void NBFileSystemWatcher::run() {
 					emit nodeChanged( watchPath + "/" + event->name );
 				}
 
-				if ( ( event->mask & IN_DELETE ) or ( event->mask & IN_MOVED_FROM ) ) {
+				if ( ( event->mask & IN_DELETE ) ) {
 					emit nodeDeleted( watchPath + "/" + event->name );
 				}
 

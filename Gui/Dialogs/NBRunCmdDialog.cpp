@@ -4,10 +4,10 @@
 	*
 */
 
-// #include <NBFolderView.hpp>
 #include <NBFVDialogs.hpp>
-#include <NBConfigParser.hpp>
-#include <NBDesktopFile.hpp>
+#include <NBAppEngine.hpp>
+#include <NBAppFile.hpp>
+#include <NBGuiWidgets.hpp>
 #include <NBTools.hpp>
 
 NBRunCmdDialog::NBRunCmdDialog( QString origName ) : NBDialog() {
@@ -55,22 +55,14 @@ void NBRunCmdDialog::createGUI() {
 	btnLyt->addWidget( okBtn );
 	btnLyt->addWidget( cancelBtn );
 
+	lyt->addWidget( Separator::horizontal() );
 	lyt->addWidget( lbl1 );
 	lyt->addWidget( appList );
 	lyt->addWidget( lbl2 );
 	lyt->addWidget( le );
 	lyt->addLayout( btnLyt );
 
-	QWidget *widget = new QWidget();
-	widget->setObjectName( "guiBase" );
-	widget->setContentsMargins( 0, 0, 0, 0 );
-	widget->setLayout( lyt );
-
-	QHBoxLayout *baseLyt = new QHBoxLayout();
-	baseLyt->setContentsMargins( QMargins() );
-	baseLyt->addWidget( widget );
-
-	setLayout( baseLyt );
+	setLayout( lyt );
 	le->setFocus();
 };
 
@@ -117,45 +109,42 @@ void NBRunCmdDialog::loadApplications() {
 	QTime time = QTime::currentTime();
 	time.start();
 
-	foreach( QString path, paths ) {
-		QDir desktopDir( path );
-		desktopDir.setFilter( QDir::Files );
-		desktopDir.setNameFilters( QStringList() << "*.desktop" );
+	NBAppEngine *engine = NBAppEngine::instance();
+	foreach( NBAppFile app, engine->allDesktops().toQList() ) {
+		if ( app.value( NBAppFile::Type ).toString() != QString( "Application" ) )
+			continue;
 
-		foreach( QString desktopEntry, desktopDir.entryList() ) {
-			NBDesktopFile dFile( desktopDir.filePath( desktopEntry ) );
-			if ( dFile.type != QString( "Application" ) )
-				continue;
+		// If we have added this executable once
+		if ( addedExecList.contains( app.execArgs().at( 0 ) ) and addedNameList.contains( app.value( NBAppFile::Name ).toString() ) )
+			continue;
 
-			// If we have added this executable once
-			if ( addedExecList.contains( dFile.execArgs[ 0 ] ) and addedNameList.contains( dFile.name ) )
-				continue;
+		if ( not app.takesArgs() )
+			continue;
 
-			addedExecList << dFile.execArgs[ 0 ];
-			addedNameList << dFile.name;
+		addedExecList << app.execArgs().at( 0 );
+		addedNameList << app.value( NBAppFile::Name ).toString();
 
-			QString name = dFile.name;
-			QStringList exec = dFile.execArgs;
-			QString icon = dFile.icon;
+		QString name = app.value( NBAppFile::Name ).toString();
+		QStringList exec = app.execArgs();
+		QString icon = app.value( NBAppFile::Icon ).toString();
 
-			QIcon progIcon = QIcon::fromTheme( icon, QIcon( icon ) );
-			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
-				progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".png" );
+		QIcon progIcon = QIcon::fromTheme( icon, QIcon( icon ) );
+		if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+			progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".png" );
 
-			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
-				progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".xpm" );
+		if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+			progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".xpm" );
 
-			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
-				progIcon = QIcon( ":/icons/exec.png" );
+		if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+			progIcon = QIcon( ":/icons/exec.png" );
 
-			QListWidgetItem *item = new QListWidgetItem();
-			item->setIcon( progIcon );
-			item->setText( name );
-			item->setData( Qt::UserRole, QVariant( dFile.exec ) );
-			item->setData( Qt::UserRole + 10, QVariant( exec ) );
+		QListWidgetItem *item = new QListWidgetItem();
+		item->setIcon( progIcon );
+		item->setText( name );
+		item->setData( Qt::UserRole, app.value( NBAppFile::Exec ) );
+		item->setData( Qt::UserRole + 10, QVariant( exec ) );
 
-			appList->addItem( item );
-		}
+		appList->addItem( item );
 	}
 
 	appList->sortItems();

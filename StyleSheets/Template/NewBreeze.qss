@@ -6,6 +6,12 @@ QWidget#mainWidget {
 	border-radius: 5px;
 }
 
+QAbstractItemView#mainList {
+	background-color: <bgcolor>;
+	color: <textcolor>;
+	border: none;
+}
+
 QListView#mainList {
 	background-color: <bgcolor>;
 	color: <textcolor>;

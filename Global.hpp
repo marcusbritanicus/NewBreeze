@@ -13,7 +13,6 @@
 // Qt Headers
 #include <QtGui>
 #include <QtCore>
-#include <QtDBus>
 #include <QtNetwork>
 #include <QCryptographicHash>
 
@@ -63,18 +62,13 @@ namespace NBIOMode {
 };
 
 static QMimeDatabase mimeDb;
+static QStringList categories;
 
 // MimeType and Progams mapping cache location
 const QString mimeProgsCache( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/NBMimeProgs.cache" ) );
 
 // Thumbnails Storage Directory
 const QString thumbsDir( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/Thumbs/" ) );
-
-// Suffix and Icon mapping cache location
-const QString suffixIconPath( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/NBSuffixIcon.cache" ) );
-
-// Suffix-Icon Map
-static QMap<QString, QStringList> suffixIconMap;
 
 // NewBreeze Preferences
 static QSettings actionSettings( "NewBreeze", "CustomActions" );

@@ -19,11 +19,19 @@
 #include <NBGuiWidgets.hpp>
 #include <NBTerminal.hpp>
 #include <NBIOManager.hpp>
+#include <NBAppsView.hpp>
+#include <NBCatalogView.hpp>
 
 class NewBreeze : public QMainWindow {
 	Q_OBJECT
 
 	public :
+		enum Views {
+			Folders = 0,
+			Applications,
+			Catalogs
+		};
+
 		NewBreeze( QString loc = QString() );
 
 		QLabel *statusName;
@@ -45,6 +53,8 @@ class NewBreeze : public QMainWindow {
 		NBQuickMenuBar *QuickMenuBar;
 		NBSidePanel *SidePanel;
 		NBFolderView *FolderView;
+		NBApplicationsView *ApplicationsView;
+		NBCatalogView *CatalogView;
 		NBTerminal *Terminal;
 		NBInfoBar *InfoBar;
 
@@ -65,7 +75,7 @@ class NewBreeze : public QMainWindow {
 		void addBookMark();
 
 		void openAddressBar();
-		void openAddressBar( QString );
+		void openAddress( QString );
 		void openWithList();
 		void openNewWindow();
 		void openInNewWindow( QString );
@@ -75,6 +85,10 @@ class NewBreeze : public QMainWindow {
 
 		void showProperties();
 		void showPermissions();
+
+		void handleSpecialUrls( QString );
+		void showApplications();
+		void showCatalogs();
 
 		void filterFiles( QString );
 		void clearFilters();
