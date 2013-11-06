@@ -119,7 +119,7 @@ void NBFileDialog::createGUI() {
 void NBFileDialog::createAndSetupActions() {
 
 	connect( sidePanel, SIGNAL( driveClicked( QString ) ),
-		mainView, SLOT(doOpen( QString ) ) );
+		mainView, SLOT( doOpen( QString ) ) );
 
 	connect( toolBar->addressWidget->crumbsBar, SIGNAL( openLocation( QString ) ),
 		mainView, SLOT( doOpen( QString ) ) );

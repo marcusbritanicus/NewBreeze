@@ -69,6 +69,8 @@ class NBAppFile {
 		bool operator==( const NBAppFile& ) const;
 
 	private:
+		NBAppFile( QVariantList );
+
 		void parseDesktopFile();
 		void generateExecArgs();
 
@@ -101,7 +103,8 @@ class NBAppsList {
 		NBAppsList();
 
 		void clear();
-		quint64 count();
+		int count();
+		void move( int, int );
 
 		NBAppFile at( quint64 );
 

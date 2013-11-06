@@ -1,6 +1,6 @@
 /*
 	*
-	* NBRunCmdDialog.cpp - NewBreeze RunCommandWidget Class
+	* NBRunCmdDialog.cpp - NewBreeze 'Open file with' Class
 	*
 */
 
@@ -21,6 +21,16 @@ NBRunCmdDialog::NBRunCmdDialog( QString origName ) : NBDialog() {
 	runOk = false;
 }
 
+QString NBRunCmdDialog::commandString() {
+
+	return execCmd;
+};
+
+bool NBRunCmdDialog::canRun() {
+
+	return runOk;
+};
+
 void NBRunCmdDialog::createGUI() {
 
 	QVBoxLayout *lyt = new QVBoxLayout();
@@ -30,27 +40,22 @@ void NBRunCmdDialog::createGUI() {
 	QLabel *lbl2 = new QLabel( tr( "Custom command:" ) );
 	le = new QLineEdit();
 
-	appList = new QListWidget();
-	appList->setGridSize( QSize( 256, 32 ) );
-	appList->setIconSize( QSize( 24, 24 ) );
-	appList->setFlow( QListView::TopToBottom );
-	appList->setMovement( QListView::Static );
-	appList->setSelectionMode( QListView::SingleSelection );
+	appList = new NBOpenWithView();
 
-	loadApplications();
-
-	okBtn = new QPushButton();
+	okBtn = new QPushButton( QIcon( ":/icons/ok.png" ), tr( "&Open" ) );
 	okBtn->setObjectName( "okBtn" );
-	okBtn->setIcon( QIcon( ":/icons/ok.png" ) );
-	okBtn->setText( "&Open" );
 	okBtn->setAutoDefault( true );
 	okBtn->setDisabled( true );
 
-	cancelBtn = new QPushButton();
-	cancelBtn->setObjectName( "cancelBtn" );
-	cancelBtn->setIcon( QIcon( ":/icons/cancel.png" ) );
-	cancelBtn->setText( "&Cancel" );
+	defaultAndRunBtn = new QPushButton( QIcon( ":/icons/ok.png" ), tr( "&Make default and open" ) );
+	defaultAndRunBtn->setObjectName( "okBtn" );
+	defaultAndRunBtn->setAutoDefault( false );
+	defaultAndRunBtn->setDisabled( true );
 
+	cancelBtn = new QPushButton( QIcon( ":/icons/cancel.png" ), tr( "&Cancel" ) );
+	cancelBtn->setObjectName( "cancelBtn" );
+
+	btnLyt->addWidget( defaultAndRunBtn );
 	btnLyt->addStretch( 0 );
 	btnLyt->addWidget( okBtn );
 	btnLyt->addWidget( cancelBtn );
@@ -68,12 +73,14 @@ void NBRunCmdDialog::createGUI() {
 
 void NBRunCmdDialog::createAndSetupActions() {
 
-	connect( appList, SIGNAL( itemClicked( QListWidgetItem* ) ), this, SLOT( appSelected( QListWidgetItem* ) ) );
-	connect( appList, SIGNAL( itemActivated( QListWidgetItem* ) ), this, SLOT( appSelected( QListWidgetItem* ) ) );
+	connect( appList, SIGNAL( clicked( QModelIndex ) ), this, SLOT( appSelected( QModelIndex ) ) );
+	connect( appList, SIGNAL( doubleClicked( QModelIndex ) ), this, SLOT( runCommand( QModelIndex ) ) );
+	connect( appList, SIGNAL( activated( QModelIndex ) ), this, SLOT( runCommand( QModelIndex ) ) );
 
 	connect( le, SIGNAL( textEdited( QString ) ), this, SLOT( handleTextChanged( QString ) ) );
 	connect( le, SIGNAL( returnPressed() ), this, SLOT( runCommand() ) );
 
+	connect( defaultAndRunBtn, SIGNAL(clicked() ), this, SLOT( makeDefaultAndRunCommand() ) );
 	connect( okBtn, SIGNAL( clicked() ), this, SLOT( runCommand() ) );
 	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( cancel() ) );
 };
@@ -98,58 +105,6 @@ void NBRunCmdDialog::setWindowProperties() {
 	setFixedSize( 480, 640 );
 };
 
-void NBRunCmdDialog::loadApplications() {
-
-	QStringList paths = QStringList() << "/usr/share/applications" << QDir::home().filePath( ".local/share/applications/" );
-	paths << "/usr/share/applications/kde4" << "/usr/share/gnome/applications/" << "/usr/local/share/applications/";
-
-	QStringList addedExecList;
-	QStringList addedNameList;
-
-	QTime time = QTime::currentTime();
-	time.start();
-
-	NBAppEngine *engine = NBAppEngine::instance();
-	foreach( NBAppFile app, engine->allDesktops().toQList() ) {
-		if ( app.value( NBAppFile::Type ).toString() != QString( "Application" ) )
-			continue;
-
-		// If we have added this executable once
-		if ( addedExecList.contains( app.execArgs().at( 0 ) ) and addedNameList.contains( app.value( NBAppFile::Name ).toString() ) )
-			continue;
-
-		if ( not app.takesArgs() )
-			continue;
-
-		addedExecList << app.execArgs().at( 0 );
-		addedNameList << app.value( NBAppFile::Name ).toString();
-
-		QString name = app.value( NBAppFile::Name ).toString();
-		QStringList exec = app.execArgs();
-		QString icon = app.value( NBAppFile::Icon ).toString();
-
-		QIcon progIcon = QIcon::fromTheme( icon, QIcon( icon ) );
-		if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
-			progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".png" );
-
-		if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
-			progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".xpm" );
-
-		if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
-			progIcon = QIcon( ":/icons/exec.png" );
-
-		QListWidgetItem *item = new QListWidgetItem();
-		item->setIcon( progIcon );
-		item->setText( name );
-		item->setData( Qt::UserRole, app.value( NBAppFile::Exec ) );
-		item->setData( Qt::UserRole + 10, QVariant( exec ) );
-
-		appList->addItem( item );
-	}
-
-	appList->sortItems();
-};
-
 void NBRunCmdDialog::handleTextChanged( QString newText ) {
 
 	if ( newText.isEmpty() ) {
@@ -160,7 +115,9 @@ void NBRunCmdDialog::handleTextChanged( QString newText ) {
 	QStringList paths = QString( getenv( "PATH" ) ).split( ":" );
 	foreach( QString path, paths ) {
 		if ( QFileInfo( path + "/" + newText.split( " " )[ 0 ] ).exists() ) {
+			execCmd = newText;
 			okBtn->setEnabled( true );
+			defaultAndRunBtn->setEnabled( true );
 			return;
 		}
 	}
@@ -168,21 +125,39 @@ void NBRunCmdDialog::handleTextChanged( QString newText ) {
 	okBtn->setDisabled( true );
 };
 
-void NBRunCmdDialog::appSelected( QListWidgetItem* item ) {
+void NBRunCmdDialog::appSelected( QModelIndex index ) {
 
-	le->setText( item->data( Qt::UserRole ).toString() );
+	le->setText( index.data( NBApplicationsModel::ExecStr ).toString() );
+	execCmd = index.data( NBApplicationsModel::ExecList ).toStringList().join( " " );
 	okBtn->setEnabled( true );
+	defaultAndRunBtn->setEnabled( true );
 };
 
 void NBRunCmdDialog::runCommand() {
 
 	runOk = true;
 	close();
-	le->setText( appList->currentItem()->data( Qt::UserRole + 10 ).toStringList().join( " " ) );
+};
+
+void NBRunCmdDialog::runCommand( QModelIndex index ) {
+
+	execCmd = index.data( NBApplicationsModel::ExecList ).toStringList().join( " " );
+	runOk = true;
+	close();
 };
 
 void NBRunCmdDialog::cancel() {
 
 	runOk = false;
+	close();
+};
+
+void NBRunCmdDialog::makeDefaultAndRunCommand() {
+
+	QModelIndex idx = appList->currentIndex();
+
+	NBAppEngine::setApplicationAsDefault( idx.data( NBApplicationsModel::DesktopFile ).toString(), getMimeType( fileName ) );
+	execCmd = idx.data( NBApplicationsModel::ExecList ).toStringList().join( " " );
+	runOk = true;
 	close();
 };

@@ -267,19 +267,13 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 					progIcon = QIcon( ":/icons/exec.png" );
 
 				// Prepare @v exec
-				if ( app.takesArgs() ) {
-					if ( app.multipleArgs() ) {
-						int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
-						exec.removeAt( idx );
-						foreach( QString node, nodes )
-							exec.insert( idx, node );
-					}
-
-					else {
-						// We are intereseted only in multiple arg takers
-						continue;
-					}
+				if ( app.multipleArgs() ) {
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
+					exec.removeAt( idx );
+					foreach( QString node, nodes )
+						exec.insert( idx, node );
 				}
+
 				else {
 					// We are intereseted only in multiple arg takers
 					continue;
@@ -302,11 +296,10 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 	}
 
 	else {
-		QFileInfo fInfo( QDir( workingDir ).absoluteFilePath( selection[ 0 ].data().toString() ) );
-		QString file = termFormatString( fInfo.absoluteFilePath() );
+		QString file = QDir( workingDir ).absoluteFilePath( selection[ 0 ].data().toString() );
 
 		NBAppEngine *engine = NBAppEngine::instance();
-		NBAppsList apps = engine->appsForMimeType( mimeDb.mimeTypeForFile( fInfo.absoluteFilePath() ) );
+		NBAppsList apps = engine->appsForMimeType( mimeDb.mimeTypeForFile( file ) );
 		foreach( NBAppFile app, apps.toQList() ) {
 			QString name = app.value( NBAppFile::Name ).toString();
 			QStringList exec = app.execArgs();
@@ -327,16 +320,16 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 				if ( app.multipleArgs() ) {
 					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
 					exec.removeAt( idx );
-					exec.insert( idx, fInfo.absoluteFilePath() );
+					exec.insert( idx, file );
 				}
 
 				else {
 					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
 					exec.removeAt( idx );
-					exec.insert( idx, fInfo.absoluteFilePath() );
+					exec.insert( idx, file );
 				}
 			else
-				exec << fInfo.absoluteFilePath();
+				exec << file;
 
 			QAction *openWithAct = new QAction( progIcon, name, this );
 			openWithAct->setData( QVariant( QStringList() << exec ) );
@@ -345,18 +338,18 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 		}
 
 		// Open with vlc
-		if ( fInfo.isDir() ) {
+		if ( isDir( file ) ) {
 			QAction *openWithVLCAct = new QAction( QIcon::fromTheme( "vlc" ), "Open with &VLC", this );
-			openWithVLCAct->setData( QVariant( QStringList() << "vlc" << fInfo.absoluteFilePath() ) );
+			openWithVLCAct->setData( QVariant( QStringList() << "vlc" << file ) );
 			connect( openWithVLCAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 			addSeparator();
 			addAction( openWithVLCAct );
 		}
 
 		// Execute and Execute in terminal
-		if ( fInfo.isFile() and fInfo.isExecutable() ) {
+		if ( isFile( file ) and isExec( file ) ) {
 			QAction *runAct = new QAction( QIcon( ":/icons/exec.png" ), "Execute", this );
-			runAct->setData( QVariant( fInfo.absoluteFilePath() ) );
+			runAct->setData( QVariant( file ) );
 			connect( runAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 
 			QAction *runInTermAct = new QAction( QIcon( ":/icons/exec.png" ), "Execute in terminal", this );

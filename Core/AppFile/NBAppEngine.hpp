@@ -13,6 +13,8 @@
 #include <QTime>
 #include <NBAppFile.hpp>
 #include <NBMimeType.hpp>
+#include <QProcess>
+#include <QSettings>
 
 class NBAppEngine {
 	public:
@@ -41,6 +43,10 @@ class NBAppEngine {
 		void parseDesktops();
 
 		static NBAppEngine* instance();
+		static void setApplicationAsDefault( QString, QString );
+
+		QString xdgDefaultApp( QString );
+		NBAppFile xdgDefaultApp( QMimeType );
 
 	private:
 		// Constructor

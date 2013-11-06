@@ -67,7 +67,6 @@ void NBIconDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 
 			// Set elided text
 			text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
-
 		}
 
 		else {

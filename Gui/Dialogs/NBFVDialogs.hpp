@@ -1,14 +1,15 @@
 /*
 	*
-	* NBFolderView.hpp - NewBreeze FolderView Class Header
+	* NBFVDialogs.hpp - Various dialogs for NewBReeze
 	*
 */
 
-#ifndef NBFVDialogs_HPP
-#define NBFVDialogs_HPP
+#ifndef NBFVDIALOGS_HPP
+#define NBFVDIALOGS_HPP
 
 #include <QtGui>
 #include <NBDialog.hpp>
+#include <NBOpenWithView.hpp>
 
 class NBRenameDialog : public NBDialog {
 	Q_OBJECT
@@ -65,23 +66,29 @@ class NBRunCmdDialog : public NBDialog {
 
 	public :
 		NBRunCmdDialog( QString );
-		QLineEdit *le;
-		QPushButton *okBtn, *cancelBtn;
-		QListWidget *appList;
-		QString fileName;
-		bool runOk;
+		QString commandString();
+
+		bool canRun();
 
 	private:
 		void createGUI();
 		void createAndSetupActions();
 		void setWindowProperties();
-		void loadApplications();
+
+		QString execCmd;
+		QLineEdit *le;
+		QPushButton *okBtn, *cancelBtn, *defaultAndRunBtn;
+		NBOpenWithView *appList;
+		QString fileName;
+		bool runOk;
 
 	private slots :
 		void runCommand();
+		void runCommand( QModelIndex );
 		void cancel();
-		void appSelected( QListWidgetItem* );
+		void appSelected( QModelIndex );
 		void handleTextChanged( QString newText );
+		void makeDefaultAndRunCommand();
 };
 
 #endif

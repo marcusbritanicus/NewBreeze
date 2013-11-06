@@ -696,7 +696,7 @@ QPixmap NBApplicationsView::pixmapForCategory( QString categoryText ) const {
 		return QIcon::fromTheme( "applications-science" ).pixmap( 16, 16 );
 
 	else if ( categoryText == "Settings" )
-		return QIcon::fromTheme( "applications-settings" ).pixmap( 16, 16 );
+		return QIcon::fromTheme( "preferences-system" ).pixmap( 16, 16 );
 
 	else if ( categoryText == "System" )
 		return QIcon::fromTheme( "applications-system" ).pixmap( 16, 16 );

@@ -357,7 +357,28 @@ void NBFolderView::doOpen( QString loc ) {
 
 	else if ( isFile( loc ) ) {
 		NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s", qPrintable( loc ) );
-		NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( "xdg-open", QStringList() << loc ) ? "[DONE]" : " [FAILED]" ) );
+
+		NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
+		QStringList exec = app.execArgs();
+		// Prepare @v exec
+		if ( app.takesArgs() ) {
+			if ( app.multipleArgs() ) {
+				int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
+				exec.removeAt( idx );
+				exec.insert( idx, loc );
+			}
+
+			else {
+				int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
+				exec.removeAt( idx );
+				exec.insert( idx, loc );
+			}
+		}
+		else {
+			exec << loc;
+		}
+
+		NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( exec.takeFirst(), exec ) ? "[DONE]" : " [FAILED]" ) );
 	}
 
 	else {
@@ -411,8 +432,28 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			}
 
 			else {
-				NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s... ", qPrintable( fileToBeOpened ) );
-				NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( "xdg-open", QStringList() << fileToBeOpened ) ? "[DONE]" : "[FAILED]" ) );
+				NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s", qPrintable( fileToBeOpened ) );
+				NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( fileToBeOpened ) );
+				QStringList exec = app.execArgs();
+				// Prepare @v exec
+				if ( app.takesArgs() ) {
+					if ( app.multipleArgs() ) {
+						int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
+						exec.removeAt( idx );
+						exec.insert( idx, fileToBeOpened );
+					}
+
+					else {
+						int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
+						exec.removeAt( idx );
+						exec.insert( idx, fileToBeOpened );
+					}
+				}
+				else {
+					exec << fileToBeOpened;
+				}
+
+				NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( exec.takeFirst(), exec ) ? "[DONE]" : " [FAILED]" ) );
 			}
 		}
 
@@ -448,8 +489,8 @@ void NBFolderView::doOpenWithCmd() {
 	NBRunCmdDialog *runCmd = new NBRunCmdDialog( QFileInfo( files[ 0 ] ).fileName() );
 	runCmd->exec();
 
-	if ( runCmd->runOk ) {
-		QStringList exec = runCmd->le->text().split( " " );
+	if ( runCmd->canRun() ) {
+		QStringList exec = runCmd->commandString().split( " " );
 
 		// Prepare @v exec
 		if ( exec.contains( "<#NEWBREEZE-ARG-FILES#>" ) ) {

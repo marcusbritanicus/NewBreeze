@@ -210,60 +210,34 @@ void NBFDFolderView::newFolder() {
 
 void NBFDFolderView::doOpen( QModelIndex idx ) {
 
-	Q_UNUSED( idx );
 	QModelIndexList selectedList = getSelection();
 
 	foreach( QModelIndex index, selectedList ) {
-		QFileInfo info = fsModel->nodeInfo( index );
-		QString fileToBeOpened = info.absoluteFilePath();
+		QString fileToBeOpened = fsModel->nodePath( index );
 
-		bool hasPermission = true;
-		hasPermission &= info.isReadable();
-		if ( info.isDir() )
-			hasPermission &= info.isExecutable();
-
-		if ( !hasPermission ) {
-			QString title = tr( "NewBreeze - Access Error" );
-			QString text = tr( "You do not have enough permissions to open the <b>%1</b>. " ).arg( info.fileName() );
-			if ( info.isDir() )
+		if ( isDir( fileToBeOpened ) ) {
+			if ( not isReadable( fileToBeOpened ) ) {
+				QString title = tr( "NewBreeze - Access Error" );
+				QString text = tr( "You do not have enough permissions to open the <b>%1</b>. " ).arg( baseName( fileToBeOpened ) );
 				text += tr( "Please change the permissions of the directory to enter it." );
 
-			else
-				text += tr( "Please change the permissions of the file to edit/view it." );
+				NBMessageDialog::error( title, text );
+				return;
+			}
 
-			NBMessageDialog::error( title, text );
-			return;
-		}
-
-		if ( info.isDir() ) {
 			NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", qPrintable( fileToBeOpened ) );
 			fsModel->setRootPath( fileToBeOpened );
 		}
 
-		else if  ( info.isFile() ) {
-			if ( info.isExecutable() and isExec( fileToBeOpened ) ) {
-				/*
-					*
-					* We make sure that @v fileToBeOpened is really an executable file,
-					* i.e it is one of shellscript, install file, or x-exec or x-sharedlib
-					* or something of the sort and not a jpg file with exec perms
-					*
-				*/
-				NBDebugMsg( DbgMsgPart::HEAD, "Executing: %s... ", qPrintable( fileToBeOpened ) );
-				NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( info.absoluteFilePath() ) ? "[DONE]" : "[FAILED]" ) );
-			}
-
-			else {
-				NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s... ", qPrintable( fileToBeOpened ) );
-				NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( "xdg-open", QStringList() << fileToBeOpened ) ? "[DONE]" : "[FAILED]" ) );
-			}
-		}
-
 		else {
-			if ( getSelection().count() ) {
-				NBMessageDialog::critical( "NewBreeze - Error", "I really do not have any idea how to open this file." );
-				return;
-			}
+			NBMessageDialog::critical(
+				tr( "NewBreeze - Error" ),
+				QString(
+					"There is no folder named"
+					"<center><b><tt>%1</tt></b></center>"
+				).arg( fsModel->nodePath( idx ) )
+			);
+			return;
 		}
 	}
 
@@ -273,45 +247,29 @@ void NBFDFolderView::doOpen( QModelIndex idx ) {
 
 void NBFDFolderView::doOpen( QString loc ) {
 
-	if ( !QFileInfo( loc ).isAbsolute() )
-		loc = QFileInfo( loc ).absoluteFilePath();
-
-	QFileInfo info( loc );
-
-	bool hasPermission = true;
-	hasPermission &= info.isReadable();
-
-	if ( !hasPermission ) {
-		QString title = tr( "NewBreeze - Access Error" );
-		QString text = tr( "You do not have enough permissions to open the <b>%1</b>. " ).arg( info.fileName() );
-		if ( info.isDir() )
+	if ( isDir( loc ) ) {
+		if ( not isReadable( loc ) ) {
+			QString title = tr( "NewBreeze - Access Error" );
+			QString text = tr( "You do not have enough permissions to open the <b>%1</b>. " ).arg( baseName( loc ) );
 			text += tr( "Please change the permissions of the directory to enter it." );
 
-		else
-			text += tr( "Please change the permissions of the file to edit/view it." );
+			NBMessageDialog::error( title, text );
+			return;
+		}
 
-		NBMessageDialog::error( title, text );
-		return;
-	}
-
-	if ( info.isDir() )
-		hasPermission &= info.isExecutable();
-
-	if ( info.isDir() ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", qPrintable( loc ) );
 		fsModel->setRootPath( loc );
 	}
 
-	else if  ( info.isFile() ) {
-		NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s", qPrintable( loc ) );
-		NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( "xdg-open", QStringList() << loc ) ? "[DONE]" : " [FAILED]" ) );
-	}
-
 	else {
-		if ( getSelection().count() ) {
-			NBMessageDialog::critical( "NewBreeze - Error", "I really do not have any idea how to open this file." );
-			return;
-		}
+		NBMessageDialog::critical(
+			tr( "NewBreeze - Error" ),
+			QString(
+				"There is no folder named."
+				"<center><b><tt>%1</tt></b></center>"
+			).arg( loc )
+		);
+		return;
 	}
 };
 
@@ -387,8 +345,7 @@ void NBFDFolderView::toBeImplemented() {
 
 void NBFDFolderView::handleWatchDogBark( QString path ) {
 
-	QFileInfo info( path );
-	if ( !info.exists() ) {
+	if ( not exists( path ) ) {
 		NBMessageDialog::critical( "NewBreeze - Error",
 			"The current directory has been moved or deleted by an external process. Loading home dir." );
 

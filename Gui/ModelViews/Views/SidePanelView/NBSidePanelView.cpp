@@ -57,7 +57,8 @@ void NBSidePanel::updateDevices() {
 
 	setExpanded( spModel->index( 0, 0 ), false );
 	spModel->updateDeviceData();
-	setExpanded( spModel->index( 0, 0 ), true );
+	setExpanded( spModel->index( 0, 0 ), Settings->Session.ExpandDevices );
+	setExpanded( spModel->index( 1, 0 ), Settings->Session.ExpandBookmarks );
 
 	resizeColumnToContents( 0 );
 	setFixedWidth( sizeHintForColumn( 0 ) );
@@ -68,6 +69,8 @@ void NBSidePanel::updateBookmarks() {
 	setExpanded( spModel->index( 1, 0 ), false );
 	spModel->updateBookmarkData();
 	setExpanded( spModel->index( 1, 0 ), true );
+	setExpanded( spModel->index( 0, 0 ), Settings->Session.ExpandDevices );
+	setExpanded( spModel->index( 1, 0 ), Settings->Session.ExpandBookmarks );
 
 	resizeColumnToContents( 0 );
 	setFixedWidth( sizeHintForColumn( 0 ) );

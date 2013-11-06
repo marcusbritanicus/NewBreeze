@@ -53,6 +53,4 @@ Some of its features are
 
 ### Upcoming
 * File/folder delete GUI
-* New functionality to file/folder properties
-  - to set open with defaults
 * Any other feature you request for... :)

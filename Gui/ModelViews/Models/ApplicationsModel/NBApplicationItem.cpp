@@ -110,6 +110,8 @@ QVariant NBApplicationItem::data( int column ) const {
 		case Qt::UserRole + 6        : return itemData[ 5 ];
 		case Qt::UserRole + 7        : return itemData[ 6 ];
 		case Qt::UserRole + 8        : return itemData[ 7 ];
+		case Qt::UserRole + 9        : return itemData[ 8 ];
+		case Qt::UserRole + 10       : return itemData[ 9 ];
 		default: return QVariant();
 	};
 };

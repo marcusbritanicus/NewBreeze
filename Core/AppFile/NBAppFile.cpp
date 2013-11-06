@@ -176,6 +176,40 @@ QString NBAppFile::category() const {
 	return "Uncategorized";
 };
 
+NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
+
+	QVariantList data;
+
+	QStringList mMimeTypes;
+	mMimeTypes << first.value( NBAppFile::MimeTypes ).toStringList() << second.value( NBAppFile::MimeTypes ).toStringList();
+	QStringList mCategories;
+	mCategories << first.value( NBAppFile::Categories ).toStringList() << second.value( NBAppFile::Categories ).toStringList();
+
+	bool firstDisplay = ( not first.value( NBAppFile::NoDisplay ).toBool() );
+	bool secondDisplay = ( not second.value( NBAppFile::NoDisplay ).toBool() );
+	QString desktopName = ( firstDisplay ? first.desktopFileName() : ( secondDisplay ? second.desktopFileName() : QString() ) );
+	if ( not( firstDisplay or secondDisplay ) )
+		desktopName = first.value( NBAppFile::Name ).toString().replace( QRegExp( "" ), QString() ).toLower() + ".desktop";
+
+	data << desktopName;
+	data << first.value( NBAppFile::Name );
+	data << first.value( NBAppFile::Type );
+	data << first.value( NBAppFile::Exec );
+	data << first.value( NBAppFile::Icon );
+	data << mMimeTypes;
+	data << first.value( NBAppFile::WorkPath );
+	data << first.value( NBAppFile::TerminalMode );
+	data << mCategories;
+	data << first.value( NBAppFile::Comment );
+	data << ( first.value( NBAppFile::NoDisplay ).toBool() and second.value( NBAppFile::NoDisplay ).toBool() );
+	data << ( first.takesArgs() or second.takesArgs() );
+	data << ( first.multipleArgs() or second.multipleArgs() );
+	data << ( first.takesArgs() ? first.execArgs() : ( second.takesArgs() ? second.execArgs() : data.at( 3 ) ) );
+	data << first.grade();
+
+	return NBAppFile( data );
+};
+
 bool NBAppFile::operator==( const NBAppFile& other ) const {
 
 	bool truth = true;
@@ -191,6 +225,26 @@ bool NBAppFile::operator==( const NBAppFile& other ) const {
 	truth &= ( grade() == other.grade() );
 
 	return truth;
+};
+
+NBAppFile::NBAppFile( QVariantList data ) {
+
+	fileUrl = data[ 0 ].toString();
+
+	__name = data[ 1 ].toString();
+	__type = data[ 2 ].toString();
+	__exec = data[ 3 ].toString();
+	__icon = data[ 4 ].toString();
+	__mimeTypes = data[ 5 ].toStringList();
+	__workPath = data[ 6 ].toString();
+	__terminalMode = data[ 7 ].toBool();
+	__categories = data[ 8 ].toStringList();
+	__comment = data[ 9 ].toString();
+	__nodisplay = data[ 10 ].toBool();
+	__takesArgs = data[ 11 ].toBool();
+	__multipleFiles = data[ 12 ].toBool();
+	__execArgs = data[ 13 ].toStringList();
+	__grade = data[ 14 ].toInt();
 };
 
 void NBAppFile::parseDesktopFile() {
@@ -308,9 +362,14 @@ void NBAppsList::clear() {
 	__appsList.clear();
 };
 
-quint64 NBAppsList::count() {
+int NBAppsList::count() {
 
 	return __appsList.count();
+};
+
+void NBAppsList::move( int from, int to ) {
+
+	__appsList.move( from, to );
 };
 
 NBAppFile NBAppsList::at( quint64 pos ) {
@@ -396,10 +455,6 @@ NBAppsList NBAppsList::operator<<( NBAppFile app ) {
 	if ( app.value( NBAppFile::Type ).toString() != QString( "Application" ) )
 		return *this;
 
-	// If app is not to be displayed, do not add it.
-	if ( app.value( NBAppFile::NoDisplay ).toBool() )
-		return *this;
-
 	foreach( NBAppFile other, __appsList ) {
 		if ( app.compare( other ) == INT_MAX ) {
 			// This means nothing. Just that the other app is not the same as this.
@@ -410,7 +465,6 @@ NBAppsList NBAppsList::operator<<( NBAppFile app ) {
 		else if ( app.compare( other ) < 0 ) {
 			// This has less priority than the one existing.
 			// So no more checks. We do not include this at all.
-
 			return *this;
 		}
 
@@ -429,12 +483,16 @@ NBAppsList NBAppsList::operator<<( NBAppFile app ) {
 
 			/// ===========> Unimplemented <=========== ///
 
+			__appsList.removeAt( __appsList.indexOf( other ) );
+			__appsList << NBAppFile::merge( app, other );
+
 			return *this;
 		}
 	}
 
 	// This means no application was found similar to the one being added.
 	// We add this application
+
 	__appsList << app;
 
 	return *this;

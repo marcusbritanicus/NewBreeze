@@ -54,6 +54,7 @@ void NewBreeze::createGUI() {
 	QVBoxLayout *ViewLayout = new QVBoxLayout();
 
 	MainLayout->setContentsMargins( QMargins() );
+	ViewLayout->setContentsMargins( QMargins( 0, 0, 3, 0 ) );
 
 	TitleBar = new NBTitleBar();
 	AddressBar = new NBAddressBar();
@@ -322,6 +323,14 @@ void NewBreeze::createAndSetupActions() {
 	viewModeAct->setShortcuts( Settings->Shortcuts.ViewMode );
 	connect( viewModeAct, SIGNAL( triggered() ), this, SLOT( switchToNextView() ) );
 
+	QAction *toggleApplicationsAct = new QAction( "Toggle Applications", this );
+	toggleApplicationsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+A" ) );
+	connect( toggleApplicationsAct, SIGNAL( triggered() ), this, SLOT( showApplications() ) );
+
+	QAction *toggleCatalogsAct = new QAction( "Toggle Catalogs", this );
+	toggleCatalogsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+C" ) );
+	connect( toggleCatalogsAct, SIGNAL( triggered() ), this, SLOT( showCatalogs() ) );
+
 	addAction( aboutNBAct );
 	addAction( aboutQtAct );
 	addAction( showInfoAct );
@@ -333,6 +342,8 @@ void NewBreeze::createAndSetupActions() {
 	addAction( termWidgetAct );
 	addAction( toggleSideBar );
 	addAction( viewModeAct );
+	addAction( toggleApplicationsAct );
+	addAction( toggleCatalogsAct );
 };
 
 void NewBreeze::updateGUI() {

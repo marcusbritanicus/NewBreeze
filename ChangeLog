@@ -2,9 +2,13 @@ Version 2.1.0-preview
 	- Added NBApplicationsView and NBCatalogView
 	- NBDesktopFile and NBConfigParser have been replaced by NBAppFile and NBAppsEngine
 	- The OpenWith menu shows an application list even when multiple items are selected.
-	- NBSidePanel width is determined dynamically.
+	- NBSidePanel width is determined dynamically
 	- NBIconProvder now handles icons from /usr/share/pixmaps
 	- CustomActions menu has link to Add New Custom action
+	- The open with dialog is now categorized
+	- You can set the defaults using the NBOpenWith dialog
+	- Double clicking a file open with default application that is recorded in mimeapps.list file
+	- The first item in the OpenWith menu is the default application
 
 Version 2.0.2
     - NBFileSystemWatcher has undergone major changes

@@ -19,12 +19,14 @@ class NBApplicationsModel : public QAbstractItemModel {
 		enum Lookup {
 			Name = Qt::UserRole + 1,
 			Comment,
+			ExecStr,
 			ExecList,
 			Icon,
 			WorkPath,
 			MimeList,
 			Terminal,
-			Categories
+			Categories,
+			DesktopFile
 		};
 		NBApplicationsModel();
 
@@ -54,6 +56,7 @@ class NBApplicationsModel : public QAbstractItemModel {
 		void showCategory( QString category );
 		bool isCategoryVisible( QString mCategory ) const;
 
+		int indexListCountForCategory( QString ) const;
 		QModelIndexList indexListForCategory( QString ) const;
 
 		// Filters

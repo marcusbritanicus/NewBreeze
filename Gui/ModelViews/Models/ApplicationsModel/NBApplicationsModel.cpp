@@ -167,6 +167,14 @@ bool NBApplicationsModel::isCategoryVisible( QString mCategory ) const {
 	return false;
 };
 
+int NBApplicationsModel::indexListCountForCategory( QString mCategory ) const {
+
+	if ( not rootItem->categoryList.contains( mCategory ) or mCategory.isEmpty() or mCategory.isNull() )
+		return 0;
+
+	return categoryRowMap[ mCategory ].count();
+};
+
 QModelIndexList NBApplicationsModel::indexListForCategory( QString mCategory ) const {
 
 	QModelIndexList mList;
@@ -210,14 +218,16 @@ void NBApplicationsModel::setupModelData() {
 
 		QVariantList data;
 
-		data << app.value( NBAppFile::Name ).toString();
-		data << app.value( NBAppFile::Comment ).toString();
+		data << app.value( NBAppFile::Name );
+		data << app.value( NBAppFile::Comment );
+		data << app.value( NBAppFile::Exec );
 		data << app.execArgs();
-		data << app.value( NBAppFile::Icon ).toString();
-		data << app.value( NBAppFile::WorkPath ).toString();
-		data << app.value( NBAppFile::MimeTypes ).toStringList();
-		data << app.value( NBAppFile::TerminalMode ).toBool();
-		data << app.value( NBAppFile::Categories ).toStringList();
+		data << app.value( NBAppFile::Icon );
+		data << app.value( NBAppFile::WorkPath );
+		data << app.value( NBAppFile::MimeTypes );
+		data << app.value( NBAppFile::TerminalMode );
+		data << app.value( NBAppFile::Categories );
+		data << app.desktopFileName();
 
 		rootItem->addChild( new NBApplicationItem( data, app.category(), rootItem ) );
 	}

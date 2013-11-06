@@ -209,7 +209,7 @@ void NBCatalogModel::setupModelData() {
 	rootItem->clearChildren();
 
 	QSettings catalogsSettings( "NewBreeze", "Catalogs" );
-	foreach( QString ctlg, catalogsSettings.value( "Catalogs" ).toStringList() ) {
+	foreach( QString ctlg, catalogsSettings.allKeys() ) {
 		QStringList locations = catalogsSettings.value( ctlg ).toStringList();
 		foreach( QString location, locations ) {
 			QVariantList data;

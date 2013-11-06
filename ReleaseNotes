@@ -8,8 +8,7 @@ This is a preview release of v2.1.0
 
 => NBCatalogView( QAbstractItemView )
    NBCatalogView is the NewBreeze equivalent of Windows 7's Libraries. It works as well in a similar fashion. You can add or remove folders
-   from catalogs. There are four default catalogs, Documents, Music, Pictures and Videos. The support for adding custom catalogs will be
-   added in the beta release.
+   from catalogs. There are four default catalogs, Documents, Music, Pictures and Videos. You can also add custom catalogs.
 
 => NBSidePanel contains links to these two new features. The first click on Application/Catalogs show the corresponding view and clicking again
    causes them to be hidden, showing the FolderView.
@@ -21,3 +20,10 @@ This is a preview release of v2.1.0
 => NBIconProvder now handles icons from /usr/share/pixmaps
 
 => NBSidePanel width is determined dynamically.
+
+=> The OpenWith dialog box showing all the installed applications is now categorized, making it easy to search for an application.
+   The categorization is based on the standard menu categories.
+
+=> One can set the default program for a mimetype via the NBOpenWith Dialog. This process is freedesktop.org compliant.
+   The external program "xdg-mime" is called with the relevant arguments, which then writes the changes to mimeapps.list
+   While opening a program, the first listed program is the default program as per the freedesktop.org guidelines.
