@@ -89,6 +89,7 @@ class NewBreeze : public QMainWindow {
 		void handleSpecialUrls( QString );
 		void showApplications();
 		void showCatalogs();
+		void showFolders();
 
 		void filterFiles( QString );
 		void clearFilters();

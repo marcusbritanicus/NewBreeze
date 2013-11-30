@@ -8,41 +8,100 @@
 #define NBFILEIO_HPP
 
 #include <Global.hpp>
+#include <NBTools.hpp>
+#include <NBDeleteManager.hpp>
 
-typedef struct _Job {
+class NBFileIO : public QObject {
+	Q_OBJECT
 
-	// JobID - Unique string that identifies the job
-	QString jobID = QString();
+	public:
+		// Initializer
+		NBFileIO();
 
-	// Source and target
-	QStringList sources = QStringList();
-	QString target = QString();
+		// Set the sources - What to Copy/Move/ACopy
+		void setSources( QStringList );
 
-	// IO Mode
-	NBIOMode::Mode mode = NBIOMode::Copy;
+		// Return the source list
+		QStringList sources();
 
-	// Sizes
-	quint64 totalNodes = 0;
-	quint64 totalBytes = 0;
-	quint64 totalBytesCopied = 0;
-	quint64 cfileBytes = 0;
-	quint64 cfileBytesCopied = 0;
+		// Set the target - Where to Copy/Move/ACopy
+		void setTarget( QString );
 
-	// Current file
-	QString currentFile = QString();
+		// Return the target
+		QString target();
 
-	// IO Operation Input
-	bool canceled = false;
-	bool paused = false;
+		// Set the mode - How to do the IO: Copy or Move or ACopy
+		void setIOMode( NBIOMode::Mode );
 
-	// IO Operation Output
-	bool running = false;
+		// Return the mode of IO
+		NBIOMode::Mode ioMode();
 
-	// Result
-	bool completed = false;
-	QStringList errorNodes = QStringList();
-} Job;
+		// Cancel the IO Operation
+		void cancel();
 
-void performIO( Job *job );
+		// Pause the IO Operation
+		void pause();
+
+		// Resume the paused IO
+		void resume();
+
+		// ID - Identity of this IO process
+		const QString id();
+
+		// What is the result of the IO
+		int result();
+
+		// The list of nodes which could not be copied/moved/archived
+		QStringList errors();
+
+		// Total bytes to be copied
+		quint64 totalSize;
+
+		// Bytes copied so far
+		quint64 copiedSize;
+
+		// Size of the current file
+		quint64 fTotalBytes;
+
+		// Bytes copied of the current file
+		quint64 fWritten;
+
+		// The currently being written file
+		QString ioTarget;
+
+	public slots:
+		// Start the IO
+		void performIO();
+
+	private:
+		// Things to be done before IO begins like computing sizes
+		void preIO();
+
+		// Compute the size of a directory
+		void getDirSize( QString );
+
+		// Copy a file
+		void copyFile( QString );
+
+		// Copy a folder
+		void copyDir( QString );
+
+		// Create a directory tree - A directory with sub-directory, sub-sub-directory, and so on
+		void mkpath( QString, QFile::Permissions );
+
+		QStringList errorNodes;
+		QStringList sourceList;
+		QString targetDir;
+
+		QString jobID;
+
+		bool wasCanceled;
+		bool isPaused;
+
+		NBIOMode::Mode mode;
+
+	Q_SIGNALS:
+		void IOComplete();
+};
 
 #endif

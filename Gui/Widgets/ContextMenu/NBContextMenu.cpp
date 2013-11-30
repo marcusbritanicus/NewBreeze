@@ -7,7 +7,7 @@
 #include <NBContextMenu.hpp>
 #include <NBFolderView.hpp>
 
-NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QString dir ) : QMenu() {
+NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QString dir ) : NBMenu() {
 	/*
 		*
 		* We set the custom actions based on the indexes
@@ -21,11 +21,6 @@ NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QS
 
 	setTitle( tr( "&Actions" ) );
 	setIcon( QIcon( ":/icons/archive.png" ) );
-
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
-
-	setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 
 	// Actions
 	if ( selectedIndexes.count() == 1 ) {
@@ -182,15 +177,10 @@ void NBCustomActionsMenu::doCustomAction() {
 		QProcess::startDetached( cmdList.takeFirst(), cmdList );
 };
 
-NBOpenWithMenu::NBOpenWithMenu( QString icon, QString name, QWidget *parent ) : QMenu( parent ) {
+NBOpenWithMenu::NBOpenWithMenu( QString icon, QString name, QWidget *parent ) : NBMenu( parent ) {
 
 	setIcon( QIcon( icon ) );
 	setTitle( name );
-
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
-
-	setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 };
 
 void NBOpenWithMenu::setWorkingDirectory( QString wDir ) {
@@ -353,7 +343,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 			connect( runAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 
 			QAction *runInTermAct = new QAction( QIcon( ":/icons/exec.png" ), "Execute in terminal", this );
-			runInTermAct->setData( QVariant( getTerminal().join( " " ).arg( workingDir ).arg( file ) ) );
+			runInTermAct->setData( QVariant( ( getTerminal().join( " " ).arg( workingDir ).arg( file ) ).split( " " ) ) );
 			connect( runInTermAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 
 			addSeparator();
@@ -370,18 +360,13 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 	}
 };
 
-NBAddToCatalogMenu::NBAddToCatalogMenu( QString wNode, QModelIndexList nodeList ) : QMenu() {
+NBAddToCatalogMenu::NBAddToCatalogMenu( QString wNode, QModelIndexList nodeList ) : NBMenu() {
 
 	setTitle( "Add to Catalo&g" );
 	setIcon( QIcon( ":/icons/catalogs.png" ) );
 
 	workNode = QString( wNode );
 	sNodes << nodeList;
-
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
-
-	setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 
 	QAction *addToDocumentsAct = new QAction( QIcon( ":/icons/documents.png" ), "&Documents", this );
 	connect( addToDocumentsAct, SIGNAL( triggered() ), this, SLOT( addToCatalog() ) );
@@ -452,9 +437,6 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		// File/directory sorting
 		NBMenu *sortMenu = new NBMenu( "&Sort by" );
 		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
-		if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-			sortMenu->setAttribute( Qt::WA_TranslucentBackground );
-		sortMenu->setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 
 		sortMenu->addAction( sortByNameAct );
 		sortMenu->addAction( sortBySizeAct );

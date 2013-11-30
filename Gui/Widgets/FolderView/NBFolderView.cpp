@@ -27,6 +27,9 @@ NBFolderView::NBFolderView() : QStackedWidget() {
 
 	// Create and setup actions like copy, move, rename, etc, etc
 	createAndSetupActions();
+
+	// Do not accept focus
+	setFocusPolicy( Qt::NoFocus );
 };
 
 void NBFolderView::setContentsWidth( int cWidth ) {
@@ -49,78 +52,47 @@ void NBFolderView::updateViewMode() {
 
 bool NBFolderView::hasSelection() {
 
-	if ( currentIndex() == 0 )
-		return IconView->selectionModel()->hasSelection();
-
-	else
-		return false;// IconView->selectionModel()->hasSelection()
+	return TreeView->selectionModel()->hasSelection() or IconView->selectionModel()->hasSelection();
 };
 
 void NBFolderView::createAndSetupActions() {
 
-	connect(
-		IconView, SIGNAL( open( QModelIndex ) ),
-		this, SLOT( doOpen( QModelIndex ) )
-	);
+	connect( IconView, SIGNAL( open( QModelIndex ) ), this, SLOT( doOpen( QModelIndex ) ) );
 
-	connect(
-		IconView, SIGNAL( contextMenuRequested( QPoint ) ),
-		this, SLOT( showContextMenu( QPoint ) )
-	);
+	connect( IconView, SIGNAL( contextMenuRequested( QPoint ) ), this, SLOT( showContextMenu( QPoint ) ) );
 
 	connect(
 		IconView->selectionModel(), SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ),
 		this, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) )
 	);
 
-	connect(
-		IconView, SIGNAL( link( QStringList, QString ) ),
-		this, SLOT( link( QStringList, QString ) )
-	);
+	connect( IconView, SIGNAL( link( QStringList, QString ) ), this, SLOT( link( QStringList, QString ) ) );
 
 	// DragDrop copy
-	connect(
-		IconView, SIGNAL( copy( QStringList, QString ) ),
-		this, SLOT( copy( QStringList, QString ) )
-	);
+	connect( IconView, SIGNAL( acopy( QStringList, QString ) ), this, SLOT( acopy( QStringList, QString ) ) );
+
+	// DragDrop copy
+	connect( IconView, SIGNAL( copy( QStringList, QString ) ), this, SLOT( copy( QStringList, QString ) ) );
 
 	// DragDrop move
-	connect(
-		IconView, SIGNAL( move( QStringList, QString ) ),
-		this, SLOT( move( QStringList, QString ) )
-	);
+	connect( IconView, SIGNAL( move( QStringList, QString ) ), this, SLOT( move( QStringList, QString ) ) );
 
-	connect(
-		TreeView, SIGNAL( open( QModelIndex ) ),
-		this, SLOT( doOpen( QModelIndex ) )
-	);
+	connect( TreeView, SIGNAL( open( QModelIndex ) ), this, SLOT( doOpen( QModelIndex ) ) );
 
-	connect(
-		TreeView, SIGNAL( contextMenuRequested( QPoint ) ),
-		this, SLOT( showContextMenu( QPoint ) )
-	);
+	connect( TreeView, SIGNAL( contextMenuRequested( QPoint ) ), this, SLOT( showContextMenu( QPoint ) ) );
 
 	connect(
 		TreeView->selectionModel(), SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ),
 		this, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) )
 	);
 
-	connect(
-		TreeView, SIGNAL( link( QStringList, QString ) ),
-		this, SLOT( link( QStringList, QString ) )
-	);
+	connect( TreeView, SIGNAL( link( QStringList, QString ) ), this, SLOT( link( QStringList, QString ) ) );
 
 	// DragDrop copy
-	connect(
-		TreeView, SIGNAL( copy( QStringList, QString ) ),
-		this, SLOT( copy( QStringList, QString ) )
-	);
+	connect( TreeView, SIGNAL( copy( QStringList, QString ) ), this, SLOT( copy( QStringList, QString ) ) );
 
 	// DragDrop move
-	connect(
-		TreeView, SIGNAL( move( QStringList, QString ) ),
-		this, SLOT( move( QStringList, QString ) )
-	);
+	connect( TreeView, SIGNAL( move( QStringList, QString ) ), this, SLOT( move( QStringList, QString ) ) );
 
 	// Home
 	actHomeDir = new QAction( QIcon( ":/icons/home.png" ), "&Home", this );
@@ -236,8 +208,7 @@ void NBFolderView::createAndSetupActions() {
 
 	// Permissions
 	permissionsAct = new QAction( QIcon::fromTheme( "users" ), "P&ermissions", this );
-	// permissionsAct->setShortcuts( Settings->Shortcuts.Permissions );
-	permissionsAct->setShortcuts( QList<QKeySequence>() << tr( "Alt+Shift+Return" ) );
+	permissionsAct->setShortcuts( Settings->Shortcuts.Permissions );
 
 	connect( permissionsAct, SIGNAL( triggered() ), this, SIGNAL( showPermissions() ) );
 	addAction( permissionsAct );
@@ -269,17 +240,19 @@ void NBFolderView::createAndSetupActions() {
 	sortByDateAct = new QAction( "&Date", this );
 	connect( sortByDateAct, SIGNAL( triggered() ), this, SLOT( sortByDate() ) );
 
-	QAction *focusSearchAct = new QAction( "Focus SearchBar", this );
-	focusSearchAct->setShortcuts( Settings->Shortcuts.FocusSearchBar );
+	// Focus the search bar
+	// QAction *focusSearchAct = new QAction( "Focus SearchBar", this );
+	// focusSearchAct->setShortcuts( Settings->Shortcuts.FocusSearchBar );
 
-	connect( focusSearchAct, SIGNAL( triggered() ), this, SIGNAL( focusSearchBar() ) );
-	addAction( focusSearchAct );
+	// connect( focusSearchAct, SIGNAL( triggered() ), this, SIGNAL( focusSearchBar() ) );
+	// addAction( focusSearchAct );
 
-	QAction *clearSearchAct = new QAction( "Clear SearchBar", this );
-	clearSearchAct->setShortcuts( Settings->Shortcuts.ClearSearchBar );
+	// Clear the search bar
+	// QAction *clearSearchAct = new QAction( "Clear SearchBar", this );
+	// clearSearchAct->setShortcuts( Settings->Shortcuts.ClearSearchBar );
 
-	connect( clearSearchAct, SIGNAL( triggered() ), this, SIGNAL( clearSearchBar() ) );
-	addAction( clearSearchAct );
+	// connect( clearSearchAct, SIGNAL( triggered() ), this, SIGNAL( clearSearchBar() ) );
+	// addAction( clearSearchAct );
 };
 
 QModelIndexList NBFolderView::getSelection() {
@@ -287,16 +260,16 @@ QModelIndexList NBFolderView::getSelection() {
 	QModelIndexList selectedList;
 	if ( currentIndex() ) {
 		selectedList << TreeView->selectionModel()->selectedIndexes();
-			foreach( QModelIndex idx, selectedList )
-				if ( idx.column() )
-					selectedList.removeAt( selectedList.indexOf( idx ) );
+		foreach( QModelIndex idx, selectedList )
+			if ( idx.column() )
+				selectedList.removeAt( selectedList.indexOf( idx ) );
 	}
 
 	else {
 		selectedList << IconView->selectionModel()->selectedIndexes();
-			foreach( QModelIndex idx, selectedList )
-				if ( idx.column() )
-					selectedList.removeAt( selectedList.indexOf( idx ) );
+		foreach( QModelIndex idx, selectedList )
+			if ( idx.column() )
+				selectedList.removeAt( selectedList.indexOf( idx ) );
 	}
 
 	return selectedList;
@@ -330,7 +303,6 @@ void NBFolderView::newFile() {
 
 void NBFolderView::newFolder() {
 
-	qDebug() << "Updating model";
 	NBNewFileFolderDialog *newFolder = new NBNewFileFolderDialog( "dir", QDir( fsModel->currentDir() ) );
 	newFolder->exec();
 };
@@ -547,6 +519,7 @@ void NBFolderView::doPeek() {
 	if ( getMimeType( "/" ) == mimeType ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing folder: %s", qPrintable( currentNode ) );
 		NBFolderFlash *previewer = new NBFolderFlash( this, currentNode );
+		connect( previewer, SIGNAL( loadFolder( QString ) ), this, SLOT( doOpen( QString ) ) );
 		previewer->show();
 	}
 
@@ -615,8 +588,7 @@ void NBFolderView::prepareCopy() {
 	QMimeData *mimedata = new QMimeData();
 	mimedata->setUrls( urlList );
 
-	QClipboard *clipboard = qApp->clipboard();
-	clipboard->setMimeData( mimedata );
+	QApplication::clipboard()->setMimeData( mimedata );
 };
 
 void NBFolderView::prepareMove() {
@@ -634,8 +606,12 @@ void NBFolderView::prepareMove() {
 	QMimeData *mimedata = new QMimeData();
 	mimedata->setUrls( urlList );
 
-	QClipboard *clipboard = qApp->clipboard();
-	clipboard->setMimeData( mimedata );
+	QApplication::clipboard()->setMimeData( mimedata );
+};
+
+void NBFolderView::acopy( QStringList srcList, QString tgt ) {
+
+	emit copy( srcList, tgt, NBIOMode::ACopy );
 };
 
 void NBFolderView::copy( QStringList srcList, QString tgt ) {
@@ -656,8 +632,7 @@ void NBFolderView::link( QStringList linkList, QString path ) {
 
 void NBFolderView::prepareIO() {
 
-	QClipboard *clipboard = qApp->clipboard();
-	const QMimeData *mimeData = clipboard->mimeData();
+	const QMimeData *mimeData = QApplication::clipboard()->mimeData();
 
 	if ( mimeData->hasUrls() ) {
 		QStringList srcList;
@@ -823,6 +798,11 @@ void NBFolderView::openTerminal() {
 	}
 
 	NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
+};
+
+void NBFolderView::setFocus() {
+
+	currentWidget()->setFocus();
 };
 
 void NBFolderView::handleWatchDogBark( QString path ) {

@@ -21,6 +21,11 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	createAndSetupActions();
 	setWindowProperties();
 
+	// By default we do not show hidden files, but if the user
+	// had closed while viewing the hidden files, let's show it.
+	if ( Settings->Session.ShowHidden )
+		FolderView->fsModel->setShowHidden( true );
+
 	if ( not loc.isEmpty() ) {
 		FolderView->doOpen( loc );
 	}
@@ -32,11 +37,6 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 		else
 			FolderView->doOpen( QDir::homePath() );
 	}
-
-	// By default we do not show hidden files, but if the user
-	// had closed while viewing the hidden files, let's show it.
-	if ( Settings->Session.ShowHidden )
-		FolderView->fsModel->setShowHidden( true );
 
 	FolderView->currentWidget()->setFocus();
 };
@@ -211,6 +211,9 @@ void NewBreeze::createAndSetupActions() {
 	connect( SidePanel, SIGNAL( driveClicked( QString ) ),
 		FolderView, SLOT( doOpen( QString ) ) );
 
+	connect( SidePanel, SIGNAL( showFolders() ),
+		this, SLOT( showFolders() ) );
+
 	connect( SidePanel, SIGNAL( specialUrl( QString ) ),
 		this, SLOT( handleSpecialUrls( QString ) ) );
 
@@ -323,13 +326,20 @@ void NewBreeze::createAndSetupActions() {
 	viewModeAct->setShortcuts( Settings->Shortcuts.ViewMode );
 	connect( viewModeAct, SIGNAL( triggered() ), this, SLOT( switchToNextView() ) );
 
-	QAction *toggleApplicationsAct = new QAction( "Toggle Applications", this );
-	toggleApplicationsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+A" ) );
-	connect( toggleApplicationsAct, SIGNAL( triggered() ), this, SLOT( showApplications() ) );
+	// Show Application View
+	QAction *showApplicationsAct = new QAction( "show Applications", this );
+	showApplicationsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+A" ) );
+	connect( showApplicationsAct, SIGNAL( triggered() ), this, SLOT( showApplications() ) );
 
-	QAction *toggleCatalogsAct = new QAction( "Toggle Catalogs", this );
-	toggleCatalogsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+C" ) );
-	connect( toggleCatalogsAct, SIGNAL( triggered() ), this, SLOT( showCatalogs() ) );
+	// Show Catalog View
+	QAction *showCatalogsAct = new QAction( "show Catalogs", this );
+	showCatalogsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+C" ) );
+	connect( showCatalogsAct, SIGNAL( triggered() ), this, SLOT( showCatalogs() ) );
+
+	// Show Folder View
+	QAction *showFoldersAct = new QAction( "Toggle Catalogs", this );
+	showFoldersAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+F" ) );
+	connect( showFoldersAct, SIGNAL( triggered() ), this, SLOT( showFolders() ) );
 
 	addAction( aboutNBAct );
 	addAction( aboutQtAct );
@@ -342,8 +352,9 @@ void NewBreeze::createAndSetupActions() {
 	addAction( termWidgetAct );
 	addAction( toggleSideBar );
 	addAction( viewModeAct );
-	addAction( toggleApplicationsAct );
-	addAction( toggleCatalogsAct );
+	addAction( showApplicationsAct );
+	addAction( showCatalogsAct );
+	addAction( showFoldersAct );
 };
 
 void NewBreeze::updateGUI() {
@@ -411,15 +422,16 @@ void NewBreeze::showCustomActionsDialog() {
 void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 
 	// If there are background FileIO jobs, bring them to front
-	InfoBar->ioManager->showAllIODialogs();
+	if ( InfoBar->ioManagerMini->activeJobs() )
+		InfoBar->ioManagerMini->showAllIODialogs();
 
 	// Store the previous session - geometry, and open directory.
 	Settings->setValue( "Session/Geometry", geometry() );
 	Settings->setValue( "Session/LastDir", FolderView->fsModel->currentDir() );
 	Settings->setValue( "Session/ShowHidden", FolderView->fsModel->showHidden() );
 	Settings->setValue( "Session/Maximized", isMaximized() );
-	Settings->setValue( "Session/ExpandDevices", SidePanel->isExpanded( SidePanel->spModel->index( 0, 0 ) ) );
-	Settings->setValue( "Session/ExpandBookmarks", SidePanel->isExpanded( SidePanel->spModel->index( 1, 0 ) ) );
+	Settings->setValue( "Session/ExpandDevices", SidePanel->isExpanded( SidePanel->spModel->index( 3, 0 ) ) );
+	Settings->setValue( "Session/ExpandBookmarks", SidePanel->isExpanded( SidePanel->spModel->index( 4, 0 ) ) );
 
 	qDebug() << "Good Bye!";
 
@@ -490,6 +502,7 @@ void NewBreeze::showHideTermWidget() {
 
 	else {
 		Terminal->show();
+		// Terminal->setFocus();
 		return;
 	}
 };
@@ -668,38 +681,29 @@ void NewBreeze::handleSpecialUrls( QString specialUrl ) {
 
 void NewBreeze::showApplications() {
 
-	if ( ApplicationsView->isVisible() ) {
-		FolderView->show();
-		CatalogView->hide();
+	FolderView->hide();
+	CatalogView->hide();
 
-		ApplicationsView->hide();
-	}
-
-	else {
-		FolderView->hide();
-		CatalogView->hide();
-
-		ApplicationsView->show();
-		ApplicationsView->setFocus();
-	}
+	ApplicationsView->show();
+	ApplicationsView->setFocus();
 };
 
 void NewBreeze::showCatalogs() {
 
-	if ( CatalogView->isVisible() ) {
-		FolderView->show();
-		CatalogView->hide();
+	FolderView->hide();
+	ApplicationsView->hide();
 
-		ApplicationsView->hide();
-	}
+	CatalogView->show();
+	CatalogView->setFocus();
+};
 
-	else {
-		FolderView->hide();
-		ApplicationsView->hide();
+void NewBreeze::showFolders() {
 
-		CatalogView->show();
-		CatalogView->setFocus();
-	}
+	ApplicationsView->hide();
+	CatalogView->hide();
+
+	FolderView->show();
+	FolderView->setFocus();
 };
 
 void NewBreeze::showPermissions() {
@@ -730,7 +734,7 @@ void NewBreeze::clearFilters() {
 
 void NewBreeze::initiateIO( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {
 
-	InfoBar->ioManager->addJob( sourceList, target, iomode );
+	InfoBar->ioManagerMini->addJob( sourceList, target, iomode );
 };
 
 void NewBreeze::openWithList() {

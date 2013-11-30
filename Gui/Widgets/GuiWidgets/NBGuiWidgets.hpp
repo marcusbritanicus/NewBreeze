@@ -84,7 +84,6 @@ class NBClickLabel : public QLabel {
 		NBClickLabel( QPixmap icon = QPixmap() );
 		NBClickLabel( QString icon = QString() );
 		void setClickable( bool );
-		QString Style;
 
 	private :
 		bool clickEnabled;
@@ -126,7 +125,7 @@ class NBInfoLabel : public QLabel {
 
 	public:
 		NBInfoLabel();
-		void setText( QString, QString, QString );
+		void setText( QString, QString, QString, QString );
 };
 
 class NBDriveLabel : public QWidget {

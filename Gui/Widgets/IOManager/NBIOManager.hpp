@@ -9,18 +9,61 @@
 
 #include <Global.hpp>
 #include <NBTools.hpp>
-#include <NBPasteDialog.hpp>
+#include <NBDialog.hpp>
 #include <NBFileIO.hpp>
+#include <NBProgressBar.hpp>
+#include <NBIconProvider.hpp>
+#include <NBMessageDialog.hpp>
 
-class NBIOManager : public QFrame {
+class NBIOWidget : public QWidget {
+	Q_OBJECT
+
+	public:
+		NBIOWidget( NBFileIO *io );
+
+	private:
+		QLabel *ttlLbl, *srcLbl, *tgtLbl, *speedLbl, *etcLbl, *cfileLbl;
+		NBClickLabel *toggleDetailsLbl, *togglePauseResumeLbl, *closeLbl;
+		NBProgressBar *totalBar, *cfileBar;
+
+		QTimer *timer;
+		bool detailsAreSeen = true;
+
+		NBFileIO *io;
+		bool paused = false;
+
+	private slots:
+		void toggleDetails();
+		void togglePauseResume();
+		void cancelIO();
+		void update();
+};
+
+class NBIOManager : public NBDialog {
+	Q_OBJECT
+
+	public:
+		NBIOManager( QList<NBFileIO*> );
+		void showCritical();
+		void update();
+
+	private:
+		QList<NBFileIO*> ioList;
+		bool killIOOnClose = false;
+
+	protected:
+		void closeEvent( QCloseEvent* );
+};
+
+class NBIOManagerMini : public QFrame {
 	Q_OBJECT
 
 	public:
 		// Init all variables
-		NBIOManager();
+		NBIOManagerMini();
 
 		// Destroy all variables
-		~NBIOManager();
+		~NBIOManagerMini();
 
 		// addJob( sourceList, target, IOMode, JobMode );
 		void addJob( QStringList, QString, NBIOMode::Mode );
@@ -32,7 +75,8 @@ class NBIOManager : public QFrame {
 		void showAllIODialogs();
 
 	private:
-		QList<NBPasteDialog *> jobList;
+		QList<NBFileIO *> jobList;
+		NBIOManager *ioManager;
 
 		QPainter *painter;
 		qreal totalF;

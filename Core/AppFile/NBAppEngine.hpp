@@ -15,6 +15,7 @@
 #include <NBMimeType.hpp>
 #include <QProcess>
 #include <QSettings>
+#include <NBXdg.hpp>
 
 class NBAppEngine {
 	public:
@@ -45,7 +46,6 @@ class NBAppEngine {
 		static NBAppEngine* instance();
 		static void setApplicationAsDefault( QString, QString );
 
-		QString xdgDefaultApp( QString );
 		NBAppFile xdgDefaultApp( QMimeType );
 
 	private:

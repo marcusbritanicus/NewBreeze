@@ -49,7 +49,6 @@ Some of its features are
 * Some issues with cut-copy-paste files and folders
 * Issues with delete folders
 * Tree View does not handle custom menu events
-* Okular doesnot show up in the context menu (because of the .desktop structure)
 
 ### Upcoming
 * File/folder delete GUI

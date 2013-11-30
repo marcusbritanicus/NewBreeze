@@ -7,7 +7,10 @@
 #ifndef NBDEVICEINFO_HPP
 #define NBDEVICEINFO_HPP
 
-#include <Global.hpp>
+#include <fstream>
+#include <unistd.h>
+
+#include <QtCore>
 
 class NBDeviceInfoPrivate {
 

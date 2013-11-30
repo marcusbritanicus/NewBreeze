@@ -284,19 +284,22 @@ NBInfoLabel::NBInfoLabel() : QLabel() {
 	setStyleSheet( "QLabel { font-family: Courier 10 Pitch, Courier New, Monotype; font-size: 12pt; }" );
 };
 
-void NBInfoLabel::setText( QString size, QString type, QString perm ) {
+void NBInfoLabel::setText( QString name, QString size, QString type, QString perm ) {
 
 	QString text = QString(
-		"<table>"												\
-		"	<tr width = 700>"									\
-		"		<td width=300 align='left'>%1</td>"				\
+		"<table style='width: 700px; height: 56px;'>"			\
+		"	<tr>"												\
+		"		<td colspan=3 align = 'left'>%1</td>"			\
+		"	</tr>"												\
+		"	<tr>"												\
 		"		<td width=300 align='left'>%2</td>"				\
-		"		<td width=100 align='center'>%3</td>"			\
+		"		<td width=300 align='left'>%3</td>"				\
+		"		<td width=100 align='center'>%4</td>"			\
 		"	</tr>"												\
 		"</table>"
 	);
 
-	QLabel::setText( text.arg( size ).arg( type ).arg( perm ) );
+	QLabel::setText( text.arg( name ).arg( size ).arg( type ).arg( perm ) );
 };
 
 NBDriveLabel::NBDriveLabel( const QString path ) : QWidget() {

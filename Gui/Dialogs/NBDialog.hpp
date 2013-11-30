@@ -8,6 +8,9 @@
 #define NBDIALOG_HPP
 
 #include <Global.hpp>
+#include <NBTools.hpp>
+#include <NBGuiWidgets.hpp>
+#include <NBActionButtons.hpp>
 
 class NBDialog : public QWidget {
 	Q_OBJECT
@@ -26,9 +29,10 @@ class NBDialog : public QWidget {
 		void setupActions();
 		void setupDialogProperties();
 
-		QToolButton *closeBtn, *maxBtn, *minBtn;
+		NBActionButtons *actBtns;
 		QLabel *titleLbl;
 		QString buttons;
+
 		QFrame *BodyFrame;
 		QPoint dragPosition;
 

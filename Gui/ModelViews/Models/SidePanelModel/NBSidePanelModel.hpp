@@ -33,7 +33,7 @@ class NBSidePanelModel : public QAbstractItemModel {
 		void prepareRootItems();
 
 		NBSidePanelItem *rootItem, *devRootItem, *bmkRootItem;
-		NBSidePanelItem *appRootItem, *catalogRootItem;
+		NBSidePanelItem *appRootItem, *catalogRootItem, *folderRootItem;
 		QStringList bmkList, devList;
 
 	public slots:

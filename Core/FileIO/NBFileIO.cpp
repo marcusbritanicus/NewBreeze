@@ -5,257 +5,333 @@
 */
 
 #include <NBFileIO.hpp>
-#include <NBTools.hpp>
-#include <NBDeleteManager.hpp>
 
-bool copyFile( Job *job, QString srcFile, QString tgtFile ) {
+#define COPY_BUF_SIZE ( 64 * 1024 )
 
-	QFile iFile( srcFile );
-	QFile oFile( tgtFile );
+/*
+	*
+	* NBFileIO Initialization.
+	*
+	* @v mode is set to NBIOMode::Copy
+	* @v errorNodes and @v sourceList lists are cleared
+	* @v targetDir and @v ioTarget are set to empty strings
+	* All sizes are set to 0
+	* @v wasCanceled and @v isPaused set to false
+	*
+*/
+NBFileIO::NBFileIO() {
 
-	job->cfileBytesCopied = 0;
-	job->currentFile = QString( tgtFile );
-	job->cfileBytes = getSize( srcFile );
+	jobID = MD5( QDateTime::currentDateTime().toString( Qt::ISODate ) );
 
-	if ( not iFile.open( QFile::ReadOnly ) ) {
-		job->errorNodes << srcFile;
-		return false;
-	}
+	errorNodes.clear();
+	sourceList.clear();
+	targetDir = QString();
 
-	if ( not oFile.open( QFile::WriteOnly ) ) {
-		job->errorNodes << srcFile;
-		return false;
-	}
+	ioTarget = QString();
 
-	while( not iFile.atEnd() ) {
-		if ( job->canceled ) {
-			job->errorNodes << srcFile;
+	wasCanceled = false;
+	isPaused = false;
 
-			iFile.close();
-			oFile.close();
+	mode = NBIOMode::Copy;
 
-			return false;
-		}
-
-		while ( job->paused )
-			continue;
-
-		char block[ 4096 ] = { 0 };
-		qint64 inBytes = iFile.read( block, sizeof( block ) );
-		oFile.write( block, inBytes );
-		job->totalBytesCopied += inBytes;
-		job->cfileBytesCopied += inBytes;
-	}
-
-	iFile.close();
-	oFile.close();
-
-	oFile.setPermissions( iFile.permissions() );
-
-	return true;
+	totalSize = 0;
+	copiedSize = 0;
+	fTotalBytes = 0;
+	fWritten = 0;
 };
 
-bool copyDir( Job *job, QString srcDir, QString tgtDir ) {
-	/*
-		*
-		* All nodes in srcDir are to be copied to tgtDir
-		* If tgtDir does not exist, create it
-		*
-	*/
+void NBFileIO::setSources( QStringList sources ) {
 
-	bool success = true;
+	sourceList << sources;
+};
 
-	if ( not exists( tgtDir ) )
-		QDir( "." ).mkpath( tgtDir );
+QStringList NBFileIO::sources() {
 
-	foreach( QFileInfo info, QDir( srcDir ).entryInfoList( QDir::NoDotAndDotDot | QDir::System | QDir::Hidden | QDir::AllDirs | QDir::Files, QDir::DirsFirst ) ) {
-		if ( job->canceled ) {
-			job->errorNodes << info.absoluteFilePath();
-			success &= false;
-			continue;
+	return sourceList;
+};
+
+void NBFileIO::setTarget( QString target ) {
+
+	targetDir = target.endsWith( "/" ) ? target : target + "/";
+	jobID = MD5( targetDir + QDateTime::currentDateTime().toString( Qt::ISODate ) );
+};
+
+QString NBFileIO::target() {
+
+	return targetDir;
+};
+
+void NBFileIO::setIOMode( NBIOMode::Mode io_Mode ) {
+
+	mode = io_Mode;
+};
+
+NBIOMode::Mode NBFileIO::ioMode() {
+
+	return mode;
+};
+
+void NBFileIO::cancel() {
+
+	wasCanceled = true;
+};
+
+void NBFileIO::pause() {
+
+	isPaused = true;
+};
+
+void NBFileIO::resume() {
+
+	isPaused = false;
+};
+
+const QString NBFileIO::id() {
+
+	return jobID;
+};
+
+int NBFileIO::result() {
+
+	if ( errorNodes.count() )
+		return 1;
+
+	else
+		return 0;
+};
+
+QStringList NBFileIO::errors() {
+
+	return errorNodes;
+};
+
+void NBFileIO::performIO() {
+
+	preIO();
+
+	QString curWD( get_current_dir_name() );
+
+	Q_FOREACH( QString node, sourceList ) {
+		if ( wasCanceled )
+			break;
+
+		while ( isPaused ) {
+			if ( wasCanceled )
+				break;
+
+			usleep( 100 );
+			qApp->processEvents();
 		}
 
-		QString source = info.absoluteFilePath();
-		QString target = QDir( tgtDir ).filePath( baseName( source ) ) ;
+		QString srcPath = dirName( node );
+		QString srcBase = baseName( node );
 
-		if ( info.isDir() )
-			success &= copyDir( job, source, target );
+		chdir( qPrintable( srcPath ) );
+		if ( isDir( node ) )
+			copyDir( srcBase );
 
 		else
-			success &= copyFile( job, source, target );
+			copyFile( srcBase );
+
+		chdir( qPrintable( curWD ) );
 	}
 
-	return success;
+	emit IOComplete();
 };
 
-void performIO( Job *job ) {
+void NBFileIO::preIO() {
 
-	job->running = true;
+	QString curWD( get_current_dir_name() );
 
-	// Compute IO amount: totalBytes, totalnodes etc
-	foreach( QString path, job->sources ) {
-		QDirIterator it( path, QDir::AllEntries | QDir::System | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::Hidden, QDirIterator::Subdirectories );
-		while ( it.hasNext() ) {
-			if( job->canceled )
+	Q_FOREACH( QString node, sourceList ) {
+		QString srcPath = dirName( node );
+		QString srcBase = baseName( node );
+
+		chdir( qPrintable( srcPath ) );
+		if ( isDir( node ) ) {
+			/*
+				*
+				* This is a top level directory. This won't be created in @f getDirSize( ... )
+				* We need to create this directory and get its size.
+				*
+			*/
+			mkpath( srcBase, QFile::permissions( srcBase ) );
+			getDirSize( srcBase );
+		}
+
+		else {
+			// This is a file. Just get its size
+			totalSize += getSize( srcBase );
+		}
+
+		chdir( qPrintable( curWD ) );
+	}
+};
+
+void NBFileIO::getDirSize( QString path ) {
+
+	DIR* d_fh;
+	struct dirent* entry;
+	QString longest_name;
+
+	while( ( d_fh = opendir( qPrintable( path ) ) ) == NULL ) {
+		qWarning() << "Couldn't open directory:" << path;
+		return;
+	}
+
+	longest_name = QString( path );
+	if ( not longest_name.endsWith( "/" ) )
+		longest_name += "/";
+
+	while( ( entry = readdir( d_fh ) ) != NULL ) {
+
+		/* Don't descend up the tree or include the current directory */
+		if ( strcmp( entry->d_name, ".." ) != 0 && strcmp( entry->d_name, "." ) != 0 ) {
+
+			if ( entry->d_type == DT_DIR ) {
+
+				/*
+					*
+					* Prepend the current directory and recurse
+					* We also need to create this directory in
+					* @v targetDir
+					*
+				*/
+				mkpath( longest_name + entry->d_name, QFile::permissions( longest_name + entry->d_name ) );
+				getDirSize( longest_name + entry->d_name );
+			}
+			else {
+
+				/* Copy the current file */
+				totalSize += getSize( longest_name + entry->d_name );
+			}
+		}
+	}
+
+	closedir( d_fh );
+};
+
+void NBFileIO::copyFile( QString srcFile ) {
+
+	ioTarget = targetDir + srcFile;
+
+	if ( not isReadable( srcFile ) ) {
+		qDebug() << "Unreadable file: " + srcFile;
+		errorNodes << srcFile;
+		return;
+	}
+
+	if ( not isWritable( dirName( ioTarget ) ) ) {
+		qDebug() << ioTarget + " not writable!!!";
+		errorNodes << srcFile;
+		// return;
+	}
+
+	int iFileFD = open( qPrintable( srcFile ), O_RDONLY );
+	int oFileFD = open( qPrintable( ioTarget ), O_WRONLY | O_CREAT );
+
+	struct stat iStat, oStat;
+	fstat( iFileFD, &iStat );
+	fstat( oFileFD, &oStat );
+
+	fTotalBytes = iStat.st_size;
+	fWritten = 0;
+	int bytesWritten = 0;
+
+	while( fWritten != quint64( iStat.st_size ) ) {
+		if ( wasCanceled ) {
+			close( iFileFD );
+			close( oFileFD );
+
+			return;
+		}
+
+		while ( isPaused ) {
+			if ( wasCanceled ){
+				close( iFileFD );
+				close( oFileFD );
+
 				return;
-
-			it.next();
-			if( it.fileInfo().isDir() ) {
-				if ( it.filePath() == path )
-					continue;
 			}
 
+			usleep( 100 );
+			qApp->processEvents();
+		}
+
+		char block[ COPY_BUF_SIZE ];
+		qint64 inBytes = read( iFileFD, block, sizeof( block ) );
+		bytesWritten = write( oFileFD, block, inBytes );
+		fWritten += bytesWritten;
+		copiedSize += bytesWritten;
+		qApp->processEvents();
+	}
+
+	close( iFileFD );
+	close( oFileFD );
+
+	QFile::setPermissions( ioTarget, QFile::permissions( srcFile ) );
+
+	if ( mode == NBIOMode::Move ) {
+		if ( fWritten == quint64( iStat.st_size ) )
+			unlink( qPrintable( srcFile) );
+
+		else
+			errorNodes << srcFile;
+	}
+};
+
+void NBFileIO::copyDir( QString path ) {
+
+	DIR* d_fh;
+	struct dirent* entry;
+	QString longest_name;
+
+	if ( wasCanceled )
+		return;
+
+	while( ( d_fh = opendir( qPrintable( path ) ) ) == NULL ) {
+		qWarning() << "Couldn't open directory:" << path;
+		return;
+	}
+
+	longest_name = QString( path );
+	if ( not longest_name.endsWith( "/" ) )
+		longest_name += "/";
+
+	while( ( entry = readdir( d_fh ) ) != NULL ) {
+
+		/* Don't descend up the tree or include the current directory */
+		if ( strcmp( entry->d_name, ".." ) != 0 && strcmp( entry->d_name, "." ) != 0 ) {
+
+			/* If it's a directory print it's name and recurse into it */
+			if ( entry->d_type == DT_DIR ) {
+
+				/* Prepend the current directory and recurse */
+				copyDir( longest_name + entry->d_name );
+			}
 			else {
-				job->totalNodes++;
-				job->totalBytes += it.fileInfo().size();
+
+				/* Copy the current file */
+				copyFile( longest_name + entry->d_name );
 			}
 		}
 	}
 
-	// We have a Copy Operation to do
-	if ( job->mode == NBIOMode::Copy ) {
-		foreach( QString src, job->sources ) {
-			/*
-				*
-				* If the files from the current folder are being pasted into the same folder
-				* then we need to make a copy
-				*
+	closedir( d_fh );
+};
 
-				*
-				* if @src is a file, then target becomes target + Copy of baseName( @src )
-				* if @src is a directory, then files from @src are copied into target + Copy of baseName( @src )
-				*
-				* baseName : function defined in NBTools.hpp
-				*
-			*/
+void NBFileIO::mkpath( QString path, QFile::Permissions dirPerms ) {
 
-			if ( dirName( src ) == job->target ) {
-				QString source = src;
-				QString target = QDir( job->target ).filePath( "Copy of " + baseName( src ) );
+	QString curWD( get_current_dir_name() );
 
-				if ( isFile( src ) )
-					copyFile( job, source, target );
-
-				else if ( isDir( src ) )
-					copyDir( job, source, target );
-
-				else
-					job->errorNodes << source;
-			}
-
-			/*
-				*
-				* The files and folder to be pasted do not originate from this directory.
-				* But check for the existence of similarly named files/folders.
-				* If similarly named files/folders exist, then we follow the above procedure.
-				*
-			*/
-			else if ( exists( QDir( job->target ).filePath( baseName( src ) ) ) ) {
-				QString source = src;
-				QString target = QDir( job->target ).filePath( "Copy of " + baseName( src ) );
-
-				if ( isFile( src ) )
-					copyFile( job, source, target );
-
-				else if ( isDir( src ) )
-					copyDir( job, source, target );
-
-				else
-					job->errorNodes << source;
-			}
-
-			/*
-				*
-				* Now we are sure the source and target are different
-				* If source is a file, copy it directly
-				*
-			*/
-
-			else {
-				QString source = src;
-				QString target = QDir( job->target ).filePath( baseName( src ) );
-
-				if ( isFile( src ) )
-					copyFile( job, source, target );
-
-				else if ( isDir( src ) )
-					copyDir( job, source, target );
-
-				else
-					job->errorNodes << src;
-			}
+	chdir( qPrintable( targetDir ) );
+	QString __path;
+	Q_FOREACH( QString pathBit, path.split( "/", QString::SkipEmptyParts ) ) {
+		__path += pathBit + "/";
+		if ( not exists( __path ) ) {
+			mkdir( qPrintable( __path ), S_IRWXU );
+			QFile::setPermissions( __path, dirPerms );
 		}
 	}
-
-	// We need to move the files
-	else {
-		NBDeleteManager *deleter = new NBDeleteManager( NULL, false );
-
-		foreach( QString src, job->sources ) {
-			/*
-				*
-				* If the files from the current folder are being pasted into the same folder
-				* then we have a problem
-				*
-			*/
-			if ( dirName( src ) == job->target ) {
-				job->errorNodes << src;
-			}
-
-			/*
-				*
-				* The files and folder to be pasted do not originate from this directory.
-				* But check for the existence of similarly named files/folders.
-				* If similarly named files/folders exist, then we follow the above procedure.
-				*
-			*/
-			else if ( exists( QDir( job->target ).filePath( baseName( src ) ) ) ) {
-				QString source = src;
-				QString target = QDir( job->target ).filePath( "Copy of " + baseName( src ) );
-
-				if ( isFile( src ) ) {
-					if ( copyFile( job, source, target ) )
-						QFile::remove( source );
-				}
-
-				else if ( isDir( src ) ) {
-					if ( copyDir( job, source, target ) )
-						deleter->deleteFromDisk( QStringList() << source );
-				}
-
-				else {
-					job->errorNodes << source;
-				}
-			}
-
-			/*
-				*
-				* Now we are sure the source and target are different
-				* If source is a file, copy it directly
-				*
-			*/
-
-			else {
-				QString source = src;
-				QString target = QDir( job->target ).filePath( baseName( src ) );
-
-				if ( isFile( src ) ) {
-					if ( copyFile( job, source, target ) )
-						QFile::remove( source );
-				}
-
-				else if ( isDir( src ) ) {
-					if ( copyDir( job, source, target ) )
-						deleter->deleteFromDisk( QStringList() << source );
-				}
-
-				else {
-					job->errorNodes << source;
-				}
-			}
-		}
-	}
-
-	job->running = false;
-	job->completed = true;
+	chdir( qPrintable( curWD ) );
 };

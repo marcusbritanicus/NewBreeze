@@ -12,6 +12,7 @@
 #include <NBCatalogDelegate.hpp>
 #include <NBMessageDialog.hpp>
 #include <NBTools.hpp>
+#include <NBGuiWidgets.hpp>
 
 class NBCatalogView : public QAbstractItemView {
 	Q_OBJECT

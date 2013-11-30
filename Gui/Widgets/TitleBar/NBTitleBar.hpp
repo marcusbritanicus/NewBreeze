@@ -1,6 +1,6 @@
 /*
 	*
-	* NBGuiWidgets.hpp - NBGuiWidgets.cpp header
+	* NBTitleBar.hpp - NewBreeze TitleBar Class HEader
 	*
 */
 
@@ -9,6 +9,7 @@
 
 #include <Global.hpp>
 #include <NBGuiWidgets.hpp>
+#include <NBActionButtons.hpp>
 
 class NBTitleBar : public QWidget {
 	Q_OBJECT
@@ -26,8 +27,7 @@ class NBTitleBar : public QWidget {
 		QString m_title;
 		QIcon m_icon;
 
-		QToolButton *closeBtn, *maxBtn, *minBtn;
-
+		NBActionButtons *actBtns;
 		QPainter *painter;
 
 	public slots:
@@ -50,37 +50,6 @@ class NBTitleBar : public QWidget {
 
 		void aboutNB();
 		void aboutQt4();
-};
-
-class NBActionButtons : public QWidget {
-	Q_OBJECT
-
-	public:
-		NBActionButtons( bool, bool, bool );
-		~NBActionButtons();
-
-	private:
-		QPainter *painter;
-
-		bool maxBtnEnabled;
-		bool minBtnEnabled;
-		bool closeBtnEnabled;
-
-		quint64 widgetWidth;
-
-		QRect minRect = QRect( 0, 0, 0, 0 );
-		QRect maxRect = QRect( 0, 0, 0, 0 );
-		QRect clsRect = QRect( 0, 0, 0, 0 );
-
-	protected:
-		void mousePressEvent( QMouseEvent * );
-		void mouseMoveEvent( QMouseEvent * );
-		void paintEvent( QPaintEvent * );
-
-	Q_SIGNALS:
-		void maximizeWindow();
-		void minimizeWindow();
-		void closeWindow();
 };
 
 #endif

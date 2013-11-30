@@ -27,6 +27,9 @@ class NBFolderFlash : public QWidget {
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
+
+	Q_SIGNALS:
+		void loadFolder( QString );
 };
 
 #endif

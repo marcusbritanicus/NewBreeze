@@ -79,6 +79,7 @@ class NBFolderView : public QStackedWidget {
 		void doReload();
 		void doToggleHidden();
 		void move( QStringList, QString );
+		void acopy( QStringList, QString );
 		void copy( QStringList, QString );
 		void link( QStringList, QString );
 		void doSendToTrash();
@@ -93,6 +94,9 @@ class NBFolderView : public QStackedWidget {
 
 		void openTerminal();
 		void showContextMenu( QPoint );
+
+		// Over-riding the setFocus() of QWidget
+		void setFocus();
 
 	private slots :
 		void prepareCopy();

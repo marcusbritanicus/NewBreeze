@@ -15,7 +15,6 @@ NBBreadCrumbMenu::NBBreadCrumbMenu( QWidget *parent, QString path ) : QLabel( pa
 	// Create the GUI, i.e., an arrow
 	setPixmap( QIcon::fromTheme( "arrow-right" ).pixmap( QSize( 16, 16 ) ) );
 	menu = new NBMenu();
-	// menu->setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 	connect( menu, SIGNAL( aboutToHide() ), this, SLOT( onMenuHidden() ) );
 };
 

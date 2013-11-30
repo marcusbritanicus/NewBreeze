@@ -1,3 +1,11 @@
+Version 2.1.0
+    - Added shortcut for showing Folders, Applications and Catalogs
+    - Added Arching copy ( copy using archive to filder using cpio )
+    - Deprecated NBPasteDialog, and replaced it with NBIOManager
+    - File Copying/Moving now uses the NBFileIO class
+    - Several small performance fixes
+    - Several small buf fixes
+
 Version 2.1.0-preview
 	- Added NBApplicationsView and NBCatalogView
 	- NBDesktopFile and NBConfigParser have been replaced by NBAppFile and NBAppsEngine

@@ -41,6 +41,7 @@ class NBIconView : public QListView {
 	Q_SIGNALS :
 		void open( QModelIndex );
 		void contextMenuRequested( QPoint );
+		void acopy( QStringList, QString );
 		void copy( QStringList, QString );
 		void move( QStringList, QString );
 		void link( QStringList, QString );

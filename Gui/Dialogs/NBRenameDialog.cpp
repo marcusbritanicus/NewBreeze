@@ -65,47 +65,65 @@ void NBRenameDialog::handleTextChanged( QString newText ) {
 		return;
 	}
 
-	if ( replaceCB->isChecked() )
-		if ( newText == name )
-			okBtn->setDisabled( true );
-
-		else
-			okBtn->setEnabled( true );
-
-	else
-		if ( ( newText == name ) or ( dir.entryList().contains( newText ) ) )
-			okBtn->setDisabled( true );
-
-		else
-			okBtn->setEnabled( true );
-}
-
-void NBRenameDialog::handleCBStateChanged() {
-
-	if ( le->text().isEmpty() )
+	if ( newText == name )
 		okBtn->setDisabled( true );
 
-	else if ( replaceCB->isChecked() )
-		okBtn->setEnabled( true );
-
-	else {
-		QString newText = le->text();
-		if ( ( newText == name ) or ( dir.entryList().contains( newText ) ) )
+	else if ( replaceCB->isChecked() ) {
+		if ( isDir( dir.filePath( newText ) ) )
 			okBtn->setDisabled( true );
 
 		else
 			okBtn->setEnabled( true );
 	}
-}
+
+	else {
+		if ( dir.entryList().contains( newText ) )
+			okBtn->setDisabled( true );
+
+		else
+			okBtn->setEnabled( true );
+	}
+};
+
+void NBRenameDialog::handleCBStateChanged() {
+
+	QString newText = le->text();
+
+	if ( newText.isEmpty() ) {
+		okBtn->setDisabled( true );
+		return;
+	}
+
+	if ( newText == name )
+		okBtn->setDisabled( true );
+
+	else if ( replaceCB->isChecked() ) {
+		if ( isDir( dir.filePath( newText ) ) )
+			okBtn->setDisabled( true );
+
+		else
+			okBtn->setEnabled( true );
+	}
+
+	else {
+		if ( dir.entryList().contains( newText ) )
+			okBtn->setDisabled( true );
+
+		else
+			okBtn->setEnabled( true );
+	}
+};
 
 void NBRenameDialog::rename() {
 
-	renameOk = true;
-	close();
-}
+	if ( okBtn->isEnabled() ) {
+		renameOk = true;
+		close();
+	}
+};
 
 void NBRenameDialog::cancel() {
 
 	renameOk = false;
 	close();
-}
+};

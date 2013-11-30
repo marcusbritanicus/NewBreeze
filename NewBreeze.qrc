@@ -109,12 +109,10 @@
 		<file>StyleSheets/Template/NBInfoBar.qss</file>
 		<file>StyleSheets/Template/NBTitleBar.qss</file>
 		<file>StyleSheets/Template/NBAddressBar.qss</file>
-		<file>StyleSheets/Template/NBCustomActions.qss</file>
 		<file>StyleSheets/Template/NBSidePanel.qss</file>
 		<file>StyleSheets/Template/NBToolButton.qss</file>
 		<file>StyleSheets/Template/NBPreview.qss</file>
 		<file>StyleSheets/Template/NBDialog.qss</file>
-		<file>StyleSheets/Template/NBFileDialog.qss</file>
 		<file>StyleSheets/Template/NBMenu.qss</file>
 		<file>StyleSheets/Template/NBShowHideButton.qss</file>
 	</qresource>

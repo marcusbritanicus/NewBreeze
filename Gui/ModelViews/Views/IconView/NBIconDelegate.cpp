@@ -203,15 +203,23 @@ void NBIconDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 			QPoint bl = option.rect.bottomLeft() + QPoint( 7, 0 );
 			QPoint br = option.rect.bottomRight() - QPoint( 7, 0 );
 			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) ) {
-				painter->setPen(  Settings->Colors.FocusPenColorAlt );
+				QLinearGradient hLine( bl, br );
+				hLine.setColorAt( 0, Qt::transparent );
+				hLine.setColorAt( 0.3, Settings->Colors.FocusPenColorAlt );
+				hLine.setColorAt( 0.7, Settings->Colors.FocusPenColorAlt );
+				hLine.setColorAt( 1, Qt::transparent );
+				painter->setPen( QPen( QBrush( hLine ), 2 ) );
 				painter->drawLine( bl, br );
-				painter->drawLine( bl + QPoint( 0, -1 ), br - QPoint( 0, 1 ) );
 			}
 
 			else {
-				painter->setPen( Settings->Colors.FocusPenColor );
+				QLinearGradient hLine( bl, br );
+				hLine.setColorAt( 0, Qt::transparent );
+				hLine.setColorAt( 0.3, Settings->Colors.FocusPenColor );
+				hLine.setColorAt( 0.7, Settings->Colors.FocusPenColor );
+				hLine.setColorAt( 1, Qt::transparent );
+				painter->setPen( QPen( QBrush( hLine ), 2 ) );
 				painter->drawLine( bl, br );
-				painter->drawLine( bl + QPoint( 0, -1 ), br - QPoint( 0, 1 ) );
 			}
 		}
 
@@ -256,6 +264,7 @@ void NBIconDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 				painter->setPen( Settings->Colors.TextPenColor );
 		}
 
+		// Paint the text
 		if ( ListView.contains( Settings->General.FolderView ) )
 			painter->drawText( textRect, Qt::AlignLeft | Qt::AlignVCenter, text );
 

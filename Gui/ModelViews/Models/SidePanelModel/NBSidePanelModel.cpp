@@ -139,16 +139,18 @@ void NBSidePanelModel::prepareRootItems() {
 
 	rootItem = new NBSidePanelItem( QVariantList() );
 	devRootItem = new NBSidePanelItem( QVariantList() << "Devices" << QIcon( ":/icons/comp.png" ) << "", rootItem );
-	bmkRootItem = new NBSidePanelItem( QVariantList() << "Bookmarks" << QIcon( ":/icons/bookmark.png" ) << "", rootItem );
+	bmkRootItem = new NBSidePanelItem( QVariantList() << "Favorites" << QIcon( ":/icons/bookmark.png" ) << "", rootItem );
 
 	appRootItem = new NBSidePanelItem( QVariantList() << "Applications" << QIcon( ":/icons/applications.png" ) << "NB://Applications", rootItem );
 	catalogRootItem = new NBSidePanelItem( QVariantList() << "Catalogs" << QIcon( ":/icons/catalogs.png" ) << "NB://Catalogs", rootItem );
+	folderRootItem = new NBSidePanelItem( QVariantList() << "Folders" << QIcon( ":/icons/folder.png" ) << "NB://FolderView", rootItem );
+
+	rootItem->appendChild( folderRootItem );
+	rootItem->appendChild( appRootItem );
+	rootItem->appendChild( catalogRootItem );
 
 	rootItem->appendChild( devRootItem );
 	rootItem->appendChild( bmkRootItem );
-
-	rootItem->appendChild( appRootItem );
-	rootItem->appendChild( catalogRootItem );
 };
 
 void NBSidePanelModel::updateDeviceData() {

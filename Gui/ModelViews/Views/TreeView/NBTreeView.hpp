@@ -38,6 +38,7 @@ class NBTreeView : public QTreeView {
 		void newWindow( QString );
 		void contextMenuRequested( const QPoint &position );
 		void copy( QStringList, QString );
+		void acopy( QStringList, QString );
 		void move( QStringList, QString );
 		void link( QStringList, QString );
 

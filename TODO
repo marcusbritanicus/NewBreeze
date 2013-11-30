@@ -8,7 +8,7 @@ Widgets
 
 	☐ MyComputer: NBDeviceView, NBDeviceDelegate, NBDeviceModel( QStringListModel )                                                 [ 0 of 3 ]
 
-	☐ NBTrash: NBTrashView, NBTrashDelegate, NBTrashModel( QStringListModel )                                                       [ 0 of 3 ]
+	☐ NBTrash: NBTrashView, NBTrashDelegate, NBTrashModel( QAbstractItemModel )                                                     [ 0 of 3 ]
 
 	☑ ProgressWidget
 		☑ InfoBar ProgressWidget: Widget, Realtime progress updates                                                                 [ 2 of 2 ]
@@ -36,3 +36,13 @@ Undo-Redo Sequences
 
 Trash
 	☐ TrashView
+
+XDG Class
+	☐ An exclusive XDG class that does                                                                                              [ 2 of 3 ]
+		- Obtain default application for a mimetype
+		- XDG Base Dirs
+		- Obtain the location of trashed folder
+
+NBPasteDialog
+	☑ Determine the mode before hand, and in case of a move operation an intradevice move should be just a renaming operation       [ 0 of 1 ]
+	☐ Determine before hand, if there is enough space on the target to complete the copying/moving                                  [ 0 of 1 ]

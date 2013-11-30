@@ -28,8 +28,10 @@
 #include <Global.hpp>
 #include <NBServer.hpp>
 #include <NewBreeze.hpp>
-#include <NBPasteDialog.hpp>
 #include <NBSettingsManager.hpp>
+
+#include <NBIOManager.hpp>
+#include <NBFileIO.hpp>
 
 int main( int argc, char **argv ) {
 
@@ -40,27 +42,7 @@ int main( int argc, char **argv ) {
 	app.setOrganizationName( "NewBreeze" );
 	app.setApplicationName( "NewBreeze" );
 
-	if ( ( argc >= 3 ) and ( app.arguments().indexOf( QRegExp( "^--(cut|copy)pastemode$" ) ) != -1 ) ) {
-		/*
-			*
-			* Check the format:
-			*
-			* NewBreeze --cutpastemode --targetdir dir --sources src1 src2 src3 src4 ...
-			* NewBreeze --copypastemode --targetdir dir --sources src1 src2 src3 src4 ...
-			*
-			* Alternatively: NOT IMPLEMENTED
-			*
-			* NewBreeze --cutpastemode tgtdir src1 src2 src3 src4 ...
-			* NewBreeze --copypastemode tgtdir src1 src2 src3 src4 ...
-			*
-		*/
-
-		NBPasteDialog *pasteDlg = new NBPasteDialog();
-		pasteDlg->show();
-		return pasteDlg->result();
-	}
-
-	else if ( ( argc == 2 ) and app.arguments()[ 1 ] == QString( "--settings" ) ) {
+	if ( ( argc == 2 ) and app.arguments()[ 1 ] == QString( "--settings" ) ) {
 		NBSettingsManager *settingsMgr = new NBSettingsManager();
 		settingsMgr->show();
 	}

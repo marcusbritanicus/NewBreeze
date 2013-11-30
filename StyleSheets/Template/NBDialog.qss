@@ -1,6 +1,7 @@
 QWidget {
 	background-color: transparent;
 	color: <textcolor>;
+	border: none;
 }
 
 QWidget#guiBase {
@@ -68,6 +69,7 @@ QPushButton {
 	text-align: center;
 	color: <textcolor>;
 	outline: none;
+	min-width: 100px;
 }
 
 QPushButton:hover {

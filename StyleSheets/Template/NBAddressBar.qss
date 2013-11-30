@@ -1,6 +1,6 @@
 QLineEdit {
 	background: transparent;
-	font-family: Envy Code R;
+	font-family: Envy Code R, Courier 10 Pitch, Monotype, Courier New;
 	font-size: 11pt;
 	border: none;
 	border-radius: 5px;

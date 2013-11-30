@@ -13,6 +13,7 @@
 #include <NBDialog.hpp>
 #include <NBMessageDialog.hpp>
 #include <NBIconProvider.hpp>
+#include <NBDeviceInfo.hpp>
 
 class NBPasteDialog : public NBDialog {
 	Q_OBJECT

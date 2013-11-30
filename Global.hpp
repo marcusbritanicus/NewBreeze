@@ -31,7 +31,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/param.h>
@@ -56,13 +55,21 @@
 
 namespace NBIOMode {
 	enum Mode {
+		ACopy,
 		Copy,
 		Move
 	};
 };
 
+namespace NBInfoMode {
+	enum Mode {
+		Application,
+		FileSystem,
+		Catalog
+	};
+};
+
 static QMimeDatabase mimeDb;
-static QStringList categories;
 
 // MimeType and Progams mapping cache location
 const QString mimeProgsCache( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/NBMimeProgs.cache" ) );

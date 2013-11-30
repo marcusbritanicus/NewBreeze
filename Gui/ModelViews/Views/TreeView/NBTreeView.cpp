@@ -95,6 +95,19 @@ void NBTreeView::updateViewMode() {
 	}
 };
 
+
+void NBTreeView::createAndSetupActions() {
+
+	connect(
+		this, SIGNAL( activated( QModelIndex ) ),
+		this, SIGNAL( open( QModelIndex ) )
+	);
+
+	connect(
+		this, SIGNAL( customContextMenuRequested( QPoint ) ),
+		this, SIGNAL( contextMenuRequested( QPoint ) )
+	);
+};
 void NBTreeView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 	if ( ( mpEvent->button() == Qt::LeftButton ) )
@@ -288,6 +301,13 @@ void NBTreeView::dropEvent( QDropEvent *dpEvent ) {
 			emit link( args, mtpt );
 		}
 
+		else if ( dpEvent->keyboardModifiers() == ( Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier ) ) {
+
+			qDebug() << "Ctrl+Shift+Alt+Drop. Alphabetical Copy activated";
+			QProcess::startDetached( "sh", QStringList() << "find -type f -print0 | sort -z | cpio -0 -pd " + mtpt )
+			emit acopy( args, mtpt );
+		}
+
 		else {
 
 			dpEvent->ignore();
@@ -296,17 +316,4 @@ void NBTreeView::dropEvent( QDropEvent *dpEvent ) {
 	}
 
 	dpEvent->accept();
-};
-
-void NBTreeView::createAndSetupActions() {
-
-	connect(
-		this, SIGNAL( activated( QModelIndex ) ),
-		this, SIGNAL( open( QModelIndex ) )
-	);
-
-	connect(
-		this, SIGNAL( customContextMenuRequested( QPoint ) ),
-		this, SIGNAL( contextMenuRequested( QPoint ) )
-	);
 };

@@ -5,6 +5,9 @@
 */
 
 #include <NBPasteDialog.hpp>
+#include <sys/syscall.h>
+
+#define COPY_BUF_SIZE ( 64 * 1024 )
 
 NBPasteDialog::NBPasteDialog() : NBDialog( QString( "n" ) ) {
 
@@ -140,9 +143,6 @@ void NBPasteDialog::startWork() {
 
 	else
 		nameLbl->setText( tr( "Moving files (%1)" ).arg( formatSize( totalSize ) ) );
-
-	qApp->processEvents();
-	performIO();
 }
 
 void NBPasteDialog::togglePauseResume() {
@@ -193,165 +193,23 @@ void NBPasteDialog::handleFinished( int exitCode, QProcess::ExitStatus exitStatu
 
 void NBPasteDialog::preCopy() {
 
-	foreach( QString url, srcList ) {
-		if ( QFileInfo( url ).isDir() ) {
-
-			QDirIterator it( url, QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-			while ( it.hasNext() ) {
-				totalSize += getSize( it.next() );
-				qApp->processEvents();
-			}
-		}
-		else {
-			totalSize += getSize( url );
-		}
-	}
 	qApp->processEvents();
 };
 
 void NBPasteDialog::performIO() {
-
-	foreach( srcFile, srcList ) {
-		if ( wasCanceled ) {
-			emit IOComplete();
-			return;
-		}
-
-		// If source is a dir, create the dir tree, then iterate through the dir and copy the files
-		if ( QFileInfo( srcFile ).isDir() ) {
-			srcDir = QString( srcFile );
-			createDirTree();
-
-			QDirIterator it( srcDir, QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-			while ( it.hasNext() ) {
-				if ( wasCanceled ) {
-					emit IOComplete();
-					return;
-				}
-
-				srcFile = it.next();
-				tgtFile = QDir( tgtDir ).filePath( QString( srcFile ).remove( QFileInfo( srcDir ).path() ).remove( 0, 1 ) );
-
-				if ( srcFile == tgtFile ) {
-					QString tgtDir = QFileInfo( srcFile ).absolutePath();
-					QString tgtBase = QFileInfo( srcFile ).baseName();
-					QString tgtSfx = mimeDb.suffixForFileName( srcFile );
-					tgtSfx = tgtSfx.isEmpty() ? QFileInfo( srcFile ).completeSuffix() : tgtSfx;
-
-					tgtFile = QDir( tgtDir ).filePath( tgtBase + " - copy." + tgtSfx );
-
-					copyFile();
-				}
-				else
-					copyFile();
-			}
-
-			if ( mode == NBIOMode::Move )
-				// qDebug() << QString( "rm -rf '%1'" ).arg( srcDir.c_str();
-				system( qPrintable( QString( "rm -rf '%1'" ).arg( srcDir ) ) );
-		}
-
-		// Otherwise it is a file ( hopefully ) set the tgtFile and begin copy
-		else if ( QFileInfo( srcFile ).isFile() ) {
-			if ( wasCanceled ) {
-				emit IOComplete();
-				return;
-			}
-
-			tgtFile = QDir( tgtDir ).filePath( QFileInfo( srcFile ).fileName() );
-			if ( srcFile == tgtFile ) {
-				QString tgtDir = QFileInfo( srcFile ).absolutePath();
-				QString tgtBase = QFileInfo( srcFile ).baseName();
-				QString tgtSfx = QFileInfo( srcFile ).completeSuffix().isEmpty() ? "" : "." + QFileInfo( srcFile ).completeSuffix();
-
-				tgtFile = QDir( tgtDir ).filePath( tgtBase + " - copy" + tgtSfx );
-
-				copyFile();
-			}
-			else
-				copyFile();
-		}
-	}
-
-	close();
-	progressCheckTimer->stop();
 
 	emit IOComplete();
 };
 
 void NBPasteDialog::createDirTree() {
 
-	qDebug() << tgtDir;
-	QDir( tgtDir ).mkpath( QFileInfo( srcDir ).fileName() );
-
-	QDirIterator it( srcDir, QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot, QDirIterator::Subdirectories );
-	while ( it.hasNext() )
-		QDir( tgtDir ).mkpath( QString( it.next() ).remove( QFileInfo( srcDir ).path() ).remove( 0, 1 ) );
 };
 
 void NBPasteDialog::copyFile() {
 
-	filePB->setValue( 0 );
-	fromToLbl->setText( tr( "Copying %1..." ).arg( srcFile ) );
-
-	progressCheckTimer->start( 500 );
-
-	QFile ifile( srcFile );
-	QFile ofile( tgtFile );
-
-	ifile.open( QFile::ReadOnly );
-	ofile.open( QFile::WriteOnly );
-
-	if ( !ifile.isOpen() ) {
-		errors << srcFile;
-		return;
-	}
-
-	if ( !ofile.isOpen() ) {
-		errors << tgtFile;
-		return;
-	}
-
-	while( !ifile.atEnd() ) {
-		if ( wasCanceled ) {
-			ifile.close();
-			ofile.close();
-
-			progressCheckTimer->stop();
-			close();
-			return;
-		}
-
-		while ( isPaused ) {
-			usleep( 100 );
-			qApp->processEvents();
-		}
-
-		char block[ 4096 ];
-		qint64 inBytes = ifile.read( block, sizeof( block ) );
-		ofile.write( block, inBytes );
-		qApp->processEvents();
-	}
-
-	ifile.close();
-	ofile.close();
-
-	ofile.setPermissions( ifile.permissions() );
-
-	copiedSize += QFileInfo( srcFile ).size();
-	totalPB->setValue( ( int )( ( 100 * copiedSize ) / totalSize ) );
-
-	if ( mode == NBIOMode::Move )
-		// qDebug() << QString( tr( "rm %1" ).arg( srcFile ) );
-		ifile.remove();
 };
 
 void NBPasteDialog::setProgress() {
 
-	int percentTotal = 100 * ( copiedSize + QFileInfo( tgtFile ).size() ) / totalSize;
-	int percentFile = ( 100 * QFileInfo( tgtFile ).size() ) / QFileInfo( srcFile ).size();
-
-	totalPB->setValue( percentTotal );
-	filePB->setValue( percentFile );
 	qApp->processEvents();
 };

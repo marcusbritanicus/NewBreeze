@@ -35,7 +35,25 @@ inline QString baseName( QString path ) {
 
 NBAppFile::NBAppFile( QString path ) {
 
-	fileUrl = QString( path );
+	if ( exists( path ) ) {
+
+		fileUrl = path;
+	}
+
+	else{
+		if ( exists( NBXdg::home() + "/.local/share/applications/" + path ) )
+			fileUrl = NBXdg::home() + "/.local/share/applications/" + path;
+
+		else if ( exists( "/usr/local/share/applications/" + path ) )
+			fileUrl = "/usr/local/share/applications/" + path;
+
+		else if ( exists( "/usr/share/applications/" + path ) )
+			fileUrl = "/usr/share/applications/" + path;
+
+		else
+			return;
+	}
+
 	parseDesktopFile();
 };
 
@@ -187,6 +205,7 @@ NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
 
 	bool firstDisplay = ( not first.value( NBAppFile::NoDisplay ).toBool() );
 	bool secondDisplay = ( not second.value( NBAppFile::NoDisplay ).toBool() );
+
 	QString desktopName = ( firstDisplay ? first.desktopFileName() : ( secondDisplay ? second.desktopFileName() : QString() ) );
 	if ( not( firstDisplay or secondDisplay ) )
 		desktopName = first.value( NBAppFile::Name ).toString().replace( QRegExp( "" ), QString() ).toLower() + ".desktop";
@@ -206,6 +225,15 @@ NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
 	data << ( first.multipleArgs() or second.multipleArgs() );
 	data << ( first.takesArgs() ? first.execArgs() : ( second.takesArgs() ? second.execArgs() : data.at( 3 ) ) );
 	data << first.grade();
+
+	// LibreOffice Fix
+	if ( desktopName.toLower().contains( "libre" ) ) {
+		data[ 0 ] = desktopName.split( "-", QString::SkipEmptyParts ).at( 0 ) + "-startcenter.desktop";
+		data[ 1 ] = data[ 1 ].toString().left( 15 );
+		data[ 3 ] = first.execArgs().at( 0 ) + " %U";
+		data[ 4 ] = first.execArgs().at( 0 ) + "-startcenter";
+		data[ 13 ] = QStringList() << first.execArgs().at( 0 ) << "<#NEWBREEZE-ARG-FILES#>";
+	}
 
 	return NBAppFile( data );
 };
@@ -375,6 +403,16 @@ void NBAppsList::move( int from, int to ) {
 NBAppFile NBAppsList::at( quint64 pos ) {
 
 	return __appsList.at( pos );
+};
+
+int NBAppsList::indexOf( NBAppFile app ) {
+
+	return __appsList.indexOf( app );
+};
+
+void NBAppsList::insert( int at, NBAppFile app ) {
+
+	return __appsList.insert( at, app );
 };
 
 bool NBAppsList::contains( NBAppFile app ) {

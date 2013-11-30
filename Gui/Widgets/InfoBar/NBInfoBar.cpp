@@ -6,20 +6,19 @@
 
 #include <NBTools.hpp>
 #include <NBInfoBar.hpp>
-#include <NBMimeDatabase.hpp>
 
 inline QString getPermissions( QString path ) {
 
 	QString text;
 	// Read Permissions
-	if ( access( qPrintable( path ), R_OK ) == 0 )
+	if ( isReadable( path ) )
 		text += "<font color='#008000'><b>R</b></font>";
 
 	else
 		text += "<font color='#800000'><b>R</b></font>";
 
 	// Write Permissions
-	if ( access( qPrintable( path ), W_OK ) == 0 )
+	if ( isWritable( path ) )
 		text += " <font color='#008000'><b>W</b></font>";
 
 	else
@@ -52,24 +51,17 @@ NBInfoBar::NBInfoBar() : QWidget() {
 	iconLbl->setFixedSize( QSize( 52, 52 ) );
 	iconLbl->setAlignment( Qt::AlignCenter );
 
-	nameLbl = new QLabel();
-	nameLbl->setMinimumWidth( 700 );
-
 	infoLbl = new NBInfoLabel();
 	infoLbl->setMinimumWidth( 700 );
 
-	ioManager = new NBIOManager();
+	ioManagerMini = new NBIOManagerMini();
 
 	// Layouts
 	QHBoxLayout *baseLyt = new QHBoxLayout();
-	QGridLayout *infoLyt = new QGridLayout();
-
-	infoLyt->addWidget( nameLbl, 0, 0 );
-	infoLyt->addWidget( infoLbl, 1, 0 );
 
 	baseLyt->addWidget( iconLbl );
-	baseLyt->addLayout( infoLyt );
-	baseLyt->addWidget( ioManager );
+	baseLyt->addWidget( infoLbl );
+	baseLyt->addWidget( ioManagerMini );
 	baseLyt->addStretch( 0 );
 
 	setStyleSheet( getStyleSheet( "NBInfoBar", Settings->General.Style ) );
@@ -88,10 +80,12 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 		setIcon( QIcon::fromTheme( icoStr, QIcon( icoStr ) ) );
 
 	// Name
+	QString name;
 	if ( folderPath.split( "/", QString::SkipEmptyParts ).count() )
-		nameLbl->setText( folderPath.split( "/", QString::SkipEmptyParts ).takeLast() );
+		name = folderPath.split( "/", QString::SkipEmptyParts ).takeLast();
+
 	else
-		nameLbl->setText( "/ (root)" );
+		name = "/ (root)";
 
 	// Size
 	int folders = 0, files = 0, others = 0;
@@ -132,8 +126,7 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 	else
 		sizeTxt += QString( "%1 items" ).arg( QDir( folderPath ).entryList().count() );
 
-	infoLbl->show();
-	infoLbl->setText( sizeTxt, "Folder", getPermissions( folderPath ) );
+	infoLbl->setText( name, sizeTxt, "Folder", getPermissions( folderPath ) );
 };
 
 void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
@@ -146,7 +139,6 @@ void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
 	QString name = itemPath.split( "/", QString::SkipEmptyParts ).takeLast();
 	if ( isLink( itemPath ) )
 		name += QString( "<tt> > %1</tt>" ).arg( readLink( itemPath ) );
-	nameLbl->setText( name );
 
 	// Size
 	QString sizeTxt;
@@ -163,8 +155,7 @@ void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
 	QString permTxt = getPermissions( itemPath );
 
 	// Info
-	infoLbl->show();
-	infoLbl->setText( sizeTxt, typeTxt, permTxt );
+	infoLbl->setText( name, sizeTxt, typeTxt, permTxt );
 };
 
 void NBInfoBar::updateInfoBarSelection( QString folderPath, QModelIndexList selection ) {
@@ -244,18 +235,13 @@ void NBInfoBar::updateInfoBarSelection( QString folderPath, QModelIndexList sele
 	// Icon
 	setIcon( icon );
 
-	// Name
-	nameLbl->setText( nameText );
-
 	// Info
-	infoLbl->show();
-	infoLbl->setText( sizeText, QString(), QString() );
+	infoLbl->setText( nameText, sizeText, QString(), QString() );
 };
 
 void NBInfoBar::clear() {
 
 	iconLbl->clear();
-	nameLbl->clear();
 	infoLbl->clear();
 };
 

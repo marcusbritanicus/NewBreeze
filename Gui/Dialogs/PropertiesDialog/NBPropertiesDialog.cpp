@@ -65,10 +65,12 @@ void NBPropertiesDialog::createGUI() {
 		if ( isDir( pathsList.at( 0 ) ) ) {
 			iconLabel->setClickable( true );
 			type2Label->setText( "inode/directory" );
+			setFixedHeight( 300 );
 		}
 		else {
 			iconLabel->setClickable( false );
 			type2Label->setText( getMimeType( pathsList.at( 0 ) ) );
+			setFixedHeight( 280 );
 		}
 		nameLabel->setText( baseName( pathsList.at( 0 ) ) );
 	}
@@ -103,6 +105,8 @@ void NBPropertiesDialog::createGUI() {
 			nameLabel->setText( foldersText );
 			type2Label->setText( "Folders" );
 		}
+
+		setFixedHeight( 260 );
 	}
 
 	QGridLayout *fileLyt = new QGridLayout();
@@ -158,7 +162,6 @@ void NBPropertiesDialog::createGUI() {
 
 	QVBoxLayout *baseLyt = new QVBoxLayout();
 	baseLyt->setContentsMargins( QMargins() );
-	baseLyt->addWidget( Separator::horizontal() );
 	baseLyt->addLayout( fileLyt );
 	baseLyt->addWidget( Separator::horizontal() );
 	baseLyt->addLayout( driveLyt );
@@ -228,7 +231,7 @@ void NBPropertiesDialog::setDialogProperties() {
 	else
 		setWindowFlags( Qt::Popup );
 
-	setFixedSize( 530, 300 );
+	setFixedWidth( 530 );
 
 	QDesktopWidget dw;
 	int hpos = ( int )( ( dw.width() - 530 ) / 2 );
@@ -425,7 +428,7 @@ void NBPermissionsDialog::createGUI() {
 		permsFrame->setDisabled( 1 );
 
 	QVBoxLayout *baseLyt = new QVBoxLayout();
-	baseLyt->addWidget( Separator::horizontal() );
+	baseLyt->setContentsMargins( QMargins() );
 	baseLyt->addLayout( iconLyt );
 	baseLyt->addWidget( Separator::horizontal() );
 	baseLyt->addWidget( permsFrame );

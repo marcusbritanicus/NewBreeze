@@ -66,7 +66,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->Shortcuts.Delete = QList<QKeySequence>() << QKeySequence( "Shift+Delete" );
 	defaultSettings->Shortcuts.Trash = QList<QKeySequence>() << QKeySequence( "Delete" );
 	defaultSettings->Shortcuts.Properties = QList<QKeySequence>() << QKeySequence( "Alt+Return" );
-	defaultSettings->Shortcuts.Permissions = QList<QKeySequence>() << QKeySequence( "Alt+Return" );
+	defaultSettings->Shortcuts.Permissions = QList<QKeySequence>() << QKeySequence( "Alt+Shift+Return" );
 	defaultSettings->Shortcuts.Terminal = QList<QKeySequence>() << QKeySequence( "F4" );
 	defaultSettings->Shortcuts.InlineTerminal = QList<QKeySequence>() << QKeySequence( "Shift+F4" );
 	defaultSettings->Shortcuts.NBInfo = QList<QKeySequence>() << QKeySequence( "Ctrl+I" );

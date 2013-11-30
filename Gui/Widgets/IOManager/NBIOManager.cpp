@@ -6,12 +6,219 @@
 
 #include <NBIOManager.hpp>
 
-NBIOManager::NBIOManager() : QFrame() {
+NBIOWidget::NBIOWidget( NBFileIO *ioProc ) {
+
+	io = ioProc;
+	connect( io, SIGNAL( IOComplete() ), this, SLOT( close() ) );
+
+	paused = false;
+
+	timer = new QTimer();
+	timer->setInterval( 500 );
+	connect( timer, SIGNAL( timeout() ), this, SLOT( update() ) );
+	timer->start();
+
+	ttlLbl = new QLabel( ( io->ioMode() == NBIOMode::Copy ? "Copying Files" : "Moving Files" ) );
+	srcLbl = new QLabel(  "Source: " + dirName( io->sources().at( 0 ) ) );
+	tgtLbl = new QLabel( "Target: " + io->target() );
+	speedLbl = new QLabel( "Speed: 0 kBps" );
+	etcLbl = new QLabel( "ETC: 00:00:00" );
+	cfileLbl = new QLabel( "Current file: " + io->ioTarget );
+
+	toggleDetailsLbl = new NBClickLabel( QPixmap( ":/icons/arrow-up.png" ).scaled( QSize( 16, 16 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	toggleDetailsLbl->setClickable( true );
+	connect( toggleDetailsLbl, SIGNAL( clicked() ), this, SLOT( toggleDetails() ) );
+
+	togglePauseResumeLbl = new NBClickLabel( QIcon::fromTheme( "media-playback-pause" ).pixmap( 16 ) );
+	togglePauseResumeLbl->setClickable( true );
+	connect( togglePauseResumeLbl, SIGNAL( clicked() ), this, SLOT( togglePauseResume() ) );
+
+	closeLbl = new NBClickLabel( QPixmap( ":/icons/delete.png" ).scaled( QSize( 16, 16 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	closeLbl->setClickable( true );
+	connect( closeLbl, SIGNAL( clicked() ), this, SLOT( cancelIO() ) );
+
+	totalBar = new NBProgressBar();
+	totalBar->setRange( 0, io->totalSize );
+
+	cfileBar = new NBProgressBar();
+	cfileBar->setRange( 0, io->fTotalBytes );
+
+	QHBoxLayout *ttlLyt = new QHBoxLayout();
+	ttlLyt->addWidget( ttlLbl );
+	ttlLyt->addStretch( 0 );
+	ttlLyt->addWidget( toggleDetailsLbl );
+	ttlLyt->addWidget( togglePauseResumeLbl );
+	ttlLyt->addWidget( closeLbl );
+
+	QHBoxLayout *spdLyt = new QHBoxLayout();
+	spdLyt->addWidget( speedLbl );
+	spdLyt->addWidget( etcLbl );
+
+	QVBoxLayout *baseLyt = new QVBoxLayout();
+	baseLyt->addLayout( ttlLyt );
+	baseLyt->addWidget( srcLbl );
+	baseLyt->addWidget( tgtLbl );
+	baseLyt->addLayout( spdLyt );
+	baseLyt->addWidget( new QLabel( "Total progress" ) );
+	baseLyt->addWidget( totalBar );
+	baseLyt->addWidget( cfileLbl );
+	baseLyt->addWidget( cfileBar );
+
+	QWidget *baseWidget = new QWidget();
+	baseWidget->setObjectName( "guiBase" );
+	baseWidget->setLayout( baseLyt );
+
+	QHBoxLayout *lyt = new QHBoxLayout( this );
+	lyt->addWidget( baseWidget );
+
+	setLayout( lyt );
+};
+
+void NBIOWidget::toggleDetails() {
+
+	if ( detailsAreSeen ) {
+		toggleDetailsLbl->setPixmap( QPixmap( ":/icons/arrow-down.png" ).scaled( QSize( 16, 16 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+
+		srcLbl->hide();
+		tgtLbl->hide();
+		speedLbl->hide();
+		etcLbl->hide();
+		cfileLbl->hide();
+		cfileBar->hide();
+
+		detailsAreSeen = false;
+
+		setFixedHeight( 70 );
+	}
+
+	else {
+		toggleDetailsLbl->setPixmap( QPixmap( ":/icons/arrow-up.png" ).scaled( QSize( 16, 16 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+
+		srcLbl->show();
+		tgtLbl->show();
+		speedLbl->show();
+		etcLbl->show();
+		cfileLbl->show();
+		cfileBar->show();
+
+		detailsAreSeen = true;
+		setFixedHeight( 180 );
+	}
+};
+
+void NBIOWidget::togglePauseResume() {
+
+	if ( paused ) {
+		io->resume();
+		togglePauseResumeLbl->setPixmap( QIcon::fromTheme( "media-playback-pause" ).pixmap( 16 ) );
+		togglePauseResumeLbl->setToolTip( "Pause" );
+
+		paused = false;
+	}
+
+	else {
+		io->pause();
+		togglePauseResumeLbl->setPixmap( QIcon::fromTheme( "media-playback-start" ).pixmap( 16 ) );
+		togglePauseResumeLbl->setToolTip( "Resume" );
+
+		paused = true;
+	}
+};
+
+void NBIOWidget::update() {
+
+	speedLbl->setText( "Speed: 0 kBps" );
+	etcLbl->setText( "ETC: 00:00:00" );
+	cfileLbl->setText( "Current file: " + io->ioTarget );
+
+	totalBar->setMaximum( io->totalSize );
+	cfileBar->setMaximum( io->fTotalBytes );
+	totalBar->setValue( io->copiedSize );
+	cfileBar->setValue( io->fWritten );
+};
+
+void NBIOWidget::cancelIO() {
+
+	io->resume();
+	io->cancel();
+	close();
+};
+
+NBIOManager::NBIOManager( QList<NBFileIO*> jobList ) : NBDialog( "nxc" ) {
+
+	ioList = jobList;
+
+	QScrollArea *scroller = new QScrollArea();
+	scroller->setWidgetResizable( true );
+	// scroller->setStyleSheet( "border-top: 1px solid gray;" );
+
+	QWidget *baseWidget = new QWidget();
+	QVBoxLayout *baseLyt = new QVBoxLayout();
+	baseLyt->setContentsMargins( QMargins() );
+
+	foreach( NBFileIO *io, jobList ) {
+		NBIOWidget *iow = new NBIOWidget( io );
+		baseLyt->addWidget( iow );
+	}
+	baseLyt->addStretch( 0 );
+
+	baseWidget->setLayout( baseLyt );
+	scroller->setWidget( baseWidget );
+
+	QHBoxLayout *scrollLyt = new QHBoxLayout();
+	scrollLyt->setContentsMargins( QMargins() );
+	scrollLyt->addWidget( scroller );
+
+	setLayout( scrollLyt );
+	setAttribute( Qt::WA_DeleteOnClose );
+	setWindowModality( Qt::NonModal );
+
+	setDialogTitle( "NewBreeze IO Manager" );
+	setDialogIcon( QIcon( ":/icons/newbreeze,png" ) );
+
+	setMinimumSize( QSize( 800, 500 ) );
+};
+
+void NBIOManager::showCritical() {
+
+	killIOOnClose = true;
+	NBIOManager::show();
+};
+
+void NBIOManager::closeEvent( QCloseEvent *cEvent ) {
+
+	if ( killIOOnClose ) {
+		int reply = NBMessageDialog::question(
+			tr( "Cancel all pending IO?" ),
+			tr(
+				"Some file IO processes are still active. Do you want to cancel all the IO processes and close window?"
+				"To cancel press 'Yes'. Click 'No' to let the IO continue."
+			),
+			QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Yes << NBMessageDialog::No
+		);
+
+		if ( reply == NBMessageDialog::Yes ) {
+			Q_FOREACH( NBFileIO *io, ioList )
+				io->cancel();
+			cEvent->accept();
+		}
+
+		else {
+			cEvent->ignore();
+			return;
+		}
+	}
+
+	cEvent->accept();
+};
+
+NBIOManagerMini::NBIOManagerMini() : QFrame() {
 
 	checked = false;
 	jobList.clear();
 
 	totalF = 0;
+	ioManager = NULL;
 
 	painter = new QPainter();
 	setFixedSize( QSize( 128, 52 ) );
@@ -21,7 +228,7 @@ NBIOManager::NBIOManager() : QFrame() {
 	connect( timer, SIGNAL( timeout() ), this, SLOT( updateProgress() ) );
 };
 
-NBIOManager::~NBIOManager() {
+NBIOManagerMini::~NBIOManagerMini() {
 
 	if ( painter->isActive() )
 		painter->end();
@@ -29,34 +236,46 @@ NBIOManager::~NBIOManager() {
 	delete painter;
 };
 
-void NBIOManager::addJob( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {
+void NBIOManagerMini::addJob( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {
 
-	NBPasteDialog *pasteDialog = new NBPasteDialog();
-	pasteDialog->setSources( sourceList );
-	pasteDialog->setTarget( target );
-	pasteDialog->setIOMode( iomode );
+	if ( iomode == NBIOMode::ACopy ) {
+		qDebug() << "Alphabetical copy";
+		return;
+	}
 
-	connect( pasteDialog, SIGNAL( IOComplete() ), this, SLOT( handleJobComplete() ) );
+	NBFileIO *io = new NBFileIO();
+	io->setSources( sourceList );
+	io->setTarget( target );
+	io->setIOMode( iomode );
 
-	jobList << pasteDialog;
+	connect( io, SIGNAL( IOComplete() ), this, SLOT( handleJobComplete() ) );
 
-	QTimer::singleShot( 100, pasteDialog, SLOT( startWork() ) );
+	jobList << io;
+
+	QTimer::singleShot( 100, io, SLOT( performIO() ) );
 
 	manageTimer();
 };
 
-quint64 NBIOManager::activeJobs() {
+quint64 NBIOManagerMini::activeJobs() {
 
 	return jobList.count();
 };
 
-void NBIOManager::showAllIODialogs() {
+void NBIOManagerMini::showAllIODialogs() {
 
-	foreach( NBPasteDialog *pDialog, jobList )
-		pDialog->show();
+	if ( ioManager ) {
+		// qDebug() << "Attempting to show ioManager";
+		ioManager->showCritical();
+	}
+
+	else {
+		ioManager = new NBIOManager( jobList );
+		ioManager->showCritical();
+	}
 };
 
-void NBIOManager::paintEvent( QPaintEvent *pEvent ) {
+void NBIOManagerMini::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->begin( this );
 	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
@@ -101,36 +320,35 @@ void NBIOManager::paintEvent( QPaintEvent *pEvent ) {
 	pEvent->accept();
 };
 
-void NBIOManager::mousePressEvent( QMouseEvent *mEvent ) {
+void NBIOManagerMini::mousePressEvent( QMouseEvent *mEvent ) {
 
 	if ( checked ) {
-		foreach( NBPasteDialog *pDialog, jobList )
-			pDialog->hide();
+		ioManager->close();
+		ioManager = NULL;
 
 		checked = false;
 		repaint();
 	}
 
 	else {
-		if ( jobList.count() ) {
-			foreach( NBPasteDialog *pDialog, jobList )
-				pDialog->show();
+		ioManager = new NBIOManager( jobList );
+		connect( ioManager, SIGNAL( destroyed() ), this, SLOT( uncheck() ) );
+		ioManager->show();
 
-			checked = true;
-			repaint();
-		}
+		checked = true;
+		repaint();
 	}
 
 	mEvent->accept();
 };
 
-void NBIOManager::uncheck() {
+void NBIOManagerMini::uncheck() {
 
 	checked = false;
 	repaint();
 };
 
-void NBIOManager::manageTimer() {
+void NBIOManagerMini::manageTimer() {
 
 	// If there are jobs still running,
 	if ( activeJobs() ) {
@@ -147,26 +365,25 @@ void NBIOManager::manageTimer() {
 	}
 };
 
-void NBIOManager::updateProgress() {
+void NBIOManagerMini::updateProgress() {
 
 	qreal totalP = 0;
 	if ( activeJobs() ) {
-		foreach( NBPasteDialog *pDialog, jobList ) {
-			totalP += pDialog->progress();
+		foreach( NBFileIO *io, jobList ) {
+			totalP += io->copiedSize * 1.0 / io->totalSize;
 		}
-		totalF = ( totalP / 100.0 ) / jobList.count();
+		totalF = totalP / jobList.count();
 	}
 
 	manageTimer();
 	repaint();
 };
 
-void NBIOManager::handleJobComplete() {
+void NBIOManagerMini::handleJobComplete() {
 
-	NBPasteDialog *pDialog = qobject_cast<NBPasteDialog*>( sender() );
-	pDialog->close();
-	QStringList errors = pDialog->errorNodes();
-	NBIOMode::Mode mode = pDialog->ioMode();
+	NBFileIO *io = qobject_cast<NBFileIO*>( sender() );
+	QStringList errors = io->errors();
+	NBIOMode::Mode mode = io->ioMode();
 
 	if ( errors.count() ) {
 		QString title = QString( "Error %1 files" ).arg( ( mode == NBIOMode::Copy ) ? "copying" : "moving" );
@@ -189,8 +406,7 @@ void NBIOManager::handleJobComplete() {
 		NBMessageDialog::error( title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok, errorList );
 	}
 
-	pDialog->deleteLater();
-	jobList.removeOne( pDialog );
+	jobList.removeOne( io );
 
 	manageTimer();
 	repaint();

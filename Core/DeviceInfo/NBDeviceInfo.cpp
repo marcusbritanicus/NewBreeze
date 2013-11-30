@@ -5,8 +5,24 @@
 */
 
 #include <NBDeviceInfo.hpp>
-#include <NBTools.hpp>
 #include <sys/statvfs.h>
+#include <sys/stat.h>
+
+inline QString readLink( QString path ) {
+
+	char linkTarget[ 1024 ] = { 0 };
+	readlink( qPrintable( path ), linkTarget, 1023 );
+
+	return QString( linkTarget );
+};
+
+inline QString baseName( QString path ) {
+
+	if ( path.endsWith( "/" ) )
+		path.chop( 1 );
+
+	return QString( basename( strdup( qPrintable( path ) ) ) );
+};
 
 NBDeviceManager::NBDeviceManager() {
 };

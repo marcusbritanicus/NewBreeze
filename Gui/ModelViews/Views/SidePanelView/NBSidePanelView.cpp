@@ -36,8 +36,8 @@ void NBSidePanel::setupView() {
 	setSelectionMode( QTreeView::NoSelection );
 
 	// By default set both Devices and Bookmarks to previous state
-	setExpanded( spModel->index( 0, 0 ), Settings->Session.ExpandDevices );
-	setExpanded( spModel->index( 1, 0 ), Settings->Session.ExpandBookmarks );
+	setExpanded( spModel->index( 3, 0 ), Settings->Session.ExpandDevices );
+	setExpanded( spModel->index( 4, 0 ), Settings->Session.ExpandBookmarks );
 
 	// Fixed Width
 	setFixedWidth( sizeHintForColumn( 0 ) );
@@ -47,18 +47,21 @@ void NBSidePanel::setupView() {
 
 	// DragAndDrop
 	viewport()->setAcceptDrops(true);
+
 	setDragDropMode( QListView::DragDrop );
 	setDropIndicatorShown( true );
+
 	setDragEnabled( true );
 	setAcceptDrops( true );
 };
 
 void NBSidePanel::updateDevices() {
 
-	setExpanded( spModel->index( 0, 0 ), false );
+	setExpanded( spModel->index( 3, 0 ), false );
 	spModel->updateDeviceData();
-	setExpanded( spModel->index( 0, 0 ), Settings->Session.ExpandDevices );
-	setExpanded( spModel->index( 1, 0 ), Settings->Session.ExpandBookmarks );
+
+	setExpanded( spModel->index( 3, 0 ), Settings->Session.ExpandDevices );
+	setExpanded( spModel->index( 4, 0 ), Settings->Session.ExpandBookmarks );
 
 	resizeColumnToContents( 0 );
 	setFixedWidth( sizeHintForColumn( 0 ) );
@@ -66,11 +69,11 @@ void NBSidePanel::updateDevices() {
 
 void NBSidePanel::updateBookmarks() {
 
-	setExpanded( spModel->index( 1, 0 ), false );
+	setExpanded( spModel->index( 4, 0 ), false );
 	spModel->updateBookmarkData();
-	setExpanded( spModel->index( 1, 0 ), true );
-	setExpanded( spModel->index( 0, 0 ), Settings->Session.ExpandDevices );
-	setExpanded( spModel->index( 1, 0 ), Settings->Session.ExpandBookmarks );
+
+	setExpanded( spModel->index( 3, 0 ), Settings->Session.ExpandDevices );
+	setExpanded( spModel->index( 4, 0 ), Settings->Session.ExpandBookmarks );
 
 	resizeColumnToContents( 0 );
 	setFixedWidth( sizeHintForColumn( 0 ) );
@@ -78,12 +81,19 @@ void NBSidePanel::updateBookmarks() {
 
 void NBSidePanel::handleClick( const QModelIndex clickedIndex ) {
 
-	if ( ( clickedIndex.parent() == spModel->parent() ) and ( clickedIndex.row() == 2 ) )
+	/* First logical row is show folders switch */
+	if ( ( clickedIndex.parent() == spModel->parent() ) and ( clickedIndex.row() == 0 ) )
+		emit showFolders();
+
+	/* Second logical row is Applications */
+	else if ( ( clickedIndex.parent() == spModel->parent() ) and ( clickedIndex.row() == 1 ) )
 		emit specialUrl( clickedIndex.data( Qt::UserRole + 1 ).toString() );
 
-	else if ( ( clickedIndex.parent() == spModel->parent() ) and ( clickedIndex.row() == 3 ) )
+	/* Third logical row is Catalogs */
+	else if ( ( clickedIndex.parent() == spModel->parent() ) and ( clickedIndex.row() == 2 ) )
 		emit specialUrl( clickedIndex.data( Qt::UserRole + 1 ).toString() );
 
+	/* All others are devices or book marks */
 	else if ( clickedIndex.parent() != spModel->parent() )
 		emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
 };
@@ -147,6 +157,13 @@ void NBSidePanel::dropEvent( QDropEvent *dpEvent ) {
 
 			foreach( QString node, args )
 				QFile::link( node, QDir( mtpt ).filePath( baseName( node ) ) );
+		}
+
+		else if ( dpEvent->keyboardModifiers() == ( Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier ) ) {
+
+			qDebug() << "Ctrl+Shift+Alt+Drop. Alphabetical Copy activated";
+			QProcess::startDetached( "sh", QStringList() << "find -type f -print0 | sort -z | cpio -0 -pd " + mtpt )
+			emit copy( args, mtpt, NBIOMode::ACopy );
 		}
 
 		else {

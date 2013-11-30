@@ -79,7 +79,6 @@ void NBFolderFlash::keyPressEvent( QKeyEvent *keyEvent ) {
 
 void NBFolderFlash::loadFolder() {
 
-	// Signal the parent to load this folder
-	// QProcess::startDetached( "xdg-open " + path );
+	emit loadFolder( path );
 	close();
 };

@@ -797,12 +797,7 @@ void NBCatalogView::openCatalogItem(const QModelIndex &index ) {
 
 void NBCatalogView::showContextMenu( const QPoint &point ) {
 
-	QMenu *menu = new QMenu();
-
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		menu->setAttribute( Qt::WA_TranslucentBackground );
-
-	menu->setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
+	NBMenu *menu = new NBMenu();
 
 	QAction *openAct = new QAction( QIcon(), "&Open Location", this );
 	connect( openAct, SIGNAL( triggered() ), this, SLOT( openCatalogItem() ) );

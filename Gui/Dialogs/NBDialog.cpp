@@ -1,17 +1,10 @@
 /*
 	*
-	* NBDialog.cpp - NBDialog Class
+	* NBDialog.cpp - NewBreeze Dialog Class
 	*
 */
 
-#include <QtGui>
-#include <QtCore>
-
 #include <NBDialog.hpp>
-#include <NBTools.hpp>
-#include <NBGuiWidgets.hpp>
-
-using namespace std;
 
 NBDialog::NBDialog( QString btns ) : QWidget() {
 
@@ -34,48 +27,32 @@ void NBDialog::setupGUI() {
 	QVBoxLayout *baseLyt = new QVBoxLayout();
 	QHBoxLayout *titleLyt = new QHBoxLayout();
 
-	if ( buttons.count( "c" ) ) {
-		closeBtn = new QToolButton();
-		closeBtn->setObjectName( tr( "closeBtn" ) );
-		closeBtn->setText( trUtf8( "\u2718" ) );
-		closeBtn->setFocusPolicy( Qt::NoFocus );
-		connect( closeBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
-	}
+	bool minBtn = false, maxBtn = false, clsBtn = false;
 
-	if ( buttons.count( "n" ) ) {
-		minBtn = new QToolButton();
-		minBtn->setObjectName( tr( "minBtn" ) );
-		minBtn->setText( trUtf8( "\u25AC" ) );
-		minBtn->setFocusPolicy( Qt::NoFocus );
-		connect( minBtn, SIGNAL( clicked() ), this, SLOT( showMinimized() ) );
-	}
+	if ( buttons.count( "n" ) )
+		minBtn = true;
 
-	if ( buttons.count( "x" ) ) {
-		maxBtn = new QToolButton();
-		maxBtn->setObjectName( tr( "maxBtn" ) );
-		maxBtn->setText( trUtf8( "\u25A1" ) );
-		maxBtn->setFocusPolicy( Qt::NoFocus );
-		connect( maxBtn, SIGNAL( clicked() ), this, SLOT( maxBtnClicked() ) );
-	}
+	if ( buttons.count( "x" ) )
+		maxBtn = true;
+
+	if ( buttons.count( "c" ) )
+		clsBtn = true;
+
+	actBtns = new NBActionButtons( minBtn, maxBtn, clsBtn );
+	connect( actBtns, SIGNAL( minimizeWindow() ), this, SLOT( showMinimized() ) );
+	connect( actBtns, SIGNAL( maximizeWindow() ), this, SLOT( maxBtnClicked() ) );
+	connect( actBtns, SIGNAL( closeWindow() ), this, SLOT( close() ) );
 
 	titleLbl = new QLabel( "<b><h3>NBDialog</h3><b>" );
 
 	titleLyt->addStretch( 0 );
 	titleLyt->addWidget( titleLbl );
 	titleLyt->addStretch( 0 );
-
-	if ( buttons.count( "n" ) )
-		titleLyt->addWidget( minBtn );
-
-	if ( buttons.count( "x" ) )
-		titleLyt->addWidget( maxBtn );
-
-	if ( buttons.count( "c" ) )
-		titleLyt->addWidget( closeBtn );
+	titleLyt->addWidget( actBtns );
 
 	if ( not Settings->General.NativeTitleBar ) {
 		baseLyt->addLayout( titleLyt );
-		// baseLyt->addWidget( Separator::horizontal() );
+		baseLyt->addWidget( Separator::horizontal() );
 	}
 	baseLyt->addWidget( BodyFrame );
 

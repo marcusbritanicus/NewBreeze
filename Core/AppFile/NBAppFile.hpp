@@ -18,6 +18,7 @@
 #include <QMap>
 
 #include <libgen.h>
+#include <NBXdg.hpp>
 
 class NBAppFile {
 
@@ -107,6 +108,8 @@ class NBAppsList {
 		void move( int, int );
 
 		NBAppFile at( quint64 );
+		int indexOf( NBAppFile );
+		void insert( int, NBAppFile );
 
 		bool contains( NBAppFile );
 		void removeDuplicates();
