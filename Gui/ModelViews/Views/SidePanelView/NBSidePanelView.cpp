@@ -162,7 +162,7 @@ void NBSidePanel::dropEvent( QDropEvent *dpEvent ) {
 		else if ( dpEvent->keyboardModifiers() == ( Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier ) ) {
 
 			qDebug() << "Ctrl+Shift+Alt+Drop. Alphabetical Copy activated";
-			QProcess::startDetached( "sh", QStringList() << "find -type f -print0 | sort -z | cpio -0 -pd " + mtpt )
+			QProcess::startDetached( "sh", QStringList() << "find -type f -print0 | sort -z | cpio -0 -pd " + mtpt );
 			emit copy( args, mtpt, NBIOMode::ACopy );
 		}
 

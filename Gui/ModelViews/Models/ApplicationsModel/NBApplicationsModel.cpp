@@ -6,15 +6,6 @@
 
 #include <NBApplicationsModel.hpp>
 
-inline bool matchesFilter( QStringList filters, QString text ) {
-
-	foreach( QString filter, filters )
-		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
-			return true;
-
-	return false;
-};
-
 NBApplicationsModel::NBApplicationsModel() : QAbstractItemModel() {
 
 	appEngine = NBAppEngine::instance();

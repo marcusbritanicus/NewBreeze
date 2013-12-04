@@ -6,15 +6,6 @@
 
 #include <NBCatalogModel.hpp>
 
-inline bool matchesFilter( QStringList filters, QString text ) {
-
-	foreach( QString filter, filters )
-		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
-			return true;
-
-	return false;
-};
-
 NBCatalogModel::NBCatalogModel() : QAbstractItemModel() {
 
 	rootItem = new NBCatalogItem();
