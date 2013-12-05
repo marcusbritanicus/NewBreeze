@@ -41,6 +41,7 @@
 		<file>icons/folder-locked.png</file>
 		<file>icons/folder.png</file>
 		<file>icons/folders.png</file>
+		<file>icons/groups.png</file>
 		<file>icons/hdd.png</file>
 		<file>icons/hidden.png</file>
 		<file>icons/home.png</file>
@@ -82,6 +83,7 @@
 		<file>icons/search.png</file>
 		<file>icons/select1.png</file>
 		<file>icons/selectall.png</file>
+		<file>icons/size.png</file>
 		<file>icons/square-minus.png</file>
 		<file>icons/square-plus.png</file>
 		<file>icons/stop.png</file>

@@ -8,6 +8,7 @@
 #define NBIMAGEPEEK_HPP
 
 #include <Global.hpp>
+#include <NBTools.hpp>
 
 class NBImagePeek : public QWidget {
 	Q_OBJECT

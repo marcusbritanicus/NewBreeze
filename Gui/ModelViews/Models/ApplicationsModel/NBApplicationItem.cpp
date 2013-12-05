@@ -10,8 +10,8 @@ QStringList NBApplicationItem::categoryList = QStringList();
 
 bool categorySorter( NBApplicationItem *first, NBApplicationItem *second ) {
 
-	int firstIdx = NBApplicationItem::categoryList.indexOf( first->category() );
-	int secondIdx = NBApplicationItem::categoryList.indexOf( second->category() );
+	int firstIdx = first->categoryIndex();
+	int secondIdx = second->categoryIndex();
 
 	if ( firstIdx > secondIdx )
 		return false;

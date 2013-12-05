@@ -8,6 +8,7 @@
 #define NBWEBWATCH_HPP
 
 #include <Global.hpp>
+#include <NBTools.hpp>
 #include <QtWebKit>
 
 class NBWebWatch : public QWidget {

@@ -11,6 +11,7 @@
 #include <NBGuiWidgets.hpp>
 #include <NBIOManager.hpp>
 #include <NBIconProvider.hpp>
+#include <NBTools.hpp>
 
 class NBInfoBar : public QWidget {
 	Q_OBJECT

@@ -10,6 +10,7 @@
 #include <Global.hpp>
 #include <NBDialog.hpp>
 #include <NBGuiWidgets.hpp>
+#include <NBTools.hpp>
 
 class NBCustomActions : public NBDialog {
 	Q_OBJECT

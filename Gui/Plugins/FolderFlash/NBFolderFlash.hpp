@@ -9,6 +9,7 @@
 
 #include <Global.hpp>
 #include <NBFolderViewRestricted.hpp>
+#include <NBTools.hpp>
 
 class NBFolderFlash : public QWidget {
 	Q_OBJECT

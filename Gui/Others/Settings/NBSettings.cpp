@@ -40,6 +40,9 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->Session.Maximized = true;
 	defaultSettings->Session.SidePanel = true;
 	defaultSettings->Session.ShowHidden = false;
+	defaultSettings->Session.SortColumn = 0;
+	defaultSettings->Session.SortCase = false;
+	defaultSettings->Session.SortCategory = false;
 	defaultSettings->Session.ExpandDevices = true;
 	defaultSettings->Session.ExpandBookmarks = true;
 
@@ -140,6 +143,15 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "Session/ShowHidden" ) ) )
 		settings->Session.ShowHidden = gSettings.value( "Session/ShowHidden" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/SortColumn" ) ) )
+		settings->Session.SortColumn = gSettings.value( "Session/SortColumn" ).toInt();
+
+	if ( gaKeys.contains( QString( "Session/SortCase" ) ) )
+		settings->Session.SortCase = gSettings.value( "Session/SortCase" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/SortCategory" ) ) )
+		settings->Session.SortCategory = gSettings.value( "Session/SortCategory" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/ExpandDevices" ) ) )
 		settings->Session.ExpandDevices = gSettings.value( "Session/ExpandDevices" ).toBool();
@@ -298,6 +310,15 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "Session/ShowHidden" ) ) )
 		Session.ShowHidden = gSettings.value( "Session/ShowHidden" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/SortColumn" ) ) )
+		Session.SortColumn = gSettings.value( "Session/SortColumn" ).toInt();
+
+	if ( gaKeys.contains( QString( "Session/SortCase" ) ) )
+		Session.SortCase = gSettings.value( "Session/SortCase" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/SortCategory" ) ) )
+		Session.SortCategory = gSettings.value( "Session/SortCategory" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/ExpandDevices" ) ) )
 		Session.ExpandDevices = gSettings.value( "Session/ExpandDevices" ).toBool();

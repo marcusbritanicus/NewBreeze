@@ -8,6 +8,7 @@
 #define NBGUIWIDGETS_HPP
 
 #include <Global.hpp>
+#include <NBTools.hpp>
 
 class NBSearchBar : public QWidget {
 	Q_OBJECT
@@ -107,13 +108,16 @@ class NBViewModeButton: public QToolButton {
 
 	public:
 		NBViewModeButton();
-		QRadioButton *smallListBtn, *mediumListBtn, *tilesBtn, *smallIconsBtn, *normalIconsBtn, *largeIconsBtn, *hugeIconsBtn;
-		QRadioButton *smallDetailsBtn, *normalDetailsBtn;
-		QWidgetAction *smallListAct, *mediumListAct, *tilesAct, *smallIconsAct, *normalIconsAct, *largeIconsAct, *hugeIconsAct;
-		QWidgetAction *smallDetailsAct, *normalDetailsAct;
+		int checkedAction();
 
-	// private slots:
-		// void actionHandler();
+	private :
+		QAction *smallListAct, *mediumListAct, *tilesAct, *smallIconsAct, *normalIconsAct, *largeIconsAct, *hugeIconsAct;
+		QAction *smallDetailsAct, *normalDetailsAct;
+
+		QActionGroup *viewsGroup;
+
+	public slots:
+		void showMenu();
 
 	Q_SIGNALS:
 		void changeViewMode();

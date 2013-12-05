@@ -5,9 +5,8 @@
 */
 
 #include <NBFileSystemModel.hpp>
-#include <NBTools.cpp>
 
-inline bool matchesFilter( QStringList filters, QString text ) {
+inline bool matchesFilter2( QStringList filters, QString text ) {
 
 	foreach( QString filter, filters )
 		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
@@ -24,7 +23,8 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 	oldRoots.clear();
 	curIndex = 0;
 
-	rootNode = new NBFileSystemNode( QVariantList() );
+	rootNode = new NBFileSystemNode();
+
 	quickDataGatherer = new NBQuickFileInfoGatherer();
 
 	watcher = new NBFileSystemWatcher();
@@ -41,6 +41,17 @@ NBFileSystemModel::~NBFileSystemModel() {
 
 };
 
+bool NBFileSystemModel::isCategorizationEnabled() {
+
+	return mCategorizationEnabled;
+};
+
+void NBFileSystemModel::setCategorizationEnabled( bool enabled ) {
+
+	mCategorizationEnabled = enabled;
+	sort( prevSort.column, prevSort.cs, enabled );
+};
+
 int NBFileSystemModel::rowCount( const QModelIndex & parent ) const {
 
 	if ( parent.column() > 0 )
@@ -51,6 +62,19 @@ int NBFileSystemModel::rowCount( const QModelIndex & parent ) const {
 
 	else
 		return static_cast<NBFileSystemNode*>( parent.internalPointer() )->childCount();
+};
+
+int NBFileSystemModel::rowCount( QString mCategory ) const {
+
+	if ( not rootNode->categoryList.contains( mCategory ) or mCategory.isEmpty() or mCategory.isNull() )
+		return 0;
+
+	return categoryRowMap[ mCategory ].count();
+};
+
+int NBFileSystemModel::categoryCount() const {
+
+	return rootNode->categoryCount();
 };
 
 int NBFileSystemModel::columnCount( const QModelIndex & parent ) const {
@@ -189,35 +213,38 @@ bool NBFileSystemModel::insertNode( QString nodeName ) {
 
 	beginResetModel();
 	beginInsertRows( parent(), __childNames.count(), __childNames.count() );
+
+	QVariantList data = quickDataGatherer->getQuickFileInfo( __rootPath + nodeName );
+
 	if ( __showHidden ) {
 		if ( __nameFilters.count() ) {
-			if ( matchesFilter( __nameFilters, nodeName ) ) {
-				rootNode->appendChild( new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath + nodeName ), rootNode ) );
+			if ( matchesFilter2( __nameFilters, nodeName ) ) {
+				rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 				__childNames << nodeName;
 			}
 		}
 		else {
-			rootNode->appendChild( new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath + nodeName ), rootNode ) );
+			rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 			__childNames << nodeName;
 		}
 	}
 	else {
 		if ( not nodeName.startsWith( "." ) ) {
 			if ( __nameFilters.count() ) {
-				if ( matchesFilter( __nameFilters, nodeName ) ) {
-					rootNode->appendChild( new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath + nodeName ), rootNode ) );
+				if ( matchesFilter2( __nameFilters, nodeName ) ) {
+					rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 					__childNames << nodeName;
 				}
 			}
 			else {
-				rootNode->appendChild( new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath + nodeName ), rootNode ) );
+				rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 				__childNames << nodeName;
 			}
 		}
 	}
 	endInsertRows();
 
-	sort( prevSort.column, prevSort.cs, prevSort.dirsFirst );
+	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 	endResetModel();
 
 	NBFileInfoGatherer *ig = new NBFileInfoGatherer();
@@ -324,6 +351,71 @@ QModelIndex NBFileSystemModel::parent( const QModelIndex &index ) const {
 	return createIndex( parentNode->row(), 0, parentNode );
 };
 
+QString NBFileSystemModel::category( const QModelIndex &index ) const {
+
+	if ( not index.isValid() )
+		return QString();
+
+	NBFileSystemNode *childItem = ( NBFileSystemNode * )index.internalPointer();
+	return childItem->category();
+};
+
+int NBFileSystemModel::categoryIndex( const QModelIndex &index ) const {
+
+	if ( not index.isValid() )
+		return -1;
+
+	NBFileSystemNode *childItem = ( NBFileSystemNode * )index.internalPointer();
+	return childItem->categoryIndex();
+};
+
+QStringList NBFileSystemModel::categories() const {
+
+	return rootNode->categoryList;
+};
+
+void NBFileSystemModel::hideCategory( QString mCategory ) {
+
+	if ( rootNode->categoryList.contains( mCategory ) )
+		categoryVisibilityMap[ mCategory ] = false;
+};
+
+void NBFileSystemModel::showCategory( QString mCategory ) {
+
+	if ( rootNode->categoryList.contains( mCategory ) )
+		categoryVisibilityMap[ mCategory ] = true;
+};
+
+bool NBFileSystemModel::isCategoryVisible( QString mCategory ) const {
+
+	if ( rootNode->categoryList.contains( mCategory ) )
+		return categoryVisibilityMap[ mCategory ];
+
+	return false;
+};
+
+int NBFileSystemModel::indexListCountForCategory( QString mCategory ) const {
+
+	if ( not rootNode->categoryList.contains( mCategory ) or mCategory.isEmpty() or mCategory.isNull() )
+		return 0;
+
+	return categoryRowMap[ mCategory ].count();
+};
+
+QModelIndexList NBFileSystemModel::indexListForCategory( QString mCategory ) const {
+
+	QModelIndexList mList;
+
+	if ( not rootNode->categoryList.contains( mCategory ) or mCategory.isEmpty() or mCategory.isNull() )
+		return mList;
+
+	foreach( int row, categoryRowMap[ mCategory ] ) {
+		mList << index( row, 0, QModelIndex() );
+	}
+
+	return mList;
+};
+
 bool NBFileSystemModel::showHidden() const {
 
 	return __showHidden;
@@ -405,13 +497,39 @@ void NBFileSystemModel::clearNameFilters() {
 	setupModelData();
 };
 
-void NBFileSystemModel::sort( int column, bool cs, bool dirsFirst ) {
+void NBFileSystemModel::sort( int column, bool cs, bool categorized ) {
 
 	prevSort.column = column;
 	prevSort.cs = cs;
-	prevSort.dirsFirst = dirsFirst;
+	prevSort.categorized = categorized;
 
-	rootNode->sort( column, cs, dirsFirst );
+	recategorize();
+	rootNode->sort( column, cs, categorized );
+
+	// Create a map of categoryIdndex versus rows
+	categoryRowMap.clear();
+	foreach( NBFileSystemNode *item, rootNode->children() )
+		categoryRowMap[ item->category() ] << item->row();
+
+	foreach( QString mCategory, rootNode->categoryList )
+		categoryVisibilityMap[ mCategory ] = true;
+
+	emit directoryLoaded( __rootPath );
+};
+
+int NBFileSystemModel::sortColumn() const {
+
+	return prevSort.column;
+};
+
+bool NBFileSystemModel::sortCaseSensitivity() const {
+
+	return prevSort.cs;
+};
+
+bool NBFileSystemModel::sortCategorized() const {
+
+	return prevSort.categorized;
 };
 
 void NBFileSystemModel::reload() {
@@ -506,7 +624,7 @@ void NBFileSystemModel::setRootPath( QString path ) {
 
 	delete rootNode;
 
-	rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( path ) );
+	rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( path ), "" );
 	if ( curentLoadStatus.loading )
 		curentLoadStatus.stopLoading = true;
 
@@ -526,7 +644,7 @@ void NBFileSystemModel::goBack() {
 		__rootPath = oldRoots[ curIndex ];
 
 		delete rootNode;
-		rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath ) );
+		rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath ), "" );
 
 		setupModelData();
 	}
@@ -540,7 +658,7 @@ void NBFileSystemModel::goForward() {
 		__rootPath = oldRoots.at( curIndex );
 
 		delete rootNode;
-		rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath ) );
+		rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath ), "" );
 
 		setupModelData();
 	}
@@ -635,28 +753,29 @@ void NBFileSystemModel::setupModelData() {
 			if ( ( nodeName.compare( "." ) == 0 ) or ( nodeName.compare( ".." ) == 0 ) )
 				continue;
 
+			QVariantList data = quickDataGatherer->getQuickFileInfo( __rootPath + nodeName );
 			if ( __showHidden ) {
 				if ( __nameFilters.count() ) {
-					if ( matchesFilter( __nameFilters, nodeName ) ) {
-						rootNode->appendChild( new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath + nodeName ), rootNode ) );
+					if ( matchesFilter2( __nameFilters, nodeName ) ) {
+						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 						__childNames << nodeName;
 					}
 				}
 				else {
-					rootNode->appendChild( new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath + nodeName ), rootNode ) );
+					rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 					__childNames << nodeName;
 				}
 			}
 			else {
 				if ( not nodeName.startsWith( "." ) ) {
 					if ( __nameFilters.count() ) {
-						if ( matchesFilter( __nameFilters, nodeName ) ) {
-							rootNode->appendChild( new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath + nodeName ), rootNode ) );
+						if ( matchesFilter2( __nameFilters, nodeName ) ) {
+							rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 							__childNames << nodeName;
 						}
 					}
 					else {
-						rootNode->appendChild( new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath + nodeName ), rootNode ) );
+						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 						__childNames << nodeName;
 					}
 				}
@@ -667,12 +786,79 @@ void NBFileSystemModel::setupModelData() {
 	}
 	endResetModel();
 
-	sort( prevSort.column, prevSort.cs, prevSort.dirsFirst );
+	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
 	curentLoadStatus.loading = false;
 
 	emit loadFileInfo();
 	emit directoryLoaded( __rootPath );
+};
+
+QString NBFileSystemModel::getCategory( QVariantList data ) {
+
+	switch( prevSort.column ) {
+		/* Name Sorting */
+		case 0: {
+			return data.at( 3 ).toString().toUpper().at( 0 );
+		}
+
+		/* Size Sorting */
+		/* Separate directories from files */
+		case 1: {
+			/* Folders */
+			if ( data.at( 0 ).toString() == "dir" )
+				return "Folders";
+			/* 0 - 100 kB */
+			if ( data.at( 1 ).toLongLong() < 102400 )
+				return "Tiny";
+			/* 100 kB - 10 MB */
+			if ( data.at( 1 ).toLongLong() < 10485760 )
+				return "Small";
+			/* 10 MB - 100 MB */
+			if ( data.at( 1 ).toLongLong() < 104857600 )
+				return "Medium";
+			/* 100 MB - 1 GB */
+			if ( data.at( 1 ).toLongLong() < 1073741824 )
+				return "Large";
+			/* 0 - 100 kB */
+			if ( data.at( 1 ).toLongLong() >= 1073741824 )
+				return "Massive";
+		}
+
+		/* Type Sorting */
+		case 2: {
+			if ( data.at( 0 ).toString() == "dir" ) {
+				return "Folders";
+			}
+
+			if ( data.at( 0 ).toString() == "file" ) {
+				return data.at( 5 ).toString();
+			}
+
+			if ( data.at( 0 ).toString() == "system" ) {
+				return "System Files";
+			}
+		}
+
+		case 4: {
+			QDate date = QDate::fromString( data.at( 7 ).toString(), "ddd, dd MMM, yyyy" );
+			return date.toString( "MMMM yyyy" );
+		}
+
+		default: {
+			return QString( "Uncategorized" );
+		}
+	}
+
+	return QString( "Uncategorized" );
+};
+
+void NBFileSystemModel::recategorize() {
+
+	foreach( NBFileSystemNode *node, rootNode->children() ) {
+		node->setCategory( getCategory( node->allData() ) );
+	}
+	rootNode->updateCategories();
 };
 
 void NBFileSystemModel::gatherFileInfo() {
@@ -707,6 +893,9 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 	node->setData( 2, info.at( 0 ), true );
 	node->setData( 2, info.at( 1 ), false );
 	node->setData( 3, info.at( 2 ), false );
+
+	if ( prevSort.column == 2 )
+		sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
 	emit dataChanged( idx, idx );
 };

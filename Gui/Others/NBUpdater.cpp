@@ -60,53 +60,10 @@ void NewBreeze::changeViewMode() {
 	viewModes << "SmallIconsView" << "NormalIconsView" << "LargeIconsView" << "HugeIconsView";
 	viewModes << "SDetailsView" << "NDetailsView";
 
-	if ( AddressBar->viewModeBtn->smallListBtn->isChecked() )
-		Settings->General.FolderView = viewModes.at( 0 );
-
-	else if ( AddressBar->viewModeBtn->mediumListBtn->isChecked() )
-		Settings->General.FolderView = viewModes.at( 1 );
-
-	else if ( AddressBar->viewModeBtn->tilesBtn->isChecked() )
-		Settings->General.FolderView = viewModes.at( 2 );
-
-	else if ( AddressBar->viewModeBtn->smallIconsBtn->isChecked() )
-		Settings->General.FolderView = viewModes.at( 3 );
-
-	else if ( AddressBar->viewModeBtn->normalIconsBtn->isChecked() )
-		Settings->General.FolderView = viewModes.at( 4 );
-
-	else if ( AddressBar->viewModeBtn->largeIconsBtn->isChecked() )
-		Settings->General.FolderView = viewModes.at( 5 );
-
-	else if ( AddressBar->viewModeBtn->hugeIconsBtn->isChecked() )
-		Settings->General.FolderView = viewModes.at( 6 );
-
-	else if ( AddressBar->viewModeBtn->smallDetailsBtn->isChecked() )
-		Settings->General.FolderView = viewModes.at( 7 );
-
-	else if ( AddressBar->viewModeBtn->normalDetailsBtn->isChecked() )
-		Settings->General.FolderView = viewModes.at( 8 );
+	Settings->General.FolderView = viewModes.at( AddressBar->viewModeBtn->checkedAction() );
 
 	Settings->setValue( "FolderView", Settings->General.FolderView );
 	Settings->reload();
-
-	int fvcWidth = FolderView->size().width();
-
-	if ( FolderView->currentIndex() ) {
-		fvcWidth -= FolderView->TreeView->contentsMargins().left();
-		fvcWidth -= FolderView->TreeView->contentsMargins().right();
-		fvcWidth -= FolderView->TreeView->autoScrollMargin();
-		fvcWidth -= FolderView->TreeView->verticalScrollBar()->width();
-	}
-	else {
-		fvcWidth -= FolderView->IconView->contentsMargins().left();
-		fvcWidth -= FolderView->IconView->contentsMargins().right();
-		fvcWidth -= FolderView->IconView->autoScrollMargin();
-		fvcWidth -= FolderView->IconView->verticalScrollBar()->width();
-	}
-
-	FolderView->setContentsWidth( fvcWidth );
-	FolderView->updateViewMode();
 
 	FolderView->updateViewMode();
 };
@@ -126,23 +83,21 @@ void NewBreeze::switchToNextView() {
 	Settings->setValue( "FolderView", viewModes.at( newIndex ) );
 	Settings->reload();
 
-	int fvcWidth = FolderView->size().width();
+	FolderView->updateViewMode();
+};
 
-	if ( FolderView->currentIndex() ) {
-		fvcWidth -= FolderView->TreeView->contentsMargins().left();
-		fvcWidth -= FolderView->TreeView->contentsMargins().right();
-		fvcWidth -= FolderView->TreeView->autoScrollMargin();
-		fvcWidth -= FolderView->TreeView->verticalScrollBar()->width();
+void NewBreeze::toggleGrouping() {
+
+	if ( Settings->Session.SortCategory ) {
+		Settings->setValue( "Session/SortCategory", false );
+		Settings->reload();
 	}
+
 	else {
-		fvcWidth -= FolderView->IconView->contentsMargins().left();
-		fvcWidth -= FolderView->IconView->contentsMargins().right();
-		fvcWidth -= FolderView->IconView->autoScrollMargin();
-		fvcWidth -= FolderView->IconView->verticalScrollBar()->width();
+		Settings->setValue( "Session/SortCategory", true );
+		Settings->reload();
 	}
 
-	FolderView->setContentsWidth( fvcWidth );
-	FolderView->updateViewMode();
-
-	FolderView->updateViewMode();
+	FolderView->fsModel->setCategorizationEnabled( Settings->Session.SortCategory );
+	FolderView->groupsAct->setChecked( Settings->Session.SortCategory );
 };

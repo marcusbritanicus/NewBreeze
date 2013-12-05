@@ -36,7 +36,6 @@ class NBFolderView : public QStackedWidget {
 	public :
 		NBFolderView();
 
-		void setContentsWidth( int );
 		void updateViewMode();
 
 		QModelIndexList getSelection();
@@ -46,6 +45,7 @@ class NBFolderView : public QStackedWidget {
 		QAction *actPrevDir, *actNextDir, *actParDir, *actHomeDir, *showHideDotFiles, *openVTE;
 		QAction *actNewDir, *actNewFile;
 		QAction *sortByNameAct, *sortByTypeAct, *sortBySizeAct, *sortByDateAct;
+		QAction *groupsAct;
 
 		NBIconView *IconView;
 		NBTreeView *TreeView;
@@ -57,6 +57,7 @@ class NBFolderView : public QStackedWidget {
 		QModelIndex indexAt( QPoint );
 		void createAndSetupActions();
 
+		QClipboard *ClipBoard = qApp->clipboard();
 		bool moveItems;
 
 	public slots :
@@ -125,6 +126,7 @@ class NBFolderView : public QStackedWidget {
 		void showPermissions();
 
 		void reloadCatalogs();
+		void toggleGroups();
 };
 
 #endif

@@ -4,7 +4,6 @@
 	*
 */
 
-#include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
 
 NBSearchBar::NBSearchBar() : QWidget() {
@@ -175,107 +174,150 @@ NBViewModeButton::NBViewModeButton() : QToolButton() {
 	setIcon( QIcon( ":/icons/view-choose.png" ) );
 	setPopupMode( QToolButton::InstantPopup );
 
-	QMenu *menu = new QMenu( this );
 	connect( this, SIGNAL( clicked() ), this, SIGNAL( switchToNextView() ) );
 
-	smallListBtn = new QRadioButton( "Small List", this );
-	mediumListBtn = new QRadioButton( "Large List", this );
-	tilesBtn = new QRadioButton( "Tiles", this );
-	smallIconsBtn = new QRadioButton( "Small Icons", this );
-	normalIconsBtn = new QRadioButton( "Normal Icons", this );
-	largeIconsBtn = new QRadioButton( "Large Icons", this );
-	hugeIconsBtn = new QRadioButton( "Huge Icons", this );
-	smallDetailsBtn = new QRadioButton( "Small Details", this );
-	normalDetailsBtn = new QRadioButton( "Normal Details", this );
+	NBMenu *menu = new NBMenu( this );
 
-	smallListAct = new QWidgetAction( this );
-	smallListAct->setText( "Small List" );
-	smallListAct->setDefaultWidget( smallListBtn );
-	connect( smallListBtn, SIGNAL( clicked() ), this, SIGNAL( changeViewMode() ) );
-	connect( smallListBtn, SIGNAL( clicked() ), menu, SLOT( close() ) );
+	smallListAct = new QAction( "&Small List", this );
+	smallListAct->setCheckable( true );
+	connect( smallListAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	mediumListAct = new QWidgetAction( this );
-	mediumListAct->setDefaultWidget( mediumListBtn );
-	connect( mediumListBtn, SIGNAL( clicked() ), this, SIGNAL( changeViewMode() ) );
-	connect( mediumListBtn, SIGNAL( clicked() ), menu, SLOT( close() ) );
+	mediumListAct = new QAction( "&Large List", this );
+	mediumListAct->setCheckable( true );
+	connect( mediumListAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	tilesAct = new QWidgetAction( this );
-	tilesAct->setDefaultWidget( tilesBtn );
-	connect( tilesBtn, SIGNAL( clicked() ), this, SIGNAL( changeViewMode() ) );
-	connect( tilesBtn, SIGNAL( clicked() ), menu, SLOT( close() ) );
+	tilesAct = new QAction( "&Tiles", this );
+	tilesAct->setCheckable( true );
+	connect( tilesAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	smallIconsAct = new QWidgetAction( this );
-	smallIconsAct->setDefaultWidget( smallIconsBtn );
-	connect( smallIconsBtn, SIGNAL( clicked() ), this, SIGNAL( changeViewMode() ) );
-	connect( smallIconsBtn, SIGNAL( clicked() ), menu, SLOT( close() ) );
+	smallIconsAct = new QAction( "S&mall Icons", this );
+	smallIconsAct->setCheckable( true );
+	connect( smallIconsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	normalIconsAct = new QWidgetAction( this );
-	normalIconsAct->setDefaultWidget( normalIconsBtn );
-	connect( normalIconsBtn, SIGNAL( clicked() ), this, SIGNAL( changeViewMode() ) );
-	connect( normalIconsBtn, SIGNAL( clicked() ), menu, SLOT( close() ) );
+	normalIconsAct = new QAction( "&Normal Icons", this );
+	normalIconsAct->setCheckable( true );
+	connect( normalIconsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	largeIconsAct = new QWidgetAction( this );
-	largeIconsAct->setDefaultWidget( largeIconsBtn );
-	connect( largeIconsBtn, SIGNAL( clicked() ), this, SIGNAL( changeViewMode() ) );
-	connect( largeIconsBtn, SIGNAL( clicked() ), menu, SLOT( close() ) );
+	largeIconsAct = new QAction( "L&arge Icons", this );
+	largeIconsAct->setCheckable( true );
+	connect( largeIconsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	hugeIconsAct = new QWidgetAction( this );
-	hugeIconsAct->setDefaultWidget( hugeIconsBtn );
-	connect( hugeIconsBtn, SIGNAL( clicked() ), this, SIGNAL( changeViewMode() ) );
-	connect( hugeIconsBtn, SIGNAL( clicked() ), menu, SLOT( close() ) );
+	hugeIconsAct = new QAction( "&Huge Icons", this );
+	hugeIconsAct->setCheckable( true );
+	connect( hugeIconsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	smallDetailsAct = new QWidgetAction( this );
-	smallDetailsAct->setText( "Small List" );
-	smallDetailsAct->setDefaultWidget( smallDetailsBtn );
-	connect( smallDetailsBtn, SIGNAL( clicked() ), this, SIGNAL( changeViewMode() ) );
-	connect( smallDetailsBtn, SIGNAL( clicked() ), menu, SLOT( close() ) );
+	smallDetailsAct = new QAction( "Small &Details", this );
+	smallDetailsAct->setCheckable( true );
+	connect( smallDetailsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	normalDetailsAct = new QWidgetAction( this );
-	normalDetailsAct->setText( "normal List" );
-	normalDetailsAct->setDefaultWidget( normalDetailsBtn );
-	connect( normalDetailsBtn, SIGNAL( clicked() ), this, SIGNAL( changeViewMode() ) );
-	connect( normalDetailsBtn, SIGNAL( clicked() ), menu, SLOT( close() ) );
+	normalDetailsAct = new QAction( "La&rge Details", this );
+	normalDetailsAct->setCheckable( true );
+	connect( normalDetailsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	menu->setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
+	viewsGroup = new QActionGroup( this );
 
-	menu->addAction( smallListAct );
-	menu->addAction( mediumListAct );
-	menu->addAction( tilesAct );
-	menu->addAction( smallIconsAct );
-	menu->addAction( normalIconsAct );
-	menu->addAction( largeIconsAct );
-	menu->addAction( hugeIconsAct );
-	menu->addAction( smallDetailsAct );
-	menu->addAction( normalDetailsAct );
+	menu->addAction( viewsGroup->addAction( smallListAct ) );
+	menu->addAction( viewsGroup->addAction( mediumListAct ) );
+	menu->addAction( viewsGroup->addAction( tilesAct ) );
+	menu->addAction( viewsGroup->addAction( smallIconsAct ) );
+	menu->addAction( viewsGroup->addAction( normalIconsAct ) );
+	menu->addAction( viewsGroup->addAction( largeIconsAct ) );
+	menu->addAction( viewsGroup->addAction( hugeIconsAct ) );
+	menu->addAction( viewsGroup->addAction( smallDetailsAct ) );
+	menu->addAction( viewsGroup->addAction( normalDetailsAct ) );
 
 	setMenu( menu );
 
 	if ( Settings->General.FolderView == QString( "SmallListView" ) )
-		smallListBtn->setChecked( true );
+		smallListAct->setChecked( true );
 
 	else if ( Settings->General.FolderView == QString( "NormalListView" ) )
-		mediumListBtn->setChecked( true );
+		mediumListAct->setChecked( true );
 
 	else if ( Settings->General.FolderView == QString( "TilesView" ) )
-		tilesBtn->setChecked( true );
+		tilesAct->setChecked( true );
 
 	else if ( Settings->General.FolderView == QString( "SmallIconsView" ) )
-		smallIconsBtn->setChecked( true );
+		smallIconsAct->setChecked( true );
 
 	else if ( Settings->General.FolderView == QString( "NormalIconsView" ) )
-		normalIconsBtn->setChecked( true );
+		normalIconsAct->setChecked( true );
 
 	else if ( Settings->General.FolderView == QString( "LargeIconsView" ) )
-		largeIconsBtn->setChecked( true );
+		largeIconsAct->setChecked( true );
 
 	else if ( Settings->General.FolderView == QString( "HugeIconsView" ) )
-		hugeIconsBtn->setChecked( true );
+		hugeIconsAct->setChecked( true );
 
 	else if ( Settings->General.FolderView == QString( "SDetailsView" ) )
-		smallDetailsBtn->setChecked( true );
+		smallDetailsAct->setChecked( true );
 
 	else if ( Settings->General.FolderView == QString( "NDetailsView" ) )
-		normalDetailsBtn->setChecked( true );
+		normalDetailsAct->setChecked( true );
+};
+
+int NBViewModeButton::checkedAction() {
+
+	if ( viewsGroup->checkedAction() == smallListAct )
+		return 0;
+
+	else if ( viewsGroup->checkedAction() == mediumListAct )
+		return 1;
+
+	else if ( viewsGroup->checkedAction() == tilesAct )
+		return 2;
+
+	else if ( viewsGroup->checkedAction() == smallIconsAct )
+		return 3;
+
+	else if ( viewsGroup->checkedAction() == normalIconsAct )
+		return 4;
+
+	else if ( viewsGroup->checkedAction() == largeIconsAct )
+		return 5;
+
+	else if ( viewsGroup->checkedAction() == hugeIconsAct )
+		return 6;
+
+	else if ( viewsGroup->checkedAction() == smallDetailsAct )
+		return 7;
+
+	else if ( viewsGroup->checkedAction() == normalDetailsAct )
+		return 8;
+
+	return 4;
+};
+
+void NBViewModeButton::showMenu() {
+
+	if ( Settings->General.FolderView == QString( "SmallListView" ) )
+		smallListAct->setChecked( true );
+
+	else if ( Settings->General.FolderView == QString( "NormalListView" ) )
+		mediumListAct->setChecked( true );
+
+	else if ( Settings->General.FolderView == QString( "TilesView" ) )
+		tilesAct->setChecked( true );
+
+	else if ( Settings->General.FolderView == QString( "SmallIconsView" ) )
+		smallIconsAct->setChecked( true );
+
+	else if ( Settings->General.FolderView == QString( "NormalIconsView" ) )
+		normalIconsAct->setChecked( true );
+
+	else if ( Settings->General.FolderView == QString( "LargeIconsView" ) )
+		largeIconsAct->setChecked( true );
+
+	else if ( Settings->General.FolderView == QString( "HugeIconsView" ) )
+		hugeIconsAct->setChecked( true );
+
+	else if ( Settings->General.FolderView == QString( "SDetailsView" ) )
+		smallDetailsAct->setChecked( true );
+
+	else if ( Settings->General.FolderView == QString( "NDetailsView" ) )
+		normalDetailsAct->setChecked( true );
+
+	QToolButton::showMenu();
 };
 
 NBInfoLabel::NBInfoLabel() : QLabel() {
@@ -413,89 +455,3 @@ void NBDriveInfo::paintEvent( QPaintEvent *pEvent ) {
 
 	pEvent->accept();
 };
-
-QDialog *getMessageDialog( QString title, QString icon, QString text, QString wTitle, QString wIcon, QString btns ) {
-
-	QDialog *msgDlg = new QDialog();
-	msgDlg->setAttribute( Qt::WA_TranslucentBackground );
-	if ( not Settings->General.NativeTitleBar )
-		msgDlg->setWindowFlags( Qt::FramelessWindowHint );
-
-	QHBoxLayout *dlgLyt = new QHBoxLayout();
-	dlgLyt->setContentsMargins( 0, 0, 0, 0 );
-
-	QHBoxLayout *ttlLyt = new QHBoxLayout();
-	QHBoxLayout *txtLyt = new QHBoxLayout();
-	QHBoxLayout *btnLyt = new QHBoxLayout();
-
-	QVBoxLayout *baseLyt = new QVBoxLayout();
-
-	ttlLyt->addWidget( new QLabel( QString( "<h3>%1</h3>" ).arg( title ) ) );
-	ttlLyt->setAlignment( Qt::AlignCenter );
-
-	QLabel *iconLbl = new QLabel();
-	iconLbl->setAlignment( Qt::AlignCenter );
-	iconLbl->setPixmap(  QPixmap( icon ).scaled( 64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	iconLbl->setFixedWidth( 96 );
-
-	QLabel *textLbl = new QLabel( text );
-	textLbl->setWordWrap( true );
-	textLbl->setAlignment( Qt::AlignLeft );
-
-	txtLyt->addWidget( iconLbl );
-	txtLyt->addWidget( textLbl );
-
-	btnLyt->addStretch( 0 );
-	if ( btns == QString( "O" ) ) {
-		QPushButton *okBtn = new QPushButton( "&Ok" );
-		okBtn->setObjectName( "okBtn" );
-		QObject::connect( okBtn, SIGNAL( clicked() ), msgDlg, SLOT( close() ) );
-		btnLyt->addWidget( okBtn );
-	}
-
-	else if ( btns == QString( "OC" ) ) {
-		QPushButton *okBtn = new QPushButton( "&Ok" );
-		okBtn->setObjectName( "okBtn" );
-		QObject::connect( okBtn, SIGNAL( clicked() ), msgDlg, SLOT( accept() ) );
-
-		QPushButton *cancelBtn = new QPushButton( "&Cancel" );
-		cancelBtn->setObjectName( "cancelBtn" );
-		QObject::connect( cancelBtn, SIGNAL( clicked() ), msgDlg, SLOT( reject() ) );
-
-		btnLyt->addWidget( okBtn );
-		btnLyt->addWidget( cancelBtn );
-	}
-
-	else if ( btns == QString( "YN" ) ) {
-		QPushButton *okBtn = new QPushButton( "&Yes" );
-		okBtn->setObjectName( "okBtn" );
-		QObject::connect( okBtn, SIGNAL( clicked() ), msgDlg, SLOT( accept() ) );
-
-		QPushButton *cancelBtn = new QPushButton( "&No" );
-		cancelBtn->setObjectName( "cancelBtn" );
-		QObject::connect( cancelBtn, SIGNAL( clicked() ), msgDlg, SLOT( reject() ) );
-
-		btnLyt->addWidget( okBtn );
-		btnLyt->addWidget( cancelBtn );
-	}
-	btnLyt->addStretch( 0 );
-
-	if ( not Settings->General.NativeTitleBar )
-		baseLyt->addLayout( ttlLyt );
-	baseLyt->addLayout( txtLyt );
-	baseLyt->addWidget( Separator::horizontal() );
-	baseLyt->addLayout( btnLyt );
-
-	QWidget *widget = new QWidget();
-	widget->setObjectName( "guiBase" );
-	widget->setLayout( baseLyt );
-
-	dlgLyt->addWidget( widget );
-	msgDlg->setLayout( dlgLyt );
-	msgDlg->setStyleSheet( getStyleSheet( "NBDialog", Settings->General.Style ) );
-
-	msgDlg->setWindowTitle( wTitle);
-	msgDlg->setWindowIcon( QIcon( wIcon ) );
-
-	return msgDlg;
-}

@@ -98,37 +98,6 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
 	height: 0px;
 }
 
-QMenu::item {
-	margin: 2px;
-	padding: 0px 18px 0px 27px;
-}
-
-QMenu::item:selected {
-	border-radius: 5px;
-	background: rgba( 100, 100, 100, 150 );
-}
-
-QMenu::icon:checked {
-	background: rgba( 222, 222, 222, 18% );
-	border: 1px solid darkblue;
-	border-radius: 2px;
-	padding: 2px;
-}
-
-QMenu::separator {
-	height: 1px;
-	background: gray;
-	margin: 5px 27% 5px 27%;
-}
-
-QFrame#hsep {
-	border: 1px solid gray;
-}
-
-QFrame#vsep {
-	border: 1px solid gray;
-}
-
 QSizeGrip {
 	width: 16px;
 	height: 16px;

@@ -5,10 +5,6 @@
 */
 
 #include <NBFDFolderView.hpp>
-#include <NBMessageDialog.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBFVDialogs.hpp>
-#include <NBTools.hpp>
 
 NBFDFolderView::NBFDFolderView( QString location ) : QListView() {
 

@@ -20,7 +20,6 @@
 #include <QtGui/qboxlayout.h>
 #include <QtGui/qlayoutitem.h>
 #include <QtGui/qsizepolicy.h>
-#include "SearchBar.h"
 #include "qtermwidget.h"
 #include "ColorTables.h"
 
@@ -31,7 +30,6 @@
 #include "TerminalDisplay.h"
 #include "KeyboardTranslator.h"
 #include "ColorScheme.h"
-#include "SearchBar.h"
 
 #define STEP_ZOOM 3
 
@@ -126,67 +124,6 @@ void QTermWidget::selectionChanged(bool textSelected)
     emit copyAvailable(textSelected);
 }
 
-void QTermWidget::find()
-{
-    search(true, false);
-}
-
-void QTermWidget::findNext()
-{
-    search(true, true);
-}
-
-void QTermWidget::findPrevious()
-{
-    search(false, false);
-}
-
-void QTermWidget::search(bool forwards, bool next)
-{
-    int startColumn, startLine;
-
-    if (next) // search from just after current selection
-    {
-        m_impl->m_terminalDisplay->screenWindow()->screen()->getSelectionEnd(startColumn, startLine);
-        startColumn++;
-    }
-    else // search from start of current selection
-    {
-        m_impl->m_terminalDisplay->screenWindow()->screen()->getSelectionStart(startColumn, startLine);
-    }
-
-    // qDebug() << "current selection starts at: " << startColumn << startLine;
-    // qDebug() << "current cursor position: " << m_impl->m_terminalDisplay->screenWindow()->cursorPosition();
-
-    QRegExp regExp(m_searchBar->searchText());
-    regExp.setPatternSyntax(m_searchBar->useRegularExpression() ? QRegExp::RegExp : QRegExp::FixedString);
-    regExp.setCaseSensitivity(m_searchBar->matchCase() ? Qt::CaseSensitive : Qt::CaseInsensitive);
-
-    HistorySearch *historySearch =
-            new HistorySearch(m_impl->m_session->emulation(), regExp, forwards, startColumn, startLine, this);
-    connect(historySearch, SIGNAL(matchFound(int, int, int, int)), this, SLOT(matchFound(int, int, int, int)));
-    connect(historySearch, SIGNAL(noMatchFound()), this, SLOT(noMatchFound()));
-    connect(historySearch, SIGNAL(noMatchFound()), m_searchBar, SLOT(noMatchFound()));
-    historySearch->search();
-}
-
-
-void QTermWidget::matchFound(int startColumn, int startLine, int endColumn, int endLine)
-{
-    ScreenWindow* sw = m_impl->m_terminalDisplay->screenWindow();
-    // qDebug() << "Scroll to" << startLine;
-    sw->scrollTo(startLine);
-    sw->setTrackOutput(false);
-    sw->notifyOutputChanged();
-    sw->setSelectionStart(startColumn, startLine - sw->currentLine(), false);
-    sw->setSelectionEnd(endColumn, endLine - sw->currentLine());
-}
-
-void QTermWidget::noMatchFound()
-{
-        m_impl->m_terminalDisplay->screenWindow()->clearSelection();
-}
-
 int QTermWidget::getShellPID()
 {
     return m_impl->m_session->processId();
@@ -237,14 +174,6 @@ void QTermWidget::init(int startnow)
     m_impl->m_terminalDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     m_layout->addWidget(m_impl->m_terminalDisplay);
 
-    m_searchBar = new SearchBar(this);
-    m_searchBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
-    connect(m_searchBar, SIGNAL(searchCriteriaChanged()), this, SLOT(find()));
-    connect(m_searchBar, SIGNAL(findNext()), this, SLOT(findNext()));
-    connect(m_searchBar, SIGNAL(findPrevious()), this, SLOT(findPrevious()));
-    m_layout->addWidget(m_searchBar);
-    m_searchBar->hide();
-
     if (startnow && m_impl->m_session) {
         m_impl->m_session->run();
     }
@@ -267,7 +196,6 @@ void QTermWidget::init(int startnow)
     QFont font = QFont( "Envy Code R", 9 );
     font.setStyleHint(QFont::TypeWriter);
     setTerminalFont(font);
-    m_searchBar->setFont(font);
 
     setScrollBarPosition(NoScrollBar);
 
@@ -469,11 +397,6 @@ QStringList QTermWidget::availableKeyBindings()
 QString QTermWidget::keyBindings()
 {
     return m_impl->m_session->keyBindings();
-}
-
-void QTermWidget::toggleShowSearchBar()
-{
-    m_searchBar->isHidden() ? m_searchBar->show() : m_searchBar->hide();
 }
 
 bool QTermWidget::flowControlEnabled(void)

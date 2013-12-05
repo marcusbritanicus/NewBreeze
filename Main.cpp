@@ -26,6 +26,7 @@
 */
 
 #include <Global.hpp>
+#include <NBTools.hpp>
 #include <NBServer.hpp>
 #include <NewBreeze.hpp>
 #include <NBSettingsManager.hpp>

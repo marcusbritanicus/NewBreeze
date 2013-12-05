@@ -23,7 +23,6 @@ Boston, MA 02110-1301, USA.
 #include <QtGui>
 
 struct TermWidgetImpl;
-class SearchBar;
 
 
 class QTermWidget : public QWidget {
@@ -153,8 +152,6 @@ public slots:
 */
     void clear();
 
-    void toggleShowSearchBar();
-
 protected:
     virtual void resizeEvent(QResizeEvent *);
 
@@ -162,19 +159,10 @@ protected slots:
     void sessionFinished();
     void selectionChanged(bool textSelected);
 
-private slots:
-    void find();
-    void findNext();
-    void findPrevious();
-    void matchFound(int startColumn, int startLine, int endColumn, int endLine);
-    void noMatchFound();
-
 private:
-    void search(bool forwards, bool next);
     void setZoom(int step);
     void init(int startnow);
     TermWidgetImpl * m_impl;
-    SearchBar* m_searchBar;
     QVBoxLayout *m_layout;
 };
 

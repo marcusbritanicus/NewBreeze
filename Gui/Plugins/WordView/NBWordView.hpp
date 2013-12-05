@@ -8,6 +8,7 @@
 #define NBWORDVIEW_HPP
 
 #include <Global.hpp>
+#include <NBTools.hpp>
 
 class NBWordView : public QWidget {
 	Q_OBJECT

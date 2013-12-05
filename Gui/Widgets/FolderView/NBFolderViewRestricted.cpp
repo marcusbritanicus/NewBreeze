@@ -5,8 +5,6 @@
 */
 
 #include <NBFolderViewRestricted.hpp>
-#include <NBIconDelegate.hpp>
-#include <NBTools.hpp>
 
 NBFolderViewRestricted::NBFolderViewRestricted( QString path ) : QListView() {
 

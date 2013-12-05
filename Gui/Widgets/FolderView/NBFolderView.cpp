@@ -11,6 +11,7 @@ NBFolderView::NBFolderView() : QStackedWidget() {
 	// Set Data Model
 	fsModel = new NBFileSystemModel();
 	fsModel->setReadOnly( false );
+	fsModel->setCategorizationEnabled( Settings->Session.SortCategory );
 
 	// Setup the views
 	IconView = new NBIconView( fsModel );
@@ -30,11 +31,6 @@ NBFolderView::NBFolderView() : QStackedWidget() {
 
 	// Do not accept focus
 	setFocusPolicy( Qt::NoFocus );
-};
-
-void NBFolderView::setContentsWidth( int cWidth ) {
-
-	IconView->setContentsWidth( cWidth );
 };
 
 void NBFolderView::updateViewMode() {
@@ -207,7 +203,7 @@ void NBFolderView::createAndSetupActions() {
 	addAction( propertiesAct );
 
 	// Permissions
-	permissionsAct = new QAction( QIcon::fromTheme( "users" ), "P&ermissions", this );
+	permissionsAct = new QAction( QIcon::fromTheme( "system-users" ), "P&ermissions", this );
 	permissionsAct->setShortcuts( Settings->Shortcuts.Permissions );
 
 	connect( permissionsAct, SIGNAL( triggered() ), this, SIGNAL( showPermissions() ) );
@@ -228,17 +224,51 @@ void NBFolderView::createAndSetupActions() {
 	addAction( selectAllAct );
 
 	// Sorting
-	sortByNameAct = new QAction( "&Name", this );
+	sortByNameAct = new QAction( QIcon::fromTheme( "format-text-underline" ), "&Name", this );
+	sortByNameAct->setCheckable( true );
 	connect( sortByNameAct, SIGNAL( triggered() ), this, SLOT( sortByName() ) );
 
-	sortByTypeAct = new QAction( "&Type", this );
+	sortByTypeAct = new QAction( QIcon::fromTheme( "preferences-other" ), "&Type", this );
+	sortByTypeAct->setCheckable( true );
 	connect( sortByTypeAct, SIGNAL( triggered() ), this, SLOT( sortByType() ) );
 
-	sortBySizeAct = new QAction( "&Size", this );
+	sortBySizeAct = new QAction( QIcon( ":/icons/size.png" ), "&Size", this );
+	sortBySizeAct->setCheckable( true );
 	connect( sortBySizeAct, SIGNAL( triggered() ), this, SLOT( sortBySize() ) );
 
-	sortByDateAct = new QAction( "&Date", this );
+	sortByDateAct = new QAction( QIcon::fromTheme( "office-calendar" ), "&Date", this );
+	sortByDateAct->setCheckable( true );
 	connect( sortByDateAct, SIGNAL( triggered() ), this, SLOT( sortByDate() ) );
+
+	QActionGroup *sortGroup = new QActionGroup( this );
+	sortGroup->addAction( sortByNameAct );
+	sortGroup->addAction( sortByTypeAct );
+	sortGroup->addAction( sortBySizeAct );
+	sortGroup->addAction( sortByDateAct );
+
+	switch( Settings->Session.SortColumn ) {
+		case 0: {
+			sortByNameAct->setChecked( true );
+			break;
+		}
+		case 1: {
+			sortBySizeAct->setChecked( true );
+			break;
+		}
+		case 2: {
+			sortByTypeAct->setChecked( true );
+			break;
+		}
+		case 4: {
+			sortByDateAct->setChecked( true );
+			break;
+		}
+	}
+
+	groupsAct = new QAction( QIcon( ":/icons/groups.png" ), "Show in &Groups", this );
+	groupsAct->setCheckable( true );
+	groupsAct->setChecked( Settings->Session.SortCategory );
+	connect( groupsAct, SIGNAL( triggered() ), this, SIGNAL( toggleGroups() ) );
 
 	// Focus the search bar
 	// QAction *focusSearchAct = new QAction( "Focus SearchBar", this );
@@ -588,7 +618,7 @@ void NBFolderView::prepareCopy() {
 	QMimeData *mimedata = new QMimeData();
 	mimedata->setUrls( urlList );
 
-	QApplication::clipboard()->setMimeData( mimedata );
+	ClipBoard->setMimeData( mimedata );
 };
 
 void NBFolderView::prepareMove() {
@@ -606,7 +636,7 @@ void NBFolderView::prepareMove() {
 	QMimeData *mimedata = new QMimeData();
 	mimedata->setUrls( urlList );
 
-	QApplication::clipboard()->setMimeData( mimedata );
+	ClipBoard->setMimeData( mimedata );;
 };
 
 void NBFolderView::acopy( QStringList srcList, QString tgt ) {
@@ -632,7 +662,7 @@ void NBFolderView::link( QStringList linkList, QString path ) {
 
 void NBFolderView::prepareIO() {
 
-	const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+	const QMimeData *mimeData = ClipBoard->mimeData();
 
 	if ( mimeData->hasUrls() ) {
 		QStringList srcList;
@@ -732,46 +762,38 @@ void NBFolderView::doRename() {
 
 void NBFolderView::sortByName() {
 
-	bool descending = qobject_cast<QAction*>( sender() )->data().toBool();
-
-	if ( descending )
-		fsModel->sort( 0, Qt::DescendingOrder );
+	if ( fsModel->isCategorizationEnabled() )
+		fsModel->sort( 0, Qt::CaseInsensitive, true );
 
 	else
-		fsModel->sort( 0, Qt::AscendingOrder );
+		fsModel->sort( 0, Qt::CaseInsensitive, false );
 };
 
 void NBFolderView::sortBySize() {
 
-	bool descending = qobject_cast<QAction*>( sender() )->data().toBool();
-
-	if ( descending )
-		fsModel->sort( 1, Qt::DescendingOrder );
+	if ( fsModel->isCategorizationEnabled() )
+		fsModel->sort( 1, Qt::CaseInsensitive, true );
 
 	else
-		fsModel->sort( 1, Qt::AscendingOrder );
+		fsModel->sort( 1, Qt::CaseInsensitive, false );
 };
 
 void NBFolderView::sortByType() {
 
-	bool descending = qobject_cast<QAction*>( sender() )->data().toBool();
-
-	if ( descending )
-		fsModel->sort( 2, Qt::DescendingOrder );
+	if ( fsModel->isCategorizationEnabled() )
+		fsModel->sort( 2, Qt::CaseInsensitive, true );
 
 	else
-		fsModel->sort( 2, Qt::AscendingOrder );
+		fsModel->sort( 2, Qt::CaseInsensitive, false );
 };
 
 void NBFolderView::sortByDate() {
 
-	bool descending = qobject_cast<QAction*>( sender() )->data().toBool();
-
-	if ( descending )
-		fsModel->sort( 3, Qt::DescendingOrder );
+	if ( fsModel->isCategorizationEnabled() )
+		fsModel->sort( 4, Qt::CaseInsensitive, true );
 
 	else
-		fsModel->sort( 3, Qt::AscendingOrder );
+		fsModel->sort( 4, Qt::CaseInsensitive, false );
 };
 
 void NBFolderView::selectAll() {

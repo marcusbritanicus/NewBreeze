@@ -1,3 +1,9 @@
+Version 2.2.0-preview
+    - Upgraded NBFileSystemModel to a Categorized ItemModel
+    - Upgraded NBIconView to a Categorized ItemView
+    - SortBy menu and NBViewModeButton now use QActionGroup
+    - Added 'Show in Groups' toggle switch
+
 Version 2.1.0
     - Added shortcut for showing Folders, Applications and Catalogs
     - Added Arching copy ( copy using archive to filder using cpio )

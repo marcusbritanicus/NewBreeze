@@ -12,6 +12,9 @@
 #include <NBFDFolderView.hpp>
 #include <NBSidePanelView.hpp>
 #include <NBDialog.hpp>
+#include <NBMessageDialog.hpp>
+#include <NBGuiWidgets.hpp>
+#include <NBTools.hpp>
 
 class NBFileDialog : public NBDialog {
 	Q_OBJECT

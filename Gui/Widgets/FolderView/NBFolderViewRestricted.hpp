@@ -9,6 +9,8 @@
 
 #include <Global.hpp>
 #include <NBFileSystemModel.hpp>
+#include <NBIconDelegate.hpp>
+#include <NBTools.hpp>
 
 class NBFolderViewRestricted : public QListView {
 	Q_OBJECT

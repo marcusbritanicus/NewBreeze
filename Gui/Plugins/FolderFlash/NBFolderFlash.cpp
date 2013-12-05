@@ -5,7 +5,6 @@
 */
 
 #include <NBFolderFlash.hpp>
-#include <NBTools.hpp>
 
 NBFolderFlash::NBFolderFlash( QWidget *parent, QString pth ) : QWidget( parent ) {
 

@@ -1,29 +1,18 @@
-NewBreeze v2.1.0-preview
+NewBreeze v2.2.0-preview
 ========================
 
-This is a preview release of v2.1.0
+This is a preview release of v2.2.0
 
-=> NBApplicationsView( QAbstractItemView )
-   NBApplicationsView is a categorized view displaying the installed GUI applications in your system. Editing these files is not yet possible.
+=> NBAFileSystemModel( QAbstractItemModel )
+   NBFileSystemModel is now a categorized item model. Categories can be name, size, type or modification time based. Categorization can
+   easily be switched on or off via setCategorizationEnabled( bool );
 
-=> NBCatalogView( QAbstractItemView )
-   NBCatalogView is the NewBreeze equivalent of Windows 7's Libraries. It works as well in a similar fashion. You can add or remove folders
-   from catalogs. There are four default catalogs, Documents, Music, Pictures and Videos. You can also add custom catalogs.
+=> NBIconView( QAbstractItemView )
+   NBIconView is now categorized item view. It supports both a categorized and a non categorized item model.
 
-=> NBSidePanel contains links to these two new features. The first click on Application/Catalogs show the corresponding view and clicking again
-   causes them to be hidden, showing the FolderView.
+=> 'Show in groups'
+   This switch helps to switch on or of the Categorization of the Model and the View.
 
-=> NBAppEngine and NBAppFile
-   NBDesktopFile and NBConfigParser have become obsolete. In their place, I have introduced a new and improved NBAppFile and NBAppEngine.
-   These are faster and more efficient than their counterparts and make full use of QMimeDatabase and QMimeType class of Qt5(backported to Qt4)
-
-=> NBIconProvder now handles icons from /usr/share/pixmaps
-
-=> NBSidePanel width is determined dynamically.
-
-=> The OpenWith dialog box showing all the installed applications is now categorized, making it easy to search for an application.
-   The categorization is based on the standard menu categories.
-
-=> One can set the default program for a mimetype via the NBOpenWith Dialog. This process is freedesktop.org compliant.
-   The external program "xdg-mime" is called with the relevant arguments, which then writes the changes to mimeapps.list
-   While opening a program, the first listed program is the default program as per the freedesktop.org guidelines.
+=> QActionGroup
+   The older approach of using radiobuttons and making them exclusive to provide 'View Modes' list and 'Sort By' menu has been replaced by the
+   cleaner QActionGroup approach. This is much more elegant and clean.

@@ -6,7 +6,7 @@ Some of its features are
     - Fast startup and browsing
     - Folder, text, html and image quick preview
     - File Association support
-    - Provides List, Icon and Details View
+    - Provides Categorized List, Icon and Details View
     - Lists the drives/boomarks in the sidebar
     - Full drag and drop support
     - Bookmark Support
@@ -51,7 +51,6 @@ Bugs
     - Large paths run away from BreadCrumbs Bar
     - Some issues with cut-copy-paste files and folders
     - Issues with delete folders
-    - TreeView does not handle context menu events
 
 List of shortcuts
 +==============================================================+============================+
@@ -93,4 +92,7 @@ List of shortcuts
 
 Upcoming
     - File/folder delete GUI
+    - Unified Folder, Application, and Catalog Viewer
+    - Pdf Preview Plugin
+    - Application Editor ( Desktop file editor )
     - Any other feature you request for... :)

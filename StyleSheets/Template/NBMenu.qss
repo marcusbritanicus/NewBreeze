@@ -23,7 +23,6 @@ QMenu::item:selected {
 
 QMenu::icon:checked {
 	background: rgba( 222, 222, 222, 18% );
-	border: 1px solid darkblue;
 	border-radius: 2px;
 	padding: 2px;
 }

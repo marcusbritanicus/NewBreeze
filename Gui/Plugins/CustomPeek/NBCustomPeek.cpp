@@ -5,9 +5,6 @@
 */
 
 #include <NBCustomPeek.hpp>
-#include <NBTools.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBIconProvider.hpp>
 
 NBCustomPeek::NBCustomPeek( QWidget *parent, QString pth ) : QWidget( parent ) {
 

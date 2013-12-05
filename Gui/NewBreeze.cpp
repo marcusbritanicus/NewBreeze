@@ -6,9 +6,6 @@
 
 // Local Headers
 #include <NewBreeze.hpp>
-#include <NBTools.hpp>
-#include <NBCustomActions.hpp>
-#include <NBSettingsManager.hpp>
 
 NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 
@@ -253,6 +250,9 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( reloadCatalogs() ),
 		CatalogView, SLOT( reload() ) );
 
+	connect( FolderView, SIGNAL( toggleGroups() ),
+		this, SLOT( toggleGrouping() ) );
+
 	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ),
 		this, SLOT( updateVarious( QString ) ) );
 
@@ -429,6 +429,9 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	Settings->setValue( "Session/Geometry", geometry() );
 	Settings->setValue( "Session/LastDir", FolderView->fsModel->currentDir() );
 	Settings->setValue( "Session/ShowHidden", FolderView->fsModel->showHidden() );
+	Settings->setValue( "Session/SortColumn", FolderView->fsModel->sortColumn() );
+	Settings->setValue( "Session/SortCase", FolderView->fsModel->sortCaseSensitivity() );
+	Settings->setValue( "Session/SortCategory", FolderView->fsModel->sortCategorized() );
 	Settings->setValue( "Session/Maximized", isMaximized() );
 	Settings->setValue( "Session/ExpandDevices", SidePanel->isExpanded( SidePanel->spModel->index( 3, 0 ) ) );
 	Settings->setValue( "Session/ExpandBookmarks", SidePanel->isExpanded( SidePanel->spModel->index( 4, 0 ) ) );
@@ -436,41 +439,6 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	qDebug() << "Good Bye!";
 
 	cEvent->accept();
-};
-
-
-void NewBreeze::resizeEvent( QResizeEvent *rEvent ) {
-
-	int fvcWidth = FolderView->size().width();
-
-	if ( not FolderView->currentIndex() ) {
-		fvcWidth -= FolderView->IconView->contentsMargins().left();
-		fvcWidth -= FolderView->IconView->contentsMargins().right();
-		fvcWidth -= FolderView->IconView->autoScrollMargin();
-		fvcWidth -= FolderView->IconView->verticalScrollBar()->width();
-	}
-
-	FolderView->setContentsWidth( fvcWidth );
-	FolderView->updateViewMode();
-
-	rEvent->accept();
-};
-
-void NewBreeze::showEvent( QShowEvent *sEvent ) {
-
-	int fvcWidth = FolderView->size().width();
-
-	if ( not FolderView->currentIndex() ) {
-		fvcWidth -= FolderView->IconView->contentsMargins().left();
-		fvcWidth -= FolderView->IconView->contentsMargins().right();
-		fvcWidth -= FolderView->IconView->autoScrollMargin();
-		fvcWidth -= FolderView->IconView->verticalScrollBar()->width();
-	}
-
-	FolderView->setContentsWidth( fvcWidth );
-	FolderView->updateViewMode();
-
-	sEvent->accept();
 };
 
 void NewBreeze::addBookMark() {
@@ -566,25 +534,13 @@ void NewBreeze::showInfoDlg() {
 void NewBreeze::openAddressBar() {
 
 	if ( !QFileInfo( AddressBar->addressWidget->addressEdit->text() ).exists() ) {
-		QString title = QString( "Invalid Location" );
-		QString icon = QString( ":/icons/close.png" );
 		QString text = QString( "There is no file or directory named: "		\
 			"<tt><b>%1</b></tt>. Please check the path entered."
 		).arg(  AddressBar->addressWidget->addressEdit->text() );
 
-		QString btns = "O";
-		QString wTitle = QString( "NewBreeze - Invalid Location" );
-		QString wIcon = QString( ":/icons/newbreeze.png" );
+		QString title = QString( "NewBreeze - Invalid Location" );
 
-		QDialog *errDlg = getMessageDialog( title, icon, text, wTitle, wIcon, btns );
-		errDlg->setFixedWidth( 540 );
-
-		QDesktopWidget dw;
-		int hpos = (int)( ( dw.width() - 540 ) / 2 );
-		int vpos = (int)( ( dw.height() - errDlg->sizeHint().height() ) / 2 );
-		errDlg->setGeometry( hpos, vpos, 540, errDlg->sizeHint().height() );
-
-		errDlg->exec();
+		NBMessageDialog::error( title, text );
 
 		return;
 	}

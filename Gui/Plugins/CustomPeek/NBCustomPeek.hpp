@@ -8,6 +8,9 @@
 #define NBCUSTOMPEEK_HPP
 
 #include <Global.hpp>
+#include <NBTools.hpp>
+#include <NBGuiWidgets.hpp>
+#include <NBIconProvider.hpp>
 
 class NBCustomPeek : public QWidget {
 	Q_OBJECT

@@ -5,7 +5,6 @@
 */
 
 #include <NBImagePeek.hpp>
-#include <NBTools.hpp>
 
 NBImagePeek::NBImagePeek( QWidget *parent, QString pth ) : QWidget( parent ) {
 

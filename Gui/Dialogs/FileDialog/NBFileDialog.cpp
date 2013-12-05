@@ -5,9 +5,6 @@
 */
 
 #include <NBFileDialog.hpp>
-#include <NBMessageDialog.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBTools.hpp>
 
 NBFileDialog::NBFileDialog( QString wIcon, QString wTitle, QString fLocation, FileType dType ) : NBDialog() {
 

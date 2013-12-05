@@ -4,7 +4,6 @@
 	*
 */
 
-#include <NBTools.hpp>
 #include <NBInfoBar.hpp>
 
 inline QString getPermissions( QString path ) {

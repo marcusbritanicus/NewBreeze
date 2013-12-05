@@ -442,6 +442,8 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		sortMenu->addAction( sortBySizeAct );
 		sortMenu->addAction( sortByTypeAct );
 		sortMenu->addAction( sortByDateAct );
+		sortMenu->addSeparator();
+		sortMenu->addAction( groupsAct );
 
 		menu->addMenu( createNewMenu );
 		menu->addSeparator();
@@ -492,6 +494,8 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		sortMenu->addAction( sortBySizeAct );
 		sortMenu->addAction( sortByTypeAct );
 		sortMenu->addAction( sortByDateAct );
+		sortMenu->addSeparator();
+		sortMenu->addAction( groupsAct );
 
 		menu->addMenu( openWithMenu );
 		menu->addSeparator();
@@ -547,6 +551,8 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		sortMenu->addAction( sortBySizeAct );
 		sortMenu->addAction( sortByTypeAct );
 		sortMenu->addAction( sortByDateAct );
+		sortMenu->addSeparator();
+		sortMenu->addAction( groupsAct );
 
 		menu->addMenu( openWithMenu );
 		menu->addSeparator();

@@ -5,7 +5,6 @@
 */
 
 #include <NBWordView.hpp>
-#include <NBTools.hpp>
 
 NBWordView::NBWordView( QWidget *parent, QString pth ) : QWidget( parent ) {
 

@@ -18,7 +18,7 @@ class NBQuickMenuBar : public QWidget {
 		NBQuickMenuBar();
 
 		NBPushButton *openWithBtn, *moveToBtn, *deleteBtn, *propsBtn, *permsBtn;
-		QMenu openWithMenu;
+		NBMenu openWithMenu;
 
 	signals:
 		void showOpenWithMenu();

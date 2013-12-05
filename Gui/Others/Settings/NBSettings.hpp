@@ -38,6 +38,9 @@ class NBSettings {
 				QSize Splitter;
 				bool SidePanel;
 				bool ShowHidden;
+				int SortColumn;
+				bool SortCase;
+				bool SortCategory;
 				bool ExpandDevices;
 				bool ExpandBookmarks;
 		} Session;

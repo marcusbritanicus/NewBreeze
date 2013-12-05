@@ -8,6 +8,7 @@
 #define NBFILESYSTEMMODEL_HPP
 
 #include <Global.hpp>
+#include <NBTools.hpp>
 #include <NBFileSystemNode.hpp>
 #include <NBFileInfoGatherer.hpp>
 #include <NBFileSystemWatcher.hpp>
@@ -17,13 +18,13 @@ class NBFileSystemModel : public QAbstractItemModel {
 
 	public:
 		enum Sections {
-			NAME = 0,
-			SIZE = 1,
-			TYPE = 2,
-			MIME = 3,
-			TIME = 4,
-			PERM = 5,
-			OWNR = 6
+			NAME = 3,
+			SIZE = 4,
+			TYPE = 5,
+			MIME = 6,
+			TIME = 7,
+			PERM = 8,
+			OWNR = 9
 		};
 
 		enum Filters {
@@ -42,8 +43,15 @@ class NBFileSystemModel : public QAbstractItemModel {
 		NBFileSystemModel();
 		~NBFileSystemModel();
 
+		// Categorization Info
+		bool isCategorizationEnabled();
+		void setCategorizationEnabled( bool );
+
 		// Children Info
 		int rowCount( const QModelIndex &parent = QModelIndex() ) const;
+		int rowCount( const QString mCategory ) const;
+		int categoryCount() const;
+
 		int columnCount( const QModelIndex &parent = QModelIndex() ) const;
 
 		Qt::ItemFlags flags( const QModelIndex &) const;
@@ -62,6 +70,18 @@ class NBFileSystemModel : public QAbstractItemModel {
 		QModelIndex index( int row = 0, int column = 0, const QModelIndex &parent = QModelIndex() ) const;
 		QModelIndex index( QString, const QModelIndex &parent = QModelIndex() ) const;
 		QModelIndex parent( const QModelIndex &index = QModelIndex() ) const;
+
+		QString category( const QModelIndex &index = QModelIndex() ) const;
+		int categoryIndex( const QModelIndex &index = QModelIndex() ) const;
+		QStringList categories() const;
+
+		// Show Hide Categories
+		void hideCategory( QString category );
+		void showCategory( QString category );
+		bool isCategoryVisible( QString mCategory ) const;
+
+		int indexListCountForCategory( QString ) const;
+		QModelIndexList indexListForCategory( QString ) const;
 
 		bool showHidden() const;
 		void setShowHidden( bool );
@@ -82,7 +102,10 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void setNameFilters( QStringList );
 		void clearNameFilters();
 
-		void sort( int column = 0, bool cs = false, bool dirsFirst = true );
+		void sort( int column = 0, bool cs = false, bool categorized = false );
+		int sortColumn() const;
+		bool sortCaseSensitivity() const;
+		bool sortCategorized() const;
 		void reload();
 
 		// FS Modification
@@ -118,16 +141,23 @@ class NBFileSystemModel : public QAbstractItemModel {
 
 	private:
 		void setupModelData();
+		QString getCategory( QVariantList );
+		void recategorize();
 
 		NBFileSystemNode *rootNode;
 
 		QString __rootPath;
 		QStringList __childNames;
 
+		QHash<QString, QList<int>> categoryRowMap;
+		QHash<QString, bool> categoryVisibilityMap;
+
+		bool mCategorizationEnabled = false;
+
 		struct __prevSort {
-			int column = 0;
-			bool cs = false;
-			bool dirsFirst = true;
+			int column = Settings->Session.SortColumn;
+			bool cs = Settings->Session.SortCase;
+			bool categorized = Settings->Session.SortCategory;
 		} prevSort;
 
 		struct loadStatus {

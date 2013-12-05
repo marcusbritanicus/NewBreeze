@@ -21,6 +21,10 @@
 #include <NBIOManager.hpp>
 #include <NBAppsView.hpp>
 #include <NBCatalogView.hpp>
+#include <NBTools.hpp>
+#include <NBCustomActions.hpp>
+#include <NBSettingsManager.hpp>
+#include <NBMessageDialog.hpp>
 
 class NewBreeze : public QMainWindow {
 	Q_OBJECT
@@ -102,6 +106,7 @@ class NewBreeze : public QMainWindow {
 
 		void switchToNextView();
 		void changeViewMode();
+		void toggleGrouping();
 
 		void toggleMaximizeRestore();
 		void toggleSideBarVisible();
@@ -112,8 +117,6 @@ class NewBreeze : public QMainWindow {
 
 	protected:
 		void closeEvent( QCloseEvent *cEvent );
-		void resizeEvent( QResizeEvent *rEvent );
-		void showEvent( QShowEvent *sEvent );
 };
 
 // The code for @f NBStartup() and ReadSettings() is in NBStartup.cpp

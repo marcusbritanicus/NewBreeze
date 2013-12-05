@@ -11,6 +11,10 @@
 #include <NBFileSystemModel.hpp>
 #include <NBFDItemDelegate.hpp>
 #include <NBContextMenu.hpp>
+#include <NBMessageDialog.hpp>
+#include <NBGuiWidgets.hpp>
+#include <NBFVDialogs.hpp>
+#include <NBTools.hpp>
 
 class NBFDFolderView : public QListView {
 	Q_OBJECT

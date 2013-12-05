@@ -19,6 +19,7 @@
 
 #include <libgen.h>
 #include <NBXdg.hpp>
+#include <NBTools.hpp>
 
 class NBAppFile {
 

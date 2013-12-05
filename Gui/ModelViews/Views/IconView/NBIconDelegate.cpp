@@ -6,7 +6,6 @@
 
 #include <NBIconDelegate.hpp>
 #include <NBFileSystemModel.hpp>
-#include <NBTools.hpp>
 
 static QStringList ListView = QStringList() << "SmallListView" << "NormalListView" << "TilesView";
 static QStringList IconView = QStringList() << "SmallIconsView" << "NormalIconsView" << "LargeIconsView" << "HugeIconsView";
@@ -22,137 +21,62 @@ void NBIconDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 		const NBFileSystemModel *model = static_cast<const NBFileSystemModel*>( index.model() );
 		QFileInfo ftype = model->nodeInfo( index );
 
+		QRect optionRect( option.rect );
+
 		// Font Mentrics for elided text;
 		QFontMetrics fm( qApp->font() );
 
 		// Get icon size
-		QSize iconSize;
-		if ( Settings->General.FolderView == QString( "SmallListView" ) )
-			iconSize = QSize( 24, 24 );
-
-		else if ( Settings->General.FolderView == QString( "NormalListView" ) )
-			iconSize = QSize( 48, 48 );
-
-		else if ( Settings->General.FolderView == QString( "TilesView" ) )
-			iconSize = QSize( 48, 48 );
-
-		else if ( Settings->General.FolderView == QString( "SmallIconsView" ) )
-			iconSize = QSize( 24, 24 );
-
-		else if ( Settings->General.FolderView == QString( "NormalIconsView" ) )
-			iconSize = QSize( 48, 48 );
-
-		else if ( Settings->General.FolderView == QString( "LargeIconsView" ) )
-			iconSize = QSize( 64, 64 );
-
-		else if ( Settings->General.FolderView == QString( "HugeIconsView" ) )
-			iconSize = QSize( 128, 128 );
+		QSize iconSize( option.decorationSize );
 
 		QString text = model->data( index, Qt::DisplayRole ).toString();
-		QPixmap icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize );
+		QPixmap icon;
+		if ( option.state & QStyle::State_Selected )
+			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Selected );
+
+		else if ( option.state & QStyle::State_MouseOver )
+			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Active );
+
+		else
+			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Normal );
 
 		if ( ( icon.size().width() > iconSize.width() ) or ( icon.size().height() > iconSize.height() ) )
 			icon = icon.scaled( iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 
-		QSize iSize = icon.size();
+		QSize iSize( icon.size() );
 
 		QRect textRect;
-		if ( ListView.contains( Settings->General.FolderView ) ) {
-			// Original X + Image Left Border + Image Width + Image-Text Gap
-			textRect.setX( option.rect.x() + 3 + iconSize.width() + 5 );
-			// Vertical Centering, so don't bother
-			textRect.setY( option.rect.y() );
-			// Original Width - Image Left Border - Image Width - Image Text Gap -Text Right Border
-			textRect.setSize( option.rect.size() - QSize( 3, 0 ) - QSize( iconSize.width(), 0 ) - QSize( 5, 0 ) - QSize( 3, 0 ) );
+		// Horizontal Centering, so don't bother
+		textRect.setX( optionRect.x() );
+		// Original Y + Image Top Border + Image Height
+		textRect.setY( optionRect.y() + 2 + iconSize.height() + 3 );
+		// Text Bottom Border
+		textRect.setSize( optionRect.size() - QSize( 0, 2 ) );
 
-			// Set elided text
-			text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
-		}
-
-		else {
-			// Horizontal Centering, so don't bother
-			textRect.setX( option.rect.x() );
-			// Original Y + Image Top Border + Image Height
-			textRect.setY( option.rect.y() + 2 + iconSize.height() + 3 );
-			// Text Bottom Border
-			textRect.setSize( option.rect.size() - QSize( 0, 2 ) );
-
-			// Set elided text
-			text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
-		}
+		// Set elided text
+		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
 
 		QRect iconRect;
-		if ( ListView.contains( Settings->General.FolderView ) ) {
-			if ( iSize.width() > iSize.height() ) {
-				/*
-					*
-					* In this case, we need to center the image vertically.
-					* So we add a small padding along the x-axis.
-					*
-				*/
+		/*
+			*
+			* In this case, we need to center the image horizontally and vertically.
+			* +------------------------+
+			* |       +--------+       |
+			* |       |        |       |
+			* |       |  icon  |       |
+			* |       |        |       |
+			* |       +--------+       |
+			* |    This is the text    |
+			* +------------------------+
+			*
+		*/
 
-				// Original X + Image Left Border
-				iconRect.setX( option.rect.x() + 2 );
-				// Original Y + Height to make the image center of the selection rectangle
-				iconRect.setY( option.rect.y() + ( option.rect.height() - iSize.height() ) / 2 );
-				// Icon Size
-				iconRect.setSize( iSize );
-			}
-
-			else if ( iSize.height() > iSize.width() ) {
-				/*
-					*
-					* Here, we need to center the image horizontally.
-					* We have no padding on top
-					*
-				*/
-
-				// Original X + Width to make the image center of the image rectangle
-				iconRect.setX( option.rect.x() + ( iconSize.width() - iSize.width() ) / 2 + 2 );
-				// Original Y + Image Top Border
-				iconRect.setY( option.rect.y() + 1 );
-				// Icon Size
-				iconRect.setSize( iSize );
-			}
-
-			else {
-				/*
-					*
-					* Here, we need to center the image horizontally and vertically
-					*
-				*/
-
-				// Original X + Width to make the image center of the image rectangle
-				iconRect.setX( option.rect.x() + ( iconSize.width() - iSize.width() ) / 2 + 2 );
-				// Original Y + Height to make the image center of the image rectangle
-				iconRect.setY( option.rect.y() + ( option.rect.height() - iSize.height() ) / 2 );
-				// Icon Size
-				iconRect.setSize( iSize );
-			}
-		}
-
-		else {
-			/*
-				*
-				* In this case, we need to center the image horizontally and vertically.
-				* +------------------------+
-				* |       +--------+       |
-				* |       |        |       |
-				* |       |  icon  |       |
-				* |       |        |       |
-				* |       +--------+       |
-				* |    This is the text    |
-				* +------------------------+
-				*
-			*/
-
-			// Original X
-			iconRect.setX( option.rect.x() + ( option.rect.width() - iSize.width() ) / 2 );
-			// Original Y + Image Top Border + Height to make the image center of the icon rectangle
-			iconRect.setY( option.rect.y() + 3 + ( iconSize.height() - iSize.height() ) / 2 );
-			// Icon Size
-			iconRect.setSize( iSize );
-		}
+		// Original X
+		iconRect.setX( optionRect.x() + ( optionRect.width() - iSize.width() ) / 2 );
+		// Original Y + Image Top Border + Height to make the image center of the icon rectangle
+		iconRect.setY( optionRect.y() + 3 + ( iconSize.height() - iSize.height() ) / 2 );
+		// Icon Size
+		iconRect.setSize( iSize );
 
 		painter->save();
 
@@ -163,71 +87,68 @@ void NBIconDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 
 		// Background Painter Settings and Background
 		painter->setPen( QPen( Qt::NoPen ) );
-		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) ) {
 			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 				painter->setBrush( Settings->Colors.SelectionMouseBrushColor.darker() );
 
 			else
 				painter->setBrush( Settings->Colors.SelectionMouseBrushColor );
+		}
 
-		else if ( option.state & QStyle::State_Selected )
+		else if ( option.state & QStyle::State_Selected ) {
 			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 				painter->setBrush( Settings->Colors.SelectionBrushColor.darker() );
 
 			else
 				painter->setBrush( Settings->Colors.SelectionBrushColor );
+		}
 
-		else if ( option.state & QStyle::State_MouseOver )
+		else if ( option.state & QStyle::State_MouseOver ) {
 			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 				painter->setBrush( Settings->Colors.MouseBrushColor.darker() );
 
 			else
 				painter->setBrush( Settings->Colors.MouseBrushColor );
+		}
 
-		else
+		else {
 			painter->setBrush( QBrush( Qt::transparent ) );
+		}
 
 		// Paint Background
 		if ( TinyView.contains( Settings->General.FolderView ) )
-			painter->drawRoundedRect( option.rect, 5, 5 );
+				painter->drawRoundedRect( option.rect, 5, 5 );
 
 		else if ( HugeView.contains( Settings->General.FolderView ) )
-			painter->drawRoundedRect( option.rect, 15, 15 );
+				painter->drawRoundedRect( option.rect, 15, 15 );
 
 		else
-			painter->drawRoundedRect( option.rect, 7, 7 );
+				painter->drawRoundedRect( option.rect, 7, 7 );
 
 		// Focus Rectangle
 		if ( option.state & QStyle::State_HasFocus ) {
-			painter->setBrush( Qt::NoBrush );
-			QPoint bl = option.rect.bottomLeft() + QPoint( 7, 0 );
-			QPoint br = option.rect.bottomRight() - QPoint( 7, 0 );
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) ) {
-				QLinearGradient hLine( bl, br );
-				hLine.setColorAt( 0, Qt::transparent );
-				hLine.setColorAt( 0.3, Settings->Colors.FocusPenColorAlt );
-				hLine.setColorAt( 0.7, Settings->Colors.FocusPenColorAlt );
-				hLine.setColorAt( 1, Qt::transparent );
-				painter->setPen( QPen( QBrush( hLine ), 2 ) );
-				painter->drawLine( bl, br );
-			}
+				painter->setBrush( Qt::NoBrush );
+				QPoint bl = option.rect.bottomLeft() + QPoint( 7, 0 );
+				QPoint br = option.rect.bottomRight() - QPoint( 7, 0 );
+				if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) ) {
+						QLinearGradient hLine( bl, br );
+						hLine.setColorAt( 0, Qt::transparent );
+						hLine.setColorAt( 0.3, Settings->Colors.FocusPenColorAlt );
+						hLine.setColorAt( 0.7, Settings->Colors.FocusPenColorAlt );
+						hLine.setColorAt( 1, Qt::transparent );
+						painter->setPen( QPen( QBrush( hLine ), 2 ) );
+						painter->drawLine( bl, br );
+				}
 
-			else {
-				QLinearGradient hLine( bl, br );
-				hLine.setColorAt( 0, Qt::transparent );
-				hLine.setColorAt( 0.3, Settings->Colors.FocusPenColor );
-				hLine.setColorAt( 0.7, Settings->Colors.FocusPenColor );
-				hLine.setColorAt( 1, Qt::transparent );
-				painter->setPen( QPen( QBrush( hLine ), 2 ) );
-				painter->drawLine( bl, br );
-			}
-		}
-
-		// In NormalListView paint an arrow to show its a directory
-		if ( ( ftype.isDir() ) and ( Settings->General.FolderView == QString( "NormalListView" ) ) ) {
-			QPixmap arrowPix = QPixmap( ":/icons/arrow-right.png" ).scaled( 24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation );
-			QRect arrowRect = QRect( option.rect.width() - 32, option.rect.y() + 12, 24, 24 );
-			painter->drawPixmap( arrowRect, arrowPix );
+				else {
+						QLinearGradient hLine( bl, br );
+						hLine.setColorAt( 0, Qt::transparent );
+						hLine.setColorAt( 0.3, Settings->Colors.FocusPenColor );
+						hLine.setColorAt( 0.7, Settings->Colors.FocusPenColor );
+						hLine.setColorAt( 1, Qt::transparent );
+						painter->setPen( QPen( QBrush( hLine ), 2 ) );
+						painter->drawLine( bl, br );
+				}
 		}
 
 		// Paint Icon
@@ -264,12 +185,8 @@ void NBIconDelegate::paint( QPainter *painter, const QStyleOptionViewItem &optio
 				painter->setPen( Settings->Colors.TextPenColor );
 		}
 
-		// Paint the text
-		if ( ListView.contains( Settings->General.FolderView ) )
-			painter->drawText( textRect, Qt::AlignLeft | Qt::AlignVCenter, text );
-
-		else
-			painter->drawText( textRect, Qt::AlignHCenter, text );
+		// Draw Text
+		painter->drawText( textRect, Qt::AlignHCenter, text );
 
 		painter->restore();
 	}

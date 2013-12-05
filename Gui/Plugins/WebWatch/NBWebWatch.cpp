@@ -5,7 +5,6 @@
 */
 
 #include <NBWebWatch.hpp>
-#include <NBTools.hpp>
 
 NBWebWatch::NBWebWatch( QWidget *parent, QString pth ) : QWidget( parent ) {
 

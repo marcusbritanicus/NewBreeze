@@ -6,37 +6,35 @@
 
 #include <NBFileSystemNode.hpp>
 
-static int __sortColumn = 0;
-static bool __sortCase = false;
-static bool __sortDirs = true;
+static int __sortColumn = Settings->Session.SortColumn;
+static bool __sortCase = Settings->Session.SortCase;
+static bool __sortCategory = Settings->Session.SortCategory;
+
+QStringList NBFileSystemNode::categoryList = QStringList();
 
 NBFileSystemNode::NBFileSystemNode() {
 
 	for( int i = 0; i < 10; i++ )
 		nodeData << "";
 
+	myCategory = "Uncategorized";
 	parentNode = 0;
 };
 
-NBFileSystemNode::NBFileSystemNode( QVariantList data, NBFileSystemNode *parent ) {
+NBFileSystemNode::NBFileSystemNode( QVariantList data, QString category, NBFileSystemNode *parent ) {
 
 	nodeData << data;
+	myCategory = category;
+
 	parentNode = parent;
 };
 
-void NBFileSystemNode::appendChild( NBFileSystemNode *node ) {
+void NBFileSystemNode::addChild( NBFileSystemNode *node ) {
+
+	if ( not categoryList.contains( node->category() ) )
+		categoryList << node->category();
 
 	childNodes << node;
-};
-
-void NBFileSystemNode::insertChildAt( int row, NBFileSystemNode *node ) {
-
-	childNodes.insert( row, node );
-};
-
-void NBFileSystemNode::removeChildAt( int row ) {
-
-	delete childNodes.takeAt( row );
 };
 
 void NBFileSystemNode::removeChild( NBFileSystemNode *node ) {
@@ -55,7 +53,12 @@ NBFileSystemNode* NBFileSystemNode::child( QString name ) {
 		if ( node->data( 0 ) == name )
 			return node;
 
-	return new NBFileSystemNode( QVariantList() );
+	return new NBFileSystemNode();
+};
+
+QList<NBFileSystemNode*> NBFileSystemNode::children() {
+
+	return childNodes;
 };
 
 int NBFileSystemNode::childCount() {
@@ -63,21 +66,30 @@ int NBFileSystemNode::childCount() {
 	return childNodes.count();
 };
 
-void NBFileSystemNode::clearChildren() {
+int NBFileSystemNode::categoryCount() {
 
-	return childNodes.clear();
+	return categoryList.count();
 };
 
-int NBFileSystemNode::columnCount() {
+void NBFileSystemNode::clearChildren() {
 
-	/*
-		*
-		* We have three special columns which need to be discounted from the count
-		*
-	*/
+	childNodes.clear();
+	categoryList.clear();
+};
 
-	qDebug() << nodeData.count() - 3;
-	return nodeData.count() - 3;
+QString NBFileSystemNode::category() {
+
+	return myCategory;
+};
+
+void NBFileSystemNode::setCategory( QString newCategory ) {
+
+	myCategory = newCategory;
+};
+
+int NBFileSystemNode::categoryIndex() {
+
+	return categoryList.indexOf( myCategory );
 };
 
 QVariant NBFileSystemNode::data( int column, bool special ) const {
@@ -103,6 +115,11 @@ QVariant NBFileSystemNode::data( int column, bool special ) const {
 		return nodeData.at( 3 + column );
 	}
 };
+
+QVariantList NBFileSystemNode::allData() {
+
+	return nodeData;
+}
 
 bool NBFileSystemNode::setData( int column, QVariant data, bool special ) {
 
@@ -143,23 +160,42 @@ int NBFileSystemNode::row() {
 	return 0;
 };
 
-void NBFileSystemNode::sort( int column, bool cs, bool dirsFirst ) {
+void NBFileSystemNode::sort( int column, bool cs, bool categorized ) {
 
 	__sortColumn = column;
 	__sortCase = cs;
-	__sortDirs = dirsFirst;
+	__sortCategory = categorized;
 
-	qSort( childNodes.begin(), childNodes.end(), columnSort );
+	if ( categorized )
+		NBFileSystemNode::categoryList = sortCategoryList( NBFileSystemNode::categoryList );
+
+	qSort( childNodes.begin(), childNodes.end(), columnSort2 );
 };
 
-bool columnSort( const NBFileSystemNode *first, const NBFileSystemNode *second )  {
+void NBFileSystemNode::updateCategories() {
 
-	// dir/file/system, rawsize, icon
-	// name, size, type, mime, time, perm, owner
+	NBFileSystemNode::categoryList.clear();
+	foreach( NBFileSystemNode *cNode, childNodes ) {
+		QString newCategory = cNode->category();
+		if ( not NBFileSystemNode::categoryList.contains( newCategory ) )
+			NBFileSystemNode::categoryList << newCategory;
+	}
 
-	if ( __sortDirs ) {
+	if ( __sortCategory )
+		NBFileSystemNode::categoryList = sortCategoryList( NBFileSystemNode::categoryList );
+}
+
+bool columnSort2( NBFileSystemNode *first, NBFileSystemNode *second )  {
+
+	int firstIdx = first->categoryIndex();
+	int secondIdx = second->categoryIndex();
+
+	/* If its not a categorized sorting, then both have equal categorization weights */
+	if ( not __sortCategory )
+		firstIdx = secondIdx;
+
+	if ( firstIdx == secondIdx ) {
 		if ( ( first->data( 0, true ) == "dir" ) and ( second->data( 0, true ) == "dir" ) ) {
-
 			switch( __sortColumn ) {
 				case 0: {
 					if ( __sortCase )
@@ -285,5 +321,88 @@ bool columnSort( const NBFileSystemNode *first, const NBFileSystemNode *second )
 		}
 	}
 
-	return true;
+	else if ( firstIdx < secondIdx ) {
+		/* Means first item is in a category earlier than the second category */
+		return true;
+	}
+
+	else {
+		/* Means first item is in a category later than the second category */
+		return false;
+	}
+
+	return false;
+};
+
+
+QStringList sortCategoryList( QStringList& cList ) {
+
+	switch( __sortColumn ) {
+		/* Name sort */
+		case 0: {
+			cList.sort();
+			return cList;
+		};
+
+		/* Size sort */
+		/* The order should be: Folders, Tiny, Small, Medium, Large, Massive */
+		case 1: {
+			QStringList nList;
+			if ( cList.contains( "Folders" ) )
+				nList << "Folders";
+
+			if ( cList.contains( "Tiny" ) )
+				nList << "Tiny";
+
+			if ( cList.contains( "Small" ) )
+				nList << "Small";
+
+			if ( cList.contains( "Medium" ) )
+				nList << "Medium";
+
+			if ( cList.contains( "Large" ) )
+				nList << "Large";
+
+			if ( cList.contains( "Massive" ) )
+				nList << "Massive";
+
+			return nList;
+		};
+
+		/* Type sort */
+		/* Folder must be the first item Then come the files */
+		case 2: {
+			if ( cList.contains( "Folders" ) ) {
+				cList.removeAll( "Folders" );
+				qSort( cList.begin(), cList.end(), []( QString a, QString b ) { return a.toLower() < b.toLower(); } );
+				cList.insert( 0, "Folders" );
+			}
+
+			else {
+				qSort( cList.begin(), cList.end(), []( QString a, QString b ) { return a.toLower() < b.toLower(); } );
+			}
+
+			return cList;
+		};
+
+		/* Date sort */
+		/* We convert all the String dates to QDates, sort them and then convert them back to String */
+		case 4: {
+			QList<QDate> dList;
+			QStringList nList;
+			Q_FOREACH( QString date, cList ) {
+				dList << QDate::fromString( date, "MMMM yyyy" );
+			}
+
+			qSort( dList.begin(), dList.end() );
+			Q_FOREACH( QDate date, dList )
+				nList << date.toString( "MMMM yyyy" );
+
+			return nList;
+		};
+
+		default: {
+			return cList;
+		}
+	};
 };
