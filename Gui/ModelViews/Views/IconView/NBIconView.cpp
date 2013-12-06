@@ -479,14 +479,26 @@ void NBIconView::resizeEvent( QResizeEvent* ) {
 
 void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 
-	if ( ( mpEvent->button() == Qt::LeftButton ) )
+	if ( mpEvent->button() == Qt::LeftButton )
 		dragStartPosition = mpEvent->pos();
 
 	else
 		dragStartPosition = QPoint();
 
+	if ( mpEvent->button() == Qt::RightButton ) {
+		mpEvent->ignore();
+		return;
+	}
+
+	QModelIndex idx = indexAt( mpEvent->pos() );
+	QItemSelectionModel *selector = selectionModel();
+	if ( selector->isSelected( idx ) )
+		selector->select( idx, QItemSelectionModel::SelectCurrent );
+
+	else
+		selector->select( idx, QItemSelectionModel::Deselect );
+
 	QAbstractItemView::mousePressEvent( mpEvent );
-	setCurrentIndex( indexAt( mpEvent->pos() ) );
 };
 
 void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
@@ -528,13 +540,15 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 	mmEvent->accept();
 };
 
-void NBIconView::mouseDoubleClickEvent( QMouseEvent *event ) {
+void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 
-	QModelIndex idx = indexAt( event->pos() );
-	if ( idx.isValid() )
-		emit open( idx );
+	if ( mEvent->button() == Qt::LeftButton ) {
+		QModelIndex idx = indexAt( mEvent->pos() );
+		if ( idx.isValid() )
+			emit open( idx );
+	}
 
-	event->accept();
+	mEvent->accept();
 };
 
 void NBIconView::dragEnterEvent( QDragEnterEvent *deEvent ) {
@@ -659,15 +673,12 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 
 			case QAbstractItemView::MoveDown: {
 
-				QString thisCategory = cModel->category( idx );
-				QString nextCategory;
+				int thisCategoryIdx = cModel->categoryIndex( idx );
+				/* If we in the last category go to the first one */
+				int nextCategoryIdx = ( thisCategoryIdx == cModel->categoryCount() - 1 ? 0 : thisCategoryIdx + 1 );
 
-				for ( int i = categoryList.indexOf( thisCategory ) + 1; i < categoryList.count(); i++ ) {
-					if ( cModel->isCategoryVisible( categoryList.at( i ) ) ) {
-						nextCategory = categoryList.value( i );
-						break;
-					}
-				}
+				QString thisCategory = cModel->category( idx );
+				QString nextCategory = categoryList.value( nextCategoryIdx );
 
 				QModelIndexList thisCategoryIndexes = cModel->indexListForCategory( thisCategory );
 				QModelIndexList nextCategoryIndexes = cModel->indexListForCategory( nextCategory );
@@ -709,15 +720,12 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 			}
 
 			case QAbstractItemView::MoveUp: {
-				QString thisCategory = cModel->category( idx );
-				QString prevCategory;
+				int thisCategoryIdx = cModel->categoryIndex( idx );
+				/* If we in the first category go to the last one */
+				int prevCategoryIdx = ( thisCategoryIdx == 0 ? cModel->categoryCount() - 1 : thisCategoryIdx - 1 );
 
-				for( int i = categoryList.indexOf( thisCategory ) - 1; i >= 0; i-- ) {
-					if ( cModel->isCategoryVisible( categoryList.at( i ) ) ) {
-						prevCategory = categoryList.value( i );
-						break;
-					}
-				}
+				QString thisCategory = cModel->category( idx );
+				QString prevCategory = categoryList.value( prevCategoryIdx );
 
 				QModelIndexList thisCategoryIndexes = cModel->indexListForCategory( thisCategory );
 				QModelIndexList prevCategoryIndexes = cModel->indexListForCategory( prevCategory );

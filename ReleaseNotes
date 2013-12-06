@@ -16,3 +16,31 @@ This is a preview release of v2.2.0
 => QActionGroup
    The older approach of using radiobuttons and making them exclusive to provide 'View Modes' list and 'Sort By' menu has been replaced by the
    cleaner QActionGroup approach. This is much more elegant and clean.
+
+NewBreeze v2.2.0
+================
+
+=> NBAFileSystemModel( QAbstractItemModel )
+   NBFileSystemModel is now a categorized item model. Categories can be name, size, type or modification time based. Categorization can
+   easily be switched on or off via setCategorizationEnabled( bool );
+
+=> NBIconView( QAbstractItemView )
+   NBIconView is now categorized item view. It supports both a categorized and a non categorized item model.
+
+=> 'Show in groups'
+   This switch helps to switch on or of the Categorization of the Model and the View.
+
+=> QActionGroup
+   The older approach of using radiobuttons and making them exclusive to provide 'View Modes' list and 'Sort By' menu has been replaced by the
+   cleaner QActionGroup approach. This is much more elegant and clean.
+
+=> Move
+   The intra-device move is now purely a renaming action.
+
+=> FileIO
+   While copying/moving a file, if by chance, the target exists, then the newly copied file will be renamed as *basename* - Copy.*ext*
+   While copying/moving a folder, if by chance, the target exist, then folder being copied get merged with the existing folder, and existing
+   files renamed.
+
+=> Multifile ( Experimental )
+   This is a very unique feature that enables NewBreeze to have many multiple versions

@@ -9,7 +9,7 @@
 
 #include <Global.hpp>
 #include <NBTools.hpp>
-#include <NBDeleteManager.hpp>
+#include <NBDeviceInfo.hpp>
 
 class NBFileIO : public QObject {
 	Q_OBJECT

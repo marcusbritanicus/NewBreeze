@@ -227,6 +227,21 @@ void NBFileIO::copyFile( QString srcFile ) {
 		// return;
 	}
 
+	if ( exists( ioTarget ) ) {
+		QString suffix = mimeDb.suffixForFileName( srcFile );
+		ioTarget = ( suffix.length() ? ioTarget.chop( 1 + suffix.length() ) + " - Copy." + suffix : ioTarget + " - Copy" );
+	}
+
+	/* If the operation is intra-device operation and its a move, then we can simply rename the file */
+	if ( NBIOMode::Move == mode ) {
+		NBDeviceManager devMgr;
+		NBDeviceInfo srcInfo = devMgr.deviceInfoForPath( dirName( sourceList.at( 0 ) ) );
+		NBDeviceInfo tgtInfo = devMgr.deviceInfoForPath( targetDir );
+
+		if ( tgtInfo.mountPoint() == srcInfo.mountPoint() )
+			QFile::rename( srcFile, ioTarget );
+	}
+
 	int iFileFD = open( qPrintable( srcFile ), O_RDONLY );
 	int oFileFD = open( qPrintable( ioTarget ), O_WRONLY | O_CREAT );
 
@@ -282,6 +297,16 @@ void NBFileIO::copyFile( QString srcFile ) {
 
 void NBFileIO::copyDir( QString path ) {
 
+	/* If the operation is intra-device operation and its a move, then we can simply rename the file */
+	if ( NBIOMode::Move == mode ) {
+		NBDeviceManager devMgr;
+		NBDeviceInfo srcInfo = devMgr.deviceInfoForPath( dirName( sourceList.at( 0 ) ) );
+		NBDeviceInfo tgtInfo = devMgr.deviceInfoForPath( targetDir );
+
+		if ( tgtInfo.mountPoint() == srcInfo.mountPoint() )
+			QFile::rename( path, targetDir + baseName( path ) );
+	}
+
 	DIR* d_fh;
 	struct dirent* entry;
 	QString longest_name;
@@ -318,6 +343,9 @@ void NBFileIO::copyDir( QString path ) {
 	}
 
 	closedir( d_fh );
+
+	if ( mode == NBIOMode::Move )
+		rmdir( qPrintable( path ) );
 };
 
 void NBFileIO::mkpath( QString path, QFile::Permissions dirPerms ) {
