@@ -229,7 +229,7 @@ void NBFileIO::copyFile( QString srcFile ) {
 
 	if ( exists( ioTarget ) ) {
 		QString suffix = mimeDb.suffixForFileName( srcFile );
-		ioTarget = ( suffix.length() ? ioTarget.chop( 1 + suffix.length() ) + " - Copy." + suffix : ioTarget + " - Copy" );
+		ioTarget = ( suffix.length() ? ioTarget.left( ioTarget.length() - ( 1 + suffix.length() ) ) + " - Copy." + suffix : ioTarget + " - Copy" );
 	}
 
 	/* If the operation is intra-device operation and its a move, then we can simply rename the file */

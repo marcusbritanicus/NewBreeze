@@ -43,4 +43,6 @@ NewBreeze v2.2.0
    files renamed.
 
 => Multifile ( Experimental )
-   This is a very unique feature that enables NewBreeze to have many multiple versions of the same file.
+   This is a very unique feature that enables NewBreeze to have many multiple versions of the same file. This is not similar to Windows File
+   Versioning. Windows file versionin creates a backup or restore point of a file. In our case, a binary difference is stored. If we delete the
+   latest file then all the older versions are as well deleted. This is optional and in not enabled by default.
