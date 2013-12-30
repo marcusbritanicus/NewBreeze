@@ -19,12 +19,11 @@
 #include <NBGuiWidgets.hpp>
 #include <NBTerminal.hpp>
 #include <NBIOManager.hpp>
-#include <NBAppsView.hpp>
-#include <NBCatalogView.hpp>
 #include <NBTools.hpp>
 #include <NBCustomActions.hpp>
 #include <NBSettingsManager.hpp>
 #include <NBMessageDialog.hpp>
+#include <NBStyleManager.hpp>
 
 class NewBreeze : public QMainWindow {
 	Q_OBJECT
@@ -57,8 +56,6 @@ class NewBreeze : public QMainWindow {
 		NBQuickMenuBar *QuickMenuBar;
 		NBSidePanel *SidePanel;
 		NBFolderView *FolderView;
-		NBApplicationsView *ApplicationsView;
-		NBCatalogView *CatalogView;
 		NBTerminal *Terminal;
 		NBInfoBar *InfoBar;
 
@@ -90,7 +87,7 @@ class NewBreeze : public QMainWindow {
 		void showProperties();
 		void showPermissions();
 
-		void handleSpecialUrls( QString );
+		void handleDriveUrl( QString );
 		void showApplications();
 		void showCatalogs();
 		void showFolders();

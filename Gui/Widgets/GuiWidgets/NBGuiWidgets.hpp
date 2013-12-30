@@ -103,7 +103,7 @@ class Separator {
 		static QWidget* horizontal();
 };
 
-class NBViewModeButton: public QToolButton {
+class NBViewModeButton: public QPushButton {
 	Q_OBJECT
 
 	public:
@@ -111,9 +111,7 @@ class NBViewModeButton: public QToolButton {
 		int checkedAction();
 
 	private :
-		QAction *smallListAct, *mediumListAct, *tilesAct, *smallIconsAct, *normalIconsAct, *largeIconsAct, *hugeIconsAct;
-		QAction *smallDetailsAct, *normalDetailsAct;
-
+		QAction *tilesAct, *iconsAct, *detailsAct;
 		QActionGroup *viewsGroup;
 
 	public slots:

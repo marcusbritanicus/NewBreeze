@@ -707,27 +707,6 @@ void NBOpenWithView::mousePressEvent( QMouseEvent *event ) {
 
 void NBOpenWithView::mouseDoubleClickEvent( QMouseEvent *event ) {
 
-	/*
-		*
-		* QString mCategory = categoryAt( event->pos() );
-		* if ( ( not mCategory.isNull() ) or ( not mCategory.isEmpty() ) ) {
-		* 	if ( appModel->isCategoryVisible( mCategory ) )
-		* 		appModel->hideCategory( mCategory );
-        *
-		* 	else
-		* 		appModel->showCategory( mCategory );
-        *
-		* 	hashIsDirty = true;
-		* 	calculateRectsIfNecessary();
-		* 	updateGeometries();
-        *
-		* 	event->accept();
-        *
-		* 	return;
-		* }
-		*
-	*/
-
 	QModelIndex index = indexAt( event->pos() );
 	if ( index.isValid() ) {
 		QStringList execList = index.data( NBApplicationsModel::ExecList ).toStringList();

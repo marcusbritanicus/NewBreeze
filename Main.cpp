@@ -50,8 +50,8 @@ int main( int argc, char **argv ) {
 
 	else {
 		if ( isServerRunning() ) {
-			qDebug() << "Running server found";
-			qDebug() << "Requesting server for new window";
+			qDebug( "Running server found" );
+			qDebug( "Requesting server for new window" );
 
 			QTcpSocket *client = new QTcpSocket();
 			client->connectToHost( QHostAddress::LocalHost, 14928 );
@@ -99,16 +99,20 @@ int main( int argc, char **argv ) {
 			return app.exec();
 		}
 
-		qDebug() << "Server not found.";
-		qDebug() << "Starting new server.";
+		qDebug( "Server not found." );
+		qDebug( "Starting new server." );
 
 		NBStartup();
+
+		app.setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
+
 		NBServer *server = new NBServer();
 		server->start();
 
 		NewBreeze *Gui;
 		if ( argc >= 2 )
 			Gui = new NewBreeze( app.tr( argv[ 1 ] ) );
+
 
 		else
 			Gui = new NewBreeze();

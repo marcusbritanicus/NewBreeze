@@ -15,10 +15,12 @@ NBFolderView::NBFolderView() : QStackedWidget() {
 
 	// Setup the views
 	IconView = new NBIconView( fsModel );
-	TreeView = new NBTreeView( fsModel );
+	ApplicationsView = new NBApplicationsView();
+	CatalogView = new NBCatalogView();
 
 	addWidget( IconView );
-	addWidget( TreeView );
+	addWidget( ApplicationsView );
+	addWidget( CatalogView );
 
 	// Minimum Width - 640px
 	setMinimumWidth( 640 );
@@ -35,20 +37,12 @@ NBFolderView::NBFolderView() : QStackedWidget() {
 
 void NBFolderView::updateViewMode() {
 
-	if ( Settings->General.FolderView.contains( "DetailsView" ) ) {
-		setCurrentIndex( 1 );
-		TreeView->updateViewMode();
-	}
-
-	else {
-		setCurrentIndex( 0 );
-		IconView->updateViewMode();
-	}
+	IconView->updateViewMode();
 };
 
 bool NBFolderView::hasSelection() {
 
-	return TreeView->selectionModel()->hasSelection() or IconView->selectionModel()->hasSelection();
+	return IconView->selectionModel()->hasSelection();
 };
 
 void NBFolderView::createAndSetupActions() {
@@ -73,22 +67,9 @@ void NBFolderView::createAndSetupActions() {
 	// DragDrop move
 	connect( IconView, SIGNAL( move( QStringList, QString ) ), this, SLOT( move( QStringList, QString ) ) );
 
-	connect( TreeView, SIGNAL( open( QModelIndex ) ), this, SLOT( doOpen( QModelIndex ) ) );
-
-	connect( TreeView, SIGNAL( contextMenuRequested( QPoint ) ), this, SLOT( showContextMenu( QPoint ) ) );
-
-	connect(
-		TreeView->selectionModel(), SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ),
-		this, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) )
-	);
-
-	connect( TreeView, SIGNAL( link( QStringList, QString ) ), this, SLOT( link( QStringList, QString ) ) );
-
-	// DragDrop copy
-	connect( TreeView, SIGNAL( copy( QStringList, QString ) ), this, SLOT( copy( QStringList, QString ) ) );
-
-	// DragDrop move
-	connect( TreeView, SIGNAL( move( QStringList, QString ) ), this, SLOT( move( QStringList, QString ) ) );
+	connect( fsModel, SIGNAL( loadFolders() ), this, SLOT( showFolders() ) );
+	connect( fsModel, SIGNAL( loadApplications() ), this, SLOT( showApplications() ) );
+	connect( fsModel, SIGNAL( loadCatalogs() ), this, SLOT( showCatalogs() ) );
 
 	// Home
 	actHomeDir = new QAction( QIcon( ":/icons/home.png" ), "&Home", this );
@@ -265,7 +246,7 @@ void NBFolderView::createAndSetupActions() {
 		}
 	}
 
-	groupsAct = new QAction( QIcon( ":/icons/groups.png" ), "Show in &Groups", this );
+	groupsAct = new QAction( QIcon::fromTheme( "view-group", QIcon( ":/icons/groups.png" ) ), "Show in &Groups", this );
 	groupsAct->setCheckable( true );
 	groupsAct->setChecked( Settings->Session.SortCategory );
 	connect( groupsAct, SIGNAL( triggered() ), this, SIGNAL( toggleGroups() ) );
@@ -288,19 +269,10 @@ void NBFolderView::createAndSetupActions() {
 QModelIndexList NBFolderView::getSelection() {
 
 	QModelIndexList selectedList;
-	if ( currentIndex() ) {
-		selectedList << TreeView->selectionModel()->selectedIndexes();
-		foreach( QModelIndex idx, selectedList )
-			if ( idx.column() )
-				selectedList.removeAt( selectedList.indexOf( idx ) );
-	}
-
-	else {
-		selectedList << IconView->selectionModel()->selectedIndexes();
-		foreach( QModelIndex idx, selectedList )
-			if ( idx.column() )
-				selectedList.removeAt( selectedList.indexOf( idx ) );
-	}
+	selectedList << IconView->selectionModel()->selectedIndexes();
+	foreach( QModelIndex idx, selectedList )
+		if ( idx.column() )
+			selectedList.removeAt( selectedList.indexOf( idx ) );
 
 	return selectedList;
 };
@@ -312,12 +284,18 @@ void NBFolderView::goUp() {
 
 void NBFolderView::goBack() {
 
-	fsModel->goBack();
+	if ( fsModel->canGoBack() ) {
+		emit updateAddressBar( fsModel->previousDir() );
+		fsModel->goBack();
+	}
 };
 
 void NBFolderView::goForward() {
 
-	fsModel->goForward();
+	if ( fsModel->canGoForward() ) {
+		emit updateAddressBar( fsModel->nextDir() );
+		fsModel->goForward();
+	}
 };
 
 void NBFolderView::doOpenHome() {
@@ -338,6 +316,11 @@ void NBFolderView::newFolder() {
 };
 
 void NBFolderView::doOpen( QString loc ) {
+
+	if ( loc.startsWith( "NB://" ) ) {
+		fsModel->setRootPath( loc );
+		return;
+	}
 
 	if ( not isReadable( loc ) ) {
 		QString title = tr( "Access Error" );
@@ -362,6 +345,7 @@ void NBFolderView::doOpen( QString loc ) {
 
 		NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
 		QStringList exec = app.execArgs();
+
 		// Prepare @v exec
 		if ( app.takesArgs() ) {
 			if ( app.multipleArgs() ) {
@@ -398,6 +382,12 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 
 	Q_UNUSED( idx );
 	QList<QModelIndex> selectedList = getSelection();
+
+	if ( isDir( fsModel->nodePath( idx ) ) ) {
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", qPrintable( fsModel->nodePath( idx ) ) );
+		fsModel->setRootPath( fsModel->nodePath( idx ) );
+		return;
+	}
 
 	foreach( QModelIndex index, selectedList ) {
 		QString fileToBeOpened = fsModel->nodePath( index );
@@ -437,6 +427,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 				NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s", qPrintable( fileToBeOpened ) );
 				NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( fileToBeOpened ) );
 				QStringList exec = app.execArgs();
+
 				// Prepare @v exec
 				if ( app.takesArgs() ) {
 					if ( app.multipleArgs() ) {
@@ -516,9 +507,27 @@ void NBFolderView::doOpenWithCmd() {
 	}
 };
 
+void NBFolderView::showApplications() {
+
+	setCurrentIndex( 1 );
+	currentWidget()->setFocus();
+};
+
+void NBFolderView::showCatalogs() {
+
+	setCurrentIndex( 2 );
+	currentWidget()->setFocus();
+};
+
+void NBFolderView::showFolders() {
+
+	setCurrentIndex( 0 );
+	currentWidget()->setFocus();
+};
+
 void NBFolderView::doPeek() {
 
-	QModelIndex curIndex = ( currentIndex() ? TreeView->currentIndex() : IconView->currentIndex() );
+	QModelIndex curIndex = IconView->currentIndex();
 
 	if ( !curIndex.isValid() ) {
 		emit showProperties();
@@ -534,7 +543,6 @@ void NBFolderView::doPeek() {
 	QString mimeType = getMimeType( currentNode );
 
 	if ( not isReadable( currentNode ) ) {
-
 		NBMessageDialog::error(
 			QString( "Cannot Open Location" ),
 			QString(
@@ -546,40 +554,40 @@ void NBFolderView::doPeek() {
 		return;
 	}
 
-	if ( getMimeType( "/" ) == mimeType ) {
+	if ( isDir( currentNode ) ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing folder: %s", qPrintable( currentNode ) );
-		NBFolderFlash *previewer = new NBFolderFlash( this, currentNode );
+		NBFolderFlash *previewer = new NBFolderFlash( currentNode );
+
 		connect( previewer, SIGNAL( loadFolder( QString ) ), this, SLOT( doOpen( QString ) ) );
 		previewer->show();
 	}
 
 	else if ( mimeType.contains( "html" ) ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing html: %s", qPrintable( currentNode ) );
-		NBWebWatch *previewer = new NBWebWatch( this, currentNode );
+		NBWebWatch *previewer = new NBWebWatch( currentNode );
 		previewer->show();
 	}
 
 	else if ( isText( currentNode ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing text: ", qPrintable( currentNode ) );
-		NBWordView *previewer = new NBWordView( this, currentNode );
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing text: %s", qPrintable( currentNode ) );
+		NBWordView *previewer = new NBWordView( currentNode );
 		previewer->show();
 	}
 
 	else if ( mimeType.contains( "image" ) or mimeType.contains( "mng" ) or mimeType.contains( "gif" ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing image: ", qPrintable( currentNode ) );
-		NBImagePeek *previewer = new NBImagePeek( this, currentNode );
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing image: %s", qPrintable( currentNode ) );
+		NBImagePeek *previewer = new NBImagePeek( currentNode );
 		previewer->show();
 	}
 
 	else {
 		// Custom Peeking
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: ", qPrintable( currentNode ) );
-		NBCustomPeek *previewer = new NBCustomPeek( this, currentNode );
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", qPrintable( currentNode ) );
+		NBCustomPeek *previewer = new NBCustomPeek( currentNode );
 		previewer->show();
 	}
 
 	currentWidget()->setFocus();
-	// emit updateAddressBar();
 };
 
 void NBFolderView::doReload() {
@@ -600,7 +608,7 @@ void NBFolderView::doToggleHidden() {
 		fsModel->setShowHidden( true );
 	}
 
-	Settings->setValue( "Session/ShowHidden", fsModel->showHidden() );
+	Settings->Session.ShowHidden = fsModel->showHidden();
 };
 
 void NBFolderView::prepareCopy() {
@@ -613,7 +621,7 @@ void NBFolderView::prepareCopy() {
 
 	QList<QUrl> urlList;
 	foreach( QModelIndex item, copyList )
-		urlList << QUrl( fsModel->nodePath( item.data().toString() ) );
+		urlList << QUrl::fromLocalFile( fsModel->nodePath( item.data().toString() ) );
 
 	QMimeData *mimedata = new QMimeData();
 	mimedata->setUrls( urlList );
@@ -731,7 +739,7 @@ void NBFolderView::doDelete() {
 
 void NBFolderView::doRename() {
 
-	QModelIndex curIndex = ( currentIndex() ? TreeView->currentIndex() : IconView->currentIndex() );
+	QModelIndex curIndex = IconView->currentIndex();
 
 	if ( !curIndex.isValid() )
 		return;
@@ -798,11 +806,7 @@ void NBFolderView::sortByDate() {
 
 void NBFolderView::selectAll() {
 
-	if ( currentIndex() )
-		TreeView->selectAll();
-
-	else
-		IconView->selectAll();
+	IconView->selectAll();
 };
 
 void NBFolderView::openTerminal() {
@@ -900,7 +904,7 @@ void NBFolderView::compress( QStringList archiveList ) {
 	*/
 
 	QString archiveName = NBFileDialog::getSaveFileName(
-			QString( ":/icons/newbreeze.png" ),
+			QString( ":/icons/newbreeze2.png" ),
 			tr( "NewBreeze - Save Archive As" ),
 			fsModel->currentDir(),
 			QStringList(

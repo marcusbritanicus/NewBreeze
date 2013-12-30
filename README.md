@@ -50,8 +50,8 @@ Some of its features are
 * Issues with delete folders
 
 ### Upcoming
-* File/folder delete GUI
 * Unified Folder, Application, and Catalog Viewer
 * Pdf Preview Plugin
 * Application Editor ( Desktop file editor )
+* Smaller and mode stylish SideBar with more functionality
 * Any other feature you request for... :)

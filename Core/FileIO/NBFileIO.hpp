@@ -95,8 +95,8 @@ class NBFileIO : public QObject {
 
 		QString jobID;
 
-		bool wasCanceled;
-		bool isPaused;
+		bool wasCanceled = false;
+		bool isPaused = false;
 
 		NBIOMode::Mode mode;
 

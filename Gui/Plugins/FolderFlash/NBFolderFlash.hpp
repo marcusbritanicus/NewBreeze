@@ -8,16 +8,16 @@
 #define NBFOLDERFLASH_HPP
 
 #include <Global.hpp>
-#include <NBFolderViewRestricted.hpp>
+#include <NBIconViewRestricted.hpp>
 #include <NBTools.hpp>
 
 class NBFolderFlash : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBFolderFlash( QWidget *parent = 0, QString path = QDir::homePath() );
+		NBFolderFlash( QString path = QDir::homePath() );
 		QString path;
-		NBFolderViewRestricted *peekWidgetBase;
+		NBIconViewRestricted *peekWidgetBase;
 
 	private :
 		void createGUI();
@@ -28,6 +28,7 @@ class NBFolderFlash : public QWidget {
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
+		void changeEvent( QEvent *cEvent );
 
 	Q_SIGNALS:
 		void loadFolder( QString );

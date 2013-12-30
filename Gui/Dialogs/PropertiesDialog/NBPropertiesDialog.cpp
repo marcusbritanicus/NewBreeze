@@ -220,13 +220,13 @@ void NBPropertiesDialog::recurseProperties( QString path ) {
 void NBPropertiesDialog::setDialogProperties() {
 
 	setDialogTitle( tr( "Properties" ) );
-	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
 
 	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
 
 	if ( not Settings->General.NativeTitleBar )
-		setWindowFlags( Qt::FramelessWindowHint | Qt::Popup );
+		setWindowFlags( Qt::FramelessWindowHint );
 
 	else
 		setWindowFlags( Qt::Popup );
@@ -282,7 +282,7 @@ void NBPropertiesDialog::update() {
 void NBPropertiesDialog::setDirIcon() {
 
 	QString iconName = NBFileDialog::getExistingFileName(
-			QString( ":/icons/newbreeze.png" ),
+			QString( ":/icons/newbreeze2.png" ),
 			tr( "NewBreeze - Select Icon" ),
 			QDir::homePath(),
 			QStringList(
@@ -303,6 +303,19 @@ void NBPropertiesDialog::setDirIcon() {
 
 		NBClickLabel *label = qobject_cast<NBClickLabel*>( sender() );
 		label->setPixmap( QPixmap( iconName ).scaled( 48, 48, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	}
+};
+
+void NBPropertiesDialog::changeEvent( QEvent *event ) {
+
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
+		hide();
+		event->accept();
+	}
+
+	else {
+		QWidget::changeEvent( event );
+		event->accept();
 	}
 };
 
@@ -539,7 +552,7 @@ void NBPermissionsDialog::readPermissions() {
 void NBPermissionsDialog::setDialogProperties() {
 
 	setDialogTitle( tr( "Permissions" ) );
-	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
 
 	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );

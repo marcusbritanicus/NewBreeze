@@ -15,7 +15,7 @@ class NBWebWatch : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBWebWatch( QWidget *parent = 0, QString path = QDir::homePath() );
+		NBWebWatch( QString path = QDir::homePath() );
 		QString path;
 		QWebView *peekWidgetBase;
 
@@ -28,6 +28,7 @@ class NBWebWatch : public QWidget {
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
+		void changeEvent( QEvent *cEvent );
 };
 
 #endif

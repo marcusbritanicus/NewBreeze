@@ -21,8 +21,9 @@ NewBreeze v2.2.0
 ================
 
 => NBAFileSystemModel( QAbstractItemModel )
-   NBFileSystemModel is now a categorized item model. Categories can be name, size, type or modification time based. Categorization can
-   easily be switched on or off via setCategorizationEnabled( bool );
+   - NBFileSystemModel is now a categorized item model. Categories can be name, size, type or modification time based. Categorization can
+     easily be switched on or off via setCategorizationEnabled( bool )
+   - NBFileSystem now detects file size changes and automatically updates it.
 
 => NBIconView( QAbstractItemView )
    NBIconView is now categorized item view. It supports both a categorized and a non categorized item model.
@@ -36,13 +37,23 @@ NewBreeze v2.2.0
 
 => Move
    The intra-device move is now purely a renaming action.
+   In case a directory which is being moved exists then a full-gledged FileIO will be performed.
 
 => FileIO
    While copying/moving a file, if by chance, the target exists, then the newly copied file will be renamed as *basename* - Copy.*ext*
    While copying/moving a folder, if by chance, the target exist, then folder being copied get merged with the existing folder, and existing
    files renamed.
 
-=> Multifile ( Experimental )
-   This is a very unique feature that enables NewBreeze to have many multiple versions of the same file. This is not similar to Windows File
-   Versioning. Windows file versionin creates a backup or restore point of a file. In our case, a binary difference is stored. If we delete the
-   latest file then all the older versions are as well deleted. This is optional and in not enabled by default.
+=> View Modes
+   I have done away with the predefined view modes with fixed sizes. Now we have three view modes, the tiles view, the icons view and the
+   details view. Icon size can be dynamically changed by pressing the 'Zoom In' and 'Zoom Out' key sequences. This changes the icon size by
+   4px
+   -> Icons And Tiles view: 16px <-->128px
+   -> Tree view: 16px <--> 64px
+
+=> Details
+   Depending on the Icon Size, extra details will be shown for all the items in the tiles and the icons views. For now the order of details
+   which are unveiled are hard coded into the program. This *may* be changed at a later date.
+
+=> Delete GUI
+   Since the delete process is very fast a gui is not required.

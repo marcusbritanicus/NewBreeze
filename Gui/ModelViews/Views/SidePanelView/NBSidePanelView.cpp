@@ -7,7 +7,7 @@
 #include <NBSidePanelView.hpp>
 #include <NBTools.hpp>
 
-NBSidePanel::NBSidePanel() {
+NBSidePanel::NBSidePanel() : QTreeView() {
 
 	spModel = new NBSidePanelModel();
 	setModel( spModel );
@@ -87,11 +87,11 @@ void NBSidePanel::handleClick( const QModelIndex clickedIndex ) {
 
 	/* Second logical row is Applications */
 	else if ( ( clickedIndex.parent() == spModel->parent() ) and ( clickedIndex.row() == 1 ) )
-		emit specialUrl( clickedIndex.data( Qt::UserRole + 1 ).toString() );
+		emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
 
 	/* Third logical row is Catalogs */
 	else if ( ( clickedIndex.parent() == spModel->parent() ) and ( clickedIndex.row() == 2 ) )
-		emit specialUrl( clickedIndex.data( Qt::UserRole + 1 ).toString() );
+		emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
 
 	/* All others are devices or book marks */
 	else if ( clickedIndex.parent() != spModel->parent() )

@@ -22,7 +22,11 @@ QString dirName( QString path ) {
 	if ( path.endsWith( "/" ) )
 		path.chop( 1 );
 
-	return QString( dirname( strdup( qPrintable( path ) ) ) ) + "/";
+	char *dupPath = strdup( qPrintable( path ) );
+	QString dirPth = QString( dirname( dupPath ) ) + "/";
+	free( dupPath );
+
+	return dirPth;
 };
 
 QString baseName( QString path ) {
@@ -30,7 +34,11 @@ QString baseName( QString path ) {
 	if ( path.endsWith( "/" ) )
 		path.chop( 1 );
 
-	return QString( basename( strdup( qPrintable( path ) ) ) );
+	char *dupPath = strdup( qPrintable( path ) );
+	QString basePth = QString( basename( dupPath ) );
+	free( dupPath );
+
+	return basePth;
 };
 
 QString getMimeType( QString path ) {
@@ -164,12 +172,12 @@ bool isReadable( QString path ) {
 
 	struct stat fileMode;
 	QList<int> groupList;
-	gid_t *groups = 0;
+	gid_t groups[ 1024 ] = { 0 };
 
 	if ( stat( qPrintable( path ), &fileMode ) != 0 )
 		return false;
 
-	int ngrps = getgroups( getgroups( 0, groups ), groups );
+	int ngrps = getgroups( 1024, groups );
 	if ( ngrps > 0 )
 		for( int i = 0; i < ngrps; i++ )
 			groupList << groups[ i ];
@@ -245,7 +253,7 @@ bool isWritable( QString path ) {
 
 	struct stat fileMode;
 	QList<int> groupList;
-	gid_t *groups = 0;
+	gid_t groups[ 1024 ] = { 0 };
 
 	if ( stat( qPrintable( path ), &fileMode ) != 0 )
 		return false;
@@ -490,14 +498,14 @@ QString formatSize( qint64 num ) {
 	else if ( num >= gb ) total = QString( "%1 GiB" ).arg( QString::number( qreal( num ) / gb, 'f', 2 ) );
 	else if ( num >= mb ) total = QString( "%1 MiB" ).arg( QString::number( qreal( num ) / mb, 'f', 1 ) );
 	else if ( num >= kb ) total = QString( "%1 KiB" ).arg( QString::number( qreal( num ) / kb,'f',1 ) );
-	else total = QString( "%1 bytes" ).arg( num );
+	else total = QString( "%1 byte%2" ).arg( num ).arg( num > 1 ? "s": "" );
 
 	return total;
 };
 
 QString getStyleSheet( QString Widget, QString Style ) {
 
-	return styleManager.getStyleSheet( Widget, Style );
+	return NBStyleManager::getStyleSheet( Widget, Style );
 };
 
 QStringList getTerminal() {
@@ -534,6 +542,8 @@ void NBMessageOutput( QtMsgType type, const char* message ) {
 		}
 
 		case QtWarningMsg: {
+			if ( QString( message ).contains( "X Error" ) )
+				break;
 			fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", message );
 			break;
 		}

@@ -16,22 +16,23 @@ void NewBreeze::updateVarious( QString url ) {
 	AddressBar->addressWidget->addressEdit->setText( url );
 	AddressBar->addressWidget->crumbsBar->setCurrentDirectory( url );
 
-	Terminal->changeDir( url );
+	if ( not url.startsWith( "NB://" ) )
+		Terminal->changeDir( url );
 };
 
 void NewBreeze::updateQuickMenuBar() {
 
 	if ( FolderView->hasSelection() ) {
-		QuickMenuBar->openWithBtn->setEnabled( true );
-		QuickMenuBar->moveToBtn->setEnabled( true );
-		QuickMenuBar->deleteBtn->setEnabled( true );
-		QuickMenuBar->permsBtn->setEnabled( true );
+		QuickMenuBar->quickBtns->setSegmentEnabled( 0 );
+		QuickMenuBar->quickBtns->setSegmentEnabled( 2 );
+		QuickMenuBar->quickBtns->setSegmentEnabled( 3 );
+		QuickMenuBar->quickBtns->setSegmentEnabled( 4 );
 	}
+
 	else {
-		QuickMenuBar->openWithBtn->setDisabled( true );
-		QuickMenuBar->moveToBtn->setDisabled( true );
-		QuickMenuBar->deleteBtn->setDisabled( true );
-		QuickMenuBar->permsBtn->setDisabled( true );
+		QuickMenuBar->quickBtns->setSegmentDisabled( 0 );
+		QuickMenuBar->quickBtns->setSegmentDisabled( 1 );
+		QuickMenuBar->quickBtns->setSegmentDisabled( 2 );
 	}
 };
 
@@ -56,47 +57,33 @@ void NewBreeze::updateInfoBar() {
 
 void NewBreeze::changeViewMode() {
 
-	QStringList viewModes = QStringList() << "SmallListView" << "NormalListView"<< "TilesView";
-	viewModes << "SmallIconsView" << "NormalIconsView" << "LargeIconsView" << "HugeIconsView";
-	viewModes << "SDetailsView" << "NDetailsView";
-
+	QStringList viewModes = QStringList() << "TilesView" << "IconsView" << "DetailsView";
 	Settings->General.FolderView = viewModes.at( AddressBar->viewModeBtn->checkedAction() );
-
-	Settings->setValue( "FolderView", Settings->General.FolderView );
-	Settings->reload();
 
 	FolderView->updateViewMode();
 };
 
 void NewBreeze::switchToNextView() {
 
-	QStringList viewModes = QStringList() << "SmallListView" << "NormalListView"<< "TilesView";
-	viewModes << "SmallIconsView" << "NormalIconsView" << "LargeIconsView" << "HugeIconsView";
-	viewModes << "SDetailsView" << "NDetailsView";
+	if ( Settings->General.FolderView == QString( "TilesView" ) )
+		Settings->General.FolderView = QString( "IconsView" );
 
-	QString currentMode = Settings->General.FolderView;
+	else if ( Settings->General.FolderView == QString( "IconsView" ) )
+		Settings->General.FolderView = QString( "DetailsView" );
 
-	int curIndex = viewModes.indexOf( currentMode );
-	int newIndex = ( curIndex == ( viewModes.size() - 1 ) ) ? 0 : curIndex + 1;
-
-	Settings->General.FolderView = viewModes.at( newIndex );
-	Settings->setValue( "FolderView", viewModes.at( newIndex ) );
-	Settings->reload();
+	else
+		Settings->General.FolderView = QString( "TilesView" );
 
 	FolderView->updateViewMode();
 };
 
 void NewBreeze::toggleGrouping() {
 
-	if ( Settings->Session.SortCategory ) {
-		Settings->setValue( "Session/SortCategory", false );
-		Settings->reload();
-	}
+	if ( Settings->Session.SortCategory )
+		Settings->Session.SortCategory = false;
 
-	else {
-		Settings->setValue( "Session/SortCategory", true );
-		Settings->reload();
-	}
+	else
+		Settings->Session.SortCategory = true;
 
 	FolderView->fsModel->setCategorizationEnabled( Settings->Session.SortCategory );
 	FolderView->groupsAct->setChecked( Settings->Session.SortCategory );

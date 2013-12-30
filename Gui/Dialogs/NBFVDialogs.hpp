@@ -87,6 +87,7 @@ class NBRunCmdDialog : public NBDialog {
 		void runCommand( QModelIndex );
 		void cancel();
 		void appSelected( QModelIndex );
+		// void appSelected();
 		void handleTextChanged( QString newText );
 		void makeDefaultAndRunCommand();
 };

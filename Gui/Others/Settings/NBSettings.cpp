@@ -29,17 +29,20 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->init = true;
 
 	defaultSettings->General.Style = QString( "LightGray" );
-	defaultSettings->General.FolderView = QString( "NormalIconsView" );
+	defaultSettings->General.FolderView = QString( "IconsView" );
 	defaultSettings->General.IconTheme = NBSystemIconTheme();
 	defaultSettings->General.ImagePreviews = true;
 	defaultSettings->General.NativeTitleBar = false;
 	defaultSettings->General.MaxIOJobs = 5;
+
+	defaultSettings->Special.ClosingDown = false;
 
 	defaultSettings->Session.Geometry = QRect( 900, 600, 0, 0 );
 	defaultSettings->Session.LastDir = QDir::homePath();
 	defaultSettings->Session.Maximized = true;
 	defaultSettings->Session.SidePanel = true;
 	defaultSettings->Session.ShowHidden = false;
+	defaultSettings->Session.IconSize = QSize( 48, 48 );
 	defaultSettings->Session.SortColumn = 0;
 	defaultSettings->Session.SortCase = false;
 	defaultSettings->Session.SortCategory = false;
@@ -143,6 +146,9 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "Session/ShowHidden" ) ) )
 		settings->Session.ShowHidden = gSettings.value( "Session/ShowHidden" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/IconSize" ) ) )
+		settings->Session.IconSize = gSettings.value( "Session/IconSize" ).toSize();
 
 	if ( gaKeys.contains( QString( "Session/SortColumn" ) ) )
 		settings->Session.SortColumn = gSettings.value( "Session/SortColumn" ).toInt();
@@ -310,6 +316,9 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "Session/ShowHidden" ) ) )
 		Session.ShowHidden = gSettings.value( "Session/ShowHidden" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/IconSize" ) ) )
+		Session.IconSize = gSettings.value( "Session/IconSize" ).toSize();
 
 	if ( gaKeys.contains( QString( "Session/SortColumn" ) ) )
 		Session.SortColumn = gSettings.value( "Session/SortColumn" ).toInt();

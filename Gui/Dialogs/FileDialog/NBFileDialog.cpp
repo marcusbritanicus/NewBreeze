@@ -13,11 +13,17 @@ NBFileDialog::NBFileDialog( QString wIcon, QString wTitle, QString fLocation, Fi
 	location = fLocation;
 	type = dType;
 
+	fsModel = new NBFileSystemModel();
+	fsModel->setShowHidden( Settings->Session.ShowHidden );
+	fsModel->setCategorizationEnabled( Settings->Session.SortCategory );
+	fsModel->setReadOnly( true );
+
 	createGUI();
 	createAndSetupActions();
 	setWindowProperties();
 
 	mainView->setFocus();
+	fsModel->setRootPath( fLocation );
 };
 
 void NBFileDialog::createGUI() {
@@ -29,11 +35,10 @@ void NBFileDialog::createGUI() {
 	QHBoxLayout *filterLyt = new QHBoxLayout();
 	QHBoxLayout *btnLyt = new QHBoxLayout();
 
-	toolBar = new NBAddressBar();
-	toolBar->viewModeBtn->hide();
+	addressWidget = new NBAddressWidget();
 	sidePanel = new NBSidePanel();
 
-	mainView = new NBFDFolderView( location );
+	mainView = new NBIconView( fsModel );
 	switch( type ) {
 		case ExistingFile :
 		case SaveFile :
@@ -69,7 +74,7 @@ void NBFileDialog::createGUI() {
 	connect( okBtn, SIGNAL( clicked() ), this, SLOT( accept() ) );
 	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
-	viewLyt->addWidget( toolBar );
+	viewLyt->addWidget( addressWidget );
 	viewLyt->addWidget( Separator::horizontal() );
 	viewLyt->addWidget( mainView );
 
@@ -99,7 +104,6 @@ void NBFileDialog::createGUI() {
 	btnLyt->addWidget( okBtn );
 	btnLyt->addWidget( cancelBtn );
 
-	lyt->addWidget( Separator::horizontal() );
 	lyt->addLayout( bodyLyt );
 	lyt->addWidget( Separator::horizontal() );
 	if( ( type == SaveFile ) or ( type == SaveDirectory ) )
@@ -115,16 +119,14 @@ void NBFileDialog::createGUI() {
 
 void NBFileDialog::createAndSetupActions() {
 
-	connect( sidePanel, SIGNAL( driveClicked( QString ) ),
-		mainView, SLOT( doOpen( QString ) ) );
+	connect( sidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( open( QString ) ) );
 
-	connect( toolBar->addressWidget->crumbsBar, SIGNAL( openLocation( QString ) ),
-		mainView, SLOT( doOpen( QString ) ) );
+	connect( addressWidget->crumbsBar, SIGNAL( openLocation( QString ) ), this, SLOT( open( QString ) ) );
+	connect( addressWidget->addressEdit, SIGNAL( returnPressed() ), this, SLOT( openAddressBar() ) );
 
-	connect( toolBar->addressWidget->addressEdit, SIGNAL( returnPressed() ),
-		this, SLOT( openAddressBar() ) );
+	connect( fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateToolBar() ) );
 
-	connect( mainView, SIGNAL( updateToolBar() ), this, SLOT( updateToolBar() ) );
+	connect( mainView, SIGNAL( open( QModelIndex ) ), this, SLOT( open( QModelIndex ) ) );
 
 	connect( filtersCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( resetFilters() ) );
 };
@@ -146,7 +148,7 @@ QString NBFileDialog::selectedItem() {
 	QString ext = selectedFilter();
 
 	if ( nameLE->text().isEmpty() ) {
-		QString item = mainView->fsModel->nodePath( mainView->selectionModel()->selectedRows().at( 0 ).data().toString() );
+		QString item = fsModel->nodePath( mainView->selectionModel()->selectedRows().at( 0 ).data().toString() );
 		if ( not item.endsWith( ext ) )
 			return item += ext;
 
@@ -155,7 +157,7 @@ QString NBFileDialog::selectedItem() {
 	}
 
 	else {
-		QString item = mainView->fsModel->nodePath( nameLE->text() );
+		QString item = fsModel->nodePath( nameLE->text() );
 		if ( not item.endsWith( ext ) )
 			return item += ext;
 
@@ -171,7 +173,7 @@ QStringList NBFileDialog::selectedItems() {
 	if ( nameLE->text().isEmpty() ) {
 		QStringList selected;
 		foreach( QModelIndex idx, mainView->selectionModel()->selectedRows() ) {
-			QString item = mainView->fsModel->nodePath( idx.data().toString() );
+			QString item = fsModel->nodePath( idx.data().toString() );
 			if ( not item.endsWith( ext ) )
 				selected << item += ext;
 
@@ -183,7 +185,7 @@ QStringList NBFileDialog::selectedItems() {
 	}
 
 	else {
-		QString item = mainView->fsModel->nodePath( nameLE->text() );
+		QString item = fsModel->nodePath( nameLE->text() );
 		if ( not item.endsWith( ext ) )
 			return QStringList() << item += ext;
 
@@ -247,18 +249,30 @@ QString NBFileDialog::getExistingFileName( QString icon, QString title, QString 
 
 void NBFileDialog::openAddressBar() {
 
-	if ( !QFileInfo( toolBar->addressWidget->addressEdit->text() ).exists() ) {
+	if ( !QFileInfo( addressWidget->addressEdit->text() ).exists() ) {
 		QString title = QString( "Invalid Location" );
 		QString text = QString( "There is no file or directory named: "		\
 			"<tt><b>%1</b></tt>. Please check the path entered."
-		).arg(  toolBar->addressWidget->addressEdit->text() );
+		).arg(  addressWidget->addressEdit->text() );
 
 		NBMessageDialog::error( title, text );
 		return;
 	}
 
+	fsModel->setRootPath( addressWidget->addressEdit->text() );
 	mainView->setFocus();
-	mainView->doOpen( toolBar->addressWidget->addressEdit->text() );
+};
+
+void NBFileDialog::open( QModelIndex idx ) {
+
+	fsModel->setRootPath( fsModel->nodePath( idx ) );
+	mainView->setFocus();
+};
+
+void NBFileDialog::open( QString path ) {
+
+	fsModel->setRootPath( path );
+	mainView->setFocus();
 };
 
 void NBFileDialog::resetFilters() {
@@ -268,14 +282,14 @@ void NBFileDialog::resetFilters() {
 
 	if ( rx.indexIn( filter ) != -1 ) {
 		QStringList nFilters = rx.cap( 1 ).simplified().split( " " );
-		mainView->fsModel->setNameFilters( nFilters );
+		fsModel->setNameFilters( nFilters );
 	}
 };
 
 void NBFileDialog::updateToolBar() {
 
-	QString url = mainView->fsModel->currentDir();
+	QString url = fsModel->currentDir();
 
-	toolBar->addressWidget->addressEdit->setText( url );
-	toolBar->addressWidget->crumbsBar->setCurrentDirectory( url );
+	addressWidget->addressEdit->setText( url );
+	addressWidget->crumbsBar->setCurrentDirectory( url );
 };

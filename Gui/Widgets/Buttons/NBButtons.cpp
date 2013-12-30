@@ -165,6 +165,8 @@ void NBButtons::setSegmentWidth( int width ) {
 
 	Q_FOREACH( QPushButton *pBtn, segments )
 		pBtn->setFixedWidth( width );
+
+	setFixedWidth( segments.count() * width + segments.count() * 2 );
 };
 
 void NBButtons::setSegmentHeight( int height ) {

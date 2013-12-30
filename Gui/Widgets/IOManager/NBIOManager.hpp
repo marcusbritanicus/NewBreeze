@@ -27,16 +27,24 @@ class NBIOWidget : public QWidget {
 		NBProgressBar *totalBar, *cfileBar;
 
 		QTimer *timer;
+		QTimer *speedTimer;
 		bool detailsAreSeen = true;
 
 		NBFileIO *io;
 		bool paused = false;
+
+		quint64 previousSize = 0, currentSize = 0;
 
 	private slots:
 		void toggleDetails();
 		void togglePauseResume();
 		void cancelIO();
 		void update();
+		void speedCalculator();
+		void signalRemove();
+
+	Q_SIGNALS:
+		void removeIO( NBFileIO* );
 };
 
 class NBIOManager : public NBDialog {
@@ -44,12 +52,17 @@ class NBIOManager : public NBDialog {
 
 	public:
 		NBIOManager( QList<NBFileIO*> );
+		void addIO( NBFileIO * );
 		void showCritical();
-		void update();
 
 	private:
 		QList<NBFileIO*> ioList;
+		QVBoxLayout *baseLyt;
+
 		bool killIOOnClose = false;
+
+	private slots:
+		void removeIO( NBFileIO* );
 
 	protected:
 		void closeEvent( QCloseEvent* );

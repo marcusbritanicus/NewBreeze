@@ -9,6 +9,10 @@
 
 #include <Global.hpp>
 #include <NBDialog.hpp>
+#include <NBGuiWidgets.hpp>
+#include <NBTools.hpp>
+#include <NBIconProvider.hpp>
+#include <NBButtons.hpp>
 
 class NBConfirmDeleteDialog : public NBDialog {
 	Q_OBJECT
@@ -20,7 +24,8 @@ class NBConfirmDeleteDialog : public NBDialog {
 
 	private:
 		QLabel *iconLbl, *textLbl;
-		QPushButton *deleteBtn, *cancelBtn, *detailsBtn;
+		NBButtons *segBtns;
+		QPushButton *deleteBtn, *cancelBtn;
 		QTableWidget *table;
 		QStringList deletePaths;
 
@@ -40,7 +45,6 @@ class NBConfirmDeleteDialog : public NBDialog {
 	private slots:
 		void deleteOk();
 		void deleteCancel();
-		void handleDetailsBtnClicked();
 
 	signals:
 		void closed();

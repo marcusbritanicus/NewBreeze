@@ -367,7 +367,7 @@ void NBPropertiesDialog::readPermissions() {
 void NBPropertiesDialog::setWindowProperties() {
 
 	setDialogTitle( tr( "Properties" ) );
-	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
 
 	if ( Settings->General.Style == "Transparent" )
 		setAttribute( Qt::WA_TranslucentBackground );
@@ -544,7 +544,7 @@ void NBPropertiesDialog::numericChanged( QString text ) {
 void NBPropertiesDialog::setDirIcon() {
 
 	QString iconName = NBFileDialog::getExistingFileName(
-			QString( ":/icons/newbreeze.png" ),
+			QString( ":/icons/newbreeze2.png" ),
 			tr( "NewBreeze - Select Icon" ),
 			QDir::homePath(),
 			QStringList(

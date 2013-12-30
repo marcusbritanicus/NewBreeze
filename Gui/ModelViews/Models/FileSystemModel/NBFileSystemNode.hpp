@@ -35,13 +35,15 @@ class NBFileSystemNode {
 
 		int categoryIndex();
 
+		QStringList categoryList();
+
 		NBFileSystemNode *parent();
 		int row();
 
 		void sort( int column = 0, bool cs = false, bool categorized = false );
 
 		void updateCategories();
-		static QStringList categoryList;
+		QStringList mCategoryList;
 
 	private:
 		QList<NBFileSystemNode*> childNodes;

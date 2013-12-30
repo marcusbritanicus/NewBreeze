@@ -49,8 +49,6 @@ Windows and Linux Source Available
 
 Bugs
     - Large paths run away from BreadCrumbs Bar
-    - Some issues with cut-copy-paste files and folders
-    - Issues with delete folders
 
 List of shortcuts
 +==============================================================+============================+
@@ -91,8 +89,8 @@ List of shortcuts
 +==============================================================+============================+
 
 Upcoming
-    - File/folder delete GUI
     - Unified Folder, Application, and Catalog Viewer
     - Pdf Preview Plugin
     - Application Editor ( Desktop file editor )
+    - Smaller and mode stylish SideBar with more functionality
     - Any other feature you request for... :)

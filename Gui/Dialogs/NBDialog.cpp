@@ -5,6 +5,7 @@
 */
 
 #include <NBDialog.hpp>
+#include <NBStyleManager.hpp>
 
 NBDialog::NBDialog( QString btns ) : QWidget() {
 
@@ -20,6 +21,7 @@ void NBDialog::setupGUI() {
 
 	QWidget *BaseWidget = new QWidget();
 	BaseWidget->setObjectName( tr( "guiBase" ) );
+	setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
 
 	BodyFrame = new QFrame();
 	BodyFrame->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );

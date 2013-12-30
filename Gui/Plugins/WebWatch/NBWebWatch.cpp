@@ -6,7 +6,7 @@
 
 #include <NBWebWatch.hpp>
 
-NBWebWatch::NBWebWatch( QWidget *parent, QString pth ) : QWidget( parent ) {
+NBWebWatch::NBWebWatch( QString pth ) : QWidget() {
 
 	path = QString( pth );
 
@@ -57,10 +57,10 @@ void NBWebWatch::createGUI() {
 void NBWebWatch::setWindowProperties() {
 
 	setFixedSize( 1024, 640 );
-	setWindowFlags( Qt::Popup );
 
 	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
+	setWindowFlags( Qt::FramelessWindowHint );
 
 	setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
 
@@ -78,6 +78,19 @@ void NBWebWatch::keyPressEvent( QKeyEvent *keyEvent ) {
 
 	else
 		QWidget::keyPressEvent( keyEvent );
+};
+
+void NBWebWatch::changeEvent( QEvent *event ) {
+
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
+		hide();
+		event->accept();
+	}
+
+	else {
+		QWidget::changeEvent( event );
+		event->accept();
+	}
 };
 
 void NBWebWatch::openInExternal() {

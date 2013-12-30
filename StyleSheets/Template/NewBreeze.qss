@@ -1,40 +1,24 @@
 QWidget#mainWidget {
-	background-image: url(:/icons/<bg>.png);
-	background-color: <bgcolor>;
-	color: <textcolor>;
 	border: 1px solid <bordercolor>;
 	border-radius: 5px;
 }
 
 QAbstractItemView#mainList {
-	background-color: <bgcolor>;
-	color: <textcolor>;
 	border: none;
 }
 
 QListView#mainList {
-	background-color: <bgcolor>;
-	color: <textcolor>;
 	border: none;
 }
 
 QTreeView#mainList {
-	background-color: <bgcolor>;
-	alternate-background-color: rgba( <27> );
-	color: <textcolor>;
 	border: none;
 }
 
-QHeaderView {
-	background: <bgcolor>;
-}
-
 QHeaderView::section {
-	background: <bgcolor>;
 	border-bottom: 1px solid gray;
 	border-top: none;
 	font-weight: bold;
-	color: <textcolor>;
 	height: 20px;
 }
 
@@ -47,7 +31,6 @@ QHeaderView::up-arrow {
 }
 
 QScrollBar:vertical {
-	background-color: <bgcolor>;
 	max-width: 8px;
 	border-radius: 4px;
 	padding: 1px;
@@ -57,14 +40,6 @@ QScrollBar::handle:vertical {
 	background-color: <scrollcolor>;
 	max-width: 6px;
 	border-radius: 3px;
-}
-
-QScrollBar::sub-page:vertical {
-	background-color: <bgcolor>;
-}
-
-QScrollBar::add-page:vertical {
-	background-color: <bgcolor>;
 }
 
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
@@ -85,14 +60,6 @@ QScrollBar::handle:horizontal {
 	border-radius: 3px;
 }
 
-QScrollBar::sub-page:horizontal {
-	background-color: <bgcolor>;
-}
-
-QScrollBar::add-page:horizontal {
-	background-color: <bgcolor>;
-}
-
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
 	width: 0px;
 	height: 0px;
@@ -105,8 +72,6 @@ QSizeGrip {
 
 QToolTip {
 	border: none;
-	color: <textcolor>;
-	background: rgba( <81> );
 	padding: 2px;
 	border-radius: 5px;
 	font-weight: bold;

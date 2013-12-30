@@ -9,7 +9,7 @@
 
 #include <Global.hpp>
 #include <NBAddressBar.hpp>
-#include <NBFDFolderView.hpp>
+#include <NBIconView.hpp>
 #include <NBSidePanelView.hpp>
 #include <NBDialog.hpp>
 #include <NBMessageDialog.hpp>
@@ -46,8 +46,10 @@ class NBFileDialog : public NBDialog {
 		void createAndSetupActions();
 		void setWindowProperties();
 
-		NBAddressBar *toolBar;
-		NBFDFolderView *mainView;
+		NBFileSystemModel *fsModel;
+
+		NBAddressWidget *addressWidget;
+		NBIconView *mainView;
 		NBSidePanel *sidePanel;
 
 		QLineEdit *nameLE;
@@ -62,6 +64,8 @@ class NBFileDialog : public NBDialog {
 
 	private slots:
 		void openAddressBar();
+		void open( QModelIndex );
+		void open( QString );
 
 		void resetFilters();
 		void updateToolBar();

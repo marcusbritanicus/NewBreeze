@@ -1,10 +1,8 @@
 QWidget {
-	color: <textcolor>;
 	font-weight: bold;
 }
 
 QToolButton {
-	background: transparent;
 	border: 0px;
 }
 
@@ -21,7 +19,6 @@ QToolButton#maxBtn:hover {
 }
 
 QLabel {
-	background: transparent;
 	padding-top: 5px;
 	padding-left: 5px;
 };

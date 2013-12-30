@@ -14,7 +14,7 @@ class NBImagePeek : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBImagePeek( QWidget *parent = 0, QString path = QDir::homePath() );
+		NBImagePeek( QString path = QDir::homePath() );
 		QString path;
 		QLabel *peekWidgetBase;
 
@@ -28,6 +28,7 @@ class NBImagePeek : public QWidget {
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
+		void changeEvent( QEvent *cEvent );
 };
 
 #endif

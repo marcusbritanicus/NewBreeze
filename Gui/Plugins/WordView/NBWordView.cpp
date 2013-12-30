@@ -6,7 +6,7 @@
 
 #include <NBWordView.hpp>
 
-NBWordView::NBWordView( QWidget *parent, QString pth ) : QWidget( parent ) {
+NBWordView::NBWordView( QString pth ) : QWidget() {
 
 	path = QString( pth );
 
@@ -71,10 +71,10 @@ void NBWordView::createGUI() {
 void NBWordView::setWindowProperties() {
 
 	setFixedSize( 720, 540 );
-	setWindowFlags( Qt::Popup );
 
 	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
+	setWindowFlags( Qt::FramelessWindowHint );
 
 	setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
 
@@ -92,6 +92,19 @@ void NBWordView::keyPressEvent( QKeyEvent *keyEvent ) {
 
 	else
 		QWidget::keyPressEvent( keyEvent );
+};
+
+void NBWordView::changeEvent( QEvent *event ) {
+
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
+		hide();
+		event->accept();
+	}
+
+	else {
+		QWidget::changeEvent( event );
+		event->accept();
+	}
 };
 
 QString NBWordView::loadFile() {

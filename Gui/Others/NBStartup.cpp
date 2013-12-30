@@ -117,4 +117,6 @@ void NBStartup() {
 			}
 		}
 	}
+
+	QThreadPool::globalInstance()->setMaxThreadCount( NBSettings::instance()->General.MaxIOJobs );
 };

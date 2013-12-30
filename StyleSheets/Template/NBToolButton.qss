@@ -1,8 +1,6 @@
 QPushButton {
-	background: transparent;
 	font-family: Architects Daughter;
 	text-align: center;
-	color: <textcolor>;
 	border: 0px;
 	margin-top: 5px;
 	min-width: 100px;
@@ -21,7 +19,6 @@ QPushButton:disabled {
 }
 
 QToolButton {
-	background: transparent;
 	text-align: center;
 	border: 0px;
 }
@@ -38,5 +35,4 @@ QToolButton:pressed {
 QToolButton:checked {
 	border: 1px solid gray;
 	border-radius: 5px;
-	background: rgba( <27> );
 }

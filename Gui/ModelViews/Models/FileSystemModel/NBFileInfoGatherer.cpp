@@ -10,7 +10,7 @@
 
 NBQuickFileInfoGatherer::NBQuickFileInfoGatherer() {
 
-	fileTypes = new QSettings( ":/NBFSExtData.conf", QSettings::NativeFormat );
+	fileTypes = new QSettings( ":/Data/NBFSExtData.conf", QSettings::NativeFormat );
 };
 
 QString NBQuickFileInfoGatherer::permStr( mode_t fileMode ) {
@@ -43,7 +43,7 @@ QString NBQuickFileInfoGatherer::formatSize( qint64 num ) {
 	else if ( num >= gb ) total = QString( "%1 GiB" ).arg( QString::number( qreal( num ) / gb, 'f', 2 ) );
 	else if ( num >= mb ) total = QString( "%1 MiB" ).arg( QString::number( qreal( num ) / mb, 'f', 1 ) );
 	else if ( num >= kb ) total = QString( "%1 KiB" ).arg( QString::number( qreal( num ) / kb,'f',1 ) );
-	else total = QString( "%1 bytes" ).arg( num );
+	else total = QString( "%1 byte%2" ).arg( num ).arg( num > 1 ? "s": "" );
 
 	return total;
 }
@@ -80,7 +80,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 		info << nChildren( "/" );
 		info << "folder";
 		info << "FileSystem";
-		info << QString( "%1 items" ).arg( info.at( 1 ).toLongLong() );
+		info << QString( "%1 item%2" ).arg( info.at( 1 ).toLongLong() ).arg( info.at( 1 ).toLongLong() > 1 ? "s": "" );
 		info << "Directory";
 		info << "inode/directory";
 		info << QDateTime::fromTime_t( statbuf.st_mtime ).toString( "ddd, dd MMM, yyyy" );
@@ -102,7 +102,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 		info << nChildren( path );
 		info << "folder";
 		info << ( name.isEmpty() ? "/" : name );
-		info << QString( "%1 items" ).arg( info.at( 1 ).toLongLong() );
+		info << QString( "%1 item%2" ).arg( info.at( 1 ).toLongLong() ).arg( info.at( 1 ).toLongLong() > 1 ? "s": "" );
 		info << "Directory";
 		info << "inode/directory";
 	}
@@ -206,9 +206,9 @@ void NBFileInfoGatherer::gatherInfo( QStringList entries, QString root ) {
 
 void NBFileInfoGatherer::run() {
 
-	QMutex mutex;
 	foreach( QString entry, entryList ) {
-		mutex.lock();
+		if ( Settings->Special.ClosingDown )
+			break;
 
 		QMimeType mimeType = mimeDb.mimeTypeForFile( rootPath + entry );
 		QStringList info;
@@ -218,7 +218,5 @@ void NBFileInfoGatherer::run() {
 		info << mimeType.name();
 
 		emit done( rootPath, entry, info );
-
-		mutex.unlock();
 	}
 };

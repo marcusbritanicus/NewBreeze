@@ -28,7 +28,8 @@
 #include <NBMessageDialog.hpp>
 #include <NBDeleteManager.hpp>
 #include <NBIconProvider.hpp>
-#include <NBPasteDialog.hpp>
+#include <NBAppsView.hpp>
+#include <NBCatalogView.hpp>
 
 class NBFolderView : public QStackedWidget {
 	Q_OBJECT
@@ -48,7 +49,8 @@ class NBFolderView : public QStackedWidget {
 		QAction *groupsAct;
 
 		NBIconView *IconView;
-		NBTreeView *TreeView;
+		NBApplicationsView *ApplicationsView;
+		NBCatalogView *CatalogView;
 
 		NBFileSystemModel *fsModel;
 		NBCustomActionsMenu *customMenu;
@@ -74,6 +76,10 @@ class NBFolderView : public QStackedWidget {
 		void doOpenWith();
 		void doOpenInNewWindow();
 		void doOpenWithCmd();
+
+		void showApplications();
+		void showCatalogs();
+		void showFolders();
 
 		void doRename();
 		void doPeek();
@@ -127,6 +133,8 @@ class NBFolderView : public QStackedWidget {
 
 		void reloadCatalogs();
 		void toggleGroups();
+
+		void updateAddressBar( QString );
 };
 
 #endif

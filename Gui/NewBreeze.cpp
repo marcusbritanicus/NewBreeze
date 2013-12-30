@@ -60,17 +60,12 @@ void NewBreeze::createGUI() {
 	FolderView = new NBFolderView();
 	InfoBar = new NBInfoBar();
 	Terminal = new NBTerminal();
-	ApplicationsView = new NBApplicationsView();
-	CatalogView = new NBCatalogView();
 
 	// Widgets layout
 	ViewLayout->addWidget( AddressBar );
 	ViewLayout->addWidget( Separator::horizontal() );
 	ViewLayout->addWidget( QuickMenuBar );
-	ViewLayout->addWidget( Separator::horizontal() );
 	ViewLayout->addWidget( FolderView );
-	ViewLayout->addWidget( ApplicationsView );
-	ViewLayout->addWidget( CatalogView );
 
 	BodyLayout->setContentsMargins( QMargins() );
 	BodyLayout->addWidget( SidePanel );
@@ -97,8 +92,6 @@ void NewBreeze::createGUI() {
 	FolderView->setObjectName( "mainList" );
 	Terminal->setFixedHeight( 270 );
 	Terminal->hide();
-	ApplicationsView->hide();
-	CatalogView->hide();
 
 	if ( not Settings->Session.SidePanel )
 		SidePanel->hide();
@@ -113,11 +106,11 @@ void NewBreeze::createGUI() {
 void NewBreeze::setWindowProperties() {
 
 	setWindowTitle( tr( "NewBreeze" ) );
-	setWindowIcon( QIcon( ":/icons/newbreeze.png" ) );
+	setWindowIcon( QIcon( ":/icons/newbreeze2.png" ) );
 
 	setMinimumSize( 900, 600 );
 
-	setGeometry( Settings->Session.Geometry);
+	setGeometry( Settings->Session.Geometry );
 
 	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
@@ -125,7 +118,13 @@ void NewBreeze::setWindowProperties() {
 	if ( not Settings->General.NativeTitleBar )
 		setWindowFlags( Qt::FramelessWindowHint );
 
-	setStyleSheet( getStyleSheet( "NewBreeze", Settings->General.Style ) );
+	setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
+
+	if ( Settings->General.Style == QString( "TransDark" ) )
+		setStyleSheet( QString( "QWidget#mainWidget { background-image: url(:/icons/bg.png); }" ) + getStyleSheet( "NewBreeze", Settings->General.Style ) );
+
+	else
+		setStyleSheet( getStyleSheet( "NewBreeze", Settings->General.Style ) );
 };
 
 void NewBreeze::setWindowTitle( QString title ) {
@@ -193,26 +192,17 @@ void NewBreeze::createAndSetupActions() {
 	// connect( AddressBar->searchBar, SIGNAL( searchCleared() ),
 		// this, SLOT( clearFilters() ) );
 
-	connect( QuickMenuBar->openWithBtn, SIGNAL( clicked() ),
-		this, SLOT( openWithList() ) );
+	connect( QuickMenuBar, SIGNAL( openWithClicked() ), this, SLOT( openWithList() ) );
 
-	connect( QuickMenuBar->deleteBtn, SIGNAL( clicked() ),
-		FolderView, SLOT( doDelete() ) );
+	connect( QuickMenuBar, SIGNAL( deleteClicked() ), FolderView, SLOT( doDelete() ) );
 
-	connect( QuickMenuBar->propsBtn, SIGNAL( clicked() ),
-		this, SLOT( showProperties() ) );
+	connect( QuickMenuBar, SIGNAL( propsClicked() ), this, SLOT( showProperties() ) );
 
-	connect( QuickMenuBar->permsBtn, SIGNAL( clicked() ),
-		this, SLOT( showPermissions() ) );
+	connect( QuickMenuBar, SIGNAL( permsClicked() ), this, SLOT( showPermissions() ) );
 
-	connect( SidePanel, SIGNAL( driveClicked( QString ) ),
-		FolderView, SLOT( doOpen( QString ) ) );
+	connect( SidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
 
-	connect( SidePanel, SIGNAL( showFolders() ),
-		this, SLOT( showFolders() ) );
-
-	connect( SidePanel, SIGNAL( specialUrl( QString ) ),
-		this, SLOT( handleSpecialUrls( QString ) ) );
+	connect( SidePanel, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
 
 	connect( SidePanel, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ),
 		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
@@ -226,44 +216,35 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( move( QStringList, QString, NBIOMode::Mode ) ),
 		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
 
-	connect( FolderView, SIGNAL( showProperties() ),
-		this, SLOT( showProperties() ) );
+	connect( FolderView, SIGNAL( showProperties() ), this, SLOT( showProperties() ) );
 
-	connect( FolderView, SIGNAL( showPermissions() ),
-		this, SLOT( showPermissions() ) );
+	connect( FolderView, SIGNAL( showPermissions() ), this, SLOT( showPermissions() ) );
 
-	connect( FolderView, SIGNAL( focusSearchBar() ),
-		this, SLOT( focusSearch() ) );
+	connect( FolderView, SIGNAL( focusSearchBar() ), this, SLOT( focusSearch() ) );
 
-	connect( FolderView, SIGNAL( clearSearchBar() ),
-		this, SLOT( clearSearch() ) );
+	connect( FolderView, SIGNAL( clearSearchBar() ), this, SLOT( clearSearch() ) );
 
-	connect( FolderView, SIGNAL( newWindow( QString ) ),
-		this, SLOT( openInNewWindow( QString ) ) );
+	connect( FolderView, SIGNAL( newWindow( QString ) ), this, SLOT( openInNewWindow( QString ) ) );
 
-	connect( FolderView, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ),
-		this, SLOT( updateInfoBar() ) );
+	connect( FolderView, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ), this, SLOT( updateInfoBar() ) );
 
-	connect( FolderView, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ),
-		this, SLOT( updateQuickMenuBar() ) );
+	connect( FolderView, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ), this, SLOT( updateQuickMenuBar() ) );
 
-	connect( FolderView, SIGNAL( reloadCatalogs() ),
-		CatalogView, SLOT( reload() ) );
+	connect( FolderView, SIGNAL( reloadCatalogs() ), FolderView->widget( 2 ), SLOT( reload() ) );
 
-	connect( FolderView, SIGNAL( toggleGroups() ),
-		this, SLOT( toggleGrouping() ) );
+	connect( FolderView, SIGNAL( toggleGroups() ), this, SLOT( toggleGrouping() ) );
 
-	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ),
-		this, SLOT( updateVarious( QString ) ) );
+	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 
-	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ),
-		this, SLOT( updateInfoBar() ) );
+	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateInfoBar() ) );
 
-	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ),
-		this, SLOT( updateQuickMenuBar() ) );
+	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateQuickMenuBar() ) );
 
-	connect( CatalogView, SIGNAL( openLocation( QString ) ),
-		this, SLOT( openAddress( QString ) ) );
+	connect( FolderView->widget( 2 ), SIGNAL( openLocation( QString ) ), this, SLOT( openAddress( QString ) ) );
+
+	connect( FolderView, SIGNAL( updateAddressBar( QString ) ), this, SLOT( updateVarious( QString ) ) );
+
+	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateQuickMenuBar() ) );
 
 	// About NB
 	QAction *aboutNBAct = new QAction( this );
@@ -421,11 +402,15 @@ void NewBreeze::showCustomActionsDialog() {
 
 void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 
+	// Signal all those who are looking for closing signal
+	Settings->Special.ClosingDown = true;
+
 	// If there are background FileIO jobs, bring them to front
 	if ( InfoBar->ioManagerMini->activeJobs() )
 		InfoBar->ioManagerMini->showAllIODialogs();
 
 	// Store the previous session - geometry, and open directory.
+	Settings->setValue( "FolderView", Settings->General.FolderView );
 	Settings->setValue( "Session/Geometry", geometry() );
 	Settings->setValue( "Session/LastDir", FolderView->fsModel->currentDir() );
 	Settings->setValue( "Session/ShowHidden", FolderView->fsModel->showHidden() );
@@ -436,7 +421,7 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	Settings->setValue( "Session/ExpandDevices", SidePanel->isExpanded( SidePanel->spModel->index( 3, 0 ) ) );
 	Settings->setValue( "Session/ExpandBookmarks", SidePanel->isExpanded( SidePanel->spModel->index( 4, 0 ) ) );
 
-	qDebug() << "Good Bye!";
+	qDebug( "Good Bye!" );
 
 	cEvent->accept();
 };
@@ -520,7 +505,7 @@ void NewBreeze::showInfoDlg() {
 
 	shortcutDlg->setFixedSize( QSize( 720, 630 ) );
 
-	shortcutDlg->setWindowIcon( QIcon( ":/icons/newbreeze.png" ) );
+	shortcutDlg->setWindowIcon( QIcon( ":/icons/newbreeze2.png" ) );
 	shortcutDlg->setWindowTitle( tr( "NewBreeze Info" ) );
 
 	QDesktopWidget dw;
@@ -545,18 +530,14 @@ void NewBreeze::openAddressBar() {
 		return;
 	}
 
-	FolderView->setFocus();
 	FolderView->doOpen( AddressBar->addressWidget->addressEdit->text() );
 };
 
 void NewBreeze::openAddress( QString path ) {
 
-	ApplicationsView->hide();
-	CatalogView->hide();
-	FolderView->show();
+	FolderView->setCurrentIndex( 0 );
 
 	FolderView->doOpen( path );
-	FolderView->setFocus();
 };
 
 void NewBreeze::newWindow( QString path ) {
@@ -575,7 +556,7 @@ void NewBreeze::newWindow( QString path ) {
 void NewBreeze::openNewWindow() {
 
 	QString location = FolderView->fsModel->currentDir();
-	qDebug() << "Opening new window at " << location;
+	qDebug( "Opening new window at %s", qPrintable( location ) );
 
 	NewBreeze *newbreeze = new NewBreeze( location );
 	if ( Settings->Session.Maximized )
@@ -626,40 +607,35 @@ void NewBreeze::showProperties() {
 	propsDlg->show();
 };
 
-void NewBreeze::handleSpecialUrls( QString specialUrl ) {
+void NewBreeze::handleDriveUrl( QString url ){
 
-	if ( specialUrl == "NB://Applications" )
+	if ( url.startsWith( "NB://A" ) )
 		showApplications();
 
-	else if ( specialUrl == "NB://Catalogs" )
+	else if ( url.startsWith( "NB://C" ) )
 		showCatalogs();
+
+	else
+		FolderView->doOpen( url );
 };
 
 void NewBreeze::showApplications() {
 
-	FolderView->hide();
-	CatalogView->hide();
-
-	ApplicationsView->show();
-	ApplicationsView->setFocus();
+	FolderView->doOpen( "NB://Applications" );
+	AddressBar->addressWidget->addressEdit->setText( "NB://Applications" );
+	AddressBar->addressWidget->crumbsBar->setCurrentDirectory( "NB://Applications" );
 };
 
 void NewBreeze::showCatalogs() {
 
-	FolderView->hide();
-	ApplicationsView->hide();
-
-	CatalogView->show();
-	CatalogView->setFocus();
+	FolderView->doOpen( "NB://Catalogs" );
+	AddressBar->addressWidget->addressEdit->setText( "NB://Catalogs" );
+	AddressBar->addressWidget->crumbsBar->setCurrentDirectory( "NB://Catalogs" );
 };
 
 void NewBreeze::showFolders() {
 
-	ApplicationsView->hide();
-	CatalogView->hide();
-
-	FolderView->show();
-	FolderView->setFocus();
+	FolderView->doOpen( FolderView->fsModel->currentDir() );
 };
 
 void NewBreeze::showPermissions() {

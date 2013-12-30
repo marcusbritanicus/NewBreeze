@@ -9,6 +9,7 @@
 
 #include <Global.hpp>
 #include <NBTools.hpp>
+#include <NBButtons.hpp>
 #include <NBGuiWidgets.hpp>
 #include <NBActionButtons.hpp>
 

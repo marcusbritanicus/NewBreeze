@@ -164,160 +164,69 @@ QWidget* Separator::horizontal() {
 	return hSep;
 };
 
-NBViewModeButton::NBViewModeButton() : QToolButton() {
+NBViewModeButton::NBViewModeButton() : QPushButton() {
 
-	setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
-
-	setFixedHeight( 24 );
-	setMinimumWidth( 32 );
+	setFixedSize( QSize( 36, 24 ) );
 
 	setIcon( QIcon( ":/icons/view-choose.png" ) );
-	setPopupMode( QToolButton::InstantPopup );
 
 	connect( this, SIGNAL( clicked() ), this, SIGNAL( switchToNextView() ) );
 
 	NBMenu *menu = new NBMenu( this );
 
-	smallListAct = new QAction( "&Small List", this );
-	smallListAct->setCheckable( true );
-	connect( smallListAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
-
-	mediumListAct = new QAction( "&Large List", this );
-	mediumListAct->setCheckable( true );
-	connect( mediumListAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
-
-	tilesAct = new QAction( "&Tiles", this );
+	tilesAct = new QAction( QIcon::fromTheme( "view-list-details" ), "&Tiles View", this );
 	tilesAct->setCheckable( true );
 	connect( tilesAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	smallIconsAct = new QAction( "S&mall Icons", this );
-	smallIconsAct->setCheckable( true );
-	connect( smallIconsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
+	iconsAct = new QAction( QIcon::fromTheme( "view-list-icons" ), "&Icons View", this );
+	iconsAct->setCheckable( true );
+	connect( iconsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
-	normalIconsAct = new QAction( "&Normal Icons", this );
-	normalIconsAct->setCheckable( true );
-	connect( normalIconsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
-
-	largeIconsAct = new QAction( "L&arge Icons", this );
-	largeIconsAct->setCheckable( true );
-	connect( largeIconsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
-
-	hugeIconsAct = new QAction( "&Huge Icons", this );
-	hugeIconsAct->setCheckable( true );
-	connect( hugeIconsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
-
-	smallDetailsAct = new QAction( "Small &Details", this );
-	smallDetailsAct->setCheckable( true );
-	connect( smallDetailsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
-
-	normalDetailsAct = new QAction( "La&rge Details", this );
-	normalDetailsAct->setCheckable( true );
-	connect( normalDetailsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
+	detailsAct = new QAction( QIcon::fromTheme( "view-list-text" ), "&Details View", this );
+	detailsAct->setCheckable( true );
+	connect( detailsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
 
 	viewsGroup = new QActionGroup( this );
 
-	menu->addAction( viewsGroup->addAction( smallListAct ) );
-	menu->addAction( viewsGroup->addAction( mediumListAct ) );
 	menu->addAction( viewsGroup->addAction( tilesAct ) );
-	menu->addAction( viewsGroup->addAction( smallIconsAct ) );
-	menu->addAction( viewsGroup->addAction( normalIconsAct ) );
-	menu->addAction( viewsGroup->addAction( largeIconsAct ) );
-	menu->addAction( viewsGroup->addAction( hugeIconsAct ) );
-	menu->addAction( viewsGroup->addAction( smallDetailsAct ) );
-	menu->addAction( viewsGroup->addAction( normalDetailsAct ) );
-
+	menu->addAction( viewsGroup->addAction( iconsAct ) );
+	menu->addAction( viewsGroup->addAction( detailsAct ) );
 	setMenu( menu );
 
-	if ( Settings->General.FolderView == QString( "SmallListView" ) )
-		smallListAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "NormalListView" ) )
-		mediumListAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "TilesView" ) )
+	if ( Settings->General.FolderView == QString( "TilesView" ) )
 		tilesAct->setChecked( true );
 
-	else if ( Settings->General.FolderView == QString( "SmallIconsView" ) )
-		smallIconsAct->setChecked( true );
+	else if ( Settings->General.FolderView == QString( "IconsView" ) )
+		iconsAct->setChecked( true );
 
-	else if ( Settings->General.FolderView == QString( "NormalIconsView" ) )
-		normalIconsAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "LargeIconsView" ) )
-		largeIconsAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "HugeIconsView" ) )
-		hugeIconsAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "SDetailsView" ) )
-		smallDetailsAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "NDetailsView" ) )
-		normalDetailsAct->setChecked( true );
+	else if ( Settings->General.FolderView == QString( "DetailsView" ) )
+		detailsAct->setChecked( true );
 };
 
 int NBViewModeButton::checkedAction() {
 
-	if ( viewsGroup->checkedAction() == smallListAct )
+	if ( viewsGroup->checkedAction() == tilesAct )
 		return 0;
 
-	else if ( viewsGroup->checkedAction() == mediumListAct )
+	else if ( viewsGroup->checkedAction() == iconsAct )
 		return 1;
 
-	else if ( viewsGroup->checkedAction() == tilesAct )
+	else
 		return 2;
-
-	else if ( viewsGroup->checkedAction() == smallIconsAct )
-		return 3;
-
-	else if ( viewsGroup->checkedAction() == normalIconsAct )
-		return 4;
-
-	else if ( viewsGroup->checkedAction() == largeIconsAct )
-		return 5;
-
-	else if ( viewsGroup->checkedAction() == hugeIconsAct )
-		return 6;
-
-	else if ( viewsGroup->checkedAction() == smallDetailsAct )
-		return 7;
-
-	else if ( viewsGroup->checkedAction() == normalDetailsAct )
-		return 8;
-
-	return 4;
 };
 
 void NBViewModeButton::showMenu() {
 
-	if ( Settings->General.FolderView == QString( "SmallListView" ) )
-		smallListAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "NormalListView" ) )
-		mediumListAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "TilesView" ) )
+	if ( Settings->General.FolderView == QString( "TilesView" ) )
 		tilesAct->setChecked( true );
 
-	else if ( Settings->General.FolderView == QString( "SmallIconsView" ) )
-		smallIconsAct->setChecked( true );
+	else if ( Settings->General.FolderView == QString( "IconsView" ) )
+		iconsAct->setChecked( true );
 
-	else if ( Settings->General.FolderView == QString( "NormalIconsView" ) )
-		normalIconsAct->setChecked( true );
+	else if ( Settings->General.FolderView == QString( "DetailsView" ) )
+		detailsAct->setChecked( true );
 
-	else if ( Settings->General.FolderView == QString( "LargeIconsView" ) )
-		largeIconsAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "HugeIconsView" ) )
-		hugeIconsAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "SDetailsView" ) )
-		smallDetailsAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "NDetailsView" ) )
-		normalDetailsAct->setChecked( true );
-
-	QToolButton::showMenu();
+	QPushButton::showMenu();
 };
 
 NBInfoLabel::NBInfoLabel() : QLabel() {

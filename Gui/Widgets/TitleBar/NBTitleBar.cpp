@@ -16,7 +16,7 @@ NBTitleBar::NBTitleBar() : QWidget() {
 
 	isMaximized = true;
 
-	m_icon = QIcon( ":/icons/newbreeze.png" );
+	m_icon = QIcon( ":/icons/newbreeze2.png" );
 	m_title = QString( "NewBreeze" );
 
 	actBtns = new NBActionButtons( true, true, true );

@@ -10,6 +10,7 @@ NBIOWidget::NBIOWidget( NBFileIO *ioProc ) {
 
 	io = ioProc;
 	connect( io, SIGNAL( IOComplete() ), this, SLOT( close() ) );
+	connect( io, SIGNAL( IOComplete() ), this, SLOT( signalRemove() ) );
 
 	paused = false;
 
@@ -17,6 +18,11 @@ NBIOWidget::NBIOWidget( NBFileIO *ioProc ) {
 	timer->setInterval( 500 );
 	connect( timer, SIGNAL( timeout() ), this, SLOT( update() ) );
 	timer->start();
+
+	speedTimer = new QTimer();
+	speedTimer->setInterval( 1000 );
+	connect( speedTimer, SIGNAL( timeout() ), this, SLOT( speedCalculator() ) );
+	speedTimer->start();
 
 	ttlLbl = new QLabel( ( io->ioMode() == NBIOMode::Copy ? "Copying Files" : "Moving Files" ) );
 	srcLbl = new QLabel(  "Source: " + dirName( io->sources().at( 0 ) ) );
@@ -127,8 +133,6 @@ void NBIOWidget::togglePauseResume() {
 
 void NBIOWidget::update() {
 
-	speedLbl->setText( "Speed: 0 kBps" );
-	etcLbl->setText( "ETC: 00:00:00" );
 	cfileLbl->setText( "Current file: " + io->ioTarget );
 
 	totalBar->setMaximum( io->totalSize );
@@ -137,11 +141,39 @@ void NBIOWidget::update() {
 	cfileBar->setValue( io->fWritten );
 };
 
+void NBIOWidget::speedCalculator() {
+
+	if ( io->totalSize == io->copiedSize )
+		return;
+
+	previousSize = currentSize;
+	currentSize = io->copiedSize;
+
+	quint64 speed = currentSize - previousSize;
+	quint64 rTime = ceil( ( io->totalSize - io->copiedSize ) / speed );
+	QString hrs = ( rTime / 3600 ? QString( "%1 hours, " ).arg( rTime / 3600 ) : QString() );
+	QString mins = ( ( rTime % 3600 ) / 60 ? QString( "%1 minutes, " ).arg( ( rTime % 3600 ) / 60 ) : QString() );
+	QString secs = ( ( rTime % 3600 ) % 60 ? QString( "%1 seconds" ).arg( ( rTime % 3600 ) % 60 ) : QString() );
+
+	speedLbl->setText( QString( "Speed: %1/s" ).arg( formatSize( speed ) ) );
+	etcLbl->setText( QString( "ETC: %1%2%3" ).arg( hrs ).arg( mins ).arg( secs ) );
+};
+
 void NBIOWidget::cancelIO() {
 
+	/* There is a chance that IO has been paused. We make sure to resume it before cancelling it. */
 	io->resume();
+
 	io->cancel();
 	close();
+};
+
+void NBIOWidget::signalRemove() {
+
+	speedTimer->stop();
+	timer->stop();
+
+	emit removeIO( io );
 };
 
 NBIOManager::NBIOManager( QList<NBFileIO*> jobList ) : NBDialog( "nxc" ) {
@@ -153,11 +185,12 @@ NBIOManager::NBIOManager( QList<NBFileIO*> jobList ) : NBDialog( "nxc" ) {
 	// scroller->setStyleSheet( "border-top: 1px solid gray;" );
 
 	QWidget *baseWidget = new QWidget();
-	QVBoxLayout *baseLyt = new QVBoxLayout();
+	baseLyt = new QVBoxLayout();
 	baseLyt->setContentsMargins( QMargins() );
 
 	foreach( NBFileIO *io, jobList ) {
 		NBIOWidget *iow = new NBIOWidget( io );
+		connect( iow, SIGNAL( removeIO( NBFileIO* ) ), this, SLOT( removeIO( NBFileIO* ) ) );
 		baseLyt->addWidget( iow );
 	}
 	baseLyt->addStretch( 0 );
@@ -170,13 +203,22 @@ NBIOManager::NBIOManager( QList<NBFileIO*> jobList ) : NBDialog( "nxc" ) {
 	scrollLyt->addWidget( scroller );
 
 	setLayout( scrollLyt );
-	setAttribute( Qt::WA_DeleteOnClose );
 	setWindowModality( Qt::NonModal );
 
 	setDialogTitle( "NewBreeze IO Manager" );
-	setDialogIcon( QIcon( ":/icons/newbreeze,png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
 
 	setMinimumSize( QSize( 800, 500 ) );
+};
+
+void NBIOManager::addIO( NBFileIO *io ) {
+
+	ioList << io;
+
+	NBIOWidget *iow = new NBIOWidget( io );
+	connect( iow, SIGNAL( removeIO( NBFileIO* ) ), this, SLOT( removeIO( NBFileIO* ) ) );
+
+	baseLyt->insertWidget( ioList.count() - 1, iow );
 };
 
 void NBIOManager::showCritical() {
@@ -187,22 +229,45 @@ void NBIOManager::showCritical() {
 
 void NBIOManager::closeEvent( QCloseEvent *cEvent ) {
 
+	/* If this is the last window then we should see if all the IO procs are complete */
 	if ( killIOOnClose ) {
+		/* If there are no processes, then simple close */
+		if ( not ioList.count() ) {
+			cEvent->accept();
+			return;
+		}
+
+		/* Question phrasing based on the number of processes */
+		QString question;
+		if ( ioList.count() == 1 ) {
+			question = QString::fromLocal8Bit(
+				"There is still 1 active IO process. Do you want to cancel it and close window? "
+				"To cancel press 'Yes'. Click 'No' to let the IO continue."
+			);
+		}
+
+		else {
+			question = QString::fromLocal8Bit(
+				"There are still %1 active IO processes. Do you want to cancel all of them and close window? "
+				"To cancel press 'Yes'. Click 'No' to let the IO continue."
+			).arg( ioList.count() );
+		}
+
+		/* This means we have running IO processes. Ask the user if we want to stop the IO */
 		int reply = NBMessageDialog::question(
 			tr( "Cancel all pending IO?" ),
-			tr(
-				"Some file IO processes are still active. Do you want to cancel all the IO processes and close window?"
-				"To cancel press 'Yes'. Click 'No' to let the IO continue."
-			),
+			question,
 			QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Yes << NBMessageDialog::No
 		);
 
+		/* If yes, stop them and get out */
 		if ( reply == NBMessageDialog::Yes ) {
 			Q_FOREACH( NBFileIO *io, ioList )
 				io->cancel();
 			cEvent->accept();
 		}
 
+		/* Otherwise, wait till they complete */
 		else {
 			cEvent->ignore();
 			return;
@@ -210,6 +275,11 @@ void NBIOManager::closeEvent( QCloseEvent *cEvent ) {
 	}
 
 	cEvent->accept();
+};
+
+void NBIOManager::removeIO( NBFileIO *io ) {
+
+	ioList.removeAll( io );
 };
 
 NBIOManagerMini::NBIOManagerMini() : QFrame() {
@@ -251,10 +321,12 @@ void NBIOManagerMini::addJob( QStringList sourceList, QString target, NBIOMode::
 	connect( io, SIGNAL( IOComplete() ), this, SLOT( handleJobComplete() ) );
 
 	jobList << io;
-
 	QTimer::singleShot( 100, io, SLOT( performIO() ) );
 
 	manageTimer();
+
+	if ( ioManager )
+		ioManager->addIO( io );
 };
 
 quint64 NBIOManagerMini::activeJobs() {
@@ -265,7 +337,6 @@ quint64 NBIOManagerMini::activeJobs() {
 void NBIOManagerMini::showAllIODialogs() {
 
 	if ( ioManager ) {
-		// qDebug() << "Attempting to show ioManager";
 		ioManager->showCritical();
 	}
 
@@ -281,7 +352,7 @@ void NBIOManagerMini::paintEvent( QPaintEvent *pEvent ) {
 	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
 	painter->setFont( QFont( "Courier 10 Pitch", 10 ) );
 
-	// Draw the frame border
+	// Draw the frame
 	painter->setPen( Qt::gray );
 	painter->setBrush( checked ? QColor( 100, 100, 100, 72 ) : QColor( 0, 0, 0, 72 ) );
 	painter->drawRoundedRect( 0, 0, 128, 52, 9, 9 );

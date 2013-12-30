@@ -6,7 +6,7 @@
 
 #include <NBFolderFlash.hpp>
 
-NBFolderFlash::NBFolderFlash( QWidget *parent, QString pth ) : QWidget( parent ) {
+NBFolderFlash::NBFolderFlash( QString pth ) : QWidget() {
 
 	path = QString( pth );
 
@@ -32,8 +32,9 @@ void NBFolderFlash::createGUI() {
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( loadFolder() ) );
 
-	peekWidgetBase = new NBFolderViewRestricted( path );
+	peekWidgetBase = new NBIconViewRestricted( new NBFileSystemModel() );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
+	qobject_cast<NBFileSystemModel*>( peekWidgetBase->model() )->setRootPath( path );
 
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
@@ -53,10 +54,10 @@ void NBFolderFlash::createGUI() {
 void NBFolderFlash::setWindowProperties() {
 
 	setFixedSize( 720, 540 );
-	setWindowFlags( Qt::Popup );
 
 	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
+	setWindowFlags( Qt::FramelessWindowHint );
 
 	setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
 
@@ -74,6 +75,19 @@ void NBFolderFlash::keyPressEvent( QKeyEvent *keyEvent ) {
 
 	else
 		QWidget::keyPressEvent( keyEvent );
+};
+
+void NBFolderFlash::changeEvent( QEvent *event ) {
+
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
+		hide();
+		event->accept();
+	}
+
+	else {
+		QWidget::changeEvent( event );
+		event->accept();
+	}
 };
 
 void NBFolderFlash::loadFolder() {

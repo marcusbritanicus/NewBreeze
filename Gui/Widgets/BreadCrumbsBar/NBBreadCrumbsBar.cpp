@@ -140,6 +140,15 @@ void NBBreadCrumbsBar::loadPath( QString path ) {
 	QHBoxLayout *crumbLyt = new QHBoxLayout();
 	crumbLyt->setContentsMargins( QMargins() );
 
+	if ( path.startsWith( "NB://" ) ) {
+		NBBreadCrumb *crumb = new NBBreadCrumb( this, path, true );
+		crumbLyt->addWidget( crumb );
+		crumbLyt->addStretch( 0 );
+		setLayout( crumbLyt );
+
+		return;
+	}
+
 	// Create a QFileInfo object representing the current working directory.
 	QFileInfo info( cwd.absolutePath() );
 
@@ -157,7 +166,7 @@ void NBBreadCrumbsBar::loadPath( QString path ) {
 			* Insert them at position 0. Crumb Menu first, and then the Crumb
 			* This way, we have the Menu to be always on the right of the Crumb
 			* Also on the subsequent run, we will have a Crumb and menu to the
-			* right of the current pair,which represent the path of the current
+			* right of the current pair, which represent the path of the current
 			* Crumb and Menu path.
 			*
 
@@ -223,6 +232,11 @@ void NBBreadCrumbsBar::setAutoLoadNewPath( bool truth ) {
 void NBBreadCrumbsBar::setCurrentDirectory( QString path ) {
 
 	// This is a very ugly hack :(
+
+	if ( path.startsWith( "NB://" ) ) {
+		loadPath( path );
+		return;
+	}
 
 	QDir d( path );
 

@@ -223,7 +223,6 @@ NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
 	data << ( first.value( NBAppFile::NoDisplay ).toBool() and second.value( NBAppFile::NoDisplay ).toBool() );
 	data << ( first.takesArgs() or second.takesArgs() );
 	data << ( first.multipleArgs() or second.multipleArgs() );
-	data << ( first.takesArgs() ? first.execArgs() : ( second.takesArgs() ? second.execArgs() : data.at( 3 ) ) );
 	data << first.grade();
 
 	// LibreOffice Fix
@@ -271,8 +270,36 @@ NBAppFile::NBAppFile( QVariantList data ) {
 	__nodisplay = data[ 10 ].toBool();
 	__takesArgs = data[ 11 ].toBool();
 	__multipleFiles = data[ 12 ].toBool();
-	__execArgs = data[ 13 ].toStringList();
-	__grade = data[ 14 ].toInt();
+	__grade = data[ 13 ].toInt();
+
+	QStringList args = __exec.split( " " );
+	foreach( QString arg, args ) {
+		if ( arg == "%f" or arg == "%u" ) {
+			__multipleFiles = false;
+			__takesArgs = true;
+			__execArgs << "<#NEWBREEZE-ARG-FILE#>";
+		}
+
+		else if ( arg == "%F" or arg == "%U" ) {
+			__multipleFiles = true;
+			__takesArgs = true;
+			__execArgs << "<#NEWBREEZE-ARG-FILES#>";
+		}
+
+		else if ( arg == "%i" ) {
+			if ( !__icon.isEmpty() )
+				__execArgs << "--icon" << __icon;
+		}
+
+		else if ( arg.contains( "\"%c\"" ) or arg.contains( "'%c'" ) or arg.contains( "%c" ) )
+			__execArgs << __name;
+
+		else if ( arg == "%k" )
+			__execArgs << QUrl( fileUrl ).toLocalFile();
+
+		else
+			__execArgs << arg;
+	}
 };
 
 void NBAppFile::parseDesktopFile() {

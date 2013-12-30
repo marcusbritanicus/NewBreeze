@@ -11,9 +11,10 @@ NBFolderViewRestricted::NBFolderViewRestricted( QString path ) : QListView() {
 	currentPath = QString( path );
 
 	// Set Data Model
-	fsModel = new NBFileSystemModel();
-	setModel( fsModel );
-	fsModel->setReadOnly( true );
+	model = new NBFileSystemModel();
+	setModel( model );
+	model->setReadOnly( true );
+	model->setShowHidden( Settings->Session.ShowHidden );
 
 	// Item Delegate
 	NBIconDelegate *iDelegate = new NBIconDelegate();
@@ -38,7 +39,7 @@ NBFolderViewRestricted::NBFolderViewRestricted( QString path ) : QListView() {
 	setContextMenuPolicy( Qt::NoContextMenu );
 
 	// Load items
-	fsModel->setRootPath( path );
+	model->setRootPath( path );
 };
 
 void NBFolderViewRestricted::updateViewMode() {
@@ -59,33 +60,7 @@ void NBFolderViewRestricted::updateViewMode() {
 		*
 	*/
 
-	if ( Settings->General.FolderView == QString( "SmallListView" ) ) {
-		// View and Resize Modes
-		setViewMode( QListView::ListMode );
-		setFlow( QListView::TopToBottom );
-
-		// Sizes
-		setGridSize( QSize( 256, 28 ) );
-		setIconSize( QSize( 24, 24 ) );
-
-		// Wrapping
-		setWrapping( true );
-	}
-
-	else if ( Settings->General.FolderView == QString( "NormalListView" ) ) {
-		// View and Resize Modes
-		setViewMode( QListView::ListMode );
-		setFlow( QListView::TopToBottom );
-
-		// Sizes
-		setGridSize( QSize( 256, 48 ) );
-		setIconSize( QSize( 48, 48 ) );
-
-		// Wrapping
-		setWrapping( false );
-	}
-
-	else if ( Settings->General.FolderView == QString( "TilesView" ) ) {
+	if ( Settings->General.FolderView == QString( "TilesView" ) ) {
 		// View and Resize Modes
 		setViewMode( QListView::ListMode );
 		setFlow( QListView::LeftToRight );
@@ -98,20 +73,7 @@ void NBFolderViewRestricted::updateViewMode() {
 		setWrapping( true );
 	}
 
-	else if ( Settings->General.FolderView == QString( "SmallIconsView" ) ) {
-		// View and Resize Modes
-		setViewMode( QListView::IconMode );
-		setFlow( QListView::LeftToRight );
-
-		// Sizes
-		setGridSize( QSize( 80, 48 ) );
-		setIconSize( QSize( 24, 24 ) );
-
-		// Wrapping
-		setWrapping( true );
-	}
-
-	else if ( Settings->General.FolderView == QString( "NormalIconsView" ) ) {
+	else {
 		// View and Resize Modes
 		setViewMode( QListView::IconMode );
 		setFlow( QListView::LeftToRight );
@@ -119,32 +81,6 @@ void NBFolderViewRestricted::updateViewMode() {
 		// Sizes
 		setGridSize( QSize( 120, 80 ) );
 		setIconSize( QSize( 48, 48 ) );
-
-		// Wrapping
-		setWrapping( true );
-	}
-
-	else if ( Settings->General.FolderView == QString( "LargeIconsView" ) ) {
-		// View and Resize Modes
-		setViewMode( QListView::IconMode );
-		setFlow( QListView::LeftToRight );
-
-		// Sizes
-		setGridSize( QSize( 160, 100 ) );
-		setIconSize( QSize( 64, 64 ) );
-
-		// Wrapping
-		setWrapping( true );
-	}
-
-	else if ( Settings->General.FolderView == QString( "HugeIconsView" ) ) {
-		// View and Resize Modes
-		setViewMode( QListView::IconMode );
-		setFlow( QListView::LeftToRight );
-
-		// Sizes
-		setGridSize( QSize( 300, 180 ) );
-		setIconSize( QSize( 128, 128 ) );
 
 		// Wrapping
 		setWrapping( true );

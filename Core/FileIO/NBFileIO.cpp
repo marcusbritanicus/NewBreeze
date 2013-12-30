@@ -29,9 +29,6 @@ NBFileIO::NBFileIO() {
 
 	ioTarget = QString();
 
-	wasCanceled = false;
-	isPaused = false;
-
 	mode = NBIOMode::Copy;
 
 	totalSize = 0;
@@ -155,8 +152,19 @@ void NBFileIO::preIO() {
 				* We need to create this directory and get its size.
 				*
 			*/
-			mkpath( srcBase, QFile::permissions( srcBase ) );
-			getDirSize( srcBase );
+
+			/* If we are moving and its an intra-device move then mkpath won't be necessary */
+			struct stat iStat, oStat;
+			stat( qPrintable( node ), &iStat );
+			stat( qPrintable( targetDir ), &oStat );
+
+			if ( ( iStat.st_dev == oStat.st_dev ) and ( NBIOMode::Move == mode ) )
+				continue;
+
+			else {
+				mkpath( srcBase, QFile::permissions( srcBase ) );
+				getDirSize( srcBase );
+			}
 		}
 
 		else {
@@ -232,22 +240,18 @@ void NBFileIO::copyFile( QString srcFile ) {
 		ioTarget = ( suffix.length() ? ioTarget.left( ioTarget.length() - ( 1 + suffix.length() ) ) + " - Copy." + suffix : ioTarget + " - Copy" );
 	}
 
-	/* If the operation is intra-device operation and its a move, then we can simply rename the file */
-	if ( NBIOMode::Move == mode ) {
-		NBDeviceManager devMgr;
-		NBDeviceInfo srcInfo = devMgr.deviceInfoForPath( dirName( sourceList.at( 0 ) ) );
-		NBDeviceInfo tgtInfo = devMgr.deviceInfoForPath( targetDir );
+	struct stat iStat, oStat;
+	stat( qPrintable( srcFile ), &iStat );
+	stat( qPrintable( targetDir ), &oStat );
 
-		if ( tgtInfo.mountPoint() == srcInfo.mountPoint() )
-			QFile::rename( srcFile, ioTarget );
+	/* If the operation is intra-device operation and its a move, then we can simply rename the file */
+	if ( ( iStat.st_dev == oStat.st_dev ) and ( NBIOMode::Move == mode ) ) {
+		QFile::rename( srcFile, ioTarget );
+		return;
 	}
 
 	int iFileFD = open( qPrintable( srcFile ), O_RDONLY );
 	int oFileFD = open( qPrintable( ioTarget ), O_WRONLY | O_CREAT );
-
-	struct stat iStat, oStat;
-	fstat( iFileFD, &iStat );
-	fstat( oFileFD, &oStat );
 
 	fTotalBytes = iStat.st_size;
 	fWritten = 0;
@@ -298,13 +302,19 @@ void NBFileIO::copyFile( QString srcFile ) {
 void NBFileIO::copyDir( QString path ) {
 
 	/* If the operation is intra-device operation and its a move, then we can simply rename the file */
-	if ( NBIOMode::Move == mode ) {
-		NBDeviceManager devMgr;
-		NBDeviceInfo srcInfo = devMgr.deviceInfoForPath( dirName( sourceList.at( 0 ) ) );
-		NBDeviceInfo tgtInfo = devMgr.deviceInfoForPath( targetDir );
+	struct stat iStat, oStat;
+	stat( qPrintable( path ), &iStat );
+	stat( qPrintable( targetDir ), &oStat );
 
-		if ( tgtInfo.mountPoint() == srcInfo.mountPoint() )
-			QFile::rename( path, targetDir + baseName( path ) );
+	if ( ( iStat.st_dev == oStat.st_dev ) and ( NBIOMode::Move == mode ) ) {
+		/*
+			*
+			* If the rename fails, then the target may be existing and is not empty
+			* In such a case, we must perform a normal copy
+			*
+		*/
+		if ( not rename( qPrintable( path ), qPrintable( targetDir + baseName( path ) ) ) )
+			return;
 	}
 
 	DIR* d_fh;

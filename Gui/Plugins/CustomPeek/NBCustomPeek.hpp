@@ -16,7 +16,7 @@ class NBCustomPeek : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBCustomPeek( QWidget *parent = 0, QString path = QDir::homePath() );
+		NBCustomPeek( QString path = QDir::homePath() );
 		QString path;
 		QWidget *peekWidgetBase;
 		QLabel *iconLbl, *nameLbl, *pathLbl, *mimeLbl, *sizeLbl, *timeLbl, *ugidLbl;
@@ -31,6 +31,7 @@ class NBCustomPeek : public QWidget {
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
+		void changeEvent( QEvent *cEvent );
 };
 
 #endif

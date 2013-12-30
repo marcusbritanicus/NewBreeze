@@ -14,7 +14,7 @@ class NBWordView : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBWordView( QWidget *parent = 0, QString path = QDir::homePath() );
+		NBWordView( QString path = QDir::homePath() );
 		QString path;
 		QTextEdit *peekWidgetBase;
 
@@ -28,6 +28,7 @@ class NBWordView : public QWidget {
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
+		void changeEvent( QEvent *cEvent );
 };
 
 #endif

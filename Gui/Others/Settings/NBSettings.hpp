@@ -29,6 +29,12 @@ class NBSettings {
 				int MaxIOJobs;
 		} General;
 
+		// Special Settings
+		class SpecialSettings {
+			public:
+				bool ClosingDown;
+		} Special;
+
 		// Session Settings
 		class SessionSettings {
 			public:
@@ -38,6 +44,7 @@ class NBSettings {
 				QSize Splitter;
 				bool SidePanel;
 				bool ShowHidden;
+				QSize IconSize;
 				int SortColumn;
 				bool SortCase;
 				bool SortCategory;

@@ -74,6 +74,7 @@ NBNewFileFolderDialog::NBNewFileFolderDialog( QString type, QDir curDir, QString
 
 	connect( le, SIGNAL( textEdited( QString ) ), this, SLOT( handleTextChanged( QString ) ) );
 	connect( le, SIGNAL( returnPressed() ), this, SLOT( createFileFolder() ) );
+
 	connect( okBtn, SIGNAL( clicked() ), this, SLOT( createFileFolder() ) );
 	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( cancel() ) );
 

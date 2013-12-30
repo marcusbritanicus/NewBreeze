@@ -102,7 +102,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void setNameFilters( QStringList );
 		void clearNameFilters();
 
-		void sort( int column = 0, bool cs = false, bool categorized = false );
+		void sort( int column, bool cs, bool categorized );
 		int sortColumn() const;
 		bool sortCaseSensitivity() const;
 		bool sortCategorized() const;
@@ -174,6 +174,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 		// History
 		QStringList oldRoots;
 		long curIndex;
+		mutable int updatedNodes = 0;
 
 		NBQuickFileInfoGatherer *quickDataGatherer;
 		NBFileSystemWatcher *watcher;
@@ -187,11 +188,21 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void handleNodeDeleted( QString );
 		void loadHome();
 
+		/* Perform the sorting again on a signal */
+		/* Just does sort( prevSort.column, prevSort.cs, prevSort.categorized ) */
+		void sort();
+
 	Q_SIGNALS:
 		void loadFileInfo();
 		void dirLoading( QString );
 		void directoryLoaded( QString );
 		void runningHome( QString );
+		void updatedAllNodes();
+
+		// Experimental
+		void loadApplications();
+		void loadCatalogs();
+		void loadFolders();
 };
 
 #endif

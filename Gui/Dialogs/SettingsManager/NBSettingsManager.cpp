@@ -17,8 +17,6 @@ void NBSettingsManager::createGUI() {
 
 	// Widget and Layout Base
 	QVBoxLayout *guiLyt = new QVBoxLayout();
-	if ( not Settings->General.NativeTitleBar )
-		guiLyt->addWidget( Separator::horizontal() );
 	guiLyt->addLayout( createBodyLayout() );
 	guiLyt->addWidget( Separator::horizontal() );
 	guiLyt->addLayout( createFooterLayout() );

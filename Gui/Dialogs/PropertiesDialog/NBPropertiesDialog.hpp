@@ -53,6 +53,9 @@ class NBPropertiesDialog: public NBDialog {
 
 	private slots:
 		void setDirIcon();
+
+	protected:
+		void changeEvent( QEvent *cEvent );
 };
 
 class NBPermissionsDialog: public NBDialog {

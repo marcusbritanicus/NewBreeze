@@ -12,18 +12,24 @@
 class NBStyleManager {
 
 	public:
-		NBStyleManager();
-		QString getStyleSheet( QString widget, QString style );
+		static QString getStyleSheet( QString widget, QString style );
+		static QPalette getPalette( QString style );
 
 	private:
-		QString getStyleSheetTD( QString widget );
-		QString getStyleSheetTL( QString widget );
-		QString getStyleSheetLG( QString widget );
-		QString getStyleSheetDB( QString widget );
+		static QString getStyleSheetTD( QString widget );
+		static QString getStyleSheetTL( QString widget );
+		static QString getStyleSheetLG( QString widget );
+		static QString getStyleSheetDB( QString widget );
 
-		QMap<QString, QStringList> variableMap;
+		static QPalette getPaletteTD();
+		static QPalette getPaletteTL();
+		static QPalette getPaletteLG();
+		static QPalette getPaletteDB();
+
+		static void initStyleManager();
+
+		static bool initDone;
+		static QMap<QString, QStringList> variableMap;
 };
-
-static NBStyleManager styleManager;
 
 #endif

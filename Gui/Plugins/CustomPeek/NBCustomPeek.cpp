@@ -6,7 +6,7 @@
 
 #include <NBCustomPeek.hpp>
 
-NBCustomPeek::NBCustomPeek( QWidget *parent, QString pth ) : QWidget( parent ) {
+NBCustomPeek::NBCustomPeek( QString pth ) : QWidget() {
 
 	path = QString( pth );
 
@@ -90,10 +90,10 @@ void NBCustomPeek::createGUI() {
 void NBCustomPeek::setWindowProperties() {
 
 	setFixedSize( 720, 540 );
-	setWindowFlags( Qt::Popup );
 
 	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 		setAttribute( Qt::WA_TranslucentBackground );
+	setWindowFlags( Qt::FramelessWindowHint );
 
 	setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
 
@@ -111,6 +111,19 @@ void NBCustomPeek::keyPressEvent( QKeyEvent *keyEvent ) {
 
 	else
 		QWidget::keyPressEvent( keyEvent );
+};
+
+void NBCustomPeek::changeEvent( QEvent *event ) {
+
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
+		hide();
+		event->accept();
+	}
+
+	else {
+		QWidget::changeEvent( event );
+		event->accept();
+	}
 };
 
 void NBCustomPeek::getFileProps() {

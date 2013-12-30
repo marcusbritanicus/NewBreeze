@@ -1,13 +1,7 @@
-QWidget {
-	color: <textcolor>;
-}
-
 QMenu {
-	background-color: rgba( <72> );
 	border-radius: 5px;
 	border: 1px solid <bordercolor>;
 	font-size: 9pt;
-	color: <textcolor>;
 	menu-scrollable: 1;
 }
 

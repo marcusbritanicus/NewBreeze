@@ -81,16 +81,29 @@ void NBAddressWidget::toggleCrumbsBarAndEdit() {
 NBAddressBar::NBAddressBar() : QFrame() {
 
 	setFrameStyle( NoFrame );
-	setFixedHeight( 28 );
+	setFixedHeight( 24 );
 
 	QHBoxLayout *fLyt = new QHBoxLayout();
 	fLyt->setContentsMargins( QMargins() );
 
-	openVTEBtn = new NBToolButton( ":/icons/vte.png" );
-	reloadBtn = new NBToolButton( ":/icons/reload.png" );
+	reloadBtn = new  QPushButton();
+	reloadBtn->setIcon( QIcon( ":/icons/reload.png" ) );
+	reloadBtn->setFixedSize( QSize( 24, 24 ) );
+
 	viewModeBtn = new NBViewModeButton();
 
+	openVTEBtn = new QPushButton();
+	openVTEBtn->setIcon( QIcon(  ":/icons/vte.png"  ) );
+	openVTEBtn->setFixedSize( QSize( 24, 24 ) );
+
 	addressWidget = new NBAddressWidget();
+	addressButtons = new NBButtons();
+
+	addressButtons->addSegment( reloadBtn );
+	addressButtons->addSegment( viewModeBtn );
+	addressButtons->addSegment( openVTEBtn );
+
+	addressButtons->setFixedHeight( 24 );
 
 	openVTEBtn->setFocusPolicy( Qt::NoFocus );
 	reloadBtn->setFocusPolicy( Qt::NoFocus );
@@ -100,19 +113,11 @@ NBAddressBar::NBAddressBar() : QFrame() {
 	addressWidget->crumbsBar->setFocusPolicy( Qt::NoFocus );
 
 	reloadBtn->setToolTip( tr( "Reload view" ) );
-	openVTEBtn->setToolTip( tr( "Open a terminal emulator here" ) );
 	viewModeBtn->setToolTip( tr( "Switch to list mode" ) );
+	openVTEBtn->setToolTip( tr( "Open a terminal emulator here" ) );
 
 	fLyt->addWidget( addressWidget );
-
-	fLyt->addWidget( Separator::vertical() );
-	fLyt->addWidget( reloadBtn );
-
-	fLyt->addWidget( Separator::vertical() );
-	fLyt->addWidget( viewModeBtn );
-
-	fLyt->addWidget( Separator::vertical() );
-	fLyt->addWidget( openVTEBtn );
+	fLyt->addWidget( addressButtons );
 
 	setLayout( fLyt );
 };

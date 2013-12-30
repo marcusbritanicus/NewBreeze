@@ -10,13 +10,12 @@ static int __sortColumn = Settings->Session.SortColumn;
 static bool __sortCase = Settings->Session.SortCase;
 static bool __sortCategory = Settings->Session.SortCategory;
 
-QStringList NBFileSystemNode::categoryList = QStringList();
-
 NBFileSystemNode::NBFileSystemNode() {
 
 	for( int i = 0; i < 10; i++ )
 		nodeData << "";
 
+	mCategoryList.clear();
 	myCategory = "Uncategorized";
 	parentNode = 0;
 };
@@ -31,8 +30,8 @@ NBFileSystemNode::NBFileSystemNode( QVariantList data, QString category, NBFileS
 
 void NBFileSystemNode::addChild( NBFileSystemNode *node ) {
 
-	if ( not categoryList.contains( node->category() ) )
-		categoryList << node->category();
+	if ( not mCategoryList.contains( node->category() ) )
+		mCategoryList << node->category();
 
 	childNodes << node;
 };
@@ -68,13 +67,13 @@ int NBFileSystemNode::childCount() {
 
 int NBFileSystemNode::categoryCount() {
 
-	return categoryList.count();
+	return mCategoryList.count();
 };
 
 void NBFileSystemNode::clearChildren() {
 
 	childNodes.clear();
-	categoryList.clear();
+	mCategoryList.clear();
 };
 
 QString NBFileSystemNode::category() {
@@ -89,7 +88,12 @@ void NBFileSystemNode::setCategory( QString newCategory ) {
 
 int NBFileSystemNode::categoryIndex() {
 
-	return categoryList.indexOf( myCategory );
+	return parentNode->mCategoryList.indexOf( myCategory );
+};
+
+QStringList NBFileSystemNode::categoryList() {
+
+	return mCategoryList;
 };
 
 QVariant NBFileSystemNode::data( int column, bool special ) const {
@@ -167,22 +171,22 @@ void NBFileSystemNode::sort( int column, bool cs, bool categorized ) {
 	__sortCategory = categorized;
 
 	if ( categorized )
-		NBFileSystemNode::categoryList = sortCategoryList( NBFileSystemNode::categoryList );
+		mCategoryList = sortCategoryList( mCategoryList );
 
 	qSort( childNodes.begin(), childNodes.end(), columnSort2 );
 };
 
 void NBFileSystemNode::updateCategories() {
 
-	NBFileSystemNode::categoryList.clear();
+	NBFileSystemNode::mCategoryList.clear();
 	foreach( NBFileSystemNode *cNode, childNodes ) {
 		QString newCategory = cNode->category();
-		if ( not NBFileSystemNode::categoryList.contains( newCategory ) )
-			NBFileSystemNode::categoryList << newCategory;
+		if ( not mCategoryList.contains( newCategory ) )
+			mCategoryList << newCategory;
 	}
 
 	if ( __sortCategory )
-		NBFileSystemNode::categoryList = sortCategoryList( NBFileSystemNode::categoryList );
+		mCategoryList = sortCategoryList( mCategoryList );
 }
 
 bool columnSort2( NBFileSystemNode *first, NBFileSystemNode *second )  {
@@ -340,7 +344,15 @@ QStringList sortCategoryList( QStringList& cList ) {
 	switch( __sortColumn ) {
 		/* Name sort */
 		case 0: {
-			cList.sort();
+			qSort( cList.begin(), cList.end(),
+				/* Lambda function: less than */
+				[]( QString a, QString b ) {
+					if ( a.count() != b.count() )
+						return ( a.count() < b.count() );
+					else
+						return ( a < b );
+				}
+			);
 			return cList;
 		};
 

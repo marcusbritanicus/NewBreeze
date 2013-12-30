@@ -40,6 +40,9 @@ NBMessageDialog::NBMessageDialog( QString icon, QString title, QString text, QLi
 
 	btnLyt->addStretch( 0 );
 
+	QStringList labels;
+	QList<QIcon> icons;
+
 	foreach( StandardButton btn, btns ) {
 		QPushButton *button;
 		switch( btn ) {
@@ -231,7 +234,7 @@ void NBMessageDialog::buttonClickHandler() {
 
 void NBMessageDialog::aboutNewBreeze() {
 
-	QString title = QString( "About NewBreeze v2.1.0" );
+	QString title = QString( "About NewBreeze v2.2.0" );
 	QString text = QString(
 		"<p><b><center>Fast and light-weight File Manager</center></b></p>"		\
 		"<p>Built on top of the Powerful Qt4 GUI Toolkit, this file manager "	\
@@ -259,7 +262,7 @@ void NBMessageDialog::aboutNewBreeze() {
 	);
 	QList<StandardButton> btns = QList<StandardButton>() << NBMessageDialog::Ok;
 
-	NBMessageDialog *dlg = new NBMessageDialog( ":/icons/newbreeze.png", title, text, btns );
+	NBMessageDialog *dlg = new NBMessageDialog( ":/icons/newbreeze2.png", title, text, btns );
 	dlg->setFixedSize( 540, 390 );
 	dlg->exec();
 };

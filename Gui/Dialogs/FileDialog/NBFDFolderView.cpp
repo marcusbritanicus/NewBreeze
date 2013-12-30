@@ -285,53 +285,42 @@ void NBFDFolderView::doShowHideDotFiles() {
 		showHidden = true;
 		fsModel->setShowHidden( true );
 	}
-
-	// Settings->setValue( "Session/ShowHidden", showHidden );
-	Settings->reload();
 };
 
 void NBFDFolderView::sortByName() {
 
-	bool descending = qobject_cast<QAction*>( sender() )->data().toBool();
-
-	if ( descending )
-		fsModel->sort( 0, Qt::DescendingOrder );
+	if ( fsModel->isCategorizationEnabled() )
+		fsModel->sort( 0, Qt::CaseInsensitive, true );
 
 	else
-		fsModel->sort( 0, Qt::AscendingOrder );
+		fsModel->sort( 0, Qt::CaseInsensitive, false );
 };
 
 void NBFDFolderView::sortBySize() {
 
-	bool descending = qobject_cast<QAction*>( sender() )->data().toBool();
-
-	if ( descending )
-		fsModel->sort( 1, Qt::DescendingOrder );
+	if ( fsModel->isCategorizationEnabled() )
+		fsModel->sort( 1, Qt::CaseInsensitive, true );
 
 	else
-		fsModel->sort( 1, Qt::AscendingOrder );
+		fsModel->sort( 1, Qt::CaseInsensitive, false );
 };
 
 void NBFDFolderView::sortByType() {
 
-	bool descending = qobject_cast<QAction*>( sender() )->data().toBool();
-
-	if ( descending )
-		fsModel->sort( 2, Qt::DescendingOrder );
+	if ( fsModel->isCategorizationEnabled() )
+		fsModel->sort( 2, Qt::CaseInsensitive, true );
 
 	else
-		fsModel->sort( 2, Qt::AscendingOrder );
+		fsModel->sort( 2, Qt::CaseInsensitive, false );
 };
 
 void NBFDFolderView::sortByDate() {
 
-	bool descending = qobject_cast<QAction*>( sender() )->data().toBool();
-
-	if ( descending )
-		fsModel->sort( 3, Qt::DescendingOrder );
+	if ( fsModel->isCategorizationEnabled() )
+		fsModel->sort( 4, Qt::CaseInsensitive, true );
 
 	else
-		fsModel->sort( 3, Qt::AscendingOrder );
+		fsModel->sort( 4, Qt::CaseInsensitive, false );
 };
 
 void NBFDFolderView::toBeImplemented() {

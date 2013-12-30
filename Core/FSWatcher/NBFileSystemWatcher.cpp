@@ -37,7 +37,8 @@ void NBFileSystemWatcher::setWatchPath( QString wPath ) {
 	}
 
 	// Now delete the old watch
-	inotify_rm_watch( inotifyFD, oldWD );
+	if ( oldWD >= 0 )
+		inotify_rm_watch( inotifyFD, oldWD );
 };
 
 void NBFileSystemWatcher::startWatch() {

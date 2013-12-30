@@ -8,38 +8,33 @@
 
 NBQuickMenuBar::NBQuickMenuBar() : QWidget() {
 
-	openWithBtn = new NBPushButton( QIcon( ":/icons/open.png" ), tr( "&Open With" ) );
-	moveToBtn = new NBPushButton( QIcon( ":/icons/move.png" ), tr( "&Move To" ) );
-	deleteBtn = new NBPushButton( QIcon( ":/icons/delete.png" ), tr( "&Delete" ) );
-	propsBtn = new NBPushButton( QIcon( ":/icons/props.png" ), tr( "&Properties" ) );
-	permsBtn = new NBPushButton( QIcon( ":/icons/perms.png" ), tr( "P&ermissions" ) );
+	QList<QIcon> icons;
+	QStringList labels;
 
-	openWithBtn->setFocusPolicy( Qt::NoFocus );
-	moveToBtn->setFocusPolicy( Qt::NoFocus );
-	deleteBtn->setFocusPolicy( Qt::NoFocus );
-	propsBtn->setFocusPolicy( Qt::NoFocus );
-	permsBtn->setFocusPolicy( Qt::NoFocus );
+	icons << QIcon( ":/icons/open.png" ) << QIcon( ":/icons/move.png" ) << QIcon( ":/icons/delete.png" ) << QIcon( ":/icons/props.png" );
+	icons << QIcon( ":/icons/perms.png" );
 
-	openWithBtn->setDisabled( true );
-	moveToBtn->setDisabled( true );
-	deleteBtn->setDisabled( true );
-	permsBtn->setDisabled( true );
+	labels << QString( "&Open With" ) << QString( "&Move To" ) << QString( "&Delete" ) << QString( "&Properties" ) << QString( "P&ermissions" );
 
-	openWithBtn->setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
-	moveToBtn->setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
-	deleteBtn->setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
-	propsBtn->setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
-	permsBtn->setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
+	quickBtns = new NBButtons( labels, icons );
+	quickBtns->setSegmentWidth( 128 );
+
+	quickBtns->setSegmentDisabled( 0 );
+	quickBtns->setSegmentDisabled( 1 );
+	quickBtns->setSegmentDisabled( 2 );
+	quickBtns->setSegmentEnabled( 3 );
+	quickBtns->setSegmentEnabled( 4 );
+
+	connect( quickBtns->segment( 0 ), SIGNAL( clicked() ), this, SIGNAL( openWithClicked() ) );
+	connect( quickBtns->segment( 2 ), SIGNAL( clicked() ), this, SIGNAL( deleteClicked() ) );
+	connect( quickBtns->segment( 3 ), SIGNAL( clicked() ), this, SIGNAL( propsClicked() ) );
+	connect( quickBtns->segment( 4 ), SIGNAL( clicked() ), this, SIGNAL( permsClicked() ) );
 
 	setContentsMargins( QMargins() );
 	QHBoxLayout *toolsLyt = new QHBoxLayout();
 	toolsLyt->setContentsMargins( QMargins() );
 
-	toolsLyt->addWidget( openWithBtn );
-	toolsLyt->addWidget( moveToBtn );
-	toolsLyt->addWidget( deleteBtn );
-	toolsLyt->addWidget( propsBtn );
-	toolsLyt->addWidget( permsBtn );
+	toolsLyt->addWidget( quickBtns );
 	toolsLyt->addStretch( 0 );
 
 	setFixedHeight( 24 );

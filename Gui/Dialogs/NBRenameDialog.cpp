@@ -49,6 +49,7 @@ NBRenameDialog::NBRenameDialog( QString origName, QDir curDir ) : NBDialog() {
 	connect( le, SIGNAL( textEdited( QString ) ), this, SLOT( handleTextChanged( QString ) ) );
 	connect( le, SIGNAL( returnPressed() ), this, SLOT( rename() ) );
 	connect( replaceCB, SIGNAL( stateChanged( int ) ), this, SLOT( handleCBStateChanged() ) );
+
 	connect( okBtn, SIGNAL( clicked() ), this, SLOT( rename() ) );
 	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( cancel() ) );
 

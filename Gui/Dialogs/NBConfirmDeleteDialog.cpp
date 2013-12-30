@@ -5,9 +5,6 @@
 */
 
 #include <NBConfirmDeleteDialog.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBTools.hpp>
-#include <NBIconProvider.hpp>
 
 NBConfirmDeleteDialog::NBConfirmDeleteDialog( QStringList paths, bool permanent ) : NBDialog() {
 
@@ -28,22 +25,28 @@ void NBConfirmDeleteDialog::setupGUI( bool permanent ) {
 
 	if ( permanent )
 		textLbl = new QLabel(
-			"<p>Do you really want to delete the selected item(s) permanently? You cannot retieve them once deleted.</p>" \
-			"<p>To see the list of files you are about to delete, press 'More..'</p>"
+			QString(
+				"<p>You are about to delete the below listed files/directories from</p>"
+				"<center><b><tt>%1</tt></b></center>"
+				"<p>Items once deleted cannot be retrieved. Do you wan't to continue?</p>"
+			).arg( dirName( deletePaths.at( 0 ) ) )
 		);
 	else
 		textLbl = new QLabel(
-			"<p>Do you really want to send the selected item(s) to trash?</p>" \
-			"<p>To see the list of files you are about to trash, press 'More..'</p>"
+			QString(
+				"<p>You are about to trash the below listed files/directories from</p>"
+				"<center><b><tt>%1</tt></b></center>"
+				"<p>Do you wan't to continue?</p>"
+			).arg( dirName( deletePaths.at( 0 ) ) )
 		);
 
 	textLbl->setWordWrap( true );
 
 	table = new QTableWidget( 0, 2 );
 	table->setFocusPolicy( Qt::NoFocus );
-	table->hide();
 
-	setTitle( "Delete Files?" );
+	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	setDialogTitle( "Delete Files?" );
 
 	msgLyt->addWidget( iconLbl );
 	msgLyt->addWidget( textLbl );
@@ -56,13 +59,13 @@ void NBConfirmDeleteDialog::setupGUI( bool permanent ) {
 	cancelBtn->setObjectName( "cancelBtn" );
 	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( deleteCancel() ) );
 
-	detailsBtn = new QPushButton( QIcon( ":/icons/info.png" ), "&More..." );
-	connect( detailsBtn, SIGNAL( clicked() ), this, SLOT( handleDetailsBtnClicked() ) );
+	segBtns = new NBButtons();
+	segBtns->addSegment( deleteBtn );
+	segBtns->addSegment( cancelBtn );
+	segBtns->setSegmentHeight( 24 );
 
-	btnLyt->addWidget( detailsBtn );
 	btnLyt->addStretch( 0 );
-	btnLyt->addWidget( deleteBtn );
-	btnLyt->addWidget( cancelBtn );
+	btnLyt->addWidget( segBtns );
 
 	dlgLyt->addLayout( msgLyt );
 	dlgLyt->addWidget( table );
@@ -71,7 +74,7 @@ void NBConfirmDeleteDialog::setupGUI( bool permanent ) {
 
 	NBDialog::setLayout( dlgLyt );
 
-	setFixedSize( 480, 200 );
+	setFixedSize( 480, 480 );
 
 	cancelBtn->setFocus();
 };
@@ -97,17 +100,17 @@ void NBConfirmDeleteDialog::setupTable() {
 	}
 };
 
-void NBConfirmDeleteDialog::setTitle( QString title ) {
-
-	NBDialog::setDialogTitle( title );
-};
-
 void NBConfirmDeleteDialog::addEntry( QString path ) {
 
 	QString iconName = NBIconProvider::icon( path );
 
-	QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), path );
-	QTableWidgetItem *itm2 = new QTableWidgetItem( formatSize( getSize( path ) ) );
+	QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), baseName( path ) );
+	QTableWidgetItem *itm2;
+	if ( isDir( path ) )
+		itm2 = new QTableWidgetItem( QString( "%1 items" ).arg( nChildren( path ) ) );
+
+	else
+		itm2 = new QTableWidgetItem( QString( "%1 items" ).arg( formatSize( getSize( path ) ) ) );
 
 	itm1->setFlags( itm1->flags() & ~Qt::ItemIsEditable );
 	itm2->setFlags( itm2->flags() & ~Qt::ItemIsEditable );
@@ -116,7 +119,7 @@ void NBConfirmDeleteDialog::addEntry( QString path ) {
 
 	table->setItem( table->rowCount() - 1, 0, itm1 );
 	table->setItem( table->rowCount() - 1, 1, itm2 );
-}
+};
 
 void NBConfirmDeleteDialog::keyPressEvent( QKeyEvent *keyEvent ) {
 
@@ -154,31 +157,4 @@ void NBConfirmDeleteDialog::deleteCancel() {
 
 	deleteFiles = false;
 	close();
-};
-
-void NBConfirmDeleteDialog::handleDetailsBtnClicked() {
-
-	if ( table->isVisible() ) {
-		detailsBtn->setText( "&More..." );
-		table->hide();
-
-		QDesktopWidget dw;
-		int hpos = ( int )( ( dw.width() - 480 ) / 2 );
-		int vpos = ( int )( ( dw.height() - 200 ) / 2 );
-		move( hpos, vpos );
-
-		setFixedSize( 480, 200 );
-	}
-
-	else {
-		detailsBtn->setText( "&Less..." );
-		table->show();
-
-		QDesktopWidget dw;
-		int hpos = ( int )( ( dw.width() - 480 ) / 2 );
-		int vpos = ( int )( ( dw.height() - 480 ) / 2 );
-		move( hpos, vpos );
-
-		setFixedSize( 480, 480 );
-	}
 };

@@ -1,3 +1,17 @@
+Version 2.2.0-beta
+    - Fixed cursor movements for NBIconView
+    - Fixed issues with Copy/Move Folders and Files
+    - NBIOManager is now mostly stable, may have minor quirks
+    - Autoupdate file size changes
+
+Version 2.2.0-alpha
+    - Several small performance tweaks
+    - Fixing some quirks in NBIconView
+    - Fixed drag and drop URL issues
+    - ApplicationsView and Catalog View are now included in the history list
+    - New Icon
+    - Fixed some FileIO issues ( drag n drop and copy and move are smoother
+
 Version 2.2.0-preview
     - Upgraded NBFileSystemModel to a Categorized ItemModel
     - Upgraded NBIconView to a Categorized ItemView

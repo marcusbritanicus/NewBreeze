@@ -4,8 +4,8 @@
 	*
 */
 
-#ifndef NBIconView_HPP
-#define NBIconView_HPP
+#ifndef NBICONVIEW_HPP
+#define NBICONVIEW_HPP
 
 #include <Global.hpp>
 #include <NBFileSystemModel.hpp>
@@ -17,15 +17,9 @@ class NBIconView : public QAbstractItemView {
 
 	public:
 		enum class ViewType {
-			SmallListView              = 0x01,
-			NormalListView             = 0x02,
-			TilesView                  = 0x03,
-			SmallIconsView             = 0x04,
-			NormalIconsView            = 0x05,
-			LargeIconsView             = 0x06,
-			HugeIconsView              = 0x07,
-			SmallTreeView              = 0x08,
-			NormalTreeView             = 0x09
+			TilesView             = 0x01,
+			IconsView             = 0x02,
+			DetailsView           = 0x03
 		};
 
 		NBIconView( NBFileSystemModel* );
@@ -39,11 +33,6 @@ class NBIconView : public QAbstractItemView {
 		// Category drawing height : myCategoryHeight
 		int categoryHeight() const;
 		void setCategoryHeight( int );
-
-		// Grid size for the indexes: myGridSizeMin, myGridSize
-		QSize gridSize() const;
-		void setGridSize( QSize );
-		void setGridSize( int, int );
 
 		// Icon Size for the indexes: myIconSize
 		QSize iconSize() const;
@@ -64,7 +53,7 @@ class NBIconView : public QAbstractItemView {
 		int categorySpacing() const;
 		void setCategorySpacing( int );
 
-		// Given the index, return the visual index
+		// Given the index, return the visual rect
 		QRect visualRect( const QModelIndex &index ) const;
 
 		// Given the category index get the rectangle for it
@@ -100,6 +89,7 @@ class NBIconView : public QAbstractItemView {
 
 		void mousePressEvent( QMouseEvent * );
 		void mouseMoveEvent( QMouseEvent * );
+		void mouseReleaseEvent( QMouseEvent * );
 		void mouseDoubleClickEvent( QMouseEvent * );
 
 		void dragEnterEvent( QDragEnterEvent* );
@@ -107,6 +97,9 @@ class NBIconView : public QAbstractItemView {
 		void dropEvent( QDropEvent* );
 
 	private:
+		// Grid size for the indexes: myGridSizeMin, myGridSize
+		void computeGridSize( QSize );
+
 		QModelIndex moveCursorCategorized( QAbstractItemView::CursorAction cursorAction );
 		QModelIndex moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction );
 
@@ -114,6 +107,14 @@ class NBIconView : public QAbstractItemView {
 
 		void calculateCategorizedRects() const;
 		void calculateNonCategorizedRects() const;
+
+		void calculateCategorizedIconsRects() const;
+		void calculateCategorizedTilesRects() const;
+		void calculateCategorizedDetailsRects() const;
+
+		void calculateNonCategorizedIconsRects() const;
+		void calculateNonCategorizedTilesRects() const;
+		void calculateNonCategorizedDetailsRects() const;
 
 		void computeRowsAndColumns() const;
 
@@ -124,6 +125,7 @@ class NBIconView : public QAbstractItemView {
 
 		NBFileSystemModel *cModel;
 
+		// Icon rects
 		mutable int idealHeight = 0;
 		mutable QHash<int, QPoint> rectForRow;
 		mutable QHash<int, QRect> rectForCategory;
@@ -149,11 +151,20 @@ class NBIconView : public QAbstractItemView {
 		// Icon Size
 		mutable QSize myIconSize = QSize( 48, 48 );
 
-		// Items per cisual row
+		// Persistent vertical column
+		mutable int persistentVCol = 0;
+
+		// Items per visual row
 		mutable int itemsPerRow = 1;
 		mutable int numberOfRows = 0;
+		mutable int padding = 0;
 
 		QPoint dragStartPosition;
+		QRubberBand *rBand;
+
+	private slots:
+		void zoomIn();
+		void zoomOut();
 
 	Q_SIGNALS :
 		void open( QModelIndex );

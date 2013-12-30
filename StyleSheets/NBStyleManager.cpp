@@ -6,23 +6,27 @@
 
 #include <NBStyleManager.hpp>
 
-NBStyleManager::NBStyleManager() {
+bool NBStyleManager::initDone = false;
+QMap<QString, QStringList> NBStyleManager::variableMap = QMap<QString, QStringList>();
+
+void NBStyleManager::initStyleManager() {
 
 	// Item: TransDark, TransLight, LightGray, DullBlack
-	variableMap[ "<bg>" ] = QStringList() << QString( "bg" ) << QString( "bg2" ) << QString( "" ) << QString( "bg" );
-	variableMap[ "<bgcolor>" ] = QStringList() << QString( "transparent" ) << QString( "transparent" ) << QString( "lightgray" ) << QString( "transparent" );
 	variableMap[ "<textcolor>" ] = QStringList() << QString( "white" ) << QString( "black" ) << QString( "black" ) << QString( "white" );
 	variableMap[ "<81>" ] = QStringList() << QString( "0, 0, 0, 206" ) << QString( "255, 255, 255, 206" ) << QString( "255, 255, 255, 255" ) << QString( "0, 0, 0, 255" );
-	variableMap[ "<72>" ] = QStringList() << QString( "0, 0, 0, 183" ) << QString( "255, 255, 255, 183" ) << QString( "255, 255, 255, 255" ) << QString( "0, 0, 0, 255" );
-	variableMap[ "<27>" ] = QStringList() << QString( "0, 0, 0,  68" ) << QString( "255, 255, 255,  68" ) << QString( "255, 255, 255, 255" ) << QString( "0, 0, 0, 255" );
 	variableMap[ "<bordercolor>" ] = QStringList() << QString( "white" ) << QString( "black" ) << QString( "black" ) << QString( "white" );
 	variableMap[ "<disabled>" ] = QStringList() << QString( "lightgray" ) << QString( "gray" ) << QString( "gray" ) << QString( "lightgray" );
 	variableMap[ "<checked>" ] = QStringList() << QString( "checked" ) << QString( "checkedn" ) << QString( "checkedn" ) << QString( "checked" );
 	variableMap[ "<unchecked>" ] = QStringList() << QString( "unchecked" ) << QString( "uncheckedn" ) << QString( "uncheckedn" ) << QString( "unchecked" );
 	variableMap[ "<scrollcolor>" ] = QStringList() << QString( "silver" ) << QString( "gray" ) << QString( "#2F2F2F" ) << QString( "silver" );
+
+	initDone = true;
 };
 
 QString NBStyleManager::getStyleSheet( QString widget, QString style ) {
+
+	if ( not initDone )
+		initStyleManager();
 
 	if ( style == QString( "TransDark" ) )
 		return getStyleSheetTD( widget );
@@ -37,7 +41,25 @@ QString NBStyleManager::getStyleSheet( QString widget, QString style ) {
 		return getStyleSheetDB( widget );
 };
 
+QPalette NBStyleManager::getPalette( QString style ) {
+
+	if ( style == QString( "TransDark" ) )
+		return getPaletteTD();
+
+	else if ( style == QString( "TransLight" ) )
+		return getPaletteTL();
+
+	else if ( style == QString( "LightGray" ) )
+		return getPaletteLG();
+
+	else // DullBlack
+		return getPaletteDB();
+};
+
 QString NBStyleManager::getStyleSheetTD( QString widget ) {
+
+	if ( not initDone )
+		initStyleManager();
 
 	QFile file( qApp->tr( ":/StyleSheets/Template/%1.qss" ).arg( widget ) );
 	if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
@@ -54,6 +76,9 @@ QString NBStyleManager::getStyleSheetTD( QString widget ) {
 
 QString NBStyleManager::getStyleSheetTL( QString widget ) {
 
+	if ( not initDone )
+		initStyleManager();
+
 	QFile file( qApp->tr( ":/StyleSheets/Template/%1.qss" ).arg( widget ) );
 	if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
 		return QString();
@@ -68,6 +93,9 @@ QString NBStyleManager::getStyleSheetTL( QString widget ) {
 };
 
 QString NBStyleManager::getStyleSheetLG( QString widget ) {
+
+	if ( not initDone )
+		initStyleManager();
 
 	QFile file( qApp->tr( ":/StyleSheets/Template/%1.qss" ).arg( widget ) );
 	if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
@@ -84,6 +112,9 @@ QString NBStyleManager::getStyleSheetLG( QString widget ) {
 
 QString NBStyleManager::getStyleSheetDB( QString widget ) {
 
+	if ( not initDone )
+		initStyleManager();
+
 	QFile file( qApp->tr( ":/StyleSheets/Template/%1.qss" ).arg( widget ) );
 	if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
 		return QString();
@@ -95,4 +126,76 @@ QString NBStyleManager::getStyleSheetDB( QString widget ) {
 		QSS.replace( key, variableMap[ key ].at( 3 ) );
 
 	return QSS;
+};
+
+QPalette NBStyleManager::getPaletteTD() {
+
+	QPalette pltt = QPalette();
+
+	pltt.setColor( QPalette::Window, QColor( 1, 1, 1, 0 ) );
+	pltt.setColor( QPalette::WindowText, Qt::white );
+	pltt.setColor( QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::AlternateBase, QColor( 30, 30, 30, 180 ) );
+	pltt.setColor( QPalette::ToolTipBase, QColor( 0, 0, 0, 206 ) );
+	pltt.setColor( QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
+	pltt.setColor( QPalette::Text, Qt::white );
+	pltt.setColor( QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::ButtonText, Qt::white );
+	pltt.setColor( QPalette::BrightText, Qt::white );
+
+	return pltt;
+};
+
+QPalette NBStyleManager::getPaletteTL() {
+
+	QPalette pltt = qApp->palette();
+
+	pltt.setColor( QPalette::Window, QColor( 120, 120, 120, 206 ) );
+	pltt.setColor( QPalette::WindowText, Qt::black );
+	pltt.setColor( QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::AlternateBase, QColor( 90, 90, 90, 180 ) );
+	pltt.setColor( QPalette::ToolTipBase, QColor( 120, 120, 120, 206 ) );
+	pltt.setColor( QPalette::ToolTipText, QColor( 0x00, 0x43, 0x8A ) );
+	pltt.setColor( QPalette::Text, Qt::black );
+	pltt.setColor( QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::ButtonText, Qt::black );
+	pltt.setColor( QPalette::BrightText, Qt::black );
+
+	return pltt;
+};
+
+QPalette NBStyleManager::getPaletteLG() {
+
+	QPalette pltt = qApp->palette();
+
+	pltt.setColor( QPalette::Window, QColor( 120, 120, 120 ) );
+	pltt.setColor( QPalette::WindowText, Qt::black );
+	pltt.setColor( QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::AlternateBase, QColor( 90, 90, 90 ) );
+	pltt.setColor( QPalette::ToolTipBase, QColor( 100, 100, 100 ) );
+	pltt.setColor( QPalette::ToolTipText, QColor( 0x00, 0x43, 0x8A ) );
+	pltt.setColor( QPalette::Text, Qt::black );
+	pltt.setColor( QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::ButtonText, Qt::black );
+	pltt.setColor( QPalette::BrightText, Qt::black );
+
+	return pltt;
+};
+
+QPalette NBStyleManager::getPaletteDB() {
+
+	QPalette pltt = qApp->palette();
+
+	pltt.setColor( QPalette::Window, QColor( 30, 30, 30 ) );
+	pltt.setColor( QPalette::WindowText, Qt::white );
+	pltt.setColor( QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::AlternateBase, QColor( 60, 60, 60) );
+	pltt.setColor( QPalette::ToolTipBase, QColor( 45, 45, 45 ) );
+	pltt.setColor( QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
+	pltt.setColor( QPalette::Text, Qt::white );
+	pltt.setColor( QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::ButtonText, Qt::white );
+	pltt.setColor( QPalette::BrightText, Qt::white );
+
+	return pltt;
 };

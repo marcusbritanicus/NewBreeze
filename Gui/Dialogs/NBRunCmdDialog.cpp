@@ -77,10 +77,13 @@ void NBRunCmdDialog::createAndSetupActions() {
 	connect( appList, SIGNAL( doubleClicked( QModelIndex ) ), this, SLOT( runCommand( QModelIndex ) ) );
 	connect( appList, SIGNAL( activated( QModelIndex ) ), this, SLOT( runCommand( QModelIndex ) ) );
 
+	connect( appList->selectionModel(), SIGNAL( currentChanged( QModelIndex, QModelIndex ) ), this, SLOT( appSelected( QModelIndex ) ) );
+
 	connect( le, SIGNAL( textEdited( QString ) ), this, SLOT( handleTextChanged( QString ) ) );
 	connect( le, SIGNAL( returnPressed() ), this, SLOT( runCommand() ) );
 
-	connect( defaultAndRunBtn, SIGNAL(clicked() ), this, SLOT( makeDefaultAndRunCommand() ) );
+	connect( defaultAndRunBtn, SIGNAL( clicked() ), this, SLOT( makeDefaultAndRunCommand() ) );
+
 	connect( okBtn, SIGNAL( clicked() ), this, SLOT( runCommand() ) );
 	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( cancel() ) );
 };

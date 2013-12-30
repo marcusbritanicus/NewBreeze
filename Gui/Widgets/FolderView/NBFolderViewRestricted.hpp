@@ -18,13 +18,11 @@ class NBFolderViewRestricted : public QListView {
 	public :
 		NBFolderViewRestricted( QString path = QString() );
 
-		bool showHidden;
-
 	private :
 		void updateViewMode();
 
 		QString currentPath;
-		NBFileSystemModel *fsModel;
+		NBFileSystemModel *model;
 };
 
 #endif

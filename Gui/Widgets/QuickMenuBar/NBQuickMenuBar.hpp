@@ -10,6 +10,7 @@
 #include <Global.hpp>
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
+#include <NBButtons.hpp>
 
 class NBQuickMenuBar : public QWidget {
 	Q_OBJECT
@@ -17,11 +18,16 @@ class NBQuickMenuBar : public QWidget {
 	public:
 		NBQuickMenuBar();
 
-		NBPushButton *openWithBtn, *moveToBtn, *deleteBtn, *propsBtn, *permsBtn;
+		NBButtons *quickBtns;
 		NBMenu openWithMenu;
 
-	signals:
+	Q_SIGNALS:
 		void showOpenWithMenu();
+
+		void openWithClicked();
+		void deleteClicked();
+		void propsClicked();
+		void permsClicked();
 };
 
 #endif

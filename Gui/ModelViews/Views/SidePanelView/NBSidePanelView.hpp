@@ -38,7 +38,6 @@ class NBSidePanel : public QTreeView {
 
 	Q_SIGNALS:
 		void showFolders();
-		void specialUrl( QString );
 		void driveClicked( QString );
 		void copy( QStringList, QString, NBIOMode::Mode );
 		void move( QStringList, QString, NBIOMode::Mode );

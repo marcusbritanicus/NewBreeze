@@ -11,6 +11,7 @@
 #include <NBGuiWidgets.hpp>
 #include <NBBreadCrumbsBar.hpp>
 #include <NBTools.hpp>
+#include <NBButtons.hpp>
 
 class NBAddressWidget : public QWidget {
 	Q_OBJECT
@@ -38,7 +39,8 @@ class NBAddressBar : public QFrame {
 	public:
 		NBAddressBar();
 
-		NBToolButton *reloadBtn, *openVTEBtn;
+		NBButtons *addressButtons;
+		QPushButton *reloadBtn, *openVTEBtn;
 		NBViewModeButton *viewModeBtn;
 		NBAddressWidget *addressWidget;
 };
