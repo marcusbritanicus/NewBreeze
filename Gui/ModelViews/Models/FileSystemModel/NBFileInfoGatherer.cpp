@@ -206,17 +206,19 @@ void NBFileInfoGatherer::gatherInfo( QStringList entries, QString root ) {
 
 void NBFileInfoGatherer::run() {
 
-	foreach( QString entry, entryList ) {
-		if ( Settings->Special.ClosingDown )
-			break;
+	if ( rootPath != "/dev/" ) {
+		foreach( QString entry, entryList ) {
+			if ( Settings->Special.ClosingDown )
+				break;
 
-		QMimeType mimeType = mimeDb.mimeTypeForFile( rootPath + entry );
-		QStringList info;
+			QMimeType mimeType = mimeDb.mimeTypeForFile( rootPath + entry );
+			QStringList info;
 
-		info << NBIconProvider::icon( rootPath + entry, mimeType );
-		info << mimeType.comment();
-		info << mimeType.name();
+			info << NBIconProvider::icon( rootPath + entry, mimeType );
+			info << mimeType.comment();
+			info << mimeType.name();
 
-		emit done( rootPath, entry, info );
+			emit done( rootPath, entry, info );
+		}
 	}
 };

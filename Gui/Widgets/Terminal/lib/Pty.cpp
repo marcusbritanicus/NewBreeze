@@ -38,7 +38,7 @@
 #include <signal.h>
 
 // Qt
-#include <QtCore/QStringList>
+#include <QStringList>
 
 #include "kpty.h"
 #include "kptydevice.h"

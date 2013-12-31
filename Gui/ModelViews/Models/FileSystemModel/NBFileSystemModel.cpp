@@ -688,10 +688,16 @@ void NBFileSystemModel::setRootPath( QString path ) {
 	if ( curentLoadStatus.loading )
 		curentLoadStatus.stopLoading = true;
 
-	watcher->setWatchPath( path );
+	if ( __rootPath != "/dev/" ) {
+		watcher->setWatchPath( path );
+		if ( not watcher->isRunning() )
+			watcher->startWatch();
+	}
 
-	if ( not watcher->isRunning() )
-		watcher->startWatch();
+	else {
+		if ( watcher->isRunning() )
+			watcher->stopWatch();
+	}
 
 	setupModelData();
 };
@@ -880,7 +886,7 @@ void NBFileSystemModel::setupModelData() {
 		closedir( dir );
 	}
 	endResetModel();
-
+;
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
 	curentLoadStatus.loading = false;

@@ -122,13 +122,13 @@ void NBPicLabel::mousePressEvent( QMouseEvent *mEvent ) {
 NBClickLabel::NBClickLabel( QPixmap icon ) : QLabel() {
 
 	setPixmap( icon );
-	clickEnabled = false;
+	setAlignment( Qt::AlignCenter );
 };
 
 NBClickLabel::NBClickLabel( QString text ) : QLabel() {
 
 	setText( text );
-	clickEnabled = false;
+	setAlignment( Qt::AlignCenter );
 };
 
 void NBClickLabel::mousePressEvent( QMouseEvent *mEvent ) {
@@ -137,12 +137,12 @@ void NBClickLabel::mousePressEvent( QMouseEvent *mEvent ) {
 		emit clicked();
 
 	mEvent->accept();
-}
+};
 
 void NBClickLabel::setClickable( bool canClick ) {
 
 	clickEnabled = canClick;
-}
+};
 
 QWidget* Separator::vertical() {
 
@@ -162,6 +162,26 @@ QWidget* Separator::horizontal() {
 	hSep->setStyleSheet( "background-color: gray;" );
 
 	return hSep;
+};
+
+QWidget* NBSpacer::vertical( int spacing ) {
+
+	QWidget *vSpace = new QWidget();
+	vSpace->setContentsMargins( QMargins() );
+	vSpace->setFixedHeight( spacing );
+	vSpace->setStyleSheet( "background-color: transparent;" );
+
+	return vSpace;
+};
+
+QWidget* NBSpacer::horizontal( int spacing ) {
+
+	QWidget *hSpace = new QWidget();
+	hSpace->setContentsMargins( QMargins() );
+	hSpace->setFixedWidth( spacing );
+	hSpace->setStyleSheet( "background-color: transparent;" );
+
+	return hSpace;
 };
 
 NBViewModeButton::NBViewModeButton() : QPushButton() {

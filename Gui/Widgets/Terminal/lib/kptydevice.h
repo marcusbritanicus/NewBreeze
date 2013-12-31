@@ -31,7 +31,7 @@
 
 #include "kpty_p.h"
 
-#include <QtCore/QIODevice>
+#include <QIODevice>
 
 #define KMAXINT ((int)(~0U >> 1))
 
@@ -166,8 +166,8 @@ private:
 // Helper. Remove when QRingBuffer becomes public. //
 /////////////////////////////////////////////////////
 
-#include <QtCore/qbytearray.h>
-#include <QtCore/qlinkedlist.h>
+#include <qbytearray.h>
+#include <qlinkedlist.h>
 
 #define CHUNKSIZE 4096
 
@@ -357,4 +357,3 @@ struct KPtyDevicePrivate : public KPtyPrivate {
 };
 
 #endif
-

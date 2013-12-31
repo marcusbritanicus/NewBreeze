@@ -981,11 +981,17 @@ void NBFolderView::handleDeleteFailure( QStringList files, QStringList dirs ) {
 
 	QHeaderView *headerView = new QHeaderView( Qt::Horizontal, table );
 	table->setHorizontalHeader( headerView );
-	headerView->setResizeMode( 0, QHeaderView::Stretch );
-	headerView->setResizeMode( 1, QHeaderView::Fixed );
+	#if QT_VERSION >= 0x050000
+		headerView->setSectionResizeMode( 0, QHeaderView::Stretch );
+		headerView->setSectionResizeMode( 1, QHeaderView::Fixed );
+		table->verticalHeader()->setSectionResizeMode( QHeaderView::Fixed );
+	#else
+		headerView->setResizeMode( 0, QHeaderView::Stretch );
+		headerView->setResizeMode( 1, QHeaderView::Fixed );
+		table->verticalHeader()->setResizeMode( QHeaderView::Fixed );
+	#endif
 
 	table->setColumnWidth( 1, 100 );
-	table->verticalHeader()->setResizeMode( QHeaderView::Fixed );
 
 	foreach( QString path, dirs ) {
 		QString iconName = NBIconProvider::icon( path );

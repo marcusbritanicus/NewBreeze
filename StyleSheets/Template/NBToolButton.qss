@@ -25,7 +25,7 @@ QToolButton {
 
 QToolButton:hover {
 	border: 1px solid skyblue;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QToolButton:pressed {
@@ -34,5 +34,5 @@ QToolButton:pressed {
 
 QToolButton:checked {
 	border: 1px solid gray;
-	border-radius: 5px;
+	border-radius: 2px;
 }

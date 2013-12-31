@@ -12,7 +12,16 @@
 
 #include <QTime>
 #include <NBAppFile.hpp>
-#include <NBMimeType.hpp>
+
+#if QT_VERSION >= 0x050000
+	#include <QMimeDatabase>
+	#include <QMimeType>
+#else
+	#include <NBMimeDatabase.hpp>
+	#include <NBMimeType.hpp>
+	#include <NBStandardPaths.hpp>
+#endif
+
 #include <QProcess>
 #include <QSettings>
 #include <NBXdg.hpp>

@@ -72,7 +72,16 @@ QString getStyleSheet( QString, QString Style = "LightGray" );
 /*  */
 QStringList getTerminal();
 
-void NBMessageOutput( QtMsgType, const char* );
+#if QT_VERSION >= 0x050000
+	#include <QtWidgets>
+#endif
+
+#if QT_VERSION >= 0x050000
+	void NBMessageOutput5( QtMsgType, const QMessageLogContext&, const QString& );
+#else
+	void NBMessageOutput( QtMsgType, const char* );
+#endif
+
 void NBDebugMsg( DbgMsgPart::MsgPart, const char*, ... );
 
 #endif

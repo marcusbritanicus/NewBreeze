@@ -87,10 +87,10 @@ class NBClickLabel : public QLabel {
 		void setClickable( bool );
 
 	private :
-		bool clickEnabled;
+		bool clickEnabled = true;
 
 	protected:
-		virtual void mousePressEvent( QMouseEvent * );
+		void mousePressEvent( QMouseEvent * );
 
 	signals:
 		void clicked();
@@ -101,6 +101,13 @@ class Separator {
 	public:
 		static QWidget* vertical();
 		static QWidget* horizontal();
+};
+
+class NBSpacer {
+
+	public:
+		static QWidget* vertical( int spacing = 1 );
+		static QWidget* horizontal( int spacing = 1 );
 };
 
 class NBViewModeButton: public QPushButton {

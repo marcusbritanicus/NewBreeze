@@ -121,7 +121,7 @@ QStringList NBXdg::systemDirs( NBXdg::XdgSystemDirs pathEnum ) {
 	*
 	* freedesktop.org says, check if home and path are on the same partition. The $XDG_DATA_DIR/.Trash is the trash location.
 	*
-	* If not, check $mountpoint/.Trash/ if it exists, then (create and ) use $mountpoint/.Trash/$uid
+	* If not, check $mountpoint/.Trash/ if it exists, then ( create and ) use $mountpoint/.Trash/$uid
 	*	* $mountpoint/.Trash/ should have sticky bit set (S_ISVTX), and should not be a symbolic link
 	*   * readLink( $mountpoint/.Trash/ ) == $mountpoint/.Trash/
 	* Otherwise, use $mountpoint/.Trash-$uid

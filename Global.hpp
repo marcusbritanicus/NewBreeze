@@ -43,14 +43,17 @@
 #include <limits.h>
 
 #include <NBSettings.hpp>
+#include <NBXdg.hpp>
 
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>
 	#include <QMimeDatabase>
 	#include <QMimeType>
+	#include <QStandardPaths>
 #else
 	#include <NBMimeDatabase.hpp>
 	#include <NBMimeType.hpp>
+	#include <NBStandardPaths.hpp>
 #endif
 
 namespace NBIOMode {
@@ -72,10 +75,10 @@ namespace NBInfoMode {
 static QMimeDatabase mimeDb;
 
 // MimeType and Progams mapping cache location
-const QString mimeProgsCache( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/NBMimeProgs.cache" ) );
+const QString mimeProgsCache( QDir( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) ).filePath( "NewBreeze/NBMimeProgs.cache" ) );
 
 // Thumbnails Storage Directory
-const QString thumbsDir( QDir( QDesktopServices::storageLocation( QDesktopServices::CacheLocation ) ).filePath( "NewBreeze/Thumbs/" ) );
+const QString thumbsDir( QDir( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) ).filePath( "NewBreeze/Thumbs/" ) );
 
 // NewBreeze Preferences
 static QSettings actionSettings( "NewBreeze", "CustomActions" );

@@ -11,6 +11,10 @@
 #include <NBTools.hpp>
 #include <QtWebKit>
 
+#if QT_VERSION >= 0x050000
+	#include <QtWebKitWidgets>
+#endif
+
 class NBWebWatch : public QWidget {
 	Q_OBJECT
 

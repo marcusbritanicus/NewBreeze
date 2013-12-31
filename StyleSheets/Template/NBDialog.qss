@@ -4,12 +4,12 @@ QWidget {
 
 QWidget#guiBase {
 	border: 1px solid <bordercolor>;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QWidget#infoDlg {
 	border: 1px solid <bordercolor>;
-	border-radius: 5px;
+	border-radius: 2px;
 	font-family: Courier 10 Pitch;
 }
 
@@ -29,7 +29,7 @@ QListView {
 QGroupBox {
 	font-weight: bold;
 	border: 1px solid gray;
-	border-radius: 5px;
+	border-radius: 2px;
 	margin-top: 1.3ex;
 	margin-bottom: 1ex;
 	padding: 10px 0px 10px 0px;
@@ -42,13 +42,13 @@ QGroupBox::title {
 
 QProgressBar {
 	border: 1px solid <bordercolor>;
-	border-radius: 5px;
+	border-radius: 2px;
 	text-align: center;
 }
 
 QProgressBar::chunk {
 	background: gray;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QPushButton {
@@ -60,22 +60,22 @@ QPushButton {
 
 QPushButton:hover {
 	color: blue;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QPushButton#okBtn:hover {
 	color: darkgreen;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QPushButton#cancelBtn:hover {
 	color: brown;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QPushButton#abortBtn:hover {
 	color: red;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QToolButton:focus {
@@ -100,7 +100,7 @@ QPushButton#cancelBtn:focus {
 
 QPushButton#abortBtn:focus {
 	color: red;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QPushButton:pressed {
@@ -120,12 +120,12 @@ QPushButton#cancelBtn:pressed {
 
 QPushButton#abortBtn:pressed {
 	color: red;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QLineEdit {
 	border: 1px solid <bordercolor>;
-	border-radius: 5px;
+	border-radius: 2px;
 	font-size: 10pt;
 }
 
@@ -193,7 +193,7 @@ QComboBox {
 	font-size: 9pt;
 
 	padding: 3px;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QComboBox:on {

@@ -89,11 +89,20 @@ void NBConfirmDeleteDialog::setupTable() {
 
 	QHeaderView *headerView = new QHeaderView( Qt::Horizontal, table );
 	table->setHorizontalHeader( headerView );
-	headerView->setResizeMode( 0, QHeaderView::Stretch );
-	headerView->setResizeMode( 1, QHeaderView::Fixed );
+	#if QT_VERSION >= 0x050000
+		headerView->setSectionResizeMode( 0, QHeaderView::Stretch );
+		headerView->setSectionResizeMode( 1, QHeaderView::Fixed );
+	#else
+		headerView->setResizeMode( 0, QHeaderView::Stretch );
+		headerView->setResizeMode( 1, QHeaderView::Fixed );
+	#endif
 
 	table->setColumnWidth( 1, 100 );
-	table->verticalHeader()->setResizeMode( QHeaderView::Fixed );
+	#if QT_VERSION >= 0x050000
+		table->verticalHeader()->setSectionResizeMode( QHeaderView::Fixed );
+	#else
+		table->verticalHeader()->setResizeMode( QHeaderView::Fixed );
+	#endif
 
 	foreach( QString path, deletePaths ) {
 		addEntry( path );

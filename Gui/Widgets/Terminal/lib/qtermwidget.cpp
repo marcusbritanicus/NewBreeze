@@ -16,10 +16,12 @@
     Boston, MA 02110-1301, USA.
 */
 
+#include <QtGui>
+#include <QtCore>
 #include <QLayout>
-#include <QtGui/qboxlayout.h>
-#include <QtGui/qlayoutitem.h>
-#include <QtGui/qsizepolicy.h>
+#include <qboxlayout.h>
+#include <qlayoutitem.h>
+#include <qsizepolicy.h>
 #include "qtermwidget.h"
 #include "ColorTables.h"
 

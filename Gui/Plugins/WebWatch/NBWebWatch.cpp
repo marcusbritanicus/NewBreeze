@@ -37,7 +37,7 @@ void NBWebWatch::createGUI() {
 	peekWidgetBase = new QWebView();
 	peekWidgetBase->setRenderHints( QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing );
 
-	peekWidgetBase->load( QUrl( path ) );
+	peekWidgetBase->load( QUrl::fromLocalFile( path ) );
 
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );

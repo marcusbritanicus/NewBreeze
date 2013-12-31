@@ -1,6 +1,6 @@
 QWidget#guiBase {
 	border: 1px solid <bordercolor>;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QWidget:focus {

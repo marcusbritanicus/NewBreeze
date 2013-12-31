@@ -114,6 +114,7 @@ class NewBreeze : public QMainWindow {
 
 	protected:
 		void closeEvent( QCloseEvent *cEvent );
+		void resizeEvent( QResizeEvent *rEvent );
 };
 
 // The code for @f NBStartup() and ReadSettings() is in NBStartup.cpp

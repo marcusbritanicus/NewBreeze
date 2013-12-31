@@ -9,7 +9,6 @@
 
 #include <Global.hpp>
 #include <NBIconView.hpp>
-#include <NBTreeView.hpp>
 #include <NBContextMenu.hpp>
 #include <NBFileSystemModel.hpp>
 #include <NBFVDialogs.hpp>

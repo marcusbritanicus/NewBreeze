@@ -36,12 +36,19 @@
 
 int main( int argc, char **argv ) {
 
-	qInstallMsgHandler( NBMessageOutput );
+	#if QT_VERSION >= 0x050000
+		qInstallMessageHandler( NBMessageOutput5 );
+	#else
+		qInstallMsgHandler( NBMessageOutput );
+	#endif
 	qRegisterMetaType<NBDeviceInfo>( "NBDeviceInfo" );
 
 	QApplication app( argc, argv );
 	app.setOrganizationName( "NewBreeze" );
 	app.setApplicationName( "NewBreeze" );
+
+	qDebug() << thumbsDir;
+	qDebug() << mimeProgsCache;
 
 	if ( ( argc == 2 ) and app.arguments()[ 1 ] == QString( "--settings" ) ) {
 		NBSettingsManager *settingsMgr = new NBSettingsManager();

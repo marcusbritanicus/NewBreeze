@@ -14,6 +14,9 @@
 #include <NBDeviceInfo.hpp>
 #include <NBTools.hpp>
 #include <NBFileDialog.hpp>
+#if QT_VERSION >= 0x050000
+	#include <QtConcurrent>
+#endif
 
 class NBPropertiesDialog: public NBDialog {
     Q_OBJECT

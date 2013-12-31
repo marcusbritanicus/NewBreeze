@@ -1,5 +1,5 @@
 QWidget {
-	background: rgba( 0, 0, 0, 0 );
+	background: transparent;
 	border: none;
 }
 
@@ -44,4 +44,10 @@ QScrollBar::handle:vertical {
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
 	width: 0px;
 	height: 0px;
+}
+
+QLabel:hover {
+	background: rgba( 180, 180, 180, 30 );
+	border-top: 2px solid gray;
+	border-bottom: 1px solid gray;
 }

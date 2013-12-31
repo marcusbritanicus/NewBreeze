@@ -47,9 +47,15 @@ void NBCustomActions::createGUI() {
 
 void NBCustomActions::setupTable() {
 
-	actionsTable->horizontalHeader()->setResizeMode( QHeaderView::Fixed );
+	#if QT_VERSION >= 0x050000
+		actionsTable->horizontalHeader()->setSectionResizeMode( QHeaderView::Fixed );
+		actionsTable->verticalHeader()->setSectionResizeMode( QHeaderView::Fixed );
+	#else
+		actionsTable->horizontalHeader()->setResizeMode( QHeaderView::Fixed );
+		actionsTable->verticalHeader()->setResizeMode( QHeaderView::Fixed );
+	#endif
+
 	actionsTable->horizontalHeader()->setStretchLastSection( true );
-	actionsTable->verticalHeader()->setResizeMode( QHeaderView::Fixed );
 	actionsTable->verticalHeader()->hide();
 
 	actionsTable->setShowGrid( false );

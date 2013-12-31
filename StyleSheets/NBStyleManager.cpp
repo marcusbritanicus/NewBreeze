@@ -130,18 +130,19 @@ QString NBStyleManager::getStyleSheetDB( QString widget ) {
 
 QPalette NBStyleManager::getPaletteTD() {
 
-	QPalette pltt = QPalette();
+	QPalette pltt = qApp->palette();
 
-	pltt.setColor( QPalette::Window, QColor( 1, 1, 1, 0 ) );
-	pltt.setColor( QPalette::WindowText, Qt::white );
-	pltt.setColor( QPalette::Base, Qt::transparent );
-	pltt.setColor( QPalette::AlternateBase, QColor( 30, 30, 30, 180 ) );
-	pltt.setColor( QPalette::ToolTipBase, QColor( 0, 0, 0, 206 ) );
-	pltt.setColor( QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
-	pltt.setColor( QPalette::Text, Qt::white );
-	pltt.setColor( QPalette::Button, Qt::transparent );
-	pltt.setColor( QPalette::ButtonText, Qt::white );
-	pltt.setColor( QPalette::BrightText, Qt::white );
+	pltt.setColor( QPalette::Active, QPalette::Window, QColor( 1, 1, 1, 180 ) );
+	pltt.setColor( QPalette::Active, QPalette::WindowText, Qt::white );
+	pltt.setColor( QPalette::Active, QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::Active, QPalette::AlternateBase, QColor( 30, 30, 30, 180 ) );
+	pltt.setColor( QPalette::Active, QPalette::ToolTipBase, QColor( 0, 0, 0, 206 ) );
+	pltt.setColor( QPalette::Active, QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
+	pltt.setColor( QPalette::Active, QPalette::Text, Qt::white );
+	pltt.setColor( QPalette::Active, QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::Active, QPalette::ButtonText, Qt::white );
+	pltt.setColor( QPalette::Active, QPalette::BrightText, Qt::white );
+	pltt.setColor( QPalette::Active, QPalette::Link, Qt::darkGreen );
 
 	return pltt;
 };

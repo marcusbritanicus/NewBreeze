@@ -1,17 +1,13 @@
 QWidget#mainWidget {
 	border: 1px solid <bordercolor>;
-	border-radius: 5px;
+	border-radius: 2px;
 }
 
 QAbstractItemView#mainList {
 	border: none;
 }
 
-QListView#mainList {
-	border: none;
-}
-
-QTreeView#mainList {
+QAbstractItemView {
 	border: none;
 }
 
@@ -73,6 +69,6 @@ QSizeGrip {
 QToolTip {
 	border: none;
 	padding: 2px;
-	border-radius: 5px;
+	border-radius: 2px;
 	font-weight: bold;
 }

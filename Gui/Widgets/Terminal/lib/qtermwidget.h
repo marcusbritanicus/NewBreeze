@@ -20,10 +20,14 @@ Boston, MA 02110-1301, USA.
 #ifndef _Q_TERM_WIDGET
 #define _Q_TERM_WIDGET
 
+#include <QtCore>
 #include <QtGui>
 
-struct TermWidgetImpl;
+#if QT_VERSION >= 0x050000
+	#include <QtWidgets>
+#endif
 
+struct TermWidgetImpl;
 
 class QTermWidget : public QWidget {
     Q_OBJECT

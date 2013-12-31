@@ -11,7 +11,6 @@
 #include <QStringList>
 #include <QSettings>
 #include <NBDeviceInfo.hpp>
-#include <NBTools.hpp>
 
 class NBXdg {
 	public:

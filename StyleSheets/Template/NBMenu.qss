@@ -1,5 +1,5 @@
 QMenu {
-	border-radius: 5px;
+	border-radius: 2px;
 	border: 1px solid <bordercolor>;
 	font-size: 9pt;
 	menu-scrollable: 1;
@@ -11,7 +11,7 @@ QMenu::item {
 }
 
 QMenu::item:selected {
-	border-radius: 5px;
+	border-radius: 2px;
 	background: rgba( 100, 100, 100, 150 );
 }
 

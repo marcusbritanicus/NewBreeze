@@ -4,13 +4,19 @@ TARGET = newbreeze2
 QT += webkit xml network
 LIBS += -lmagic -lzip -ltar -lbz2 -llzma -lz
 
+greaterThan(QT_MAJOR_VERSION, 4) {
+	QT += widgets
+	QT += webkitwidgets
+	QT += concurrent
+}
+
 INCLUDEPATH += . Core Core/AppFile Core/Archive Core/ConfigParser Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/FileIO
 INCLUDEPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/Server Core/StandardPaths Core/SystemInfo Core/XDG
 INCLUDEPATH += Gui Gui/Dialogs Gui/Dialogs/FileDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/SettingsManager Gui/ModelViews
 INCLUDEPATH += Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel
 INCLUDEPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel
 INCLUDEPATH += Gui/ModelViews/Views Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView
-INCLUDEPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/SidePanelView Gui/ModelViews/Views/TreeView Gui/Others
+INCLUDEPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/SidePanelView Gui/Others
 INCLUDEPATH += Gui/Others/Settings Gui/Plugins Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash Gui/Plugins/ImagePeek Gui/Plugins/WebWatch
 INCLUDEPATH += Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu
 INCLUDEPATH += Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/IOManager
@@ -23,7 +29,7 @@ DEPENDPATH += Gui Gui/Dialogs Gui/Dialogs/FileDialog Gui/Dialogs/PropertiesDialo
 DEPENDPATH += Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel
 DEPENDPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel
 DEPENDPATH += Gui/ModelViews/Views Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView
-DEPENDPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/SidePanelView Gui/ModelViews/Views/TreeView Gui/Others
+DEPENDPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/SidePanelView Gui/Others
 DEPENDPATH += Gui/Others/Settings Gui/Plugins Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash Gui/Plugins/ImagePeek Gui/Plugins/WebWatch
 DEPENDPATH += Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu
 DEPENDPATH += Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/IOManager
@@ -90,8 +96,6 @@ HEADERS += Gui/ModelViews/Views/OpenWithView/NBOpenWithDelegate.hpp
 HEADERS += Gui/ModelViews/Views/OpenWithView/NBOpenWithView.hpp
 HEADERS += Gui/ModelViews/Views/SidePanelView/NBSidePanelDelegate.hpp
 HEADERS += Gui/ModelViews/Views/SidePanelView/NBSidePanelView.hpp
-HEADERS += Gui/ModelViews/Views/TreeView/NBTreeDelegate.hpp
-HEADERS += Gui/ModelViews/Views/TreeView/NBTreeView.hpp
 HEADERS += Gui/NewBreeze.hpp
 HEADERS += Gui/Others/Settings/NBSettings.hpp
 HEADERS += Gui/Plugins/CustomPeek/NBCustomPeek.hpp
@@ -206,8 +210,6 @@ SOURCES += Gui/ModelViews/Views/OpenWithView/NBOpenWithDelegate.cpp
 SOURCES += Gui/ModelViews/Views/OpenWithView/NBOpenWithView.cpp
 SOURCES += Gui/ModelViews/Views/SidePanelView/NBSidePanelDelegate.cpp
 SOURCES += Gui/ModelViews/Views/SidePanelView/NBSidePanelView.cpp
-SOURCES += Gui/ModelViews/Views/TreeView/NBTreeDelegate.cpp
-SOURCES += Gui/ModelViews/Views/TreeView/NBTreeView.cpp
 SOURCES += Gui/NewBreeze.cpp
 SOURCES += Gui/Others/NBStartup.cpp
 SOURCES += Gui/Others/NBUpdater.cpp

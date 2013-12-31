@@ -24,36 +24,12 @@
 #include "TerminalDisplay.h"
 
 // Qt
-#include <QtGui/QApplication>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QClipboard>
-#include <QtGui/QKeyEvent>
-#include <QtCore/QEvent>
-#include <QtCore/QTime>
-#include <QtCore/QFile>
-#include <QtGui/QGridLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QPainter>
-#include <QtGui/QPixmap>
-#include <QtGui/QScrollBar>
-#include <QtGui/QStyle>
-#include <QtCore/QTimer>
-#include <QtGui/QToolTip>
+#include <QtGui>
+#include <QtCore>
 #include <QtDebug>
-#include <QUrl>
-
-// KDE
-//#include <kshell.h>
-//#include <KColorScheme>
-//#include <KCursor>
-//#include <kdebug.h>
-//#include <KLocale>
-//#include <KMenu>
-//#include <KNotification>
-//#include <KGlobalSettings>
-//#include <KShortcut>
-//#include <KIO/NetAccess>
+#if QT_VERSION >= 0x050000
+	#include <QtWidgets>
+#endif
 
 // Konsole
 //#include <config-apps.h>

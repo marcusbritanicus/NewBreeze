@@ -532,33 +532,64 @@ QStringList getTerminal() {
 	return QStringList();
 };
 
-void NBMessageOutput( QtMsgType type, const char* message ) {
+#if QT_VERSION >= 0x050000
+	void NBMessageOutput5( QtMsgType type, const QMessageLogContext &context, const QString &message ) {
 
-	switch ( type ) {
+		Q_UNUSED( context );
 
-		case QtDebugMsg: {
-			fprintf( stderr, "\033[01;30mNewBreeze::Debug# %s\n\033[00;00m", message );
-			break;
-		}
-
-		case QtWarningMsg: {
-			if ( QString( message ).contains( "X Error" ) )
+		switch ( type ) {
+			case QtDebugMsg: {
+				fprintf( stderr, "\033[01;30mNewBreeze::Debug# %s\n\033[00;00m", qPrintable( message ) );
 				break;
-			fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", message );
-			break;
-		}
+			}
 
-		case QtCriticalMsg: {
-			fprintf( stderr, "\033[01;31mNewBreeze::CriticalError# %s\n\033[00;00m", message );
-			break;
-		}
+			case QtWarningMsg: {
+				if ( QString( message ).contains( "X Error" ) )
+					break;
+				fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", qPrintable( message ) );
+				break;
+			}
 
-		case QtFatalMsg: {
-			fprintf( stderr, "\033[01;41mNewBreeze::FatalError# %s\n\033[00;00m", message );
-			abort();
+			case QtCriticalMsg: {
+				fprintf( stderr, "\033[01;31mNewBreeze::CriticalError# %s\n\033[00;00m", qPrintable( message ) );
+				break;
+			}
+
+			case QtFatalMsg: {
+				fprintf( stderr, "\033[01;41mNewBreeze::FatalError# %s\n\033[00;00m", qPrintable( message ) );
+				abort();
+			}
 		}
-	}
-};
+	};
+#else
+	void NBMessageOutput( QtMsgType type, const char* message ) {
+
+		switch ( type ) {
+
+			case QtDebugMsg: {
+				fprintf( stderr, "\033[01;30mNewBreeze::Debug# %s\n\033[00;00m", message );
+				break;
+			}
+
+			case QtWarningMsg: {
+				if ( QString( message ).contains( "X Error" ) )
+					break;
+				fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", message );
+				break;
+			}
+
+			case QtCriticalMsg: {
+				fprintf( stderr, "\033[01;31mNewBreeze::CriticalError# %s\n\033[00;00m", message );
+				break;
+			}
+
+			case QtFatalMsg: {
+				fprintf( stderr, "\033[01;41mNewBreeze::FatalError# %s\n\033[00;00m", message );
+				abort();
+			}
+		}
+	};
+#endif
 
 void NBDebugMsg(  DbgMsgPart::MsgPart part, const char *format, ... ) {
 

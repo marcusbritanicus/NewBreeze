@@ -52,6 +52,9 @@ void NewBreeze::createGUI() {
 
 	MainLayout->setContentsMargins( QMargins() );
 	ViewLayout->setContentsMargins( QMargins( 0, 0, 3, 0 ) );
+	ViewLayout->setSpacing( 3 );
+	BodyLayout->setContentsMargins( QMargins() );
+	BodyLayout->setSpacing( 0 );
 
 	TitleBar = new NBTitleBar();
 	AddressBar = new NBAddressBar();
@@ -67,9 +70,9 @@ void NewBreeze::createGUI() {
 	ViewLayout->addWidget( QuickMenuBar );
 	ViewLayout->addWidget( FolderView );
 
-	BodyLayout->setContentsMargins( QMargins() );
 	BodyLayout->addWidget( SidePanel );
 	BodyLayout->addWidget( Separator::vertical() );
+	BodyLayout->addWidget( NBSpacer::horizontal( 3 ) );
 	BodyLayout->addLayout( ViewLayout );
 
 	BodyWidget->setLayout( BodyLayout );
@@ -418,12 +421,35 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	Settings->setValue( "Session/SortCase", FolderView->fsModel->sortCaseSensitivity() );
 	Settings->setValue( "Session/SortCategory", FolderView->fsModel->sortCategorized() );
 	Settings->setValue( "Session/Maximized", isMaximized() );
-	Settings->setValue( "Session/ExpandDevices", SidePanel->isExpanded( SidePanel->spModel->index( 3, 0 ) ) );
-	Settings->setValue( "Session/ExpandBookmarks", SidePanel->isExpanded( SidePanel->spModel->index( 4, 0 ) ) );
 
 	qDebug( "Good Bye!" );
 
 	cEvent->accept();
+};
+
+void NewBreeze::resizeEvent( QResizeEvent *rEvent ) {
+
+	QPixmap pixmap( rEvent->size() );
+
+	QPainter painter;
+
+	painter.begin( &pixmap );
+	painter.save();
+
+	painter.fillRect( pixmap.rect(), Qt::white );
+
+	// painter.setRenderHint( QPainter::Antialiasing );
+	painter.setPen( Qt::black );
+	painter.setBrush( QBrush( Qt::black ) );
+
+	painter.drawRoundedRect( pixmap.rect(), 2, 2 );
+
+	painter.restore();
+	painter.end();
+
+	setMask( pixmap.createMaskFromColor( Qt::white ) );
+
+	rEvent->accept();
 };
 
 void NewBreeze::addBookMark() {
