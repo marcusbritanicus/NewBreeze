@@ -1,0 +1,5 @@
+body {
+	background-url: none;
+	background-color: rgba(30, 30, 30, 0.7);
+	color: white;
+}
