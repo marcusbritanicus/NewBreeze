@@ -689,7 +689,7 @@ QPixmap NBCatalogView::pixmapForCategory( QString categoryText ) const {
 		return QIcon::fromTheme( "folder-video" ).pixmap( 16, 16 );
 
 	else
-		return QIcon::fromTheme( ":/icons/" ).pixmap( 16, 16 );
+		return QIcon( ":/icons/catalogs-alt.png" ).pixmap( 16, 16 );
 };
 
 QRegion NBCatalogView::visualRegionForSelection( const QItemSelection &selection ) const {

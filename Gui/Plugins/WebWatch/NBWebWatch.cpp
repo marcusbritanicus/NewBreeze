@@ -36,6 +36,7 @@ void NBWebWatch::createGUI() {
 
 	peekWidgetBase = new QWebView();
 	peekWidgetBase->setRenderHints( QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing );
+	peekWidgetBase->settings()->setUserStyleSheetUrl( QUrl::fromLocalFile( ":/StyleSheets/Template/CustomWebkit.qss" ) );
 
 	peekWidgetBase->load( QUrl::fromLocalFile( path ) );
 

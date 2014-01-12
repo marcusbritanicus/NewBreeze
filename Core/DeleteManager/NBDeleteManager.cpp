@@ -5,7 +5,6 @@
 */
 
 #include <NBDeleteManager.hpp>
-#include <NBMessageDialog.hpp>
 
 NBDeleteManager::NBDeleteManager( QObject *parent, bool trash ) : QObject( parent ) {
 
@@ -42,10 +41,9 @@ void NBDeleteManager::sendToTrash( QStringList trashList ) {
 	Q_UNUSED( trashList );
 
 	// QMetaObject::invokeMethod( trasher, "trashFilesAndFolders", Qt::QueuedConnection, Q_ARG( QStringList, trashList ) );
-	NBMessageDialog::information(
-		"Sorry: Unimplemented Function",
-		"I'm extremely sorry about this, but it seems that NewBreeze was released without fixing this issue. Please contact me at "		\
-		"marcusbritanicus@gmail.com to know about the fix." );
+	qCritical() << "Sorry: Unimplemented Function";
+	qCritical() << "I'm extremely sorry about this, but it seems that NewBreeze was released without fixing this issue. Please contact me at "
+					"marcusbritanicus@gmail.com to know about the fix.";
 };
 
 void NBDeleteManager::failureHandler( QStringList failedFiles, QStringList failedDirs ) {

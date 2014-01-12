@@ -8,8 +8,8 @@
 
 NBSidePanelModel::NBSidePanelModel() : QAbstractItemModel() {
 
-	prepareRootItems();
-	updateModelData();
+	rootItem = new NBSidePanelItem( QVariantList() );
+	updateDeviceData();
 };
 
 NBSidePanelModel::~NBSidePanelModel() {
@@ -27,14 +27,14 @@ QVariant NBSidePanelModel::data( const QModelIndex &index, int role ) const {
 	switch( role ) {
 		case Qt::ForegroundRole : {
 			if ( ( Settings->General.Style == QString( "TransLight" ) ) or ( Settings->General.Style == QString( "LightGray" ) ) )
-				return QColor( Qt::black );
+				return QColor( Settings->Colors.TextPenColor );
 
 			else
-				return QColor( Qt::white );
+				return QColor( Settings->Colors.TextPenColorAlt );
 		}
 
 		case Qt::ToolTipRole : {
-			if ( index.parent().data() == "Devices" )
+			if ( showingDevices )
 				return item->data( Qt::UserRole + 1 ).value<NBDeviceInfo>().mountPoint();
 
 			else
@@ -42,7 +42,7 @@ QVariant NBSidePanelModel::data( const QModelIndex &index, int role ) const {
 		}
 
 		case Qt::UserRole + 1 : {
-			if ( index.parent().data() == "Devices" )
+			if ( showingDevices )
 				return item->data( Qt::UserRole + 1 ).value<NBDeviceInfo>().mountPoint();
 
 			else
@@ -76,23 +76,7 @@ Qt::ItemFlags NBSidePanelModel::flags( const QModelIndex & index ) const {
 	if ( not index.isValid() )
 		return Qt::NoItemFlags;
 
-	if ( index.parent() == parent() )
-		switch( index.row() ) {
-			case 0:
-			case 1:
-				return Qt::NoItemFlags;
-
-			case 2:
-				return Qt::ItemIsEnabled;
-
-			case 3:
-				return Qt::ItemIsEnabled;
-		}
-
-	else
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled;
-
-	return Qt::NoItemFlags;
+	return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled;
 };
 
 QModelIndex NBSidePanelModel::rootIndex() const {
@@ -135,34 +119,18 @@ int NBSidePanelModel::columnCount( const QModelIndex &parent ) const {
 	return 1;
 };
 
-void NBSidePanelModel::prepareRootItems() {
-
-	rootItem = new NBSidePanelItem( QVariantList() );
-
-	folderRootItem = new NBSidePanelItem( QVariantList() << "Folders" << QIcon( ":/icons/folder.png" ) << "NB://FolderView", rootItem );
-	appRootItem = new NBSidePanelItem( QVariantList() << "Applications" << QIcon( ":/icons/applications.png" ) << "NB://Applications", rootItem );
-	catalogRootItem = new NBSidePanelItem( QVariantList() << "Catalogs" << QIcon( ":/icons/catalogs.png" ) << "NB://Catalogs", rootItem );
-
-	devRootItem = new NBSidePanelItem( QVariantList() << "Devices" << QIcon( ":/icons/comp.png" ) << "", rootItem );
-	bmkRootItem = new NBSidePanelItem( QVariantList() << "Favorites" << QIcon( ":/icons/bookmark.png" ) << "", rootItem );
-
-	rootItem->appendChild( folderRootItem );
-	rootItem->appendChild( appRootItem );
-	rootItem->appendChild( catalogRootItem );
-
-	rootItem->appendChild( devRootItem );
-	rootItem->appendChild( bmkRootItem );
-};
-
 void NBSidePanelModel::updateDeviceData() {
 
 	NBDeviceManager dm;
 	QList<NBDeviceInfo> deviceInfos = dm.allDevices();
 
+	showingDevices = true;
 	beginResetModel();
 
 	devList.clear();
-	devRootItem->clearChildren();
+	bmkList.clear();
+
+	rootItem->clearChildren();
 	foreach( NBDeviceInfo devInfo, deviceInfos ) {
 
 		QVariantList data;
@@ -173,17 +141,20 @@ void NBSidePanelModel::updateDeviceData() {
 		data << QIcon( ":/icons/" + devInfo.driveType() + ".png" );
 		data << var;
 
-		devRootItem->appendChild( new NBSidePanelItem( data, devRootItem ) );
+		rootItem->appendChild( new NBSidePanelItem( data, rootItem ) );
 	}
 	endResetModel();
 };
 
 void NBSidePanelModel::updateBookmarkData() {
 
+	showingDevices = false;
 	beginResetModel();
 
+	devList.clear();
 	bmkList.clear();
-	bmkRootItem->clearChildren();
+
+	rootItem->clearChildren();
 	foreach( QString bookmark, bookmarkSettings.value( "Order" ).toStringList() ) {
 		QString label = bookmarkSettings.value( QUrl::toPercentEncoding( bookmark ) ).toString();
 
@@ -192,13 +163,7 @@ void NBSidePanelModel::updateBookmarkData() {
 		data << QIcon::fromTheme( "bookmarks", QIcon( ":/icons/bookmarks.png" ) );
 		data << bookmark;
 
-		bmkRootItem->appendChild( new NBSidePanelItem( data, bmkRootItem ) );
+		rootItem->appendChild( new NBSidePanelItem( data, rootItem ) );
 	}
 	endResetModel();
-};
-
-void NBSidePanelModel::updateModelData() {
-
-	updateDeviceData();
-	updateBookmarkData();
 };

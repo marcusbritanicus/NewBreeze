@@ -18,58 +18,70 @@
 	#include <QtConcurrent>
 #endif
 
-class NBPropertiesDialog: public NBDialog {
+class NBPropertiesBase: public QWidget {
+	Q_OBJECT
+
+	public:
+		NBPropertiesBase( QStringList );
+
+	private:
+		NBClickLabel *iconLabel;
+		QLabel *infoLabel;
+		QStringList pathsList;
+
+	Q_SIGNALS:
+		void setDirIcon();
+};
+
+class NBPropertiesWidget: public QWidget {
     Q_OBJECT
 
 	public:
-		NBPropertiesDialog( QStringList );
-		~NBPropertiesDialog();
+		NBPropertiesWidget( QStringList );
+		~NBPropertiesWidget();
 
 	private:
 		void createGUI();
-		void setDialogProperties();
+		void setWidgetProperties();
 
 		bool terminate;
 
 	public slots:
 		void update();
 
-	signals:
-		void updateSignal();
-
 	private:
 		void folderProperties( QStringList paths );
 		void recurseProperties( QString path );
 
-		NBClickLabel *iconLabel;
+		QString sizeTypeStr;
+		QLabel *sizeTypeLabel;
 
-		QLabel *size2Label;
-		QLabel *cont2Label;
+		QLabel *timeLabel;
 
 		QStringList pathsList;
 
 		QFuture<void> thread;
 
-		qint64 files;
-		qint64 folders;
-		qint64 totalSize;
+		qint64 files = 0;
+		qint64 folders = 0;
+		qint64 totalSize = 0;
 
-	private slots:
-		void setDirIcon();
+		QDateTime ctimeMin, mtimeMin, atimeMin;
+		QDateTime ctimeMax, mtimeMax, atimeMax;
 
-	protected:
-		void changeEvent( QEvent *cEvent );
+	Q_SIGNALS:
+		void updateSignal();
 };
 
-class NBPermissionsDialog: public NBDialog {
+class NBPermissionsWidget: public QWidget {
     Q_OBJECT
 
 	public:
-		NBPermissionsDialog( QStringList );
+		NBPermissionsWidget( QStringList );
 
 	private:
 		void createGUI();
-		void setDialogProperties();
+		void setWidgetProperties();
 		void readPermissions();
 
 		NBClickLabel *iconLabel;
@@ -83,13 +95,45 @@ class NBPermissionsDialog: public NBDialog {
 		QCheckBox *smartExecCheck;
 		QCheckBox *carryCheck;
 
-		QPushButton *applyBtn, *cancelBtn;
-
 	private slots:
 		void applyPermissions();
 		void applyTo( const char*, QFile::Permissions );
 };
 
 void smartExecutable( QString );
+
+/*
+	*
+	* We want a independent, non modal dialog showing properties,
+	*
+*/
+class NBPropertiesDialog: public NBDialog {
+	Q_OBJECT
+
+
+	public:
+		Q_ENUMS( PropertiesTab )
+
+		enum PropertiesTab {
+			Properties  = 0x00,
+			Permissions = 0x01,
+			OpenWith    = 0x02
+		};
+
+		NBPropertiesDialog( QStringList paths, PropertiesTab tab = Properties );
+
+	private:
+		QStackedWidget *stack;
+		QTabBar *tabs;
+
+		NBPropertiesWidget *propsW;
+		NBPermissionsWidget *permsW;
+
+		QStringList pathsList;
+
+	private slots:
+		void switchToTab( int  );
+		void setDirIcon();
+};
 
 #endif

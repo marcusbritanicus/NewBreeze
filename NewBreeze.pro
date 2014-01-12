@@ -2,40 +2,44 @@ TEMPLATE = app
 TARGET = newbreeze2
 
 QT += webkit xml network
-LIBS += -lmagic -lzip -ltar -lbz2 -llzma -lz
-
 greaterThan(QT_MAJOR_VERSION, 4) {
 	QT += widgets
 	QT += webkitwidgets
 	QT += concurrent
 }
 
-INCLUDEPATH += . Core Core/AppFile Core/Archive Core/ConfigParser Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/FileIO
+LIBS += -lmagic -lzip -ltar -lbz2 -llzma -lz
+
+# Poppler-Qt4
+INCLUDEPATH  += /usr/include/poppler/qt4
+LIBS         += -L/usr/lib -lpoppler-qt4
+
+# Source Paths
+INCLUDEPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/ConfigParser Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/FileIO
 INCLUDEPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/Server Core/StandardPaths Core/SystemInfo Core/XDG
 INCLUDEPATH += Gui Gui/Dialogs Gui/Dialogs/FileDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/SettingsManager Gui/ModelViews
 INCLUDEPATH += Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel
-INCLUDEPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel
-INCLUDEPATH += Gui/ModelViews/Views Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView
-INCLUDEPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/SidePanelView Gui/Others
-INCLUDEPATH += Gui/Others/Settings Gui/Plugins Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash Gui/Plugins/ImagePeek Gui/Plugins/WebWatch
-INCLUDEPATH += Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu
-INCLUDEPATH += Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/IOManager
-INCLUDEPATH += Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
-INCLUDEPATH += Gui/Widgets/TitleBar StyleSheets
+INCLUDEPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel Gui/ModelViews/Views Gui/ModelViews/Views/AppsView
+INCLUDEPATH += Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView Gui/Plugins/PdfPeep
+INCLUDEPATH += Gui/ModelViews/Views/SidePanelView Gui/Others Gui/Others/Settings Gui/Plugins Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash
+INCLUDEPATH += Gui/Plugins/ImagePeek Gui/Plugins/OdfOgle Gui/Plugins/WebWatch Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar
+INCLUDEPATH += Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/FolderView
+INCLUDEPATH += Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/IOManager Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget
+INCLUDEPATH += Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar StyleSheets
 
-DEPENDPATH += . Core Core/AppFile Core/Archive Core/ConfigParser Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/FileIO
+DEPENDPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/ConfigParser Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/FileIO
 DEPENDPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/Server Core/StandardPaths Core/SystemInfo Core/XDG
 DEPENDPATH += Gui Gui/Dialogs Gui/Dialogs/FileDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/SettingsManager Gui/ModelViews
 DEPENDPATH += Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel
-DEPENDPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel
-DEPENDPATH += Gui/ModelViews/Views Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView
-DEPENDPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/SidePanelView Gui/Others
-DEPENDPATH += Gui/Others/Settings Gui/Plugins Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash Gui/Plugins/ImagePeek Gui/Plugins/WebWatch
-DEPENDPATH += Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu
-DEPENDPATH += Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/IOManager
-DEPENDPATH += Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
-DEPENDPATH += Gui/Widgets/TitleBar StyleSheets
+DEPENDPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel Gui/ModelViews/Views Gui/ModelViews/Views/AppsView
+DEPENDPATH += Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView Gui/Plugins/PdfPeep
+DEPENDPATH += Gui/ModelViews/Views/SidePanelView Gui/Others Gui/Others/Settings Gui/Plugins Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash
+DEPENDPATH += Gui/Plugins/ImagePeek Gui/Plugins/OdfOgle Gui/Plugins/WebWatch Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar
+DEPENDPATH += Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/FolderView
+DEPENDPATH += Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/IOManager Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget
+DEPENDPATH += Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar StyleSheets
 
+# Headers
 HEADERS += Global.hpp
 HEADERS += Core/AppFile/NBAppEngine.hpp
 HEADERS += Core/AppFile/NBAppFile.hpp
@@ -45,6 +49,7 @@ HEADERS += Core/Archive/NBLibGZip.hpp
 HEADERS += Core/Archive/NBLibLzma.hpp
 HEADERS += Core/Archive/NBLibTar.hpp
 HEADERS += Core/Archive/NBLibZip.hpp
+HEADERS += Core/ArgParser/NBCLParser.hpp
 HEADERS += Core/CoreTools/NBTools.hpp
 HEADERS += Core/DeleteManager/NBDeleteManager.hpp
 HEADERS += Core/DeviceInfo/NBDeviceInfo.hpp
@@ -101,6 +106,9 @@ HEADERS += Gui/Others/Settings/NBSettings.hpp
 HEADERS += Gui/Plugins/CustomPeek/NBCustomPeek.hpp
 HEADERS += Gui/Plugins/FolderFlash/NBFolderFlash.hpp
 HEADERS += Gui/Plugins/ImagePeek/NBImagePeek.hpp
+HEADERS += Gui/Plugins/OdfOgle/*.h
+HEADERS += Gui/Plugins/OdfOgle/NBOdfOgle.hpp
+HEADERS += Gui/Plugins/PdfPeep/NBPdfPeep.hpp
 HEADERS += Gui/Plugins/WebWatch/NBWebWatch.hpp
 HEADERS += Gui/Plugins/WordView/NBWordView.hpp
 HEADERS += Gui/Widgets/AddressBar/NBAddressBar.hpp
@@ -111,12 +119,15 @@ HEADERS += Gui/Widgets/CustomActions/NBCustomActions.hpp
 HEADERS += Gui/Widgets/FolderView/NBFolderView.hpp
 HEADERS += Gui/Widgets/FolderView/NBFolderViewRestricted.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBActionButtons.hpp
+HEADERS += Gui/Widgets/GuiWidgets/NBFlashLabel.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBGuiWidgets.hpp
+HEADERS += Gui/Widgets/GuiWidgets/NBLabels.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBProgressBar.hpp
 HEADERS += Gui/Widgets/InfoBar/NBInfoBar.hpp
 HEADERS += Gui/Widgets/IOManager/NBIOManager.hpp
 HEADERS += Gui/Widgets/QuickMenuBar/NBQuickMenuBar.hpp
 HEADERS += Gui/Widgets/ShowHideWidget/NBShowHideWidget.hpp
+HEADERS += Gui/Widgets/SidePanel/NBSidePanel.hpp
 HEADERS += Gui/Widgets/Terminal/lib/BlockArray.h
 HEADERS += Gui/Widgets/Terminal/lib/CharacterColor.h
 HEADERS += Gui/Widgets/Terminal/lib/Character.h
@@ -150,6 +161,7 @@ HEADERS += Gui/Widgets/Terminal/NBTerminal.hpp
 HEADERS += Gui/Widgets/TitleBar/NBTitleBar.hpp
 HEADERS += StyleSheets/NBStyleManager.hpp
 
+# Sources
 SOURCES += Core/AppFile/NBAppEngine.cpp
 SOURCES += Core/AppFile/NBAppFile.cpp
 SOURCES += Core/Archive/NBArchive.cpp
@@ -158,6 +170,7 @@ SOURCES += Core/Archive/NBLibGZip.cpp
 SOURCES += Core/Archive/NBLibLzma.cpp
 SOURCES += Core/Archive/NBLibTar.cpp
 SOURCES += Core/Archive/NBLibZip.cpp
+SOURCES += Core/ArgParser/NBCLParser.cpp
 SOURCES += Core/CoreTools/NBTools.cpp
 SOURCES += Core/DeleteManager/NBDeleteManager.cpp
 SOURCES += Core/DeviceInfo/NBDeviceInfo.cpp
@@ -217,6 +230,8 @@ SOURCES += Gui/Others/Settings/NBSettings.cpp
 SOURCES += Gui/Plugins/CustomPeek/NBCustomPeek.cpp
 SOURCES += Gui/Plugins/FolderFlash/NBFolderFlash.cpp
 SOURCES += Gui/Plugins/ImagePeek/NBImagePeek.cpp
+SOURCES += Gui/Plugins/OdfOgle/*.cpp
+SOURCES += Gui/Plugins/PdfPeep/NBPdfPeep.cpp
 SOURCES += Gui/Plugins/WebWatch/NBWebWatch.cpp
 SOURCES += Gui/Plugins/WordView/NBWordView.cpp
 SOURCES += Gui/Widgets/AddressBar/NBAddressBar.cpp
@@ -227,12 +242,15 @@ SOURCES += Gui/Widgets/CustomActions/NBCustomActions.cpp
 SOURCES += Gui/Widgets/FolderView/NBFolderView.cpp
 SOURCES += Gui/Widgets/FolderView/NBFolderViewRestricted.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBActionButtons.cpp
+SOURCES += Gui/Widgets/GuiWidgets/NBFlashLabel.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBGuiWidgets.cpp
+SOURCES += Gui/Widgets/GuiWidgets/NBLabels.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBProgressBar.cpp
 SOURCES += Gui/Widgets/InfoBar/NBInfoBar.cpp
 SOURCES += Gui/Widgets/IOManager/NBIOManager.cpp
 SOURCES += Gui/Widgets/QuickMenuBar/NBQuickMenuBar.cpp
 SOURCES += Gui/Widgets/ShowHideWidget/NBShowHideWidget.cpp
+SOURCES += Gui/Widgets/SidePanel/NBSidePanel.cpp
 SOURCES += Gui/Widgets/Terminal/lib/BlockArray.cpp
 SOURCES += Gui/Widgets/Terminal/lib/ColorScheme.cpp
 SOURCES += Gui/Widgets/Terminal/lib/Emulation.cpp
@@ -260,17 +278,20 @@ SOURCES += Gui/Widgets/TitleBar/NBTitleBar.cpp
 SOURCES += StyleSheets/NBStyleManager.cpp
 SOURCES += Main.cpp
 
-RESOURCES += NewBreeze.qrc #Gui/Widgets/Terminal/data/color-schemes/color-schemes.qrc Gui/Widgets/Terminal/data/kb-layouts/kb-layouts.qrc
+# Icon and stylesheet resources
+RESOURCES += NewBreeze.qrc
 
 # C++11 Support
+QMAKE_CFLAGS += -std=c++0x
 QMAKE_CXXFLAGS += -std=c++0x
 
-CONFIG += warn_all thread
+# Enable warnings and threading support
+CONFIG += warn_all thread silent
 
-MOC_DIR 	= build/moc
-OBJECTS_DIR = build/objs
-RCC_DIR		= build/qrc
-UI_DIR      = build/uic
+MOC_DIR 	= /home/Softwares/Others/Builds/NewBreeze/build/moc
+OBJECTS_DIR = /home/Softwares/Others/Builds/NewBreeze/build/objs
+RCC_DIR		= /home/Softwares/Others/Builds/NewBreeze/build/qrc
+UI_DIR      = /home/Softwares/Others/Builds/NewBreeze/build/uic
 
 unix {
 	isEmpty(PREFIX) {
@@ -285,7 +306,7 @@ unix {
 	desktop.files = newbreeze.desktop
 
 	icons.path = $$PREFIX/share/icons/hicolor/256x256/apps/
-	icons.files = icons/newbreeze.png
+	icons.files = icons/newbreeze2.png
 
 	data.path = $$PREFIX/share/newbreeze/
 	data.files = Gui/Widgets/Terminal/data/color-schemes Gui/Widgets/Terminal/data/kb-layouts README.md freedesktop.org.xml README Changelog

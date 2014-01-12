@@ -58,7 +58,6 @@
 		<file>icons/minimize.png</file>
 		<file>icons/move.png</file>
 		<file>icons/network.png</file>
-		<file>icons/newbreeze.png</file>
 		<file>icons/newbreeze2.png</file>
 		<file>icons/newfolder.png</file>
 		<file>icons/newwin.png</file>
@@ -84,16 +83,13 @@
 		<file>icons/search.png</file>
 		<file>icons/select1.png</file>
 		<file>icons/selectall.png</file>
+		<file>icons/show-folders.png</file>
 		<file>icons/size.png</file>
-		<file>icons/square-minus.png</file>
-		<file>icons/square-plus.png</file>
 		<file>icons/stop.png</file>
 		<file>icons/text.png</file>
 		<file>icons/TransDark.png</file>
 		<file>icons/TransLight.png</file>
 		<file>icons/trash.png</file>
-		<file>icons/tree-hidden.png</file>
-		<file>icons/tree-shown.png</file>
 		<file>icons/unknown.png</file>
 		<file>icons/up.png</file>
 		<file>icons/usb.png</file>
@@ -119,6 +115,7 @@
 		<file>StyleSheets/Template/NBTitleBar.qss</file>
 		<file>StyleSheets/Template/NBToolButton.qss</file>
 		<file>StyleSheets/Template/NewBreeze.qss</file>
+		<file>StyleSheets/Template/CustomWebkit.qss</file>
 
 	</qresource>
 </RCC>

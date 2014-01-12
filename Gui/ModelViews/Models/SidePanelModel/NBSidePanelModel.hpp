@@ -32,15 +32,14 @@ class NBSidePanelModel : public QAbstractItemModel {
 	private:
 		void prepareRootItems();
 
-		NBSidePanelItem *rootItem, *devRootItem, *bmkRootItem;
-		NBSidePanelItem *appRootItem, *catalogRootItem, *folderRootItem;
+		NBSidePanelItem *rootItem;
 		QStringList bmkList, devList;
+
+		bool showingDevices = true;
 
 	public slots:
 		void updateDeviceData();
 		void updateBookmarkData();
-
-		void updateModelData();
 };
 
 #endif

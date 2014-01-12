@@ -10,7 +10,7 @@
 #include <Global.hpp>
 #include <NBAddressBar.hpp>
 #include <NBIconView.hpp>
-#include <NBSidePanelView.hpp>
+#include <NBSidePanel.hpp>
 #include <NBDialog.hpp>
 #include <NBMessageDialog.hpp>
 #include <NBGuiWidgets.hpp>

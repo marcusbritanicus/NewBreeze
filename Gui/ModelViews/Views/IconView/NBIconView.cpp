@@ -434,37 +434,18 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 	dragStartPosition = mpEvent->pos();
 
 	QModelIndex idx = indexAt( mpEvent->pos() );
-	if ( idx.isValid() ) {
-		/* Click landed on an index. Select / deselect the item(s) */
-		QModelIndexList selected = selectionModel()->selectedRows( 0 );
-		QModelIndex start = ( selected.count() ? selected.at( 0 ) : currentIndex() );
-		if ( not start.isValid() ) start = cModel->index( 0, 0, rootIndex() );
-		setCurrentIndex( idx );
-		if ( qApp->keyboardModifiers() & Qt::ControlModifier ) {
-			if ( selected.contains( idx ) )
-				selected.removeAll( idx );
-
-			else
-				selected << idx;
-
-			QItemSelection selection;
-			Q_FOREACH( QModelIndex sidx, selected )
-				selection.select( sidx, sidx );
-			selectionModel()->select( selection, QItemSelectionModel::Select );
-		}
-		else if ( qApp->keyboardModifiers() & Qt::ShiftModifier ) {
-			QItemSelection selection( start, idx );
-			selectionModel()->clearSelection();
-			selectionModel()->select( selection, QItemSelectionModel::Select );
-		}
-	}
-
-	else {
+	if ( not idx.isValid() ) {
 		/* Click did not land on an index. Draw an item selection rectangle */
 		selectionModel()->clearSelection();
+		repaint();
 
 		rBand->setGeometry( QRect( dragStartPosition, QSize() ) );
 		rBand->show();
+	}
+
+	else {
+
+		return;
 	}
 
 	QAbstractItemView::mousePressEvent( mpEvent );
@@ -484,7 +465,7 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 		return;
 	}
 
-	else if ( ( mmEvent->pos() - dragStartPosition ).manhattanLength() < QApplication::startDragDistance() ) {
+	else if ( not ( mmEvent->pos() - dragStartPosition ).manhattanLength() ) {
 
 		QAbstractItemView::mouseMoveEvent( mmEvent );
 		return;
@@ -495,14 +476,14 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 		QDrag *drag = new QDrag( this );
 
 		QList<QUrl> urlList;
-		foreach( QModelIndex item, selectionModel()->selectedRows() )
-			urlList << QUrl::fromLocalFile( cModel->nodePath( item.data().toString() ) );
+		Q_FOREACH( QModelIndex idx, selectionModel()->selectedIndexes() )
+			if ( not idx.column() )
+				urlList << QUrl::fromLocalFile( cModel->nodePath( idx ) );
 
 		QMimeData *mimedata = new QMimeData();
 		mimedata->setUrls( urlList );
 
 		drag->setMimeData( mimedata );
-
 		drag->exec( Qt::CopyAction | Qt::MoveAction | Qt::LinkAction );
 		return;
 	}
@@ -528,14 +509,61 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 		rBand->setGeometry( QRect( tl, br ) );
 	}
 
-	setSelection( rBand->geometry(), QItemSelectionModel::Select );
+	setSelection( rBand->geometry(), QItemSelectionModel::ClearAndSelect );
+	repaint();
 
 	mmEvent->accept();
 };
 
 void NBIconView::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 
-	rBand->hide();
+	/* If its just a click and not a drag */
+	if ( dragStartPosition == mrEvent->pos() ) {
+		QModelIndex idx = indexAt( mrEvent->pos() );
+		if ( idx.isValid() ) {
+			/* Click landed on an index. Select / deselect the item(s) */
+			QModelIndexList selected = selectionModel()->selectedRows( 0 );
+
+			/* This is the starting index in the selection */
+			QModelIndex start = ( selected.count() ? selected.at( 0 ) : currentIndex() );
+			if ( not start.isValid() )
+				start = cModel->index( 0, 0, rootIndex() );
+
+			/* On click-release, we make the index below the mouse as the current */
+			setCurrentIndex( idx );
+
+			/* If the index below the mouse is selected, deselect it and vice-versa */
+			if ( qApp->keyboardModifiers() & Qt::ControlModifier ) {
+
+				/* Index below the mouse is selected, deselect it */
+				if ( selected.contains( idx ) )
+					selected.removeAll( idx );
+
+				/* Index below the mouse is no selected, select it */
+				else
+					selected << idx;
+
+				/* Prepare the selection */
+				QItemSelection selection;
+				Q_FOREACH( QModelIndex sidx, selected )
+					selection.select( sidx, sidx );
+
+				/* Apply the selection */
+				selectionModel()->select( selection, QItemSelectionModel::Select );
+			}
+
+			/* Continuous Selection */
+			else if ( qApp->keyboardModifiers() & Qt::ShiftModifier ) {
+				QItemSelection selection( start, idx );
+				selectionModel()->clearSelection();
+				selectionModel()->select( selection, QItemSelectionModel::Select );
+			}
+		}
+	}
+
+	if ( rBand->isVisible() )
+		rBand->hide();
+
 	mrEvent->accept();
 };
 
@@ -740,6 +768,14 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 			}
 
 			case QAbstractItemView::MoveDown: {
+				if ( Settings->General.FolderView == "DetailsView" ) {
+					if ( idx.row() == cModel->rowCount() - 1 ) {
+						return cModel->index( 0, 0, idx.parent() );
+					}
+					else {
+						return cModel->index( idx.row() + 1, 0, idx.parent() );
+					}
+				}
 
 				int newVRow = vrow + 1;
 
@@ -772,6 +808,15 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 			}
 
 			case QAbstractItemView::MoveUp: {
+
+				if ( Settings->General.FolderView == "DetailsView" ) {
+					if ( idx.row() == 0 ) {
+						return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
+					}
+					else {
+						return cModel->index( idx.row() - 1, 0, idx.parent() );
+					}
+				}
 
 				int newVRow = vrow - 1;
 
@@ -880,6 +925,15 @@ QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorActio
 			}
 
 			case QAbstractItemView::MoveDown: {
+				if ( Settings->General.FolderView == "DetailsView" ) {
+					if ( idx.row() == cModel->rowCount() - 1 ) {
+						return cModel->index( 0, 0, idx.parent() );
+					}
+					else {
+						return cModel->index( idx.row() + 1, 0, idx.parent() );
+					}
+				}
+
 				int nextRow = idx.row() + itemsPerRow;
 				if ( nextRow >= cModel->rowCount() )
 					return cModel->index( cModel->rowCount() - 1, 0, rootIndex() );
@@ -889,6 +943,15 @@ QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorActio
 			}
 
 			case QAbstractItemView::MoveUp: {
+				if ( Settings->General.FolderView == "DetailsView" ) {
+					if ( idx.row() == 0 ) {
+						return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
+					}
+					else {
+						return cModel->index( idx.row() - 1, 0, idx.parent() );
+					}
+				}
+
 				int prevRow = idx.row() - itemsPerRow;
 				if ( prevRow < 0 )
 					return cModel->index( 0, 0, rootIndex() );

@@ -26,6 +26,9 @@ NBAppsList NBAppEngine::appsForMimeType( QMimeType mimeType ) {
 
 	foreach( NBAppFile app, appsList.toQList() ) {
 		foreach( QString mime, mimeList ) {
+			// if ( app.value( NBAppFile::Name ).toString().toLower().contains( "libre" ) )
+				// qDebug() << app.value( NBAppFile::MimeTypes ).toStringList();
+
 			if ( app.value( NBAppFile::MimeTypes ).toStringList().contains( mime ) ) {
 				if ( ( app.value( NBAppFile::Type ).toString() == "Application" ) and ( not app.value( NBAppFile::NoDisplay ).toBool() ) ) {
 					if ( not appsForMimeList.contains( app ) ) {

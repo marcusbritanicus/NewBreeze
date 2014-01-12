@@ -3,20 +3,21 @@
 
 Built on top of the Powerful Qt4 GUI Toolkit, this file manager is sleek, stylish and fast.
 Some of its features are
+
 * Fast startup and browsing
-* Folder, text, html and image quick preview
+* Folder, text, html, image, odt, and pdf quick preview
 * File Association support
-* Provides categorized List, Icon and Details View
-* Lists the drives/bookmarks in the sidebar
+* Provides Categorized List, Icon and Details View
+* Sleek side panel showing drives and boomarks
 * Full drag and drop support
-* Bookmark Support
-* Applications View
-* Catalog View
+* Applications and Catalog View
 * Auto update devices list
 * Custom Folder Icons and Thumbnail Preview
 * Complete mime-icon support
 * BreadCrumbs Navigation Bar
+* Custom Actions
 * Inline terminal
+* Server for resource sharing
 
 ## Windows and Linux Source Available
 
@@ -25,7 +26,7 @@ Some of its features are
 * Go to NewBreeze
 * Please edit the $$PREFIX qmake variable to your choice
 * To  compile and install, the command prompt and type
-  + `qmake && make && make install`
+    + `qmake && make && make install`
 
 ### Notes for installing icon themes (Windows only):
 * Copy the icon theme into the folder $$PREFIX/icons/
@@ -51,7 +52,6 @@ Some of its features are
 
 ### Upcoming
 * Unified Folder, Application, and Catalog Viewer
-* Pdf Preview Plugin
 * Application Editor ( Desktop file editor )
-* Smaller and mode stylish SideBar with more functionality
+* Trash support
 * Any other feature you request for... :)

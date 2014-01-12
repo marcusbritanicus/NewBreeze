@@ -21,6 +21,10 @@ NBSidePanel::NBSidePanel() : QWidget() {
 	vSpacer->setFixedHeight( 192 );
 	spView->updateDevices();
 	maxWidth = 48 + spView->idealWidth();
+
+	QSettings settings( "NewBreeze", "NewBreeze" );
+	if ( settings.value( "SidePanelOpen" ).toBool() )
+		expand();
 };
 
 /* Forcibly expand and show the devices/bookmarks */
@@ -33,6 +37,10 @@ void NBSidePanel::expand() {
 /* Forcibly expand and show the devices/bookmarks */
 void NBSidePanel::contract() {
 
+	QSettings settings( "NewBreeze", "NewBreeze" );
+	if ( settings.value( "SidePanelOpen" ).toBool() )
+		return;
+
 	if ( not expandingTimer->isActive() )
 		contractingTimer->start();
 };
@@ -43,7 +51,7 @@ void NBSidePanel::setupPanel() {
 
 	/* The 'Folders' Label */
 	dirLbl = new NBFlashLabel();
-	dirLbl->setPixmap( QPixmap( ":/icons/folder.png" ).scaled( QSize( 32, 32 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	dirLbl->setPixmap( QPixmap( ":/icons/show-folders.png" ).scaled( QSize( 32, 32 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 	dirLbl->setFixedSize( QSize( 48, 48 ) );
 	dirLbl->setToolTip( "Show folders" );
 	connect( dirLbl, SIGNAL( clicked() ), this, SIGNAL( showFolders() ) );

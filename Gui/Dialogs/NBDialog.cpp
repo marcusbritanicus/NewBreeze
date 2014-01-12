@@ -17,6 +17,29 @@ NBDialog::NBDialog( QString btns ) : QWidget() {
 	setupDialogProperties();
 };
 
+NBDialog::NBDialog( Buttons btns ) : QWidget() {
+
+	if ( btns == None )
+		buttons = QString();
+
+	else {
+		if ( btns & Minimize )
+			buttons += "n";
+
+		if ( btns & Maximize )
+			buttons += "x";
+
+		if ( btns & Close )
+			buttons += "c";
+	}
+
+	__newClosed = false;
+	__accepted = false;
+
+	setupGUI();
+	setupDialogProperties();
+};
+
 void NBDialog::setupGUI() {
 
 	QWidget *BaseWidget = new QWidget();
@@ -82,6 +105,7 @@ void NBDialog::setupDialogProperties() {
 
 	setMinimumSize( 600, 200 );
 
+	setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
 	setStyleSheet( getStyleSheet( "NBDialog", Settings->General.Style ) );
 };
 

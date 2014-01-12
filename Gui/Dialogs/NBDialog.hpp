@@ -17,7 +17,17 @@ class NBDialog : public QWidget {
 	Q_OBJECT
 
 	public:
+		enum ButtonFlag {
+			None     = 0x00,
+			Minimize = 0x01,
+			Maximize = 0x02,
+			Close    = 0x04
+		};
+
+		Q_DECLARE_FLAGS( Buttons, ButtonFlag )
+
 		NBDialog( QString btns = QString() );
+		NBDialog( Buttons btns );
 
 		void setLayout( QLayout* );
 		void setDialogTitle( QString );

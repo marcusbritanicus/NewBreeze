@@ -135,6 +135,11 @@ void NBViewsWidget::createGUI() {
 	maxIOJobsSB->setValue( Settings->General.MaxIOJobs );
 	connect( maxIOJobsSB, SIGNAL( valueChanged( int ) ), this, SLOT( handleMaxIOJobsChanged( int ) ) );
 
+	sidePanelOpen = new QCheckBox( "&Keep the SidePanel always open");
+	QSettings settings( "NewBreeze", "NewBreeze" );
+	sidePanelOpen->setChecked( settings.value( "SidePanelOpen" ).toBool() );
+	connect( sidePanelOpen, SIGNAL( toggled( bool ) ), this, SLOT( handleSidePanelOpenToggled( bool ) ) );
+
 	if ( Settings->General.Style == QString( "TransLight" ) ) {
 		tlRB->setChecked( true );
 		imageLbl->setPixmap( QPixmap( ":/icons/TransLight.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
@@ -163,6 +168,7 @@ void NBViewsWidget::createGUI() {
 	themeLyt->addWidget( nativeTitleBarCB, 2, 0, 1, 4, Qt::AlignLeft );
 	themeLyt->addWidget( new QLabel( "Maximum number of cuncurrent IO Jobs:" ), 3, 0, 1, 3 );
 	themeLyt->addWidget( maxIOJobsSB, 3, 3 );
+	themeLyt->addWidget( sidePanelOpen, 4, 0, 1, 4, Qt::AlignLeft );
 
 	setLayout( themeLyt );
 };
@@ -204,6 +210,13 @@ void NBViewsWidget::handleMaxIOJobsChanged( int value ) {
 
 	Settings->setValue( "MaxIOJobs", value );
 	Settings->General.MaxIOJobs = value;
+};
+
+void NBViewsWidget::handleSidePanelOpenToggled( bool keepOpen ) {
+
+	QSettings settings( "NewBreeze", "NewBreeze" );
+	settings.setValue( "SidePanelOpen", keepOpen );
+	settings.sync();
 };
 
 NBIconThemeWidget::NBIconThemeWidget() {

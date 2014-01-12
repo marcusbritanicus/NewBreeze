@@ -60,6 +60,7 @@ class NBAddToCatalogMenu : public NBMenu {
 
 	private slots:
 		void addToCatalog();
+		void addToNewCatalog();
 
 	Q_SIGNALS:
 		void reloadCatalogs();

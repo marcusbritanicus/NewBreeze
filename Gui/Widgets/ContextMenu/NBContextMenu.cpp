@@ -383,9 +383,26 @@ NBAddToCatalogMenu::NBAddToCatalogMenu( QString wNode, QModelIndexList nodeList 
 	QAction *addToVideosAct = new QAction( QIcon::fromTheme( "folder-video" ), "&Videos", this );
 	connect( addToVideosAct, SIGNAL( triggered() ), this, SLOT( addToCatalog() ) );
 	addAction( addToVideosAct );
+
+	addSeparator();
+
+	/* Add custom catalogs */
+	QSettings cSett( "NewBreeze", "Catalogs" );
+	cSett.beginGroup( "Custom" );
+	Q_FOREACH( QString ctlg, cSett.childKeys() ) {
+		QAction *ctlgAct = new QAction( QIcon( ":/icons/catalogs-alt.png" ), ctlg, this );
+		connect( ctlgAct, SIGNAL( triggered() ), this, SLOT( addToCatalog() ) );
+		addAction( ctlgAct );
+	}
+	cSett.endGroup();
+
+	/* Add to new catalog */
+	QAction *addToNewCtlgAct = new QAction( QIcon( ":/icons/catalogs-alt.png" ), "Add to &New Catalog", this );
+	connect( addToNewCtlgAct, SIGNAL( triggered() ), this, SLOT( addToNewCatalog() ) );
+	addAction( addToNewCtlgAct );
 };
 
-void NBAddToCatalogMenu::addToCatalog() {
+void NBAddToCatalogMenu::addToNewCatalog() {
 
 	QAction *action = qobject_cast<QAction*>( sender() );
 	if ( not action )
@@ -394,6 +411,36 @@ void NBAddToCatalogMenu::addToCatalog() {
 	QString catalog = action->text().replace( "&", "" );
 
 	QSettings catalogsConf( "NewBreeze", "Catalogs" );
+	QStringList existing = catalogsConf.value( catalog ).toStringList();
+
+	if ( sNodes.count() ) {
+		foreach( QModelIndex idx, sNodes ) {
+			QString node = QDir( workNode ).filePath( idx.data().toString() );
+			if ( isDir( node ) )
+				existing << node;
+		}
+	}
+
+	else {
+		existing << workNode;
+	}
+
+	existing.removeDuplicates();
+
+	catalogsConf.setValue( catalog, existing );
+	catalogsConf.sync();
+
+	emit reloadCatalogs();
+};
+
+void NBAddToCatalogMenu::addToCatalog() {
+
+	QString catalog = QInputDialog::getText( this, "New Catalog", QString( "Enter the name of the new catalog" ) );
+
+	QSettings catalogsConf( "NewBreeze", "Catalogs" );
+	if ( not catalogsConf.childKeys().contains( catalog ) )
+		catalogsConf.beginGroup( "Custom" );
+
 	QStringList existing = catalogsConf.value( catalog ).toStringList();
 
 	if ( sNodes.count() ) {

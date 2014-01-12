@@ -6,7 +6,6 @@
 
 #include <NBIconProvider.hpp>
 #include <NBFileInfoGatherer.hpp>
-#include <pwd.h>
 
 NBQuickFileInfoGatherer::NBQuickFileInfoGatherer() {
 

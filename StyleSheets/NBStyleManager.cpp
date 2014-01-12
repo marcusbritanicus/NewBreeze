@@ -132,7 +132,7 @@ QPalette NBStyleManager::getPaletteTD() {
 
 	QPalette pltt = qApp->palette();
 
-	pltt.setColor( QPalette::Active, QPalette::Window, QColor( 1, 1, 1, 180 ) );
+	pltt.setColor( QPalette::Active, QPalette::Window, QColor( 30, 30, 30, 180 ) );
 	pltt.setColor( QPalette::Active, QPalette::WindowText, Qt::white );
 	pltt.setColor( QPalette::Active, QPalette::Base, Qt::transparent );
 	pltt.setColor( QPalette::Active, QPalette::AlternateBase, QColor( 30, 30, 30, 180 ) );

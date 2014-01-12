@@ -6,137 +6,223 @@
 
 #include <NBPropertiesDialog.hpp>
 
-NBPropertiesDialog::NBPropertiesDialog( QStringList paths ) : NBDialog() {
+NBPropertiesBase::NBPropertiesBase( QStringList paths ) : QWidget() {
+
+	pathsList << paths;
+
+	// Name and Icon Labels
+	iconLabel = new NBClickLabel( QPixmap() );
+	iconLabel->setFixedSize( QSize( 48, 48 ) );
+	connect( iconLabel, SIGNAL( clicked() ), this, SIGNAL( setDirIcon() ) );
+
+	QString name;
+	if ( pathsList.count() == 1 ) {
+		QString iconName = NBIconProvider::icon( pathsList.at( 0 ) );
+		iconLabel->setPixmap( QIcon::fromTheme( iconName, QIcon( iconName ) ).pixmap( 48, 48 ) );
+		if ( isDir( pathsList.at( 0 ) ) )
+			iconLabel->setClickable( true );
+
+		else
+			iconLabel->setClickable( false );
+
+		name = QString(baseName( pathsList.at( 0 ) ) );
+	}
+
+	else {
+		qint64 nFiles = 0, nFolders = 0;
+
+		iconLabel->setClickable( false );
+		Q_FOREACH( QString path, pathsList ) {
+			if ( isDir( path ) )
+				nFolders++;
+
+			else
+				nFiles++;
+		}
+
+		QString filesText = QString( "%1 file%2" ).arg( nFiles ).arg( ( nFiles > 1 ? "s" : "" ) );
+		QString foldersText = QString( "%1 folder%2" ).arg( nFolders ).arg( ( nFolders > 1 ? "s" : "" ) );
+
+		if ( nFiles and nFolders ) {
+			iconLabel->setPixmap( QIcon( ":/icons/others.png" ).pixmap( QSize( 48, 48 ) ) );
+			name = QString(filesText + ", " + foldersText );
+		}
+
+		else if ( nFiles and not nFolders ) {
+			iconLabel->setPixmap( QIcon( ":/icons/documents.png" ).pixmap( QSize( 48, 48 ) ) );
+			name = QString(filesText );
+		}
+
+		else {
+			iconLabel->setPixmap( QIcon( ":/icons/folders.png" ).pixmap( QSize( 48, 48 ) ) );
+			name = QString(foldersText );
+		}
+
+		setFixedHeight( 260 );
+	}
+
+	// Location Labels
+	infoLabel = new QLabel();
+	infoLabel->setAlignment( Qt::AlignVCenter | Qt::AlignRight );
+	infoLabel->setFixedHeight( 48 );
+	infoLabel->setText(
+		QString( "<b>%1</b><br>%2" ).arg( name ).arg( dirName( pathsList.at( 0 ) ) )
+	);
+
+	QHBoxLayout *baseLyt = new QHBoxLayout();
+	baseLyt->setContentsMargins( QMargins() );
+
+	baseLyt->addWidget( iconLabel );
+	baseLyt->addWidget( infoLabel );
+
+	setLayout( baseLyt );
+
+	setFixedHeight( 48 );
+};
+
+NBPropertiesWidget::NBPropertiesWidget( QStringList paths ) : QWidget() {
 
 	pathsList << paths;
 	terminate = false;
 
 	createGUI();
-	setDialogProperties();
 };
 
-NBPropertiesDialog::~NBPropertiesDialog() {
+NBPropertiesWidget::~NBPropertiesWidget() {
 
 	terminate = true;
 	thread.waitForFinished();
 };
 
-void NBPropertiesDialog::createGUI() {
-
-	files = 0;
-	folders = 0;
-	totalSize = 0;
+void NBPropertiesWidget::createGUI() {
 
 	QFileInfo info( pathsList.at( 0 ) );
 
-	// Name and Icon
-	iconLabel = new NBClickLabel( QPixmap() );
-	iconLabel->setFixedSize( QSize( 48, 48 ) );
-	connect( iconLabel, SIGNAL( clicked() ), this, SLOT( setDirIcon() ) );
-	QLabel *nameLabel = new QLabel();
-
-	// Location
-	QLabel *loc1Label = new QLabel( "Location:" );
-	QLabel *loc2Label = new QLabel( dirName( pathsList.at( 0 ) ) );
-
-	// Size
-	QLabel *size1Label = new QLabel( "Size" );
-	size2Label = new QLabel();
-
-	// Type
-	QLabel *type1Label = new QLabel( "Type" );
-	QLabel *type2Label = new QLabel();
-
-	// Contents
-	QLabel *cont1Label = new QLabel( "Contents" );
-	cont2Label = new QLabel();
-
-	// M Time
-	QLabel *time11Label = new QLabel( "Modified" );
-	QLabel *time12Label = new QLabel( info.lastModified().toString( "ddd, MMM dd, yyyy hh:mm:ss AP" ) );
-
-	// A Time
-	QLabel *time21Label = new QLabel( "Accessed" );
-	QLabel *time22Label = new QLabel( info.lastRead().toString( "ddd, MMM dd, yyyy hh:mm:ss AP" ) );
-
+	QString typeStr;
 	if ( pathsList.count() == 1 ) {
-		QString iconName = NBIconProvider::icon( pathsList.at( 0 ) );
-		iconLabel->setPixmap( QIcon::fromTheme( iconName, QIcon( iconName ) ).pixmap( 48, 48 ) );
-		if ( isDir( pathsList.at( 0 ) ) ) {
-			iconLabel->setClickable( true );
-			type2Label->setText( "inode/directory" );
-			setFixedHeight( 300 );
-		}
-		else {
-			iconLabel->setClickable( false );
-			type2Label->setText( getMimeType( pathsList.at( 0 ) ) );
-			setFixedHeight( 280 );
-		}
-		nameLabel->setText( baseName( pathsList.at( 0 ) ) );
+
+		if ( isDir( pathsList.at( 0 ) ) )
+			typeStr = QString( "inode/directory<br>folder" );
+
+		else
+			typeStr = QString(
+				"%1<br>%2"
+			).arg( getMimeType( pathsList.at( 0 ) ) ).arg( mimeDb.mimeTypeForFile( pathsList.at( 0 ) ).comment() );
 	}
 
 	else {
 		qint64 sFiles = 0, sFolders = 0;
-
-		foreach( QString path, pathsList ) {
+		Q_FOREACH( QString path, pathsList ) {
 			if ( isDir( path ) )
 				sFolders++;
 
 			else
 				sFiles++;
 		}
-		QString filesText = QString( "%1 file%2" ).arg( sFiles ).arg( ( sFiles > 1 ? "s" : "" ) );
-		QString foldersText = QString( "%1 folder%2" ).arg( sFolders ).arg( ( sFolders > 1 ? "s" : "" ) );
 
-		if ( sFiles and sFolders ) {
-			iconLabel->setPixmap( QIcon( ":/icons/others.png" ).pixmap( QSize( 48, 48 ) ) );
-			nameLabel->setText( filesText + ", " + foldersText );
-			type2Label->setText( "Files and Folders" );
-		}
+		if ( sFiles and sFolders )
+			typeStr = QString( "Files and Folders" );
 
-		else if ( sFiles and not sFolders ) {
-			iconLabel->setPixmap( QIcon( ":/icons/documents.png" ).pixmap( QSize( 48, 48 ) ) );
-			nameLabel->setText( filesText );
-			type2Label->setText( "Files" );
-		}
+		else if ( sFiles and not sFolders )
+			typeStr = QString( "Files" );
 
-		else {
-			iconLabel->setPixmap( QIcon( ":/icons/folders.png" ).pixmap( QSize( 48, 48 ) ) );
-			nameLabel->setText( foldersText );
-			type2Label->setText( "Folders" );
-		}
-
-		setFixedHeight( 260 );
+		else
+			typeStr = QString( "Folders" );
 	}
 
-	QGridLayout *fileLyt = new QGridLayout();
+	sizeTypeStr = QString(
+		"<table width='100%'>"
+		"	<tr>"
+		"		<td width='150px'>Size</td>"
+		"		<td align='right' style='padding-bottom: 5px;'>%1 (%2 bytes)</td>"
+		"	</tr>"
+		"	<tr>"
+		"		<td width='150px'>Type</td>"
+		"		<td align='right' style='padding-bottom: 5px;'>" + typeStr + "</td>"
+		"	</tr>"
+		"	<tr>"
+		"		<td>Contents</td>"
+		"		<td align='right' style='padding-bottom: 0px;'>%3</td>"
+		"	</tr>"
+		"</table>"
+	);
 
-	fileLyt->addWidget( iconLabel, 0, 0, Qt::AlignLeft );
-	fileLyt->addWidget( nameLabel, 0, 1, Qt::AlignRight );
+	sizeTypeLabel = new QLabel( sizeTypeStr );
 
-	fileLyt->addWidget( Separator::horizontal(), 1, 0, 1, 2 );
+	timeLabel = new QLabel();
+	QString timeStr = QString(
+		"<table width='100%'>"
+		"	<tr>"
+		"		<td>Last Accessed</td>"
+		"		<td align='right' style='padding-bottom: 5px;'>%1</td>"
+		"	</tr>"
+		"	<tr>"
+		"		<td>Last Modified</td>"
+		"		<td align='right' style='padding-bottom: 5px;'>%2</td>"
+		"	</tr>"
+		"	<tr>"
+		"		<td>Last Status Change</td>"
+		"		<td align='right' style='padding-bottom: 0px;'>%3</td>"
+		"	</tr>"
+		"</table>"
+	);
 
-	fileLyt->addWidget( loc1Label, 2, 0, Qt::AlignLeft );
-	fileLyt->addWidget( loc2Label, 2, 1, Qt::AlignRight );
+	if ( pathsList.count() > 1 ) {
 
-	fileLyt->addWidget( type1Label, 3, 0, Qt::AlignLeft );
-	fileLyt->addWidget( type2Label, 3, 1, Qt::AlignRight );
+		ctimeMin = QDateTime::currentDateTime().addDays( 1 );
+		mtimeMin = QDateTime::currentDateTime().addDays( 1 );
+		atimeMin = QDateTime::currentDateTime().addDays( 1 );
 
-	fileLyt->addWidget( size1Label, 4, 0, Qt::AlignLeft );
-	fileLyt->addWidget( size2Label, 4, 1, Qt::AlignRight );
+		ctimeMax = QDateTime( QDate( 1900, 1, 1 ) );
+		mtimeMax = QDateTime( QDate( 1900, 1, 1 ) );
+		atimeMax = QDateTime( QDate( 1900, 1, 1 ) );
 
-	if ( ( pathsList.count() > 1 ) or ( isDir( pathsList.at( 0 ) ) ) ) {
-		fileLyt->addWidget( cont1Label, 5, 0, Qt::AlignLeft );
-		fileLyt->addWidget( cont2Label, 5, 1, Qt::AlignRight );
+		Q_FOREACH( QString path, pathsList ) {
+			struct stat timeSt;
+			if ( stat( qPrintable( path ), &timeSt ) == 0 ) {
+
+				ctimeMin = qMin( QDateTime::fromTime_t( timeSt.st_ctim.tv_sec ), ctimeMin );
+				mtimeMin = qMin( QDateTime::fromTime_t( timeSt.st_mtim.tv_sec ), mtimeMin );
+				atimeMin = qMin( QDateTime::fromTime_t( timeSt.st_atim.tv_sec ), atimeMin );
+
+				ctimeMax = qMax( QDateTime::fromTime_t( timeSt.st_ctim.tv_sec ), ctimeMax );
+				mtimeMax = qMax( QDateTime::fromTime_t( timeSt.st_mtim.tv_sec ), mtimeMax );
+				atimeMax = qMax( QDateTime::fromTime_t( timeSt.st_atim.tv_sec ), atimeMax );
+			}
+		}
+
+		QString aDate, mDate, cDate;
+
+		if ( atimeMin.date() == atimeMax.date() )
+			aDate = atimeMin.toString( "MMM dd, yyyy" );
+		else
+			aDate = QString( "Between %1 and %2" ).arg( atimeMin.toString( "MMM dd, yyyy" ) ).arg( atimeMax.toString( "MMM dd, yyyy" ) );
+
+		if ( mtimeMin.date() == mtimeMax.date() )
+			mDate = mtimeMin.toString( "MMM dd, yyyy" );
+		else
+			mDate = QString( "Between %1 and %2" ).arg( mtimeMin.toString( "MMM dd, yyyy" ) ).arg( mtimeMax.toString( "MMM dd, yyyy" ) );
+
+		if ( ctimeMin.date() == ctimeMax.date() )
+			cDate = ctimeMin.toString( "MMM dd, yyyy" );
+		else
+			cDate = QString( "Between %1 and %2" ).arg( ctimeMin.toString( "MMM dd, yyyy" ) ).arg( ctimeMax.toString( "MMM dd, yyyy" ) );
+
+		timeLabel->setText( timeStr.arg( aDate ).arg( mDate ).arg( cDate ) );
 	}
 
-	if ( pathsList.count() == 1 ) {
-		fileLyt->addWidget( time11Label, 6, 0, Qt::AlignLeft );
-		fileLyt->addWidget( time12Label, 6, 1, Qt::AlignRight );
+	else {
+		QString cDate = QFileInfo( pathsList.at( 0 ) ).lastRead().toString( "MMM dd, yyyy" );
+		QString mDate = QFileInfo( pathsList.at( 0 ) ).lastModified().toString( "MMM dd, yyyy" );
+		QString aDate = QFileInfo( pathsList.at( 0 ) ).created().toString( "MMM dd, yyyy" );
 
-		fileLyt->addWidget( time21Label, 7, 0, Qt::AlignLeft );
-		fileLyt->addWidget( time22Label, 7, 1, Qt::AlignRight );
+		timeLabel->setText( timeStr.arg( aDate ).arg( mDate ).arg( cDate ) );
 	}
+
+	QVBoxLayout *fileLyt = new QVBoxLayout();
+	fileLyt->addWidget( sizeTypeLabel );
+	fileLyt->addWidget( Separator::horizontal() );
+	fileLyt->addWidget( timeLabel );
 
 	NBDriveLabel *driveIcon;
 	QLabel *driveName = new QLabel();
@@ -168,15 +254,15 @@ void NBPropertiesDialog::createGUI() {
 	setLayout( baseLyt );
 
 	connect( this, SIGNAL( updateSignal() ), this, SLOT( update() ) );
-	thread = QtConcurrent::run( this, &NBPropertiesDialog::folderProperties, pathsList );
+	thread = QtConcurrent::run( this, &NBPropertiesWidget::folderProperties, pathsList );
 };
 
-void NBPropertiesDialog::folderProperties( QStringList paths ) {
+void NBPropertiesWidget::folderProperties( QStringList paths ) {
 
 	Q_UNUSED( paths );
 
-	foreach( QString path, pathsList ) {
-		if( terminate )
+	Q_FOREACH( QString path, pathsList ) {
+		if( terminate or Settings->Special.ClosingDown )
 			return;
 
 		if ( isDir( path ) ) {
@@ -192,11 +278,11 @@ void NBPropertiesDialog::folderProperties( QStringList paths ) {
 	emit updateSignal();
 };
 
-void NBPropertiesDialog::recurseProperties( QString path ) {
+void NBPropertiesWidget::recurseProperties( QString path ) {
 
 	QDirIterator it( path, QDir::AllEntries | QDir::System | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::Hidden, QDirIterator::Subdirectories );
 	while ( it.hasNext() ) {
-		if( terminate )
+		if( terminate or Settings->Special.ClosingDown )
 			return;
 
 		it.next();
@@ -217,163 +303,82 @@ void NBPropertiesDialog::recurseProperties( QString path ) {
 	}
 };
 
-void NBPropertiesDialog::setDialogProperties() {
+void NBPropertiesWidget::update() {
 
-	setDialogTitle( tr( "Properties" ) );
-	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
-
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
-
-	if ( not Settings->General.NativeTitleBar )
-		setWindowFlags( Qt::FramelessWindowHint );
-
-	else
-		setWindowFlags( Qt::Popup );
-
-	setFixedWidth( 530 );
-
-	QDesktopWidget dw;
-	int hpos = ( int )( ( dw.width() - 530 ) / 2 );
-	int vpos = ( int )( ( dw.height() - 300 ) / 2 );
-	move( hpos, vpos );
-
-	this->setAttribute( Qt::WA_DeleteOnClose, 1 );
-};
-
-void NBPropertiesDialog::update() {
-
-	size2Label->setText( formatSize( totalSize ) );
-
+	QString contentsStr;
 	if( files and folders ) {
 		if ( ( files == 1 ) and ( folders == 1 ) )
-			cont2Label->setText( QString( tr( "%1 file, %2 sub-folder" ) ).arg( files ).arg( folders ) );
+			contentsStr = QString( tr( "%1 file, %2 sub-folder" ) ).arg( files ).arg( folders );
 
 		else if ( ( files > 1 ) and ( folders == 1 ) )
-			cont2Label->setText( QString( tr( "%1 files, %2 sub-folder" ) ).arg( files ).arg( folders ) );
+			contentsStr = QString( tr( "%1 files, %2 sub-folder" ) ).arg( files ).arg( folders );
 
 		else if ( ( files == 1 ) and ( folders > 1 ) )
-			cont2Label->setText( QString( tr( "%1 files, %2 sub-folders" ) ).arg( files ).arg( folders ) );
+			contentsStr = QString( tr( "%1 files, %2 sub-folders" ) ).arg( files ).arg( folders );
 
 		else
-			cont2Label->setText( QString( tr( "%1 files, %2 sub-folders" ) ).arg( files ).arg( folders ) );
+			contentsStr = QString( tr( "%1 files, %2 sub-folders" ) ).arg( files ).arg( folders );
 	}
 
 	else if ( files and !folders ) {
 		if ( files == 1 )
-			cont2Label->setText( QString( tr( "%1 file" ) ).arg( files ) );
+			contentsStr = QString( tr( "%1 file" ) ).arg( files );
 
 		else
-			cont2Label->setText( QString( tr( "%1 files" ) ).arg( files ) );
+			contentsStr = QString( tr( "%1 files" ) ).arg( files );
 	}
 
 	else {
 		if ( not folders )
-			cont2Label->setText( "Empty" );
+			contentsStr = "Empty";
 
 		else if ( folders == 1 )
-			cont2Label->setText( "1 sub-folder" );
+			contentsStr = "1 sub-folder";
 
 		else
-			cont2Label->setText( QString( tr( "%1 sub-folders" ) ).arg( folders ) );
+			contentsStr = QString( tr( "%1 sub-folders" ) ).arg( folders );
 	}
+
+	sizeTypeLabel->setText( sizeTypeStr.arg( formatSize( totalSize ) ).arg( totalSize ).arg( contentsStr ) );
 };
 
-void NBPropertiesDialog::setDirIcon() {
-
-	QString iconName = NBFileDialog::getExistingFileName(
-			QString( ":/icons/newbreeze2.png" ),
-			tr( "NewBreeze - Select Icon" ),
-			QDir::homePath(),
-			QStringList(
-				QStringList() << "Images ( *.png *.bmp *.jpg *.svg *.gif *.ppm )"
-			),
-			QString( "PNG (*.png)" )
-	);
-
-	if ( not iconName.isEmpty() ) {
-		QFile file( pathsList.at( 0 ) + "/.directory" );
-		if ( not file.open( QFile::WriteOnly ) ) {
-			QMessageBox::warning( this, "Error", "Unable to set icon" );
-			return;
-		}
-		file.write( QString( "[Desktop Entry]\nIcon=%1" ).arg( iconName ).toUtf8() );
-		file.flush();
-		file.close();
-
-		NBClickLabel *label = qobject_cast<NBClickLabel*>( sender() );
-		label->setPixmap( QPixmap( iconName ).scaled( 48, 48, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	}
-};
-
-void NBPropertiesDialog::changeEvent( QEvent *event ) {
-
-	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
-		hide();
-		event->accept();
-	}
-
-	else {
-		QWidget::changeEvent( event );
-		event->accept();
-	}
-};
-
-NBPermissionsDialog::NBPermissionsDialog( QStringList paths ) : NBDialog() {
+NBPermissionsWidget::NBPermissionsWidget( QStringList paths ) : QWidget() {
 
 	pathsList << paths;
 
 	createGUI();
-	setDialogProperties();
 };
 
-void NBPermissionsDialog::createGUI() {
+void NBPermissionsWidget::createGUI() {
 
-	// Name and Icon
-	iconLabel = new NBClickLabel( QPixmap() );
-	iconLabel->setFixedSize( QSize( 48, 48 ) );
-	QLabel *nameLabel = new QLabel();
-	nameLabel->setFixedHeight( 48 );
+	QFileInfo info1( pathsList.at( 0 ) );
 
-	if ( pathsList.count() == 1 ) {
-		QString iconName = NBIconProvider::icon( pathsList.at( 0 ) );
-		iconLabel->setPixmap( QIcon::fromTheme( iconName, QIcon( iconName ) ).pixmap( 48, 48 ) );
-		nameLabel->setText( baseName( pathsList.at( 0 ) ) );
-	}
+	QLabel *usrGrpLbl = new QLabel();
+	QString usrName = info1.owner();
+	QString grpName = info1.group();
+	if ( pathsList.count() > 1 ) {
+		Q_FOREACH( QString path, pathsList ) {
+			QFileInfo info( path );
+			if ( info.owner() != usrName )
+				usrName = "Various";
 
-	else {
-		qint64 sFiles = 0, sFolders = 0;
-
-		foreach( QString path, pathsList ) {
-			if ( isDir( path ) )
-				sFolders++;
-
-			else
-				sFiles++;
-		}
-		QString filesText = QString( "%1 file%2" ).arg( sFiles ).arg( ( sFiles > 1 ? "s" : "" ) );
-		QString foldersText = QString( "%1 folder%2" ).arg( sFolders ).arg( ( sFolders > 1 ? "s" : "" ) );
-
-		if ( sFiles and sFolders ) {
-			iconLabel->setPixmap( QIcon( ":/icons/others.png" ).pixmap( QSize( 48, 48 ) ) );
-			nameLabel->setText( filesText + ", " + foldersText );
-		}
-
-		else if ( sFiles and not sFolders ) {
-			iconLabel->setPixmap( QIcon( ":/icons/files.png" ).pixmap( QSize( 48, 48 ) ) );
-			nameLabel->setText( filesText );
-		}
-
-		else {
-			iconLabel->setPixmap( QIcon( ":/icons/folders.png" ).pixmap( QSize( 48, 48 ) ) );
-			nameLabel->setText( foldersText );
+			if ( info.group() != grpName )
+				grpName = "Various";
 		}
 	}
 
-	QHBoxLayout *iconLyt = new QHBoxLayout();
-	iconLyt->addWidget( iconLabel );
-	iconLyt->addStretch( 0 );
-	iconLyt->addWidget( nameLabel );
+	usrGrpLbl->setText (
+		QString(
+			"<table width='100%'>"
+			"	<tr>"
+			"		<td width='15%'>User</td>"
+			"		<td width='35%'>%1</td>"
+			"		<td width='15%'>Group</td>"
+			"		<td width='35%'>%2</td>"
+			"	</tr>"
+			"</table>"
+		).arg( usrName ).arg( grpName )
+	);
 
 	uReadCheck = new QCheckBox();
 	uWritCheck = new QCheckBox();
@@ -388,28 +393,28 @@ void NBPermissionsDialog::createGUI() {
 	oExecCheck = new QCheckBox();
 
 	smartExecCheck = new QCheckBox( "Enable &Smart Executable" );
-	smartExecCheck->setToolTip( "Set all ELF files and shell scripts and files in 'bin' folders to executable" );
+	smartExecCheck->setToolTip( "Set all the files which have an executable ancenstry to Executable" );
 
 	carryCheck = new QCheckBox( "Appl&y changes to all subfolders and their contents" );
 
-	applyBtn = new QPushButton( "&Apply" );
-	applyBtn->setObjectName( tr( "okBtn" ) );
-	connect( applyBtn, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( uReadCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( uWritCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( uExecCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( gReadCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( gWritCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( gExecCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( oReadCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( oWritCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( oExecCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
 
-	cancelBtn = new QPushButton( "&Cancel" );
-	cancelBtn->setObjectName( tr( "cancelBtn" ) );
-	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
+	connect( smartExecCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( carryCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
 
 	readPermissions();
 
-	QHBoxLayout *btnLyt = new QHBoxLayout();
-	btnLyt->addStretch();
-	btnLyt->addWidget( applyBtn );
-	btnLyt->addWidget( cancelBtn );
-	btnLyt->addStretch();
-
 	QGridLayout *permsLyt = new QGridLayout();
 	permsLyt->setContentsMargins( QMargins() );
+	permsLyt->setSpacing( 10 );
 
 	permsLyt->addWidget( new QLabel( tr( "Read" ) ), 0, 1 );
 	permsLyt->addWidget( new QLabel( tr( "Write" ) ), 0, 2 );
@@ -431,30 +436,33 @@ void NBPermissionsDialog::createGUI() {
 	permsLyt->addWidget( oWritCheck, 3, 2 );
 	permsLyt->addWidget( oExecCheck, 3, 3 );
 
-	permsLyt->addWidget( smartExecCheck, 4, 0, 4, -1 );
-	permsLyt->addWidget( carryCheck, 5, 0, 5, -1 );
+	QVBoxLayout *frameLyt = new QVBoxLayout();
+	frameLyt->setSpacing( 10 );
+	frameLyt->addLayout( permsLyt );
+	frameLyt->addWidget( smartExecCheck );
+	frameLyt->addWidget( carryCheck );
 
 	QWidget *permsFrame = new QWidget( this );
-	permsFrame->setLayout( permsLyt );
+	permsFrame->setLayout( frameLyt );
 
 	if ( QFileInfo( pathsList.at( 0 ) ).ownerId() != QFileInfo( QDir::homePath() ).ownerId() )
 		permsFrame->setDisabled( 1 );
 
 	QVBoxLayout *baseLyt = new QVBoxLayout();
 	baseLyt->setContentsMargins( QMargins() );
-	baseLyt->addLayout( iconLyt );
-	baseLyt->addWidget( Separator::horizontal() );
+
+	baseLyt->addWidget( usrGrpLbl );
 	baseLyt->addWidget( permsFrame );
-	baseLyt->addWidget( Separator::horizontal() );
-	baseLyt->addLayout( btnLyt );
+	baseLyt->addWidget( new QLabel( "Note: If you want to enter a directory, it must have the executable bit set." ) );
+	baseLyt->addStretch();
 
 	setLayout( baseLyt );
 };
 
-void NBPermissionsDialog::readPermissions() {
+void NBPermissionsWidget::readPermissions() {
 
 	short UR = 0, UW = 0, UE = 0, GR = 0, GW = 0, GE = 0, OR = 0, OW = 0, OE = 0;
-	foreach( QString path, pathsList ) {
+	Q_FOREACH( QString path, pathsList ) {
 		QFile::Permissions perms = QFile::permissions( path );
 		UR += ( perms & QFile::ReadOwner ? 1 : -1 );
 		UW += ( perms & QFile::WriteOwner ? 1 : -1 );
@@ -549,55 +557,56 @@ void NBPermissionsDialog::readPermissions() {
 		oExecCheck->setCheckState( Qt::Checked );
 };
 
-void NBPermissionsDialog::setDialogProperties() {
+void NBPermissionsWidget::applyPermissions() {
 
-	setDialogTitle( tr( "Permissions" ) );
-	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	Q_FOREACH( QString path, pathsList ) {
+		QFile::Permissions perms = NULL;
 
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
+		if ( uReadCheck->isChecked() )
+			perms |= ( ( uReadCheck->checkState() == Qt::Checked ) ? QFile::ReadOwner : ( QFile::permissions( path ) & QFile::ReadOwner ) );
 
-	setFixedSize( 530, 300 );
+		if ( uWritCheck->isChecked() )
+			perms |= ( ( uWritCheck->checkState() == Qt::Checked ) ? QFile::WriteOwner : ( QFile::permissions( path ) & QFile::WriteOwner ) );
 
-	QDesktopWidget dw;
-	int hpos = ( int )( ( dw.width() - 530 ) / 2 );
-	int vpos = ( int )( ( dw.height() - 300 ) / 2 );
-	move( hpos, vpos );
+		if ( uExecCheck->isChecked() )
+			perms |= ( ( uExecCheck->checkState() == Qt::Checked ) ? QFile::ExeOwner : ( QFile::permissions( path ) & QFile::ExeOwner ) );
 
-	this->setAttribute( Qt::WA_DeleteOnClose, 1 );
-};
+		if ( gReadCheck->isChecked() )
+			perms |= ( ( gReadCheck->checkState() == Qt::Checked ) ? QFile::ReadGroup : ( QFile::permissions( path ) & QFile::ReadGroup ) );
 
-void NBPermissionsDialog::applyPermissions() {
+		if ( gWritCheck->isChecked() )
+			perms |= ( ( gWritCheck->checkState() == Qt::Checked ) ? QFile::WriteGroup : ( QFile::permissions( path ) & QFile::WriteGroup ) );
 
-	QFile::Permissions perms = NULL;
+		if ( gExecCheck->isChecked() )
+			perms |= ( ( gExecCheck->checkState() == Qt::Checked ) ? QFile::ExeGroup : ( QFile::permissions( path ) & QFile::ExeGroup ) );
 
-	if ( uReadCheck->isChecked() ) perms |= QFile::ReadOwner;
-	if ( uWritCheck->isChecked() ) perms |= QFile::WriteOwner;
-	if ( uExecCheck->isChecked() ) perms |= QFile::ExeOwner;
+		if ( oReadCheck->isChecked() )
+			perms |= ( ( oReadCheck->checkState() == Qt::Checked ) ? QFile::ReadOther : ( QFile::permissions( path ) & QFile::ReadOther ) );
 
-	if ( gReadCheck->isChecked() ) perms |= QFile::ReadGroup;
-	if ( gWritCheck->isChecked() ) perms |= QFile::WriteGroup;
-	if ( gExecCheck->isChecked() ) perms |= QFile::ExeGroup;
+		if ( oWritCheck->isChecked() )
+			perms |= ( ( oWritCheck->checkState() == Qt::Checked ) ? QFile::WriteOther : ( QFile::permissions( path ) & QFile::WriteOther ) );
 
-	if ( oReadCheck->isChecked() ) perms |= QFile::ReadOther;
-	if ( oWritCheck->isChecked() ) perms |= QFile::WriteOther;
-	if ( oExecCheck->isChecked() ) perms |= QFile::ExeOther;
+		if ( oExecCheck->isChecked() )
+			perms |= ( ( oExecCheck->checkState() == Qt::Checked ) ? QFile::ExeOther : ( QFile::permissions( path ) & QFile::ExeOther ) );
 
-	foreach( QString path, pathsList ) {
 		if ( not path.endsWith( "/" ) and isDir( path ) )
 			path += "/";
 
-		if ( carryCheck->isChecked() )
-			applyTo( path.toLocal8Bit(), perms );
+		if ( isDir( path ) and carryCheck->isChecked() ) {
 
-		else
+			/* Recursively apply these permissions to all the children in this directory */
+			applyTo( path.toLocal8Bit(), perms );
+		}
+
+		else {
 			QFile::setPermissions( path, perms );
+		}
 	}
 
 	close();
 };
 
-void NBPermissionsDialog::applyTo( const char *node, QFile::Permissions perms ) {
+void NBPermissionsWidget::applyTo( const char *node, QFile::Permissions perms ) {
 
 	DIR* d_fh;
 	struct dirent* entry;
@@ -639,4 +648,79 @@ void NBPermissionsDialog::applyTo( const char *node, QFile::Permissions perms ) 
 	}
 
 	closedir( d_fh );
+};
+
+NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab ) : NBDialog( NBDialog::Close ) {
+
+	pathsList << paths;
+
+	setFixedSize( QSize( 530, 400 ) );
+
+	NBPropertiesBase *propsBase = new NBPropertiesBase( paths );
+	propsW = new NBPropertiesWidget( paths );
+	permsW = new NBPermissionsWidget( paths );
+
+	tabs = new QTabBar();
+	tabs->addTab( QIcon( ":/icons/props.png" ), QString( "P&roperties" ) );
+	tabs->addTab( QIcon( ":/icons/perms.png" ), QString( "P&ermissions" ) );
+
+	stack = new QStackedWidget();
+	stack->addWidget( propsW );
+	stack->addWidget( permsW );
+
+	switchToTab( tab );
+
+	QVBoxLayout *lyt = new QVBoxLayout();
+	lyt->setContentsMargins( QMargins() );
+
+	lyt->addWidget( tabs );
+	lyt->addWidget( propsBase );
+	lyt->addWidget( Separator::horizontal() );
+	lyt->addWidget( stack );
+	setLayout( lyt );
+
+	setDialogTitle( tr( "NewBreeze - Properties" ) );
+	setDialogIcon( QIcon( ";/icons/newbreeze2.png" ) );
+
+	setWindowModality( Qt::NonModal );
+
+	connect( tabs, SIGNAL( currentChanged( int ) ), this, SLOT( switchToTab( int ) ) );
+	connect( stack, SIGNAL( currentChanged( int ) ), this, SLOT( switchToTab( int ) ) );
+
+	if ( tab == NBPropertiesDialog::Properties )
+		connect( propsBase, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ) );
+};
+
+void NBPropertiesDialog::switchToTab( int newTab ) {
+
+	tabs->setCurrentIndex( newTab );
+	stack->setCurrentIndex( newTab );
+	setFixedSize( 530, 370 );
+};
+
+void NBPropertiesDialog::setDirIcon() {
+
+	QString iconName = NBFileDialog::getExistingFileName(
+			QString( ":/icons/newbreeze2.png" ),
+			tr( "NewBreeze - Select Icon" ),
+			QDir::homePath(),
+			QStringList(
+				QStringList() << "Images ( *.png *.bmp *.jpg *.svg *.gif *.ppm )"
+			),
+			QString( "PNG (*.png)" )
+	);
+
+	if ( not iconName.isEmpty() ) {
+		QFile file( pathsList.at( 0 ) + "/.directory" );
+		if ( not file.open( QFile::WriteOnly ) ) {
+			QMessageBox::warning( this, "Error", "Unable to set icon" );
+			return;
+		}
+		file.write( QString( "[Desktop Entry]\nIcon=%1" ).arg( iconName ).toUtf8() );
+		file.flush();
+		file.close();
+
+		NBClickLabel *label = qobject_cast<NBClickLabel*>( sender() );
+		label->setPixmap( QPixmap( iconName ).scaled( 48, 48, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	}
 };

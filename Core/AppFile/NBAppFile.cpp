@@ -200,6 +200,7 @@ NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
 
 	QStringList mMimeTypes;
 	mMimeTypes << first.value( NBAppFile::MimeTypes ).toStringList() << second.value( NBAppFile::MimeTypes ).toStringList();
+
 	QStringList mCategories;
 	mCategories << first.value( NBAppFile::Categories ).toStringList() << second.value( NBAppFile::Categories ).toStringList();
 
@@ -231,7 +232,6 @@ NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
 		data[ 1 ] = data[ 1 ].toString().left( 15 );
 		data[ 3 ] = first.execArgs().at( 0 ) + " %U";
 		data[ 4 ] = first.execArgs().at( 0 ) + "-startcenter";
-		data[ 13 ] = QStringList() << first.execArgs().at( 0 ) << "<#NEWBREEZE-ARG-FILES#>";
 	}
 
 	return NBAppFile( data );
@@ -546,8 +546,6 @@ NBAppsList NBAppsList::operator<<( NBAppFile app ) {
 			// We already have an equivalent application.
 			// We'll try to merge the two and return.
 
-			/// ===========> Unimplemented <=========== ///
-
 			__appsList.removeAt( __appsList.indexOf( other ) );
 			__appsList << NBAppFile::merge( app, other );
 
@@ -557,7 +555,6 @@ NBAppsList NBAppsList::operator<<( NBAppFile app ) {
 
 	// This means no application was found similar to the one being added.
 	// We add this application
-
 	__appsList << app;
 
 	return *this;

@@ -39,4 +39,6 @@ NBQuickMenuBar::NBQuickMenuBar() : QWidget() {
 
 	setFixedHeight( 24 );
 	setLayout( toolsLyt );
+
+	setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
 };

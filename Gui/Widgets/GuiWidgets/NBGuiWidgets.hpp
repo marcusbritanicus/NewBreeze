@@ -9,6 +9,7 @@
 
 #include <Global.hpp>
 #include <NBTools.hpp>
+#include <NBLabels.hpp>
 
 class NBSearchBar : public QWidget {
 	Q_OBJECT
@@ -64,52 +65,6 @@ class NBTitleIcon : public QLabel {
 		void aboutQt4();
 };
 
-class NBPicLabel : public QLabel {
-	Q_OBJECT
-
-	public:
-		NBPicLabel( QPixmap, QString );
-		QString Style;
-
-	protected:
-		virtual void mousePressEvent( QMouseEvent * );
-
-	signals:
-		void clicked();
-};
-
-class NBClickLabel : public QLabel {
-	Q_OBJECT
-
-	public:
-		NBClickLabel( QPixmap icon = QPixmap() );
-		NBClickLabel( QString icon = QString() );
-		void setClickable( bool );
-
-	private :
-		bool clickEnabled = true;
-
-	protected:
-		void mousePressEvent( QMouseEvent * );
-
-	signals:
-		void clicked();
-};
-
-class Separator {
-
-	public:
-		static QWidget* vertical();
-		static QWidget* horizontal();
-};
-
-class NBSpacer {
-
-	public:
-		static QWidget* vertical( int spacing = 1 );
-		static QWidget* horizontal( int spacing = 1 );
-};
-
 class NBViewModeButton: public QPushButton {
 	Q_OBJECT
 
@@ -127,14 +82,6 @@ class NBViewModeButton: public QPushButton {
 	Q_SIGNALS:
 		void changeViewMode();
 		void switchToNextView();
-};
-
-class NBInfoLabel : public QLabel {
-	Q_OBJECT
-
-	public:
-		NBInfoLabel();
-		void setText( QString, QString, QString, QString );
 };
 
 class NBDriveLabel : public QWidget {
@@ -168,6 +115,18 @@ class NBDriveInfo : public QFrame {
 		virtual void paintEvent( QPaintEvent * );
 };
 
-QDialog* getMessageDialog( QString, QString, QString, QString, QString, QString btns = "O" );
+class Separator {
+
+	public:
+		static QWidget* vertical();
+		static QWidget* horizontal();
+};
+
+class NBSpacer {
+
+	public:
+		static QWidget* vertical( int spacing = 1 );
+		static QWidget* horizontal( int spacing = 1 );
+};
 
 #endif

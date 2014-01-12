@@ -107,83 +107,6 @@ void NBTitleIcon::mousePressEvent( QMouseEvent *mpEvent ) {
 	mpEvent->accept();
 };
 
-NBPicLabel::NBPicLabel( QPixmap pixmap, QString style ) : QLabel() {
-
-	setPixmap( pixmap );
-	Style = QString( style );
-};
-
-void NBPicLabel::mousePressEvent( QMouseEvent *mEvent ) {
-
-	emit clicked();
-	mEvent->accept();
-}
-
-NBClickLabel::NBClickLabel( QPixmap icon ) : QLabel() {
-
-	setPixmap( icon );
-	setAlignment( Qt::AlignCenter );
-};
-
-NBClickLabel::NBClickLabel( QString text ) : QLabel() {
-
-	setText( text );
-	setAlignment( Qt::AlignCenter );
-};
-
-void NBClickLabel::mousePressEvent( QMouseEvent *mEvent ) {
-
-	if ( clickEnabled )
-		emit clicked();
-
-	mEvent->accept();
-};
-
-void NBClickLabel::setClickable( bool canClick ) {
-
-	clickEnabled = canClick;
-};
-
-QWidget* Separator::vertical() {
-
-	QWidget *vSep = new QWidget();
-	vSep->setContentsMargins( QMargins() );
-	vSep->setFixedWidth( 1 );
-	vSep->setStyleSheet( "background-color: gray;" );
-
-	return vSep;
-};
-
-QWidget* Separator::horizontal() {
-
-	QWidget *hSep = new QWidget();
-	hSep->setContentsMargins( QMargins() );
-	hSep->setFixedHeight( 1 );
-	hSep->setStyleSheet( "background-color: gray;" );
-
-	return hSep;
-};
-
-QWidget* NBSpacer::vertical( int spacing ) {
-
-	QWidget *vSpace = new QWidget();
-	vSpace->setContentsMargins( QMargins() );
-	vSpace->setFixedHeight( spacing );
-	vSpace->setStyleSheet( "background-color: transparent;" );
-
-	return vSpace;
-};
-
-QWidget* NBSpacer::horizontal( int spacing ) {
-
-	QWidget *hSpace = new QWidget();
-	hSpace->setContentsMargins( QMargins() );
-	hSpace->setFixedWidth( spacing );
-	hSpace->setStyleSheet( "background-color: transparent;" );
-
-	return hSpace;
-};
-
 NBViewModeButton::NBViewModeButton() : QPushButton() {
 
 	setFixedSize( QSize( 36, 24 ) );
@@ -249,30 +172,6 @@ void NBViewModeButton::showMenu() {
 	QPushButton::showMenu();
 };
 
-NBInfoLabel::NBInfoLabel() : QLabel() {
-
-	setAlignment( Qt::AlignCenter );
-	setStyleSheet( "QLabel { font-family: Courier 10 Pitch, Courier New, Monotype; font-size: 12pt; }" );
-};
-
-void NBInfoLabel::setText( QString name, QString size, QString type, QString perm ) {
-
-	QString text = QString(
-		"<table style='width: 700px; height: 56px;'>"			\
-		"	<tr>"												\
-		"		<td colspan=3 align = 'left'>%1</td>"			\
-		"	</tr>"												\
-		"	<tr>"												\
-		"		<td width=300 align='left'>%2</td>"				\
-		"		<td width=300 align='left'>%3</td>"				\
-		"		<td width=100 align='center'>%4</td>"			\
-		"	</tr>"												\
-		"</table>"
-	);
-
-	QLabel::setText( text.arg( name ).arg( size ).arg( type ).arg( perm ) );
-};
-
 NBDriveLabel::NBDriveLabel( const QString path ) : QWidget() {
 
 	painter = new QPainter();
@@ -331,6 +230,7 @@ void NBDriveLabel::paintEvent( QPaintEvent *pEvent ) {
 NBDriveInfo::NBDriveInfo( qint64 used, qint64 total ) : QFrame() {
 
 	setFrameStyle( QFrame::StyledPanel | QFrame::Plain );
+	setMaximumHeight( 32 );
 
 	painter = new QPainter();
 
@@ -383,4 +283,44 @@ void NBDriveInfo::paintEvent( QPaintEvent *pEvent ) {
 	painter->end();
 
 	pEvent->accept();
+};
+
+QWidget* Separator::vertical() {
+
+	QWidget *vSep = new QWidget();
+	vSep->setContentsMargins( QMargins() );
+	vSep->setFixedWidth( 1 );
+	vSep->setStyleSheet( "background-color: gray;" );
+
+	return vSep;
+};
+
+QWidget* Separator::horizontal() {
+
+	QWidget *hSep = new QWidget();
+	hSep->setContentsMargins( QMargins() );
+	hSep->setFixedHeight( 1 );
+	hSep->setStyleSheet( "background-color: gray;" );
+
+	return hSep;
+};
+
+QWidget* NBSpacer::vertical( int spacing ) {
+
+	QWidget *vSpace = new QWidget();
+	vSpace->setContentsMargins( QMargins() );
+	vSpace->setFixedHeight( spacing );
+	vSpace->setStyleSheet( "background-color: transparent;" );
+
+	return vSpace;
+};
+
+QWidget* NBSpacer::horizontal( int spacing ) {
+
+	QWidget *hSpace = new QWidget();
+	hSpace->setContentsMargins( QMargins() );
+	hSpace->setFixedWidth( spacing );
+	hSpace->setStyleSheet( "background-color: transparent;" );
+
+	return hSpace;
 };

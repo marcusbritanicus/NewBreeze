@@ -57,7 +57,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->Shortcuts.GoHome = QList<QKeySequence>() << QKeySequence( "Alt+Home" );
 	defaultSettings->Shortcuts.GoUp = QList<QKeySequence>() << QKeySequence( "Alt+Up" );
 	defaultSettings->Shortcuts.GoLeft = QList<QKeySequence>() << QKeySequence( "Alt+Left" );
-	defaultSettings->Shortcuts.GoRight = QList<QKeySequence>() << QKeySequence( "Alt+Right" );
+	defaultSettings->Shortcuts.GoRight = QList<QKeySequence>() << QKeySequence( "Alt+Right" ) << QKeySequence( "Alt+Down" );
 	defaultSettings->Shortcuts.NewFolder = QList<QKeySequence>() << QKeySequence( "F10" );
 	defaultSettings->Shortcuts.NewFile = QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+N" );
 	defaultSettings->Shortcuts.Peek = QList<QKeySequence>() << QKeySequence( "Ctrl+Return" );

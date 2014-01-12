@@ -9,7 +9,7 @@
 
 #include <Global.hpp>
 
-class NBServer : public QTcpServer {
+class NBServer : public QLocalServer {
 	Q_OBJECT
 
 	public:
@@ -17,26 +17,30 @@ class NBServer : public QTcpServer {
 		bool start();
 
 	private:
-		QNetworkSession *networkSession;
+		QString mServerName;
 
-	protected:
-		void incomingConnection( int );
+	private slots:
+		void handleNewConnection();
 
 	Q_SIGNALS:
 		void newWindow( QString path );
 };
 
-class ThreadedReplier : public QThread {
+class ThreadedReplier : public QObject {
 	Q_OBJECT
 
 	public:
-		ThreadedReplier( QObject*, int );
-		void run();
+		ThreadedReplier( QLocalSocket* );
+		void talkToClient();
 
 	private:
-		int socketDescr;
+		QLocalSocket *client;
+
+	private slots:
+		void sendReplyToClient();
 
 	Q_SIGNALS:
+		void finished();
 		void newWindow( QString path );
 };
 

@@ -21,16 +21,16 @@ void NBSidePanelDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
 
 		// Get icon size
 		QString text = model->data( index, Qt::DisplayRole ).toString();
-		QPixmap icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( QSize( 16, 16 ) );
+		QPixmap icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( QSize( 24, 24 ) );
 		QSize iSize = icon.size();
 
 		QRect textRect;
 		// Original X + Image Left Border + Image Width + Image-Text Gap
-		textRect.setX( option.rect.x() + 3 + 5 );
+		textRect.setX( option.rect.x() + 5 + 5 + 24 );
 		// Vertical Centering, so don't bother
 		textRect.setY( option.rect.y() );
 		// Original Width - Image Left Border - Image Width - Image Text Gap -Text Right Border
-		textRect.setSize( option.rect.size() - QSize( 3, 0 ) - QSize( 5, 0 ) - QSize( 3, 0 ) );
+		textRect.setSize( option.rect.size() - QSize( 5, 0 ) - QSize( 5, 0 ) - QSize( 3, 0 ) );
 
 		// Set elided text
 		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
@@ -45,7 +45,7 @@ void NBSidePanelDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
 			*/
 
 			// Original X + Image Left Border
-			iconRect.setX( option.rect.x() + 2 - 16 );
+			iconRect.setX( option.rect.x() + 2 );
 			// Original Y + Height to make the image center of the selection rectangle
 			iconRect.setY( option.rect.y() + ( option.rect.height() - iSize.height() ) / 2 );
 			// Icon Size
@@ -60,8 +60,8 @@ void NBSidePanelDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
 				*
 			*/
 
-			// Original X + Width to make the image center of the image rectangle
-			iconRect.setX( option.rect.x() + ( 16 - iSize.width() ) / 2 + 2 - 16 );
+			// Original X + Width to make the image center of the image rectangle + Image left border
+			iconRect.setX( option.rect.x() + ( 24 - iSize.width() ) / 2 + 5 );
 			// Original Y + Image Top Border
 			iconRect.setY( option.rect.y() + 1 );
 			// Icon Size
@@ -69,14 +69,10 @@ void NBSidePanelDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
 		}
 
 		else {
-			/*
-				*
-				* Here, we need to center the image horizontally and vertically
-				*
-			*/
+			/* Here, we need to center the image horizontally and vertically */
 
-			// Original X + Width to make the image center of the image rectangle
-			iconRect.setX( option.rect.x() + ( 16 - iSize.width() ) / 2 + 2 - 16 );
+			// Original X + Width to make the image center of the image rectangle + Imge left border
+			iconRect.setX( option.rect.x() + ( 24 - iSize.width() ) / 2 + 5 );
 			// Original Y + Height to make the image center of the image rectangle
 			iconRect.setY( option.rect.y() + ( option.rect.height() - iSize.height() ) / 2 );
 			// Icon Size
@@ -92,41 +88,31 @@ void NBSidePanelDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
 			painter->setRenderHint( QPainter::TextAntialiasing, true );
 
 			// Background Painter Settings and Background
-			QRect bgRect;
-			bgRect.setX( iconRect.x() - 2 );
-			bgRect.setY( iconRect.y() );
-			bgRect.setSize( option.rect.size() + QSize( 4, 0 ) );
-
 			painter->setPen( QPen( Qt::NoPen ) );
-			if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
-				if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-					painter->setBrush( Settings->Colors.SelectionMouseBrushColor.darker() );
-
-				else
-					painter->setBrush( Settings->Colors.SelectionMouseBrushColor );
-
-			else if ( option.state & QStyle::State_Selected )
-				if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-					painter->setBrush( Settings->Colors.SelectionBrushColor.darker() );
-
-				else
-					painter->setBrush( Settings->Colors.SelectionBrushColor );
-
-			else if ( option.state & QStyle::State_MouseOver )
+			if ( option.state & QStyle::State_MouseOver ) {
 				if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 					painter->setBrush( Settings->Colors.MouseBrushColor.darker() );
 
 				else
 					painter->setBrush( Settings->Colors.MouseBrushColor );
 
-			else
+				painter->setPen( Qt::gray );
+				painter->drawLine( option.rect.topLeft(), option.rect.topRight() );
+				painter->drawLine( option.rect.bottomLeft(), option.rect.bottomRight() );
+				painter->setPen( Qt::NoPen );
+			}
+
+			else {
 				painter->setBrush( QBrush( Qt::transparent ) );
+			}
 
 			// Paint Background
-			painter->drawRoundedRect( bgRect, 5, 5 );
+			painter->drawRect( option.rect );
 		}
 
 		// Paint Icon
+		painter->setPen( Qt::transparent );
+		painter->setBrush( Qt::transparent );
 		painter->drawPixmap( iconRect, icon );
 
 		// Text Painter Settings
@@ -136,7 +122,7 @@ void NBSidePanelDelegate::paint( QPainter *painter, const QStyleOptionViewItem &
 		else
 			painter->setPen( Settings->Colors.TextPenColor );
 
-		painter->drawText( textRect, Qt::AlignLeft, text );
+		painter->drawText( textRect, Qt::AlignVCenter, text );
 		painter->restore();
 	}
 };

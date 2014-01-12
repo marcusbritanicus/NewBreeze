@@ -119,7 +119,7 @@ void NBConfirmDeleteDialog::addEntry( QString path ) {
 		itm2 = new QTableWidgetItem( QString( "%1 items" ).arg( nChildren( path ) ) );
 
 	else
-		itm2 = new QTableWidgetItem( QString( "%1 items" ).arg( formatSize( getSize( path ) ) ) );
+		itm2 = new QTableWidgetItem( QString( "%1" ).arg( formatSize( getSize( path ) ) ) );
 
 	itm1->setFlags( itm1->flags() & ~Qt::ItemIsEditable );
 	itm2->setFlags( itm2->flags() & ~Qt::ItemIsEditable );

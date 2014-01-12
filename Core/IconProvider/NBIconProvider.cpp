@@ -86,7 +86,7 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 		}
 	}
 
-	// If it is an executable
+	// If it is a desktop file
 	else if ( mimetype.name() == QString( "application/x-desktop" ) ) {
 		// I won't use @v mimeIcon from mimetype, 'coz the icons for
 		// application/x-executable is always application-x-executable
@@ -106,6 +106,7 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 			return QString( ":/icons/exec.png" );
 	}
 
+	// If it is an executable
 	else if ( mimetype.name() == QString( "application/x-executable" ) ) {
 		// I won't use @v mimeIcon from mimetype, 'coz the icons for
 		// application/x-executable is always application-x-executable
@@ -130,8 +131,16 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 	else {
 		// If it is a image (save thumbnail) and image previews are set
 		if ( ( mimetype.name().startsWith( "image" ) or mimetype.name().startsWith( "video/mng" ) ) and ( Settings->General.ImagePreviews ) ) {
-			if ( mimetype.name().contains( "djvu" ) )
-				return "image-x-generic";
+			if ( mimetype.name().contains( "djvu" ) ) {
+				if ( hasIcon( "image-vnd.djvu" ) )
+					return "image-vnd.djvu";
+
+				else if ( hasIcon ( "application-x-office-document" ) )
+					return "application-x-office-document";
+
+				else
+					return "image-x-generic";
+			}
 
 			QString hashPath = QDir( thumbsDir ).absoluteFilePath( MD5( path ) );
 			if ( hasStoredThumb( path, hashPath ) )
@@ -141,7 +150,7 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 				return ( saveThumb( path, hashPath ) ? hashPath : QString( "image-x-generic" ) );
 		}
 
-		if ( hasIcon( mimeIcon ) )
+		else if ( hasIcon( mimeIcon ) )
 			return QString( mimeIcon );
 
 		else if ( hasIcon( genericIcon ) )
@@ -193,8 +202,6 @@ bool NBIconProvider::hasIcon( QString icon ) {
 	// Search in each of the directories if the icon is present
 	foreach( QString theme, themes ) {
 		foreach( QString str, iconDirs ) {
-			// qDebug() << iconDir + theme + "/" + str + "/" + icon + ".png";
-			// "/usr/share/icons/" + theme + "/" + @v str + "/" + @p icon + ".png"
 			if ( exists( iconDir + theme + "/" + str + "/" + icon + ".png" ) )
 				return true;
 
@@ -227,8 +234,7 @@ QString NBIconProvider::pixmapIcon( QString icon ) {
 bool NBIconProvider::hasStoredThumb( QString path, QString hashPath ) {
 
 	if ( exists( hashPath ) )
-		if ( thumbsInfo.value( path ).toDateTime() != QFileInfo( path ).lastModified() )
-			return false;
+		return ( thumbsInfo.value( path ).toDateTime() == QFileInfo( path ).lastModified() );
 
 	return false;
 };
@@ -269,7 +275,7 @@ QString NBIconProvider::getCustomIcon( QString mime ) {
 bool NBIconProvider::saveThumb( QString path, QString hashPath ) {
 
 	QImage thumb = QImage( path ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
-	if ( thumb.save( hashPath, "PNG", 50 ) ) {
+	if ( thumb.save( hashPath, "PNG", 0 ) ) {
 		thumbsInfo.setValue( path, QFileInfo( path ).lastModified() );
 		thumbsInfo.sync();
 		return true;

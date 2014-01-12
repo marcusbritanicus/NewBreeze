@@ -55,8 +55,6 @@ class NBMessageDialog : public NBDialog {
 
 	public slots:
 		void close();
-		void show();
-		void exec();
 
 	private slots:
 		void toggleInfoWidget();

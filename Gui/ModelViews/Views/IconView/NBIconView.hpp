@@ -16,7 +16,7 @@ class NBIconView : public QAbstractItemView {
 	Q_OBJECT
 
 	public:
-		enum class ViewType {
+		enum ViewType {
 			TilesView             = 0x01,
 			IconsView             = 0x02,
 			DetailsView           = 0x03

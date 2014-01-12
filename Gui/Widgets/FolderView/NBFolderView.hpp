@@ -17,6 +17,8 @@
 #include <NBWordView.hpp>
 #include <NBWebWatch.hpp>
 #include <NBImagePeek.hpp>
+#include <NBOdfOgle.hpp>
+#include <NBPdfPeep.hpp>
 #include <NBCustomPeek.hpp>
 #include <NBConfirmDeleteDialog.hpp>
 #include <NBPropertiesDialog.hpp>

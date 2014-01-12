@@ -45,12 +45,15 @@ class NBFileSystemNode {
 		void updateCategories();
 		QStringList mCategoryList;
 
+		QIcon icon();
+
 	private:
 		QList<NBFileSystemNode*> childNodes;
 		QVariantList nodeData;
 		NBFileSystemNode *parentNode;
 
 		QString myCategory;
+		QIcon mIcon;
 };
 
 bool columnSort2( NBFileSystemNode *first, NBFileSystemNode *second );

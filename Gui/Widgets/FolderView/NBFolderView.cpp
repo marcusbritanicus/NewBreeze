@@ -580,6 +580,18 @@ void NBFolderView::doPeek() {
 		previewer->show();
 	}
 
+	else if ( mimeType.contains( "opendocument.text" ) ) {
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing image: %s", qPrintable( currentNode ) );
+		NBOdfOgle *previewer = new NBOdfOgle( currentNode );
+		previewer->show();
+	}
+
+	else if ( mimeType.contains( "pdf" ) ) {
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing PDF: %s", qPrintable( currentNode ) );
+		NBPdfPeep *previewer = new NBPdfPeep( currentNode );
+		previewer->show();
+	}
+
 	else {
 		// Custom Peeking
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", qPrintable( currentNode ) );

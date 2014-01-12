@@ -1,68 +1,269 @@
 /*
 	*
-	* NBSidePanel.cpp - The side panel showing My Computer ( All the mounted drives )
+	* NBSidePanelView.cpp - The side panel view showing mounted devices or bookmarks
 	*
 */
 
 #include <NBSidePanelView.hpp>
+#include <NBTools.hpp>
 
-NBSidePanel::NBSidePanel() : QWidget() {
+NBSidePanelView::NBSidePanelView() : QListView() {
 
+	/* Set up the model */
+	spModel = new NBSidePanelModel();
+	setModel( spModel );
+
+	/* setup the root index */
+	setRootIndex( spModel->rootIndex() );
+
+	/* Set up the delegate */
+	iDelegate = new NBSidePanelDelegate();
+	setItemDelegate( iDelegate );
+
+	updateDevices();
 	setupView();
+}
+
+int NBSidePanelView::idealWidth() {
+
+	return mIdealWidth;
 };
 
-void NBSidePanel::setupView() {
+void NBSidePanelView::setupView() {
 
-	setFixedWidth( 48 );
-	setStyleSheet( getStyleSheet( "NBSidePanel", Settings->General.Style ) );
+	/* No Focus */
+	setFocusPolicy( Qt::NoFocus );
 
-	QStringList icons;
-	icons << ":/icons/folder.png" << ":/icons/applications.png"  << ":/icons/catalogs.png" << ":/icons/comp.png" << ":/icons/bookmark.png";
+	/* StyleSheet */
+	setStyleSheet( getStyleSheet( "NBSidePanelView", Settings->General.Style ) );
 
-	QVBoxLayout *iconsLyt = new QVBoxLayout();
-	iconsLyt->setContentsMargins( QMargins() );
-	iconsLyt->setSpacing( 0 );
+	/* Selection */
+	setSelectionMode( QTreeView::NoSelection );
 
-	Q_FOREACH( QString icon, icons ) {
-		NBClickLabel *lbl = new NBClickLabel( QPixmap( icon ).scaled( QSize( 32, 32 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-		lbl->setFixedSize( QSize( 48, 48 ) );
+	/* Mouse Tracking */
+	setMouseTracking( true );
 
-		iconsLyt->addWidget( lbl );
+	/* Grid and Item Sizes */
+	setGridSize( QSize( sizeHintForColumn( 0 ), 32 ) );
+	setIconSize( QSize( 28, 28 ) );
+
+	/* DragAndDrop */
+	viewport()->setAcceptDrops(true);
+	setDragDropMode( QListView::DragDrop );
+	setDropIndicatorShown( true );
+	setDragEnabled( true );
+	setAcceptDrops( true );
+
+	setFixedWidth( 0 );
+
+	/* No ScrollBars */
+	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+
+	/* Unifor Item Sizes */
+	setUniformItemSizes( true );
+};
+
+void NBSidePanelView::showMenu( QModelIndex idx, QPoint pos ) {
+
+	if ( showingDevices )
+		return;
+
+	int row = idx.row();
+
+	QAction *moveUpAct, *moveDownAct, *deleteAct;
+
+	deleteAct = new QAction( QIcon( ":/icons/delete.png" ), "&Delete BookMark", this );
+	deleteAct->setData( row );
+	connect( deleteAct, SIGNAL( triggered() ), this, SLOT( removeBookmark() ) );
+
+	moveUpAct = new QAction( QIcon( ":/icons/arrow-up.png" ), "&Move Up", this );
+	moveUpAct->setData( row );
+	connect( moveUpAct, SIGNAL( triggered() ), this, SLOT( moveBookmarkUp() ) );
+
+	moveDownAct = new QAction( QIcon( ":/icons/arrow-down.png" ), "&Move Down", this );
+	moveDownAct->setData( row );
+	connect( moveDownAct, SIGNAL( triggered() ), this, SLOT( moveBookmarkDown() ) );
+
+	NBMenu *menu = new NBMenu();
+	connect( menu, SIGNAL( aboutToShow() ), this, SIGNAL( showingMenu() ) );
+	connect( menu, SIGNAL( aboutToHide() ), this, SIGNAL( hidingMenu() ) );
+
+	if ( row > 0 )
+		menu->addAction( moveUpAct );
+
+	if ( row < spModel->rowCount() - 1 )
+		menu->addAction( moveDownAct );
+
+	menu->addSeparator();
+	menu->addAction( deleteAct );
+	menu->exec( pos );
+};
+
+void NBSidePanelView::updateDevices() {
+
+	showingDevices = true;
+	spModel->updateDeviceData();
+
+	setFixedHeight( spModel->rowCount() * 32 + contentsMargins().top() * 2 );
+	mIdealWidth = sizeHintForColumn( 0 ) + contentsMargins().left() * 2;
+};
+
+void NBSidePanelView::updateBookmarks() {
+
+	showingDevices = false;
+	spModel->updateBookmarkData();
+
+	setFixedHeight( spModel->rowCount() * 32 + contentsMargins().top() * 2 );
+	mIdealWidth = sizeHintForColumn( 0 ) + contentsMargins().left() * 2;
+};
+
+void NBSidePanelView::handleClick( const QModelIndex clickedIndex ) {
+
+	/* Some device or bookmark has been clicked */
+	emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
+};
+
+void NBSidePanelView::moveBookmarkUp() {
+
+	QAction *mover = qobject_cast<QAction*>( sender() );
+	int bookmarkIndex = mover->data().toInt();
+
+	QStringList order = bookmarkSettings.value( "Order" ).toStringList();
+	order.swap( bookmarkIndex, bookmarkIndex - 1 );
+
+	bookmarkSettings.setValue( "Order", order );
+	bookmarkSettings.sync();
+
+	updateBookmarks();
+};
+
+void NBSidePanelView::moveBookmarkDown() {
+
+	QAction *mover = qobject_cast<QAction*>( sender() );
+	int bookmarkIndex = mover->data().toInt();
+
+	QStringList order = bookmarkSettings.value( "Order" ).toStringList();
+	order.swap( bookmarkIndex, bookmarkIndex + 1 );
+
+	bookmarkSettings.setValue( "Order", order );
+	bookmarkSettings.sync();
+
+	updateBookmarks();
+};
+
+void NBSidePanelView::removeBookmark() {
+
+	QAction *deleter = qobject_cast<QAction*>( sender() );
+	int bookmarkIndex = deleter->data().toInt();
+
+	QModelIndex idx = spModel->index( bookmarkIndex, 0 );
+	bookmarkSettings.remove( QUrl::toPercentEncoding( spModel->data( idx, Qt::UserRole + 1 ).toString() ) );
+
+	QStringList order = bookmarkSettings.value( "Order" ).toStringList();
+	order.removeAt( bookmarkIndex );
+
+	bookmarkSettings.setValue( "Order", order );
+	bookmarkSettings.sync();
+
+	updateBookmarks();
+	emit bookmarkRemoved();
+};
+
+void NBSidePanelView::mousePressEvent( QMouseEvent *mEvent ) {
+
+	if ( indexAt( mEvent->pos() ).isValid() ) {
+
+		QModelIndex idx = indexAt( mEvent->pos() );
+
+		if( mEvent->modifiers() == Qt::ShiftModifier ) {
+			// renameBookMark( idx );
+		}
+
+		else if ( mEvent->button() == Qt::LeftButton ) {
+			handleClick( idx );
+		}
+
+		else if ( mEvent->button() == Qt::RightButton ) {
+			showMenu( idx, mEvent->globalPos() );
+		}
+
+		mEvent->accept();
+		return;
 	}
-	iconsLyt->addStretch( 0 );
 
-	QVBoxLayout *lyt = new QVBoxLayout();
-	lyt->setContentsMargins( QMargins() );
-	lyt->setSpacing( 0 );
-
-	QWidget *base = new QWidget();
-	base->setObjectName( "guiBase" );
-	base->setLayout( iconsLyt );
-	lyt->addWidget( base );
-
-	setLayout( lyt );
+	QListView::mousePressEvent( mEvent );
+	mEvent->accept();
 };
 
-void NBSidePanel::updateBookmarks() {
+void NBSidePanelView::dragEnterEvent( QDragEnterEvent *deEvent ) {
 
+	deEvent->acceptProposedAction();
 };
 
-void NBSidePanel::updateDevices() {
+void NBSidePanelView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 
+	if ( indexAt( dmEvent->pos() ).isValid() ) {
+		QModelIndex idx = indexAt( dmEvent->pos() );
+		QString mtpt = spModel->data( idx, Qt::UserRole + 1 ).toString();
+
+		if ( QFileInfo( mtpt ).isWritable() ) {
+			dmEvent->setDropAction( Qt::CopyAction );
+			dmEvent->accept();
+		}
+
+		else
+			dmEvent->ignore();
+	}
+
+	else
+		dmEvent->ignore();
 };
 
-void NBSidePanel::handleClick( const QModelIndex ) {
+void NBSidePanelView::dropEvent( QDropEvent *dpEvent ) {
 
-};
+	QModelIndex idx = indexAt( dpEvent->pos() );
+	QString mtpt = spModel->data( idx, Qt::UserRole + 1 ).toString();
 
-void NBSidePanel::dragEnterEvent( QDragEnterEvent* ) {
+	const QMimeData *mData = dpEvent->mimeData();
+	if ( mData->hasUrls() ) {
 
-};
+		QStringList args;
+		foreach( QUrl url, mData->urls() )
+			args << url.toLocalFile();
 
-void NBSidePanel::dragMoveEvent( QDragMoveEvent* ) {
+		// Copy -> Ctrl
+		// Move -> Shift
+		// Link -> Ctrl + Shift
+		if ( dpEvent->keyboardModifiers() == Qt::ShiftModifier ) {
 
-};
+			emit move( args, mtpt, NBIOMode::Move );
+		}
 
-void NBSidePanel::dropEvent( QDropEvent* ) {
+		else if ( ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) or ( dpEvent->keyboardModifiers() == Qt::NoModifier ) ) {
 
+			emit copy( args, mtpt, NBIOMode::Copy );
+		}
+
+		else if ( dpEvent->keyboardModifiers() == ( Qt::ControlModifier | Qt::ShiftModifier ) ) {
+
+			foreach( QString node, args )
+				QFile::link( node, QDir( mtpt ).filePath( baseName( node ) ) );
+		}
+
+		else if ( dpEvent->keyboardModifiers() == ( Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier ) ) {
+
+			qDebug() << "Ctrl+Shift+Alt+Drop. Alphabetical Copy activated";
+			QProcess::startDetached( "sh", QStringList() << "find -type f -print0 | sort -z | cpio -0 -pd " + mtpt );
+			emit copy( args, mtpt, NBIOMode::ACopy );
+		}
+
+		else {
+
+			dpEvent->ignore();
+			return;
+		}
+	}
+
+	dpEvent->accept();
 };

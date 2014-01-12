@@ -1,3 +1,17 @@
+Version 2.3.0-preview
+    - BugFix: NBIconView smooth selection and drag and drop
+    - BugFix: NBAppFile Application grading and mimetype sorting bug
+    - BugFix: NBMessageDialog::KeyPressEvent handling
+    - BugFix: NBDeleteManager core class was inheriting from GUI classes
+    - An improved NBSidePanel replacing the old one
+    - Changes to NBSidePanelModel and NBSidePanelView to support the new NBSidePanel
+    - Added ODT and PDF Previewer ( only basic text rendering is available )
+    - Added Settings entry for keeping the SidePanel open
+    - SidePanel and Catalogs will not show non-existsing entries
+    - Custom catalogs are available
+    - Thumbnailer bug fixed. Thumbnails get loaded much faster
+    - NBPropertiesDialog is upgraded
+
 Version 2.2.0-beta
     - Fixed cursor movements for NBIconView
     - Fixed issues with Copy/Move Folders and Files
@@ -27,16 +41,16 @@ Version 2.1.0
     - Several small buf fixes
 
 Version 2.1.0-preview
-	- Added NBApplicationsView and NBCatalogView
-	- NBDesktopFile and NBConfigParser have been replaced by NBAppFile and NBAppsEngine
-	- The OpenWith menu shows an application list even when multiple items are selected.
-	- NBSidePanel width is determined dynamically
-	- NBIconProvder now handles icons from /usr/share/pixmaps
-	- CustomActions menu has link to Add New Custom action
-	- The open with dialog is now categorized
-	- You can set the defaults using the NBOpenWith dialog
-	- Double clicking a file open with default application that is recorded in mimeapps.list file
-	- The first item in the OpenWith menu is the default application
+    - Added NBApplicationsView and NBCatalogView
+    - NBDesktopFile and NBConfigParser have been replaced by NBAppFile and NBAppsEngine
+    - The OpenWith menu shows an application list even when multiple items are selected.
+    - NBSidePanel width is determined dynamically
+    - NBIconProvder now handles icons from /usr/share/pixmaps
+    - CustomActions menu has link to Add New Custom action
+    - The open with dialog is now categorized
+    - You can set the defaults using the NBOpenWith dialog
+    - Double clicking a file open with default application that is recorded in mimeapps.list file
+    - The first item in the OpenWith menu is the default application
 
 Version 2.0.2
     - NBFileSystemWatcher has undergone major changes

@@ -122,17 +122,18 @@ QVariant NBFileSystemModel::data( const QModelIndex &index, int role ) const {
 
 				// The inbuilt icon or from the file system
 				QIcon savedIcon = QIcon( icoStr );
+
 				// Icon we got from the theme
 				QIcon themeIcon = QIcon::fromTheme( icoStr );
 
-				if ( themeIcon.isNull() and savedIcon.isNull() )
-					return unknown;
+				if ( not themeIcon.isNull() )
+					return themeIcon;
 
-				else if ( themeIcon.isNull() and not savedIcon.isNull() )
+				else if ( not savedIcon.isNull() )
 					return savedIcon;
 
 				else
-					return themeIcon;
+					return unknown;
 			}
 
 			return QVariant();

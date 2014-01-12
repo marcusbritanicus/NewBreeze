@@ -1,26 +1,7 @@
-NewBreeze v2.2.0-preview
-========================
-
-This is a preview release of v2.2.0
-
-=> NBAFileSystemModel( QAbstractItemModel )
-   NBFileSystemModel is now a categorized item model. Categories can be name, size, type or modification time based. Categorization can
-   easily be switched on or off via setCategorizationEnabled( bool );
-
-=> NBIconView( QAbstractItemView )
-   NBIconView is now categorized item view. It supports both a categorized and a non categorized item model.
-
-=> 'Show in groups'
-   This switch helps to switch on or of the Categorization of the Model and the View.
-
-=> QActionGroup
-   The older approach of using radiobuttons and making them exclusive to provide 'View Modes' list and 'Sort By' menu has been replaced by the
-   cleaner QActionGroup approach. This is much more elegant and clean.
-
-NewBreeze v2.2.0
+NewBreeze v2.3.0
 ================
 
-=> NBAFileSystemModel( QAbstractItemModel )
+=> NBFileSystemModel( QAbstractItemModel )
    - NBFileSystemModel is now a categorized item model. Categories can be name, size, type or modification time based. Categorization can
      easily be switched on or off via setCategorizationEnabled( bool )
    - NBFileSystem now detects file size changes and automatically updates it.
@@ -37,12 +18,12 @@ NewBreeze v2.2.0
 
 => Move
    The intra-device move is now purely a renaming action.
-   In case a directory which is being moved exists then a full-gledged FileIO will be performed.
+   In case a directory which is being moved exists then a full-fledged FileIO will be performed.
 
 => FileIO
    While copying/moving a file, if by chance, the target exists, then the newly copied file will be renamed as *basename* - Copy.*ext*
-   While copying/moving a folder, if by chance, the target exist, then folder being copied get merged with the existing folder, and existing
-   files renamed.
+   While copying/moving a folder, if by chance, the target exist, then folder being copied gets merged with the existing folder, and newly
+   copied files renamed as above
 
 => View Modes
    I have done away with the predefined view modes with fixed sizes. Now we have three view modes, the tiles view, the icons view and the
@@ -57,3 +38,14 @@ NewBreeze v2.2.0
 
 => Delete GUI
    Since the delete process is very fast a gui is not required.
+
+=> SidePanel
+   > A much more compact panel is provided. The icons are folders, appications, catalogs, devices, bookmarks and trash.
+   > When the mouse moves over the devices or the bookmarks icon, the panel expands to reveal the devices/bookmarks.
+   > Similiar behaviour is observed when you drag items to the devices/bookmarks icons.
+   > To delete files and folders, you can simply drag and drop them while pressing [ SHIFT ] button.
+
+=> ODT and PDF preview
+   It is now possible to preview odt file (Open Document Text) from LibreOffice/OpenOffice, and PDF files via the Peek option.
+   ODT has limited support, but let's hope we do get some native support from Qt for rendering ODT in the future.
+   Support for PDF is dependent on the poppler-qt4 library

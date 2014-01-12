@@ -140,27 +140,13 @@ void NBMessageDialog::setText( QString text ) {
 
 void NBMessageDialog::keyPressEvent( QKeyEvent *keyEvent ) {
 
-	QWidget::keyPressEvent( keyEvent );
+	NBDialog::keyPressEvent( keyEvent );
 };
 
 void NBMessageDialog::close() {
 
 	NBDialog::close();
 	emit closed();
-};
-
-void NBMessageDialog::show() {
-
-	QWidget::show();
-};
-
-void NBMessageDialog::exec() {
-
-	QEventLoop loop;
-	connect( this, SIGNAL( closed() ), &loop, SLOT( quit() ) );
-
-	QWidget::show();
-	loop.exec();
 };
 
 void NBMessageDialog::toggleInfoWidget() {
@@ -234,26 +220,24 @@ void NBMessageDialog::buttonClickHandler() {
 
 void NBMessageDialog::aboutNewBreeze() {
 
-	QString title = QString( "About NewBreeze v2.2.0" );
+	QString title = QString( "About NewBreeze v2.3.0-preview" );
 	QString text = QString(
 		"<p><b><center>Fast and light-weight File Manager</center></b></p>"		\
 		"<p>Built on top of the Powerful Qt4 GUI Toolkit, this file manager "	\
 		"is sleek, stylish and fast. Some of its features are</p>"				\
 		"<ul>"																	\
 		"	<li>Fast startup and browsing</li>"									\
-		"	<li>Folder, text, html and image quick preview</li>"				\
+		"	<li>Folder, text, html, image and odt quick preview</li>"			\
 		"	<li>File Association support</li>"									\
-		"	<li>Multiple Views</li>"											\
-		"	<li>Lists the dives in the sidebar</li>"							\
+		"	<li>Multiple Views - Tiles, Icons and Details</li>"					\
+		"	<li>Sleek side panel showing drives and boomarks</li>"				\
 		"	<li>Full drag and drop support</li>"								\
-		"	<li>Bookmarks</li>"													\
 		"	<li>Applications and Catalog View</li>"								\
 		"   <li>Custom Folder Icons and Thumbnail Preview</li>"					\
 		"   <li>Mime-Icon Support</li>"											\
 		"   <li>BreadCrumbs Navigation</li>"									\
 		"   <li>Custom Actions</li>"											\
 		"   <li>Inline terminal</li>"											\
-		"   <li>Set Custom Folder Icons</li>"									\
 		"</ul>"																	\
 		"<p><small>The credit for the inline terminal goes to "					\
 		"Christian Surlykke, the author of QTermWidget. "						\

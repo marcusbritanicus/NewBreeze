@@ -41,6 +41,9 @@
 #include <magic.h>
 #include <sys/inotify.h>
 #include <limits.h>
+#include <time.h>
+#include <pwd.h>
+#include <grp.h>
 
 #include <NBSettings.hpp>
 #include <NBXdg.hpp>

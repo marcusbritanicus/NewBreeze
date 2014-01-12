@@ -119,14 +119,8 @@ bool isLink( QString path ) {
 };
 
 bool exists( QString path ) {
-	struct stat fileAtt;
 
-	if ( stat( qPrintable( path ), &fileAtt ) == 0 )
-		return true;
-
-	else
-		return false;
-
+	return not access( qPrintable( path ), F_OK );
 }
 
 QString readLink( QString path ) {
@@ -383,22 +377,11 @@ QStringList recDirWalk( QString path ) {
 
 bool isText( QString path ) {
 
-	QStringList plainMimes;
-	plainMimes << "application/javascript"
-				<< "application/x-javascript"
-				<< "application/xml"
-				<< "application/x-csh'"
-				<< "application/x-sh"
-				<< "application/x-shellscript"
-				<< "application/javascript"
-				<< "application/x-perl"
-				<< "application/x-php"
-				<< "application/x-ruby";
-
-	if ( ( plainMimes.count( getMimeType( path ) ) ) > 0 )
+	QMimeType mime = mimeDb.mimeTypeForFile( path );
+	if ( mime.name() == "text/plain" )
 		return true;
 
-	else if ( getMimeType( path ).startsWith( "text" ) )
+	if ( mime.allAncestors().contains( "text/plain" ) )
 		return true;
 
 	return false;
@@ -406,16 +389,28 @@ bool isText( QString path ) {
 
 bool isExec( QString path ) {
 
+	/* If the exec bit set there is not point continuing */
+	if ( access( qPrintable( path ), X_OK ) )
+		return false;
+
+	/* If this is and application/x-executable, it can be executed */
+	if ( ( mimeDb.mimeTypeForFile( path ).name() == "applications/x-executable" ) )
+		return true;
+
+	/* There might be a file, say a .'odt' or 'txt' with exec bit set. Rule it out */
+	/* So if this has application/x-executable in its ancestry tree, then it can be executed */
+	if ( mimeDb.mimeTypeForFile( path ).allAncestors().contains( "application/x-executable" ) )
+		return true;
+
+	/* Some shared libraries, and a few other file can also be executed */
 	QStringList execMimes;
 	execMimes << "application/x-sharedlib"
 				<< "application/x-executable"
 				<< "application/x-shellscript"
 				<< "application/x-install";
 
+	/* We'll execute them */
 	if ( execMimes.contains( getMimeType( path ) ) )
-		return true;
-
-	if ( getMime( path ).allAncestors().contains( "application/x-executable" ) )
 		return true;
 
 	return false;

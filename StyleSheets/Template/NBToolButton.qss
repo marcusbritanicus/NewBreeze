@@ -1,11 +1,3 @@
-QPushButton {
-	font-family: Architects Daughter;
-	text-align: center;
-	border: 0px;
-	margin-top: 5px;
-	min-width: 100px;
-}
-
 QPushButton:hover {
 	color: lightblue;
 }

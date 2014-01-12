@@ -4,18 +4,17 @@ NewBreeze - Fast and light-weight File Manager
 Built on top of the Powerful Qt4 GUI Toolkit, this file manager is sleek, stylish and fast.
 Some of its features are
     - Fast startup and browsing
-    - Folder, text, html and image quick preview
+    - Folder, text, html, image, odt, and pdf quick preview
     - File Association support
     - Provides Categorized List, Icon and Details View
-    - Lists the drives/boomarks in the sidebar
+    - Sleek side panel showing drives and boomarks
     - Full drag and drop support
-    - Bookmark Support
-    - Applications View
-    - Catalog View
+    - Applications and Catalog View
     - Auto update devices list
     - Custom Folder Icons and Thumbnail Preview
     - Complete mime-icon support
     - BreadCrumbs Navigation Bar
+    - Custom Actions
     - Inline terminal
     - Server for resource sharing
 
@@ -90,7 +89,6 @@ List of shortcuts
 
 Upcoming
     - Unified Folder, Application, and Catalog Viewer
-    - Pdf Preview Plugin
     - Application Editor ( Desktop file editor )
-    - Smaller and mode stylish SideBar with more functionality
+    - Trash Support
     - Any other feature you request for... :)

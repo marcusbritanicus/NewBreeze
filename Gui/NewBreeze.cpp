@@ -206,6 +206,8 @@ void NewBreeze::createAndSetupActions() {
 	connect( SidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
 
 	connect( SidePanel, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
+	connect( SidePanel, SIGNAL( showApplications() ), this, SLOT( showApplications() ) );
+	connect( SidePanel, SIGNAL( showCatalogs() ), this, SLOT( showCatalogs() ) );
 
 	connect( SidePanel, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ),
 		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
@@ -292,7 +294,7 @@ void NewBreeze::createAndSetupActions() {
 	// Update devices list
 	int mountsFD = open( "/proc/self/mounts", O_RDONLY, 0 );
 	QSocketNotifier *devWatcher = new QSocketNotifier( mountsFD, QSocketNotifier::Write );
-	connect( devWatcher, SIGNAL( activated( int ) ), SidePanel, SLOT( updateDevices() ) );
+	connect( devWatcher, SIGNAL( activated( int ) ), SidePanel, SLOT( flashDevices() ) );
 
 	// Display terminal widget
 	QAction *termWidgetAct = new QAction( this );
@@ -412,6 +414,9 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	if ( InfoBar->ioManagerMini->activeJobs() )
 		InfoBar->ioManagerMini->showAllIODialogs();
 
+	// Now hide this window, other processes may take a while longer to close down
+	hide();
+
 	// Store the previous session - geometry, and open directory.
 	Settings->setValue( "FolderView", Settings->General.FolderView );
 	Settings->setValue( "Session/Geometry", geometry() );
@@ -469,7 +474,7 @@ void NewBreeze::addBookMark() {
 	bookmarkSettings.setValue( "Order", order );
 	bookmarkSettings.sync();
 
-	SidePanel->updateBookmarks();
+	SidePanel->flashBookmarks();
 };
 
 void NewBreeze::showHideTermWidget() {
@@ -629,8 +634,24 @@ void NewBreeze::showProperties() {
 		foreach( QModelIndex idx, selectedList )
 			paths << FolderView->fsModel->nodePath( idx );
 
-	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths );
+	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties );
 	propsDlg->show();
+};
+
+void NewBreeze::showPermissions() {
+
+	QList<QModelIndex> selectedList = FolderView->getSelection();
+	QStringList paths;
+
+	if ( !selectedList.count() )
+		paths << FolderView->fsModel->currentDir();
+
+	else
+		foreach( QModelIndex idx, selectedList )
+			paths << FolderView->fsModel->nodePath( idx );
+
+	NBPropertiesDialog *permsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Permissions );
+	permsDlg->show();
 };
 
 void NewBreeze::handleDriveUrl( QString url ){
@@ -647,12 +668,18 @@ void NewBreeze::handleDriveUrl( QString url ){
 
 void NewBreeze::showApplications() {
 
+	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
+		SidePanel->flashApplications();
+
 	FolderView->doOpen( "NB://Applications" );
 	AddressBar->addressWidget->addressEdit->setText( "NB://Applications" );
 	AddressBar->addressWidget->crumbsBar->setCurrentDirectory( "NB://Applications" );
 };
 
 void NewBreeze::showCatalogs() {
+
+	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
+		SidePanel->flashCatalogs();
 
 	FolderView->doOpen( "NB://Catalogs" );
 	AddressBar->addressWidget->addressEdit->setText( "NB://Catalogs" );
@@ -661,23 +688,10 @@ void NewBreeze::showCatalogs() {
 
 void NewBreeze::showFolders() {
 
+	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
+		SidePanel->flashFolders();
+
 	FolderView->doOpen( FolderView->fsModel->currentDir() );
-};
-
-void NewBreeze::showPermissions() {
-
-	QList<QModelIndex> selectedList = FolderView->getSelection();
-	QStringList paths;
-
-	if ( !selectedList.count() )
-		paths << FolderView->fsModel->currentDir();
-
-	else
-		foreach( QModelIndex idx, selectedList )
-			paths << FolderView->fsModel->nodePath( idx );
-
-	NBPermissionsDialog *permsDlg = new NBPermissionsDialog( paths );
-	permsDlg->show();
 };
 
 void NewBreeze::filterFiles( QString filter ) {

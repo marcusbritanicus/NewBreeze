@@ -8,113 +8,124 @@
 #include <NBIconProvider.hpp>
 #include <NBTools.hpp>
 
-NBServer::NBServer() : QTcpServer() {
+NBServer::NBServer() : QLocalServer() {
 
-	QNetworkConfigurationManager cfgMgr;
-	QNetworkConfiguration config = cfgMgr.defaultConfiguration();
+	mServerName = QString( "NewBreeze-%1" ).arg( getuid() );
+	removeServer( mServerName );
 
-	networkSession = new QNetworkSession( config );
-	networkSession->open();
+	connect( this, SIGNAL( newConnection() ), this, SLOT( handleNewConnection() ) );
 };
 
 bool NBServer::start() {
 
-	if ( listen( QHostAddress( QHostAddress::LocalHost ), 14928 ) ) {
+	if ( listen( QString( "NewBreeze-1000" ) ) ) {
 		// qDebug() << "Server started...!";
-		// qDebug() << "Addr:" << serverAddress().toString();
-		// qDebug() << "Port:" << serverPort();
+		// qDebug() << "Addr:" << mServerName;
+
+		return true;
 	}
 
 	else {
-		qCritical() << "Unable to start server";
+		qCritical() << "Unable to start server" << errorString();
 		return false;
 	}
 
-	return true;
-};
+}
 
-void NBServer::incomingConnection( int sockDescr ) {
+void NBServer::handleNewConnection() {
 
-	ThreadedReplier *replier = new ThreadedReplier( this, sockDescr );
+	QLocalSocket *socket = nextPendingConnection();
+
+	/* If the client is read only, then say 'Welcome ...' and end the story. */
+	qDebug() << "Client connected. Welcoming...";
+	socket->write( "Welcome to NewBreeze!" );
+
+	/* Set up reply interface, if the client is read-write */
+	ThreadedReplier *replier = new ThreadedReplier( socket );
 	connect( replier, SIGNAL( finished() ), replier, SLOT( deleteLater() ) );
 	connect( replier, SIGNAL( newWindow( QString ) ), this, SIGNAL( newWindow( QString ) ) );
-	replier->start();
 };
 
-ThreadedReplier::ThreadedReplier( QObject *parent, int sockDescr ) : QThread( parent ), socketDescr( sockDescr ) {
+ThreadedReplier::ThreadedReplier( QLocalSocket *socket ) : QObject(), client( socket ) {
+
+	/* We had said Welcome. Flush the stream. */
+	client->flush();
+
+	/* If the client disconnects, quit */
+	connect( client, SIGNAL( disconnected() ), this, SIGNAL( finished() ) );
+
+	/* If client queries something, respond to it */
+	connect( client, SIGNAL( readyRead() ), this, SLOT( sendReplyToClient() ) );
+
+	/* If the client had queried by the time we set up shop, respond to it. */
+	if ( client->bytesAvailable() )
+		sendReplyToClient();
 };
 
-void ThreadedReplier::run() {
+void ThreadedReplier::sendReplyToClient() {
 
 	/*
 		*
 		* The query process is as follows:
 		*
 		* Q: Good Morning!
-		* R: Welcome to NBServer!
+		* R: Welcome to NewBreeze!
 		*
-		* Q: AllInfo OR Icon OR MimeType OR Description
-		* R: Path
-		*
-		* Q : <URL>
-		* R1: <URL>\n<ICON>\n<DESC>\n<MIME>\n
-		* R2: <URL>\n<ICON>\n
-		* R3: <URL>\n<DESC>\n
-		* R4: <URL>\n<MIME>\n
+		* Q: NewWindow @ <URL>
+		* R: Done
+		* R: <Open a new window>
 		*
 		* Q: <Anything else>
-		* R: Invalid query
+		* R: Try: 'Good Morning!' or 'NewWindow @ <URL>'
 		*
 	*/
 
-	QTcpSocket *client = new QTcpSocket();
-	client->setSocketDescriptor( socketDescr);
-
-	QStringList qTypes = QStringList() << "Info" << "Icon" << "MimeType" << "Description" << "MimeAncestors";
-
-	while ( client->state() == QTcpSocket::ConnectedState ) {
-		client->waitForReadyRead( -1 );
-		QString queryType = QString::fromLocal8Bit( client->readAll().data() );
-
-		if ( queryType == QString( "Good Morning!" ) ) {
-			qDebug() << "Client says Good Morning!";
-			client->write( QString( "Welcome to NewBreeze!" ).toLocal8Bit() );
-		}
-
-		else if ( queryType == QString( "NewWindow" ) ) {
-			qDebug() << "Client requested New Window";
-			client->write( "Path" );
-			client->waitForBytesWritten( -1 );
-			client->waitForReadyRead( -1 );
-			QString query = QString::fromLocal8Bit( client->readAll() );
-			qDebug() << "Path:" << query;
-
-			emit newWindow( query );
-		}
-
-		else {
-			client->write( "Invalid query" );
-		}
+	/* The client must be connected at this stage. Otherwise terminate. */
+	if ( client->state() != QLocalSocket::ConnectedState ) {
+		emit finished();
+		return;
 	}
 
-	exec();
-}
+	/* We are here because we gor a readyRead(). So there must be some data. No waiting... */
+	QString query = QString::fromLocal8Bit( client->readAll().data() );
+
+	if ( query.startsWith( QString( "NewWindow @ " ) ) ) {
+		qDebug() << "Client requested New Window:" << query.mid( 12 );
+		emit newWindow( query.mid( 12 ) );
+
+		client->write( "Done" );
+		client->flush();
+
+		/* Safety measure: We mostly won't nedd this blocking call */
+		if ( client->state() == QLocalSocket::ConnectedState )
+			client->waitForBytesWritten( -1 );
+	}
+
+	else {
+		client->write( "Try: 'Good Morning!' or 'NewWindow @ <URL>'" );
+		client->flush();
+
+		/* Safety measure: We mostly won't nedd this blocking call */
+		if ( client->state() == QLocalSocket::ConnectedState )
+			client->waitForBytesWritten( -1 );
+	}
+};
 
 bool isServerRunning() {
 
-	QTcpSocket *client = new QTcpSocket();
-	client->connectToHost( QHostAddress::LocalHost, 14928 );
+	QLocalSocket *client = new QLocalSocket();
+	client->connectToServer( "NewBreeze-1000", QLocalSocket::ReadOnly );
 
 	if ( client->waitForConnected( 100 ) ) {
-		client->write( "Good Morning!" );
+		/* We must get a immediate reply */
 		client->waitForReadyRead();
 		if ( client->readAll() == "Welcome to NewBreeze!" ) {
-			client->disconnectFromHost();
+			client->disconnectFromServer();
 			return true;
 		}
 
 		else {
-			client->disconnectFromHost();
+			client->disconnectFromServer();
 			return false;
 		}
 	}

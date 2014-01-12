@@ -200,9 +200,13 @@ void NBCatalogModel::setupModelData() {
 	rootItem->clearChildren();
 
 	QSettings catalogsSettings( "NewBreeze", "Catalogs" );
-	foreach( QString ctlg, catalogsSettings.allKeys() ) {
+	/* Default Catalogs */
+	foreach( QString ctlg, catalogsSettings.childKeys() ) {
 		QStringList locations = catalogsSettings.value( ctlg ).toStringList();
 		foreach( QString location, locations ) {
+			if ( not exists( location ) )
+				continue;
+
 			QVariantList data;
 
 			// Name
@@ -217,6 +221,29 @@ void NBCatalogModel::setupModelData() {
 			rootItem->addChild( new NBCatalogItem( data, ctlg, rootItem ) );
 		}
 	}
+	/* Custom Catalogs */
+	catalogsSettings.beginGroup( "Custom" );
+	foreach( QString ctlg, catalogsSettings.childKeys() ) {
+		QStringList locations = catalogsSettings.value( ctlg ).toStringList();
+		foreach( QString location, locations ) {
+			if ( not exists( location ) )
+				continue;
+
+			QVariantList data;
+
+			// Name
+			data << baseName( location );
+
+			// Target
+			data << location;
+
+			// Target exists
+			data << exists( location );
+
+			rootItem->addChild( new NBCatalogItem( data, ctlg, rootItem ) );
+		}
+	}
+	catalogsSettings.endGroup();
 	endResetModel();
 
 	emit modelLoaded();
