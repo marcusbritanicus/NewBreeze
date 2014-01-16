@@ -160,6 +160,14 @@ bool NBCatalogModel::isCatalogVisible( QString mCatalogName ) const {
 	return false;
 };
 
+int NBCatalogModel::indexListCountForCatalog( QString mCategory ) const {
+
+	if ( not rootItem->catalogList.contains( mCategory ) or mCategory.isEmpty() or mCategory.isNull() )
+		return 0;
+
+	return catalogRowMap[ mCategory ].count();
+};
+
 QModelIndexList NBCatalogModel::indexListForCatalog( QString mCatalogName ) const {
 
 	QModelIndexList mList;

@@ -276,7 +276,13 @@ void NBDeleteLabel::dropEvent( QDropEvent *dpEvent ) {
 			color = QColor( Qt::darkYellow );
 			color.setAlpha( 150 );
 
-			qDebug() << "Trash";
+			NBDeleteManager *deleteManager = new NBDeleteManager( this, true );
+			connect(
+				deleteManager, SIGNAL( trashOperationComplete( QStringList, QStringList ) ),
+				this, SLOT( handleDeleteFailure( QStringList, QStringList ) )
+			);
+			deleteManager->sendToTrash( toBeDeleted );
+
 			flashLabel();
 		}
 
@@ -383,4 +389,3 @@ void NBDeleteLabel::flashLabel() {
 	timer.start();
 	flash = true;
 };
-

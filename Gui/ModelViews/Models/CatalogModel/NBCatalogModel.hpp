@@ -49,6 +49,7 @@ class NBCatalogModel : public QAbstractItemModel {
 		void showCatalog( QString mCatalogName );
 		bool isCatalogVisible( QString mCatalogName ) const;
 
+		int indexListCountForCatalog( QString ) const;
 		QModelIndexList indexListForCatalog( QString ) const;
 
 		// Filters

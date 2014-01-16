@@ -1,47 +1,18 @@
 Widgets
-	⊟ NBFolderView:
-		☑ NBIconView: NBIconView, NBIconDelegate, NBFileSystemModel( QAbstractItemModel )                                           [ 3 of 3 ]
+	☐ NBFolderView:
 		☐ NBPicsView: NBPicsView, NBPicsDelegate, NBFileSystemModel( QAbstractItemModel )                                           [ 1 of 3 ]
 
-	☑ NBCatalog: NBCatalogView, NBCatalogDelegate, NBCatalogModel( QAbstractItemModel )                                             [ 3 of 3 ]
-
 	☐ MyComputer: NBDeviceView, NBDeviceDelegate, NBDeviceModel( QStringListModel )                                                 [ 0 of 3 ]
-
 	☐ NBTrash: NBTrashView, NBTrashDelegate, NBTrashModel( QAbstractItemModel )                                                     [ 0 of 3 ]
 
-	☑ ProgressWidget
-		☑ InfoBar ProgressWidget: Widget, Realtime progress updates                                                                 [ 2 of 2 ]
-
 Views
-	☑ NBFolderView
-		☑ NBIconView -> Handles ListViews and Icon views -> Current capabilities                                                    [ 2 of 2 ]
-		☑ NBTreeView -> Handles the detailed list style (Small and large)                                                           [ 2 of 2 ]
-	☑ NBCatalogView -> Groups to hold various folders together. This is a equivalent of Windows 7/8 Libraries                       [ 1 of 1 ]
+	☐ NBTrashView -> DetailsView, showing info about location and deletion time                                                     [ 2 of 2 ]
 
 Models
-	☑ NBFileSystemModel( QAbstractItemModel )                                                                                       [ 1 of 1 ]
-	☑ NBSidePanelModel( QAbstractItemModel )                                                                                        [ 1 of 1 ]
-	☑ NBCatalogModel( QAbstractItemModel )                                                                                          [ 1 of 1 ]
-	☑ NBOpenWithModel( QAbstractItemModel )                                                                                         [ 1 of 1 ]
 	☐ NBTrashModel( QAbstractItemModel )                                                                                            [ 0 of 1 ]
-	☑ Put each of the models and allied files into separated sub-directories                                                        [ 4 of 4 ]
-
-SidePanel
-	☑ Migrated to NBSidePanelView/NBSidePanelModel from NBDeviceModel+NBBookmarkModel+NBDeviceView+NBBookmarksView                  [ 1 of 1 ]
-	☑ No arrows for any of the items. Only Icons                                                                                    [ 1 of 1 ]
 
 Undo-Redo Sequences
 	☐ Undo/Redo Rename, IO, Trash etc
 
-Trash
-	☐ TrashView
-
-XDG Class
-	☑ An exclusive XDG class that does                                                                                              [ 3 of 3 ]
-		- Obtain default application for a mimetype
-		- XDG Base Dirs
-		- Obtain the location of trashed folder
-
 NBPasteDialog
-	☑ Determine the mode before hand, and in case of a move operation an intradevice move should be just a renaming operation       [ 1 of 1 ]
 	☐ Determine before hand, if there is enough space on the target to complete the copying/moving                                  [ 0 of 1 ]

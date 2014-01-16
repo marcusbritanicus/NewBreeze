@@ -21,6 +21,7 @@ class NBDeleteManager : public QObject {
 		void deleteFromDisk( QStringList );
 		void sendToTrash( QStringList );
 
+	private:
 		NBDeleter *deleter;
 		NBTrasher *trasher;
 		QThread *thread;

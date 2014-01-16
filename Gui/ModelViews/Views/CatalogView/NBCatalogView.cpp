@@ -252,10 +252,10 @@ QRect NBCatalogView::viewportRectForRow( int row ) const {
 	return QRect( pt.x(), pt.y() - verticalScrollBar()->value(), myItemSize.width(), myItemSize.height() );
 };
 
-QRect NBCatalogView::categoryRect( int categoryIndex ) const {
+QRect NBCatalogView::categoryRect( int catalogIndex ) const {
 
 	calculateRectsIfNecessary();
-	QRect rect = rectForCategory.value( categoryIndex );
+	QRect rect = rectForCategory.value( catalogIndex );
 	if ( not rect.isValid() )
 		return QRect();
 
@@ -331,199 +331,160 @@ void NBCatalogView::rowsAboutToBeRemoved( const QModelIndex &parent, int start, 
 
 QModelIndex NBCatalogView::moveCursor( QAbstractItemView::CursorAction cursorAction, Qt::KeyboardModifiers ) {
 
-	QModelIndex index = currentIndex();
-	if ( index.isValid() ) {
+	QModelIndex idx = currentIndex();
+	QStringList categoryList = catalogModel->catalogs();
 
-		QStringList categoryList = catalogModel->catalogs();
+	/* If there exists a current index */
+	if ( idx.isValid() ) {
+
+		int thisCategoryIdx = catalogModel->catalogIndex( idx );
+		/* If we are in the first category go to the last one */
+		int prevCategoryIdx = ( thisCategoryIdx == 0 ? catalogModel->catalogCount() - 1 : thisCategoryIdx - 1 );
+		/* If we are in the last category go to the first one */
+		int nextCategoryIdx = ( ( thisCategoryIdx == catalogModel->catalogCount() - 1 ) ? 0 : thisCategoryIdx + 1 );
+
+		QString prevCategory = categoryList.value( prevCategoryIdx );
+		QString thisCategory = catalogModel->catalogName( idx );
+		QString nextCategory = categoryList.value( nextCategoryIdx );
+
+		QModelIndexList prevcatalogIndexes = catalogModel->indexListForCatalog( prevCategory );
+		QModelIndexList thiscatalogIndexes = catalogModel->indexListForCatalog( thisCategory );
+		QModelIndexList nextcatalogIndexes = catalogModel->indexListForCatalog( nextCategory );
+
+		// Calculate the visual row of this index
+		int rowInCategory = thiscatalogIndexes.indexOf( idx );
+		int vrow = rowInCategory / itemsPerRow;
+
 		switch( cursorAction ) {
+			case QAbstractItemView::MoveNext:
 			case QAbstractItemView::MoveRight: {
-				if ( index.row() >= 0 and index.row() < catalogModel->rowCount() ) {
-					QModelIndex mIdx = catalogModel->index( index.row() + 1, 0, rootIndex() );
-					if ( catalogModel->isCatalogVisible( catalogModel->catalogName( mIdx ) ) )
-						return mIdx;
+				/* If the current index is not the last visible index */
+				if ( idx.row() >= 0 and idx.row() < catalogModel->rowCount() - 1 ) {
+					/* If this is the visual index of the catgory, then next persistentVCol will be zero */
+					if ( idx == thiscatalogIndexes.last() )
+						persistentVCol = 0;
 
-					else {
-						// We need to return the next visible index
-						for ( int i = catalogModel->catalogIndex( index ) + 1; i < categoryList.count(); i++ ) {
-							if ( catalogModel->isCatalogVisible( categoryList.value( i ) ) )
-								return catalogModel->indexListForCatalog( categoryList.value( i ) ).first();
-						}
-						return index;
-					}
+					else
+						persistentVCol = ( rowInCategory + 1 ) % itemsPerRow;
+
+					return catalogModel->index( idx.row() + 1, 0, rootIndex() );
 				}
 
+				/* Current index is the last visible index */
 				else {
-					return catalogModel->index( catalogModel->rowCount() - 1, 0, rootIndex() );
-				}
-			}
-
-			case QAbstractItemView::MoveLeft: {
-				if ( index.row() >= 0 and index.row() < catalogModel->rowCount() ) {
-					QModelIndex mIdx = catalogModel->index( index.row() - 1, 0, rootIndex() );
-					if ( catalogModel->isCatalogVisible( catalogModel->catalogName( mIdx ) ) )
-						return mIdx;
-
-					else {
-						// We need to return the previous visible index
-						for ( int i = catalogModel->catalogIndex( index ) - 1; i < categoryList.count(); i-- ) {
-							if ( catalogModel->isCatalogVisible( categoryList.value( i ) ) )
-								return catalogModel->indexListForCatalog( categoryList.value( i ) ).last();
-						}
-						return index;
-					}
-				}
-
-				else {
+					persistentVCol = 0;
 					return catalogModel->index( 0, 0, rootIndex() );
 				}
 			}
 
+			case QAbstractItemView::MovePrevious:
+			case QAbstractItemView::MoveLeft: {
+				/* The current index is anything but the first one */
+				if ( idx.row() > 0 and idx.row() < catalogModel->rowCount() ) {
+					if ( idx == thiscatalogIndexes.first() )
+						persistentVCol = ( prevcatalogIndexes.count() - 1 ) % itemsPerRow;
+
+					else
+						persistentVCol = ( rowInCategory - 1 ) % itemsPerRow;
+					return catalogModel->index( idx.row() - 1, 0, rootIndex() );
+				}
+
+				/* The current index is the first one */
+				else {
+					// #warning "FIXME: This implementation is buggy"
+					persistentVCol = ( prevcatalogIndexes.count() - 1 ) % itemsPerRow;
+					return catalogModel->index( catalogModel->rowCount() - 1, 0, rootIndex() );
+				}
+			}
+
 			case QAbstractItemView::MoveDown: {
-
-				QString thisCategory = catalogModel->catalogName( index );
-				QString nextCategory;
-
-				for ( int i = categoryList.indexOf( thisCategory ) + 1; i < categoryList.count(); i++ ) {
-					if ( catalogModel->isCatalogVisible( categoryList.at( i ) ) ) {
-						nextCategory = categoryList.value( i );
-						break;
+				if ( Settings->General.FolderView == "DetailsView" ) {
+					if ( idx.row() == catalogModel->rowCount() - 1 ) {
+						return catalogModel->index( 0, 0, idx.parent() );
+					}
+					else {
+						return catalogModel->index( idx.row() + 1, 0, idx.parent() );
 					}
 				}
 
-				QModelIndexList thisCategoryIndexes = catalogModel->indexListForCatalog( thisCategory );
-				QModelIndexList nextCategoryIndexes = catalogModel->indexListForCatalog( nextCategory );
-
-				// Calculate the visual row of this index
-				int rowInCategory = thisCategoryIndexes.indexOf( index );
-				int vrow = rowInCategory / itemsPerRow;
-				int vcol = rowInCategory % itemsPerRow;
-				int nrow = ( int )ceil( 1.0 * thisCategoryIndexes.count() / itemsPerRow );
-
 				int newVRow = vrow + 1;
 
-				if ( ( newVRow * itemsPerRow + vcol ) < thisCategoryIndexes.count() ) {
-					// We have an index below this index from the same category
-					return thisCategoryIndexes.value( newVRow * itemsPerRow + vcol );
+				if ( ( newVRow * itemsPerRow + persistentVCol ) < thiscatalogIndexes.count() ) {
+					// We have an idx below this idx from the same category
+					return thiscatalogIndexes.value( newVRow * itemsPerRow + persistentVCol );
 				}
 
-				else if ( newVRow < nrow ) {
+				else if ( newVRow * itemsPerRow < thiscatalogIndexes.count() ) {
 					// We have indexes with row greater than this one, not below this one
-					return thisCategoryIndexes.last();
+					return thiscatalogIndexes.last();
 				}
 
 				else {
-					// We need to return the index from the next category same or lower column
-					if ( nextCategoryIndexes.count() ) {
-						if ( nextCategoryIndexes.count() <= vcol )
-							return nextCategoryIndexes.last();
+					// We need to return the idx from the next category same or lower column
+					if ( nextcatalogIndexes.count() ) {
+						if ( nextcatalogIndexes.count() <= persistentVCol )
+							return nextcatalogIndexes.last();
 
 						else
-							return nextCategoryIndexes.value( vcol );
+							return nextcatalogIndexes.value( persistentVCol );
 					}
 
 					else {
 
-						return thisCategoryIndexes.last();
+						return nextcatalogIndexes.last();
 					};
 				}
 
 			}
 
 			case QAbstractItemView::MoveUp: {
-				QString thisCategory = catalogModel->catalogName( index );
-				QString prevCategory;
 
-				for( int i = categoryList.indexOf( thisCategory ) - 1; i >= 0; i-- ) {
-					if ( catalogModel->isCatalogVisible( categoryList.at( i ) ) ) {
-						prevCategory = categoryList.value( i );
-						break;
+				if ( Settings->General.FolderView == "DetailsView" ) {
+					if ( idx.row() == 0 ) {
+						return catalogModel->index( catalogModel->rowCount() - 1, 0, idx.parent() );
+					}
+					else {
+						return catalogModel->index( idx.row() - 1, 0, idx.parent() );
 					}
 				}
-
-				QModelIndexList thisCategoryIndexes = catalogModel->indexListForCatalog( thisCategory );
-				QModelIndexList prevCategoryIndexes = catalogModel->indexListForCatalog( prevCategory );
-
-				// Calculate the visual row of this index
-				int rowInCategory = thisCategoryIndexes.indexOf( index );
-				int vrow = rowInCategory / itemsPerRow;
-				int vcol = rowInCategory % itemsPerRow;
 
 				int newVRow = vrow - 1;
 
 				if ( newVRow >= 0 ) {
 
 					// This means that there is a visual row before this one
-					return thisCategoryIndexes.value( newVRow * itemsPerRow + vcol );
+					return thiscatalogIndexes.value( newVRow * itemsPerRow + persistentVCol );
 				}
+
 				else {
-					if ( prevCategoryIndexes.count() ) {
-						int nrow = ( int )ceil( 1.0 * prevCategoryIndexes.count() / itemsPerRow );
-						if ( prevCategoryIndexes.count() > ( nrow - 1 ) * itemsPerRow + vcol )
-							return prevCategoryIndexes.value( ( nrow - 1 ) * itemsPerRow + vcol );
+					if ( prevcatalogIndexes.count() ) {
+						int nrow = ( int )ceil( 1.0 * prevcatalogIndexes.count() / itemsPerRow );
+						if ( prevcatalogIndexes.count() > ( nrow - 1 ) * itemsPerRow + persistentVCol )
+							return prevcatalogIndexes.value( ( nrow - 1 ) * itemsPerRow + persistentVCol );
 
 						else
-							return prevCategoryIndexes.last();
+							return prevcatalogIndexes.last();
 					}
 
 					else {
 
 						// This is the first category
-						return thisCategoryIndexes.first();
+						return thiscatalogIndexes.first();
 					}
 				}
 			}
 
 			case QAbstractItemView::MoveHome: {
 
-				return catalogModel->index( 0, 0, index.parent() );
+				verticalScrollBar()->setValue( 0 );
+				persistentVCol = 0;
+				return catalogModel->index( 0, 0, idx.parent() );
 			}
 
 			case QAbstractItemView::MoveEnd: {
 
-				return catalogModel->index( catalogModel->rowCount() - 1, 0, index.parent() );
-			}
-
-			case QAbstractItemView::MoveNext: {
-				if ( index.row() >= 0 and index.row() < catalogModel->rowCount() ) {
-					QModelIndex mIdx = catalogModel->index( index.row() + 1, 0, rootIndex() );
-					if ( catalogModel->isCatalogVisible( catalogModel->catalogName( mIdx ) ) )
-						return mIdx;
-
-					else {
-						// We need to return the next visible index
-						for ( int i = catalogModel->catalogIndex( index ) + 1; i < categoryList.count(); i++ ) {
-							if ( catalogModel->isCatalogVisible( categoryList.value( i ) ) )
-								return catalogModel->indexListForCatalog( categoryList.value( i ) ).first();
-						}
-						return index;
-					}
-				}
-
-				else {
-					return catalogModel->index( catalogModel->rowCount() - 1, 0, rootIndex() );
-				}
-			}
-
-			case QAbstractItemView::MovePrevious: {
-
-				if ( index.row() >= 0 and index.row() < catalogModel->rowCount() ) {
-					QModelIndex mIdx = catalogModel->index( index.row() - 1, 0, rootIndex() );
-					if ( catalogModel->isCatalogVisible( catalogModel->catalogName( mIdx ) ) )
-						return mIdx;
-
-					else {
-						// We need to return the previous visible index
-						for ( int i = catalogModel->catalogIndex( index ) - 1; i < categoryList.count(); i-- ) {
-							if ( catalogModel->isCatalogVisible( categoryList.value( i ) ) )
-								return catalogModel->indexListForCatalog( categoryList.value( i ) ).last();
-						}
-						return index;
-					}
-				}
-
-				else {
-					return catalogModel->index( 0, 0, rootIndex() );
-				}
+				persistentVCol = ( catalogModel->indexListCountForCatalog( categoryList.last() ) - 1 ) % itemsPerRow;
+				return catalogModel->index( catalogModel->rowCount() - 1, 0, idx.parent() );
 			}
 
 			default: {
@@ -532,16 +493,20 @@ QModelIndex NBCatalogView::moveCursor( QAbstractItemView::CursorAction cursorAct
 		}
 	}
 
+	/* If there is no current index */
 	else {
 		switch( cursorAction ) {
 			case QAbstractItemView::MoveHome: {
 
-				return catalogModel->index( 0, 0, index.parent() );
+				persistentVCol = 0;
+				verticalScrollBar()->setValue( 0 );
+				return catalogModel->index( 0, 0, idx.parent() );
 			}
 
 			case QAbstractItemView::MoveEnd: {
 
-				return catalogModel->index( catalogModel->rowCount() - 1, 0, index.parent() );
+				persistentVCol = ( catalogModel->indexListCountForCatalog( categoryList.last() ) - 1 ) % itemsPerRow;
+				return catalogModel->index( catalogModel->rowCount() - 1, 0, idx.parent() );
 			}
 
 			default: {
@@ -551,7 +516,7 @@ QModelIndex NBCatalogView::moveCursor( QAbstractItemView::CursorAction cursorAct
 		}
 	}
 
-	return index;
+	return idx;
 };
 
 int NBCatalogView::horizontalOffset() const {
@@ -734,6 +699,7 @@ void NBCatalogView::reload() {
 	catalogModel->reload();
 
 	hashIsDirty = true;
+	persistentVCol = 0;
 	calculateRectsIfNecessary();
 };
 

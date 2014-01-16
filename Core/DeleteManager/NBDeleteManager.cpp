@@ -5,6 +5,7 @@
 */
 
 #include <NBDeleteManager.hpp>
+#include <NBTools.hpp>
 
 NBDeleteManager::NBDeleteManager( QObject *parent, bool trash ) : QObject( parent ) {
 
@@ -38,12 +39,7 @@ void NBDeleteManager::deleteFromDisk( QStringList deleteList ) {
 
 void NBDeleteManager::sendToTrash( QStringList trashList ) {
 
-	Q_UNUSED( trashList );
-
-	// QMetaObject::invokeMethod( trasher, "trashFilesAndFolders", Qt::QueuedConnection, Q_ARG( QStringList, trashList ) );
-	qCritical() << "Sorry: Unimplemented Function";
-	qCritical() << "I'm extremely sorry about this, but it seems that NewBreeze was released without fixing this issue. Please contact me at "
-					"marcusbritanicus@gmail.com to know about the fix.";
+	QMetaObject::invokeMethod( trasher, "trashFilesAndFolders", Qt::QueuedConnection, Q_ARG( QStringList, trashList ) );
 };
 
 void NBDeleteManager::failureHandler( QStringList failedFiles, QStringList failedDirs ) {
@@ -97,38 +93,42 @@ NBTrasher::NBTrasher( QObject *parent ) : QObject( parent ) {
 
 };
 
-void NBTrasher::removeDir( QString dirName ) {
+void NBTrasher::trashFilesAndFolders( QStringList trashList ) {
 
-	QDir dir( dirName);
+	QString trashLoc = NBXdg::trashLocation( trashList.at( 0 ) );
 
-    if ( dir.exists( dirName ) ) {
-        Q_FOREACH( QFileInfo info, dir.entryInfoList( QDir::NoDotAndDotDot | QDir::System | QDir::Hidden | QDir::AllDirs | QDir::Files, QDir::DirsFirst ) ) {
-            if ( info.isDir() )
-                removeDir( info.absoluteFilePath() );
+	foreach( QString item, trashList ) {
+		/* Get the trashed path: $TRASH/files/filename */
+		QString newPath = trashLoc + "files/" + baseName( item );
+		QString delTime = QDateTime::currentDateTime().toString( "yyyyMMddThh:mm:ss" );
 
-            else
-                removeFile( info.absoluteFilePath() );
-        }
+		/* If it exists, add a date time to it to make it unique */
+		if ( access( qPrintable( newPath ), R_OK ) == 0 )
+			newPath += delTime;
 
-        if ( not dir.rmdir( dirName ) )
-			failedDirs << dirName;
-    }
-};
+		/* Try trashing it. If it fails, intimate the user */
+		if ( rename( qPrintable( item ), qPrintable( newPath ) ) ) {
+			qDebug() << "Error" << errno << ": Failed to trash " << item << ":" << strerror( errno );
+			failedFiles << item;
+		}
 
-void NBTrasher::removeFile( QString fileName ) {
+		/* If it succeeds, we write the meta data */
+		else {
+			QFile metadata( trashLoc + "info/" + baseName( newPath ) + ".trashinfo" );
+			metadata.open( QIODevice::WriteOnly );
+			metadata.write(
+				QString(
+					"[Trash Info]\n"
+					"Path=%1\n"
+					"DeletionDate=%2\n"
+				).arg( item ).arg( delTime ).toLocal8Bit()
+			);
+			metadata.close();
 
-	if ( not QFile::remove( fileName ) )
-		failedFiles << fileName;
-};
-
-void NBTrasher::trashFilesAndFolders( QStringList deleteList ) {
-
-	foreach( QString item, deleteList ) {
-		if ( QFileInfo( item ).isDir() )
-			removeDir( item );
-
-		else
-			removeFile( item );
+			/* An ugly hack: Shortcut for TrashModel listing */
+			QSettings trashInfo( "NewBreeze", "TrashInfo" );
+			trashInfo.setValue( baseName( item ), QStringList() << item << delTime << newPath );
+		}
 	}
 
 	emit completed( failedFiles, failedDirs );

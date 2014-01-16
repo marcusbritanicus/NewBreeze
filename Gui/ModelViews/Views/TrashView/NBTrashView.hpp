@@ -1,36 +1,38 @@
 /*
 	*
-	* NBCatalogView.hpp - NewBreeze Catalog Viewer Class Header
+	* NBIconView.hpp - NewBreeze Icon Viewer Class Header
 	*
 */
 
-#ifndef NBCATALOGVIEW_HPP
-#define NBCATALOGVIEW_HPP
+#ifndef NBICONVIEW_HPP
+#define NBICONVIEW_HPP
 
 #include <Global.hpp>
-#include <NBCatalogModel.hpp>
-#include <NBCatalogDelegate.hpp>
-#include <NBMessageDialog.hpp>
+#include <NBFileSystemModel.hpp>
+#include <NBIconDelegate.hpp>
 #include <NBTools.hpp>
-#include <NBGuiWidgets.hpp>
 
-class NBCatalogView : public QAbstractItemView {
+class NBIconView : public QAbstractItemView {
 	Q_OBJECT
 
 	public:
-		NBCatalogView();
+		enum ViewType {
+			TilesView             = 0x01,
+			IconsView             = 0x02,
+			DetailsView           = 0x03
+		};
+
+		NBIconView( NBFileSystemModel* );
 
 		// Set the item model
 		void setModel( QAbstractItemModel *model );
 
+		// Update the view mode
+		void updateViewMode();
+
 		// Category drawing height : myCategoryHeight
 		int categoryHeight() const;
 		void setCategoryHeight( int );
-
-		// Grid size for the indexes: myGridSizeMin, myGridSize
-		QSize gridSize() const;
-		void setGridSize( QSize );
-		void setGridSize( int, int );
 
 		// Icon Size for the indexes: myIconSize
 		QSize iconSize() const;
@@ -51,7 +53,7 @@ class NBCatalogView : public QAbstractItemView {
 		int categorySpacing() const;
 		void setCategorySpacing( int );
 
-		// Given the index, return the visual index
+		// Given the index, return the visual rect
 		QRect visualRect( const QModelIndex &index ) const;
 
 		// Given the category index get the rectangle for it
@@ -66,14 +68,12 @@ class NBCatalogView : public QAbstractItemView {
 		// Get the category at a given point
 		QString categoryAt( const QPoint &position ) const;
 
-	public slots:
-		void reload();
-
 	protected slots:
 		void dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
 		void rowsInserted( const QModelIndex &parent, int start, int end );
 		void rowsAboutToBeRemoved( const QModelIndex &parent, int start, int end );
 		void updateGeometries();
+		void reload();
 
 	protected:
 		QModelIndex moveCursor( QAbstractItemView::CursorAction cursorAction, Qt::KeyboardModifiers modifiers );
@@ -86,11 +86,36 @@ class NBCatalogView : public QAbstractItemView {
 
 		void paintEvent( QPaintEvent* );
 		void resizeEvent( QResizeEvent* );
-		void mousePressEvent( QMouseEvent *event );
-		void mouseDoubleClickEvent( QMouseEvent *event );
+
+		void mousePressEvent( QMouseEvent * );
+		void mouseMoveEvent( QMouseEvent * );
+		void mouseReleaseEvent( QMouseEvent * );
+		void mouseDoubleClickEvent( QMouseEvent * );
+
+		void dragEnterEvent( QDragEnterEvent* );
+		void dragMoveEvent( QDragMoveEvent* );
+		void dropEvent( QDropEvent* );
 
 	private:
+		// Grid size for the indexes: myGridSizeMin, myGridSize
+		void computeGridSize( QSize );
+
+		QModelIndex moveCursorCategorized( QAbstractItemView::CursorAction cursorAction );
+		QModelIndex moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction );
+
 		void calculateRectsIfNecessary() const;
+
+		void calculateCategorizedRects() const;
+		void calculateNonCategorizedRects() const;
+
+		void calculateCategorizedIconsRects() const;
+		void calculateCategorizedTilesRects() const;
+		void calculateCategorizedDetailsRects() const;
+
+		void calculateNonCategorizedIconsRects() const;
+		void calculateNonCategorizedTilesRects() const;
+		void calculateNonCategorizedDetailsRects() const;
+
 		void computeRowsAndColumns() const;
 
 		QRect viewportRectForRow( int row ) const;
@@ -98,8 +123,9 @@ class NBCatalogView : public QAbstractItemView {
 		void paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const;
 		QPixmap pixmapForCategory( QString ) const;
 
-		NBCatalogModel *catalogModel;
+		NBFileSystemModel *cModel;
 
+		// Icon rects
 		mutable int idealHeight = 0;
 		mutable QHash<int, QPoint> rectForRow;
 		mutable QHash<int, QRect> rectForCategory;
@@ -128,18 +154,25 @@ class NBCatalogView : public QAbstractItemView {
 		// Persistent vertical column
 		mutable int persistentVCol = 0;
 
-		// Items per cisual row
+		// Items per visual row
 		mutable int itemsPerRow = 1;
 		mutable int numberOfRows = 0;
+		mutable int padding = 0;
+
+		QPoint dragStartPosition;
+		QRubberBand *rBand;
 
 	private slots:
-		void openCatalogItem();
-		void deleteCatalogItem();
-		void openCatalogItem( const QModelIndex &index );
-		void showContextMenu( const QPoint &point );
+		void zoomIn();
+		void zoomOut();
 
-	Q_SIGNALS:
-		void openLocation( QString );
+	Q_SIGNALS :
+		void open( QModelIndex );
+		void contextMenuRequested( QPoint );
+		void acopy( QStringList, QString );
+		void copy( QStringList, QString );
+		void move( QStringList, QString );
+		void link( QStringList, QString );
 };
 
 #endif

@@ -5,10 +5,20 @@
 */
 
 #include <NBXdg.hpp>
+#include <sys/types.h>
+#include <unistd.h>
+#include <pwd.h>
 
 QString NBXdg::home() {
 
-	return QString::fromLocal8Bit( qgetenv( "HOME" ) );
+	/* If the env variable HOME is set and its proper, good! */
+	QString __home = QString::fromLocal8Bit( qgetenv( "HOME" ) );
+	if ( access( qPrintable( __home ), R_OK | X_OK ) == 0 )
+		return __home;
+
+	/* Otherwise, we divine it from the user ID */
+	struct passwd *pwd = getpwuid( getuid() );
+	return QString::fromLocal8Bit( pwd->pw_dir );
 };
 
 QString NBXdg::xdgDefaultApp( QString mimeType ) {
@@ -130,10 +140,41 @@ QStringList NBXdg::systemDirs( NBXdg::XdgSystemDirs pathEnum ) {
 
 QString NBXdg::trashLocation( QString path ) {
 
-	NBDeviceManager devMgr;
-	NBDeviceInfo trashDevInfo = devMgr.deviceInfoForPath( path );
+	/* Ideally, if path is inside home */
+	if ( path.startsWith( home() ) ) {
+		/* If the permissions of Trash folder are right */
+		if ( access( qPrintable( home() + "/.local/share/Trash/" ), R_OK | W_OK | X_OK ) == 0 )
+			return home() + "/.local/share/Trash/";
 
-	QString mountPoint = trashDevInfo.mountPoint();
+		else {
+			/* Try to make them right */
+			QDir::home().mkpath( "/.local/share/Trash/" );
+			QFile::setPermissions( home() + "/.local/share/Trash/", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner );
 
-	return mountPoint + "./Trash/-" + QString::number( getuid() );
+			return home() + "/.local/share/Trash/";
+		}
+	}
+
+	else {
+		NBDeviceManager devMgr;
+		NBDeviceInfo trashDevInfo = devMgr.deviceInfoForPath( path );
+
+		QString mountPoint = trashDevInfo.mountPoint();
+
+		/* If the mount point does not exist, return a NULL string */
+		if ( access( qPrintable( mountPoint ), R_OK | W_OK | X_OK ) )
+			return QString();
+
+		/* If $MNTPT/.Trash/$UID is present, and accessible with right permissions */
+		if( access( qPrintable( mountPoint + "/.Trash/" + QString::number( getuid() ) ), R_OK | W_OK | X_OK ) == 0 )
+			return mountPoint + "/.Trash/" + QString::number( getuid() );
+
+		/* Otherwise we create $MNTPT/.Trash-$UID */
+		QDir( mountPoint ).mkpath( QString( ".Trash-%1" ).arg( getuid() ) );
+		QFile::setPermissions( mountPoint + "/.Trash-" + QString::number( getuid() ), QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner );
+
+		return mountPoint + "/.Trash-" + QString::number( getuid() );
+	}
+
+	return QString();
 };

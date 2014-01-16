@@ -656,7 +656,7 @@ NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab ) :
 
 	setFixedSize( QSize( 530, 400 ) );
 
-	NBPropertiesBase *propsBase = new NBPropertiesBase( paths );
+	propsB = new NBPropertiesBase( paths );
 	propsW = new NBPropertiesWidget( paths );
 	permsW = new NBPermissionsWidget( paths );
 
@@ -674,7 +674,7 @@ NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab ) :
 	lyt->setContentsMargins( QMargins() );
 
 	lyt->addWidget( tabs );
-	lyt->addWidget( propsBase );
+	lyt->addWidget( propsB );
 	lyt->addWidget( Separator::horizontal() );
 	lyt->addWidget( stack );
 	setLayout( lyt );
@@ -688,7 +688,7 @@ NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab ) :
 	connect( stack, SIGNAL( currentChanged( int ) ), this, SLOT( switchToTab( int ) ) );
 
 	if ( tab == NBPropertiesDialog::Properties )
-		connect( propsBase, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ) );
+		connect( propsB, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ) );
 };
 
 void NBPropertiesDialog::switchToTab( int newTab ) {
@@ -696,6 +696,12 @@ void NBPropertiesDialog::switchToTab( int newTab ) {
 	tabs->setCurrentIndex( newTab );
 	stack->setCurrentIndex( newTab );
 	setFixedSize( 530, 370 );
+
+	if ( newTab )
+		disconnect( propsB, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ) );
+
+	else
+		connect( propsB, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ) );
 };
 
 void NBPropertiesDialog::setDirIcon() {

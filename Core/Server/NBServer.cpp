@@ -18,7 +18,7 @@ NBServer::NBServer() : QLocalServer() {
 
 bool NBServer::start() {
 
-	if ( listen( QString( "NewBreeze-1000" ) ) ) {
+	if ( listen( mServerName ) ) {
 		// qDebug() << "Server started...!";
 		// qDebug() << "Addr:" << mServerName;
 
@@ -29,8 +29,7 @@ bool NBServer::start() {
 		qCritical() << "Unable to start server" << errorString();
 		return false;
 	}
-
-}
+};
 
 void NBServer::handleNewConnection() {
 

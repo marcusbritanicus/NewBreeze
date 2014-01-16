@@ -126,6 +126,7 @@ class NBPropertiesDialog: public NBDialog {
 		QStackedWidget *stack;
 		QTabBar *tabs;
 
+		NBPropertiesBase *propsB;
 		NBPropertiesWidget *propsW;
 		NBPermissionsWidget *permsW;
 
