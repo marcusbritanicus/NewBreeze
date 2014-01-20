@@ -434,21 +434,21 @@ void NBTrashModel::setupModelData() {
 
 QString NBTrashModel::getCategory( QString dateStr ) {
 
-	QDate date = QDate::fromString( dateStr, "yyyyMMddThh:mm:ss" );
+	QDateTime date = QDateTime::fromString( dateStr, "yyyyMMddThh:mm:ss" );
 	if ( date.isValid() ) {
-		if ( date == QDate::currentDate() )
+		if ( date.date() == QDate::currentDate() )
 			return "Today";
 
-		else if ( date.weekNumber() == QDate::currentDate().weekNumber() )
+		else if ( date.date().weekNumber() == QDate::currentDate().weekNumber() )
 			return "This Week";
 
-		else if (  date.weekNumber() == QDate::currentDate().weekNumber() - 1 )
+		else if (  date.date().weekNumber() == QDate::currentDate().weekNumber() - 1 )
 			return "Last Week";
 
-		else if (  date.month() == QDate::currentDate().month() )
+		else if (  date.date().month() == QDate::currentDate().month() )
 			return "This Month";
 
-		else if (  date.month()== QDate::currentDate().month() - 1 )
+		else if (  date.date().month()== QDate::currentDate().month() - 1 )
 			return "Last Month";
 
 		else

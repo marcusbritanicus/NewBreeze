@@ -17,9 +17,6 @@ class NBTrashDelegate : public QItemDelegate {
 
 	private:
 		void paintExtraDetails( QPainter *painter, QList<QRect> &textRectList, const QModelIndex &index ) const;
-
-		mutable int maxLines = 1;		// Max number of lines that can be written
-		mutable int textLines = 1;		// Number of lines the filename occupies
 };
 
 #endif

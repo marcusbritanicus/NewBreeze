@@ -9,6 +9,7 @@
 
 void NBTrashDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
 
+
 	if ( index.column() != 0 )
 		QItemDelegate::paint( painter, option, index );
 
@@ -46,7 +47,7 @@ void NBTrashDelegate::paint( QPainter *painter, const QStyleOptionViewItem &opti
 			* +----------------------------------------------------------------------------------------------------------+
 			* | +--------+                                                                                               |
 			* | |        |                                                                                               |
-			* | |  icon  | This is the text                              Detail1    Detail2      Detail3      Detail4    |
+			* | |  icon  | This is the text        Original Path                             Size        Deletion Date   |
 			* | |        |                                                                                               |
 			* | +--------+                                                                                               |
 			* +----------------------------------------------------------------------------------------------------------+
@@ -62,32 +63,16 @@ void NBTrashDelegate::paint( QPainter *painter, const QStyleOptionViewItem &opti
 		// Vertical Centering, so don't bother
 		textRect.setY( optionRect.y() );
 		// Original Width - Image Left Border - Image Width - Image Text Gap -Text Right Border
-		textRect.setSize( QSize( 200, optionRect.size().height() ) - QSize( iconSize.width(), 0 ) - 3 * QSize( padding, 0 ) );
+		textRect.setSize( QSize( 200, optionRect.height() ) - QSize( iconSize.width(), 0 ) - 3 * QSize( padding, 0 ) );
 
 		// Set elided text
-		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
+		QString textE = fm.elidedText( text, Qt::ElideRight, textRect.width() );
 		QList<QRect> rectList;
 
 		// First detail
-		rectList << QRect( textRect.x() + 200, textRect.y(), optionRect.width() - 500, textRect.height() );
+		rectList << QRect( QPoint( textRect.x() + 200, textRect.y() ), optionRect.size() - QSize( iconSize.width(), 0 ) - 3 * QSize( padding, 0 ) - QSize( 500, 0 ) );
 		rectList << QRect( rectList.at( 0 ).x() + rectList.at( 0 ).width(), textRect.y(), 100, textRect.height() );
 		rectList << QRect( rectList.at( 1 ).x() + 100, textRect.y(), 200, textRect.height() );
-
-		if ( iconSize.width() >= 40 ) {
-			maxLines = 2;
-		}
-		else if ( iconSize.width() >= 60 ) {
-			maxLines = 3;
-		}
-		else if ( iconSize.width() >= 90 ) {
-			maxLines = 4;
-		}
-		else if ( iconSize.width() == 128 ) {
-			maxLines = 6;
-		}
-		else {
-			maxLines = 1;
-		}
 
 		QRect iconRect;
 		// Original X + Image Left Border + Width to make the ima
@@ -135,7 +120,7 @@ void NBTrashDelegate::paint( QPainter *painter, const QStyleOptionViewItem &opti
 		}
 
 		// Paint Background
-		painter->drawRoundedRect( optionRect, 4, 4 );
+		painter->drawRoundedRect( optionRect.adjusted( padding / 2, padding / 2, -padding / 2, -padding / 2 ), 4, 4 );
 
 		// Focus Rectangle
 		if ( option.state & QStyle::State_HasFocus ) {
@@ -166,31 +151,7 @@ void NBTrashDelegate::paint( QPainter *painter, const QStyleOptionViewItem &opti
 		// Paint Icon
 		painter->drawPixmap( iconRect, icon );
 
-		/* // Text Painter Settings
-		if ( ftype.isSymLink() ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.SymLinkPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.SymLinkPenColor );
-		}
-
-		else if ( ftype.isExecutable() && ftype.isFile() )
-			painter->setPen( Settings->Colors.ExecPenColor );
-
-		else if ( ftype.isHidden() ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.HiddenPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.HiddenPenColor );
-		}
-
-		else if ( !ftype.isReadable() )
-			painter->setPen( Settings->Colors.NoReadPenColor );
-
-		*/
-
+		// Text Painter Settings
 		if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
 			painter->setPen( Settings->Colors.TextPenColorAlt );
 
@@ -198,7 +159,12 @@ void NBTrashDelegate::paint( QPainter *painter, const QStyleOptionViewItem &opti
 			painter->setPen( Settings->Colors.TextPenColor );
 
 		// Draw Text
-		painter->drawText( textRect, Qt::AlignVCenter, text );
+		if ( iconSize.width() >= 40 )
+			painter->drawText( textRect, Qt::AlignVCenter | Qt::TextWordWrap, text );
+
+		else
+			painter->drawText( textRect, Qt::AlignVCenter, textE );
+
 		paintExtraDetails( painter, rectList, index );
 
 		painter->restore();
@@ -219,9 +185,9 @@ void NBTrashDelegate::paintExtraDetails( QPainter *painter, QList<QRect> &textRe
 
 	textRect = textRectList.at( 1 );
 	detail = index.data( Qt::UserRole + 2 ).toString();
-	painter->drawText( textRect, Qt::AlignCenter | Qt::TextWordWrap, detail );
+	painter->drawText( textRect, Qt::AlignVCenter | Qt::TextWordWrap, detail );
 
 	textRect = textRectList.at( 2 );
 	detail = index.data( Qt::UserRole + 3 ).toString();
-	painter->drawText( textRect, Qt::AlignCenter | Qt::TextWordWrap, detail );
+	painter->drawText( textRect, Qt::AlignVCenter | Qt::TextWordWrap, detail );
 };
