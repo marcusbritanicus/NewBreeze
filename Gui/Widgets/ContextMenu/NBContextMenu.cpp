@@ -566,7 +566,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 		menu->addSeparator();
 
-		menu->addAction( trash );
+		menu->addAction( trashAct );
 		menu->addAction( delAct );
 
 		menu->addSeparator();
