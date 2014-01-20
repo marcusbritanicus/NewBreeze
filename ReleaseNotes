@@ -1,6 +1,9 @@
 NewBreeze v2.3.0
 ================
 
+This release onwards I am supporting a Native GUI. i.e., GUI with window manager borders and background and system colors.
+To download the Native GUI, please check https://github.com/marcusbritanicus/NewBreeze-native/
+
 => NBFileSystemModel( QAbstractItemModel )
    - NBFileSystemModel is now a categorized item model. Categories can be name, size, type or modification time based. Categorization can
      easily be switched on or off via setCategorizationEnabled( bool )
