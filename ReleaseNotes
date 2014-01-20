@@ -52,3 +52,7 @@ To download the Native GUI, please check https://github.com/marcusbritanicus/New
    It is now possible to preview odt file (Open Document Text) from LibreOffice/OpenOffice, and PDF files via the Peek option.
    ODT has limited support, but let's hope we do get some native support from Qt for rendering ODT in the future.
    Support for PDF is dependent on the poppler-qt4 library
+
+=> Trash
+   NewBreeze is now trash enabled. You can simple drag the files you want to trash into the trash icon of the side bar.
+   Clicking the trash icon of the sidebar opens the trash gui, where you can see the files/folders you have trashed, sorted date wise.
