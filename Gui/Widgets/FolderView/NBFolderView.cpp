@@ -164,7 +164,7 @@ void NBFolderView::createAndSetupActions() {
 
 	// Trash
 	trashAct = new QAction( QIcon( ":/icons/trash.png" ), "Move to trash", this );
-	// trashAct->setShortcuts( Settings->Shortcuts.Trash );
+	trashAct->setShortcuts( Settings->Shortcuts.Trash );
 
 	connect( trashAct, SIGNAL( triggered() ), this, SLOT( doSendToTrash() ) );
 	addAction( trashAct );
@@ -718,8 +718,13 @@ void NBFolderView::doSendToTrash() {
 	foreach( QModelIndex idx, selectedList )
 		toBeDeleted << QDir( fsModel->rootPath() ).filePath( idx.data().toString() );
 
-	// NBDeleteManager *threadedDelete = new NBDeleteManager( toBeDeleted, true );
-	// threadedDelete.run();
+	NBDeleteManager *deleteManager = new NBDeleteManager( this, true );
+	connect(
+		deleteManager, SIGNAL( trashOperationComplete( QStringList, QStringList ) ),
+		this, SLOT( handleDeleteFailure( QStringList, QStringList ) )
+	);
+
+	deleteManager->sendToTrash( toBeDeleted );
 };
 
 void NBFolderView::doDelete() {
