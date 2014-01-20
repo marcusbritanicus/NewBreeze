@@ -1,18 +1,18 @@
 /*
 	*
-	* NBIconView.hpp - NewBreeze Icon Viewer Class Header
+	* NBTrashView.hpp - NewBreeze Icon Viewer Class Header
 	*
 */
 
-#ifndef NBICONVIEW_HPP
-#define NBICONVIEW_HPP
+#ifndef NBTRASHVIEW_HPP
+#define NBTRASHVIEW_HPP
 
 #include <Global.hpp>
-#include <NBFileSystemModel.hpp>
-#include <NBIconDelegate.hpp>
+#include <NBTrashModel.hpp>
+#include <NBTrashDelegate.hpp>
 #include <NBTools.hpp>
 
-class NBIconView : public QAbstractItemView {
+class NBTrashView : public QAbstractItemView {
 	Q_OBJECT
 
 	public:
@@ -22,7 +22,7 @@ class NBIconView : public QAbstractItemView {
 			DetailsView           = 0x03
 		};
 
-		NBIconView( NBFileSystemModel* );
+		NBTrashView();
 
 		// Set the item model
 		void setModel( QAbstractItemModel *model );
@@ -92,29 +92,16 @@ class NBIconView : public QAbstractItemView {
 		void mouseReleaseEvent( QMouseEvent * );
 		void mouseDoubleClickEvent( QMouseEvent * );
 
-		void dragEnterEvent( QDragEnterEvent* );
-		void dragMoveEvent( QDragMoveEvent* );
-		void dropEvent( QDropEvent* );
-
 	private:
 		// Grid size for the indexes: myGridSizeMin, myGridSize
 		void computeGridSize( QSize );
 
 		QModelIndex moveCursorCategorized( QAbstractItemView::CursorAction cursorAction );
-		QModelIndex moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction );
 
 		void calculateRectsIfNecessary() const;
 
 		void calculateCategorizedRects() const;
-		void calculateNonCategorizedRects() const;
-
-		void calculateCategorizedIconsRects() const;
-		void calculateCategorizedTilesRects() const;
 		void calculateCategorizedDetailsRects() const;
-
-		void calculateNonCategorizedIconsRects() const;
-		void calculateNonCategorizedTilesRects() const;
-		void calculateNonCategorizedDetailsRects() const;
 
 		void computeRowsAndColumns() const;
 
@@ -123,7 +110,7 @@ class NBIconView : public QAbstractItemView {
 		void paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const;
 		QPixmap pixmapForCategory( QString ) const;
 
-		NBFileSystemModel *cModel;
+		NBTrashModel *cModel;
 
 		// Icon rects
 		mutable int idealHeight = 0;
@@ -167,7 +154,6 @@ class NBIconView : public QAbstractItemView {
 		void zoomOut();
 
 	Q_SIGNALS :
-		void open( QModelIndex );
 		void contextMenuRequested( QPoint );
 		void acopy( QStringList, QString );
 		void copy( QStringList, QString );

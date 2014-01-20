@@ -24,6 +24,7 @@
 #include <NBSettingsManager.hpp>
 #include <NBMessageDialog.hpp>
 #include <NBStyleManager.hpp>
+#include <NBTrashView.hpp>
 
 class NewBreeze : public QMainWindow {
 	Q_OBJECT
@@ -91,6 +92,7 @@ class NewBreeze : public QMainWindow {
 		void showApplications();
 		void showCatalogs();
 		void showFolders();
+		void showTrash();
 
 		void filterFiles( QString );
 		void clearFilters();

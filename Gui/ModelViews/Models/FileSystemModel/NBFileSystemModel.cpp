@@ -114,26 +114,17 @@ QVariant NBFileSystemModel::data( const QModelIndex &index, int role ) const {
 
 		case Qt::DecorationRole: {
 			if ( index.column() == 0 ) {
-				// Unknown theme+inbuilt icon
-				QIcon unknown = QIcon::fromTheme( "unknown", QIcon( ":/icons/unknown.png" ) );
-
 				// Icon String
 				QString icoStr( node->data( 2, true ).toString() );
 
-				// The inbuilt icon or from the file system
-				QIcon savedIcon = QIcon( icoStr );
-
 				// Icon we got from the theme
-				QIcon themeIcon = QIcon::fromTheme( icoStr );
+				QIcon themeIcon = QIcon::fromTheme( icoStr, QIcon( icoStr ) );
 
 				if ( not themeIcon.isNull() )
 					return themeIcon;
 
-				else if ( not savedIcon.isNull() )
-					return savedIcon;
-
 				else
-					return unknown;
+					return QIcon::fromTheme( "unknown", QIcon( ":/icons/unknown.png" ) );
 			}
 
 			return QVariant();
@@ -948,7 +939,27 @@ QString NBFileSystemModel::getCategory( QVariantList data ) {
 
 		case 4: {
 			QDate date = QDate::fromString( data.at( 7 ).toString(), "ddd, dd MMM, yyyy" );
-			return date.toString( "MMMM yyyy" );
+			if ( date.isValid() ) {
+				if ( date == QDate::currentDate() )
+					return "Today";
+
+				else if ( date.weekNumber() == QDate::currentDate().weekNumber() )
+					return "This Week";
+
+				else if (  date.weekNumber() == QDate::currentDate().weekNumber() - 1 )
+					return "Last Week";
+
+				else if (  date.month() == QDate::currentDate().month() )
+					return "This Month";
+
+				else if (  date.month()== QDate::currentDate().month() - 1 )
+					return "Last Month";
+
+				else
+					return date.toString( "MMMM yyyy" );
+			}
+
+			return "Uncategorized";
 		}
 
 		default: {

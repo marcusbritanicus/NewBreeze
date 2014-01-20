@@ -1,16 +1,12 @@
 /*
 	*
-	* NBFileSystemNode.cpp - NewBreeze NBFileSystemNode Class
+	* NBTrashNode.cpp - NewBreeze NBTrashNode Class
 	*
 */
 
-#include <NBFileSystemNode.hpp>
+#include <NBTrashNode.hpp>
 
-static int __sortColumn = Settings->Session.SortColumn;
-static bool __sortCase = Settings->Session.SortCase;
-static bool __sortCategory = Settings->Session.SortCategory;
-
-NBFileSystemNode::NBFileSystemNode() {
+NBTrashNode::NBTrashNode() {
 
 	for( int i = 0; i < 10; i++ )
 		nodeData << "";
@@ -20,15 +16,33 @@ NBFileSystemNode::NBFileSystemNode() {
 	parentNode = 0;
 };
 
-NBFileSystemNode::NBFileSystemNode( QVariantList data, QString category, NBFileSystemNode *parent ) {
+NBTrashNode::NBTrashNode( QStringList data, QString category, NBTrashNode *parent ) {
 
 	nodeData << data;
 	myCategory = category;
 
+	if ( isDir( data.last() ) )
+		mType = "dir";
+
+	else if ( isFile( data.last() ) )
+		mType = "file";
+
+	else
+		mType = "system";
+
+	mSize = formatSize( getSize( data.last() ) );
+	mDate = QDateTime::fromString( data.at( 2 ), "yyyyMMddThh:mm:ss" );
+
+	QString icoStr = NBIconProvider::icon( data.last() );
+	if ( icoStr.contains( dirName( data.at( 1 ) ) ) )
+		icoStr.replace( dirName( data.at( 1 ) ), dirName( data.at( 3 ) ) );
+
+	mIcon = QIcon::fromTheme( icoStr, QIcon( icoStr ) );
+
 	parentNode = parent;
 };
 
-void NBFileSystemNode::addChild( NBFileSystemNode *node ) {
+void NBTrashNode::addChild( NBTrashNode *node ) {
 
 	if ( not mCategoryList.contains( node->category() ) )
 		mCategoryList << node->category();
@@ -36,67 +50,67 @@ void NBFileSystemNode::addChild( NBFileSystemNode *node ) {
 	childNodes << node;
 };
 
-void NBFileSystemNode::removeChild( NBFileSystemNode *node ) {
+void NBTrashNode::removeChild( NBTrashNode *node ) {
 
 	delete childNodes.takeAt( node->row() );
 };
 
-NBFileSystemNode* NBFileSystemNode::child( int row ) {
+NBTrashNode* NBTrashNode::child( int row ) {
 
 	return childNodes.at( row );
 };
 
-NBFileSystemNode* NBFileSystemNode::child( QString name ) {
+NBTrashNode* NBTrashNode::child( QString name ) {
 
-	foreach( NBFileSystemNode* node, childNodes )
+	foreach( NBTrashNode* node, childNodes )
 		if ( node->data( 0 ) == name )
 			return node;
 
-	return new NBFileSystemNode();
+	return new NBTrashNode();
 };
 
-QList<NBFileSystemNode*> NBFileSystemNode::children() {
+QList<NBTrashNode*> NBTrashNode::children() {
 
 	return childNodes;
 };
 
-int NBFileSystemNode::childCount() {
+int NBTrashNode::childCount() {
 
 	return childNodes.count();
 };
 
-int NBFileSystemNode::categoryCount() {
+int NBTrashNode::categoryCount() {
 
 	return mCategoryList.count();
 };
 
-void NBFileSystemNode::clearChildren() {
+void NBTrashNode::clearChildren() {
 
 	childNodes.clear();
 	mCategoryList.clear();
 };
 
-QString NBFileSystemNode::category() {
+QString NBTrashNode::category() {
 
 	return myCategory;
 };
 
-void NBFileSystemNode::setCategory( QString newCategory ) {
+void NBTrashNode::setCategory( QString newCategory ) {
 
 	myCategory = newCategory;
 };
 
-int NBFileSystemNode::categoryIndex() {
+int NBTrashNode::categoryIndex() {
 
 	return parentNode->mCategoryList.indexOf( myCategory );
 };
 
-QStringList NBFileSystemNode::categoryList() {
+QStringList NBTrashNode::categoryList() {
 
 	return mCategoryList;
 };
 
-QVariant NBFileSystemNode::data( int column, bool special ) const {
+QVariant NBTrashNode::data( int column ) const {
 
 	/*
 		*
@@ -105,27 +119,18 @@ QVariant NBFileSystemNode::data( int column, bool special ) const {
 		*
 	*/
 
-	if ( special ) {
-		if ( ( column < 0 ) or ( column > 2 ) )
-			return QVariant();
+	if ( ( column < 0 ) or ( column > 7 ) )
+		return QVariant();
 
-		return nodeData.at( column );
-	}
-
-	else {
-		if ( ( column < 0 ) or ( column > 7 ) )
-			return QVariant();
-
-		return nodeData.at( 3 + column );
-	}
+	return nodeData.at( column );
 };
 
-QVariantList NBFileSystemNode::allData() {
+QStringList NBTrashNode::allData() {
 
 	return nodeData;
 }
 
-bool NBFileSystemNode::setData( int column, QVariant data, bool special ) {
+bool NBTrashNode::setData( int column, QString data ) {
 
 	/*
 		*
@@ -134,29 +139,50 @@ bool NBFileSystemNode::setData( int column, QVariant data, bool special ) {
 		*
 	*/
 
-	if ( special ) {
-		if ( ( column < 0 ) or ( column > 2 ) )
-			return false;
+	if ( ( column < 0 ) or ( column > 7 ) )
+		return false;
 
-		nodeData.replace( column, data );
-	}
-
-	else {
-		if ( ( column < 0 ) or ( column > 7 ) )
-			return false;
-
-		nodeData.replace( 3 + column, data );
-	}
+	nodeData.replace( column, data );
 
 	return true;
 };
 
-NBFileSystemNode* NBFileSystemNode::parent() {
+QString NBTrashNode::name() {
+
+	return nodeData.at( 0 );
+};
+
+QString NBTrashNode::type() {
+
+	return mType;
+};
+
+QDateTime NBTrashNode::deletionDate() {
+
+	return mDate;
+};
+
+QString NBTrashNode::originalPath() {
+
+	return nodeData.at( 1 );
+};
+
+QString NBTrashNode::size() {
+
+	return mSize;
+};
+
+QIcon NBTrashNode::icon() {
+
+	return mIcon;
+};
+
+NBTrashNode* NBTrashNode::parent() {
 
 	return parentNode;
 };
 
-int NBFileSystemNode::row() {
+int NBTrashNode::row() {
 
 	if ( parentNode )
 		return parentNode->childNodes.indexOf( this );
@@ -164,173 +190,96 @@ int NBFileSystemNode::row() {
 	return 0;
 };
 
-void NBFileSystemNode::sort( int column, bool cs, bool categorized ) {
+void NBTrashNode::sort() {
 
-	__sortColumn = column;
-	__sortCase = cs;
-	__sortCategory = categorized;
-
-	if ( categorized )
-		mCategoryList = sortCategoryList( mCategoryList );
-
-	qSort( childNodes.begin(), childNodes.end(), columnSort2 );
+	mCategoryList = sortDateList( mCategoryList );
+	qSort( childNodes.begin(), childNodes.end(), columnSort );
 };
 
-void NBFileSystemNode::updateCategories() {
+void NBTrashNode::updateCategories() {
 
-	NBFileSystemNode::mCategoryList.clear();
-	foreach( NBFileSystemNode *cNode, childNodes ) {
+	NBTrashNode::mCategoryList.clear();
+	foreach( NBTrashNode *cNode, childNodes ) {
 		QString newCategory = cNode->category();
 		if ( not mCategoryList.contains( newCategory ) )
 			mCategoryList << newCategory;
 	}
 
-	if ( __sortCategory )
-		mCategoryList = sortCategoryList( mCategoryList );
+	mCategoryList = sortDateList( mCategoryList );
 }
 
-bool columnSort2( NBFileSystemNode *first, NBFileSystemNode *second )  {
+bool columnSort( NBTrashNode *first, NBTrashNode *second )  {
 
 	int firstIdx = first->categoryIndex();
 	int secondIdx = second->categoryIndex();
 
-	/* If its not a categorized sorting, then both have equal categorization weights */
-	if ( not __sortCategory )
-		firstIdx = secondIdx;
-
 	if ( firstIdx == secondIdx ) {
-		if ( ( first->data( 0, true ) == "dir" ) and ( second->data( 0, true ) == "dir" ) ) {
-			switch( __sortColumn ) {
-				case 0: {
-					if ( __sortCase )
-						return first->data( 0 ).toString() < second->data( 0 ).toString();
+		if ( ( first->type() == "dir" ) and ( second->type() == "dir" ) ) {
 
-					else
-						return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseInsensitive ) < 0;
-				}
+			if ( first->deletionDate() == second->deletionDate() )
+				return first->name().compare( second->name(), Qt::CaseInsensitive ) < 0;
 
-				case 1: {
-					return first->data( 1, true ).toLongLong() < second->data( 1, true ).toLongLong();
-				}
-
-				default: {
-					if ( first->data( __sortColumn ).toString() < second->data( __sortColumn ).toString() )
-						return true;
-
-					else if ( first->data( __sortColumn ).toString() == second->data( __sortColumn ).toString() )
-						if ( __sortCase )
-							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseSensitive ) < 0;
-
-						else
-							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseInsensitive ) < 0;
-
-					else
-						return false;
-				}
-			}
+			else
+				return first->deletionDate() < second->deletionDate();
 		}
 
-		else if ( ( first->data( 0, true ) == "dir" ) and ( second->data( 0, true ) == "file" ) ) {
+		else if ( ( first->type() == "dir" ) and ( second->type() == "file" ) ) {
 
 			return true;
 		}
 
-		else if ( ( first->data( 0, true ) == "dir" ) and ( second->data( 0, true ) == "system" ) ) {
+		else if ( ( first->type() == "dir" ) and ( second->type() == "system" ) ) {
 
 			return true;
 		}
 
-		else if ( ( first->data( 0, true ) == "file" ) and ( second->data( 0, true ) == "dir" ) ) {
+		else if ( ( first->type() == "file" ) and ( second->type() == "dir" ) ) {
 
 			return false;
 		}
 
-		else if ( ( first->data( 0, true ) == "file" ) and ( second->data( 0, true ) == "file" ) ) {
+		else if ( ( first->type() == "file" ) and ( second->type() == "file" ) ) {
 
-			switch( __sortColumn ) {
-				case 0: {
-					if ( __sortCase )
-						return first->data( 0 ).toString() < second->data( 0 ).toString();
+			if ( first->deletionDate() == second->deletionDate() )
+				return first->name().compare( second->name(), Qt::CaseInsensitive ) < 0;
 
-					else
-						return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseInsensitive ) < 0;
-				}
-
-				case 1: {
-					return first->data( 1, true ).toLongLong() < second->data( 1, true ).toLongLong();
-				}
-
-				default: {
-					if ( first->data( __sortColumn ).toString() < second->data( __sortColumn ).toString() )
-						return true;
-
-					else if ( first->data( __sortColumn ).toString() == second->data( __sortColumn ).toString() )
-						if ( __sortCase )
-							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseSensitive ) < 0;
-
-						else
-							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseInsensitive ) < 0;
-
-					else
-						return false;
-				}
-			}
+			else
+				return first->deletionDate() < second->deletionDate();
 		}
 
-		else if ( ( first->data( 0, true ) == "file" ) and ( second->data( 0, true ) == "system" ) ) {
+		else if ( ( first->type() == "file" ) and ( second->type() == "system" ) ) {
 
 			return true;
 		}
 
-		else if ( ( first->data( 0, true ) == "system" ) and ( second->data( 0, true ) == "dir" ) ) {
+		else if ( ( first->type() == "system" ) and ( second->type() == "dir" ) ) {
 
 			return false;
 		}
 
-		else if ( ( first->data( 0, true ) == "system" ) and ( second->data( 0, true ) == "file" ) ) {
+		else if ( ( first->type() == "system" ) and ( second->type() == "file" ) ) {
 
 			return false;
 		}
 
-		else if ( ( first->data( 0, true ) == "system" ) and ( second->data( 0, true ) == "system" ) ) {
+		else if ( ( first->type() == "system" ) and ( second->type() == "system" ) ) {
 
-			switch( __sortColumn ) {
-				case 0: {
-					if ( __sortCase )
-						return first->data( 0 ).toString() < second->data( 0 ).toString();
+			if ( first->deletionDate() == second->deletionDate() )
+				return first->name().compare( second->name(), Qt::CaseInsensitive ) < 0;
 
-					else
-						return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseInsensitive ) < 0;
-				}
-
-				case 1: {
-					return first->data( 1, true ).toLongLong() < second->data( 1, true ).toLongLong();
-				}
-
-				default: {
-					if ( first->data( __sortColumn ).toString() < second->data( __sortColumn ).toString() )
-						return true;
-
-					else if ( first->data( __sortColumn ).toString() == second->data( __sortColumn ).toString() )
-						if ( __sortCase )
-							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseSensitive ) < 0;
-
-						else
-							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseInsensitive ) < 0;
-
-					else
-						return false;
-				}
-			}
+			else
+				return first->deletionDate() < second->deletionDate();
 		}
 	}
 
 	else if ( firstIdx < secondIdx ) {
+
 		/* Means first item is in a category earlier than the second category */
 		return true;
 	}
 
 	else {
+
 		/* Means first item is in a category later than the second category */
 		return false;
 	}
@@ -339,82 +288,36 @@ bool columnSort2( NBFileSystemNode *first, NBFileSystemNode *second )  {
 };
 
 
-QStringList sortCategoryList( QStringList& cList ) {
+QStringList sortDateList( QStringList& cList ) {
 
-	switch( __sortColumn ) {
-		/* Name sort */
-		case 0: {
-			qSort( cList.begin(), cList.end(),
-				/* Lambda function: less than */
-				[]( QString a, QString b ) {
-					if ( a.count() != b.count() )
-						return ( a.count() < b.count() );
-					else
-						return ( a < b );
-				}
-			);
-			return cList;
-		};
+	QStringList alphaDates = QStringList() << "Today" <<"This Week" << "Last Week" << "This Month" << "Last Month";
 
-		/* Size sort */
-		/* The order should be: Folders, Tiny, Small, Medium, Large, Massive */
-		case 1: {
-			QStringList nList;
-			if ( cList.contains( "Folders" ) )
-				nList << "Folders";
+	QList<QDate> dList;
+	QStringList nList;
+	Q_FOREACH( QString date, cList ) {
+		if ( not alphaDates.contains( date ) )
+			dList << QDate::fromString( date, "MMMM yyyy" );
+	}
 
-			if ( cList.contains( "Tiny" ) )
-				nList << "Tiny";
+	qSort( dList.begin(), dList.end() );
+	Q_FOREACH( QDate date, dList )
+		nList << date.toString( "MMMM yyyy" );
 
-			if ( cList.contains( "Small" ) )
-				nList << "Small";
+	/* This ensures that the user sees the Alphabetic dates at first */
+	if ( cList.contains( "Last Month" ) )
+		nList.insert( 0, "Last Month" );
 
-			if ( cList.contains( "Medium" ) )
-				nList << "Medium";
+	if ( cList.contains( "This Month" ) )
+		nList.insert( 0, "This Month" );
 
-			if ( cList.contains( "Large" ) )
-				nList << "Large";
+	if ( cList.contains( "Last Week" ) )
+		nList.insert( 0, "Last Week" );
 
-			if ( cList.contains( "Massive" ) )
-				nList << "Massive";
+	if ( cList.contains( "This Week" ) )
+		nList.insert( 0, "This Week" );
 
-			return nList;
-		};
+	if ( cList.contains( "Today" ) )
+		nList.insert( 0, "Today" );
 
-		/* Type sort */
-		/* Folder must be the first item Then come the files */
-		case 2: {
-			if ( cList.contains( "Folders" ) ) {
-				cList.removeAll( "Folders" );
-				qSort( cList.begin(), cList.end(), []( QString a, QString b ) { return a.toLower() < b.toLower(); } );
-				cList.insert( 0, "Folders" );
-			}
-
-			else {
-				qSort( cList.begin(), cList.end(), []( QString a, QString b ) { return a.toLower() < b.toLower(); } );
-			}
-
-			return cList;
-		};
-
-		/* Date sort */
-		/* We convert all the String dates to QDates, sort them and then convert them back to String */
-		case 4: {
-			QList<QDate> dList;
-			QStringList nList;
-			Q_FOREACH( QString date, cList ) {
-				dList << QDate::fromString( date, "MMMM yyyy" );
-			}
-
-			qSort( dList.begin(), dList.end() );
-			Q_FOREACH( QDate date, dList )
-				nList << date.toString( "MMMM yyyy" );
-
-			return nList;
-		};
-
-		default: {
-			return cList;
-		}
-	};
+	return nList;
 };

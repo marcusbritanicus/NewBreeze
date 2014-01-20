@@ -208,6 +208,7 @@ void NewBreeze::createAndSetupActions() {
 	connect( SidePanel, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
 	connect( SidePanel, SIGNAL( showApplications() ), this, SLOT( showApplications() ) );
 	connect( SidePanel, SIGNAL( showCatalogs() ), this, SLOT( showCatalogs() ) );
+	connect( SidePanel, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
 
 	connect( SidePanel, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ),
 		this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
@@ -692,6 +693,19 @@ void NewBreeze::showFolders() {
 		SidePanel->flashFolders();
 
 	FolderView->doOpen( FolderView->fsModel->currentDir() );
+};
+
+void NewBreeze::showTrash() {
+
+	QWidget *trashWidget = new QWidget();
+	NBTrashView *trash = new NBTrashView();
+	trash->setMinimumSize( QSize( 900, 600 ) );
+
+	QHBoxLayout *lyt = new QHBoxLayout();
+	lyt->addWidget( trash );
+
+	trashWidget->setLayout( lyt );
+	trashWidget->show();
 };
 
 void NewBreeze::filterFiles( QString filter ) {

@@ -636,13 +636,43 @@ void NBIconView::dropEvent( QDropEvent *dpEvent ) {
 		foreach( QUrl url, mData->urls() )
 			args << url.toLocalFile();
 
-		if ( dpEvent->keyboardModifiers() == Qt::ShiftModifier ) {
+		if ( dpEvent->keyboardModifiers() == Qt::NoModifier ) {
+			args << mtpt;
+
+			NBMenu *menu = new NBMenu( this );
+
+			QAction *mvAct = new QAction( QIcon::fromTheme( "go-jump" ), QString( "&Move Here" ), this );
+			mvAct->setData( QVariant( args ) );
+			connect( mvAct, SIGNAL( triggered() ), this, SLOT( emitCML() ) );
+
+			QAction *cpAct = new QAction( QIcon::fromTheme( "edit-copy" ), QString( "&Copy Here" ), this );
+			cpAct->setData( QVariant( args ) );
+			connect( cpAct, SIGNAL( triggered() ), this, SLOT( emitCML() ) );
+
+			QAction *lnAct = new QAction( QIcon::fromTheme( "edit-link" ), QString( "&Link Here" ), this );
+			lnAct->setData( QVariant( args ) );
+			connect( lnAct, SIGNAL( triggered() ), this, SLOT( emitCML() ) );
+
+			QAction *cancelAct = new QAction( QIcon::fromTheme( "dialog-close" ), QString( "Cancel" ), this );
+			connect( cancelAct, SIGNAL( triggered() ), menu, SLOT( close() ) );
+
+			menu->addAction( mvAct );
+			menu->addAction( cpAct );
+			menu->addAction( lnAct );
+			menu->addSeparator();
+			menu->addAction( cancelAct );
+
+			menu->exec( mapToGlobal( dpEvent->pos() ) );
+			dpEvent->accept();
+		}
+
+		else if ( dpEvent->keyboardModifiers() == Qt::ShiftModifier ) {
 
 			qDebug() << "DnD Move";
 			emit move( args, mtpt );
 		}
 
-		else if ( ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) or ( dpEvent->keyboardModifiers() == Qt::NoModifier ) ) {
+		else if ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) {
 
 			qDebug() << "DnD Copy";
 			emit copy( args, mtpt );
@@ -1414,4 +1444,27 @@ void NBIconView::zoomOut() {
 		setIconSize( myIconSize - QSize( 4, 4 ) );
 
 	Settings->Session.IconSize = myIconSize;
+};
+
+void NBIconView::emitCML() {
+
+	QAction *act = qobject_cast<QAction*>( sender() );
+
+	QStringList args = act->data().toStringList();
+	QString mtpt = args.takeLast();
+
+	if ( act->text().contains( "Copy" ) ) {
+
+		emit copy( args, mtpt );
+	}
+
+	else if ( act->text().contains( "Copy" ) ) {
+
+		emit move( args, mtpt );
+	}
+
+	else {
+
+		emit link( args, mtpt );
+	}
 };

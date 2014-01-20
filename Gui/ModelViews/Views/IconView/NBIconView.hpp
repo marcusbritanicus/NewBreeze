@@ -11,6 +11,7 @@
 #include <NBFileSystemModel.hpp>
 #include <NBIconDelegate.hpp>
 #include <NBTools.hpp>
+#include <NBGuiWidgets.hpp>
 
 class NBIconView : public QAbstractItemView {
 	Q_OBJECT
@@ -165,6 +166,8 @@ class NBIconView : public QAbstractItemView {
 	private slots:
 		void zoomIn();
 		void zoomOut();
+
+		void emitCML();
 
 	Q_SIGNALS :
 		void open( QModelIndex );

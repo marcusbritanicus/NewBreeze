@@ -400,15 +400,34 @@ QStringList sortCategoryList( QStringList& cList ) {
 		/* Date sort */
 		/* We convert all the String dates to QDates, sort them and then convert them back to String */
 		case 4: {
+			QStringList alphaDates = QStringList() << "Today" <<"This Week" << "Last Week" << "This Month" << "Last Month";
+
 			QList<QDate> dList;
 			QStringList nList;
 			Q_FOREACH( QString date, cList ) {
-				dList << QDate::fromString( date, "MMMM yyyy" );
+				if ( not alphaDates.contains( date ) )
+					dList << QDate::fromString( date, "MMMM yyyy" );
 			}
 
 			qSort( dList.begin(), dList.end() );
 			Q_FOREACH( QDate date, dList )
 				nList << date.toString( "MMMM yyyy" );
+
+			/* This ensures that the user sees the Alphabetic dates at first */
+			if ( cList.contains( "Last Month" ) )
+				nList.insert( 0, "Last Month" );
+
+			if ( cList.contains( "This Month" ) )
+				nList.insert( 0, "This Month" );
+
+			if ( cList.contains( "Last Week" ) )
+				nList.insert( 0, "Last Week" );
+
+			if ( cList.contains( "This Week" ) )
+				nList.insert( 0, "This Week" );
+
+			if ( cList.contains( "Today" ) )
+				nList.insert( 0, "Today" );
 
 			return nList;
 		};

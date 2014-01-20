@@ -1,18 +1,18 @@
 /*
 	*
-	* NBIconView.cpp - NewBreeze IconView Class
+	* NBTrashView.cpp - NewBreeze IconView Class
 	*
 */
 
-#include <NBIconView.hpp>
+#include <NBTrashView.hpp>
 
-NBIconView::NBIconView( NBFileSystemModel *fsModel ) : QAbstractItemView() {
+NBTrashView::NBTrashView() : QAbstractItemView() {
 
 	// Set the Apps Delegate
-	setItemDelegate( new NBIconDelegate() );
+	setItemDelegate( new NBTrashDelegate() );
 
 	// Applications Model
-	cModel = fsModel;
+	cModel = new NBTrashModel();
 	setModel( cModel );
 
 	// Icon Size
@@ -42,27 +42,22 @@ NBIconView::NBIconView( NBFileSystemModel *fsModel ) : QAbstractItemView() {
 	horizontalScrollBar()->hide();
 
 	// DragAndDrop
-	viewport()->setAcceptDrops( true );
-	setDragEnabled( true );
-	setAcceptDrops( true );
-	setDragDropMode( QListView::DragDrop );
-	setDropIndicatorShown( true );
+	viewport()->setAcceptDrops( false );
+	setDragEnabled( false );
+	setAcceptDrops( false );
+	setDragDropMode( QListView::NoDragDrop );
+	setDropIndicatorShown( false );
 
 	// Context Menu
 	setContextMenuPolicy( Qt::CustomContextMenu );
 
 	connect(
-		this, SIGNAL( activated( QModelIndex ) ),
-		this, SIGNAL( open( QModelIndex ) )
-	);
-
-	connect(
-		cModel, SIGNAL( dirLoading( QString ) ),
+		cModel, SIGNAL( trashLoading() ),
 		this, SLOT( reload() )
 	);
 
 	connect(
-		cModel, SIGNAL( directoryLoaded( QString ) ),
+		cModel, SIGNAL( trashLoaded() ),
 		this, SLOT( reload() )
 	);
 
@@ -86,21 +81,17 @@ NBIconView::NBIconView( NBFileSystemModel *fsModel ) : QAbstractItemView() {
 	rBand = new QRubberBand( QRubberBand::Rectangle, this );
 };
 
-void NBIconView::setModel( QAbstractItemModel *model ) {
+void NBTrashView::setModel( QAbstractItemModel *model ) {
 
 	QAbstractItemView::setModel( model );
 	hashIsDirty = true;
 };
 
-void NBIconView::updateViewMode() {
+void NBTrashView::updateViewMode() {
 
 	computeGridSize( Settings->Session.IconSize );
 
-	if ( Settings->General.FolderView == QString ( "DetailsView" ) ){}
-		// showHeader();
-
-	else{}
-		// hideHeader();
+	// showHeader();
 
 	hashIsDirty = true;
 	calculateRectsIfNecessary();
@@ -108,12 +99,12 @@ void NBIconView::updateViewMode() {
 	return;
 };
 
-int NBIconView::categoryHeight() const {
+int NBTrashView::categoryHeight() const {
 
 	return myCategoryHeight;
 };
 
-void NBIconView::setCategoryHeight( int newCategoryHeight ) {
+void NBTrashView::setCategoryHeight( int newCategoryHeight ) {
 
 	myCategoryHeight = newCategoryHeight;
 
@@ -121,12 +112,12 @@ void NBIconView::setCategoryHeight( int newCategoryHeight ) {
 	calculateRectsIfNecessary();
 };
 
-QSize NBIconView::iconSize() const {
+QSize NBTrashView::iconSize() const {
 
 	return myIconSize;
 };
 
-void NBIconView::setIconSize( QSize newIconSize ) {
+void NBTrashView::setIconSize( QSize newIconSize ) {
 
 	myIconSize = newIconSize;
 	computeGridSize( myIconSize );
@@ -134,17 +125,17 @@ void NBIconView::setIconSize( QSize newIconSize ) {
 	viewport()->update();
 };
 
-void NBIconView::setIconSize( int nWidth, int nHeight ) {
+void NBTrashView::setIconSize( int nWidth, int nHeight ) {
 
 	setIconSize( QSize( nWidth, nHeight ) );
 };
 
-QMargins NBIconView::contentsMargins() const {
+QMargins NBTrashView::contentsMargins() const {
 
 	return myContentsMargins;
 };
 
-void NBIconView::setContentsMargins( QMargins newContentsMargins ) {
+void NBTrashView::setContentsMargins( QMargins newContentsMargins ) {
 
 	myContentsMargins = newContentsMargins;
 
@@ -152,17 +143,17 @@ void NBIconView::setContentsMargins( QMargins newContentsMargins ) {
 	calculateRectsIfNecessary();
 };
 
-void NBIconView::setContentsMargins( int nLeft, int nTop, int nRight, int nBottom ) {
+void NBTrashView::setContentsMargins( int nLeft, int nTop, int nRight, int nBottom ) {
 
 	setContentsMargins( QMargins( nLeft, nTop, nRight, nBottom ) );
 };
 
-QMargins NBIconView::inlayMargins() const {
+QMargins NBTrashView::inlayMargins() const {
 
 	return myInlayMargins;
 };
 
-void NBIconView::setInlayMargins( QMargins newInlayMargins ) {
+void NBTrashView::setInlayMargins( QMargins newInlayMargins ) {
 
 	myInlayMargins = newInlayMargins;
 
@@ -170,7 +161,7 @@ void NBIconView::setInlayMargins( QMargins newInlayMargins ) {
 	calculateRectsIfNecessary();
 };
 
-void NBIconView::setInlayMargins( int nLeft, int nTop, int nRight, int nBottom ) {
+void NBTrashView::setInlayMargins( int nLeft, int nTop, int nRight, int nBottom ) {
 
 	setInlayMargins( QMargins( nLeft, nTop, nRight, nBottom ) );
 
@@ -178,12 +169,12 @@ void NBIconView::setInlayMargins( int nLeft, int nTop, int nRight, int nBottom )
 	calculateRectsIfNecessary();
 };
 
-int NBIconView::categorySpacing() const {
+int NBTrashView::categorySpacing() const {
 
 	return myCategorySpacing;
 };
 
-void NBIconView::setCategorySpacing( int newCategorySpacing ) {
+void NBTrashView::setCategorySpacing( int newCategorySpacing ) {
 
 	myCategorySpacing = newCategorySpacing;
 
@@ -191,7 +182,7 @@ void NBIconView::setCategorySpacing( int newCategorySpacing ) {
 	calculateRectsIfNecessary();
 };
 
-QRect NBIconView::visualRect( const QModelIndex &index ) const {
+QRect NBTrashView::visualRect( const QModelIndex &index ) const {
 
 	QRect rect;
 	if ( index.isValid() )
@@ -200,7 +191,7 @@ QRect NBIconView::visualRect( const QModelIndex &index ) const {
 	return rect;
 };
 
-QRect NBIconView::categoryRect( int categoryIndex ) const {
+QRect NBTrashView::categoryRect( int categoryIndex ) const {
 
 	calculateRectsIfNecessary();
 	QRect rect = rectForCategory.value( categoryIndex );
@@ -210,7 +201,7 @@ QRect NBIconView::categoryRect( int categoryIndex ) const {
     return QRect( rect.x(), rect.y() - verticalScrollBar()->value(), rect.width(), rect.height() );
 };
 
-void NBIconView::scrollTo( const QModelIndex &index, QAbstractItemView::ScrollHint ) {
+void NBTrashView::scrollTo( const QModelIndex &index, QAbstractItemView::ScrollHint ) {
 
 	QRect viewRect = viewport()->rect();
 	QRect itemRect = visualRect( index );
@@ -228,7 +219,7 @@ void NBIconView::scrollTo( const QModelIndex &index, QAbstractItemView::ScrollHi
 	viewport()->update();
 };
 
-QModelIndex NBIconView::indexAt( const QPoint &point_ ) const {
+QModelIndex NBTrashView::indexAt( const QPoint &point_ ) const {
 
 	QPoint point( point_ );
 	point.ry() += verticalScrollBar()->value();
@@ -245,7 +236,7 @@ QModelIndex NBIconView::indexAt( const QPoint &point_ ) const {
 	return QModelIndex();
 };
 
-QString NBIconView::categoryAt( const QPoint &point_ ) const {
+QString NBTrashView::categoryAt( const QPoint &point_ ) const {
 
 	QPoint point( point_ );
 	point.ry() += verticalScrollBar()->value();
@@ -261,25 +252,25 @@ QString NBIconView::categoryAt( const QPoint &point_ ) const {
 	return QString();
 };
 
-void NBIconView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight ) {
+void NBTrashView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight ) {
 
 	hashIsDirty = true;
 	QAbstractItemView::dataChanged( topLeft, bottomRight );
 };
 
-void NBIconView::rowsInserted( const QModelIndex &parent, int start, int end ) {
+void NBTrashView::rowsInserted( const QModelIndex &parent, int start, int end ) {
 
 	hashIsDirty = true;
 	QAbstractItemView::rowsInserted( parent, start, end );
 };
 
-void NBIconView::rowsAboutToBeRemoved( const QModelIndex &parent, int start, int end ) {
+void NBTrashView::rowsAboutToBeRemoved( const QModelIndex &parent, int start, int end ) {
 
 	hashIsDirty = true;
 	QAbstractItemView::rowsAboutToBeRemoved( parent, start, end );
 };
 
-void NBIconView::updateGeometries() {
+void NBTrashView::updateGeometries() {
 
 	computeRowsAndColumns();
 
@@ -296,39 +287,35 @@ void NBIconView::updateGeometries() {
 	}
 };
 
-void NBIconView::reload() {
+void NBTrashView::reload() {
 
 	hashIsDirty = true;
 	persistentVCol = 0;
 	calculateRectsIfNecessary();
 };
 
-QModelIndex NBIconView::moveCursor( QAbstractItemView::CursorAction cursorAction, Qt::KeyboardModifiers ) {
+QModelIndex NBTrashView::moveCursor( QAbstractItemView::CursorAction cursorAction, Qt::KeyboardModifiers ) {
 
-	if ( cModel->isCategorizationEnabled() )
-		return moveCursorCategorized( cursorAction );
-
-	else
-		return moveCursorNonCategorized( cursorAction );
+	return moveCursorCategorized( cursorAction );
 };
 
-int NBIconView::horizontalOffset() const {
+int NBTrashView::horizontalOffset() const {
 
 	return horizontalScrollBar()->value();
 };
 
-int NBIconView::verticalOffset() const {
+int NBTrashView::verticalOffset() const {
 
 	return verticalScrollBar()->value();
 };
 
-void NBIconView::scrollContentsBy( int dx, int dy ) {
+void NBTrashView::scrollContentsBy( int dx, int dy ) {
 
 	scrollDirtyRegion( dx, dy );
 	viewport()->scroll( dx, dy );
 };
 
-void NBIconView::setSelection( const QRect &rect, QFlags<QItemSelectionModel::SelectionFlag> flags ) {
+void NBTrashView::setSelection( const QRect &rect, QFlags<QItemSelectionModel::SelectionFlag> flags ) {
 
 	QRect rectangle = rect.translated( horizontalScrollBar()->value(), verticalScrollBar()->value() ).normalized();
 
@@ -357,7 +344,7 @@ void NBIconView::setSelection( const QRect &rect, QFlags<QItemSelectionModel::Se
 	}
 };
 
-QRegion NBIconView::visualRegionForSelection( const QItemSelection &selection ) const {
+QRegion NBTrashView::visualRegionForSelection( const QItemSelection &selection ) const {
 
 	QRegion region;
 	foreach ( const QItemSelectionRange &range, selection ) {
@@ -371,21 +358,19 @@ QRegion NBIconView::visualRegionForSelection( const QItemSelection &selection ) 
 	return region;
 };
 
-void NBIconView::paintEvent( QPaintEvent* event ) {
+void NBTrashView::paintEvent( QPaintEvent* event ) {
 
 	QPainter painter( viewport() );
 	painter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
 
 	/* We need to draw the categories only if the model is categorization enabled */
-	if ( cModel->isCategorizationEnabled() ) {
-		for ( int catIdx = 0; catIdx < cModel->categories().count(); catIdx++ ) {
+	for ( int catIdx = 0; catIdx < cModel->categories().count(); catIdx++ ) {
 
-			QRect rect = categoryRect( catIdx );
-			if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
-				continue;
+		QRect rect = categoryRect( catIdx );
+		if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
+			continue;
 
-			paintCategory( &painter, rect, cModel->categories().at( catIdx ) );
-		}
+		paintCategory( &painter, rect, cModel->categories().at( catIdx ) );
 	}
 
 	for ( int row = 0; row < cModel->rowCount( rootIndex() ); row++ ) {
@@ -416,13 +401,13 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 	event->accept();
 };
 
-void NBIconView::resizeEvent( QResizeEvent* ) {
+void NBTrashView::resizeEvent( QResizeEvent* ) {
 
 	hashIsDirty = true;
 	calculateRectsIfNecessary();
 };
 
-void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
+void NBTrashView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 	// Do nothing whenever mouse is not left clicked
 	if ( mpEvent->button() != Qt::LeftButton ) {
@@ -451,7 +436,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 	QAbstractItemView::mousePressEvent( mpEvent );
 };
 
-void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
+void NBTrashView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 
 	if ( not ( mmEvent->buttons() & Qt::LeftButton ) ) {
 
@@ -468,23 +453,6 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 	else if ( not ( mmEvent->pos() - dragStartPosition ).manhattanLength() ) {
 
 		QAbstractItemView::mouseMoveEvent( mmEvent );
-		return;
-	}
-
-	if ( selectionModel()->hasSelection() and indexAt( dragStartPosition ).isValid() ) {
-
-		QDrag *drag = new QDrag( this );
-
-		QList<QUrl> urlList;
-		Q_FOREACH( QModelIndex idx, selectionModel()->selectedIndexes() )
-			if ( not idx.column() )
-				urlList << QUrl::fromLocalFile( cModel->nodePath( idx ) );
-
-		QMimeData *mimedata = new QMimeData();
-		mimedata->setUrls( urlList );
-
-		drag->setMimeData( mimedata );
-		drag->exec( Qt::CopyAction | Qt::MoveAction | Qt::LinkAction );
 		return;
 	}
 
@@ -515,7 +483,7 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 	mmEvent->accept();
 };
 
-void NBIconView::mouseReleaseEvent( QMouseEvent *mrEvent ) {
+void NBTrashView::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 
 	/* If its just a click and not a drag */
 	if ( dragStartPosition == mrEvent->pos() ) {
@@ -567,131 +535,16 @@ void NBIconView::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 	mrEvent->accept();
 };
 
-void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
-
-	if ( mEvent->button() == Qt::LeftButton ) {
-		QModelIndex idx = indexAt( mEvent->pos() );
-		if ( idx.isValid() )
-			emit open( idx );
-	}
+void NBTrashView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 
 	mEvent->accept();
 };
 
-void NBIconView::dragEnterEvent( QDragEnterEvent *deEvent ) {
+void NBTrashView::computeGridSize( QSize iconSize ) {
 
-	deEvent->acceptProposedAction();
-};
-
-void NBIconView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
-
-	const QMimeData *mData = dmEvent->mimeData();
-	if ( not mData->hasUrls() )
-		return;
-
-	QString source = dirName( mData->urls().at( 0 ).toLocalFile() );
-	source += ( source.endsWith( "/" ) ? "" : "/" );
-
-	if ( source != cModel->currentDir() ) {
-		if ( isWritable( cModel->currentDir() ) ) {
-			dmEvent->setDropAction( Qt::CopyAction );
-			dmEvent->accept();
-		}
-
-		else
-			dmEvent->ignore();
-	}
-
-	else if ( indexAt( dmEvent->pos() ).isValid() ) {
-		QModelIndex idx = indexAt( dmEvent->pos() );
-		QString mtpt = cModel->nodePath( cModel->data( idx ).toString() );
-
-		if ( isWritable( mtpt ) and isDir( mtpt ) ) {
-			dmEvent->setDropAction( Qt::CopyAction );
-			dmEvent->accept();
-		}
-
-		else
-			dmEvent->ignore();
-	}
-
-	else
-		dmEvent->ignore();
-};
-
-void NBIconView::dropEvent( QDropEvent *dpEvent ) {
-
-	QModelIndex idx = indexAt( dpEvent->pos() );
-	QString mtpt = cModel->nodePath( cModel->data( idx ).toString() );
-
-	if ( not isDir( mtpt ) ) {
-		dpEvent->ignore();
-		return;
-	}
-
-	const QMimeData *mData = dpEvent->mimeData();
-	if ( mData->hasUrls() ) {
-
-		QStringList args;
-		foreach( QUrl url, mData->urls() )
-			args << url.toLocalFile();
-
-		if ( dpEvent->keyboardModifiers() == Qt::ShiftModifier ) {
-
-			qDebug() << "DnD Move";
-			emit move( args, mtpt );
-		}
-
-		else if ( ( dpEvent->keyboardModifiers() == Qt::ControlModifier ) or ( dpEvent->keyboardModifiers() == Qt::NoModifier ) ) {
-
-			qDebug() << "DnD Copy";
-			emit copy( args, mtpt );
-		}
-
-		else if ( dpEvent->keyboardModifiers() == ( Qt::ControlModifier | Qt::ShiftModifier ) ) {
-
-			qDebug() << "DnD Link";
-			emit link( args, mtpt );
-		}
-
-		else if ( dpEvent->keyboardModifiers() == ( Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier ) ) {
-
-			qDebug() << "Ctrl+Shift+Alt+Drop. Alphabetical Copy activated";
-			QProcess::startDetached( "sh", QStringList() << "find -type f -print0 | sort -z | cpio -0 -pd " + mtpt );
-			emit acopy( args, mtpt );
-		}
-
-		else {
-
-			dpEvent->ignore();
-			return;
-		}
-	}
-
-	dpEvent->accept();
-};
-
-void NBIconView::computeGridSize( QSize iconSize ) {
-
-	if ( Settings->General.FolderView == "IconsView" ) {
-		/*
-			* width: 3 * iconSize
-			* height: iconSize + iconSize * 2
-		*/
-		myGridSizeMin = QSize( qMin( 256, qMax( 144, iconSize.width() * 3 ) ), qMax( iconSize.height() + 21, iconSize.height() * 2 ) );
-	}
-
-	else if ( Settings->General.FolderView == QString( "TilesView" ) ) {
-		/* iconSize + padding left + padding right + fixed width text ( max = 256px ) */
-		padding = ( int ) round( iconSize.width() * 0.1 );
-		myGridSizeMin = QSize( iconSize.width() + padding * 2 + qMin( 256, qMax( 144, iconSize.width() * 3 ) ), iconSize.height() + padding * 2 );
-	}
-
-	else {
-		int availWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
-		padding = ( int ) round( iconSize.width() * 0.1 );
-		myGridSizeMin = QSize( availWidth, iconSize.height() + padding * 2 );
-	}
+	int availWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
+	padding = ( int ) round( iconSize.width() * 0.1 );
+	myGridSizeMin = QSize( availWidth, iconSize.height() + padding * 2 );
 
 	computeRowsAndColumns();
 
@@ -699,7 +552,7 @@ void NBIconView::computeGridSize( QSize iconSize ) {
 	calculateRectsIfNecessary();
 };
 
-QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction cursorAction ) {
+QModelIndex NBTrashView::moveCursorCategorized( QAbstractItemView::CursorAction cursorAction ) {
 
 	QModelIndex idx = currentIndex();
 	QStringList categoryList = cModel->categories();
@@ -723,7 +576,6 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 
 		// Calculate the visual row of this index
 		int rowInCategory = thisCategoryIndexes.indexOf( idx );
-		int vrow = rowInCategory / itemsPerRow;
 
 		switch( cursorAction ) {
 			case QAbstractItemView::MoveNext:
@@ -768,79 +620,22 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 			}
 
 			case QAbstractItemView::MoveDown: {
-				if ( Settings->General.FolderView == "DetailsView" ) {
-					if ( idx.row() == cModel->rowCount() - 1 ) {
-						return cModel->index( 0, 0, idx.parent() );
-					}
-					else {
-						return cModel->index( idx.row() + 1, 0, idx.parent() );
-					}
+
+				if ( idx.row() == cModel->rowCount() - 1 ) {
+					return cModel->index( 0, 0, idx.parent() );
 				}
-
-				int newVRow = vrow + 1;
-
-				if ( ( newVRow * itemsPerRow + persistentVCol ) < thisCategoryIndexes.count() ) {
-					// We have an idx below this idx from the same category
-					return thisCategoryIndexes.value( newVRow * itemsPerRow + persistentVCol );
-				}
-
-				else if ( newVRow * itemsPerRow < thisCategoryIndexes.count() ) {
-					// We have indexes with row greater than this one, not below this one
-					return thisCategoryIndexes.last();
-				}
-
 				else {
-					// We need to return the idx from the next category same or lower column
-					if ( nextCategoryIndexes.count() ) {
-						if ( nextCategoryIndexes.count() <= persistentVCol )
-							return nextCategoryIndexes.last();
-
-						else
-							return nextCategoryIndexes.value( persistentVCol );
-					}
-
-					else {
-
-						return nextCategoryIndexes.last();
-					};
+					return cModel->index( idx.row() + 1, 0, idx.parent() );
 				}
-
 			}
 
 			case QAbstractItemView::MoveUp: {
 
-				if ( Settings->General.FolderView == "DetailsView" ) {
-					if ( idx.row() == 0 ) {
-						return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
-					}
-					else {
-						return cModel->index( idx.row() - 1, 0, idx.parent() );
-					}
+				if ( idx.row() == 0 ) {
+					return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
 				}
-
-				int newVRow = vrow - 1;
-
-				if ( newVRow >= 0 ) {
-
-					// This means that there is a visual row before this one
-					return thisCategoryIndexes.value( newVRow * itemsPerRow + persistentVCol );
-				}
-
 				else {
-					if ( prevCategoryIndexes.count() ) {
-						int nrow = ( int )ceil( 1.0 * prevCategoryIndexes.count() / itemsPerRow );
-						if ( prevCategoryIndexes.count() > ( nrow - 1 ) * itemsPerRow + persistentVCol )
-							return prevCategoryIndexes.value( ( nrow - 1 ) * itemsPerRow + persistentVCol );
-
-						else
-							return prevCategoryIndexes.last();
-					}
-
-					else {
-
-						// This is the first category
-						return thisCategoryIndexes.first();
-					}
+					return cModel->index( idx.row() - 1, 0, idx.parent() );
 				}
 			}
 
@@ -889,166 +684,7 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 	return idx;
 };
 
-QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction ) {
-
-	QModelIndex idx = currentIndex();
-	if ( idx.isValid() ) {
-
-		QStringList categoryList = cModel->categories();
-		switch( cursorAction ) {
-			case QAbstractItemView::MoveRight: {
-				/* If the current index is not the last visible index */
-				if ( idx.row() >= 0 and idx.row() < cModel->rowCount() - 1 ) {
-					persistentVCol = ( idx.row() + 1 ) % itemsPerRow;
-					return cModel->index( idx.row() + 1, 0, rootIndex() );
-				}
-
-				/* Current index is the last visible index */
-				else {
-					persistentVCol = 0;
-					return cModel->index( 0, 0, rootIndex() );
-				}
-			}
-
-			case QAbstractItemView::MoveLeft: {
-				/* The current index is anything but the first one */
-				if ( idx.row() > 0 and idx.row() < cModel->rowCount() ) {
-					persistentVCol = ( idx.row() - 1 ) % itemsPerRow;
-					return cModel->index( idx.row() - 1, 0, rootIndex() );
-				}
-
-				/* The current index is the first one */
-				else {
-					persistentVCol = ( cModel->rowCount() - 1 ) % itemsPerRow;
-					return cModel->index( cModel->rowCount() - 1, 0, rootIndex() );
-				}
-			}
-
-			case QAbstractItemView::MoveDown: {
-				if ( Settings->General.FolderView == "DetailsView" ) {
-					if ( idx.row() == cModel->rowCount() - 1 ) {
-						return cModel->index( 0, 0, idx.parent() );
-					}
-					else {
-						return cModel->index( idx.row() + 1, 0, idx.parent() );
-					}
-				}
-
-				int nextRow = idx.row() + itemsPerRow;
-				if ( nextRow >= cModel->rowCount() )
-					return cModel->index( cModel->rowCount() - 1, 0, rootIndex() );
-
-				else
-					return cModel->index( nextRow, 0, rootIndex() );
-			}
-
-			case QAbstractItemView::MoveUp: {
-				if ( Settings->General.FolderView == "DetailsView" ) {
-					if ( idx.row() == 0 ) {
-						return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
-					}
-					else {
-						return cModel->index( idx.row() - 1, 0, idx.parent() );
-					}
-				}
-
-				int prevRow = idx.row() - itemsPerRow;
-				if ( prevRow < 0 )
-					return cModel->index( 0, 0, rootIndex() );
-
-				else
-					return cModel->index( prevRow, 0, rootIndex() );
-			}
-
-			case QAbstractItemView::MoveHome: {
-
-				persistentVCol = 0;
-				verticalScrollBar()->setValue( 0 );
-				return cModel->index( 0, 0, idx.parent() );
-			}
-
-			case QAbstractItemView::MoveEnd: {
-
-				persistentVCol = ( cModel->rowCount() - 1 ) % itemsPerRow;
-				return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
-			}
-
-			case QAbstractItemView::MoveNext: {
-				/* If the current index is not the last visible index */
-				if ( idx.row() >= 0 and idx.row() < cModel->rowCount() - 1 )
-					return cModel->index( idx.row() + 1, 0, rootIndex() );
-
-				/* Current index is the last visible index */
-				else
-					return cModel->index( 0, 0, rootIndex() );
-			}
-
-			case QAbstractItemView::MovePrevious: {
-
-				/* The current index is anything but the first one */
-				if ( idx.row() > 0 and idx.row() < cModel->rowCount() )
-					return cModel->index( idx.row() - 1, 0, rootIndex() );
-
-				/* The current index is the first one */
-				else
-					return cModel->index( cModel->rowCount() - 1, 0, rootIndex() );
-			}
-
-			case QAbstractItemView::MovePageUp: {
-				int viewportHeight = viewport()->height();
-				int rowsInVisualArea = viewportHeight / myGridSize.height();
-				int itemsInVisualArea = rowsInVisualArea * itemsPerRow;
-
-				int prevIdx = idx.row() - itemsInVisualArea;
-				if ( not cModel->index( prevIdx, 0, rootIndex() ).isValid() )
-					return cModel->index( 0, 0, rootIndex() );
-
-				return cModel->index( prevIdx, 0, rootIndex() );
-			}
-
-			case QAbstractItemView::MovePageDown: {
-				int viewportHeight = viewport()->height();
-				int rowsInVisualArea = viewportHeight / myGridSize.height();
-				int itemsInVisualArea = rowsInVisualArea * itemsPerRow;
-
-				int nextIdx = idx.row() + itemsInVisualArea;
-				if ( not cModel->index( nextIdx, 0, rootIndex() ).isValid() )
-					return cModel->index( cModel->rowCount() - 1, 0, rootIndex() );
-
-				return cModel->index( nextIdx, 0, rootIndex() );
-			}
-
-			default: {
-				return cModel->index( 0, 0, rootIndex() );
-			}
-		}
-	}
-
-	else {
-		switch( cursorAction ) {
-			case QAbstractItemView::MoveHome: {
-
-				persistentVCol = 0;
-				return cModel->index( 0, 0, idx.parent() );
-			}
-
-			case QAbstractItemView::MoveEnd: {
-
-				persistentVCol = ( cModel->rowCount() - 1 ) % itemsPerRow;
-				return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
-			}
-
-			default: {
-
-				return cModel->index( 0, 0, rootIndex() );
-			}
-		}
-	}
-
-	return idx;
-};
-
-void NBIconView::calculateRectsIfNecessary() const {
+void NBTrashView::calculateRectsIfNecessary() const {
 
 	if ( not hashIsDirty )
 		return;
@@ -1058,11 +694,7 @@ void NBIconView::calculateRectsIfNecessary() const {
 	rectForRow.clear();
 	rectForCategory.clear();
 
-	if ( cModel->isCategorizationEnabled() )
-		calculateCategorizedRects();
-
-	else
-		calculateNonCategorizedRects();
+	calculateCategorizedRects();
 
 	if ( idealHeight <= viewport()->height() ) {
 		verticalScrollBar()->hide();
@@ -1077,111 +709,7 @@ void NBIconView::calculateRectsIfNecessary() const {
 	}
 };
 
-void NBIconView::calculateCategorizedRects() const {
-
-	if ( Settings->General.FolderView == QString( "IconsView" ) )
-		calculateCategorizedIconsRects();
-
-	else if ( Settings->General.FolderView == QString( "DetailsView" ) )
-		calculateCategorizedDetailsRects();
-
-	else
-		calculateCategorizedTilesRects();
-};
-
-void NBIconView::calculateCategorizedIconsRects() const {
-
-	int x = 0, y = 0, prevRows = 0, totalRows = 0;
-	QStringList categoryList = cModel->categories();
-
-	for( int catIdx = 0; catIdx < categoryList.count(); catIdx++ ) {
-		QModelIndexList mList = cModel->indexListForCategory( categoryList.at( catIdx ) );
-
-		// Minimum X and Y for Category Rectangle
-		int minX = myContentsMargins.left();
-		int minY = myContentsMargins.top() + catIdx * myCategoryHeight + catIdx * myCategorySpacing + totalRows * myGridSize.height();
-
-		int categoryWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
-		rectForCategory[ catIdx ] = QRect( minX, minY, categoryWidth, 24 );
-
-		if ( not cModel->isCategoryVisible( cModel->category( mList.value( 0 ) ) ) )
-			continue;
-
-		// Mimimum X and Y for indexes
-		minX += myInlayMargins.left();
-		minY += myCategoryHeight;
-
-		prevRows = mList.count() / itemsPerRow;
-		if ( mList.count() % itemsPerRow )
-			prevRows++;
-
-		totalRows += prevRows;
-
-		for( int lrow = 0; lrow < mList.count(); lrow++ ) {
-			int row = lrow / itemsPerRow;
-			int col = lrow % itemsPerRow;
-
-			x = minX + col * myGridSize.width();
-			y = minY + row * myGridSize.height();
-
-			rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
-		}
-	}
-
-	idealHeight = myContentsMargins.top() + myContentsMargins.bottom() + categoryList.count() * ( myCategoryHeight + myCategorySpacing );
-	idealHeight += totalRows * myGridSize.height();
-
-	hashIsDirty = false;
-	viewport()->update();
-};
-
-void NBIconView::calculateCategorizedTilesRects() const {
-
-	int x = 0, y = 0, prevRows = 0, totalRows = 0;
-	QStringList categoryList = cModel->categories();
-
-	for( int catIdx = 0; catIdx < categoryList.count(); catIdx++ ) {
-		QModelIndexList mList = cModel->indexListForCategory( categoryList.at( catIdx ) );
-
-		// Minimum X and Y for Category Rectangle
-		int minX = myContentsMargins.left();
-		int minY = myContentsMargins.top() + catIdx * myCategoryHeight + catIdx * myCategorySpacing + totalRows * myGridSize.height();
-
-		int categoryWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
-		rectForCategory[ catIdx ] = QRect( minX, minY, categoryWidth, 24 );
-
-		if ( not cModel->isCategoryVisible( cModel->category( mList.value( 0 ) ) ) )
-			continue;
-
-		// Mimimum X and Y for indexes
-		minX += myInlayMargins.left();
-		minY += myCategoryHeight;
-
-		prevRows = mList.count() / itemsPerRow;
-		if ( mList.count() % itemsPerRow )
-			prevRows++;
-
-		totalRows += prevRows;
-
-		for( int lrow = 0; lrow < mList.count(); lrow++ ) {
-			int row = lrow / itemsPerRow;
-			int col = lrow % itemsPerRow;
-
-			x = minX + col * myGridSize.width();
-			y = minY + row * myGridSize.height();
-
-			rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
-		}
-	}
-
-	idealHeight = myContentsMargins.top() + myContentsMargins.bottom() + categoryList.count() * ( myCategoryHeight + myCategorySpacing );
-	idealHeight += totalRows * myGridSize.height();
-
-	hashIsDirty = false;
-	viewport()->update();
-};
-
-void NBIconView::calculateCategorizedDetailsRects() const {
+void NBTrashView::calculateCategorizedRects() const {
 
 	if ( not hashIsDirty )
 		return;
@@ -1229,115 +757,19 @@ void NBIconView::calculateCategorizedDetailsRects() const {
 	viewport()->update();
 };
 
-void NBIconView::calculateNonCategorizedRects() const {
-
-	if ( Settings->General.FolderView == QString( "IconsView" ) )
-		calculateNonCategorizedIconsRects();
-
-	else if ( Settings->General.FolderView == QString( "DetailsView" ) )
-		calculateNonCategorizedDetailsRects();
-
-	else
-		calculateNonCategorizedTilesRects();
-};
-
-void NBIconView::calculateNonCategorizedIconsRects() const {
-
-	int x = 0, y = 0, totalRows = 0;
-
-	for( int lrow = 0; lrow < cModel->rowCount(); lrow++ ) {
-
-		totalRows = ( lrow + 1 ) / itemsPerRow;
-		if ( ( lrow + 1 ) % itemsPerRow )
-			totalRows++;
-
-		// Minimum X and Y for Category Rectangle
-		int minX = myContentsMargins.left();
-		int minY = myContentsMargins.top() + ( totalRows - 1 ) * myGridSize.height();
-
-		int col = lrow % itemsPerRow;
-
-		x = minX + col * myGridSize.width() + 5;
-		y = minY + 5;
-
-		rectForRow[ lrow ] = QPoint( x, y );
-	}
-
-	idealHeight = myContentsMargins.top() + numberOfRows * myGridSize.height() + myContentsMargins.bottom();
-
-	hashIsDirty = false;
-	viewport()->update();
-};
-
-void NBIconView::calculateNonCategorizedTilesRects() const {
-
-	int x = 0, y = 0, totalRows = 0;
-
-	for( int lrow = 0; lrow < cModel->rowCount(); lrow++ ) {
-
-		totalRows = ( lrow + 1 ) / itemsPerRow;
-		if ( ( lrow + 1 ) % itemsPerRow )
-			totalRows++;
-
-		// Minimum X and Y for Category Rectangle
-		int minX = myContentsMargins.left();
-		int minY = myContentsMargins.top() + ( totalRows - 1 ) * myGridSize.height();
-
-		int col = lrow % itemsPerRow;
-
-		x = minX + col * myGridSize.width();
-		y = minY;
-
-		rectForRow[ lrow ] = QPoint( x, y );
-	}
-
-	idealHeight = myContentsMargins.top() + numberOfRows * myGridSize.height() + myContentsMargins.bottom();
-
-	hashIsDirty = false;
-	viewport()->update();
-};
-
-void NBIconView::calculateNonCategorizedDetailsRects() const {
-
-	int x = 0, y = 0, totalRows = cModel->rowCount();
-
-	for( int lrow = 0; lrow < cModel->rowCount(); lrow++ ) {
-
-		x = myContentsMargins.left();
-		y = myContentsMargins.top() + lrow * myGridSize.height();
-
-		rectForRow[ lrow ] = QPoint( x, y );
-	}
-
-	idealHeight = myContentsMargins.top() + totalRows * myGridSize.height() + myContentsMargins.bottom();
-
-	hashIsDirty = false;
-	viewport()->update();
-};
-
-void NBIconView::computeRowsAndColumns() const {
+void NBTrashView::computeRowsAndColumns() const {
 
 	int vWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
 	vWidth = vWidth - myInlayMargins.left() - myInlayMargins.right();
 
-	if ( Settings->General.FolderView == QString( "DetailsView" ) ) {
-		itemsPerRow = 1;
-		numberOfRows = cModel->rowCount();
-	}
-
-	else {
-		itemsPerRow = qMax( 1, vWidth / myGridSizeMin.width() );
-		numberOfRows = ( int )( cModel->rowCount() / itemsPerRow );
-
-		if ( ( cModel->rowCount() % itemsPerRow ) > 0 )
-			numberOfRows++;
-	}
+	itemsPerRow = 1;
+	numberOfRows = cModel->rowCount();
 
 	int newGridWidth = ( int )( vWidth / itemsPerRow );
 	myGridSize = QSize( newGridWidth, myGridSizeMin.height() );
 };
 
-QRect NBIconView::viewportRectForRow( int row ) const {
+QRect NBTrashView::viewportRectForRow( int row ) const {
 
 	calculateRectsIfNecessary();
 	QPoint pt = rectForRow.value( row );
@@ -1347,7 +779,7 @@ QRect NBIconView::viewportRectForRow( int row ) const {
     return QRect( pt.x(), pt.y() - verticalScrollBar()->value(), myGridSize.width(), myGridSize.height() );
 };
 
-void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const {
+void NBTrashView::paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const {
 
 	painter->save();
 
@@ -1377,35 +809,25 @@ void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const
 	painter->restore();
 };
 
-QPixmap NBIconView::pixmapForCategory( QString categoryText ) const {
+QPixmap NBTrashView::pixmapForCategory( QString categoryText ) const {
 
 	Q_UNUSED( categoryText );
 
 	return QIcon::fromTheme( "arrow-right" ).pixmap( 16, 16 );
 };
 
-void NBIconView::zoomIn() {
+void NBTrashView::zoomIn() {
 
-	if ( Settings->General.FolderView == QString( "DetailsView" ) ) {
-		if ( myIconSize.width() >= 64 )
-			setIconSize( QSize( 64, 64 ) );
+	if ( myIconSize.width() >= 64 )
+		setIconSize( QSize( 64, 64 ) );
 
-		else
-			setIconSize( myIconSize + QSize( 4, 4 ) );
-	}
-
-	else {
-		if ( myIconSize.width() >= 128 )
-			setIconSize( QSize( 128, 128 ) );
-
-		else
-			setIconSize( myIconSize + QSize( 4, 4 ) );
-	}
+	else
+		setIconSize( myIconSize + QSize( 4, 4 ) );
 
 	Settings->Session.IconSize = myIconSize;
 };
 
-void NBIconView::zoomOut() {
+void NBTrashView::zoomOut() {
 
 	if ( myIconSize.width() <= 16 )
 		setIconSize( QSize( 16, 16 ) );
