@@ -16,30 +16,30 @@ LIBS         += -L/usr/lib -lpoppler-qt4
 
 # Source Paths
 INCLUDEPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/ConfigParser Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/FileIO
-INCLUDEPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/Server Core/StandardPaths Core/SystemInfo Core/XDG
+INCLUDEPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/MultiFile Core/Server Core/StandardPaths Core/SystemInfo Core/XDG
 INCLUDEPATH += Gui Gui/Dialogs Gui/Dialogs/FileDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/SettingsManager Gui/ModelViews
-INCLUDEPATH += Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel Gui/ModelViews/Models/TrashModel
-INCLUDEPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel Gui/ModelViews/Views Gui/ModelViews/Views/AppsView
-INCLUDEPATH += Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView Gui/Plugins/PdfPeep
-INCLUDEPATH += Gui/ModelViews/Views/SidePanelView Gui/Others Gui/Others/Settings Gui/Plugins Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash
-INCLUDEPATH += Gui/Plugins/ImagePeek Gui/Plugins/OdfOgle Gui/Plugins/WebWatch Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar
-INCLUDEPATH += Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/FolderView
-INCLUDEPATH += Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/IOManager Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget
-INCLUDEPATH += Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar StyleSheets
-INCLUDEPATH += Gui/ModelViews/Views/TrashView
+INCLUDEPATH += Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel
+INCLUDEPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
+INCLUDEPATH += Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView
+INCLUDEPATH += Gui/ModelViews/Views/SidePanelView Gui/ModelViews/Views/TrashView Gui/Others Gui/Others/Settings Gui/Plugins
+INCLUDEPATH += Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash Gui/Plugins/ImagePeek Gui/Plugins/OdfOgle Gui/Plugins/PdfPeep
+INCLUDEPATH += Gui/Plugins/WebWatch Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
+INCLUDEPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
+INCLUDEPATH += Gui/Widgets/IOManager Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget Gui/Widgets/SidePanel Gui/Widgets/Terminal
+INCLUDEPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar Gui/Widgets/TrashManager StyleSheets
 
 DEPENDPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/ConfigParser Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/FileIO
-DEPENDPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/Server Core/StandardPaths Core/SystemInfo Core/XDG
+DEPENDPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/MultiFile Core/Server Core/StandardPaths Core/SystemInfo Core/XDG
 DEPENDPATH += Gui Gui/Dialogs Gui/Dialogs/FileDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/SettingsManager Gui/ModelViews
-DEPENDPATH += Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel Gui/ModelViews/Models/TrashModel
-DEPENDPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel Gui/ModelViews/Views Gui/ModelViews/Views/AppsView
-DEPENDPATH += Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView Gui/Plugins/PdfPeep
-DEPENDPATH += Gui/ModelViews/Views/SidePanelView Gui/Others Gui/Others/Settings Gui/Plugins Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash
-DEPENDPATH += Gui/Plugins/ImagePeek Gui/Plugins/OdfOgle Gui/Plugins/WebWatch Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar
-DEPENDPATH += Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/FolderView
-DEPENDPATH += Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/IOManager Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget
-DEPENDPATH += Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar StyleSheets
-INCLUDEPATH += Gui/ModelViews/Views/TrashView
+DEPENDPATH += Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel
+DEPENDPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
+DEPENDPATH += Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView
+DEPENDPATH += Gui/ModelViews/Views/SidePanelView Gui/ModelViews/Views/TrashView Gui/Others Gui/Others/Settings Gui/Plugins
+DEPENDPATH += Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash Gui/Plugins/ImagePeek Gui/Plugins/OdfOgle Gui/Plugins/PdfPeep
+DEPENDPATH += Gui/Plugins/WebWatch Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
+DEPENDPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
+DEPENDPATH += Gui/Widgets/IOManager Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget Gui/Widgets/SidePanel Gui/Widgets/Terminal
+DEPENDPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar Gui/Widgets/TrashManager StyleSheets StyleSheets/Template
 
 # Headers
 HEADERS += Global.hpp
@@ -165,6 +165,7 @@ HEADERS += Gui/Widgets/Terminal/lib/tools.h
 HEADERS += Gui/Widgets/Terminal/lib/Vt102Emulation.h
 HEADERS += Gui/Widgets/Terminal/NBTerminal.hpp
 HEADERS += Gui/Widgets/TitleBar/NBTitleBar.hpp
+HEADERS += Gui/Widgets/TrashManager/NBTrashManager.hpp
 HEADERS += StyleSheets/NBStyleManager.hpp
 
 # Sources
@@ -285,6 +286,7 @@ SOURCES += Gui/Widgets/Terminal/lib/tools.cpp
 SOURCES += Gui/Widgets/Terminal/lib/Vt102Emulation.cpp
 SOURCES += Gui/Widgets/Terminal/NBTerminal.cpp
 SOURCES += Gui/Widgets/TitleBar/NBTitleBar.cpp
+SOURCES += Gui/Widgets/TrashManager/NBTrashManager.cpp
 SOURCES += StyleSheets/NBStyleManager.cpp
 SOURCES += Main.cpp
 

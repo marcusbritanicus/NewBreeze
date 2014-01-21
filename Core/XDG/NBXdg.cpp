@@ -142,13 +142,15 @@ QString NBXdg::trashLocation( QString path ) {
 
 	/* Ideally, if path is inside home */
 	if ( path.startsWith( home() ) ) {
-		/* If the permissions of Trash folder are right */
+		/* If the permissions of Trash folder are right; we assume $trash/files and $trash/info exists */
 		if ( access( qPrintable( home() + "/.local/share/Trash/" ), R_OK | W_OK | X_OK ) == 0 )
 			return home() + "/.local/share/Trash/";
 
 		else {
-			/* Try to make them right */
+			/* Try to make the trash folder */
 			QDir::home().mkpath( "/.local/share/Trash/" );
+			QDir::home().mkpath( "/.local/share/Trash/files/" );
+			QDir::home().mkpath( "/.local/share/Trash/info/" );
 			QFile::setPermissions( home() + "/.local/share/Trash/", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner );
 
 			return home() + "/.local/share/Trash/";
@@ -166,14 +168,30 @@ QString NBXdg::trashLocation( QString path ) {
 			return QString();
 
 		/* If $MNTPT/.Trash/$UID is present, and accessible with right permissions */
-		if( access( qPrintable( mountPoint + "/.Trash/" + QString::number( getuid() ) ), R_OK | W_OK | X_OK ) == 0 )
-			return mountPoint + "/.Trash/" + QString::number( getuid() );
+		/* We blindly try to make $MTPT/.Trash/$uid/files, $MTPT/.Trash/$uid/info */
+		if( access( qPrintable( mountPoint + "/.Trash/" + QString::number( getuid() ) ), R_OK | W_OK | X_OK ) == 0 ) {
+			QDir( mountPoint ).mkpath( QString( ".Trash/%1/" ).arg( getuid() ) );
+			QDir( mountPoint ).mkpath( QString( ".Trash/%1/files/" ).arg( getuid() ) );
+			QDir( mountPoint ).mkpath( QString( ".Trash/%1/info/" ).arg( getuid() ) );
+
+			/* Check if the any one above folders exist, say $MTPT/.Trash-$uid/files */
+			if( access( qPrintable( mountPoint + "/.Trash/" + QString::number( getuid() ) + "/files/" ), R_OK | W_OK | X_OK ) == 0 )
+				return mountPoint + "/.Trash/" + QString::number( getuid() );
+
+			return QString();
+		}
 
 		/* Otherwise we create $MNTPT/.Trash-$UID */
-		QDir( mountPoint ).mkpath( QString( ".Trash-%1" ).arg( getuid() ) );
+		QDir( mountPoint ).mkpath( QString( ".Trash-%1/" ).arg( getuid() ) );
+		QDir( mountPoint ).mkpath( QString( ".Trash-%1/files/" ).arg( getuid() ) );
+		QDir( mountPoint ).mkpath( QString( ".Trash-%1/info/" ).arg( getuid() ) );
 		QFile::setPermissions( mountPoint + "/.Trash-" + QString::number( getuid() ), QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner );
 
-		return mountPoint + "/.Trash-" + QString::number( getuid() );
+		/* Check if the any one above folders exist, say $MTPT/.Trash-$uid/files */
+		if( access( qPrintable( mountPoint + "/.Trash-" + QString::number( getuid() ) + "/files/" ), R_OK | W_OK | X_OK ) == 0 )
+			return mountPoint + "/.Trash-" + QString::number( getuid() );
+
+		return QString();
 	}
 
 	return QString();

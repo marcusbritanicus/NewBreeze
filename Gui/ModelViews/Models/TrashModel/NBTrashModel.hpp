@@ -73,12 +73,6 @@ class NBTrashModel : public QAbstractItemModel {
 		int indexListCountForCategory( QString ) const;
 		QModelIndexList indexListForCategory( QString ) const;
 
-		bool showHidden() const;
-		void setShowHidden( bool );
-
-		bool readOnly() const;
-		void setReadOnly( bool );
-
 		// Drag and Drop
 		Qt::DropActions supportedDropActions() const;
 		Qt::DropActions supportedDragActions() const;
@@ -93,6 +87,10 @@ class NBTrashModel : public QAbstractItemModel {
 		void clearNameFilters();
 
 		void reload();
+
+		// Restore/Delete
+		void restore( QModelIndexList );
+		void removeFromDisk( QModelIndexList );
 
 	private:
 		void setupModelData();
@@ -113,9 +111,6 @@ class NBTrashModel : public QAbstractItemModel {
 			bool loading = false;
 			bool stopLoading = false;
 		} curentLoadStatus;
-
-		bool __showHidden;
-		bool __readOnly;
 
 		QList<Filters> __currentFilters;
 		QStringList __nameFilters;
@@ -140,10 +135,11 @@ class NBTrashModel : public QAbstractItemModel {
 		/* Just does sort( prevSort.column, prevSort.cs, prevSort.categorized ) */
 
 	Q_SIGNALS:
-		void loadFileInfo();
 		void trashLoading();
 		void trashLoaded();
-		void updatedAllNodes();
+
+		void restored( QModelIndexList );
+		void deleted( QModelIndexList );
 };
 
 #endif

@@ -12,6 +12,7 @@
 #include <NBIconProvider.hpp>
 
 class NBTrashNode {
+
 	public:
 		NBTrashNode();
 		NBTrashNode( QStringList, QString, NBTrashNode *parent = 0 );
@@ -38,6 +39,8 @@ class NBTrashNode {
 		QString size();
 		QDateTime deletionDate();
 		QString originalPath();
+		QString trashPath();
+		QString trashInfoPath();
 		QString type();
 
 		QString category();

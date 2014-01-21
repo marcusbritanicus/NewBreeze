@@ -8,15 +8,10 @@
 
 NBTrashModel::NBTrashModel() : QAbstractItemModel() {
 
-	__showHidden = false;
-	__readOnly = true;
-
 	oldRoots.clear();
 	curIndex = 0;
 
 	rootNode = new NBTrashNode();
-
-	connect( this, SIGNAL( updatedAllNodes() ), this, SLOT( sort() ) );
 
 	setupModelData();
 };
@@ -74,11 +69,7 @@ Qt::ItemFlags NBTrashModel::flags( const QModelIndex & index ) const {
 	if ( not index.isValid() )
 		return Qt::NoItemFlags;
 
-	if ( __readOnly )
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-
-	else
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 };
 
 QVariant NBTrashModel::data( const QModelIndex &index, int role ) const {
@@ -137,6 +128,16 @@ QVariant NBTrashModel::data( const QModelIndex &index, int role ) const {
 			return node->deletionDate().toString( "MMM dd, yyyy hh:mm:ss" );
 		}
 
+		/* Trash Path */
+		case Qt::UserRole + 4: {
+			return node->trashPath();
+		}
+
+		/* Trash Info Path */
+		case Qt::UserRole + 5: {
+			return node->trashInfoPath();
+		}
+
 		default: {
 			return QVariant();
 		}
@@ -145,20 +146,13 @@ QVariant NBTrashModel::data( const QModelIndex &index, int role ) const {
 
 QVariant NBTrashModel::headerData( int section, Qt::Orientation orientation, int role ) const {
 
-	QStringList headerList = QStringList() << "Name" << "Size" << "Type" << "MimeType" << "Modified" << "Permissions" << "Owner";
+	QStringList headerList = QStringList() << "FileName" << "Original Path" << "Size" << "Deleteion Date";
 
 	if ( ( orientation == Qt::Horizontal ) and ( role == Qt::DisplayRole ) )
 		return headerList.at( section );
 
 	else if ( ( orientation == Qt::Horizontal ) and ( role == Qt::TextAlignmentRole ) )
-		if ( section == 0 )
-			return ( 0x0001 | 0x0080 );
-
-		else if ( section == 1 )
-			return ( 0x0002 | 0x0080 );
-
-		else
-			return Qt::AlignCenter;
+		return ( 0x0001 | 0x0080 );
 
 	else
 		return QVariant();
@@ -314,29 +308,6 @@ QModelIndexList NBTrashModel::indexListForCategory( QString mCategory ) const {
 	return mList;
 };
 
-bool NBTrashModel::showHidden() const {
-
-	return __showHidden;
-};
-
-void NBTrashModel::setShowHidden( bool shown ) {
-
-	__showHidden = shown;
-
-	if ( not __rootPath.isNull() or not __rootPath.isEmpty() )
-		setupModelData();
-};
-
-bool NBTrashModel::readOnly() const {
-
-	return __readOnly;
-};
-
-void NBTrashModel::setReadOnly( bool ro ) {
-
-	__readOnly = ro;
-};
-
 Qt::DropActions NBTrashModel::supportedDragActions() const {
 
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
@@ -400,6 +371,56 @@ void NBTrashModel::reload() {
 	setupModelData();
 };
 
+void NBTrashModel::restore( QModelIndexList toBeRestored ) {
+
+	QModelIndexList failed;
+	QSettings trashInfo( "NewBreeze", "TrashInfo" );
+
+	Q_FOREACH( QModelIndex idx, toBeRestored ) {
+		NBTrashNode *node = static_cast<NBTrashNode*>( idx.internalPointer() );
+		__childNames.removeOne( node->name() );
+
+		if ( exists( node->originalPath() ) )
+			failed << idx;
+
+		if( rename( qPrintable( node->trashPath() ), qPrintable( node->originalPath() ) ) )
+			failed << idx;
+
+		remove( qPrintable( node->trashInfoPath() ) );
+		trashInfo.remove( QUrl::toPercentEncoding( node->name() ) );
+		trashInfo.sync();
+
+		rootNode->removeChild( node );
+	};
+
+	setupModelData();
+};
+
+void NBTrashModel::removeFromDisk( QModelIndexList toBeDeleted ) {
+
+	QModelIndexList failed;
+	QSettings trashInfo( "NewBreeze", "TrashInfo" );
+
+	Q_FOREACH( QModelIndex idx, toBeDeleted ) {
+		NBTrashNode *node = static_cast<NBTrashNode*>( idx.internalPointer() );
+		__childNames.removeOne( node->name() );
+
+		if ( exists( node->originalPath() ) )
+			failed << idx;
+
+		if( remove( qPrintable( node->trashPath() ) ) )
+			failed << idx;
+
+		remove( qPrintable( node->trashInfoPath() ) );
+		trashInfo.remove( QUrl::toPercentEncoding( node->name() ) );
+		trashInfo.sync();
+
+		rootNode->removeChild( node );
+	};
+
+	setupModelData();
+};
+
 void NBTrashModel::setupModelData() {
 
 	__childNames.clear();
@@ -411,17 +432,61 @@ void NBTrashModel::setupModelData() {
 	QSettings trashInfo( "NewBreeze", "TrashInfo" );
 
 	beginResetModel();
-	Q_FOREACH( QString trashed, trashInfo.allKeys() ) {
-		if ( curentLoadStatus.stopLoading ) {
-			endResetModel();
-			curentLoadStatus.stopLoading = false;
-			return;
+	/* Loading home trash */
+	QString trashLoc = NBXdg::trashLocation( NBXdg::home() );
+	if ( not trashLoc.isEmpty() ) {
+		QDir trash( trashLoc + "/info/" );
+		trash.setNameFilters( QStringList() << "*.trashinfo" );
+		Q_FOREACH( QString entry, trash.entryList() ) {
+
+			if ( curentLoadStatus.stopLoading ) {
+				endResetModel();
+				curentLoadStatus.stopLoading = false;
+				return;
+			}
+
+			QSettings trashInfo( trash.absoluteFilePath( entry ), QSettings::NativeFormat );
+			QString origPath = trashInfo.value( "Trash Info/Path" ).toString();
+			QString delDate = trashInfo.value( "Trash Info/DeletionDate" ).toString();
+			QString trashPath = QString( trashInfo.fileName() ).replace( "/info/", "/files/" ).replace( ".trashinfo", "" );
+
+			QStringList data = QStringList() << baseName( origPath ) << origPath << delDate << trashPath;
+
+			rootNode->addChild( new NBTrashNode( data, getCategory( data.at( 2 ) ), rootNode ) );
+			__childNames << baseName( origPath );
 		}
+	}
 
-		QStringList data = QStringList() << trashed << trashInfo.value( trashed ).toStringList();
+	/* Loading all other trash */
+	NBDeviceManager devMgr;
+	Q_FOREACH( NBDeviceInfo devInfo, devMgr.allDevices() ) {
+		/* We don't want to check the home directory for trash once more */
+		if ( devInfo.mountPoint() == NBXdg::home() )
+			continue;
 
-		rootNode->addChild( new NBTrashNode( data, getCategory( data.at( 2 ) ), rootNode ) );
-		__childNames << trashed;
+		trashLoc = NBXdg::trashLocation( devInfo.mountPoint() );
+		if ( not trashLoc.isEmpty() ) {
+			QDir trash( trashLoc + "/info/" );
+			trash.setNameFilters( QStringList() << "*.trashinfo" );
+			Q_FOREACH( QString entry, trash.entryList() ) {
+
+				if ( curentLoadStatus.stopLoading ) {
+					endResetModel();
+					curentLoadStatus.stopLoading = false;
+					return;
+				}
+
+				QSettings trashInfo( trash.absoluteFilePath( entry ), QSettings::NativeFormat );
+				QString origPath = trashInfo.value( "Trash Info/Path" ).toString();
+				QString delDate = trashInfo.value( "Trash Info/DeletionDate" ).toString();
+				QString trashPath = QString( trashInfo.fileName() ).replace( "/info/", "/files/" ).replace( ".trashinfo", "" );
+
+				QStringList data = QStringList() << baseName( origPath ) << origPath << delDate << trashPath;
+
+				rootNode->addChild( new NBTrashNode( data, getCategory( data.at( 2 ) ), rootNode ) );
+				__childNames << baseName( origPath );
+			}
+		}
 	}
 	endResetModel();
 

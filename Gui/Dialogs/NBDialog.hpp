@@ -27,7 +27,7 @@ class NBDialog : public QWidget {
 		Q_DECLARE_FLAGS( Buttons, ButtonFlag )
 
 		NBDialog( QString btns = QString() );
-		NBDialog( Buttons btns );
+		NBDialog( NBDialog::Buttons btns );
 
 		void setLayout( QLayout* );
 		void setDialogTitle( QString );

@@ -99,12 +99,14 @@ void NBTrasher::trashFilesAndFolders( QStringList trashList ) {
 
 	foreach( QString item, trashList ) {
 		/* Get the trashed path: $TRASH/files/filename */
-		QString newPath = trashLoc + "files/" + baseName( item );
+		QString newPath = trashLoc + "/files/" + baseName( item );
 		QString delTime = QDateTime::currentDateTime().toString( "yyyyMMddThh:mm:ss" );
 
 		/* If it exists, add a date time to it to make it unique */
 		if ( access( qPrintable( newPath ), R_OK ) == 0 )
 			newPath += delTime;
+
+		qDebug() << item << newPath;
 
 		/* Try trashing it. If it fails, intimate the user */
 		if ( rename( qPrintable( item ), qPrintable( newPath ) ) ) {
@@ -114,7 +116,7 @@ void NBTrasher::trashFilesAndFolders( QStringList trashList ) {
 
 		/* If it succeeds, we write the meta data */
 		else {
-			QFile metadata( trashLoc + "info/" + baseName( newPath ) + ".trashinfo" );
+			QFile metadata( trashLoc + "/info/" + baseName( newPath ) + ".trashinfo" );
 			metadata.open( QIODevice::WriteOnly );
 			metadata.write(
 				QString(

@@ -11,21 +11,13 @@
 #include <NBTrashModel.hpp>
 #include <NBTrashDelegate.hpp>
 #include <NBTools.hpp>
+#include <NBGuiWidgets.hpp>
 
 class NBTrashView : public QAbstractItemView {
 	Q_OBJECT
 
 	public:
-		enum ViewType {
-			TilesView             = 0x01,
-			IconsView             = 0x02,
-			DetailsView           = 0x03
-		};
-
-		NBTrashView();
-
-		// Set the item model
-		void setModel( QAbstractItemModel *model );
+		NBTrashView( NBTrashModel *model );
 
 		// Update the view mode
 		void updateViewMode();
@@ -110,7 +102,7 @@ class NBTrashView : public QAbstractItemView {
 		void paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const;
 		QPixmap pixmapForCategory( QString ) const;
 
-		NBTrashModel *cModel;
+		NBTrashModel *tModel;
 
 		// Icon rects
 		mutable int idealHeight = 0;
@@ -154,11 +146,11 @@ class NBTrashView : public QAbstractItemView {
 		void zoomOut();
 
 	Q_SIGNALS :
-		void contextMenuRequested( QPoint );
 		void acopy( QStringList, QString );
 		void copy( QStringList, QString );
 		void move( QStringList, QString );
 		void link( QStringList, QString );
+		void contextMenuRequested( QPoint );
 };
 
 #endif

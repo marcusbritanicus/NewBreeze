@@ -7,6 +7,9 @@
 // Local Headers
 #include <NewBreeze.hpp>
 
+#include <NBTrashView.hpp>
+#include <NBTrashModel.hpp>
+
 NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 
 	if ( not loc.isEmpty() ) {
@@ -697,15 +700,8 @@ void NewBreeze::showFolders() {
 
 void NewBreeze::showTrash() {
 
-	QWidget *trashWidget = new QWidget();
-	NBTrashView *trash = new NBTrashView();
-	trash->setMinimumSize( QSize( 900, 600 ) );
-
-	QHBoxLayout *lyt = new QHBoxLayout();
-	lyt->addWidget( trash );
-
-	trashWidget->setLayout( lyt );
-	trashWidget->show();
+	NBTrashManager *trashManager = new NBTrashManager();
+	trashManager->show();
 };
 
 void NewBreeze::filterFiles( QString filter ) {

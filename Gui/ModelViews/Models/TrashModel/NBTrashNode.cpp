@@ -167,6 +167,16 @@ QString NBTrashNode::originalPath() {
 	return nodeData.at( 1 );
 };
 
+QString NBTrashNode::trashPath() {
+
+	return nodeData.last();
+};
+
+QString NBTrashNode::trashInfoPath() {
+
+	return nodeData.last().replace( "/files/", "/info/" ) + ".trashinfo";
+};
+
 QString NBTrashNode::size() {
 
 	return mSize;

@@ -24,7 +24,7 @@
 #include <NBSettingsManager.hpp>
 #include <NBMessageDialog.hpp>
 #include <NBStyleManager.hpp>
-#include <NBTrashView.hpp>
+#include <NBTrashManager.hpp>
 
 class NewBreeze : public QMainWindow {
 	Q_OBJECT

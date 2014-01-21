@@ -1,22 +1,25 @@
 /*
 	*
-	* NBTrashView.cpp - NewBreeze IconView Class
+	* NBTrashView.cpp - NewBreeze TrashView Class
 	*
 */
 
 #include <NBTrashView.hpp>
 
-NBTrashView::NBTrashView() : QAbstractItemView() {
+NBTrashView::NBTrashView( NBTrashModel *model ) : QAbstractItemView() {
+
+	// Item Model
+	tModel = model;
+	QAbstractItemView::setModel( model );
 
 	// Set the Apps Delegate
 	setItemDelegate( new NBTrashDelegate() );
 
-	// Applications Model
-	cModel = new NBTrashModel();
-	setModel( cModel );
-
 	// Icon Size
 	setIconSize( Settings->Session.IconSize );
+
+	// Update View
+	updateViewMode();
 
 	// Selection
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
@@ -24,9 +27,6 @@ NBTrashView::NBTrashView() : QAbstractItemView() {
 
 	// Internal Object Name
 	setObjectName( "mainList" );
-
-	// Minimum Size
-	setMinimumWidth( 640 );
 
 	// Focus Policy
 	setFocusPolicy( Qt::StrongFocus );
@@ -52,19 +52,11 @@ NBTrashView::NBTrashView() : QAbstractItemView() {
 	setContextMenuPolicy( Qt::CustomContextMenu );
 
 	connect(
-		cModel, SIGNAL( trashLoading() ),
-		this, SLOT( reload() )
-	);
-
-	connect(
-		cModel, SIGNAL( trashLoaded() ),
-		this, SLOT( reload() )
-	);
-
-	connect(
 			this, SIGNAL( customContextMenuRequested( QPoint ) ),
 			this, SIGNAL( contextMenuRequested( QPoint ) )
 	);
+
+	connect( tModel, SIGNAL( trashLoaded() ), this, SLOT( reload() ) );
 
 	// Zoom In and Out actions
 	QAction *zoomInAct = new QAction( "Zoom In", this );
@@ -81,22 +73,12 @@ NBTrashView::NBTrashView() : QAbstractItemView() {
 	rBand = new QRubberBand( QRubberBand::Rectangle, this );
 };
 
-void NBTrashView::setModel( QAbstractItemModel *model ) {
-
-	QAbstractItemView::setModel( model );
-	hashIsDirty = true;
-};
-
 void NBTrashView::updateViewMode() {
 
-	computeGridSize( Settings->Session.IconSize );
-
-	// showHeader();
+	computeGridSize( myIconSize );
 
 	hashIsDirty = true;
 	calculateRectsIfNecessary();
-
-	return;
 };
 
 int NBTrashView::categoryHeight() const {
@@ -230,7 +212,7 @@ QModelIndex NBTrashView::indexAt( const QPoint &point_ ) const {
 
 		i.next();
 		if ( QRect( i.value(), myGridSize ).adjusted( padding / 2, padding / 2, -padding / 2, -padding / 2 ).contains( point ) )
-			return cModel->index( i.key(), 0, rootIndex() );
+			return tModel->index( i.key(), 0, rootIndex() );
 	}
 
 	return QModelIndex();
@@ -246,7 +228,7 @@ QString NBTrashView::categoryAt( const QPoint &point_ ) const {
 
 		i.next();
 		if ( i.value().contains( point ) )
-			return cModel->categories().value( i.key() );
+			return tModel->categories().value( i.key() );
 	}
 
 	return QString();
@@ -291,6 +273,11 @@ void NBTrashView::reload() {
 
 	hashIsDirty = true;
 	persistentVCol = 0;
+
+	rectForRow.clear();
+	rectForCategory.clear();
+	repaint();
+
 	calculateRectsIfNecessary();
 };
 
@@ -321,7 +308,7 @@ void NBTrashView::setSelection( const QRect &rect, QFlags<QItemSelectionModel::S
 
 	calculateRectsIfNecessary();
 	QHashIterator<int, QPoint> i( rectForRow );
-	int firstRow = cModel->rowCount();
+	int firstRow = tModel->rowCount();
 	int lastRow = -1;
 	while ( i.hasNext() ) {
 
@@ -332,8 +319,8 @@ void NBTrashView::setSelection( const QRect &rect, QFlags<QItemSelectionModel::S
 		}
 	}
 
-	if ( firstRow != cModel->rowCount() && lastRow != -1 ) {
-		QItemSelection selection( cModel->index( firstRow, 0, rootIndex() ), cModel->index( lastRow, 0, rootIndex() ) );
+	if ( firstRow != tModel->rowCount() && lastRow != -1 ) {
+		QItemSelection selection( tModel->index( firstRow, 0, rootIndex() ), tModel->index( lastRow, 0, rootIndex() ) );
 		selectionModel()->select( selection, flags );
 	}
 
@@ -350,7 +337,7 @@ QRegion NBTrashView::visualRegionForSelection( const QItemSelection &selection )
 	foreach ( const QItemSelectionRange &range, selection ) {
 		for ( int row = range.top(); row <= range.bottom(); ++row ) {
 			for ( int column = range.left(); column < range.right(); ++column ) {
-				QModelIndex index = cModel->index( row, column, rootIndex() );
+				QModelIndex index = tModel->index( row, column, rootIndex() );
 				region += visualRect( index );
 			}
 		}
@@ -364,17 +351,17 @@ void NBTrashView::paintEvent( QPaintEvent* event ) {
 	painter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
 
 	/* We need to draw the categories only if the model is categorization enabled */
-	for ( int catIdx = 0; catIdx < cModel->categories().count(); catIdx++ ) {
+	for ( int catIdx = 0; catIdx < tModel->categories().count(); catIdx++ ) {
 
 		QRect rect = categoryRect( catIdx );
 		if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
 			continue;
 
-		paintCategory( &painter, rect, cModel->categories().at( catIdx ) );
+		paintCategory( &painter, rect, tModel->categories().at( catIdx ) );
 	}
 
-	for ( int row = 0; row < cModel->rowCount( rootIndex() ); row++ ) {
-		QModelIndex index = cModel->index( row, 0, rootIndex() );
+	for ( int row = 0; row < tModel->rowCount( rootIndex() ); row++ ) {
+		QModelIndex idx = tModel->index( row, 0, rootIndex() );
 
 		QRect rect = viewportRectForRow( row );
 		if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
@@ -383,10 +370,10 @@ void NBTrashView::paintEvent( QPaintEvent* event ) {
 		QStyleOptionViewItem option = viewOptions();
 		option.rect = rect;
 
-		if ( selectionModel()->isSelected( index ) )
+		if ( selectionModel()->isSelected( idx ) )
 			option.state |= QStyle::State_Selected;
 
-		if ( currentIndex() == index )
+		if ( currentIndex() == idx )
 			option.state |= QStyle::State_HasFocus;
 
 		QPoint mousePos = mapFromGlobal( cursor().pos() );
@@ -394,8 +381,7 @@ void NBTrashView::paintEvent( QPaintEvent* event ) {
 			option.state |= QStyle::State_MouseOver;
 
 		option.decorationSize = myIconSize;
-
-		itemDelegate()->paint( &painter, option, index );
+		itemDelegate()->paint( &painter, option, idx );
 	}
 
 	event->accept();
@@ -495,7 +481,7 @@ void NBTrashView::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 			/* This is the starting index in the selection */
 			QModelIndex start = ( selected.count() ? selected.at( 0 ) : currentIndex() );
 			if ( not start.isValid() )
-				start = cModel->index( 0, 0, rootIndex() );
+				start = tModel->index( 0, 0, rootIndex() );
 
 			/* On click-release, we make the index below the mouse as the current */
 			setCurrentIndex( idx );
@@ -555,24 +541,24 @@ void NBTrashView::computeGridSize( QSize iconSize ) {
 QModelIndex NBTrashView::moveCursorCategorized( QAbstractItemView::CursorAction cursorAction ) {
 
 	QModelIndex idx = currentIndex();
-	QStringList categoryList = cModel->categories();
+	QStringList categoryList = tModel->categories();
 
 	/* If there exists a current index */
 	if ( idx.isValid() ) {
 
-		int thisCategoryIdx = cModel->categoryIndex( idx );
+		int thisCategoryIdx = tModel->categoryIndex( idx );
 		/* If we are in the first category go to the last one */
-		int prevCategoryIdx = ( thisCategoryIdx == 0 ? cModel->categoryCount() - 1 : thisCategoryIdx - 1 );
+		int prevCategoryIdx = ( thisCategoryIdx == 0 ? tModel->categoryCount() - 1 : thisCategoryIdx - 1 );
 		/* If we are in the last category go to the first one */
-		int nextCategoryIdx = ( ( thisCategoryIdx == cModel->categoryCount() - 1 ) ? 0 : thisCategoryIdx + 1 );
+		int nextCategoryIdx = ( ( thisCategoryIdx == tModel->categoryCount() - 1 ) ? 0 : thisCategoryIdx + 1 );
 
 		QString prevCategory = categoryList.value( prevCategoryIdx );
-		QString thisCategory = cModel->category( idx );
+		QString thisCategory = tModel->category( idx );
 		QString nextCategory = categoryList.value( nextCategoryIdx );
 
-		QModelIndexList prevCategoryIndexes = cModel->indexListForCategory( prevCategory );
-		QModelIndexList thisCategoryIndexes = cModel->indexListForCategory( thisCategory );
-		QModelIndexList nextCategoryIndexes = cModel->indexListForCategory( nextCategory );
+		QModelIndexList prevCategoryIndexes = tModel->indexListForCategory( prevCategory );
+		QModelIndexList thisCategoryIndexes = tModel->indexListForCategory( thisCategory );
+		QModelIndexList nextCategoryIndexes = tModel->indexListForCategory( nextCategory );
 
 		// Calculate the visual row of this index
 		int rowInCategory = thisCategoryIndexes.indexOf( idx );
@@ -581,7 +567,7 @@ QModelIndex NBTrashView::moveCursorCategorized( QAbstractItemView::CursorAction 
 			case QAbstractItemView::MoveNext:
 			case QAbstractItemView::MoveRight: {
 				/* If the current index is not the last visible index */
-				if ( idx.row() >= 0 and idx.row() < cModel->rowCount() - 1 ) {
+				if ( idx.row() >= 0 and idx.row() < tModel->rowCount() - 1 ) {
 					/* If this is the visual index of the catgory, then next persistentVCol will be zero */
 					if ( idx == thisCategoryIndexes.last() )
 						persistentVCol = 0;
@@ -589,53 +575,53 @@ QModelIndex NBTrashView::moveCursorCategorized( QAbstractItemView::CursorAction 
 					else
 						persistentVCol = ( rowInCategory + 1 ) % itemsPerRow;
 
-					return cModel->index( idx.row() + 1, 0, rootIndex() );
+					return tModel->index( idx.row() + 1, 0, rootIndex() );
 				}
 
 				/* Current index is the last visible index */
 				else {
 					persistentVCol = 0;
-					return cModel->index( 0, 0, rootIndex() );
+					return tModel->index( 0, 0, rootIndex() );
 				}
 			}
 
 			case QAbstractItemView::MovePrevious:
 			case QAbstractItemView::MoveLeft: {
 				/* The current index is anything but the first one */
-				if ( idx.row() > 0 and idx.row() < cModel->rowCount() ) {
+				if ( idx.row() > 0 and idx.row() < tModel->rowCount() ) {
 					if ( idx == thisCategoryIndexes.first() )
 						persistentVCol = ( prevCategoryIndexes.count() - 1 ) % itemsPerRow;
 
 					else
 						persistentVCol = ( rowInCategory - 1 ) % itemsPerRow;
-					return cModel->index( idx.row() - 1, 0, rootIndex() );
+					return tModel->index( idx.row() - 1, 0, rootIndex() );
 				}
 
 				/* The current index is the first one */
 				else {
 					// #warning "FIXME: This implementation is buggy"
 					persistentVCol = ( prevCategoryIndexes.count() - 1 ) % itemsPerRow;
-					return cModel->index( cModel->rowCount() - 1, 0, rootIndex() );
+					return tModel->index( tModel->rowCount() - 1, 0, rootIndex() );
 				}
 			}
 
 			case QAbstractItemView::MoveDown: {
 
-				if ( idx.row() == cModel->rowCount() - 1 ) {
-					return cModel->index( 0, 0, idx.parent() );
+				if ( idx.row() == tModel->rowCount() - 1 ) {
+					return tModel->index( 0, 0, idx.parent() );
 				}
 				else {
-					return cModel->index( idx.row() + 1, 0, idx.parent() );
+					return tModel->index( idx.row() + 1, 0, idx.parent() );
 				}
 			}
 
 			case QAbstractItemView::MoveUp: {
 
 				if ( idx.row() == 0 ) {
-					return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
+					return tModel->index( tModel->rowCount() - 1, 0, idx.parent() );
 				}
 				else {
-					return cModel->index( idx.row() - 1, 0, idx.parent() );
+					return tModel->index( idx.row() - 1, 0, idx.parent() );
 				}
 			}
 
@@ -643,13 +629,13 @@ QModelIndex NBTrashView::moveCursorCategorized( QAbstractItemView::CursorAction 
 
 				verticalScrollBar()->setValue( 0 );
 				persistentVCol = 0;
-				return cModel->index( 0, 0, idx.parent() );
+				return tModel->index( 0, 0, idx.parent() );
 			}
 
 			case QAbstractItemView::MoveEnd: {
 
-				persistentVCol = ( cModel->indexListCountForCategory( categoryList.last() ) - 1 ) % itemsPerRow;
-				return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
+				persistentVCol = ( tModel->indexListCountForCategory( categoryList.last() ) - 1 ) % itemsPerRow;
+				return tModel->index( tModel->rowCount() - 1, 0, idx.parent() );
 			}
 
 			default: {
@@ -665,18 +651,18 @@ QModelIndex NBTrashView::moveCursorCategorized( QAbstractItemView::CursorAction 
 
 				persistentVCol = 0;
 				verticalScrollBar()->setValue( 0 );
-				return cModel->index( 0, 0, idx.parent() );
+				return tModel->index( 0, 0, idx.parent() );
 			}
 
 			case QAbstractItemView::MoveEnd: {
 
-				persistentVCol = ( cModel->indexListCountForCategory( categoryList.last() ) - 1 ) % itemsPerRow;
-				return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
+				persistentVCol = ( tModel->indexListCountForCategory( categoryList.last() ) - 1 ) % itemsPerRow;
+				return tModel->index( tModel->rowCount() - 1, 0, idx.parent() );
 			}
 
 			default: {
 
-				return cModel->index( 0, 0, rootIndex() );
+				return tModel->index( 0, 0, rootIndex() );
 			}
 		}
 	}
@@ -697,12 +683,12 @@ void NBTrashView::calculateRectsIfNecessary() const {
 	calculateCategorizedRects();
 
 	if ( idealHeight <= viewport()->height() ) {
+		verticalScrollBar()->setValue( 0 );
 		verticalScrollBar()->hide();
 	}
 
 	else {
 		verticalScrollBar()->show();
-
 		verticalScrollBar()->setSingleStep( myGridSize.height() );
 		verticalScrollBar()->setPageStep( viewport()->height() );
 		verticalScrollBar()->setRange( 0, qMax( 0, idealHeight - viewport()->height() ) );
@@ -715,14 +701,14 @@ void NBTrashView::calculateCategorizedRects() const {
 		return;
 
 	int y = 0, prevRows = 0, totalRows = 0;
-	QStringList categoryList = cModel->categories();
+	QStringList categoryList = tModel->categories();
 
 	int catX = myContentsMargins.left() ;
 	int catW = myGridSize.width() + myInlayMargins.left() + myInlayMargins.right();
 	int x = myContentsMargins.left() + myInlayMargins.left();
 
 	for( int catIdx = 0; catIdx < categoryList.count(); catIdx++ ) {
-		QModelIndexList mList = cModel->indexListForCategory( categoryList.at( catIdx ) );
+		QModelIndexList mList = tModel->indexListForCategory( categoryList.at( catIdx ) );
 
 		// Minimum X and Y for Category Rectangle
 		int minY = myContentsMargins.top() + catIdx * myCategoryHeight + catIdx * myCategorySpacing + totalRows * myGridSize.height();
@@ -732,7 +718,7 @@ void NBTrashView::calculateCategorizedRects() const {
 		// Mimimum X and Y for indexes
 		minY += myCategoryHeight;
 
-		prevRows = cModel->indexListCountForCategory( categoryList.at( catIdx ) );
+		prevRows = tModel->indexListCountForCategory( categoryList.at( catIdx ) );
 		totalRows += prevRows;
 
 		for( int lrow = 0; lrow < mList.count(); lrow++ ) {
@@ -751,7 +737,7 @@ void NBTrashView::calculateCategorizedRects() const {
 	// Bottom Margin Size
 	idealHeight += myContentsMargins.bottom();
 	// All item sizes
-	idealHeight += cModel->rowCount() * myGridSize.height();
+	idealHeight += tModel->rowCount() * myGridSize.height();
 
 	hashIsDirty = false;
 	viewport()->update();
@@ -763,7 +749,7 @@ void NBTrashView::computeRowsAndColumns() const {
 	vWidth = vWidth - myInlayMargins.left() - myInlayMargins.right();
 
 	itemsPerRow = 1;
-	numberOfRows = cModel->rowCount();
+	numberOfRows = tModel->rowCount();
 
 	int newGridWidth = ( int )( vWidth / itemsPerRow );
 	myGridSize = QSize( newGridWidth, myGridSizeMin.height() );
