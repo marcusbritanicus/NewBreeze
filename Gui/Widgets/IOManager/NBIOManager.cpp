@@ -143,6 +143,9 @@ void NBIOWidget::update() {
 
 void NBIOWidget::speedCalculator() {
 
+	if ( paused )
+		return;
+
 	if ( io->totalSize == io->copiedSize )
 		return;
 

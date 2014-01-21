@@ -17,7 +17,7 @@ NBDeleteManager::NBDeleteManager( QObject *parent, bool trash ) : QObject( paren
 		trasher->moveToThread( thread );
 		connect(
 			trasher, SIGNAL( completed( QStringList, QStringList ) ),
-			this, SLOT( failureHandler( QStringList, QStringList ) )
+			this, SIGNAL( deleteOperationComplete( QStringList, QStringList ) )
 		);
 	}
 
@@ -25,7 +25,7 @@ NBDeleteManager::NBDeleteManager( QObject *parent, bool trash ) : QObject( paren
 		deleter->moveToThread( thread );
 		connect(
 			deleter, SIGNAL( completed( QStringList, QStringList ) ),
-			this, SLOT( failureHandler( QStringList, QStringList ) )
+			this, SIGNAL( trashOperationComplete( QStringList, QStringList ) )
 		);
 	}
 
