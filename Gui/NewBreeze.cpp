@@ -7,9 +7,6 @@
 // Local Headers
 #include <NewBreeze.hpp>
 
-#include <NBTrashView.hpp>
-#include <NBTrashModel.hpp>
-
 NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 
 	if ( not loc.isEmpty() ) {

@@ -1458,7 +1458,7 @@ void NBIconView::emitCML() {
 		emit copy( args, mtpt );
 	}
 
-	else if ( act->text().contains( "Copy" ) ) {
+	else if ( act->text().contains( "Move" ) ) {
 
 		emit move( args, mtpt );
 	}

@@ -31,6 +31,7 @@ class NBXdg {
 		static QStringList systemDirs( NBXdg::XdgSystemDirs );
 
 		static QString trashLocation( QString path );
+		static QString homeTrashLocation();
 };
 
 #endif

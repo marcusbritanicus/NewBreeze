@@ -142,19 +142,7 @@ QString NBXdg::trashLocation( QString path ) {
 
 	/* Ideally, if path is inside home */
 	if ( path.startsWith( home() ) ) {
-		/* If the permissions of Trash folder are right; we assume $trash/files and $trash/info exists */
-		if ( access( qPrintable( home() + "/.local/share/Trash/" ), R_OK | W_OK | X_OK ) == 0 )
-			return home() + "/.local/share/Trash/";
-
-		else {
-			/* Try to make the trash folder */
-			QDir::home().mkpath( "/.local/share/Trash/" );
-			QDir::home().mkpath( "/.local/share/Trash/files/" );
-			QDir::home().mkpath( "/.local/share/Trash/info/" );
-			QFile::setPermissions( home() + "/.local/share/Trash/", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner );
-
-			return home() + "/.local/share/Trash/";
-		}
+		return NBXdg::homeTrashLocation();
 	}
 
 	else {
@@ -195,4 +183,21 @@ QString NBXdg::trashLocation( QString path ) {
 	}
 
 	return QString();
+};
+
+QString NBXdg::homeTrashLocation() {
+
+	/* If the permissions of Trash folder are right; we assume $trash/files and $trash/info exists */
+	if ( access( qPrintable( home() + "/.local/share/Trash/" ), R_OK | W_OK | X_OK ) == 0 )
+		return home() + "/.local/share/Trash/";
+
+	else {
+		/* Try to make the trash folder */
+		QDir::home().mkpath( "/.local/share/Trash/" );
+		QDir::home().mkpath( "/.local/share/Trash/files/" );
+		QDir::home().mkpath( "/.local/share/Trash/info/" );
+		QFile::setPermissions( home() + "/.local/share/Trash/", QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner );
+
+		return home() + "/.local/share/Trash/";
+	}
 };

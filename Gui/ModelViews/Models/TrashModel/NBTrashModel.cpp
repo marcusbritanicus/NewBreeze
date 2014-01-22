@@ -380,11 +380,15 @@ void NBTrashModel::restore( QModelIndexList toBeRestored ) {
 		NBTrashNode *node = static_cast<NBTrashNode*>( idx.internalPointer() );
 		__childNames.removeOne( node->name() );
 
-		if ( exists( node->originalPath() ) )
+		if ( exists( node->originalPath() ) ) {
 			failed << idx;
+			continue;
+		}
 
-		if( rename( qPrintable( node->trashPath() ), qPrintable( node->originalPath() ) ) )
+		if( rename( qPrintable( node->trashPath() ), qPrintable( node->originalPath() ) ) ) {
 			failed << idx;
+			continue;
+		}
 
 		remove( qPrintable( node->trashInfoPath() ) );
 		trashInfo.remove( QUrl::toPercentEncoding( node->name() ) );
@@ -393,6 +397,7 @@ void NBTrashModel::restore( QModelIndexList toBeRestored ) {
 		rootNode->removeChild( node );
 	};
 
+	emit restored( failed );
 	setupModelData();
 };
 
@@ -405,11 +410,10 @@ void NBTrashModel::removeFromDisk( QModelIndexList toBeDeleted ) {
 		NBTrashNode *node = static_cast<NBTrashNode*>( idx.internalPointer() );
 		__childNames.removeOne( node->name() );
 
-		if ( exists( node->originalPath() ) )
+		if( remove( qPrintable( node->trashPath() ) ) ) {
 			failed << idx;
-
-		if( remove( qPrintable( node->trashPath() ) ) )
-			failed << idx;
+			continue;
+		}
 
 		remove( qPrintable( node->trashInfoPath() ) );
 		trashInfo.remove( QUrl::toPercentEncoding( node->name() ) );
@@ -418,6 +422,7 @@ void NBTrashModel::removeFromDisk( QModelIndexList toBeDeleted ) {
 		rootNode->removeChild( node );
 	};
 
+	emit deleted( failed );
 	setupModelData();
 };
 
@@ -433,7 +438,7 @@ void NBTrashModel::setupModelData() {
 
 	beginResetModel();
 	/* Loading home trash */
-	QString trashLoc = NBXdg::trashLocation( NBXdg::home() );
+	QString trashLoc = NBXdg::homeTrashLocation();
 	if ( not trashLoc.isEmpty() ) {
 		QDir trash( trashLoc + "/info/" );
 		trash.setNameFilters( QStringList() << "*.trashinfo" );
@@ -465,6 +470,9 @@ void NBTrashModel::setupModelData() {
 			continue;
 
 		trashLoc = NBXdg::trashLocation( devInfo.mountPoint() );
+		if ( NBXdg::homeTrashLocation() == trashLoc )
+			continue;
+
 		if ( not trashLoc.isEmpty() ) {
 			QDir trash( trashLoc + "/info/" );
 			trash.setNameFilters( QStringList() << "*.trashinfo" );
