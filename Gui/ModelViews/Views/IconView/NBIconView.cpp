@@ -388,6 +388,7 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		}
 	}
 
+	QModelIndexList selectedIndexes;
 	for ( int row = 0; row < cModel->rowCount( rootIndex() ); row++ ) {
 		QModelIndex index = cModel->index( row, 0, rootIndex() );
 
@@ -399,7 +400,7 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		option.rect = rect;
 
 		if ( selectionModel()->isSelected( index ) )
-			option.state |= QStyle::State_Selected;
+			selectedIndexes << index;
 
 		if ( currentIndex() == index )
 			option.state |= QStyle::State_HasFocus;
@@ -413,7 +414,30 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		itemDelegate()->paint( &painter, option, index );
 	}
 
+	paintSelection( &painter, selectedIndexes );
+
+	painter.end();
 	event->accept();
+};
+
+void NBIconView::paintSelection( QPainter *painter, const QModelIndexList indexes ) const {
+
+	if ( not indexes.count() )
+		return;
+
+	painter->save();
+	painter->setPen( QPen( palette().color( QPalette::Highlight ), 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
+
+	QColor bg = palette().color( QPalette::Highlight );
+	bg.setAlpha( 120 );
+	painter->setBrush( bg );
+
+	QPainterPath path;
+	Q_FOREACH( QModelIndex idx, indexes )
+		path.addRoundedRect( QRectF( viewportRectForRow( idx.row() ) ), 4, 4 );
+
+	painter->drawPath( path );
+	painter->restore();
 };
 
 void NBIconView::resizeEvent( QResizeEvent* ) {
@@ -563,6 +587,8 @@ void NBIconView::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 
 	if ( rBand->isVisible() )
 		rBand->hide();
+
+	repaint();
 
 	mrEvent->accept();
 };

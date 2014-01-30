@@ -122,6 +122,7 @@ class NBIconView : public QAbstractItemView {
 		QRect viewportRectForRow( int row ) const;
 
 		void paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const;
+		void paintSelection( QPainter *painter, const QModelIndexList ) const;
 		QPixmap pixmapForCategory( QString ) const;
 
 		NBFileSystemModel *cModel;
