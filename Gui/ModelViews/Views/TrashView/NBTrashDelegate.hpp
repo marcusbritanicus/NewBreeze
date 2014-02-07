@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBTRASHDELEGATE_HPP
 #define NBTRASHDELEGATE_HPP
 

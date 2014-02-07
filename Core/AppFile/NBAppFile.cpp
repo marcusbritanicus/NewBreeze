@@ -33,6 +33,26 @@ inline QString baseName( QString path ) {
 	return QString( basename( strdup( qPrintable( path ) ) ) );
 };
 
+NBAppFile::NBAppFile() {
+
+	fileUrl = QString();
+
+	__name = QString();
+	__type = QString();
+	__exec = QString();
+	__icon = QString();
+	__mimeTypes =     QStringList();
+	__workPath =      QString();
+	__terminalMode =  false;
+	__categories =    QStringList();
+	__comment =       QString();
+	__nodisplay =     true;
+	__takesArgs =     false;
+	__multipleFiles = false;
+	__grade = -1;
+	__execArgs = QStringList();
+};
+
 NBAppFile::NBAppFile( QString path ) {
 
 	if ( exists( path ) ) {
@@ -429,7 +449,7 @@ void NBAppsList::move( int from, int to ) {
 
 NBAppFile NBAppsList::at( quint64 pos ) {
 
-	return __appsList.at( pos );
+	return __appsList.value( pos );
 };
 
 int NBAppsList::indexOf( NBAppFile app ) {

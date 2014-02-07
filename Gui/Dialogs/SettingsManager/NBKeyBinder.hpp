@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBKEYBINDER_HPP
 #define NBKEYBINDER_HPP
 

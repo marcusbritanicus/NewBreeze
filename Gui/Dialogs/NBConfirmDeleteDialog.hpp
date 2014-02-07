@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBCONFIRMDELETEDIALOG_HPP
 #define NBCONFIRMDELETEDIALOG_HPP
 

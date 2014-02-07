@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBXDG_HPP
 #define NBXDG_HPP
 

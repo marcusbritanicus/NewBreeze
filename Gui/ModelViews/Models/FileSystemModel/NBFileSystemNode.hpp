@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBFILESYSTEMNODE_HPP
 #define NBFILESYSTEMNODE_HPP
 

@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBLIBBZIP2_HPP
 #define NBLIBBZIP2_HPP
 

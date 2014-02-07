@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBLABELS_HPP
 #define NBLABELS_HPP
 

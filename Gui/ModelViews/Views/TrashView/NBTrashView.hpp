@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBTRASHVIEW_HPP
 #define NBTRASHVIEW_HPP
 

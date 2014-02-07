@@ -8,7 +8,7 @@
 
 inline bool matchesFilter( QStringList filters, QString text ) {
 
-	foreach( QString filter, filters )
+	Q_FOREACH( QString filter, filters )
 		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
 			return true;
 
@@ -332,7 +332,10 @@ bool NBFileSystemModel::removeNode( QString nodeName ) {
 
 QModelIndex NBFileSystemModel::index( int row, int column, const QModelIndex &parent ) const {
 
-	if ( not hasIndex( row, column, parent ) )
+    if (row < 0 || column < 0)
+        return QModelIndex();
+
+    if ( not ( ( row < rowCount( parent ) ) and ( column < columnCount( parent ) ) ) )
 		return QModelIndex();
 
 	NBFileSystemNode *parentNode;
@@ -524,7 +527,7 @@ void NBFileSystemModel::setNameFilters( QStringList filters ) {
 	__nameFilters.clear();
 	__nameFilters << filters;
 
-	// setupModelData();
+	setupModelData();
 };
 
 void NBFileSystemModel::clearNameFilters() {

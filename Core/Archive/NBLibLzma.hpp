@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBLIBLZMA_HPP
 #define NBLIBLZMA_HPP
 

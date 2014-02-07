@@ -252,18 +252,18 @@ void NBFolderView::createAndSetupActions() {
 	connect( groupsAct, SIGNAL( triggered() ), this, SIGNAL( toggleGroups() ) );
 
 	// Focus the search bar
-	// QAction *focusSearchAct = new QAction( "Focus SearchBar", this );
-	// focusSearchAct->setShortcuts( Settings->Shortcuts.FocusSearchBar );
+	QAction *focusSearchAct = new QAction( "Focus SearchBar", this );
+	focusSearchAct->setShortcuts( Settings->Shortcuts.FocusSearchBar );
 
-	// connect( focusSearchAct, SIGNAL( triggered() ), this, SIGNAL( focusSearchBar() ) );
-	// addAction( focusSearchAct );
+	connect( focusSearchAct, SIGNAL( triggered() ), this, SIGNAL( focusSearchBar() ) );
+	addAction( focusSearchAct );
 
 	// Clear the search bar
-	// QAction *clearSearchAct = new QAction( "Clear SearchBar", this );
-	// clearSearchAct->setShortcuts( Settings->Shortcuts.ClearSearchBar );
+	QAction *clearSearchAct = new QAction( "Clear SearchBar", this );
+	clearSearchAct->setShortcuts( Settings->Shortcuts.ClearSearchBar );
 
-	// connect( clearSearchAct, SIGNAL( triggered() ), this, SIGNAL( clearSearchBar() ) );
-	// addAction( clearSearchAct );
+	connect( clearSearchAct, SIGNAL( triggered() ), this, SIGNAL( clearSearchBar() ) );
+	addAction( clearSearchAct );
 };
 
 QModelIndexList NBFolderView::getSelection() {
@@ -336,14 +336,17 @@ void NBFolderView::doOpen( QString loc ) {
 	}
 
 	if ( isDir( loc ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", qPrintable( loc ) );
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", qPrintable( loc ) );
 		fsModel->setRootPath( loc );
 	}
 
 	else if ( isFile( loc ) ) {
-		NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s", qPrintable( loc ) );
+		NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", qPrintable( loc ) );
 
 		NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
+		if ( app.desktopFileName() == "." )
+			doOpenWithCmd();
+
 		QStringList exec = app.execArgs();
 
 		// Prepare @v exec
@@ -424,8 +427,11 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			}
 
 			else {
-				NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s", qPrintable( fileToBeOpened ) );
+				NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", qPrintable( fileToBeOpened ) );
 				NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( fileToBeOpened ) );
+				if ( app.desktopFileName() == "." )
+					doOpenWithCmd();
+
 				QStringList exec = app.execArgs();
 
 				// Prepare @v exec
@@ -477,7 +483,17 @@ void NBFolderView::doOpenInNewWindow() {
 
 void NBFolderView::doOpenWithCmd() {
 
-	QStringList files = qobject_cast<QAction *>( sender() )->data().toStringList();
+	QStringList files;
+
+	if ( qobject_cast<QAction *>( sender() ) ) {
+		QAction *action = qobject_cast<QAction *>( sender() );
+		files << action->data().toStringList();
+	}
+
+	else {
+		Q_FOREACH( QModelIndex idx, getSelection() )
+			files << fsModel->nodePath( idx );
+	}
 
 	NBRunCmdDialog *runCmd = new NBRunCmdDialog( QFileInfo( files[ 0 ] ).fileName() );
 	runCmd->exec();
@@ -554,6 +570,23 @@ void NBFolderView::doPeek() {
 		return;
 	}
 
+	/* Load the peek plugin */
+	QStringList pluginPaths = QStringList() << QString( INSTALL_PATH ) + "/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
+	QString peekPlugin;
+	Q_FOREACH( QString path, pluginPaths ) {
+		if ( exists( path + "libPeekPlugins.so" ) ) {
+			peekPlugin = path + "libPeekPlugins.so";
+			break;
+		}
+	}
+
+	QPluginLoader loader( QDir( peekPlugin ).canonicalPath() );
+	NBPeekPlugin *plugin = 0;
+	QObject *pluginObject = loader.instance();
+	if ( pluginObject ) {
+		plugin = qobject_cast<NBPeekPlugin *>( pluginObject );
+	}
+
 	if ( isDir( currentNode ) ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing folder: %s", qPrintable( currentNode ) );
 		NBFolderFlash *previewer = new NBFolderFlash( currentNode );
@@ -562,34 +595,83 @@ void NBFolderView::doPeek() {
 		previewer->show();
 	}
 
-	else if ( mimeType.contains( "html" ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing html: %s", qPrintable( currentNode ) );
-		NBWebWatch *previewer = new NBWebWatch( currentNode );
-		previewer->show();
-	}
+	else if ( plugin ) {
+		if ( mimeType.contains( "html" ) ) {
+			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing html: %s", qPrintable( currentNode ) );
+			QWidget *previewer = plugin->htmlPreviewWidget( currentNode );
 
-	else if ( isText( currentNode ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing text: %s", qPrintable( currentNode ) );
-		NBWordView *previewer = new NBWordView( currentNode );
-		previewer->show();
-	}
+			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
+			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				previewer->setAttribute( Qt::WA_TranslucentBackground );
 
-	else if ( mimeType.contains( "image" ) or mimeType.contains( "mng" ) or mimeType.contains( "gif" ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing image: %s", qPrintable( currentNode ) );
-		NBImagePeek *previewer = new NBImagePeek( currentNode );
-		previewer->show();
-	}
+			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
+			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
 
-	else if ( mimeType.contains( "opendocument.text" ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing image: %s", qPrintable( currentNode ) );
-		NBOdfOgle *previewer = new NBOdfOgle( currentNode );
-		previewer->show();
-	}
+			previewer->show();
+		}
 
-	else if ( mimeType.contains( "pdf" ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing PDF: %s", qPrintable( currentNode ) );
-		NBPdfPeep *previewer = new NBPdfPeep( currentNode );
-		previewer->show();
+		else if ( isText( currentNode ) ) {
+			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing text: %s", qPrintable( currentNode ) );
+			QWidget *previewer = plugin->textPreviewWidget( currentNode );
+
+			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
+			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				previewer->setAttribute( Qt::WA_TranslucentBackground );
+
+			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
+			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
+
+			previewer->show();
+		}
+
+		else if ( mimeType.contains( "image" ) or mimeType.contains( "mng" ) or mimeType.contains( "gif" ) ) {
+			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing image: %s", qPrintable( currentNode ) );
+			QWidget *previewer = plugin->imagePreviewWidget( currentNode );
+
+			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
+			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				previewer->setAttribute( Qt::WA_TranslucentBackground );
+
+			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
+			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
+
+			previewer->show();
+		}
+
+		else if ( mimeType.contains( "opendocument.text" ) ) {
+			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing image: %s", qPrintable( currentNode ) );
+			QWidget *previewer = plugin->odfPreviewWidget( currentNode );
+
+			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
+			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				previewer->setAttribute( Qt::WA_TranslucentBackground );
+
+			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
+			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
+
+			previewer->show();
+		}
+
+		else if ( mimeType.contains( "pdf" ) ) {
+			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing PDF: %s", qPrintable( currentNode ) );
+			QWidget *previewer = plugin->pdfPreviewWidget( currentNode );
+
+			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
+			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				previewer->setAttribute( Qt::WA_TranslucentBackground );
+
+			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
+			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
+
+			previewer->show();
+		}
+
+		else {
+			// Custom Peeking
+			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", qPrintable( currentNode ) );
+			NBCustomPeek *previewer = new NBCustomPeek( currentNode );
+			previewer->show();
+		}
 	}
 
 	else {

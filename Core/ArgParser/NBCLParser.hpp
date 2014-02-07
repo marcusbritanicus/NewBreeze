@@ -4,6 +4,7 @@
     *
 */
 
+#pragma once
 #ifndef NBARGPARSER
 #define NBARGPARSER
 

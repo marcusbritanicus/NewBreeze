@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBDIALOG_HPP
 #define NBDIALOG_HPP
 

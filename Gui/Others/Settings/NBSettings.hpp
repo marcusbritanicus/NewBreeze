@@ -4,6 +4,7 @@
     *
 */
 
+#pragma once
 #ifndef NBSETTINGS_HPP
 #define NBSETTINGS_HPP
 

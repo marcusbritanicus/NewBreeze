@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBSELECTIONAREA_HPP
 #define NBSELECTIONAREA_HPP
 

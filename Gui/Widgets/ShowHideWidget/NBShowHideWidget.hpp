@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBSHOWHIDEWIDGET_HPP
 #define NBSHOWHIDEWIDGET_HPP
 

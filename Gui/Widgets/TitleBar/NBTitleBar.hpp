@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBTITLEBAR_HPP
 #define NBTITLEBAR_HPP
 

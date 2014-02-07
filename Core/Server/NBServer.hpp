@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBSERVER_HPP
 #define NBSERVER_HPP
 

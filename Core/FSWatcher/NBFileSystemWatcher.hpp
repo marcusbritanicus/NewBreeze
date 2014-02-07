@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBFILESYSTEMWATCHER_HPP
 #define NBFILESYSTEMWATCHER_HPP
 

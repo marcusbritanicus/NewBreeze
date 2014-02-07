@@ -10,36 +10,30 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 LIBS += -lmagic -lzip -ltar -lbz2 -llzma -lz
 
-# Poppler-Qt4
-INCLUDEPATH  += /usr/include/poppler/qt4
-LIBS         += -L/usr/lib -lpoppler-qt4
-
 # Source Paths
 INCLUDEPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/ConfigParser Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/FileIO
-INCLUDEPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/MultiFile Core/Server Core/StandardPaths Core/SystemInfo Core/XDG
-INCLUDEPATH += Gui Gui/Dialogs Gui/Dialogs/FileDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/SettingsManager Gui/ModelViews
-INCLUDEPATH += Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel
+INCLUDEPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/MultiFile Core/SelectionArea Core/Server Core/StandardPaths
+INCLUDEPATH += Core/SystemInfo Core/XDG Gui Gui/Dialogs Gui/Dialogs/FileDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/SettingsManager
+INCLUDEPATH += Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel
 INCLUDEPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
 INCLUDEPATH += Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView
-INCLUDEPATH += Gui/ModelViews/Views/SidePanelView Gui/ModelViews/Views/TrashView Gui/Others Gui/Others/Settings Gui/Plugins
-INCLUDEPATH += Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash Gui/Plugins/ImagePeek Gui/Plugins/OdfOgle Gui/Plugins/PdfPeep
-INCLUDEPATH += Gui/Plugins/WebWatch Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
-INCLUDEPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
+INCLUDEPATH += Gui/ModelViews/Views/SidePanelView Gui/ModelViews/Views/TrashView Gui/Others Gui/Others/Settings Gui/Widgets
+INCLUDEPATH += Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu Gui/Widgets/CustomActions
+INCLUDEPATH += Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
 INCLUDEPATH += Gui/Widgets/IOManager Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget Gui/Widgets/SidePanel Gui/Widgets/Terminal
 INCLUDEPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar Gui/Widgets/TrashManager StyleSheets
 
 DEPENDPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/ConfigParser Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/FileIO
-DEPENDPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/MultiFile Core/Server Core/StandardPaths Core/SystemInfo Core/XDG
-DEPENDPATH += Gui Gui/Dialogs Gui/Dialogs/FileDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/SettingsManager Gui/ModelViews
-DEPENDPATH += Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel
+DEPENDPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/MultiFile Core/SelectionArea Core/Server Core/StandardPaths
+DEPENDPATH += Core/SystemInfo Core/XDG Gui Gui/Dialogs Gui/Dialogs/FileDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/SettingsManager
+DEPENDPATH += Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel
 DEPENDPATH += Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/SidePanelModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
 DEPENDPATH += Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView
-DEPENDPATH += Gui/ModelViews/Views/SidePanelView Gui/ModelViews/Views/TrashView Gui/Others Gui/Others/Settings Gui/Plugins
-DEPENDPATH += Gui/Plugins/CustomPeek Gui/Plugins/FolderFlash Gui/Plugins/ImagePeek Gui/Plugins/OdfOgle Gui/Plugins/PdfPeep
-DEPENDPATH += Gui/Plugins/WebWatch Gui/Plugins/WordView Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
-DEPENDPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
+DEPENDPATH += Gui/ModelViews/Views/SidePanelView Gui/ModelViews/Views/TrashView Gui/Others Gui/Others/Settings Gui/Widgets
+DEPENDPATH += Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu Gui/Widgets/CustomActions
+DEPENDPATH += Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
 DEPENDPATH += Gui/Widgets/IOManager Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget Gui/Widgets/SidePanel Gui/Widgets/Terminal
-DEPENDPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar Gui/Widgets/TrashManager StyleSheets StyleSheets/Template
+DEPENDPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar Gui/Widgets/TrashManager StyleSheets
 
 # Headers
 HEADERS += Global.hpp
@@ -71,8 +65,6 @@ HEADERS += Core/Server/NBServer.hpp
 HEADERS += Core/StandardPaths/NBStandardPaths.hpp
 HEADERS += Core/SystemInfo/NBSystemInfo.hpp
 HEADERS += Core/XDG/NBXdg.hpp
-HEADERS += Gui/Dialogs/FileDialog/NBFDFolderView.hpp
-HEADERS += Gui/Dialogs/FileDialog/NBFDItemDelegate.hpp
 HEADERS += Gui/Dialogs/FileDialog/NBFileDialog.hpp
 HEADERS += Gui/Dialogs/NBConfirmDeleteDialog.hpp
 HEADERS += Gui/Dialogs/NBDeleteDialog.hpp
@@ -109,21 +101,14 @@ HEADERS += Gui/ModelViews/Views/TrashView/NBTrashDelegate.hpp
 HEADERS += Gui/ModelViews/Views/TrashView/NBTrashView.hpp
 HEADERS += Gui/NewBreeze.hpp
 HEADERS += Gui/Others/Settings/NBSettings.hpp
-HEADERS += Gui/Plugins/CustomPeek/NBCustomPeek.hpp
-HEADERS += Gui/Plugins/FolderFlash/NBFolderFlash.hpp
-HEADERS += Gui/Plugins/ImagePeek/NBImagePeek.hpp
-HEADERS += Gui/Plugins/OdfOgle/*.h
-HEADERS += Gui/Plugins/OdfOgle/NBOdfOgle.hpp
-HEADERS += Gui/Plugins/PdfPeep/NBPdfPeep.hpp
-HEADERS += Gui/Plugins/WebWatch/NBWebWatch.hpp
-HEADERS += Gui/Plugins/WordView/NBWordView.hpp
 HEADERS += Gui/Widgets/AddressBar/NBAddressBar.hpp
 HEADERS += Gui/Widgets/BreadCrumbsBar/NBBreadCrumbsBar.hpp
 HEADERS += Gui/Widgets/Buttons/NBButtons.hpp
 HEADERS += Gui/Widgets/ContextMenu/NBContextMenu.hpp
 HEADERS += Gui/Widgets/CustomActions/NBCustomActions.hpp
+HEADERS += Gui/Widgets/CustomPeek/NBCustomPeek.hpp
+HEADERS += Gui/Widgets/FolderFlash/NBFolderFlash.hpp
 HEADERS += Gui/Widgets/FolderView/NBFolderView.hpp
-HEADERS += Gui/Widgets/FolderView/NBFolderViewRestricted.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBActionButtons.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBFlashLabel.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBGuiWidgets.hpp
@@ -196,8 +181,6 @@ SOURCES += Core/StandardPaths/NBStandardPaths.cpp
 SOURCES += Core/StandardPaths/NBStandardPaths_unix.cpp
 SOURCES += Core/SystemInfo/NBSystemInfo.cpp
 SOURCES += Core/XDG/NBXdg.cpp
-SOURCES += Gui/Dialogs/FileDialog/NBFDFolderView.cpp
-SOURCES += Gui/Dialogs/FileDialog/NBFDItemDelegate.cpp
 SOURCES += Gui/Dialogs/FileDialog/NBFileDialog.cpp
 SOURCES += Gui/Dialogs/NBConfirmDeleteDialog.cpp
 SOURCES += Gui/Dialogs/NBDeleteDialog.cpp
@@ -238,20 +221,14 @@ SOURCES += Gui/NewBreeze.cpp
 SOURCES += Gui/Others/NBStartup.cpp
 SOURCES += Gui/Others/NBUpdater.cpp
 SOURCES += Gui/Others/Settings/NBSettings.cpp
-SOURCES += Gui/Plugins/CustomPeek/NBCustomPeek.cpp
-SOURCES += Gui/Plugins/FolderFlash/NBFolderFlash.cpp
-SOURCES += Gui/Plugins/ImagePeek/NBImagePeek.cpp
-SOURCES += Gui/Plugins/OdfOgle/*.cpp
-SOURCES += Gui/Plugins/PdfPeep/NBPdfPeep.cpp
-SOURCES += Gui/Plugins/WebWatch/NBWebWatch.cpp
-SOURCES += Gui/Plugins/WordView/NBWordView.cpp
 SOURCES += Gui/Widgets/AddressBar/NBAddressBar.cpp
 SOURCES += Gui/Widgets/BreadCrumbsBar/NBBreadCrumbsBar.cpp
 SOURCES += Gui/Widgets/Buttons/NBButtons.cpp
 SOURCES += Gui/Widgets/ContextMenu/NBContextMenu.cpp
+SOURCES += Gui/Widgets/CustomPeek/NBCustomPeek.cpp
 SOURCES += Gui/Widgets/CustomActions/NBCustomActions.cpp
+SOURCES += Gui/Widgets/FolderFlash/NBFolderFlash.cpp
 SOURCES += Gui/Widgets/FolderView/NBFolderView.cpp
-SOURCES += Gui/Widgets/FolderView/NBFolderViewRestricted.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBActionButtons.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBFlashLabel.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBGuiWidgets.cpp
@@ -298,12 +275,20 @@ QMAKE_CFLAGS += -std=c++0x
 QMAKE_CXXFLAGS += -std=c++0x
 
 # Enable warnings and threading support
-CONFIG += warn_all thread silent
+CONFIG += warn_off thread silent
 
-MOC_DIR 	= /home/Softwares/Others/Builds/NewBreeze/build/moc
-OBJECTS_DIR = /home/Softwares/Others/Builds/NewBreeze/build/objs
-RCC_DIR		= /home/Softwares/Others/Builds/NewBreeze/build/qrc
-UI_DIR      = /home/Softwares/Others/Builds/NewBreeze/build/uic
+# Build location
+
+BUILD_PREFIX = $$(NB_BUILD_DIR)
+
+isEmpty( BUILD_PREFIX ) {
+	BUILD_PREFIX = ./build
+}
+
+MOC_DIR 	= $$BUILD_PREFIX/moc
+OBJECTS_DIR = $$BUILD_PREFIX/objs
+RCC_DIR		= $$BUILD_PREFIX/qrc
+UI_DIR      = $$BUILD_PREFIX/uic
 
 unix {
 	isEmpty(PREFIX) {
@@ -311,8 +296,11 @@ unix {
 	}
 	BINDIR = $$PREFIX/bin
 
-	INSTALLS += target desktop icons data
+	INSTALLS += target header desktop icons data
 	target.path = $$BINDIR
+
+	header.path = $PREFIX/include/newbreeze
+	header.files = NBPreviewInterface.hpp
 
 	desktop.path = $$PREFIX/share/applications/
 	desktop.files = newbreeze.desktop
@@ -329,3 +317,4 @@ DEFINES += "HAVE_SYS_TIME_H"
 DEFINES += "KB_LAYOUT_DIR=\\\""$$PREFIX/share/newbreeze/kb-layouts"\\\""
 DEFINES += "COLORSCHEMES_DIR=\\\""$$PREFIX/share/newbreeze/color-schemes"\\\""
 DEFINES += "DATA_DIR=\\\""$$PREFIX/share/newbreeze/"\\\""
+DEFINES += "INSTALL_PATH=\\\""$$PREFIX/share/newbreeze/"\\\""

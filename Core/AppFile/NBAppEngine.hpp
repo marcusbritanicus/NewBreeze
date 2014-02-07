@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBAPPENGINE_HPP
 #define NBAPPENGINE_HPP
 

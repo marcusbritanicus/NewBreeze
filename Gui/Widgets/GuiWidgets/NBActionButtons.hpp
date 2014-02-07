@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBACTIONBUTTONS_HPP
 #define NBACTIONBUTTONS_HPP
 

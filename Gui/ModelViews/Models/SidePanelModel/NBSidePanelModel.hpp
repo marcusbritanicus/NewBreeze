@@ -4,10 +4,12 @@
 	*
 */
 
+#pragma once
 #ifndef NBSIDEPANELMODEL_HPP
 #define NBSIDEPANELMODEL_HPP
 
 #include <Global.hpp>
+#include <NBTools.hpp>
 #include <NBDeviceInfo.hpp>
 #include <NBSidePanelItem.hpp>
 

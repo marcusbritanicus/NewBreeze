@@ -4,31 +4,35 @@
 	*
 */
 
-#ifndef NBIMAGEPEEK_HPP
-#define NBIMAGEPEEK_HPP
+#pragma once
+#ifndef NBFOLDERFLASH_HPP
+#define NBFOLDERFLASH_HPP
 
 #include <Global.hpp>
+#include <NBIconViewRestricted.hpp>
 #include <NBTools.hpp>
 
-class NBImagePeek : public QWidget {
+class NBFolderFlash : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBImagePeek( QString path = QDir::homePath() );
+		NBFolderFlash( QString path = QDir::homePath() );
 		QString path;
-		QLabel *peekWidgetBase;
+		NBIconViewRestricted *peekWidgetBase;
 
 	private :
 		void createGUI();
 		void setWindowProperties();
-		void loadImage();
 
 	private slots :
-		void openInExternal();
+		void loadFolder();
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
 		void changeEvent( QEvent *cEvent );
+
+	Q_SIGNALS:
+		void loadFolder( QString );
 };
 
 #endif

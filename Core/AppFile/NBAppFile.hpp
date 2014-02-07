@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBAPPFILE_HPP
 #define NBAPPFILE_HPP
 
@@ -37,6 +38,7 @@ class NBAppFile {
 			NoDisplay
 		};
 
+		NBAppFile();
 		NBAppFile( QString );
 
 		// Value of various fields

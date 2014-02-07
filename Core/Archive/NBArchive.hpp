@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBARCHIVE_HPP
 #define NBARCHIVE_HPP
 

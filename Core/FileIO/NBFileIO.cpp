@@ -106,6 +106,16 @@ void NBFileIO::performIO() {
 
 	preIO();
 
+	struct statvfs info;
+	statvfs( targetDir.toLocal8Bit(), &info );
+	quint64 availSize = ( quint64 ) ( info.f_bavail ) * info.f_frsize;
+	if ( availSize < totalSize ) {
+		errorNodes << sourceList;
+		emit IOComplete();
+
+		return;
+	}
+
 	QString curWD( get_current_dir_name() );
 
 	Q_FOREACH( QString node, sourceList ) {

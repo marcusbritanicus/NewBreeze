@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBCUSTOMACTIONS_HPP
 #define NBCUSTOMACTIONS_HPP
 

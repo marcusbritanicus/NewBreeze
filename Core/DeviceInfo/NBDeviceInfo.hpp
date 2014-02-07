@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBDEVICEINFO_HPP
 #define NBDEVICEINFO_HPP
 

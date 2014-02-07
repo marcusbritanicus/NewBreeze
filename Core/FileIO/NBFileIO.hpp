@@ -4,10 +4,12 @@
 	*
 */
 
+#pragma once
 #ifndef NBFILEIO_HPP
 #define NBFILEIO_HPP
 
 #include <Global.hpp>
+#include <sys/statvfs.h>
 #include <NBTools.hpp>
 #include <NBDeviceInfo.hpp>
 

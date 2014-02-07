@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBQUICKMENUBAR_HPP
 #define NBQUICKMENUBAR_HPP
 

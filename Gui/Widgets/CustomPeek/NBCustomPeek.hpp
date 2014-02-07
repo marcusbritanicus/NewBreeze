@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBCUSTOMPEEK_HPP
 #define NBCUSTOMPEEK_HPP
 

@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBSidePanelDelegate_HPP
 #define NBSidePanelDelegate_HPP
 

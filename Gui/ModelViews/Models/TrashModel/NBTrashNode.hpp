@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBTRASHNODE_HPP
 #define NBTRASHNODE_HPP
 

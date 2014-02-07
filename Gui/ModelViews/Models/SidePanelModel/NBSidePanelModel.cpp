@@ -156,6 +156,9 @@ void NBSidePanelModel::updateBookmarkData() {
 
 	rootItem->clearChildren();
 	foreach( QString bookmark, bookmarkSettings.value( "Order" ).toStringList() ) {
+		if ( not exists( bookmark ) )
+			continue;
+
 		QString label = bookmarkSettings.value( QUrl::toPercentEncoding( bookmark ) ).toString();
 
 		QVariantList data;

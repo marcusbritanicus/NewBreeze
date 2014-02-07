@@ -36,7 +36,7 @@ void NBRunCmdDialog::createGUI() {
 	QVBoxLayout *lyt = new QVBoxLayout();
 	QHBoxLayout *btnLyt = new QHBoxLayout();
 
-	QLabel *lbl1 = new QLabel( tr( "Open '%1' with: " ).arg( fileName ) );
+	QLabel *lbl1 = new QLabel( tr( "Open '<tt><b>%1</b></tt>' with: " ).arg( fileName ) );
 	QLabel *lbl2 = new QLabel( tr( "Custom command:" ) );
 	le = new QLineEdit();
 
@@ -60,7 +60,6 @@ void NBRunCmdDialog::createGUI() {
 	btnLyt->addWidget( okBtn );
 	btnLyt->addWidget( cancelBtn );
 
-	lyt->addWidget( Separator::horizontal() );
 	lyt->addWidget( lbl1 );
 	lyt->addWidget( appList );
 	lyt->addWidget( lbl2 );

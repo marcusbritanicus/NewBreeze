@@ -618,6 +618,7 @@ void NBIconView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 	QString source = dirName( mData->urls().at( 0 ).toLocalFile() );
 	source += ( source.endsWith( "/" ) ? "" : "/" );
 
+	/* Incoming drop from else where */
 	if ( source != cModel->currentDir() ) {
 		if ( isWritable( cModel->currentDir() ) ) {
 			dmEvent->setDropAction( Qt::CopyAction );
@@ -628,9 +629,17 @@ void NBIconView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 			dmEvent->ignore();
 	}
 
+	/* drag and drop in the current folder */
 	else if ( indexAt( dmEvent->pos() ).isValid() ) {
 		QModelIndex idx = indexAt( dmEvent->pos() );
 		QString mtpt = cModel->nodePath( cModel->data( idx ).toString() );
+
+		Q_FOREACH( QUrl url, mData->urls() ) {
+			if ( url.toLocalFile() == mtpt ) {
+				dmEvent->ignore();
+				return;
+			}
+		}
 
 		if ( isWritable( mtpt ) and isDir( mtpt ) ) {
 			dmEvent->setDropAction( Qt::CopyAction );

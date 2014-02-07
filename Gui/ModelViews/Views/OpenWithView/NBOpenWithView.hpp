@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBOPENWITHVIEW_HPP
 #define NBOPENWITHVIEW_HPP
 

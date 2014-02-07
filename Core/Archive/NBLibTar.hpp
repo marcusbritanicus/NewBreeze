@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBLIBTAR_HPP
 #define NBLIBTAR_HPP
 

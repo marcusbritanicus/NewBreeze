@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBSTYLEMANAGER_HPP
 #define NBSTLYEMANAGER_HPP
 

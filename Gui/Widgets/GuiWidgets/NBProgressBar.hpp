@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBPROGRESSBAR_HPP
 #define NBPROGRESSBAR_HPP
 

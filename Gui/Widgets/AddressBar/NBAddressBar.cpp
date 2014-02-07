@@ -97,7 +97,10 @@ NBAddressBar::NBAddressBar() : QFrame() {
 	openVTEBtn->setFixedSize( QSize( 24, 24 ) );
 
 	addressWidget = new NBAddressWidget();
+	searchBar = new NBSearchBar();
 	addressButtons = new NBButtons();
+
+	searchBar->setFixedHeight( 24 );
 
 	addressButtons->addSegment( reloadBtn );
 	addressButtons->addSegment( viewModeBtn );
@@ -117,6 +120,7 @@ NBAddressBar::NBAddressBar() : QFrame() {
 	openVTEBtn->setToolTip( tr( "Open a terminal emulator here" ) );
 
 	fLyt->addWidget( addressWidget );
+	fLyt->addWidget( searchBar );
 	fLyt->addWidget( addressButtons );
 
 	setLayout( fLyt );

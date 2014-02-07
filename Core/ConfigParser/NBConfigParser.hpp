@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBCONFIGPARSER_HPP
 #define NBCONFIGPARSER_HPP
 

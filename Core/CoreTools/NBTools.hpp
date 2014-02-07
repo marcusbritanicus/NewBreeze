@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBTOOLS_HPP
 #define NBTOOLS_HPP
 

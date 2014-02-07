@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBCATALOGDELEGATE_HPP
 #define NBCATALOGDELEGATE_HPP
 

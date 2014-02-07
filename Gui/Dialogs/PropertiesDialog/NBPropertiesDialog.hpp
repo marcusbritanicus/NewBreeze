@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBPROPERTIES_HPP
 #define NBPROPERTIES_HPP
 

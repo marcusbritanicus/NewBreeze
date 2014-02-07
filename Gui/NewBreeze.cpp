@@ -189,11 +189,11 @@ void NewBreeze::createAndSetupActions() {
 	connect( AddressBar->addressWidget->crumbsBar, SIGNAL( openLocation( QString ) ),
 		this, SLOT( openAddress( QString ) ) );
 
-	// connect( AddressBar->searchBar, SIGNAL( searchString( QString ) ),
-		// this, SLOT( filterFiles( QString ) ) );
+	connect( AddressBar->searchBar, SIGNAL( searchString( QString ) ),
+		this, SLOT( filterFiles( QString ) ) );
 
-	// connect( AddressBar->searchBar, SIGNAL( searchCleared() ),
-		// this, SLOT( clearFilters() ) );
+	connect( AddressBar->searchBar, SIGNAL( searchCleared() ),
+		this, SLOT( clearFilters() ) );
 
 	connect( QuickMenuBar, SIGNAL( openWithClicked() ), this, SLOT( openWithList() ) );
 
@@ -315,17 +315,17 @@ void NewBreeze::createAndSetupActions() {
 
 	// Show Application View
 	QAction *showApplicationsAct = new QAction( "show Applications", this );
-	showApplicationsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+A" ) );
+	showApplicationsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Alt+Shift+A" ) );
 	connect( showApplicationsAct, SIGNAL( triggered() ), this, SLOT( showApplications() ) );
 
 	// Show Catalog View
 	QAction *showCatalogsAct = new QAction( "show Catalogs", this );
-	showCatalogsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+C" ) );
+	showCatalogsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Alt+Shift+C" ) );
 	connect( showCatalogsAct, SIGNAL( triggered() ), this, SLOT( showCatalogs() ) );
 
 	// Show Folder View
 	QAction *showFoldersAct = new QAction( "Toggle Catalogs", this );
-	showFoldersAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+F" ) );
+	showFoldersAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Alt+Shift+F" ) );
 	connect( showFoldersAct, SIGNAL( triggered() ), this, SLOT( showFolders() ) );
 
 	addAction( aboutNBAct );
@@ -612,12 +612,12 @@ void NewBreeze::openInNewWindow( QString location ) {
 
 void NewBreeze::focusSearch() {
 
-	// AddressBar->searchBar->searchLE->setFocus();
+	AddressBar->searchBar->searchLE->setFocus();
 };
 
 void NewBreeze::clearSearch() {
 
-	// AddressBar->searchBar->searchLE->clear();
+	AddressBar->searchBar->searchLE->clear();
 	clearFilters();
 
 	FolderView->setFocus();

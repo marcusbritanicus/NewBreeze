@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBCONTEXTMENU_HPP
 #define NBCONTEXTMENU_HPP
 

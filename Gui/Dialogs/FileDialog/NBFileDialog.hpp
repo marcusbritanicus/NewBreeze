@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBFILEDIALOG_HPP
 #define NBFILEDIALOG_HPP
 

@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBTRASHMODEL_HPP
 #define NBTRASHMODEL_HPP
 

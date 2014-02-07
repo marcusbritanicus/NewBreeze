@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBDESKTOPFILE_HPP
 #define NBDESKTOPFILE_HPP
 

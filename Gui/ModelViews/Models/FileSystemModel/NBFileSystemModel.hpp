@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBFILESYSTEMMODEL_HPP
 #define NBFILESYSTEMMODEL_HPP
 
@@ -141,6 +142,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 
 	private:
 		void setupModelData();
+
 		QString getCategory( QVariantList );
 		void recategorize();
 

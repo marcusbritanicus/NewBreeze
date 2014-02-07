@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBGUIWIDGETS_HPP
 #define NBGUIWIDGETS_HPP
 

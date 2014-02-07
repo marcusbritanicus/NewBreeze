@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBFILEINFOGATHERER_HPP
 #define NBFILEINFOGATHERER_HPP
 

@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBFOLDERVIEW_HPP
 #define NBFOLDERVIEW_HPP
 
@@ -13,13 +14,6 @@
 #include <NBFileSystemModel.hpp>
 #include <NBFVDialogs.hpp>
 #include <NBFileDialog.hpp>
-#include <NBFolderFlash.hpp>
-#include <NBWordView.hpp>
-#include <NBWebWatch.hpp>
-#include <NBImagePeek.hpp>
-#include <NBOdfOgle.hpp>
-#include <NBPdfPeep.hpp>
-#include <NBCustomPeek.hpp>
 #include <NBConfirmDeleteDialog.hpp>
 #include <NBPropertiesDialog.hpp>
 #include <NBTools.hpp>
@@ -31,6 +25,10 @@
 #include <NBIconProvider.hpp>
 #include <NBAppsView.hpp>
 #include <NBCatalogView.hpp>
+#include <NBStyleManager.hpp>
+#include <NBDefaultPlugins.hpp>
+#include <NBCustomPeek.hpp>
+#include <NBFolderFlash.hpp>
 
 class NBFolderView : public QStackedWidget {
 	Q_OBJECT

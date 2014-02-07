@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBCATALOGVIEW_HPP
 #define NBCATALOGVIEW_HPP
 

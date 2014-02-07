@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBBUTTONS_HPP
 #define NBBUTTONS_HPP
 

@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBOpenWithDelegate_HPP
 #define NBOpenWithDelegate_HPP
 

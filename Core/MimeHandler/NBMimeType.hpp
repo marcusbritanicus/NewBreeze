@@ -39,6 +39,7 @@
 **
 ****************************************************************************/
 
+#pragma once
 #ifndef NBMIMETYPE_HPP
 #define NBMIMETYPE_HPP
 

@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBADDRESSBAR_HPP
 #define NBADDRESSBAR_HPP
 
@@ -43,6 +44,7 @@ class NBAddressBar : public QFrame {
 		QPushButton *reloadBtn, *openVTEBtn;
 		NBViewModeButton *viewModeBtn;
 		NBAddressWidget *addressWidget;
+		NBSearchBar *searchBar;
 };
 
 #endif

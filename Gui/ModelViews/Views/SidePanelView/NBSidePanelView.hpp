@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBSIDEPANELVIEW_HPP
 #define NBSIDEPANELVIEW_HPP
 

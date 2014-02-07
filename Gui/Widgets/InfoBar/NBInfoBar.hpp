@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBINFOBAR_HPP
 #define NBINFOBAR_HPP
 

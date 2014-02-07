@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBICONVIEW_HPP
 #define NBICONVIEW_HPP
 

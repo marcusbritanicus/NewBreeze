@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBICONDELEGATE_HPP
 #define NBICONDELEGATE_HPP
 

@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBIOManager_HPP
 #define NBIOManager_HPP
 

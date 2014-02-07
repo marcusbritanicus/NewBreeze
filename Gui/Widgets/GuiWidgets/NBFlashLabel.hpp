@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBFLASHLABEL_HPP
 #define NBFLASHLABEL_HPP
 

@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBAPPLICATIONSMODEL_HPP
 #define NBAPPLICATIONSMODEL_HPP
 

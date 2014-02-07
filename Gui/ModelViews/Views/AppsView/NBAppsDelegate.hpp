@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBAPPSDELEGATE_HPP
 #define NBAPPSDELEGATE_HPP
 

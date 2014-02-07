@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBDELETEMANAGER_HPP
 #define NBDELETEMANAGER_HPP
 

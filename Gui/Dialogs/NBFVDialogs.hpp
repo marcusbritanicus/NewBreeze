@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBFVDIALOGS_HPP
 #define NBFVDIALOGS_HPP
 

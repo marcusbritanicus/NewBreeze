@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBCATALOGMODEL_HPP
 #define NBCATALOGMODEL_HPP
 

@@ -4,6 +4,7 @@
 	*
 */
 
+#pragma once
 #ifndef NBBREADCRUMBSBAR_HPP
 #define NBBREADCRUMBSBAR_HPP
 
