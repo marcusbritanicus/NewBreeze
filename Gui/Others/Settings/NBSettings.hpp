@@ -28,6 +28,7 @@ class NBSettings {
 				bool ImagePreviews;
 				bool NativeTitleBar;
 				int MaxIOJobs;
+				bool OpenWithCatalog;
 		} General;
 
 		// Special Settings

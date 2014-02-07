@@ -135,6 +135,10 @@ void NBViewsWidget::createGUI() {
 	maxIOJobsSB->setValue( Settings->General.MaxIOJobs );
 	connect( maxIOJobsSB, SIGNAL( valueChanged( int ) ), this, SLOT( handleMaxIOJobsChanged( int ) ) );
 
+	openWithCatalogCB = new QCheckBox( "Open Catalog &View every time NewBreeze starts" );
+	openWithCatalogCB->setChecked( Settings->General.OpenWithCatalog );
+	connect( openWithCatalogCB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithCatalogToggled( bool ) ) );
+
 	sidePanelOpen = new QCheckBox( "&Keep the SidePanel always open");
 	QSettings settings( "NewBreeze", "NewBreeze" );
 	sidePanelOpen->setChecked( settings.value( "SidePanelOpen" ).toBool() );
@@ -169,6 +173,7 @@ void NBViewsWidget::createGUI() {
 	themeLyt->addWidget( new QLabel( "Maximum number of cuncurrent IO Jobs:" ), 3, 0, 1, 3 );
 	themeLyt->addWidget( maxIOJobsSB, 3, 3 );
 	themeLyt->addWidget( sidePanelOpen, 4, 0, 1, 4, Qt::AlignLeft );
+	themeLyt->addWidget( openWithCatalogCB, 5, 0, 1, 5, Qt::AlignLeft );
 
 	setLayout( themeLyt );
 };
@@ -204,6 +209,12 @@ void NBViewsWidget::handleNativeTitleBarToggle( bool useNative ) {
 
 	Settings->setValue( "NativeTitleBar", useNative );
 	Settings->General.NativeTitleBar = useNative;
+};
+
+void NBViewsWidget::handleOpenWithCatalogToggled( bool open ) {
+
+	Settings->setValue( "OpenWithCatalog", open );
+	Settings->General.OpenWithCatalog = open;
 };
 
 void NBViewsWidget::handleMaxIOJobsChanged( int value ) {

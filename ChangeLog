@@ -1,3 +1,11 @@
+Version 2.3.0
+    - BugFix: NBPropertiesDialog bug fixed
+    - BugFix: Drag and drop of the folder into itself not permitted
+    - Feature: FileIO checks for available disk space before beginning copy
+    - Feature: Drap and Drop now shows a menu
+    - Feature: Search the current folder
+    - All the file peek plugins separated from the main program
+
 Version 2.3.0-preview
     - BugFix: NBIconView smooth selection and drag and drop
     - BugFix: NBAppFile Application grading and mimetype sorting bug

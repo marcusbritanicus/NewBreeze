@@ -27,12 +27,14 @@ class NBViewsWidget : public QWidget {
 		QCheckBox *nativeTitleBarCB;
 		QSpinBox *maxIOJobsSB;
 		QCheckBox *sidePanelOpen;
+		QCheckBox *openWithCatalogCB;
 
 	private slots:
 		void handleThemeChanged();
 		void handleNativeTitleBarToggle( bool );
 		void handleMaxIOJobsChanged( int );
 		void handleSidePanelOpenToggled( bool );
+		void handleOpenWithCatalogToggled( bool );
 };
 
 class NBIconThemeWidget : public QWidget {

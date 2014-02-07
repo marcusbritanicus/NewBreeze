@@ -34,6 +34,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.ImagePreviews = true;
 	defaultSettings->General.NativeTitleBar = false;
 	defaultSettings->General.MaxIOJobs = 5;
+	defaultSettings->General.OpenWithCatalog = true;
 
 	defaultSettings->Special.ClosingDown = false;
 
@@ -131,6 +132,9 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "MaxIOJobs" ) ) )
 		settings->General.MaxIOJobs = gSettings.value( "MaxIOJobs" ).toInt();
+
+	if ( gaKeys.contains( QString( "OpenWithCatalog" ) ) )
+		settings->General.OpenWithCatalog = gSettings.value( "OpenWithCatalog" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		settings->Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
@@ -301,6 +305,9 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "MaxIOJobs" ) ) )
 		General.MaxIOJobs = gSettings.value( "MaxIOJobs" ).toInt();
+
+	if ( gaKeys.contains( QString( "OpenWithCatalog" ) ) )
+		General.OpenWithCatalog = gSettings.value( "OpenWithCatalog" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();

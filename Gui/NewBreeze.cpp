@@ -35,6 +35,9 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 			FolderView->doOpen( QDir::homePath() );
 	}
 
+	if ( Settings->General.OpenWithCatalog )
+		FolderView->setCurrentIndex( 2 );
+
 	FolderView->currentWidget()->setFocus();
 };
 

@@ -22,8 +22,8 @@ NBFolderView::NBFolderView() : QStackedWidget() {
 	addWidget( ApplicationsView );
 	addWidget( CatalogView );
 
-	// Minimum Width - 640px
-	setMinimumWidth( 640 );
+	// Minimum Width - 900px
+	setMinimumWidth( 700 );
 
 	// Init moveItems
 	moveItems = false;

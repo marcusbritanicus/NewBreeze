@@ -120,7 +120,9 @@ NBAddressBar::NBAddressBar() : QFrame() {
 	openVTEBtn->setToolTip( tr( "Open a terminal emulator here" ) );
 
 	fLyt->addWidget( addressWidget );
+	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( searchBar );
+	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( addressButtons );
 
 	setLayout( fLyt );
