@@ -571,7 +571,7 @@ void NBFolderView::doPeek() {
 	}
 
 	/* Load the peek plugin */
-	QStringList pluginPaths = QStringList() << QString( INSTALL_PATH ) + "/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
+	QStringList pluginPaths = QStringList() << QString( DATA_DIR ) + "/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
 	QString peekPlugin;
 	Q_FOREACH( QString path, pluginPaths ) {
 		if ( exists( path + "libPeekPlugins.so" ) ) {
