@@ -1,5 +1,5 @@
 Version 2.3.0
-    - BugFix: NBPropertiesDialog bug fixed
+    - BugFix: NBPropertiesDialog bugs fixed
     - BugFix: Drag and drop of the folder into itself not permitted
     - Feature: FileIO checks for available disk space before beginning copy
     - Feature: Drap and Drop now shows a menu

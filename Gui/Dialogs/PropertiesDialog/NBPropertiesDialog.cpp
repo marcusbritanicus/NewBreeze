@@ -602,8 +602,6 @@ void NBPermissionsWidget::applyPermissions() {
 			QFile::setPermissions( path, perms );
 		}
 	}
-
-	close();
 };
 
 void NBPermissionsWidget::applyTo( const char *node, QFile::Permissions perms ) {
