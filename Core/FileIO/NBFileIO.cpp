@@ -35,6 +35,9 @@ NBFileIO::NBFileIO() {
 	copiedSize = 0;
 	fTotalBytes = 0;
 	fWritten = 0;
+	wasCanceled = false;
+	isPaused = false;
+
 };
 
 void NBFileIO::setSources( QStringList sources ) {

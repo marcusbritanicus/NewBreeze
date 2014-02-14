@@ -39,13 +39,13 @@ class NBFileSystemWatcher : public QThread {
 	private:
 		void waitForWatchEnded();
 
-		int inotifyFD = -1;
-		int WD = -1;
-		char buffer[ BUF_LEN ] = { 0 };
+		int inotifyFD/* = -1*/;
+		int WD/* = -1*/;
+		char buffer[ BUF_LEN ]/* = { 0 }*/;
 
-		QString watchPath = QString();
+		QString watchPath/* = QString()*/;
 
-		bool __stopWatch = false;
+		bool __stopWatch/* = false*/;
 
 	Q_SIGNALS :
 		void nodeCreated( QString );

@@ -279,7 +279,7 @@ void NBSettings::reload() {
 	if ( not defaultSettings->init )
 		defaultInstance();
 
-	if ( not settings->init )
+	if ( not settings->init ) // call to defaultInstance set to false init var so dont ninit in header
 		instance();
 
 	QSettings gSettings( "NewBreeze", "NewBreeze" );
