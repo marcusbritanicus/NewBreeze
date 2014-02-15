@@ -430,6 +430,7 @@ void NBAppFile::parseDesktopFile() {
 NBAppsList::NBAppsList() {
 
 	clear();
+	__clearedOfDuplicates = false;
 };
 
 void NBAppsList::clear() {
