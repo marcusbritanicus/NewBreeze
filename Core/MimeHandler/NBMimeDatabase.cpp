@@ -518,16 +518,8 @@ QMimeType QMimeDatabase::mimeTypeForData(QIODevice *device) const
 */
 QMimeType QMimeDatabase::mimeTypeForUrl(const QUrl &url) const
 {
-
-#if QT_VERSION <= QT_VERSION_CHECK(4, 7, 0)
-    QString path = url.toLocalFile();
-    QFileInfo fi( path );
-    if ( fi.isFile() ) {
-#else
-    if (url.isLocalFile() ) {
-#endif
+    if (url.isLocalFile())
         return mimeTypeForFile(url.toLocalFile());
-    }
 
     const QString scheme = url.scheme();
     if (scheme.startsWith(QLatin1String("http")))

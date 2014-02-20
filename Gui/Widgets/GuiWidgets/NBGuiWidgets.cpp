@@ -67,7 +67,7 @@ NBToolButton::NBToolButton( QString themeIcon, QString customIcon ) : QToolButto
 
 	setIcon( QIcon::fromTheme( themeIcon, QIcon( customIcon ) ) );
 	setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
-}
+};
 
 NBPushButton::NBPushButton( QIcon icon, QString text ) : QPushButton() {
 

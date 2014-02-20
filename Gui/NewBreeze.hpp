@@ -24,6 +24,7 @@
 #include <NBSettingsManager.hpp>
 #include <NBMessageDialog.hpp>
 #include <NBTrashManager.hpp>
+#include <NBUtilityBar.hpp>
 
 class NewBreeze : public QMainWindow {
 	Q_OBJECT
@@ -51,6 +52,7 @@ class NewBreeze : public QMainWindow {
 
 		void updateGUI();
 
+		NBUtilityBar *uBar;
 		NBTitleBar *TitleBar;
 		NBAddressBar *AddressBar;
 		NBQuickMenuBar *QuickMenuBar;

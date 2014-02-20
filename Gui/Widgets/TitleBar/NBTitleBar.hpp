@@ -48,9 +48,6 @@ class NBTitleBar : public QWidget {
 		void closeWindow();
 		void titlebarMousePress( QMouseEvent * );
 		void titlebarMouseMove( QMouseEvent * );
-
-		void aboutNB();
-		void aboutQt4();
 };
 
 #endif

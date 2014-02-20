@@ -60,6 +60,7 @@ void NewBreeze::createGUI() {
 	BodyLayout->setContentsMargins( QMargins() );
 	BodyLayout->setSpacing( 0 );
 
+	uBar = new NBUtilityBar();
 	TitleBar = new NBTitleBar();
 	AddressBar = new NBAddressBar();
 	QuickMenuBar = new NBQuickMenuBar();
@@ -81,10 +82,11 @@ void NewBreeze::createGUI() {
 
 	BodyWidget->setLayout( BodyLayout );
 
-	if ( not Settings->General.NativeTitleBar ) {
-		MainLayout->addWidget( TitleBar );
-		MainLayout->addWidget( Separator::horizontal() );
-	}
+	MainLayout->addWidget( uBar );
+	// if ( not Settings->General.NativeTitleBar ) {
+		// MainLayout->addWidget( TitleBar );
+		// MainLayout->addWidget( Separator::horizontal() );
+	// }
 	MainLayout->addWidget( BodyWidget );
 	MainLayout->addWidget( Terminal );
 	MainLayout->addWidget( Separator::horizontal() );
@@ -148,56 +150,33 @@ void NewBreeze::setWindowIcon( QIcon icon ) {
 
 void NewBreeze::createAndSetupActions() {
 
-	connect( TitleBar, SIGNAL( aboutNB() ),
-		this, SLOT( showAboutNB() ) );
+	connect( uBar, SIGNAL( titleBarMousePress( QMouseEvent * ) ), this, SLOT( windowPressStart( QMouseEvent * ) ) );
 
-	connect( TitleBar, SIGNAL( aboutQt4() ),
-		this, SLOT( showAboutQt4() ) );
+	connect( uBar, SIGNAL( titleBarMouseMove( QMouseEvent * ) ), this, SLOT( windowMoveStart( QMouseEvent * ) ) );
 
-	connect( TitleBar, SIGNAL( titlebarMousePress( QMouseEvent * ) ),
-		this, SLOT( windowPressStart( QMouseEvent * ) ) );
+	connect( uBar, SIGNAL( closeWindow() ), this, SLOT( close() ) );
 
-	connect( TitleBar, SIGNAL( titlebarMousePress( QMouseEvent * ) ),
-		this, SLOT( windowPressStart( QMouseEvent * ) ) );
+	connect( uBar, SIGNAL( minimizeWindow() ), this, SLOT( showMinimized() ) );
 
-	connect( TitleBar, SIGNAL( titlebarMouseMove( QMouseEvent * ) ),
-		this, SLOT( windowMoveStart( QMouseEvent * ) ) );
+	connect( uBar, SIGNAL( maximizeWindow() ), this, SLOT( toggleMaximizeRestore() ) );
 
-	connect( TitleBar, SIGNAL( closeWindow() ),
-		this, SLOT( close() ) );
+	connect( uBar, SIGNAL( restoreWindow() ), this, SLOT( toggleMaximizeRestore() ) );
 
-	connect( TitleBar, SIGNAL( minimizeWindow() ),
-		this, SLOT( showMinimized() ) );
+	connect( AddressBar->openVTEBtn, SIGNAL( clicked() ), FolderView, SLOT( openTerminal() ) );
 
-	connect( TitleBar, SIGNAL( maximizeWindow() ),
-		this, SLOT( toggleMaximizeRestore() ) );
+	connect( AddressBar->reloadBtn, SIGNAL( clicked() ), FolderView, SLOT( doReload() ) );
 
-	connect( TitleBar, SIGNAL( restoreWindow() ),
-		this, SLOT( toggleMaximizeRestore() ) );
+	connect( AddressBar->viewModeBtn, SIGNAL( switchToNextView() ), this, SLOT( switchToNextView() ) );
 
-	connect( AddressBar->openVTEBtn, SIGNAL( clicked() ),
-		FolderView, SLOT( openTerminal() ) );
+	connect( AddressBar->viewModeBtn, SIGNAL( changeViewMode() ), this, SLOT( changeViewMode() ) );
 
-	connect( AddressBar->reloadBtn, SIGNAL( clicked() ),
-		FolderView, SLOT( doReload() ) );
+	connect( AddressBar->addressWidget->addressEdit, SIGNAL( returnPressed() ), this, SLOT( openAddressBar() ) );
 
-	connect( AddressBar->viewModeBtn, SIGNAL( switchToNextView() ),
-		this, SLOT( switchToNextView() ) );
+	connect( AddressBar->addressWidget->crumbsBar, SIGNAL( openLocation( QString ) ), this, SLOT( openAddress( QString ) ) );
 
-	connect( AddressBar->viewModeBtn, SIGNAL( changeViewMode() ),
-		this, SLOT( changeViewMode() ) );
+	connect( AddressBar->searchBar, SIGNAL( searchString( QString ) ), this, SLOT( filterFiles( QString ) ) );
 
-	connect( AddressBar->addressWidget->addressEdit, SIGNAL( returnPressed() ),
-		this, SLOT( openAddressBar() ) );
-
-	connect( AddressBar->addressWidget->crumbsBar, SIGNAL( openLocation( QString ) ),
-		this, SLOT( openAddress( QString ) ) );
-
-	connect( AddressBar->searchBar, SIGNAL( searchString( QString ) ),
-		this, SLOT( filterFiles( QString ) ) );
-
-	connect( AddressBar->searchBar, SIGNAL( searchCleared() ),
-		this, SLOT( clearFilters() ) );
+	connect( AddressBar->searchBar, SIGNAL( searchCleared() ), this, SLOT( clearFilters() ) );
 
 	connect( QuickMenuBar, SIGNAL( openWithClicked() ), this, SLOT( openWithList() ) );
 

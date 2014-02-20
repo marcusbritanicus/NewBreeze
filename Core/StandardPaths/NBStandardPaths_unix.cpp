@@ -46,9 +46,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QCoreApplication>
-#if QT_VERSION <= QT_VERSION_CHECK(4, 7, 0)  // i do not sure but for qt 4.7 and 4.6 we need this include
 #include <QHash>
-#endif
 // LOCAL HACK #include <private/qfilesystemengine_p.h>
 #include <errno.h>
 #include <stdlib.h>
