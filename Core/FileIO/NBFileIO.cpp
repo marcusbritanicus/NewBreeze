@@ -264,7 +264,7 @@ void NBFileIO::copyFile( QString srcFile ) {
 	}
 
 	int iFileFD = open( qPrintable( srcFile ), O_RDONLY );
-	int oFileFD = open( qPrintable( ioTarget ), O_WRONLY | O_CREAT );
+	int oFileFD = open( qPrintable( ioTarget ), O_WRONLY | O_CREAT, 0644 );
 
 	fTotalBytes = iStat.st_size;
 	fWritten = 0;
