@@ -382,15 +382,10 @@ void NBFolderView::doOpen( QString loc ) {
 };
 
 void NBFolderView::doOpen( QModelIndex idx ) {
+	/* This slot is triggered when the user double clicks or presses enter */
 
 	Q_UNUSED( idx );
 	QList<QModelIndex> selectedList = getSelection();
-
-	if ( isDir( fsModel->nodePath( idx ) ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", qPrintable( fsModel->nodePath( idx ) ) );
-		fsModel->setRootPath( fsModel->nodePath( idx ) );
-		return;
-	}
 
 	foreach( QModelIndex index, selectedList ) {
 		QString fileToBeOpened = fsModel->nodePath( index );
@@ -410,7 +405,11 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 
 		if ( isDir( fileToBeOpened ) ) {
 			NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", qPrintable( fileToBeOpened ) );
-			fsModel->setRootPath( fileToBeOpened );
+			if ( index == idx )
+				fsModel->setRootPath( fileToBeOpened );
+
+			else
+				emit newTab( fileToBeOpened );
 		}
 
 		else if ( isFile( fileToBeOpened ) ) {
@@ -479,6 +478,11 @@ void NBFolderView::doOpenWith() {
 void NBFolderView::doOpenInNewWindow() {
 
 	emit newWindow( qobject_cast<QAction *>( sender() )->data().toString() );
+};
+
+void NBFolderView::doOpenInNewTab() {
+
+	emit newTab( qobject_cast<QAction *>( sender() )->data().toString() );
 };
 
 void NBFolderView::doOpenWithCmd() {

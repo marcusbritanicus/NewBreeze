@@ -103,7 +103,7 @@ class NBTrashModel : public QAbstractItemModel {
 		QString __rootPath;
 		QStringList __childNames;
 
-		QHash<QString, QList<int>> categoryRowMap;
+		QHash<QString, QList<int> > categoryRowMap;
 		QHash<QString, bool> categoryVisibilityMap;
 
 		bool mCategorizationEnabled = true;

@@ -74,6 +74,7 @@ class NBFolderView : public QStackedWidget {
 		void doOpenHome();
 		void doOpenWith();
 		void doOpenInNewWindow();
+		void doOpenInNewTab();
 		void doOpenWithCmd();
 
 		void showApplications();
@@ -119,6 +120,7 @@ class NBFolderView : public QStackedWidget {
 
 	Q_SIGNALS :
 		void newWindow( QString );
+		void newTab( QString );
 		void selectionChanged( const QItemSelection&, const QItemSelection& );
 
 		void move( QStringList, QString, NBIOMode::Mode );

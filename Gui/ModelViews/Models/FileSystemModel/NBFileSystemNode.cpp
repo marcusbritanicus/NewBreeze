@@ -338,21 +338,26 @@ bool columnSort2( NBFileSystemNode *first, NBFileSystemNode *second )  {
 	return false;
 };
 
+/* function: less than */
+inline bool listLessThanA( QString a, QString b ) {
+
+	if ( a.count() != b.count() )
+		return ( a.count() < b.count() );
+	else
+		return ( a < b );
+};
+
+inline bool listLessThanB( QString a, QString b ) {
+
+	return a.toLower() < b.toLower();
+};
 
 QStringList sortCategoryList( QStringList& cList ) {
 
 	switch( __sortColumn ) {
 		/* Name sort */
 		case 0: {
-			qSort( cList.begin(), cList.end(),
-				/* Lambda function: less than */
-				[]( QString a, QString b ) {
-					if ( a.count() != b.count() )
-						return ( a.count() < b.count() );
-					else
-						return ( a < b );
-				}
-			);
+			qSort( cList.begin(), cList.end(), listLessThanA );
 			return cList;
 		};
 
@@ -386,12 +391,12 @@ QStringList sortCategoryList( QStringList& cList ) {
 		case 2: {
 			if ( cList.contains( "Folders" ) ) {
 				cList.removeAll( "Folders" );
-				qSort( cList.begin(), cList.end(), []( QString a, QString b ) { return a.toLower() < b.toLower(); } );
+				qSort( cList.begin(), cList.end(), listLessThanB );
 				cList.insert( 0, "Folders" );
 			}
 
 			else {
-				qSort( cList.begin(), cList.end(), []( QString a, QString b ) { return a.toLower() < b.toLower(); } );
+				qSort( cList.begin(), cList.end(), listLessThanB );
 			}
 
 			return cList;

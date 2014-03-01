@@ -73,7 +73,7 @@ class NBApplicationsModel : public QAbstractItemModel {
 		NBAppEngine *appEngine;
 		NBApplicationItem *rootItem;
 
-		QHash<QString, QList<int>> categoryRowMap;
+		QHash<QString, QList<int> > categoryRowMap;
 		QHash<QString, bool> categoryVisibilityMap;
 
 		struct loadStatus {

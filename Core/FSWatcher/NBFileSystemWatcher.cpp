@@ -1,117 +1,99 @@
 /*
 	*
-	* NBAppFile.hpp - NBAppFile.cpp header
+	* NBFileSystemWatcher.cpp - INotify Class for Qt4
 	*
 */
 
-#pragma once
-#ifndef NBAPPFILE_HPP
-#define NBAPPFILE_HPP
+#include <NBFileSystemWatcher.hpp>
 
-#include <QString>
-#include <QStringList>
-#include <QVariant>
-#include <QList>
-#include <QDir>
-#include <QFile>
-#include <QDebug>
-#include <QUrl>
-#include <QMap>
+NBFileSystemWatcher::NBFileSystemWatcher() : QThread() {
 
-#include <libgen.h>
-#include <NBXdg.hpp>
-#include <NBTools.hpp>
-
-class NBAppFile {
-
-	public:
-		enum Fields {
-			Name,
-			Type,
-			Exec,
-			Icon,
-			MimeTypes,
-			WorkPath,
-			TerminalMode,
-			Categories,
-			Comment,
-			NoDisplay
-		};
-
-		NBAppFile();
-		NBAppFile( QString );
-
-		// Value of various fields
-		QVariant value( NBAppFile::Fields ) const;
-
-		// Contains only the arguments, expanded wherever necessary accoring to fredesktop.org standards
-		QStringList execArgs() const;
-
-		// Can handle multiple input files?
-		bool multipleArgs() const;
-
-		// Does it take arguments
-		bool takesArgs() const;
-
-		// Grade
-		short grade() const;
-
-		// Name of the desktop file
-		QString desktopFileName() const;
-
-		// Compare this and other
-		// this.grade() - other.grade()
-		int compare( NBAppFile ) const;
-
-		// Category if this NBAppFile
-		QString category() const;
-
-		// Merge to NBAppFiles
-		static NBAppFile merge( NBAppFile first, NBAppFile second );
-
-		// Check if this NBAppFile is equivalent ot @other
-		bool operator==( const NBAppFile& ) const;
-
-	private:
-		NBAppFile( QVariantList );
-
-		void parseDesktopFile();
-		void generateExecArgs();
-
-		QString fileUrl;
-
-		// variables
-		QString __name;
-		QString __type;
-		QString __exec;
-
-		QString __icon;
-		QStringList __mimeTypes;
-		QString __workPath;
-		bool __terminalMode;
-
-		QStringList __categories;
-		QString __category;
-		QString __comment;
-		bool __nodisplay;
-
-		QStringList __execArgs;
-		bool __multipleFiles;
-		bool __takesArgs;
-
-		short __grade;
+	inotifyFD = inotify_init();
+	if ( inotifyFD < 0 )
+		qCritical() << "Failed initialize inotify";
 };
 
-class NBAppsList {
-	public:
-		NBAppsList();
+NBFileSystemWatcher::~NBFileSystemWatcher() {
 
-		void clear();
-		int count();
-		void move( int, int );
+	__stopWatch = true;
 
-		NBAppFile at( quint64 );
-		int indexOf( NBAppFile );
-		void insert( int, NBAppFile );
+	inotify_rm_watch( inotifyFD, WD );
+	close( inotifyFD );
+};
 
-		bool îEˆÊ”ûR9’z¯
+void NBFileSystemWatcher::setWatchPath( QString wPath ) {
+
+	// Set @v watchPath
+	watchPath = QString( wPath );
+
+	// Save the old Watch Descriptor
+	int oldWD = WD;
+
+	// Add anew watch
+	WD = inotify_add_watch( inotifyFD, qPrintable( watchPath ), IN_ALL_EVENTS );
+	if ( WD == -1 ) {
+		qCritical() << "Couldn't add watch: " << qPrintable( watchPath );
+		emit watchFailed();
+	}
+
+	// Now delete the old watch
+	if ( oldWD >= 0 )
+		inotify_rm_watch( inotifyFD, oldWD );
+};
+
+void NBFileSystemWatcher::startWatch() {
+
+	__stopWatch = false;
+	start();
+};
+
+void NBFileSystemWatcher::stopWatch() {
+
+	__stopWatch = true;
+};
+
+void NBFileSystemWatcher::run() {
+
+	while ( not __stopWatch ) {
+		int length = 0, i = 0;
+		while( true ) {
+			i = 0;
+			length = read( inotifyFD, buffer, BUF_LEN );
+
+			// If for some reason length < 0, continue with trying to read.
+			if ( length < 0 )
+				continue;
+
+			if ( __stopWatch )
+				return;
+
+			while ( i < length ) {
+				if ( __stopWatch )
+					return;
+
+				struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
+				// If this is a transition between two watches, ignore the old watch events
+				if ( event->wd != WD )
+					break;
+
+				if ( event->mask & IN_DELETE_SELF ) {
+					emit watchPathDeleted();
+				}
+
+				if ( ( event->mask & IN_CREATE ) ) {
+					emit nodeCreated( watchPath + "/" + event->name );
+				}
+
+				if ( event->mask & IN_MODIFY ) {
+					emit nodeChanged( watchPath + "/" + event->name );
+				}
+
+				if ( ( event->mask & IN_DELETE ) ) {
+					emit nodeDeleted( watchPath + "/" + event->name );
+				}
+
+				i += EVENT_SIZE + event->len;
+			}
+		}
+	}
+};

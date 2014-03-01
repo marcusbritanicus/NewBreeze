@@ -22,7 +22,7 @@ void NBUtilityBar::createGUI() {
 	setObjectName( tr( "UtilityBar") );
 	setFixedHeight( 40 );
 
-	tabs = new NBTabs();
+	tabs = new NBTabWidget();
 
 	closeBtn = new NBToolButton( QString( ":/icons/delete.png" ) );
 	closeBtn->setObjectName( "quitBtn" );
@@ -93,46 +93,67 @@ void NBUtilityBar::paintEvent( QPaintEvent *pEvent ) {
 	QWidget::paintEvent( pEvent );
 };
 
-NBTabs::NBTabs() : QTabBar() {
+NBTabWidget::NBTabWidget() : QWidget() {
 
-	QTabBar::addTab( QIcon::fromTheme( "folder" ), QString( "Documents" ) );
-	QTabBar::addTab( QIcon::fromTheme( "folder" ), QString( "Downloads" ) );
+	__currentIndex = -1;
 	setFixedHeight( 30 );
-	setIconSize( QSize( 24, 24 ) );
 
-	setStyleSheet(
-		QString(
-			"QTabWidget::tab-bar {"
-			"	alignment: center;"
-			"}"
-			"QTabBar::tab {"
-			"	background: none;"
-			"	border: none;"
-			"	min-width: 8ex;"
-			"	padding: 2px;"
-			"	padding-left: 5px;"
-			"}"
-			"QTabBar::tab:selected, QTabBar::tab:hover {"
-			"	background: rgba( 255, 255, 255, 20 );"
-			"}"
-			"QTabBar::tab:selected {"
-			"	border-color: #9B9B9B;"
-			"}"
-			"QTabBar::tab:first {"
-			"	border-top-left-radius: 2px;"
-			"	border-bottom-left-radius: 2px;"
-			"}"
-			"QTabBar::tab:last {"
-			"	border-top-right-radius: 2px;"
-			"	border-bottom-right-radius: 2px;"
-			"}"
-		)
-	);
+	tabsLyt = new QHBoxLayout();
+	tabsLyt->setContentsMargins( QMargins() );
+	tabsLyt->setSpacing( 0 );
+
+	setLayout( tabsLyt );
 };
 
-void NBTabs::paintEvent( QPaintEvent *pEvent ) {
+int NBTabWidget::addTab( QString path ) {
 
-	QTabBar::paintEvent( pEvent );
+	NBTab *tab = new NBTab( NBIconProvider::icon( path ), path );
+	tab->showText();
+	tabsList << tab;
+
+	connect( tab, SIGNAL( clicked() ), this, SLOT( switchToTab() ) );
+
+	if ( __currentIndex >= 0 )
+		tabsList.value( __currentIndex )->hideText();
+
+	tabsLyt->addWidget( tab );
+
+	__currentIndex = tabsList.count() - 1;
+};
+
+void NBTabWidget::removeTab( int tab ) {
+
+	tabsList.removeAt( tab );
+
+	__currentIndex--;
+	tabsList.value( __currentIndex )->showText();
+};
+
+void NBTabWidget::setCurrentIndex( int tab ) {
+
+	tabsList.value( __currentIndex )->hideText();
+	__currentIndex = tab;
+
+	tabsList.value( tab )->showText();
+};
+
+int NBTabWidget::currentIndex() {
+
+	return __currentIndex;
+};
+
+void NBTabWidget::switchToTab() {
+
+	NBTab *tab = qobject_cast<NBTab *>( sender() );
+
+	int index = tabsList.indexOf( tab );
+	if ( index >= 0 )
+		setCurrentIndex( index );
+};
+
+void NBTabWidget::paintEvent( QPaintEvent *pEvent ) {
+
+	QWidget::paintEvent( pEvent );
 
 	QPainter *painter = new QPainter( this );
 	painter->save();
@@ -142,4 +163,69 @@ void NBTabs::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->restore();
 	painter->end();
+};
+
+NBTab::NBTab( QString icon, QString path ) {
+
+	QFontMetrics fm( font() );
+
+	__text = fm.elidedText( baseName( path ), Qt::ElideRight, 120 );
+	__icon = QIcon::fromTheme( icon, QIcon( icon ) );
+
+	bool __textVisible = false;
+
+	setToolTip( path );
+	repaint();
+};
+
+void NBTab::showText() {
+
+	__textVisible = true;
+	setFixedWidth( 150 );
+
+	repaint();
+};
+
+void NBTab::hideText() {
+
+	__textVisible = false;
+	setFixedWidth( 30 );
+
+	repaint();
+};
+
+void NBTab::paintEvent( QPaintEvent *pEvent ) {
+
+	QPainter *painter = new QPainter( this );
+	painter->save();
+
+	if ( not __textVisible ) {
+		painter->drawPixmap( QRect( 3, 3, 24, 24 ), __icon.pixmap( 24 ) );
+
+		painter->setPen( Qt::gray );
+		painter->drawLine( QPoint( 29, 2 ), QPoint( 29, 27 ) );
+	}
+
+	else {
+		painter->drawPixmap( QRect( 3, 3, 24, 24 ), __icon.pixmap( 24 ) );
+		painter->drawText( QRect( 30, 0, 120, 30 ), Qt::AlignVCenter | Qt::AlignLeft, __text );
+
+		painter->setPen( Qt::gray );
+		painter->drawLine( QPoint( 149, 2 ), QPoint( 149, 27 ) );
+	}
+
+	painter->restore();
+	painter->end();
+
+	pEvent->accept();
+};
+
+void NBTab::mousePressEvent( QMouseEvent *mEvent ) {
+
+	if ( mEvent->button() == Qt::LeftButton ) {
+
+		emit clicked();
+	}
+
+	mEvent->accept();
 };

@@ -65,7 +65,7 @@ class NBCatalogModel : public QAbstractItemModel {
 
 		NBCatalogItem *rootItem;
 
-		QHash<QString, QList<int>> catalogRowMap;
+		QHash<QString, QList<int> > catalogRowMap;
 		QHash<QString, bool> catalogVisibilityMap;
 
 		struct loadStatus {

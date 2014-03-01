@@ -273,8 +273,8 @@ SOURCES += Main.cpp
 RESOURCES += NewBreeze.qrc
 
 # C++11 Support
-QMAKE_CFLAGS += -std=c++0x
-QMAKE_CXXFLAGS += -std=c++0x
+#QMAKE_CFLAGS += -std=c++11
+#QMAKE_CXXFLAGS += -std=c++11
 
 # Enable warnings and threading support
 CONFIG += warn_off thread silent

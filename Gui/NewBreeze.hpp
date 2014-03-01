@@ -82,6 +82,7 @@ class NewBreeze : public QMainWindow {
 		void openWithList();
 		void openNewWindow();
 		void openInNewWindow( QString );
+		void openInNewTab( QString );
 
 		void focusSearch();
 		void clearSearch();

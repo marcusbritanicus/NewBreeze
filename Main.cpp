@@ -36,7 +36,10 @@
 
 #include <NBCLParser.hpp>
 
-void startInstance( QApplication &app, bool startServer = false ) {
+void startInstance( QApplication &app, bool startServer = false, bool otherCLO = false ) {
+	/* @app -> QApplication instance */
+	/* @startServer -> Whether a server should be started */
+	/* @otherCLO -> Is the second command line option the location? */
 
 	NBServer *server;
 	NewBreeze *Gui;
@@ -50,11 +53,17 @@ void startInstance( QApplication &app, bool startServer = false ) {
 
 	NBStartup();
 
-	if ( app.arguments().count() >= 2 )
-		Gui = new NewBreeze( app.arguments().at( 1 ) );
+	if ( otherCLO ) {
+		if ( app.arguments().count() >= 3 )
+			Gui = new NewBreeze( app.arguments().at( 2 ) );
 
-	else
+		else
+			Gui = new NewBreeze();
+	}
+
+	else {
 		Gui = new NewBreeze();
+	}
 
 	if ( Settings->Session.Maximized )
 		Gui->showMaximized();

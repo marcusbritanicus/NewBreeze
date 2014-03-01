@@ -35,6 +35,9 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 			FolderView->doOpen( QDir::homePath() );
 	}
 
+	/* Show this opened folder in the UtilityBar tabs */
+	uBar->tabs->addTab( FolderView->fsModel->currentDir() );
+
 	/* If we are opening NewBreeze, open Catalogs, otherwise open the folder */
 	if ( Settings->General.OpenWithCatalog and loc.isEmpty() )
 		FolderView->setCurrentIndex( 2 );
@@ -82,11 +85,11 @@ void NewBreeze::createGUI() {
 
 	BodyWidget->setLayout( BodyLayout );
 
-	MainLayout->addWidget( uBar );
-	// if ( not Settings->General.NativeTitleBar ) {
-		// MainLayout->addWidget( TitleBar );
-		// MainLayout->addWidget( Separator::horizontal() );
-	// }
+	// MainLayout->addWidget( uBar );
+	if ( not Settings->General.NativeTitleBar ) {
+		MainLayout->addWidget( TitleBar );
+		MainLayout->addWidget( Separator::horizontal() );
+	}
 	MainLayout->addWidget( BodyWidget );
 	MainLayout->addWidget( Terminal );
 	MainLayout->addWidget( Separator::horizontal() );
@@ -214,6 +217,8 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( clearSearchBar() ), this, SLOT( clearSearch() ) );
 
 	connect( FolderView, SIGNAL( newWindow( QString ) ), this, SLOT( openInNewWindow( QString ) ) );
+
+	connect( FolderView, SIGNAL( newTab( QString ) ), this, SLOT( openInNewTab( QString ) ) );
 
 	connect( FolderView, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ), this, SLOT( updateInfoBar() ) );
 
@@ -583,7 +588,7 @@ void NewBreeze::openNewWindow() {
 
 void NewBreeze::openInNewWindow( QString location ) {
 
-	qDebug() << "Opening new window at " << location;
+	qDebug() << "Opening new window at" << location;
 
 	NewBreeze *newbreeze = new NewBreeze( location );
 	if ( Settings->Session.Maximized )
@@ -591,6 +596,13 @@ void NewBreeze::openInNewWindow( QString location ) {
 
 	else
 		newbreeze->showNormal();
+};
+
+void NewBreeze::openInNewTab( QString location ) {
+
+	qDebug() << "Opening new tab at" << location;
+
+	uBar->tabs->addTab( location );
 };
 
 void NewBreeze::focusSearch() {

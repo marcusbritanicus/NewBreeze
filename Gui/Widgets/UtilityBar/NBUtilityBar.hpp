@@ -12,7 +12,8 @@
 #include <NBGuiWidgets.hpp>
 #include <NBIOManager.hpp>
 
-class NBTabs;
+class NBTabWidget;
+class NBTab;
 
 class NBUtilityBar : public QWidget {
 	Q_OBJECT
@@ -21,11 +22,12 @@ class NBUtilityBar : public QWidget {
 		NBUtilityBar();
 		~NBUtilityBar();
 
+		NBTabWidget *tabs;
+
 	private:
 		void createGUI();
 		void setupConnections();
 
-		NBTabs *tabs;
 		NBToolButton *closeBtn;
 		NBToolButton *procWidget;
 
@@ -49,11 +51,11 @@ class NBUtilityBar : public QWidget {
 		void aboutQt4();
 };
 
-class NBTabs : public QTabBar {
+class NBTabWidget : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBTabs();
+		NBTabWidget();
 
 		/* Add a tab: @param is the path, which helps us determine the icon and the tab name */
 		int addTab( QString );
@@ -61,8 +63,45 @@ class NBTabs : public QTabBar {
 		/* Remove a tab: @param is the logical index */
 		void removeTab( int );
 
+		/* Switch to a tab */
+		void setCurrentIndex( int );
+
+		/* Get the current index */
+		int currentIndex();
+
+	private:
+		QList<NBTab *> tabsList;
+		QHBoxLayout *tabsLyt;
+
+		int __currentIndex;
+
+	private slots:
+		void switchToTab();
+
 	protected:
 		void paintEvent( QPaintEvent * );
+};
+
+class NBTab : public QWidget {
+	Q_OBJECT
+
+	public:
+		NBTab( QString, QString );
+
+		void showText();
+		void hideText();
+
+	private:
+		QString __text;
+		bool __textVisible;
+		QIcon __icon;
+
+	protected:
+		void paintEvent( QPaintEvent * );
+		void mousePressEvent( QMouseEvent * );
+
+	Q_SIGNALS:
+		void clicked();
 };
 
 #endif

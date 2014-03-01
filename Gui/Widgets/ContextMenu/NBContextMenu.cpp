@@ -519,6 +519,11 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		QString file = termFormatString( fInfo.absoluteFilePath() );
 
 		if ( fInfo.isDir() ) {
+			QAction *openInNewTabAct = new QAction( QIcon::fromTheme( "tab-new" ), "Open in New &Tab", this );
+			openInNewTabAct->setData( QVariant( fInfo.absoluteFilePath() ) );
+			connect( openInNewTabAct, SIGNAL( triggered() ), this, SLOT( doOpenInNewTab() ) );
+			menu->addAction( openInNewTabAct );
+
 			QAction *openInNewWinAct = new QAction( QIcon( ":/icons/newwin.png" ), "Open in New &Window", this );
 			openInNewWinAct->setData( QVariant( fInfo.absoluteFilePath() ) );
 			connect( openInNewWinAct, SIGNAL( triggered() ), this, SLOT( doOpenInNewWindow() ) );
