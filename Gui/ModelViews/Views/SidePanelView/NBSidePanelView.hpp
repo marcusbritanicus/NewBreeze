@@ -29,7 +29,7 @@ class NBSidePanelView : public QListView {
 		NBSidePanelDelegate *iDelegate;
 
 		int mIdealWidth;
-		bool showingDevices = true;
+		bool showingDevices;
 
 	public slots:
 		void updateBookmarks();

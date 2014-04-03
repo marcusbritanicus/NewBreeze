@@ -94,29 +94,29 @@ class NBOpenWithView : public QAbstractItemView {
 
 		NBApplicationsModel *appModel;
 
-		mutable int idealHeight = 0;
-		mutable int viewWidth = 0;
+		mutable int idealHeight;
+		mutable int viewWidth;
 		mutable QHash<int, int> yOffsetForRow;
 		mutable QHash<int, int> yOffsetForCategory;
-		mutable bool hashIsDirty = true;
+		mutable bool hashIsDirty;
 
 		// Category Height
-		mutable int myCategoryHeight = 32;
+		mutable int myCategoryHeight;
 
 		// Category Spacing
-		mutable int myCategorySpacing = 10;
+		mutable int myCategorySpacing;
 
 		// Contents Margins
-		mutable QMargins myContentsMargins = QMargins( 10, 10, 10, 10 );
+		mutable QMargins myContentsMargins;
 
 		// Inlay Margins
-		mutable QMargins myInlayMargins = QMargins( 10, 0, 10, 0 );
+		mutable QMargins myInlayMargins;
 
 		// Grid Size
-		mutable int myItemHeight = 32;
+		mutable int myItemHeight;
 
 		// Icon Size
-		mutable QSize myIconSize = QSize( 24, 24 );
+		mutable QSize myIconSize;
 };
 
 #endif

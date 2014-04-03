@@ -9,6 +9,9 @@
 
 void NBIconDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
 
+	maxLines = 1;
+	textLines = 1;
+
 	if ( Settings->General.FolderView == QString( "IconsView" ) )
 		paintIcons( painter, option, index );
 

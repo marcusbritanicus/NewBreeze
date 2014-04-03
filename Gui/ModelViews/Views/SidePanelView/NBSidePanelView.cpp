@@ -9,6 +9,8 @@
 
 NBSidePanelView::NBSidePanelView() : QListView() {
 
+	showingDevices = true;
+
 	/* Set up the model */
 	spModel = new NBSidePanelModel();
 	setModel( spModel );

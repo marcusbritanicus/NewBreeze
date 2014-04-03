@@ -106,7 +106,7 @@ class NBTrashModel : public QAbstractItemModel {
 		QHash<QString, QList<int> > categoryRowMap;
 		QHash<QString, bool> categoryVisibilityMap;
 
-		bool mCategorizationEnabled = true;
+		bool mCategorizationEnabled;
 
 		struct loadStatus {
 			bool loading = false;
@@ -119,7 +119,7 @@ class NBTrashModel : public QAbstractItemModel {
 		// History
 		QStringList oldRoots;
 		long curIndex;
-		mutable int updatedNodes = 0;
+		mutable int updatedNodes;
 
 		NBQuickFileInfoGatherer *quickDataGatherer;
 		NBFileSystemWatcher *watcher;

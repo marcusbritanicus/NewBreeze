@@ -8,6 +8,8 @@
 
 NBTrashManager::NBTrashManager() : NBDialog( "nxc" ) {
 
+	ClipBoard = qApp->clipboard();
+
 	setupGui();
 	setDialogProperties();
 };

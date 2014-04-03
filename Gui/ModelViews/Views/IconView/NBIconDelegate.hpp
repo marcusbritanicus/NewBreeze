@@ -26,8 +26,8 @@ class NBIconDelegate : public QItemDelegate {
 		void paintTileTextDetails( QPainter *painter, QRect &textRect, const QModelIndex &index ) const;
 		void paintExtraDetails( QPainter *painter, QList<QRect> &textRectList, const QModelIndex &index ) const;
 
-		mutable int maxLines = 1;		// Max number of lines that can be written
-		mutable int textLines = 1;		// Number of lines the filename occupies
+		mutable int maxLines;		// Max number of lines that can be written
+		mutable int textLines;		// Number of lines the filename occupies
 };
 
 #endif

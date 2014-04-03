@@ -8,6 +8,9 @@
 
 NBTrashModel::NBTrashModel() : QAbstractItemModel() {
 
+	mCategorizationEnabled = true;
+	updatedNodes = 0;
+
 	oldRoots.clear();
 	curIndex = 0;
 

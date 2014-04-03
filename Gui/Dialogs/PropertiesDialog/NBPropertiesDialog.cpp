@@ -82,6 +82,10 @@ NBPropertiesBase::NBPropertiesBase( QStringList paths ) : QWidget() {
 
 NBPropertiesWidget::NBPropertiesWidget( QStringList paths ) : QWidget() {
 
+	files = 0;
+	folders = 0;
+	totalSize = 0;
+
 	pathsList << paths;
 	terminate = false;
 

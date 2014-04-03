@@ -59,22 +59,22 @@ class NBFlashLabel : public QLabel {
 		void setFlashFrames( int );
 
 	private :
-		QPixmap mPixmap = QPixmap();
-		QString mText = QString();
+		QPixmap mPixmap;
+		QString mText;
 
 		QTimer timer;
 
-		qint64 alpha = 0;
-		qint64 mAlphaDelta = 30;
-		QColor color = QColor( 255, 255, 255, 0 );
+		qint64 alpha;
+		qint64 mAlphaDelta;
+		QColor color;
 
-		int currentStep = 0;
-		int flashSteps = 10;
-		int mFlashDuration = 200;
+		int currentStep;
+		int flashSteps;
+		int mFlashDuration;;
 
-		bool flash = false;
-		int flashesCompleted = 0;
-		int maxFlashes = 2;
+		bool flash;
+		int flashesCompleted;
+		int maxFlashes;
 
 	protected :
 		void paintEvent( QPaintEvent* );
@@ -99,17 +99,17 @@ class NBDeleteLabel : public QLabel {
 		NBDeleteLabel();
 
 	private :
-		QPixmap mPixmap = QPixmap();
+		QPixmap mPixmap;
 
 		QTimer timer;
 
-		QColor color = QColor( 255, 0, 0, 150 );
+		QColor color;
 
-		int currentStep = 0;
-		int flashSteps = 50;
-		int radius = 0;
+		int currentStep;
+		int flashSteps;
+		int radius;
 
-		bool flash = false;
+		bool flash;
 
 	protected :
 		void paintEvent( QPaintEvent* );

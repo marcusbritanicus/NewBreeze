@@ -8,6 +8,7 @@
 
 NBButtons::NBButtons() : QWidget() {
 
+	myButtonHeight = 24;
 	setContentsMargins( QMargins() );
 
 	btnsLyt = new QHBoxLayout();

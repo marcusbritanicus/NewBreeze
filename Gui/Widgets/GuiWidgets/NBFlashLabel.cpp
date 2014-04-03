@@ -8,6 +8,22 @@
 
 NBFlashLabel::NBFlashLabel() : QLabel() {
 
+
+	mPixmap = QPixmap();
+	mText = QString();
+
+	alpha = 0;
+	mAlphaDelta = 30;
+	color = QColor( 255, 255, 255, 0 );
+
+	currentStep = 0;
+	flashSteps = 10;
+	mFlashDuration = 200;
+
+	flash = false;
+	flashesCompleted = 0;
+	maxFlashes = 2;
+
 	timer.setInterval( mFlashDuration / flashSteps );
 	timer.setSingleShot( false );
 
@@ -193,6 +209,15 @@ void NBFlashLabel::flashLabel() {
 };
 
 NBDeleteLabel::NBDeleteLabel() : QLabel() {
+
+	mPixmap = QPixmap();
+	color = QColor( 255, 0, 0, 150 );
+
+	currentStep = 0;
+	flashSteps = 50;
+	radius = 0;
+
+	flash = false;
 
 	setAcceptDrops( true );
 	mPixmap = QIcon::fromTheme( "user-trash" ).pixmap( 32 );

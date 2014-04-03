@@ -20,6 +20,8 @@ void NBPicLabel::mousePressEvent( QMouseEvent *mEvent ) {
 
 NBClickLabel::NBClickLabel( QPixmap icon ) : QLabel() {
 
+	clickEnabled = true;
+
 	setPixmap( icon );
 	setAlignment( Qt::AlignCenter );
 };
@@ -66,4 +68,3 @@ void NBInfoLabel::setText( QString name, QString size, QString type, QString per
 
 	QLabel::setText( text.arg( name ).arg( size ).arg( type ).arg( perm ) );
 };
-

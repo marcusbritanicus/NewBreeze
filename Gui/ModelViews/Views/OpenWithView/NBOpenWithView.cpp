@@ -8,6 +8,28 @@
 
 NBOpenWithView::NBOpenWithView() : QAbstractItemView() {
 
+	idealHeight = 0;
+	viewWidth = 0;
+	hashIsDirty = true;
+
+	// Category Height
+	myCategoryHeight = 32;
+
+	// Category Spacing
+	myCategorySpacing = 10;
+
+	// Contents Margins
+	myContentsMargins = QMargins( 10, 10, 10, 10 );
+
+	// Inlay Margins
+	myInlayMargins = QMargins( 10, 0, 10, 0 );
+
+	// Grid Size
+	myItemHeight = 32;
+
+	// Icon Size
+	myIconSize = QSize( 24, 24 );
+
 	// Set the Apps Delegate
 	setItemDelegate( new NBOpenWithDelegate() );
 

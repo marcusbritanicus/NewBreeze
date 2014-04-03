@@ -120,7 +120,7 @@ class NBSettings {
 	private:
 		NBSettings() {};
 
-		bool init/* = false*/;
+		bool init;
 
 		static NBSettings *settings;
 		static NBSettings *defaultSettings;

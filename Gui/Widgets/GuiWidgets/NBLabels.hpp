@@ -34,7 +34,7 @@ class NBClickLabel : public QLabel {
 		void setClickable( bool );
 
 	private :
-		bool clickEnabled = true;
+		bool clickEnabled;
 
 	protected:
 		void mousePressEvent( QMouseEvent * );

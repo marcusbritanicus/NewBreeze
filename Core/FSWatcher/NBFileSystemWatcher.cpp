@@ -8,6 +8,14 @@
 
 NBFileSystemWatcher::NBFileSystemWatcher() : QThread() {
 
+	inotifyFD = -1;
+	WD = -1;
+	buffer[ BUF_LEN ] = { 0 };
+
+	watchPath = QString();
+
+	__stopWatch = false;
+
 	inotifyFD = inotify_init();
 	if ( inotifyFD < 0 )
 		qCritical() << "Failed initialize inotify";

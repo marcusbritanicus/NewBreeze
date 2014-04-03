@@ -8,6 +8,10 @@
 
 NBActionButtons::NBActionButtons( bool minBtn, bool maxBtn, bool closeBtn ) : QWidget() {
 
+	minRect = QRect( 0, 0, 0, 0 );
+	maxRect = QRect( 0, 0, 0, 0 );
+	clsRect = QRect( 0, 0, 0, 0 );
+
 	painter = new QPainter();
 
 	minBtnEnabled = minBtn;

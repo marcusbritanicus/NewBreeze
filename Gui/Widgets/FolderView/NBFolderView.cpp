@@ -8,6 +8,9 @@
 
 NBFolderView::NBFolderView() : QStackedWidget() {
 
+	// ClipBoard
+	ClipBoard = qApp->clipboard();
+
 	// Set Data Model
 	fsModel = new NBFileSystemModel();
 	fsModel->setReadOnly( false );

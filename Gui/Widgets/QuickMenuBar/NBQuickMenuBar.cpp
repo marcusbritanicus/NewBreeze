@@ -18,6 +18,7 @@ NBQuickMenuBar::NBQuickMenuBar() : QWidget() {
 
 	quickBtns = new NBButtons( labels, icons );
 	quickBtns->setSegmentWidth( 128 );
+	quickBtns->setSegmentHeight( 24 );
 
 	quickBtns->setSegmentDisabled( 0 );
 	quickBtns->setSegmentDisabled( 1 );

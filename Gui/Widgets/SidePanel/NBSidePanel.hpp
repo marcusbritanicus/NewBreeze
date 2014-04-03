@@ -32,16 +32,16 @@ class NBSidePanel : public QWidget {
 		NBFlashLabel *dirLbl, *appLbl, *ctlLbl, *devLbl, *bmkLbl;
 		NBDeleteLabel *deleteLbl;
 
-		bool forcedOpen = false;
+		bool forcedOpen;
 
-		bool showingDevices = true;
-		bool showingBookMarks = false;
-		bool animating = false;
+		bool showingDevices;
+		bool showingBookMarks;
+		bool animating;
 
 		QTimer *expandingTimer;
 		QTimer *contractingTimer;
 
-		int maxWidth = 49;
+		int maxWidth;
 
 	public slots :
 		void flashBookmarks();

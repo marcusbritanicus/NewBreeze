@@ -63,9 +63,9 @@ class NBPropertiesWidget: public QWidget {
 
 		QFuture<void> thread;
 
-		qint64 files = 0;
-		qint64 folders = 0;
-		qint64 totalSize = 0;
+		qint64 files;
+		qint64 folders;
+		qint64 totalSize;
 
 		QDateTime ctimeMin, mtimeMin, atimeMin;
 		QDateTime ctimeMax, mtimeMax, atimeMax;

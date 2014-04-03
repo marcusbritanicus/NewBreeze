@@ -19,6 +19,7 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 
 	__showHidden = false;
 	__readOnly = true;
+	updatedNodes = 0;
 
 	oldRoots.clear();
 	curIndex = 0;

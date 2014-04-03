@@ -9,6 +9,14 @@
 /* Side Panel init */
 NBSidePanel::NBSidePanel() : QWidget() {
 
+	forcedOpen = false;
+
+	showingDevices = true;
+	showingBookMarks = false;
+	animating = false;
+
+	maxWidth = 49;
+
 	setFixedWidth( 48 );
 
 	setupPanel();

@@ -8,6 +8,11 @@
 
 NBIOWidget::NBIOWidget( NBFileIO *ioProc ) {
 
+	detailsAreSeen = true;
+	paused = false;
+	previousSize = 0;
+	currentSize = 0;
+
 	io = ioProc;
 	connect( io, SIGNAL( IOComplete() ), this, SLOT( close() ) );
 	connect( io, SIGNAL( IOComplete() ), this, SLOT( signalRemove() ) );
@@ -180,6 +185,8 @@ void NBIOWidget::signalRemove() {
 };
 
 NBIOManager::NBIOManager( QList<NBFileIO*> jobList ) : NBDialog( "nxc" ) {
+
+	killIOOnClose = false;
 
 	ioList = jobList;
 

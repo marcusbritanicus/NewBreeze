@@ -37,7 +37,7 @@ class NBSidePanelModel : public QAbstractItemModel {
 		NBSidePanelItem *rootItem;
 		QStringList bmkList, devList;
 
-		bool showingDevices = true;
+		bool showingDevices;
 
 	public slots:
 		void updateDeviceData();

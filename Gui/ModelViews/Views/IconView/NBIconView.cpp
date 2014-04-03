@@ -8,6 +8,38 @@
 
 NBIconView::NBIconView( NBFileSystemModel *fsModel ) : QAbstractItemView() {
 
+	// Icon rects
+	idealHeight = 0;
+	hashIsDirty = true;
+
+	// Category Height
+	myCategoryHeight = 24;
+
+	// Category Spacing
+	myCategorySpacing = 10;
+
+	// Contents Margins
+	myContentsMargins = QMargins( 10, 10, 10, 10 );
+
+	// Inlay Margins
+	myInlayMargins = QMargins( 10, 0, 10, 0 );
+
+	// Grid Size
+	myGridSizeMin = QSize( 120, 80 );
+	myGridSize = QSize( 120, 80 );
+	myItemSize = QSize( 110, 70 );
+
+	// Icon Size
+	myIconSize = QSize( 48, 48 );
+
+	// Persistent vertical column
+	persistentVCol = 0;
+
+	// Items per visual row
+	itemsPerRow = 1;
+	numberOfRows = 0;
+	padding = 0;
+
 	// Set the Apps Delegate
 	setItemDelegate( new NBIconDelegate() );
 

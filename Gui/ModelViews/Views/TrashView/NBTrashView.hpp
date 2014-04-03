@@ -106,38 +106,38 @@ class NBTrashView : public QAbstractItemView {
 		NBTrashModel *tModel;
 
 		// Icon rects
-		mutable int idealHeight = 0;
+		mutable int idealHeight;
 		mutable QHash<int, QPoint> rectForRow;
 		mutable QHash<int, QRect> rectForCategory;
-		mutable bool hashIsDirty = true;
+		mutable bool hashIsDirty;
 
 		// Category Height
-		mutable int myCategoryHeight = 24;
+		mutable int myCategoryHeight;
 
 		// Category Spacing
-		mutable int myCategorySpacing = 10;
+		mutable int myCategorySpacing;
 
 		// Contents Margins
-		mutable QMargins myContentsMargins = QMargins( 10, 10, 10, 10 );
+		mutable QMargins myContentsMargins;
 
 		// Inlay Margins
-		mutable QMargins myInlayMargins = QMargins( 10, 0, 10, 0 );
+		mutable QMargins myInlayMargins;
 
 		// Grid Size
-		mutable QSize myGridSizeMin = QSize( 120, 80 );
-		mutable QSize myGridSize = QSize( 120, 80 );
-		mutable QSize myItemSize = QSize( 110, 70 );
+		mutable QSize myGridSizeMin;
+		mutable QSize myGridSize;
+		mutable QSize myItemSize;
 
 		// Icon Size
-		mutable QSize myIconSize = QSize( 48, 48 );
+		mutable QSize myIconSize;
 
 		// Persistent vertical column
-		mutable int persistentVCol = 0;
+		mutable int persistentVCol;
 
 		// Items per visual row
-		mutable int itemsPerRow = 1;
-		mutable int numberOfRows = 0;
-		mutable int padding = 0;
+		mutable int itemsPerRow;
+		mutable int numberOfRows;
+		mutable int padding;
 
 		QPoint dragStartPosition;
 		QRubberBand *rBand;

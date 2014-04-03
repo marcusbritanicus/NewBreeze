@@ -29,12 +29,12 @@ class NBIOWidget : public QWidget {
 
 		QTimer *timer;
 		QTimer *speedTimer;
-		bool detailsAreSeen = true;
+		bool detailsAreSeen;
 
 		NBFileIO *io;
-		bool paused = false;
+		bool paused;
 
-		quint64 previousSize = 0, currentSize = 0;
+		quint64 previousSize, currentSize;
 
 	private slots:
 		void toggleDetails();
@@ -60,7 +60,7 @@ class NBIOManager : public NBDialog {
 		QList<NBFileIO*> ioList;
 		QVBoxLayout *baseLyt;
 
-		bool killIOOnClose = false;
+		bool killIOOnClose;
 
 	private slots:
 		void removeIO( NBFileIO* );

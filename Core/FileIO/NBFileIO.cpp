@@ -23,6 +23,9 @@ NBFileIO::NBFileIO() {
 
 	jobID = MD5( QDateTime::currentDateTime().toString( Qt::ISODate ) );
 
+	wasCanceled = false;
+	isPaused = false;
+
 	errorNodes.clear();
 	sourceList.clear();
 	targetDir = QString();

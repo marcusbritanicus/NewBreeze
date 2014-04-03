@@ -8,6 +8,8 @@
 
 NBSidePanelModel::NBSidePanelModel() : QAbstractItemModel() {
 
+	showingDevices = true;
+
 	rootItem = new NBSidePanelItem( QVariantList() );
 	updateDeviceData();
 };

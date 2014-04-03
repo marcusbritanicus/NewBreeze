@@ -26,9 +26,9 @@ class NBActionButtons : public QWidget {
 
 		quint64 widgetWidth;
 
-		QRect minRect = QRect( 0, 0, 0, 0 );
-		QRect maxRect = QRect( 0, 0, 0, 0 );
-		QRect clsRect = QRect( 0, 0, 0, 0 );
+		QRect minRect;
+		QRect maxRect;
+		QRect clsRect;
 
 	protected:
 		void mousePressEvent( QMouseEvent * );

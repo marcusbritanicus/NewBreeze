@@ -43,7 +43,7 @@ class NBButtons : public QWidget {
 		QHBoxLayout *btnsLyt;
 		QList<QPushButton*> segments;
 
-		int myButtonHeight = 24;
+		int myButtonHeight;
 
 	private slots:
 		void handleSegmentClick();

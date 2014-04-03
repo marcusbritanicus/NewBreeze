@@ -176,7 +176,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 		// History
 		QStringList oldRoots;
 		long curIndex;
-		mutable int updatedNodes = 0;
+		mutable int updatedNodes;
 
 		NBQuickFileInfoGatherer *quickDataGatherer;
 		NBFileSystemWatcher *watcher;
