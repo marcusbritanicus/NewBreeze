@@ -53,14 +53,11 @@ NBInfoBar::NBInfoBar() : QWidget() {
 	infoLbl = new NBInfoLabel();
 	infoLbl->setMinimumWidth( 700 );
 
-	ioManagerMini = new NBIOManagerMini();
-
 	// Layouts
 	QHBoxLayout *baseLyt = new QHBoxLayout();
 
 	baseLyt->addWidget( iconLbl );
 	baseLyt->addWidget( infoLbl );
-	baseLyt->addWidget( ioManagerMini );
 	baseLyt->addStretch( 0 );
 
 	setStyleSheet( getStyleSheet( "NBInfoBar", Settings->General.Style ) );

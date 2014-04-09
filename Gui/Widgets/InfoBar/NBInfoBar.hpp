@@ -33,7 +33,6 @@ class NBInfoBar : public QWidget {
 
 		QLabel *iconLbl;
 		NBInfoLabel *infoLbl;
-		NBIOManagerMini *ioManagerMini;
 
 	private:
 		void setIcon( QPixmap );

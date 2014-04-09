@@ -31,8 +31,7 @@ void NBUtilityBar::createGUI() {
 	closeBtn->setShortcut( tr( "Ctrl+Q" ) );
 	connect( closeBtn, SIGNAL( clicked() ), this, SIGNAL( closeWindow() ) );
 
-	procWidget = new NBToolButton( QString( ":/icons/info.png" ) );
-	procWidget->setFixedSize( QSize( 32, 32 ) );
+	procWidget = new NBIOManagerMini();
 
 	QHBoxLayout *lyt = new QHBoxLayout();
 	lyt->setContentsMargins( 5, 0, 5, 0 );

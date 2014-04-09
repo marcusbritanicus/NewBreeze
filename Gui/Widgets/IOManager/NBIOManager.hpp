@@ -15,6 +15,7 @@
 #include <NBProgressBar.hpp>
 #include <NBIconProvider.hpp>
 #include <NBMessageDialog.hpp>
+#include <NBStyleManager.hpp>
 
 class NBIOWidget : public QWidget {
 	Q_OBJECT
@@ -69,7 +70,7 @@ class NBIOManager : public NBDialog {
 		void closeEvent( QCloseEvent* );
 };
 
-class NBIOManagerMini : public QFrame {
+class NBIOManagerMini : public QToolButton {
 	Q_OBJECT
 
 	public:
@@ -94,8 +95,6 @@ class NBIOManagerMini : public QFrame {
 
 		QPainter *painter;
 		qreal totalF;
-
-		bool checked;
 
 		QTimer *timer;
 

@@ -158,13 +158,17 @@ void NBIOWidget::speedCalculator() {
 	currentSize = io->copiedSize;
 
 	quint64 speed = currentSize - previousSize;
-	quint64 rTime = ceil( ( io->totalSize - io->copiedSize ) / speed );
+	quint64 rTime = speed ? ceil( ( io->totalSize - io->copiedSize ) / speed ) : 0;
 	QString hrs = ( rTime / 3600 ? QString( "%1 hours, " ).arg( rTime / 3600 ) : QString() );
 	QString mins = ( ( rTime % 3600 ) / 60 ? QString( "%1 minutes, " ).arg( ( rTime % 3600 ) / 60 ) : QString() );
 	QString secs = ( ( rTime % 3600 ) % 60 ? QString( "%1 seconds" ).arg( ( rTime % 3600 ) % 60 ) : QString() );
 
 	speedLbl->setText( QString( "Speed: %1/s" ).arg( formatSize( speed ) ) );
-	etcLbl->setText( QString( "ETC: %1%2%3" ).arg( hrs ).arg( mins ).arg( secs ) );
+	if ( speed )
+		etcLbl->setText( QString( "ETC: %1%2%3" ).arg( hrs ).arg( mins ).arg( secs ) );
+
+	else
+		etcLbl->setText( "ETC: -- hours, -- minutes, -- seconds" );
 };
 
 void NBIOWidget::cancelIO() {
@@ -192,7 +196,7 @@ NBIOManager::NBIOManager( QList<NBFileIO*> jobList ) : NBDialog( "nxc" ) {
 
 	QScrollArea *scroller = new QScrollArea();
 	scroller->setWidgetResizable( true );
-	// scroller->setStyleSheet( "border-top: 1px solid gray;" );
+	scroller->setPalette( NBStyleManager::transparentPalette() );
 
 	QWidget *baseWidget = new QWidget();
 	baseLyt = new QVBoxLayout();
@@ -292,20 +296,26 @@ void NBIOManager::removeIO( NBFileIO *io ) {
 	ioList.removeAll( io );
 };
 
-NBIOManagerMini::NBIOManagerMini() : QFrame() {
+NBIOManagerMini::NBIOManagerMini() : QToolButton() {
 
-	checked = false;
+	setIcon( QIcon::fromTheme( "help-about", QIcon( ":/icons/info.png" ) ) );
+	setIconSize( QSize( 24, 24 ) );
+	setFixedSize( QSize( 32, 32 ) );
+
+	setCheckable( true );
+
 	jobList.clear();
 
 	totalF = 0;
 	ioManager = NULL;
 
 	painter = new QPainter();
-	setFixedSize( QSize( 128, 52 ) );
 
 	timer = new QTimer();
 	connect( timer, SIGNAL( timeout() ), this, SLOT( manageTimer() ) );
 	connect( timer, SIGNAL( timeout() ), this, SLOT( updateProgress() ) );
+
+	setStyleSheet( "QToolButton { border: none; outline: none; }" );
 };
 
 NBIOManagerMini::~NBIOManagerMini() {
@@ -360,41 +370,68 @@ void NBIOManagerMini::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->begin( this );
 	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
-	painter->setFont( QFont( "Courier 10 Pitch", 10 ) );
 
-	// Draw the frame
-	painter->setPen( Qt::gray );
-	painter->setBrush( checked ? QColor( 100, 100, 100, 72 ) : QColor( 0, 0, 0, 72 ) );
-	painter->drawRoundedRect( 0, 0, 128, 52, 9, 9 );
+	painter->setPen( Qt::NoPen );
+
+	/* A background color indicating 'checked' status */
+	if ( isChecked() ) {
+		painter->setBrush( QColor( 255, 255, 255, 30 ) );
+		painter->drawRoundedRect( 0, 0, 32, 32, 5, 5 );
+	}
 
 	quint64 jobs = jobList.count();
 
-	if ( not jobs ) {
-		painter->setBrush( Qt::transparent );
+	if ( jobs ) {
+		int red, green;
+		// Change from Red to Yellow: When totalF = 0, green = 0; totalF = 0.4
+		if ( totalF <= 0.4 ) {
+			red = ( int )( 255 );
+			green = ( int )( totalF * 638 );
+		}
+
+		// Remain Yellow
+		else if ( totalF <= 0.6 ) {
+			red = 255;
+			green = 255;
+		}
+
+		// Change from Red to Yellow: When totalF = 0.6, red = 255; totalF = 1, red = 0;
+		else {
+			red = ( int )( ( 1 - totalF ) * 638 );
+			green = ( int )( 255 );
+		}
+
+		/* Draw the total progress indicator */
+		painter->setPen( Qt::NoPen );
+		painter->setBrush( QColor( red, green, 0, 56 ) );
+		painter->drawRoundedRect( 0, 0, 32 * totalF, 32, 5, 5 );
+
+		/* Draw text indicating total active jobs */
+		painter->setBrush( Qt::NoBrush );
 		if ( Settings->General.Style == QString( "TransDark" ) or Settings->General.Style == QString( "DullBlack" ) )
 			painter->setPen( Qt::white );
 
 		else
 			painter->setPen( Qt::black );
 
-		painter->drawText( 0, 0, 128, 52, Qt::AlignCenter, QString( "No active Jobs" ) );
+		painter->drawEllipse( QPoint( 16, 16 ), 10, 10 );
+		painter->drawEllipse( QPointF( 16, 16 ), 9.5, 9.5 );
+		painter->drawText( 0, 0, 32, 32, Qt::AlignCenter, QString( "%1" ).arg( jobs ) );
 	}
 
 	else {
-		// Draw text indicating total active jobs
-		painter->setBrush( Qt::transparent );
+		/* Draw the pixmap */
+		painter->setBrush( Qt::NoBrush );
 		if ( Settings->General.Style == QString( "TransDark" ) or Settings->General.Style == QString( "DullBlack" ) )
 			painter->setPen( Qt::white );
 
 		else
 			painter->setPen( Qt::black );
 
-		painter->drawText( 0, 6, 128, 17, Qt::AlignCenter, QString( "%1 active Job%2" ).arg( jobs ).arg( ( jobs == 1 ) ? "" : "s" ) );
+		painter->drawEllipse( QPointF( 16.0, 16.0 ), 10.0, 10.0 );
 
-		// Draw the total progress indicator
-		painter->setPen( Qt::gray );
-		painter->setBrush( Qt::darkGreen );
-		painter->drawRoundedRect( 5, 29, 118 * totalF, 17, 5, 5 );
+		painter->setFont( QFont( font().family(), 10, QFont::Bold ) );
+		painter->drawText( 0, 0, 32, 32, Qt::AlignCenter, QString( "i" ) );
 	}
 
 	painter->end();
@@ -403,20 +440,19 @@ void NBIOManagerMini::paintEvent( QPaintEvent *pEvent ) {
 
 void NBIOManagerMini::mousePressEvent( QMouseEvent *mEvent ) {
 
-	if ( checked ) {
+	if ( isChecked() ) {
 		ioManager->close();
 		ioManager = NULL;
 
-		checked = false;
 		repaint();
 	}
 
 	else {
 		ioManager = new NBIOManager( jobList );
-		connect( ioManager, SIGNAL( destroyed() ), this, SLOT( uncheck() ) );
+		connect( ioManager, SIGNAL( closed() ), this, SLOT( uncheck() ) );
 		ioManager->show();
 
-		checked = true;
+		setChecked( true );
 		repaint();
 	}
 
@@ -425,7 +461,7 @@ void NBIOManagerMini::mousePressEvent( QMouseEvent *mEvent ) {
 
 void NBIOManagerMini::uncheck() {
 
-	checked = false;
+	setChecked( false );
 	repaint();
 };
 

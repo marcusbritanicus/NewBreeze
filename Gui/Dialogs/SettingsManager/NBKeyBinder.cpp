@@ -191,6 +191,7 @@ QString NBKeyBinder::keyBinding() {
 };
 
 void NBKeyBinder::keyPressEvent( QKeyEvent *kEvent ) {
+
 	/*
 		*
 		* keyPressEvent( QKeyEvent ) -> None

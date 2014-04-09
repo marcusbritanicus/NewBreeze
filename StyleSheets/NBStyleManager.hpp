@@ -15,6 +15,7 @@ class NBStyleManager {
 	public:
 		static QString getStyleSheet( QString widget, QString style );
 		static QPalette getPalette( QString style );
+		static QPalette transparentPalette();
 
 	private:
 		static QString getStyleSheetTD( QString widget );

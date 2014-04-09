@@ -23,13 +23,13 @@ class NBUtilityBar : public QWidget {
 		~NBUtilityBar();
 
 		NBTabWidget *tabs;
+		NBIOManagerMini *procWidget;
 
 	private:
 		void createGUI();
 		void setupConnections();
 
 		NBToolButton *closeBtn;
-		NBToolButton *procWidget;
 
 	protected:
 		void mouseDoubleClickEvent( QMouseEvent * );

@@ -56,6 +56,25 @@ QPalette NBStyleManager::getPalette( QString style ) {
 		return getPaletteDB();
 };
 
+QPalette NBStyleManager::transparentPalette() {
+
+	QPalette pltt = qApp->palette();
+
+	pltt.setColor( QPalette::Active, QPalette::Window, Qt::transparent );
+	pltt.setColor( QPalette::Active, QPalette::WindowText, Qt::white );
+	pltt.setColor( QPalette::Active, QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::Active, QPalette::AlternateBase, Qt::transparent );
+	pltt.setColor( QPalette::Active, QPalette::ToolTipBase, QColor( 0, 0, 0, 206 ) );
+	pltt.setColor( QPalette::Active, QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
+	pltt.setColor( QPalette::Active, QPalette::Text, Qt::white );
+	pltt.setColor( QPalette::Active, QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::Active, QPalette::ButtonText, Qt::white );
+	pltt.setColor( QPalette::Active, QPalette::BrightText, Qt::white );
+	pltt.setColor( QPalette::Active, QPalette::Link, Qt::darkGreen );
+
+	return pltt;
+};
+
 QString NBStyleManager::getStyleSheetTD( QString widget ) {
 
 	if ( not initDone )

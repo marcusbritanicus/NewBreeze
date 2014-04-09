@@ -62,7 +62,11 @@ void startInstance( QApplication &app, bool startServer = false, bool otherCLO =
 	}
 
 	else {
-		Gui = new NewBreeze();
+		if ( app.arguments().count() >= 2 )
+			Gui = new NewBreeze( app.arguments().at( 1 ) );
+
+		else
+			Gui = new NewBreeze();
 	}
 
 	if ( Settings->Session.Maximized )

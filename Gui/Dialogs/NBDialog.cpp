@@ -44,7 +44,8 @@ void NBDialog::setupGUI() {
 
 	QWidget *BaseWidget = new QWidget();
 	BaseWidget->setObjectName( tr( "guiBase" ) );
-	setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
+	BaseWidget->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
+	setPalette( NBStyleManager::transparentPalette() );
 
 	BodyFrame = new QFrame();
 	BodyFrame->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );

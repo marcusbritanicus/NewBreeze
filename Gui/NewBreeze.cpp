@@ -36,7 +36,7 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	}
 
 	/* Show this opened folder in the UtilityBar tabs */
-	uBar->tabs->addTab( FolderView->fsModel->currentDir() );
+	// uBar->tabs->addTab( FolderView->fsModel->currentDir() );
 
 	/* If we are opening NewBreeze, open Catalogs, otherwise open the folder */
 	if ( Settings->General.OpenWithCatalog and loc.isEmpty() )
@@ -400,8 +400,8 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	Settings->Special.ClosingDown = true;
 
 	// If there are background FileIO jobs, bring them to front
-	if ( InfoBar->ioManagerMini->activeJobs() )
-		InfoBar->ioManagerMini->showAllIODialogs();
+	if ( uBar->procWidget->activeJobs() )
+		uBar->procWidget->showAllIODialogs();
 
 	// Now hide this window, other processes may take a while longer to close down
 	hide();
@@ -708,7 +708,7 @@ void NewBreeze::clearFilters() {
 
 void NewBreeze::initiateIO( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {
 
-	InfoBar->ioManagerMini->addJob( sourceList, target, iomode );
+	uBar->procWidget->addJob( sourceList, target, iomode );
 };
 
 void NewBreeze::openWithList() {
