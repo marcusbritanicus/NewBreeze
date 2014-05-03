@@ -14,6 +14,8 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 			loc.chop( 1 );
 	}
 
+	__terminate = false;
+
 	createGUI();
 	createAndSetupActions();
 	setWindowProperties();
@@ -34,9 +36,6 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 		else
 			FolderView->doOpen( QDir::homePath() );
 	}
-
-	/* Show this opened folder in the UtilityBar tabs */
-	// uBar->tabs->addTab( FolderView->fsModel->currentDir() );
 
 	/* If we are opening NewBreeze, open Catalogs, otherwise open the folder */
 	if ( Settings->General.OpenWithCatalog and loc.isEmpty() )
@@ -64,7 +63,6 @@ void NewBreeze::createGUI() {
 	BodyLayout->setSpacing( 0 );
 
 	uBar = new NBUtilityBar();
-	TitleBar = new NBTitleBar();
 	AddressBar = new NBAddressBar();
 	QuickMenuBar = new NBQuickMenuBar();
 	SidePanel = new NBSidePanel();
@@ -85,11 +83,7 @@ void NewBreeze::createGUI() {
 
 	BodyWidget->setLayout( BodyLayout );
 
-	// MainLayout->addWidget( uBar );
-	if ( not Settings->General.NativeTitleBar ) {
-		MainLayout->addWidget( TitleBar );
-		MainLayout->addWidget( Separator::horizontal() );
-	}
+	MainLayout->addWidget( uBar );
 	MainLayout->addWidget( BodyWidget );
 	MainLayout->addWidget( Terminal );
 	MainLayout->addWidget( Separator::horizontal() );
@@ -108,7 +102,6 @@ void NewBreeze::createGUI() {
 	if ( not Settings->Session.SidePanel )
 		SidePanel->hide();
 
-	TitleBar->setFocusPolicy( Qt::NoFocus );
 	AddressBar->setFocusPolicy( Qt::NoFocus );
 	SidePanel->setFocusPolicy( Qt::NoFocus );
 	FolderView->setFocusPolicy( Qt::StrongFocus );
@@ -141,13 +134,11 @@ void NewBreeze::setWindowProperties() {
 
 void NewBreeze::setWindowTitle( QString title ) {
 
-	TitleBar->setTitle( title );
 	QMainWindow::setWindowTitle( title );
 };
 
 void NewBreeze::setWindowIcon( QIcon icon ) {
 
-	TitleBar->setIcon( icon );
 	QMainWindow::setWindowIcon( icon );
 };
 
@@ -334,7 +325,6 @@ void NewBreeze::createAndSetupActions() {
 
 void NewBreeze::updateGUI() {
 
-	TitleBar->setStyleSheet( getStyleSheet( "NBTitleBar", Settings->General.Style ) );
 	AddressBar->setStyleSheet( getStyleSheet( "NBTooBar", Settings->General.Style ) );
 	SidePanel->setStyleSheet( getStyleSheet( "NBSidePanel", Settings->General.Style ) );
 	Terminal->setStyleSheet( getStyleSheet( "NBTerminal", Settings->General.Style ) );
@@ -347,12 +337,10 @@ void NewBreeze::toggleMaximizeRestore() {
 
 	if ( isMaximized() ) {
 		showNormal();
-		TitleBar->isMaximized = false;
 	}
 
 	else {
 		showMaximized();
-		TitleBar->isMaximized = true;
 	}
 };
 
@@ -396,8 +384,11 @@ void NewBreeze::showCustomActionsDialog() {
 
 void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 
-	// Signal all those who are looking for closing signal
-	Settings->Special.ClosingDown = true;
+	// Close down Info Gathering
+	FolderView->fsModel->terminateInfoGathering();
+
+	// Close down recursive size checker in Properties
+	__terminate = true;
 
 	// If there are background FileIO jobs, bring them to front
 	if ( uBar->procWidget->activeJobs() )
@@ -630,7 +621,7 @@ void NewBreeze::showProperties() {
 		foreach( QModelIndex idx, selectedList )
 			paths << FolderView->fsModel->nodePath( idx );
 
-	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties );
+	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, &__terminate );
 	propsDlg->show();
 };
 
@@ -646,7 +637,7 @@ void NewBreeze::showPermissions() {
 		foreach( QModelIndex idx, selectedList )
 			paths << FolderView->fsModel->nodePath( idx );
 
-	NBPropertiesDialog *permsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Permissions );
+	NBPropertiesDialog *permsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Permissions, &__terminate );
 	permsDlg->show();
 };
 

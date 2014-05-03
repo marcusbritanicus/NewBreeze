@@ -140,6 +140,9 @@ class NBFileSystemModel : public QAbstractItemModel {
 		QString nextDir() const;
 		QString parentDir() const;
 
+		// To halt the Info Gathering
+		void terminateInfoGathering();
+
 	private:
 		void setupModelData();
 
@@ -177,6 +180,9 @@ class NBFileSystemModel : public QAbstractItemModel {
 		QStringList oldRoots;
 		long curIndex;
 		mutable int updatedNodes;
+
+		// Info Getherer kill switch
+		bool __terminate;
 
 		NBQuickFileInfoGatherer *quickDataGatherer;
 		NBFileSystemWatcher *watcher;

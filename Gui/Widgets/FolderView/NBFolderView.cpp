@@ -25,7 +25,7 @@ NBFolderView::NBFolderView() : QStackedWidget() {
 	addWidget( ApplicationsView );
 	addWidget( CatalogView );
 
-	// Minimum Width - 900px
+	// Minimum Width - 700px
 	setMinimumWidth( 700 );
 
 	// Init moveItems
@@ -996,9 +996,46 @@ void NBFolderView::extract( QString archive ) {
 		// We cannot process this type
 		return;
 
-	NBArchive *arc = new NBArchive( archive, NBArchive::READ, type );
-	arc->setDestination( fsModel->nodePath( QFileInfo( archive ).baseName() ) );
-	arc->extract();
+	QString dest = fsModel->nodePath( QFileInfo( archive ).baseName() );
+	// Create the dest folder if it does nor exist
+	if ( not exists( dest ) )
+		QDir::current().mkdir( dest );
+
+	// QProcess Hack!! ===> TO BE FIXED <=== //
+	switch( type ) {
+		case NBArchive::ZIP : {
+			QProcess::startDetached( "unzip", QStringList() << archive << "-d" << dest );
+			break;
+		}
+		case NBArchive::GZ : {
+			QProcess::startDetached( "gunzip", QStringList() << archive );
+			break;
+		}
+		case NBArchive::BZ2 : {
+			QProcess::startDetached( "bunzip2", QStringList() << archive );
+			break;
+		}
+		case NBArchive::XZ : {
+			QProcess::startDetached( "unxz", QStringList() << archive );
+			break;
+		}
+		case NBArchive::TGZ : {
+			QProcess::startDetached( "tar", QStringList() << "-xf" << archive << "-C" << dest );
+			break;
+		}
+		case NBArchive::TBZ2 : {
+			QProcess::startDetached( "tar", QStringList() << "-xf" << archive << "-C" << dest );
+			break;
+		}
+		case NBArchive::TXZ : {
+			QProcess::startDetached( "tar", QStringList() << "-xf" << archive << "-C" << dest );
+			break;
+		}
+		case NBArchive::TZIP : {
+			// I am not handling this currently
+			break;
+		}
+	};
 };
 
 void NBFolderView::compress( QStringList archiveList ) {
@@ -1026,7 +1063,6 @@ void NBFolderView::compress( QStringList archiveList ) {
 	);
 
 	if ( not archiveName.isEmpty() ) {
-
 		NBArchive *arc;
 		if ( archiveName.endsWith( ".txz" ) )
 			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TXZ );

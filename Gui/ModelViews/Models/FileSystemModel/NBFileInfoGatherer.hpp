@@ -28,7 +28,7 @@ class NBFileInfoGatherer : public QThread {
 	Q_OBJECT
 
 	public:
-		NBFileInfoGatherer();
+		NBFileInfoGatherer( bool *term );
 		~NBFileInfoGatherer();
 
 		void gatherInfo( QStringList, QString );
@@ -38,6 +38,8 @@ class NBFileInfoGatherer : public QThread {
 
 		QStringList entryList;
 		QString rootPath;
+
+		bool *__terminate;
 
 	signals:
 		void done( QString, QString, QStringList );

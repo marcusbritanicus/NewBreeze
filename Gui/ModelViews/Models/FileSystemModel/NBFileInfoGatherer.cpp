@@ -184,7 +184,9 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 	return info;
 };
 
-NBFileInfoGatherer::NBFileInfoGatherer() : QThread() {
+NBFileInfoGatherer::NBFileInfoGatherer( bool *term ) : QThread() {
+
+	__terminate = term;
 
 	entryList.clear();
 	rootPath.clear();
@@ -207,7 +209,7 @@ void NBFileInfoGatherer::run() {
 
 	if ( rootPath != "/dev/" ) {
 		foreach( QString entry, entryList ) {
-			if ( Settings->Special.ClosingDown )
+			if ( *__terminate )
 				break;
 
 			QMimeType mimeType = mimeDb.mimeTypeForFile( rootPath + entry );

@@ -38,14 +38,14 @@ class NBPropertiesWidget: public QWidget {
     Q_OBJECT
 
 	public:
-		NBPropertiesWidget( QStringList );
+		NBPropertiesWidget( QStringList, bool *term );
 		~NBPropertiesWidget();
 
 	private:
 		void createGUI();
 		void setWidgetProperties();
 
-		bool terminate;
+		bool *terminate;
 
 	public slots:
 		void update();
@@ -121,7 +121,7 @@ class NBPropertiesDialog: public NBDialog {
 			OpenWith    = 0x02
 		};
 
-		NBPropertiesDialog( QStringList paths, PropertiesTab tab = Properties );
+		NBPropertiesDialog( QStringList paths, PropertiesTab tab, bool *term );
 
 	private:
 		QStackedWidget *stack;

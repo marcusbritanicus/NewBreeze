@@ -25,7 +25,7 @@ NBPropertiesBase::NBPropertiesBase( QStringList paths ) : QWidget() {
 		else
 			iconLabel->setClickable( false );
 
-		name = QString(baseName( pathsList.at( 0 ) ) );
+		name = QString( baseName( pathsList.at( 0 ) ) );
 	}
 
 	else {
@@ -80,21 +80,21 @@ NBPropertiesBase::NBPropertiesBase( QStringList paths ) : QWidget() {
 	setFixedHeight( 48 );
 };
 
-NBPropertiesWidget::NBPropertiesWidget( QStringList paths ) : QWidget() {
+NBPropertiesWidget::NBPropertiesWidget( QStringList paths, bool *term ) : QWidget() {
 
 	files = 0;
 	folders = 0;
 	totalSize = 0;
 
 	pathsList << paths;
-	terminate = false;
+	terminate = term;
 
 	createGUI();
 };
 
 NBPropertiesWidget::~NBPropertiesWidget() {
 
-	terminate = true;
+	*terminate = true;
 	thread.waitForFinished();
 };
 
@@ -266,7 +266,7 @@ void NBPropertiesWidget::folderProperties( QStringList paths ) {
 	Q_UNUSED( paths );
 
 	Q_FOREACH( QString path, pathsList ) {
-		if( terminate or Settings->Special.ClosingDown )
+		if ( *terminate )
 			return;
 
 		if ( isDir( path ) ) {
@@ -286,7 +286,7 @@ void NBPropertiesWidget::recurseProperties( QString path ) {
 
 	QDirIterator it( path, QDir::AllEntries | QDir::System | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::Hidden, QDirIterator::Subdirectories );
 	while ( it.hasNext() ) {
-		if( terminate or Settings->Special.ClosingDown )
+		if ( *terminate )
 			return;
 
 		it.next();
@@ -652,14 +652,14 @@ void NBPermissionsWidget::applyTo( const char *node, QFile::Permissions perms ) 
 	closedir( d_fh );
 };
 
-NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab ) : NBDialog( NBDialog::Close ) {
+NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab, bool *term ) : NBDialog( NBDialog::Close ) {
 
 	pathsList << paths;
 
 	setFixedSize( QSize( 530, 400 ) );
 
 	propsB = new NBPropertiesBase( paths );
-	propsW = new NBPropertiesWidget( paths );
+	propsW = new NBPropertiesWidget( paths, term );
 	permsW = new NBPermissionsWidget( paths );
 
 	tabs = new QTabBar();

@@ -21,7 +21,7 @@ INCLUDEPATH += Gui/ModelViews/Views/SidePanelView Gui/ModelViews/Views/TrashView
 INCLUDEPATH += Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu Gui/Widgets/CustomActions
 INCLUDEPATH += Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
 INCLUDEPATH += Gui/Widgets/IOManager Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget Gui/Widgets/SidePanel Gui/Widgets/Terminal
-INCLUDEPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar Gui/Widgets/TrashManager Gui/Widgets/UtilityBar StyleSheets
+INCLUDEPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager Gui/Widgets/UtilityBar StyleSheets
 
 DEPENDPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/ConfigParser Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/FileIO
 DEPENDPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/MultiFile Core/SelectionArea Core/Server Core/StandardPaths
@@ -33,7 +33,7 @@ DEPENDPATH += Gui/ModelViews/Views/SidePanelView Gui/ModelViews/Views/TrashView 
 DEPENDPATH += Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu Gui/Widgets/CustomActions
 DEPENDPATH += Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
 DEPENDPATH += Gui/Widgets/IOManager Gui/Widgets/QuickMenuBar Gui/Widgets/ShowHideWidget Gui/Widgets/SidePanel Gui/Widgets/Terminal
-DEPENDPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TitleBar Gui/Widgets/TrashManager Gui/Widgets/UtilityBar StyleSheets
+DEPENDPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager Gui/Widgets/UtilityBar StyleSheets
 
 # Headers
 HEADERS += Global.hpp
@@ -149,7 +149,6 @@ HEADERS += Gui/Widgets/Terminal/lib/TerminalDisplay.h
 HEADERS += Gui/Widgets/Terminal/lib/tools.h
 HEADERS += Gui/Widgets/Terminal/lib/Vt102Emulation.h
 HEADERS += Gui/Widgets/Terminal/NBTerminal.hpp
-HEADERS += Gui/Widgets/TitleBar/NBTitleBar.hpp
 HEADERS += Gui/Widgets/TrashManager/NBTrashManager.hpp
 HEADERS += Gui/Widgets/UtilityBar/NBUtilityBar.hpp
 HEADERS += StyleSheets/NBStyleManager.hpp
@@ -263,7 +262,6 @@ SOURCES += Gui/Widgets/Terminal/lib/TerminalDisplay.cpp
 SOURCES += Gui/Widgets/Terminal/lib/tools.cpp
 SOURCES += Gui/Widgets/Terminal/lib/Vt102Emulation.cpp
 SOURCES += Gui/Widgets/Terminal/NBTerminal.cpp
-SOURCES += Gui/Widgets/TitleBar/NBTitleBar.cpp
 SOURCES += Gui/Widgets/TrashManager/NBTrashManager.cpp
 SOURCES += Gui/Widgets/UtilityBar/NBUtilityBar.cpp
 SOURCES += StyleSheets/NBStyleManager.cpp
@@ -287,10 +285,10 @@ isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc
-OBJECTS_DIR = $$BUILD_PREFIX/objs
-RCC_DIR		= $$BUILD_PREFIX/qrc
-UI_DIR      = $$BUILD_PREFIX/uic
+MOC_DIR 	= $$BUILD_PREFIX/moc-git
+OBJECTS_DIR = $$BUILD_PREFIX/objs-git
+RCC_DIR		= $$BUILD_PREFIX/qrc-git
+UI_DIR      = $$BUILD_PREFIX/uic-git
 
 unix {
 	isEmpty(PREFIX) {

@@ -9,7 +9,6 @@
 
 #include <Global.hpp>
 
-#include <NBTitleBar.hpp>
 #include <NBSidePanel.hpp>
 #include <NBFolderView.hpp>
 #include <NBAddressBar.hpp>
@@ -53,7 +52,6 @@ class NewBreeze : public QMainWindow {
 		void updateGUI();
 
 		NBUtilityBar *uBar;
-		NBTitleBar *TitleBar;
 		NBAddressBar *AddressBar;
 		NBQuickMenuBar *QuickMenuBar;
 		NBSidePanel *SidePanel;
@@ -64,6 +62,9 @@ class NewBreeze : public QMainWindow {
 		QAction *addBookMarkAct;
 
 		QPoint dragPosition;
+
+		// Kill switch for Properties
+		bool __terminate;
 
 	public slots:
 		void newWindow( QString path = QString() );

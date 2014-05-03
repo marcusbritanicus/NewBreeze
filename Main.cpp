@@ -108,7 +108,7 @@ int main( int argc, char **argv ) {
 			qCritical( "Killing the existing server" );
 			qWarning( "This may have caused data loss. Be warned." );
 
-			startInstance( app, true );
+			startInstance( app, true, true );
 			return app.exec();
 		}
 

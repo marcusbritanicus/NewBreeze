@@ -145,9 +145,14 @@ int NBArgParser( int argc, char** argv ) {
 	}
 
 	/* If there some other argument was given to @a --settings, ignore it, but print it to let the user know */
-	else if ( options[ FORCENEW ] )
+	else if ( options[ FORCENEW ] ) {
+		/* We were unable to open a new instance in the existing session. */
+		/* Forcing to start a new session */
 		return FORCENEW;
+	}
 
-	else
+	else {
+		/* All is well. */
 		return NORMAL;
+	}
 }

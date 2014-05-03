@@ -284,7 +284,7 @@ void NBArchive::extractTZip() {
 
 void NBArchive::extractTBZ2() {
 
-	// Extract Zip to temp Location
+	// Extract BZip2 to temp Location
 	NBBZip2 *archive = new NBBZip2( archiveName, NBBZip2::READ, tempArchiveName );
 	archive->extract();
 

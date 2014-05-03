@@ -21,6 +21,8 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 	__readOnly = true;
 	updatedNodes = 0;
 
+	__terminate = false;
+
 	oldRoots.clear();
 	curIndex = 0;
 
@@ -265,7 +267,7 @@ bool NBFileSystemModel::insertNode( QString nodeName ) {
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 	endResetModel();
 
-	NBFileInfoGatherer *ig = new NBFileInfoGatherer();
+	NBFileInfoGatherer *ig = new NBFileInfoGatherer( &__terminate );
 	connect(
 		ig, SIGNAL( done( QString, QString, QStringList ) ),
 		this, SLOT( saveInfo( QString, QString, QStringList ) )
@@ -295,7 +297,7 @@ void NBFileSystemModel::updateNode( QString nodeName ) {
 		node->setData( 1, formatSize( node->data( 1, true ).toLongLong() ), false );
 	}
 
-	NBFileInfoGatherer *ig = new NBFileInfoGatherer();
+	NBFileInfoGatherer *ig = new NBFileInfoGatherer( &__terminate );
 	connect(
 		ig, SIGNAL( done( QString, QString, QStringList ) ),
 		this, SLOT( saveInfo( QString, QString, QStringList ) )
@@ -986,13 +988,18 @@ void NBFileSystemModel::gatherFileInfo() {
 
 	updatedNodes = 0;
 
-	NBFileInfoGatherer *ig = new NBFileInfoGatherer();
+	NBFileInfoGatherer *ig = new NBFileInfoGatherer( &__terminate );
 	connect(
 		ig, SIGNAL( done( QString, QString, QStringList ) ),
 		this, SLOT( saveInfo( QString, QString, QStringList ) )
 	);
 
 	ig->gatherInfo( __childNames, __rootPath );
+};
+
+void NBFileSystemModel::terminateInfoGathering() {
+
+	__terminate = true;
 };
 
 void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info ) {
