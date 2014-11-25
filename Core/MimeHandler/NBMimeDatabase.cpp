@@ -518,7 +518,7 @@ QMimeType QMimeDatabase::mimeTypeForData(QIODevice *device) const
 */
 QMimeType QMimeDatabase::mimeTypeForUrl(const QUrl &url) const
 {
-    if (url.isLocalFile())
+    if (url.scheme().compare( "file", Qt::CaseInsensitive ) == 0)
         return mimeTypeForFile(url.toLocalFile());
 
     const QString scheme = url.scheme();
