@@ -198,8 +198,26 @@ void NBFlashLabel::leaveEvent( QEvent *lEvent ) {
 	lEvent->accept();
 };
 
-/* Stol to access the flashing */
+/* Slot to access the flashing */
 void NBFlashLabel::flashLabel() {
+
+	if ( colorFlash ) {
+		colorFlash = false;
+		color = QColor( 255, 255, 255, 0 );
+	}
+
+	if ( timer.isActive() )
+		timer.stop();
+
+	timer.start();
+	flash = true;
+};
+
+/* Slot to access the flashing with a given color */
+void NBFlashLabel::flashLabel( QColor newColor ) {
+
+	QColor oldColor = flashColor();
+	setFlashColor( newColor );
 
 	if ( timer.isActive() )
 		timer.stop();
@@ -277,7 +295,6 @@ void NBDeleteLabel::mousePressEvent( QMouseEvent *mEvent ) {
 
 	emit clicked();
 	mEvent->accept();
-	flashLabel();
 };
 
 void NBDeleteLabel::dragEnterEvent( QDragEnterEvent *deEvent ) {

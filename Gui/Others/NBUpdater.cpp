@@ -4,11 +4,11 @@
 	*
 */
 
-#include <NewBreeze.hpp>
+#include <NewBreezeUI.hpp>
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
 
-void NewBreeze::updateVarious( QString url ) {
+void NewBreezeUI::updateVarious( QString url ) {
 
 	QString folder = ( ( url == "/" ) ? QString() : url.split( "/", QString::SkipEmptyParts ).takeLast() );
 	setWindowTitle( ( folder.isEmpty() ? "/ - NewBreeze" : QString( "%1 - NewBreeze" ).arg( folder ) ) );
@@ -20,7 +20,7 @@ void NewBreeze::updateVarious( QString url ) {
 		Terminal->changeDir( url );
 };
 
-void NewBreeze::updateQuickMenuBar() {
+void NewBreezeUI::updateQuickMenuBar() {
 
 	if ( FolderView->hasSelection() ) {
 		QuickMenuBar->quickBtns->setSegmentEnabled( 0 );
@@ -36,7 +36,7 @@ void NewBreeze::updateQuickMenuBar() {
 	}
 };
 
-void NewBreeze::updateInfoBar() {
+void NewBreezeUI::updateInfoBar() {
 
 	InfoBar->clear();
 	if ( qobject_cast<NBFolderView*>( sender() ) == FolderView ) {
@@ -55,7 +55,7 @@ void NewBreeze::updateInfoBar() {
 		InfoBar->updateInfoBarCF( FolderView->fsModel->currentDir() );
 };
 
-void NewBreeze::changeViewMode() {
+void NewBreezeUI::changeViewMode() {
 
 	QStringList viewModes = QStringList() << "TilesView" << "IconsView" << "DetailsView";
 	Settings->General.FolderView = viewModes.at( AddressBar->viewModeBtn->checkedAction() );
@@ -63,7 +63,7 @@ void NewBreeze::changeViewMode() {
 	FolderView->updateViewMode();
 };
 
-void NewBreeze::switchToNextView() {
+void NewBreezeUI::switchToNextView() {
 
 	if ( Settings->General.FolderView == QString( "TilesView" ) )
 		Settings->General.FolderView = QString( "IconsView" );
@@ -77,7 +77,7 @@ void NewBreeze::switchToNextView() {
 	FolderView->updateViewMode();
 };
 
-void NewBreeze::toggleGrouping() {
+void NewBreezeUI::toggleGrouping() {
 
 	if ( Settings->Session.SortCategory )
 		Settings->Session.SortCategory = false;

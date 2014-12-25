@@ -24,6 +24,7 @@ class NBPropertiesBase: public QWidget {
 
 	public:
 		NBPropertiesBase( QStringList );
+		void setNewIcon( QString );
 
 	private:
 		NBClickLabel *iconLabel;

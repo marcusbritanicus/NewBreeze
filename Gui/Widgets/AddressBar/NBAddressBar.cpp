@@ -6,13 +6,87 @@
 
 #include <NBAddressBar.hpp>
 
-NBAddressWidget::NBAddressWidget() : QWidget() {
+NBToggleButton::NBToggleButton( QWidget *parent ) : QWidget( parent ) {
 
-	addressEdit = new QLineEdit();
+	checked = false;
+	setFixedSize( 24, 24 );
+};
+
+bool NBToggleButton::isChecked() {
+
+	return checked;
+};
+
+void NBToggleButton::setChecked( bool truth ) {
+
+	checked = truth;
+	repaint();
+};
+
+void NBToggleButton::setShortcut( QString kSeq ) {
+
+	shortcut = new QAction( this );
+	shortcut->setShortcut( kSeq );
+	connect( shortcut, SIGNAL( triggered() ), this, SLOT( toggle() ) );
+	connect( shortcut, SIGNAL( triggered() ), this, SIGNAL( clicked() ) );
+
+	addAction( shortcut );
+};
+
+void NBToggleButton::toggle() {
+
+	if ( checked )
+		checked = false;
+
+	else
+		checked = true;
+
+	repaint();
+};
+
+void NBToggleButton::mousePressEvent( QMouseEvent *mEvent ) {
+
+	toggle();
+
+	emit clicked();
+	mEvent->accept();
+};
+
+void NBToggleButton::paintEvent( QPaintEvent *pEvent ) {
+
+	QPainter painter( this );
+
+	painter.setFont( QFont( font().family(), 14 ) );
+
+	if ( palette().color( QPalette::Text ) == Qt::white ) {
+		if ( checked )
+			painter.setPen( Qt::lightGray );
+
+		else
+			painter.setPen( QColor( 60, 60, 60 ) );
+	}
+
+	else {
+		if ( checked )
+			painter.setPen( QColor( 60, 60, 60 ) );
+
+		else
+			painter.setPen( Qt::lightGray );
+	}
+
+	painter.drawText( QRectF( 0, 0, 24, 24 ), Qt::AlignCenter, QString::fromUtf8( "\u270D " ) );
+
+	painter.end();
+	pEvent->accept();
+};
+
+NBAddressWidget::NBAddressWidget( QWidget *parent ) : QWidget( parent ) {
+
+	addressEdit = new QLineEdit( this );
 	crumbsBar = new NBBreadCrumbsBar( this, "/" );
 	crumbsBar->setAutoLoadNewPath( false );
 
-	toggleBtn = new NBToolButton( "edit-rename", ":/icons/rename.png" );
+	toggleBtn = new NBToggleButton( this );
 	QHBoxLayout *lyt = new QHBoxLayout();
 	lyt->setContentsMargins( QMargins() );
 
@@ -50,10 +124,9 @@ void NBAddressWidget::setWidgetProperties() {
 
 	setFixedHeight( 24 );
 
-	toggleBtn->setCheckable( true );
 	toggleBtn->setChecked( false );
 	toggleBtn->setFocusPolicy( Qt::NoFocus );
-	toggleBtn->setShortcut( Settings->Shortcuts.ToggleCrumbLE.at( 0 ) );
+	toggleBtn->setShortcut( Settings->Shortcuts.ToggleCrumbLE.at( 0 ).toString() );
 
 	connect( toggleBtn, SIGNAL( clicked() ), this, SLOT( toggleCrumbsBarAndEdit() ) );
 
@@ -78,7 +151,7 @@ void NBAddressWidget::toggleCrumbsBarAndEdit() {
 	}
 };
 
-NBAddressBar::NBAddressBar() : QFrame() {
+NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 
 	setFrameStyle( NoFrame );
 	setFixedHeight( 24 );
@@ -96,7 +169,7 @@ NBAddressBar::NBAddressBar() : QFrame() {
 	openVTEBtn->setIcon( QIcon(  ":/icons/vte.png"  ) );
 	openVTEBtn->setFixedSize( QSize( 24, 24 ) );
 
-	addressWidget = new NBAddressWidget();
+	addressWidget = new NBAddressWidget( this );
 	searchBar = new NBSearchBar();
 	addressButtons = new NBButtons();
 

@@ -19,7 +19,7 @@ class NBSidePanel : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBSidePanel();
+		NBSidePanel( QWidget *parent );
 
 		void expand();
 		void contract();
@@ -33,6 +33,7 @@ class NBSidePanel : public QWidget {
 		NBDeleteLabel *deleteLbl;
 
 		bool forcedOpen;
+		bool forcedOpenOnMenuShow;
 
 		bool showingDevices;
 		bool showingBookMarks;
@@ -54,11 +55,14 @@ class NBSidePanel : public QWidget {
 		void updateBookmarks();
 		void updateDevices();
 
-		void toggleExpandContract();
-
 	private slots:
 		void increaseWidth();
 		void decreaseWidth();
+
+		void toggleExpandContract();
+
+		void stayOpenOnMenuShow();
+		void restoreExpansionState();
 
 	protected :
 		bool event( QEvent* );

@@ -157,6 +157,7 @@ QScrollBar::handle:horizontal {
 	background-color: silver;
 	max-height: 6px;
 	border-radius: 3px;
+	min-width: 20px;
 }
 
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
@@ -170,11 +171,11 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:unchecked {
-	image: url(:/icons/checkbox_<unchecked>.png);
+	image: url(:/icons/checkbox_unchecked.png);
 }
 
 QCheckBox::indicator:checked {
-	image: url(:/icons/checkbox_<checked>.png);
+	image: url(:/icons/checkbox_checked.png);
 }
 
 QRadioButton::indicator:unchecked {

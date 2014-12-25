@@ -51,6 +51,14 @@ QVariant NBSidePanelModel::data( const QModelIndex &index, int role ) const {
 				return item->data( Qt::UserRole + 1 );
 		}
 
+		case Qt::UserRole + 2 : {
+			if ( showingDevices )
+				return item->data( Qt::UserRole + 1 );
+
+			else
+				return QVariant();
+		}
+
 		default :
 			return item->data( role );
 	}
@@ -123,8 +131,7 @@ int NBSidePanelModel::columnCount( const QModelIndex &parent ) const {
 
 void NBSidePanelModel::updateDeviceData() {
 
-	NBDeviceManager dm;
-	QList<NBDeviceInfo> deviceInfos = dm.allDevices();
+	QList<NBDeviceInfo> deviceInfos = NBDeviceManager::allDevices();
 
 	showingDevices = true;
 	beginResetModel();

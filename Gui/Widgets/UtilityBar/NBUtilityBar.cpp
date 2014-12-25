@@ -141,13 +141,25 @@ int NBTabWidget::currentIndex() {
 	return __currentIndex;
 };
 
+void NBTabWidget::setTabText( int idx, QString text ) {
+
+	tabsList.value( idx )->setText( text );
+};
+
+void NBTabWidget::setTabIcon( int idx, QString icon ) {
+
+	tabsList.value( idx )->setIcon( icon );
+};
+
 void NBTabWidget::switchToTab() {
 
 	NBTab *tab = qobject_cast<NBTab *>( sender() );
 
 	int index = tabsList.indexOf( tab );
-	if ( index >= 0 )
+	if ( index >= 0 ) {
 		setCurrentIndex( index );
+		emit switchToTab( index );
+	}
 };
 
 void NBTabWidget::paintEvent( QPaintEvent *pEvent ) {
@@ -174,6 +186,20 @@ NBTab::NBTab( QString icon, QString path ) {
 	bool __textVisible = false;
 
 	setToolTip( path );
+	repaint();
+};
+
+void NBTab::setText( QString text ) {
+
+	QFontMetrics fm( font() );
+	__text = fm.elidedText( baseName( text ), Qt::ElideRight, 120 );
+
+	repaint();
+};
+
+void NBTab::setIcon( QString icon ) {
+
+	__icon = QIcon::fromTheme( icon, QIcon( icon ) );
 	repaint();
 };
 

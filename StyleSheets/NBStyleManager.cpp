@@ -16,8 +16,6 @@ void NBStyleManager::initStyleManager() {
 	variableMap[ "<81>" ] = QStringList() << QString( "0, 0, 0, 206" ) << QString( "255, 255, 255, 206" ) << QString( "255, 255, 255, 255" ) << QString( "0, 0, 0, 255" );
 	variableMap[ "<bordercolor>" ] = QStringList() << QString( "white" ) << QString( "black" ) << QString( "black" ) << QString( "white" );
 	variableMap[ "<disabled>" ] = QStringList() << QString( "lightgray" ) << QString( "gray" ) << QString( "gray" ) << QString( "lightgray" );
-	variableMap[ "<checked>" ] = QStringList() << QString( "checked" ) << QString( "checkedn" ) << QString( "checkedn" ) << QString( "checked" );
-	variableMap[ "<unchecked>" ] = QStringList() << QString( "unchecked" ) << QString( "uncheckedn" ) << QString( "uncheckedn" ) << QString( "unchecked" );
 	variableMap[ "<scrollcolor>" ] = QStringList() << QString( "silver" ) << QString( "gray" ) << QString( "#2F2F2F" ) << QString( "silver" );
 
 	initDone = true;
@@ -71,6 +69,30 @@ QPalette NBStyleManager::transparentPalette() {
 	pltt.setColor( QPalette::Active, QPalette::ButtonText, Qt::white );
 	pltt.setColor( QPalette::Active, QPalette::BrightText, Qt::white );
 	pltt.setColor( QPalette::Active, QPalette::Link, Qt::darkGreen );
+
+	pltt.setColor( QPalette::Disabled, QPalette::Window, Qt::transparent );
+	pltt.setColor( QPalette::Disabled, QPalette::WindowText, Qt::white );
+	pltt.setColor( QPalette::Disabled, QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::Disabled, QPalette::AlternateBase, Qt::transparent );
+	pltt.setColor( QPalette::Disabled, QPalette::ToolTipBase, QColor( 0, 0, 0, 206 ) );
+	pltt.setColor( QPalette::Disabled, QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
+	pltt.setColor( QPalette::Disabled, QPalette::Text, Qt::white );
+	pltt.setColor( QPalette::Disabled, QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::Disabled, QPalette::ButtonText, Qt::white );
+	pltt.setColor( QPalette::Disabled, QPalette::BrightText, Qt::white );
+	pltt.setColor( QPalette::Disabled, QPalette::Link, Qt::darkGreen );
+
+	pltt.setColor( QPalette::Inactive, QPalette::Window, Qt::transparent );
+	pltt.setColor( QPalette::Inactive, QPalette::WindowText, Qt::white );
+	pltt.setColor( QPalette::Inactive, QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::Inactive, QPalette::AlternateBase, Qt::transparent );
+	pltt.setColor( QPalette::Inactive, QPalette::ToolTipBase, QColor( 0, 0, 0, 206 ) );
+	pltt.setColor( QPalette::Inactive, QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
+	pltt.setColor( QPalette::Inactive, QPalette::Text, Qt::white );
+	pltt.setColor( QPalette::Inactive, QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::Inactive, QPalette::ButtonText, Qt::white );
+	pltt.setColor( QPalette::Inactive, QPalette::BrightText, Qt::white );
+	pltt.setColor( QPalette::Inactive, QPalette::Link, Qt::darkGreen );
 
 	return pltt;
 };
@@ -151,17 +173,41 @@ QPalette NBStyleManager::getPaletteTD() {
 
 	QPalette pltt = qApp->palette();
 
-	pltt.setColor( QPalette::Active, QPalette::Window, QColor( 30, 30, 30, 180 ) );
-	pltt.setColor( QPalette::Active, QPalette::WindowText, Qt::white );
-	pltt.setColor( QPalette::Active, QPalette::Base, Qt::transparent );
-	pltt.setColor( QPalette::Active, QPalette::AlternateBase, QColor( 30, 30, 30, 180 ) );
-	pltt.setColor( QPalette::Active, QPalette::ToolTipBase, QColor( 0, 0, 0, 206 ) );
-	pltt.setColor( QPalette::Active, QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
-	pltt.setColor( QPalette::Active, QPalette::Text, Qt::white );
-	pltt.setColor( QPalette::Active, QPalette::Button, Qt::transparent );
-	pltt.setColor( QPalette::Active, QPalette::ButtonText, Qt::white );
-	pltt.setColor( QPalette::Active, QPalette::BrightText, Qt::white );
-	pltt.setColor( QPalette::Active, QPalette::Link, Qt::darkGreen );
+	pltt.setColor( QPalette::Active,   QPalette::Window, QColor( 30, 30, 30, 180 ) );
+	pltt.setColor( QPalette::Active,   QPalette::WindowText, Qt::white );
+	pltt.setColor( QPalette::Active,   QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::Active,   QPalette::AlternateBase, QColor( 30, 30, 30, 180 ) );
+	pltt.setColor( QPalette::Active,   QPalette::ToolTipBase, QColor( 0, 0, 0, 206 ) );
+	pltt.setColor( QPalette::Active,   QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
+	pltt.setColor( QPalette::Active,   QPalette::Text, Qt::white );
+	pltt.setColor( QPalette::Active,   QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::Active,   QPalette::ButtonText, Qt::white );
+	pltt.setColor( QPalette::Active,   QPalette::BrightText, Qt::white );
+	pltt.setColor( QPalette::Active,   QPalette::Link, Qt::darkGreen );
+
+	pltt.setColor( QPalette::Disabled, QPalette::Window, QColor( 30, 30, 30, 180 ) );
+	pltt.setColor( QPalette::Disabled, QPalette::WindowText, Qt::white );
+	pltt.setColor( QPalette::Disabled, QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::Disabled, QPalette::AlternateBase, QColor( 30, 30, 30, 180 ) );
+	pltt.setColor( QPalette::Disabled, QPalette::ToolTipBase, QColor( 0, 0, 0, 206 ) );
+	pltt.setColor( QPalette::Disabled, QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
+	pltt.setColor( QPalette::Disabled, QPalette::Text, Qt::white );
+	pltt.setColor( QPalette::Disabled, QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::Disabled, QPalette::ButtonText, Qt::white );
+	pltt.setColor( QPalette::Disabled, QPalette::BrightText, Qt::white );
+	pltt.setColor( QPalette::Disabled, QPalette::Link, Qt::darkGreen );
+
+	pltt.setColor( QPalette::Inactive, QPalette::Window, QColor( 30, 30, 30, 180 ) );
+	pltt.setColor( QPalette::Inactive, QPalette::WindowText, Qt::white );
+	pltt.setColor( QPalette::Inactive, QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::Inactive, QPalette::AlternateBase, QColor( 30, 30, 30, 180 ) );
+	pltt.setColor( QPalette::Inactive, QPalette::ToolTipBase, QColor( 0, 0, 0, 206 ) );
+	pltt.setColor( QPalette::Inactive, QPalette::ToolTipText, QColor( 0x61, 0x93, 0xCF ) );
+	pltt.setColor( QPalette::Inactive, QPalette::Text, Qt::white );
+	pltt.setColor( QPalette::Inactive, QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::Inactive, QPalette::ButtonText, Qt::white );
+	pltt.setColor( QPalette::Inactive, QPalette::BrightText, Qt::white );
+	pltt.setColor( QPalette::Inactive, QPalette::Link, Qt::darkGreen );
 
 	return pltt;
 };
@@ -170,16 +216,38 @@ QPalette NBStyleManager::getPaletteTL() {
 
 	QPalette pltt = qApp->palette();
 
-	pltt.setColor( QPalette::Window, QColor( 120, 120, 120, 206 ) );
-	pltt.setColor( QPalette::WindowText, Qt::black );
-	pltt.setColor( QPalette::Base, Qt::transparent );
-	pltt.setColor( QPalette::AlternateBase, QColor( 90, 90, 90, 180 ) );
-	pltt.setColor( QPalette::ToolTipBase, QColor( 120, 120, 120, 206 ) );
-	pltt.setColor( QPalette::ToolTipText, QColor( 0x00, 0x43, 0x8A ) );
-	pltt.setColor( QPalette::Text, Qt::black );
-	pltt.setColor( QPalette::Button, Qt::transparent );
-	pltt.setColor( QPalette::ButtonText, Qt::black );
-	pltt.setColor( QPalette::BrightText, Qt::black );
+	pltt.setColor( QPalette::Active, QPalette::Window, QColor( 120, 120, 120, 206 ) );
+	pltt.setColor( QPalette::Active, QPalette::WindowText, Qt::black );
+	pltt.setColor( QPalette::Active, QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::Active, QPalette::AlternateBase, QColor( 90, 90, 90, 180 ) );
+	pltt.setColor( QPalette::Active, QPalette::ToolTipBase, QColor( 120, 120, 120, 206 ) );
+	pltt.setColor( QPalette::Active, QPalette::ToolTipText, QColor( 0x00, 0x43, 0x8A ) );
+	pltt.setColor( QPalette::Active, QPalette::Text, Qt::black );
+	pltt.setColor( QPalette::Active, QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::Active, QPalette::ButtonText, Qt::black );
+	pltt.setColor( QPalette::Active, QPalette::BrightText, Qt::black );
+
+	pltt.setColor( QPalette::Disabled, QPalette::Window, QColor( 120, 120, 120, 206 ) );
+	pltt.setColor( QPalette::Disabled, QPalette::WindowText, Qt::black );
+	pltt.setColor( QPalette::Disabled, QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::Disabled, QPalette::AlternateBase, QColor( 90, 90, 90, 180 ) );
+	pltt.setColor( QPalette::Disabled, QPalette::ToolTipBase, QColor( 120, 120, 120, 206 ) );
+	pltt.setColor( QPalette::Disabled, QPalette::ToolTipText, QColor( 0x00, 0x43, 0x8A ) );
+	pltt.setColor( QPalette::Disabled, QPalette::Text, Qt::black );
+	pltt.setColor( QPalette::Disabled, QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::Disabled, QPalette::ButtonText, Qt::black );
+	pltt.setColor( QPalette::Disabled, QPalette::BrightText, Qt::black );
+
+	pltt.setColor( QPalette::Inactive, QPalette::Window, QColor( 120, 120, 120, 206 ) );
+	pltt.setColor( QPalette::Inactive, QPalette::WindowText, Qt::black );
+	pltt.setColor( QPalette::Inactive, QPalette::Base, Qt::transparent );
+	pltt.setColor( QPalette::Inactive, QPalette::AlternateBase, QColor( 90, 90, 90, 180 ) );
+	pltt.setColor( QPalette::Inactive, QPalette::ToolTipBase, QColor( 120, 120, 120, 206 ) );
+	pltt.setColor( QPalette::Inactive, QPalette::ToolTipText, QColor( 0x00, 0x43, 0x8A ) );
+	pltt.setColor( QPalette::Inactive, QPalette::Text, Qt::black );
+	pltt.setColor( QPalette::Inactive, QPalette::Button, Qt::transparent );
+	pltt.setColor( QPalette::Inactive, QPalette::ButtonText, Qt::black );
+	pltt.setColor( QPalette::Inactive, QPalette::BrightText, Qt::black );
 
 	return pltt;
 };

@@ -34,7 +34,7 @@ NBIOWidget::NBIOWidget( NBFileIO *ioProc ) {
 	tgtLbl = new QLabel( "Target: " + io->target() );
 	speedLbl = new QLabel( "Speed: 0 kBps" );
 	etcLbl = new QLabel( "ETC: 00:00:00" );
-	cfileLbl = new QLabel( "Current file: " + io->ioTarget );
+	cfileLbl = new QLabel( "Current file: " + baseName( io->ioTarget ) );
 
 	toggleDetailsLbl = new NBClickLabel( QPixmap( ":/icons/arrow-up.png" ).scaled( QSize( 16, 16 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 	toggleDetailsLbl->setClickable( true );
@@ -138,7 +138,7 @@ void NBIOWidget::togglePauseResume() {
 
 void NBIOWidget::update() {
 
-	cfileLbl->setText( "Current file: " + io->ioTarget );
+	cfileLbl->setText( "Current file: " + baseName( io->ioTarget ) );
 
 	totalBar->setMaximum( io->totalSize );
 	cfileBar->setMaximum( io->fTotalBytes );
@@ -395,7 +395,7 @@ void NBIOManagerMini::paintEvent( QPaintEvent *pEvent ) {
 			green = 255;
 		}
 
-		// Change from Red to Yellow: When totalF = 0.6, red = 255; totalF = 1, red = 0;
+		// Change from Yellow to Green: When totalF = 0.6, red = 255; totalF = 1, red = 0;
 		else {
 			red = ( int )( ( 1 - totalF ) * 638 );
 			green = ( int )( 255 );

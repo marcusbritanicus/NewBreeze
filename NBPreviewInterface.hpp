@@ -16,10 +16,10 @@ class QStringList;
 class QWidget;
 QT_END_NAMESPACE
 
-class NBPluginInterface {
+class NBPeekPluginInterface {
 
 	public:
-		virtual ~NBPluginInterface() {};
+		virtual ~NBPeekPluginInterface() {};
 		virtual QStringList mimeTypesHandled() const = 0;
 		virtual QWidget* getPreviewWidget( const QString & ) = 0;
 };

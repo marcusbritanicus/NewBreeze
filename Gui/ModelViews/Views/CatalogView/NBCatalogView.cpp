@@ -600,7 +600,6 @@ void NBCatalogView::paintEvent( QPaintEvent* event ) {
 	painter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
 
 	for ( int catIdx = 0; catIdx < catalogModel->catalogs().count(); catIdx++ ) {
-
 		QRect rect = categoryRect( catIdx );
 		if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
 			continue;
@@ -833,8 +832,11 @@ void NBCatalogView::deleteCatalogItem() {
 	QModelIndexList sList = selectionModel()->selectedRows();
 	QSettings catalogConf( "NewBreeze", "Catalogs" );
 
+	QStringList KnownCatalogs = QStringList() << "Documents" << "Music" << "Pictures" << "Videos";
 	foreach( QModelIndex idx, sList ) {
 		QString catalog = catalogModel->catalogName( idx );
+		if ( not KnownCatalogs.contains( catalog ) )
+			catalog = QString( "Custom/%1" ).arg( catalog );
 		QString target = sList.at( 0 ).data( NBCatalogModel::Target ).toString();
 
 		QStringList existing = catalogConf.value( catalog ).toStringList();

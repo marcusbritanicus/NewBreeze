@@ -38,11 +38,15 @@ void NBServer::handleNewConnection() {
 	/* If the client is read only, then say 'Welcome ...' and end the story. */
 	qDebug() << "Client connected. Welcoming...";
 	socket->write( "Welcome to NewBreeze!" );
+	socket->waitForBytesWritten( -1 );
 
-	/* Set up reply interface, if the client is read-write */
-	ThreadedReplier *replier = new ThreadedReplier( socket );
-	connect( replier, SIGNAL( finished() ), replier, SLOT( deleteLater() ) );
-	connect( replier, SIGNAL( newWindow( QString ) ), this, SIGNAL( newWindow( QString ) ) );
+	if ( socket->openMode() == QIODevice::ReadWrite ) {
+		/* Set up reply interface, if the client is read-write */
+		ThreadedReplier *replier = new ThreadedReplier( socket );
+		connect( replier, SIGNAL( finished() ), replier, SLOT( deleteLater() ) );
+		connect( replier, SIGNAL( newWindow( QString ) ), this, SIGNAL( newWindow( QString ) ) );
+		connect( replier, SIGNAL( showTrayIcon() ), this, SIGNAL( showTrayIcon() ) );
+	};
 };
 
 ThreadedReplier::ThreadedReplier( QLocalSocket *socket ) : QObject(), client( socket ) {
@@ -100,8 +104,17 @@ void ThreadedReplier::sendReplyToClient() {
 			client->waitForBytesWritten( -1 );
 	}
 
+	else if ( query.startsWith( QString( "Open in SystemTray" ) ) ) {
+		qDebug() << "Client requested TrayIcon";
+		emit showTrayIcon();
+
+		/* Client usually disconnects, but we try to make sure */
+		if ( client->state() == QLocalSocket::ConnectedState )
+			client->disconnectFromServer();
+	}
+
 	else {
-		client->write( "Try: 'Good Morning!' or 'NewWindow @ <URL>'" );
+		client->write( "Try: 'NewWindow @ <URL>'" );
 		client->flush();
 
 		/* Safety measure: We mostly won't nedd this blocking call */

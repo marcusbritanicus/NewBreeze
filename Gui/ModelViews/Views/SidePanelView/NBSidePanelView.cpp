@@ -6,6 +6,7 @@
 
 #include <NBSidePanelView.hpp>
 #include <NBTools.hpp>
+#include <sys/mount.h>
 
 NBSidePanelView::NBSidePanelView() : QListView() {
 
@@ -36,8 +37,9 @@ void NBSidePanelView::setupView() {
 	/* No Focus */
 	setFocusPolicy( Qt::NoFocus );
 
-	/* StyleSheet */
+	/* StyleSheet and Palette */
 	setStyleSheet( getStyleSheet( "NBSidePanelView", Settings->General.Style ) );
+	setPalette( NBStyleManager::transparentPalette() );
 
 	/* Selection */
 	setSelectionMode( QTreeView::NoSelection );
@@ -68,38 +70,53 @@ void NBSidePanelView::setupView() {
 
 void NBSidePanelView::showMenu( QModelIndex idx, QPoint pos ) {
 
-	if ( showingDevices )
-		return;
-
 	int row = idx.row();
 
-	QAction *moveUpAct, *moveDownAct, *deleteAct;
+	if ( showingDevices ) {
+		QAction *unmountAct;
 
-	deleteAct = new QAction( QIcon( ":/icons/delete.png" ), "&Delete BookMark", this );
-	deleteAct->setData( row );
-	connect( deleteAct, SIGNAL( triggered() ), this, SLOT( removeBookmark() ) );
+		unmountAct = new QAction( QIcon::fromTheme( "emblem-unmounted" ), "&Unmount", this );
+		unmountAct->setData( idx.data( Qt::UserRole + 2 ) );
+		connect( unmountAct, SIGNAL( triggered() ), this, SLOT( unmount() ) );
 
-	moveUpAct = new QAction( QIcon( ":/icons/arrow-up.png" ), "&Move Up", this );
-	moveUpAct->setData( row );
-	connect( moveUpAct, SIGNAL( triggered() ), this, SLOT( moveBookmarkUp() ) );
+		NBMenu *menu = new NBMenu();
+		connect( menu, SIGNAL( aboutToShow() ), this, SIGNAL( showingMenu() ) );
+		connect( menu, SIGNAL( aboutToHide() ), this, SIGNAL( hidingMenu() ) );
 
-	moveDownAct = new QAction( QIcon( ":/icons/arrow-down.png" ), "&Move Down", this );
-	moveDownAct->setData( row );
-	connect( moveDownAct, SIGNAL( triggered() ), this, SLOT( moveBookmarkDown() ) );
+		menu->addAction( unmountAct );
 
-	NBMenu *menu = new NBMenu();
-	connect( menu, SIGNAL( aboutToShow() ), this, SIGNAL( showingMenu() ) );
-	connect( menu, SIGNAL( aboutToHide() ), this, SIGNAL( hidingMenu() ) );
+		menu->exec( pos );
+	}
 
-	if ( row > 0 )
-		menu->addAction( moveUpAct );
+	else {
+		QAction *moveUpAct, *moveDownAct, *deleteAct;
 
-	if ( row < spModel->rowCount() - 1 )
-		menu->addAction( moveDownAct );
+		deleteAct = new QAction( QIcon( ":/icons/delete.png" ), "&Delete BookMark", this );
+		deleteAct->setData( row );
+		connect( deleteAct, SIGNAL( triggered() ), this, SLOT( removeBookmark() ) );
 
-	menu->addSeparator();
-	menu->addAction( deleteAct );
-	menu->exec( pos );
+		moveUpAct = new QAction( QIcon( ":/icons/arrow-up.png" ), "&Move Up", this );
+		moveUpAct->setData( row );
+		connect( moveUpAct, SIGNAL( triggered() ), this, SLOT( moveBookmarkUp() ) );
+
+		moveDownAct = new QAction( QIcon( ":/icons/arrow-down.png" ), "&Move Down", this );
+		moveDownAct->setData( row );
+		connect( moveDownAct, SIGNAL( triggered() ), this, SLOT( moveBookmarkDown() ) );
+
+		NBMenu *menu = new NBMenu();
+		connect( menu, SIGNAL( aboutToShow() ), this, SIGNAL( showingMenu() ) );
+		connect( menu, SIGNAL( aboutToHide() ), this, SIGNAL( hidingMenu() ) );
+
+		if ( row > 0 )
+			menu->addAction( moveUpAct );
+
+		if ( row < spModel->rowCount() - 1 )
+			menu->addAction( moveDownAct );
+
+		menu->addSeparator();
+		menu->addAction( deleteAct );
+		menu->exec( pos );
+	}
 };
 
 void NBSidePanelView::updateDevices() {
@@ -124,6 +141,16 @@ void NBSidePanelView::handleClick( const QModelIndex clickedIndex ) {
 
 	/* Some device or bookmark has been clicked */
 	emit driveClicked( clickedIndex.data( Qt::UserRole + 1 ).toString() );
+};
+
+void NBSidePanelView::unmount() {
+
+	QAction *act = qobject_cast<QAction*>( sender() );
+	NBDeviceInfo info = act->data().value<NBDeviceInfo>();
+
+	QProcess *unmountProc = new QProcess( this );
+	unmountProc->start( "umount", QStringList() << info.mountPoint() );
+	unmountProc->waitForFinished();
 };
 
 void NBSidePanelView::moveBookmarkUp() {

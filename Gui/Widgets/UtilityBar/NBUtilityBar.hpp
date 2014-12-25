@@ -69,6 +69,12 @@ class NBTabWidget : public QWidget {
 		/* Get the current index */
 		int currentIndex();
 
+		/* Set the tab text */
+		void setTabText( int, QString );
+
+		/* Set the tab icon */
+		void setTabIcon( int, QString );
+
 	private:
 		QList<NBTab *> tabsList;
 		QHBoxLayout *tabsLyt;
@@ -80,6 +86,9 @@ class NBTabWidget : public QWidget {
 
 	protected:
 		void paintEvent( QPaintEvent * );
+
+	Q_SIGNALS:
+		void switchToTab( int );
 };
 
 class NBTab : public QWidget {
@@ -87,6 +96,9 @@ class NBTab : public QWidget {
 
 	public:
 		NBTab( QString, QString );
+
+		void setText( QString );
+		void setIcon( QString );
 
 		void showText();
 		void hideText();

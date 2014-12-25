@@ -1,3 +1,7 @@
+Version 2.4.0
+    - Feature: Animated Catalog <-> FolderView <-> ApplicationView switching
+    - Feature: Tabs
+
 Version 2.3.0
     - BugFix: Removed all the initializations from the headers
     - BugFix: NBPropertiesDialog bugs fixed

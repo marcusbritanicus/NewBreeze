@@ -13,6 +13,8 @@
 
 #include <QtCore>
 
+#include <QVolumeInfo.hpp>
+
 class NBDeviceInfoPrivate {
 
 	public:
@@ -58,17 +60,10 @@ class NBDeviceInfo : public NBDeviceInfoPrivate {
 Q_DECLARE_METATYPE(NBDeviceInfo);
 
 class NBDeviceManager {
-	public:
-		NBDeviceManager();
-		QList<NBDeviceInfo> allDevices();
-		NBDeviceInfo deviceInfoForPath( QString path );
-		NBDeviceInfo deviceInfoForDevice( QString dev );
 
-	private:
-		QStringList getMounts();
-		QString getMountsInfo( QString );
-		QString getDevLabel( QString );
-		QString getDevType( QString, QString );
+	public:
+		static QList<NBDeviceInfo> allDevices();
+		static NBDeviceInfo deviceInfoForPath( QString path );
 };
 
 #endif

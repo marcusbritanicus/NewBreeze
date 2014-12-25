@@ -129,11 +129,9 @@ void NBViewsWidget::createGUI() {
 	nativeTitleBarCB->setChecked( Settings->General.NativeTitleBar );
 	connect( nativeTitleBarCB, SIGNAL( toggled( bool ) ), this, SLOT( handleNativeTitleBarToggle( bool ) ) );
 
-	maxIOJobsSB = new QSpinBox();
-	maxIOJobsSB->setRange( 2, 100 );
-	maxIOJobsSB->setSingleStep( 1 );
-	maxIOJobsSB->setValue( Settings->General.MaxIOJobs );
-	connect( maxIOJobsSB, SIGNAL( valueChanged( int ) ), this, SLOT( handleMaxIOJobsChanged( int ) ) );
+	TrayIconCB = new QCheckBox( "&Minimize to tray" );
+	TrayIconCB->setChecked( Settings->General.TrayIcon );
+	connect( TrayIconCB, SIGNAL( toggled( bool ) ), this, SLOT( handleTrayIconChanged( bool ) ) );
 
 	openWithCatalogCB = new QCheckBox( "Open Catalog &View every time NewBreeze starts" );
 	openWithCatalogCB->setChecked( Settings->General.OpenWithCatalog );
@@ -170,8 +168,7 @@ void NBViewsWidget::createGUI() {
 	themeLyt->addWidget( ntRB, 0, 3 );
 	themeLyt->addWidget( imageLbl, 1, 0, 1, 4, Qt::AlignCenter );
 	themeLyt->addWidget( nativeTitleBarCB, 2, 0, 1, 4, Qt::AlignLeft );
-	themeLyt->addWidget( new QLabel( "Maximum number of cuncurrent IO Jobs:" ), 3, 0, 1, 3 );
-	themeLyt->addWidget( maxIOJobsSB, 3, 3 );
+	themeLyt->addWidget( TrayIconCB, 3, 0 );
 	themeLyt->addWidget( sidePanelOpen, 4, 0, 1, 4, Qt::AlignLeft );
 	themeLyt->addWidget( openWithCatalogCB, 5, 0, 1, 5, Qt::AlignLeft );
 
@@ -217,10 +214,10 @@ void NBViewsWidget::handleOpenWithCatalogToggled( bool open ) {
 	Settings->General.OpenWithCatalog = open;
 };
 
-void NBViewsWidget::handleMaxIOJobsChanged( int value ) {
+void NBViewsWidget::handleTrayIconChanged( bool value ) {
 
-	Settings->setValue( "MaxIOJobs", value );
-	Settings->General.MaxIOJobs = value;
+	Settings->setValue( "TrayIcon", value );
+	Settings->General.TrayIcon = value;
 };
 
 void NBViewsWidget::handleSidePanelOpenToggled( bool keepOpen ) {

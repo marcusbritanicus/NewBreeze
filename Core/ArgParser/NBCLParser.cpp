@@ -28,7 +28,7 @@ struct Arg: public option::Arg {
 const option::Descriptor usage[] = {
     /* Help prefix */
     { UNKNOWN,    0,   "",     "",            Arg::Unknown,     "NewBreeze version 2.3.0\n"
-		                                                        "Copyright (C) 2013 Marcus Britanicus\n\n"
+		                                                        "Copyright (C) 2014 Marcus Britanicus\n\n"
 		                                                        "This is free software and is released under the GPLv3 license.\n"
 		                                                        "There is ABSOLUTELY NO WARRANTY; not even for MERCHANTABILITY or "
 		                                                        "FITNESS FOR A PARTICULAR PURPOSE.\n\n"
@@ -48,6 +48,9 @@ const option::Descriptor usage[] = {
     { VERSION,    0,   "v",    "version",     Arg::None,        "    -v  --version    Print version information and exit." },
 
 	/* Print the settings option */
+    { SYSTRAY,    0,   "t",    "tray",        Arg::None,        "    -t, --tray       Open an instance in system tray." },
+
+	/* Print the settings option */
     { SETTINGS,   0,   "s",    "settings",    Arg::None,        "    -s, --settings   Open the settings dialog." },
 
 	/* Print the force-new option */
@@ -59,13 +62,14 @@ const option::Descriptor usage[] = {
 
     /* List the examples */
     { UNKNOWN,    0,   "", "",                Arg::None,        "\nExamples:\n"
-                                                                "    newbreeze -h                           # Prints this help message\n"
-                                                                "    newbreeze                              # Opens the last opened directory\n"
-                                                                "    newbreeze -s                           # Opens the settings dialog\n"
-                                                                "    newbreeze --settings                   # Opens the settings dialog\n"
-                                                                "    newbreeze --force-new                  # Kills the existsing server and "
+                                                                "    newbreeze2 -h                           # Prints this help message\n"
+                                                                "    newbreeze2                              # Opens the last opened directory\n"
+                                                                "    newbreeze2 -t                           # Opens an instance in tray\n"
+                                                                "    newbreeze2 -s                           # Opens the settings dialog\n"
+                                                                "    newbreeze2 --settings                   # Opens the settings dialog\n"
+                                                                "    newbreeze2 --force-new                  # Kills the existsing server and "
                                                                                                     "opens window at the last opened location\n"
-                                                                "    newbreeze --force-new /home/cosmos     # Kills the existsing server and "
+                                                                "    newbreeze2 --force-new /home/cosmos     # Kills the existsing server and "
                                                                                                               "opens a window at /home/cosmos\n"
     },
 
@@ -134,6 +138,14 @@ int NBArgParser( int argc, char** argv ) {
 			fprintf( stdout, "You are currently running %s %s\n\n", uts.sysname, uts.release );
 
 		return 0;
+	}
+
+	/* If there some other argument was given to @a --tray, ignore it, but print it to let the user know */
+	if ( options[ SYSTRAY ] ) {
+		if( argc > 1 )
+			fprintf( stdout, "Ignoring the %d extra arguments specified...\n", parse.optionsCount() + parse.nonOptionsCount() - 1 );
+
+		return SYSTRAY;
 	}
 
 	/* If there some other argument was given to @a --settings, ignore it, but print it to let the user know */

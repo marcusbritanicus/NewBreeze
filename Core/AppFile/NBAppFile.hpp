@@ -66,8 +66,11 @@ class NBAppFile {
 		// Category if this NBAppFile
 		QString category() const;
 
-		// Merge to NBAppFiles
+		// Merge two NBAppFiles
 		static NBAppFile merge( NBAppFile first, NBAppFile second );
+
+		// Does this instance contain vaild data?
+		bool isValid();
 
 		// Check if this NBAppFile is equivalent ot @other
 		bool operator==( const NBAppFile& ) const;
@@ -100,6 +103,8 @@ class NBAppFile {
 		bool __takesArgs;
 
 		short __grade;
+
+		bool mIsValid;
 };
 
 class NBAppsList {
@@ -111,6 +116,7 @@ class NBAppsList {
 		void move( int, int );
 
 		NBAppFile at( quint64 );
+		NBAppFile value( quint64 );
 		int indexOf( NBAppFile );
 		void insert( int, NBAppFile );
 

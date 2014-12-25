@@ -150,6 +150,18 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 				return ( saveThumb( path, hashPath ) ? hashPath : QString( "image-x-generic" ) );
 		}
 
+		// Android Package
+		if ( mimetype.name().contains( "android.package" ) ) {
+			if ( hasIcon( "application-x-java-archive" ) )
+				return "application-x-java-archive";
+
+			else if ( hasIcon ( "application-zip" ) )
+				return "application-zip";
+
+			else
+				return "package-x-generic";
+		}
+
 		else if ( hasIcon( mimeIcon ) )
 			return QString( mimeIcon );
 

@@ -102,6 +102,9 @@ void NBDialog::setupDialogProperties() {
 	else
 		setWindowFlags( Qt::Dialog );
 
+	/* NewBreeze speciality */
+	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+
 	setWindowModality( Qt::ApplicationModal);
 
 	setMinimumSize( 600, 200 );

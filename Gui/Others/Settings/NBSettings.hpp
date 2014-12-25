@@ -27,7 +27,7 @@ class NBSettings {
 				QString IconTheme;
 				bool ImagePreviews;
 				bool NativeTitleBar;
-				int MaxIOJobs;
+				bool TrayIcon;
 				bool OpenWithCatalog;
 		} General;
 

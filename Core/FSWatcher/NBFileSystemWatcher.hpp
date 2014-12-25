@@ -44,6 +44,8 @@ class NBFileSystemWatcher : public QThread {
 		char buffer[ BUF_LEN ];
 
 		QString watchPath;
+		QString originalName;
+		int prevEvent;
 
 		bool __stopWatch;
 
@@ -51,6 +53,7 @@ class NBFileSystemWatcher : public QThread {
 		void nodeCreated( QString );
 		void nodeDeleted( QString );
 		void nodeChanged( QString );
+		void nodeRenamed( QString, QString );
 
 		void watchPathDeleted();
 

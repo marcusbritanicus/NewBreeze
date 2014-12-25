@@ -12,6 +12,8 @@
 #include <NBSidePanelModel.hpp>
 #include <NBSidePanelDelegate.hpp>
 #include <NBGuiWidgets.hpp>
+#include <NBDeviceInfo.hpp>
+#include <NBStyleManager.hpp>
 
 class NBSidePanelView : public QListView {
 	Q_OBJECT
@@ -37,6 +39,8 @@ class NBSidePanelView : public QListView {
 
 	private slots:
 		void handleClick( const QModelIndex );
+
+		void unmount();
 
 		void moveBookmarkUp();
 		void moveBookmarkDown();

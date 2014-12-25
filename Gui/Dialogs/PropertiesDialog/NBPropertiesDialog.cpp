@@ -80,6 +80,11 @@ NBPropertiesBase::NBPropertiesBase( QStringList paths ) : QWidget() {
 	setFixedHeight( 48 );
 };
 
+void NBPropertiesBase::setNewIcon( QString icoStr ) {
+
+	iconLabel->setPixmap( QIcon( icoStr ).pixmap( 48 ) );
+};
+
 NBPropertiesWidget::NBPropertiesWidget( QStringList paths, bool *term ) : QWidget() {
 
 	files = 0;
@@ -232,8 +237,7 @@ void NBPropertiesWidget::createGUI() {
 	QLabel *driveName = new QLabel();
 	NBDriveInfo *driveInfo;
 
-	NBDeviceManager devMgr;
-	NBDeviceInfo deviceInfo = devMgr.deviceInfoForPath( pathsList.at( 0 ) );
+	NBDeviceInfo deviceInfo = NBDeviceManager::deviceInfoForPath( pathsList.at( 0 ) );
 
 	driveIcon = new NBDriveLabel( deviceInfo.driveLabel() );
 	driveName->setText( deviceInfo.driveName() );
@@ -690,7 +694,7 @@ NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab, bo
 	connect( stack, SIGNAL( currentChanged( int ) ), this, SLOT( switchToTab( int ) ) );
 
 	if ( tab == NBPropertiesDialog::Properties )
-		connect( propsB, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ) );
+		connect( propsB, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ), Qt::UniqueConnection );
 };
 
 void NBPropertiesDialog::switchToTab( int newTab ) {
@@ -703,7 +707,7 @@ void NBPropertiesDialog::switchToTab( int newTab ) {
 		disconnect( propsB, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ) );
 
 	else
-		connect( propsB, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ) );
+		connect( propsB, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ), Qt::UniqueConnection );
 };
 
 void NBPropertiesDialog::setDirIcon() {
@@ -719,16 +723,16 @@ void NBPropertiesDialog::setDirIcon() {
 	);
 
 	if ( not iconName.isEmpty() ) {
+		propsB->setNewIcon( iconName );
+
 		QFile file( pathsList.at( 0 ) + "/.directory" );
 		if ( not file.open( QFile::WriteOnly ) ) {
 			QMessageBox::warning( this, "Error", "Unable to set icon" );
 			return;
 		}
+
 		file.write( QString( "[Desktop Entry]\nIcon=%1" ).arg( iconName ).toUtf8() );
 		file.flush();
 		file.close();
-
-		NBClickLabel *label = qobject_cast<NBClickLabel*>( sender() );
-		label->setPixmap( QPixmap( iconName ).scaled( 48, 48, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 	}
 };

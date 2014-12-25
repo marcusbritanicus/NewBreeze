@@ -3,16 +3,12 @@ Widgets
 		☐ NBPicsView: NBPicsView, NBPicsDelegate, NBFileSystemModel( QAbstractItemModel )                                           [ 1 of 3 ]
 
 	☐ MyComputer: NBDeviceView, NBDeviceDelegate, NBDeviceModel( QStringListModel )                                                 [ 0 of 3 ]
-	☐ NBTrash: NBTrashView, NBTrashDelegate, NBTrashModel( QAbstractItemModel )                                                     [ 0 of 3 ]
-
-Views
-	☐ NBTrashView -> DetailsView, showing info about location and deletion time                                                     [ 2 of 2 ]
-
-Models
-	☐ NBTrashModel( QAbstractItemModel )                                                                                            [ 0 of 1 ]
 
 Undo-Redo Sequences
 	☐ Undo/Redo Rename, IO, Trash etc
 
-NBPasteDialog
-	☐ Determine before hand, if there is enough space on the target to complete the copying/moving                                  [ 0 of 1 ]
+NBFolderView
+	☐ Intelligent file handling, eg, option for executing a shell script in the inline terminal, or directly viewing it.
+	☐
+
+Inbuilt text viewer

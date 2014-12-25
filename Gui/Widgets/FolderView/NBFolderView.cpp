@@ -6,10 +6,22 @@
 
 #include <NBFolderView.hpp>
 
+inline static void setXClipBoardData( QStringList paths ) {
+
+	FILE *xclip = popen( "xclip -selection clipboard -t text/uri-list", "w" );
+	Q_FOREACH( QString path, paths ) {
+		QByteArray name = QUrl::fromLocalFile( path + "\n" ).toString().toLocal8Bit();
+		fwrite( name.data(), name.count(), 1, xclip );
+	}
+
+	fflush( xclip );
+	pclose( xclip );
+};
+
 NBFolderView::NBFolderView() : QStackedWidget() {
 
 	// ClipBoard
-	ClipBoard = qApp->clipboard();
+	clipBoard = QApplication::clipboard();
 
 	// Set Data Model
 	fsModel = new NBFileSystemModel();
@@ -344,33 +356,47 @@ void NBFolderView::doOpen( QString loc ) {
 	}
 
 	else if ( isFile( loc ) ) {
-		NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", qPrintable( loc ) );
-
-		NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
-		if ( app.desktopFileName() == "." )
-			doOpenWithCmd();
-
-		QStringList exec = app.execArgs();
-
-		// Prepare @v exec
-		if ( app.takesArgs() ) {
-			if ( app.multipleArgs() ) {
-				int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
-				exec.removeAt( idx );
-				exec.insert( idx, loc );
-			}
-
-			else {
-				int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
-				exec.removeAt( idx );
-				exec.insert( idx, loc );
-			}
+		if ( isExec( loc ) and not isText( loc ) ) {
+			/*
+				*
+				* We make sure that @v loc is really an executable file,
+				* i.e it is one of x-exec or x-sharedlib or something
+				* of the sort and not a shellscript or jpg file with exec
+				* permissions
+				*
+			*/
+			NBDebugMsg( DbgMsgPart::HEAD, "Executing: %s... ", qPrintable( loc ) );
+			NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( loc ) ? "[DONE]" : "[FAILED]" ) );
 		}
+
 		else {
-			exec << loc;
-		}
+			NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", qPrintable( loc ) );
+			NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
+			if ( not app.isValid() )
+				doOpenWithCmd();
 
-		NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( exec.takeFirst(), exec ) ? "[DONE]" : " [FAILED]" ) );
+			QStringList exec = app.execArgs();
+
+			// Prepare @v exec
+			if ( app.takesArgs() ) {
+				if ( app.multipleArgs() ) {
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
+					exec.removeAt( idx );
+					exec.insert( idx, loc );
+				}
+
+				else {
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
+					exec.removeAt( idx );
+					exec.insert( idx, loc );
+				}
+			}
+			else {
+				exec << loc;
+			}
+
+			NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( exec.takeFirst(), exec ) ? "[DONE]" : " [FAILED]" ) );
+		}
 	}
 
 	else {
@@ -416,7 +442,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 		}
 
 		else if ( isFile( fileToBeOpened ) ) {
-			if ( isExec( fileToBeOpened ) ) {
+			if ( isExec( fileToBeOpened ) and not isText( fileToBeOpened ) ) {
 				/*
 					*
 					* We make sure that @v fileToBeOpened is really an executable file,
@@ -431,7 +457,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			else {
 				NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", qPrintable( fileToBeOpened ) );
 				NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( fileToBeOpened ) );
-				if ( app.desktopFileName() == "." )
+				if ( not app.isValid() )
 					doOpenWithCmd();
 
 				QStringList exec = app.execArgs();
@@ -631,7 +657,7 @@ void NBFolderView::doPeek() {
 			previewer->show();
 		}
 
-		else if ( mimeType.contains( "image" ) or mimeType.contains( "mng" ) or mimeType.contains( "gif" ) ) {
+		else if ( isImage( currentNode ) ) {
 			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing image: %s", qPrintable( currentNode ) );
 			QWidget *previewer = plugin->imagePreviewWidget( currentNode );
 
@@ -662,6 +688,20 @@ void NBFolderView::doPeek() {
 		else if ( mimeType.contains( "pdf" ) ) {
 			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing PDF: %s", qPrintable( currentNode ) );
 			QWidget *previewer = plugin->pdfPreviewWidget( currentNode );
+
+			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
+			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
+				previewer->setAttribute( Qt::WA_TranslucentBackground );
+
+			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
+			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
+
+			previewer->show();
+		}
+
+		else if ( mimeType.contains( "djvu" ) ) {
+			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing DjVu: %s", qPrintable( currentNode ) );
+			QWidget *previewer = plugin->djvuPreviewWidget( currentNode );
 
 			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
 			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
@@ -720,14 +760,11 @@ void NBFolderView::prepareCopy() {
 	moveItems = false;
 	QModelIndexList copyList = getSelection();
 
-	QList<QUrl> urlList;
+	QStringList urlList;
 	foreach( QModelIndex item, copyList )
-		urlList << QUrl::fromLocalFile( fsModel->nodePath( item.data().toString() ) );
+		urlList << fsModel->nodePath( item.data().toString() );
 
-	QMimeData *mimedata = new QMimeData();
-	mimedata->setUrls( urlList );
-
-	ClipBoard->setMimeData( mimedata );
+	setXClipBoardData( urlList );
 };
 
 void NBFolderView::prepareMove() {
@@ -738,14 +775,11 @@ void NBFolderView::prepareMove() {
 	moveItems = true;
 	QModelIndexList copyList = getSelection();
 
-	QList<QUrl> urlList;
+	QStringList urlList;
 	foreach( QModelIndex item, copyList )
-		urlList << QUrl( fsModel->nodePath( item.data().toString() ) );
+		urlList << fsModel->nodePath( item.data().toString() );
 
-	QMimeData *mimedata = new QMimeData();
-	mimedata->setUrls( urlList );
-
-	ClipBoard->setMimeData( mimedata );;
+	setXClipBoardData( urlList );
 };
 
 void NBFolderView::acopy( QStringList srcList, QString tgt ) {
@@ -771,7 +805,7 @@ void NBFolderView::link( QStringList linkList, QString path ) {
 
 void NBFolderView::prepareIO() {
 
-	const QMimeData *mimeData = ClipBoard->mimeData();
+	const QMimeData *mimeData = clipBoard->mimeData();
 
 	if ( mimeData->hasUrls() ) {
 		QStringList srcList;
@@ -871,7 +905,7 @@ void NBFolderView::doRename() {
 	else
 		NBDebugMsg( DbgMsgPart::TAIL, "[Done]" );
 
-	doReload();
+	// doReload();
 };
 
 void NBFolderView::sortByName() {

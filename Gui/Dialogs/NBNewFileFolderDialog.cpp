@@ -35,12 +35,17 @@ NBNewFileFolderDialog::NBNewFileFolderDialog( QString type, QDir curDir, QString
 
 	QLabel *lbl = new QLabel();
 	le = new QLineEdit();
+	le->setFixedHeight( 24 );
 
 	okBtn = new QPushButton();
 	okBtn->setObjectName( tr( "okBtn" ) );
 
 	cancelBtn = new QPushButton();
 	cancelBtn->setObjectName( tr( "cancelBtn" ) );
+
+	NBButtons *segBtns = new NBButtons();
+	segBtns->addSegment( okBtn );
+	segBtns->addSegment( cancelBtn );
 
 	if ( type == QString( "dir" ) ) {
 		lbl->setText( tr( "Create new folder in:\n%1" ).arg( curDir.path() ) );
@@ -65,11 +70,11 @@ NBNewFileFolderDialog::NBNewFileFolderDialog( QString type, QDir curDir, QString
 	cancelBtn->setText( "&Cancel" );
 
 	btnLyt->addStretch( 0 );
-	btnLyt->addWidget( okBtn );
-	btnLyt->addWidget( cancelBtn );
+	btnLyt->addWidget( segBtns );
 
 	lyt->addWidget( lbl );
 	lyt->addWidget( le );
+	lyt->addWidget( Separator::horizontal() );
 	lyt->addLayout( btnLyt );
 
 	connect( le, SIGNAL( textEdited( QString ) ), this, SLOT( handleTextChanged( QString ) ) );

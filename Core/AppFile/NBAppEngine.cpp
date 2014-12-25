@@ -107,7 +107,7 @@ NBAppEngine::NBAppEngine() {
 
 NBAppFile NBAppEngine::xdgDefaultApp( QMimeType mimeType ) {
 
-	return appsForMimeType( mimeType ).at( 0 );
+	return appsForMimeType( mimeType ).value( 0 );
 };
 
 QStringList NBAppEngine::listApplications( QString appsDir ) {

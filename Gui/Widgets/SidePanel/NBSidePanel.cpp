@@ -7,9 +7,10 @@
 #include <NBSidePanel.hpp>
 
 /* Side Panel init */
-NBSidePanel::NBSidePanel() : QWidget() {
+NBSidePanel::NBSidePanel( QWidget *parent ) : QWidget( parent ) {
 
 	forcedOpen = false;
+	forcedOpenOnMenuShow = false;
 
 	showingDevices = true;
 	showingBookMarks = false;
@@ -122,8 +123,8 @@ void NBSidePanel::setupPanel() {
 	connect( spView, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 	connect( spView, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ), this, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ) );
 	connect( spView, SIGNAL( move( QStringList, QString, NBIOMode::Mode ) ), this, SIGNAL( move( QStringList, QString, NBIOMode::Mode ) ) );
-	connect( spView, SIGNAL( showingMenu() ), this, SLOT( toggleExpandContract() ) );
-	connect( spView, SIGNAL( hidingMenu() ), this, SLOT( toggleExpandContract() ) );
+	connect( spView, SIGNAL( showingMenu() ), this, SLOT( stayOpenOnMenuShow() ) );
+	connect( spView, SIGNAL( hidingMenu() ), this, SLOT( restoreExpansionState() ) );
 	connect( spView, SIGNAL( bookmarkRemoved() ), this, SLOT( updateBookmarks() ) );
 
 	QVBoxLayout *viewLyt = new QVBoxLayout();
@@ -238,6 +239,31 @@ void NBSidePanel::toggleExpandContract() {
 		else
 			updateBookmarks();
 	}
+};
+
+void NBSidePanel::stayOpenOnMenuShow() {
+
+	if ( forcedOpen )
+		forcedOpenOnMenuShow = false;
+
+	else
+		forcedOpenOnMenuShow = true;
+
+	forcedOpen = true;
+	if ( showingDevices )
+		updateDevices();
+
+	else
+		updateBookmarks();
+};
+
+void NBSidePanel::restoreExpansionState() {
+
+	if ( forcedOpenOnMenuShow )
+		forcedOpen = false;
+
+	forcedOpen ? expand() : contract();
+	forcedOpenOnMenuShow = false;
 };
 
 void NBSidePanel::increaseWidth() {

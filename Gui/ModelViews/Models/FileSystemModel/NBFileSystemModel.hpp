@@ -181,7 +181,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 		long curIndex;
 		mutable int updatedNodes;
 
-		// Info Getherer kill switch
+		// Info Gatherer kill switch
 		bool __terminate;
 
 		NBQuickFileInfoGatherer *quickDataGatherer;
@@ -194,6 +194,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void handleNodeCreated( QString );
 		void handleNodeChanged( QString );
 		void handleNodeDeleted( QString );
+		void handleNodeRenamed( QString, QString );
 		void loadHome();
 
 		/* Perform the sorting again on a signal */

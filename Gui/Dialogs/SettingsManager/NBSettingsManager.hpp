@@ -25,14 +25,14 @@ class NBViewsWidget : public QWidget {
 		QRadioButton *tlRB, *tdRB, *dbRB, *ntRB;
 		QLabel *imageLbl;
 		QCheckBox *nativeTitleBarCB;
-		QSpinBox *maxIOJobsSB;
+		QCheckBox *TrayIconCB;
 		QCheckBox *sidePanelOpen;
 		QCheckBox *openWithCatalogCB;
 
 	private slots:
 		void handleThemeChanged();
 		void handleNativeTitleBarToggle( bool );
-		void handleMaxIOJobsChanged( int );
+		void handleTrayIconChanged( bool );
 		void handleSidePanelOpenToggled( bool );
 		void handleOpenWithCatalogToggled( bool );
 };

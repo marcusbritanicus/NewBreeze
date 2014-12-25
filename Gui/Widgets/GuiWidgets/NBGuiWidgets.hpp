@@ -116,11 +116,27 @@ class NBDriveInfo : public QFrame {
 		virtual void paintEvent( QPaintEvent * );
 };
 
-class Separator {
+class Separator : public QWidget {
+	Q_OBJECT
 
 	public:
 		static QWidget* vertical();
 		static QWidget* horizontal();
+
+	private:
+		enum Mode {
+			Horizontal,
+			Vertical
+		};
+
+		Separator( Separator::Mode mode );
+
+		QLinearGradient vGrad, hGrad;
+		Separator::Mode mMode;
+
+	protected:
+		void paintEvent( QPaintEvent * );
+		void resizeEvent( QResizeEvent * );
 };
 
 class NBSpacer {

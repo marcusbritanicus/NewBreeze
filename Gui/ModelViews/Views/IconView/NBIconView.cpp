@@ -67,7 +67,7 @@ NBIconView::NBIconView( NBFileSystemModel *fsModel ) : QAbstractItemView() {
 	setFont( qApp->font() );
 
 	// Mouse tracking
-	setMouseTracking( true );
+	setMouseTracking( false );
 
 	// No Horizontal ScrollBar
 	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
@@ -406,7 +406,7 @@ QRegion NBIconView::visualRegionForSelection( const QItemSelection &selection ) 
 void NBIconView::paintEvent( QPaintEvent* event ) {
 
 	QPainter painter( viewport() );
-	painter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
+	painter.setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing );
 
 	/* We need to draw the categories only if the model is categorization enabled */
 	if ( cModel->isCategorizationEnabled() ) {

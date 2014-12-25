@@ -33,14 +33,21 @@ inline QString baseName( QString path ) {
 	return QString( basename( strdup( qPrintable( path ) ) ) );
 };
 
+NBAppFile::NBAppFile() {
+
+	mIsValid = false;
+};
+
 NBAppFile::NBAppFile( QString path ) {
+
+	mIsValid = false;
 
 	if ( exists( path ) ) {
 
 		fileUrl = path;
 	}
 
-	else{
+	else {
 		if ( exists( NBXdg::home() + "/.local/share/applications/" + path ) )
 			fileUrl = NBXdg::home() + "/.local/share/applications/" + path;
 
@@ -237,6 +244,11 @@ NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
 	return NBAppFile( data );
 };
 
+bool NBAppFile::isValid() {
+
+	return mIsValid;
+};
+
 bool NBAppFile::operator==( const NBAppFile& other ) const {
 
 	bool truth = true;
@@ -255,6 +267,8 @@ bool NBAppFile::operator==( const NBAppFile& other ) const {
 };
 
 NBAppFile::NBAppFile( QVariantList data ) {
+
+	mIsValid = false;
 
 	fileUrl = data[ 0 ].toString();
 
@@ -300,6 +314,8 @@ NBAppFile::NBAppFile( QVariantList data ) {
 		else
 			__execArgs << arg;
 	}
+
+	mIsValid = true;
 };
 
 void NBAppFile::parseDesktopFile() {
@@ -405,6 +421,8 @@ void NBAppFile::parseDesktopFile() {
 		qDebug() << dirName( fileUrl );
 		__grade = 96;
 	}
+
+	mIsValid = true;
 };
 
 NBAppsList::NBAppsList() {
@@ -431,6 +449,11 @@ void NBAppsList::move( int from, int to ) {
 NBAppFile NBAppsList::at( quint64 pos ) {
 
 	return __appsList.at( pos );
+};
+
+NBAppFile NBAppsList::value( quint64 pos ) {
+
+	return __appsList.value( pos );
 };
 
 int NBAppsList::indexOf( NBAppFile app ) {

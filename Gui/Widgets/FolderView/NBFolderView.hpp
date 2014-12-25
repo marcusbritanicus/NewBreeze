@@ -58,8 +58,9 @@ class NBFolderView : public QStackedWidget {
 		QModelIndex indexAt( QPoint );
 		void createAndSetupActions();
 
-		QClipboard *ClipBoard;
 		bool moveItems;
+
+		QClipboard *clipBoard;
 
 	public slots :
 		void goUp();

@@ -23,6 +23,7 @@ class NBPeekPlugin {
 		virtual QWidget* imagePreviewWidget( const QString & ) = 0;
 		virtual QWidget* odfPreviewWidget( const QString & ) = 0;
 		virtual QWidget* pdfPreviewWidget( const QString & ) = 0;
+		virtual QWidget* djvuPreviewWidget( const QString & ) = 0;
 		virtual QWidget* htmlPreviewWidget( const QString & ) = 0;
 		virtual QWidget* textPreviewWidget( const QString & ) = 0;
 };

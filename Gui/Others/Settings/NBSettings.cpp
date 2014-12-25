@@ -33,7 +33,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.IconTheme = NBSystemIconTheme();
 	defaultSettings->General.ImagePreviews = true;
 	defaultSettings->General.NativeTitleBar = false;
-	defaultSettings->General.MaxIOJobs = 5;
+	defaultSettings->General.TrayIcon = true;
 	defaultSettings->General.OpenWithCatalog = true;
 
 	defaultSettings->Special.ClosingDown = false;
@@ -130,8 +130,8 @@ NBSettings* NBSettings::instance() {
 	if ( gaKeys.contains( QString( "NativeTitleBar" ) ) )
 		settings->General.NativeTitleBar = gSettings.value( "NativeTitleBar" ).toBool();
 
-	if ( gaKeys.contains( QString( "MaxIOJobs" ) ) )
-		settings->General.MaxIOJobs = gSettings.value( "MaxIOJobs" ).toInt();
+	if ( gaKeys.contains( QString( "TrayIcon" ) ) )
+		settings->General.TrayIcon = gSettings.value( "TrayIcon" ).toBool();
 
 	if ( gaKeys.contains( QString( "OpenWithCatalog" ) ) )
 		settings->General.OpenWithCatalog = gSettings.value( "OpenWithCatalog" ).toBool();
@@ -303,8 +303,8 @@ void NBSettings::reload() {
 	if ( gaKeys.contains( QString( "NativeTitleBar" ) ) )
 		General.NativeTitleBar = gSettings.value( "NativeTitleBar" ).toBool();
 
-	if ( gaKeys.contains( QString( "MaxIOJobs" ) ) )
-		General.MaxIOJobs = gSettings.value( "MaxIOJobs" ).toInt();
+	if ( gaKeys.contains( QString( "TrayIcon" ) ) )
+		General.TrayIcon = gSettings.value( "TrayIcon" ).toBool();
 
 	if ( gaKeys.contains( QString( "OpenWithCatalog" ) ) )
 		General.OpenWithCatalog = gSettings.value( "OpenWithCatalog" ).toBool();

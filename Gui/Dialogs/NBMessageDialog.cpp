@@ -140,6 +140,11 @@ void NBMessageDialog::setText( QString text ) {
 
 void NBMessageDialog::keyPressEvent( QKeyEvent *keyEvent ) {
 
+	if ( keyEvent->key() == Qt::Key_Escape ) {
+		retValue = NBMessageDialog::Cancel;
+		close();
+	}
+
 	NBDialog::keyPressEvent( keyEvent );
 };
 
@@ -220,7 +225,7 @@ void NBMessageDialog::buttonClickHandler() {
 
 void NBMessageDialog::aboutNewBreeze() {
 
-	QString title = QString( "About NewBreeze v2.3.0-preview" );
+	QString title = QString( "About NewBreeze v2.5.0" );
 	QString text = QString(
 		"<p><b><center>Fast and light-weight File Manager</center></b></p>"		\
 		"<p>Built on top of the Powerful Qt4 GUI Toolkit, this file manager "	\

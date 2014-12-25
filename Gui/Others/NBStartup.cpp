@@ -11,7 +11,7 @@
 void NBStartup() {
 	/*
 		*
-		* Check if each of the fields have a value. If not set them.
+		* Check if thumbDir exists. Otherwise try to create it.
 		*
 	*/
 	if ( !QFileInfo( thumbsDir ).exists() ) {
@@ -24,14 +24,14 @@ void NBStartup() {
 
 	/*
 		*
-		* Icon Theme
+		* Set the Icon Theme
 		*
 	*/
 	QIcon::setThemeName( NBSystemIconTheme() );
 
 	/*
 		*
-		* Set basic CustomActions
+		* Set hard coded CustomActions: Open as SU, Open in terminal.
 		*
 	*/
 	if ( actionSettings.value( "OpenAsSuperUser/Name" ).toString().isEmpty() ) {
@@ -118,5 +118,5 @@ void NBStartup() {
 		}
 	}
 
-	QThreadPool::globalInstance()->setMaxThreadCount( NBSettings::instance()->General.MaxIOJobs );
+	QThreadPool::globalInstance()->setMaxThreadCount( 5 );
 };

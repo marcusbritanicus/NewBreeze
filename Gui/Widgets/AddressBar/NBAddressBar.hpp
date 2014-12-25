@@ -14,11 +14,37 @@
 #include <NBTools.hpp>
 #include <NBButtons.hpp>
 
+class NBToggleButton : public QWidget {
+	Q_OBJECT
+
+	public:
+		NBToggleButton( QWidget *parent = NULL );
+
+		bool isChecked();
+		void setChecked( bool );
+
+		void setShortcut( QString );
+
+	private:
+		bool checked;
+		QAction *shortcut;
+
+	public slots:
+		void toggle();
+
+	protected:
+		void mousePressEvent( QMouseEvent* );
+		void paintEvent( QPaintEvent* );
+
+	Q_SIGNALS:
+		void clicked();
+};
+
 class NBAddressWidget : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBAddressWidget();
+		NBAddressWidget( QWidget *parent = NULL );
 		void setShowHidden( bool );
 
 		QLineEdit *addressEdit;
@@ -27,7 +53,7 @@ class NBAddressWidget : public QWidget {
 	private :
 		void setWidgetProperties();
 
-		NBToolButton *toggleBtn;
+		NBToggleButton *toggleBtn;
 		QDirModel *dModel;
 
 	private slots:
@@ -38,7 +64,7 @@ class NBAddressBar : public QFrame {
 	Q_OBJECT
 
 	public:
-		NBAddressBar();
+		NBAddressBar( QWidget *parent = NULL );
 
 		NBButtons *addressButtons;
 		QPushButton *reloadBtn, *openVTEBtn;

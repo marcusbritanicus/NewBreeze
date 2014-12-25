@@ -12,6 +12,9 @@ NBFileSystemWatcher::NBFileSystemWatcher() : QThread() {
 	WD = -1;
 	buffer[ BUF_LEN ] = { 0 };
 
+	originalName = QString();
+	prevEvent = 0;
+
 	watchPath = QString();
 
 	__stopWatch = false;
@@ -89,14 +92,37 @@ void NBFileSystemWatcher::run() {
 				}
 
 				if ( ( event->mask & IN_CREATE ) ) {
+
+					prevEvent = IN_CREATE;
 					emit nodeCreated( watchPath + "/" + event->name );
 				}
 
 				if ( event->mask & IN_MODIFY ) {
+
+					prevEvent = IN_MODIFY;
 					emit nodeChanged( watchPath + "/" + event->name );
 				}
 
+				if ( ( event->mask & IN_MOVED_FROM ) ) {
+
+					prevEvent = IN_MOVED_FROM;
+					originalName = QString( watchPath + "/" + event->name );
+				}
+
+				if ( ( event->mask & IN_MOVED_TO ) ) {
+
+					if ( prevEvent == IN_MOVED_FROM )
+						emit nodeRenamed( originalName, watchPath + "/" + event->name );
+
+					else
+						emit nodeCreated( watchPath + "/" + event->name );
+
+					prevEvent = IN_MOVED_TO;
+				}
+
 				if ( ( event->mask & IN_DELETE ) ) {
+
+					prevEvent = IN_MOVED_TO;
 					emit nodeDeleted( watchPath + "/" + event->name );
 				}
 

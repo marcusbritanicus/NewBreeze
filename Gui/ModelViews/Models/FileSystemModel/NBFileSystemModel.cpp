@@ -35,6 +35,8 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 	connect( watcher, SIGNAL( nodeCreated( QString ) ), this, SLOT( handleNodeCreated( QString ) ) );
 	connect( watcher, SIGNAL( nodeChanged( QString ) ), this, SLOT( handleNodeChanged( QString ) ) );
 	connect( watcher, SIGNAL( nodeDeleted( QString ) ), this, SLOT( handleNodeDeleted( QString ) ) );
+	connect( watcher, SIGNAL( nodeRenamed( QString, QString ) ), this, SLOT( handleNodeRenamed( QString, QString ) ) );
+
 	connect( watcher, SIGNAL( watchPathDeleted() ), this, SLOT( loadHome() ) );
 
 	connect( this, SIGNAL( loadFileInfo() ), this, SLOT( gatherFileInfo() ) );
@@ -548,7 +550,7 @@ void NBFileSystemModel::sort( int column, bool cs, bool categorized ) {
 	recategorize();
 	rootNode->sort( column, cs, categorized );
 
-	// Create a map of categoryIdndex versus rows
+	// Create a map of categoryIndex versus rows
 	categoryRowMap.clear();
 	foreach( NBFileSystemNode *item, rootNode->children() )
 		categoryRowMap[ item->category() ] << item->row();
@@ -613,10 +615,13 @@ bool NBFileSystemModel::move( QString, QString ) {
 	return true;
 };
 
-bool NBFileSystemModel::rename( QString, QString ) {
+bool NBFileSystemModel::rename( QString oldName, QString newName ) {
 
-	if ( __readOnly )
-		return false;
+	NBFileSystemNode *node = rootNode->child( baseName( oldName ) );
+	node->setData( 0, baseName( newName ) );
+
+	QModelIndex idx = index( baseName( oldName ) );
+	emit dataChanged( idx, idx );
 
 	return true;
 };
@@ -884,7 +889,7 @@ void NBFileSystemModel::setupModelData() {
 		closedir( dir );
 	}
 	endResetModel();
-;
+
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
 	curentLoadStatus.loading = false;
@@ -1007,7 +1012,7 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 	/*
 		 *
 		 * info -> [ iconStr, Type, MimeType ]
-		 * idx  -> [    s2  ,  n2 ,    n3    ]
+		 * idx  -> [   s2   ,  n2 ,    n3    ]
 		 *
 	*/
 
@@ -1034,7 +1039,7 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 
 void NBFileSystemModel::handleNodeCreated( QString node ) {
 
-	if ( baseName( node ).startsWith( "." ) )
+	if ( baseName( node ).startsWith( "." ) and not __showHidden )
 		return;
 
 	if ( dirName( node ) == currentDir() )
@@ -1052,11 +1057,16 @@ void NBFileSystemModel::handleNodeChanged( QString node ) {
 
 void NBFileSystemModel::handleNodeDeleted( QString node ) {
 
-	if ( baseName( node ).startsWith( "." ) )
+	if ( baseName( node ).startsWith( "." ) and not __showHidden )
 		return;
 
 	if ( dirName( node ) == currentDir() )
 		removeNode( baseName( node ) );
+};
+
+void NBFileSystemModel::handleNodeRenamed( QString oldNode, QString newNode ) {
+
+	rename( oldNode, newNode );
 };
 
 void NBFileSystemModel::loadHome() {

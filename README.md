@@ -53,5 +53,4 @@ Some of its features are
 ### Upcoming
 * Unified Folder, Application, and Catalog Viewer
 * Application Editor ( Desktop file editor )
-* Trash support
 * Any other feature you request for... :)

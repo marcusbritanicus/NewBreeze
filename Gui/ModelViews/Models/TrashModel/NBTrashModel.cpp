@@ -466,8 +466,7 @@ void NBTrashModel::setupModelData() {
 	}
 
 	/* Loading all other trash */
-	NBDeviceManager devMgr;
-	Q_FOREACH( NBDeviceInfo devInfo, devMgr.allDevices() ) {
+	Q_FOREACH( NBDeviceInfo devInfo, NBDeviceManager::allDevices() ) {
 		/* We don't want to check the home directory for trash once more */
 		if ( devInfo.mountPoint() == NBXdg::home() )
 			continue;

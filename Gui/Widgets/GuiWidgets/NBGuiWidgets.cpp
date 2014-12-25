@@ -65,7 +65,12 @@ NBToolButton::NBToolButton( QString themeIcon, QString customIcon ) : QToolButto
 	setIconSize( QSize( 20, 20 ) );
 	setAutoRaise( true );
 
-	setIcon( QIcon::fromTheme( themeIcon, QIcon( customIcon ) ) );
+	if ( customIcon == QString( "#textBtn" ) )
+		setText( themeIcon );
+
+	else
+		setIcon( QIcon::fromTheme( themeIcon, QIcon( customIcon ) ) );
+
 	setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
 };
 
@@ -287,15 +292,12 @@ void NBDriveInfo::paintEvent( QPaintEvent *pEvent ) {
 
 QWidget* Separator::vertical() {
 
-	QWidget *vSep = new QWidget();
-	vSep->setContentsMargins( QMargins() );
-	vSep->setFixedWidth( 1 );
-	vSep->setStyleSheet( "background-color: gray;" );
-
-	return vSep;
+	return new Separator( Separator::Vertical );
 };
 
 QWidget* Separator::horizontal() {
+
+	return new Separator( Separator::Horizontal );
 
 	QWidget *hSep = new QWidget();
 	hSep->setContentsMargins( QMargins() );
@@ -303,6 +305,86 @@ QWidget* Separator::horizontal() {
 	hSep->setStyleSheet( "background-color: gray;" );
 
 	return hSep;
+};
+
+Separator::Separator( Separator::Mode mode ) {
+
+	mMode = mode;
+
+	switch( mode ) {
+		case Separator::Horizontal: {
+			setContentsMargins( QMargins() );
+			setFixedHeight( 1 );
+
+			hGrad = QLinearGradient( QPoint( 0, 0 ), QPoint( 2000, 0 ) );
+			hGrad.setColorAt( 0.0, Qt::transparent );
+			hGrad.setColorAt( 0.4, Qt::gray );
+			hGrad.setColorAt( 0.6, Qt::gray );
+			hGrad.setColorAt( 1.0, Qt::transparent );
+
+			break;
+		};
+
+		case Separator::Vertical: {
+			setContentsMargins( QMargins() );
+			setFixedWidth( 1 );
+
+			vGrad = QLinearGradient( QPoint( 0, 0 ), QPoint( 0, 2000 ) );
+			vGrad.setColorAt( 0.0, Qt::transparent );
+			vGrad.setColorAt( 0.4, Qt::gray );
+			vGrad.setColorAt( 0.6, Qt::gray );
+			vGrad.setColorAt( 1.0, Qt::transparent );
+
+			break;
+		}
+	}
+};
+
+void Separator::resizeEvent( QResizeEvent *rEvent ) {
+
+	switch( mMode ) {
+		case Separator::Horizontal : {
+			hGrad.setFinalStop( 0, rEvent->size().width() );
+			break;
+		}
+
+		case Separator::Vertical : {
+			vGrad.setFinalStop( 0, rEvent->size().height() );
+			break;
+		}
+	}
+
+	repaint();
+	rEvent->accept();
+};
+
+void Separator::paintEvent( QPaintEvent *pEvent ) {
+
+	QPainter *painter = new QPainter( this );
+	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing );
+
+	switch( mMode ) {
+		case Separator::Horizontal : {
+			hGrad.setFinalStop( 0, width() );
+
+			// painter->setPen( QPen( QBrush( hGrad ), 1.0 ) );
+			painter->setPen( QPen( Qt::gray, 1.0 ) );
+			painter->drawLine( 0, 0, width(), 0 );
+			break;
+		}
+
+		case Separator::Vertical : {
+			vGrad.setFinalStop( 0, height() );
+
+			painter->setPen( QPen( QBrush( vGrad ), 1.0 ) );
+			painter->drawLine( rect().topLeft(), rect().bottomLeft() );
+			break;
+		}
+	}
+
+	painter->end();
+
+	pEvent->accept();
 };
 
 QWidget* NBSpacer::vertical( int spacing ) {

@@ -24,198 +24,7 @@ inline QString baseName( QString path ) {
 	return QString( basename( strdup( qPrintable( path ) ) ) );
 };
 
-NBDeviceManager::NBDeviceManager() {
-};
-
-QList<NBDeviceInfo> NBDeviceManager::allDevices() {
-
-	QList<NBDeviceInfo> devInfoList;
-
-	foreach( QString devLine, getMounts() ) {
-		NBDeviceInfo devInfo = deviceInfoForDevice( devLine );
-		if ( devInfo.driveName() != "unknown" )
-				devInfoList << devInfo;
-	}
-
-	return devInfoList;
-};
-
-NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
-
-	NBDeviceInfoPrivate devInfoP;
-
-	struct statvfs info;
-	statvfs( path.toLocal8Bit(), &info );
-
-	struct stat info2;
-	stat( path.toLocal8Bit(), &info2 );
-
-	QStringList vfsTypes;
-
-	vfsTypes << "efs" << "ext" << "ext2" << "ext3" << "ext4" << "hfs" << "hfsplus" << "hpfs" << "iso9660" << "jfs";
-	vfsTypes << "minix" << "msdos" << "ntfs" << "reiserfs" << "squashfs" << "smbfs" << "ubifs" << "udf" << "ufs";
-	vfsTypes << "umsdos" << "usbfs" << "vfat" << "xfs" << "xiafs" << "ntfs-3g" << "fuseblk" << "fuse" << "encfs";
-	vfsTypes << "fuse.encfs" << "btrfs";
-
-	// Get the device name
-	QString devById = QString( "/sys/dev/block/" ) + QString::number( major( info2.st_dev ) ) + ":" + QString::number( minor( info2.st_dev ) );
-
-	// Get the mount point
-	QRegExp mountsRx( "(\\S+) (\\S+) ([a-z0-9-.]+)" );
-	QString mountsInfo = getMountsInfo( path );
-
-	if ( mountsRx.indexIn( mountsInfo ) == -1 )
-		return NBDeviceInfo();
-
-	devInfoP.dN = mountsRx.cap( 1 );
-	devInfoP.mP = mountsRx.cap( 2 );
-
-	// If the disk is identified using uuid, get the /dev/ version
-	if ( devInfoP.dN.startsWith( "/dev/disk/by-uuid" ) )
-		devInfoP.dN = QFileInfo( "/dev/" + baseName( QFileInfo( devById ).symLinkTarget() ) ).symLinkTarget();
-
-	if ( QFileInfo( devInfoP.mP ).isRoot() )
-		devInfoP.dL = QString( "FileSystem" );
-
-	else
-		devInfoP.dL = getDevLabel( devInfoP.dN ).isEmpty() ? baseName( devInfoP.mP ) : getDevLabel( devInfoP.dN );
-
-	devInfoP.fS = mountsRx.cap( 3 );
-	if ( vfsTypes.contains( devInfoP.fS ) )
-		devInfoP.dT = getDevType( devInfoP.dN, devInfoP.fS );
-
-	else
-		return NBDeviceInfo();
-
-	devInfoP.fSz = ( quint64 ) ( info.f_bfree ) * info.f_frsize;
-	devInfoP.aSz = ( quint64 ) ( info.f_bavail ) * info.f_frsize;
-	devInfoP.uSz = ( quint64 ) ( info.f_blocks - info.f_bfree ) * info.f_frsize;
-	devInfoP.dSz = ( quint64 ) ( info.f_blocks ) * info.f_frsize;
-
-	return NBDeviceInfo( devInfoP );
-};
-
-NBDeviceInfo NBDeviceManager::deviceInfoForDevice( QString dev ) {
-
-	NBDeviceInfoPrivate devInfoP;
-
-	QStringList vfsTypes;
-
-	vfsTypes << "efs" << "ext" << "ext2" << "ext3" << "ext4" << "hfs" << "hfsplus" << "hpfs" << "iso9660" << "jfs";
-	vfsTypes << "minix" << "msdos" << "ntfs" << "reiserfs" << "squashfs" << "smbfs" << "ubifs" << "udf" << "ufs";
-	vfsTypes << "umsdos" << "usbfs" << "vfat" << "xfs" << "xiafs" << "ntfs-3g" << "fuseblk" << "fuse" << "encfs";
-	vfsTypes << "fuse.encfs" << "btrfs";
-
-	// Get the mount point
-	QRegExp mountsRx( "(\\S+) (\\S*) ([a-z0-9-.]+)" );
-	QString mountsInfo = dev.contains( " " ) ? dev : getMountsInfo( dev );
-	dev = dev.contains( " " ) ? dev.split( " " ).at( 0 ) : dev;
-
-	if ( mountsRx.indexIn( mountsInfo ) == -1 ) {
-		return NBDeviceInfo();
-	}
-
-	devInfoP.dN = mountsRx.cap( 1 );
-	devInfoP.mP = mountsRx.cap( 2 );
-	devInfoP.mP.replace( "\\040", " " );
-
-	// If the disk is identified using uuid, get the /dev/ version
-	if ( devInfoP.dN.startsWith( "/dev/disk/by-uuid" ) )
-		devInfoP.dN = QFileInfo( dev ).symLinkTarget();
-
-	if ( QFileInfo( devInfoP.mP ).isRoot() )
-		devInfoP.dL = QString( "FileSystem" );
-
-	else
-		devInfoP.dL = getDevLabel( devInfoP.dN ).isEmpty() ? devInfoP.mP.split( "/" ).last() : getDevLabel( devInfoP.dN );
-
-	devInfoP.fS = mountsRx.cap( 3 );
-	if ( vfsTypes.contains( devInfoP.fS ) )
-		devInfoP.dT = getDevType( devInfoP.dN, devInfoP.fS );
-
-	else
-		return NBDeviceInfo();
-
-	struct statvfs info;
-	statvfs( devInfoP.mP.toLocal8Bit(), &info );
-
-	devInfoP.fSz = ( quint64 ) ( info.f_bfree ) * info.f_frsize;
-	devInfoP.aSz = ( quint64 ) ( info.f_bavail ) * info.f_frsize;
-	devInfoP.uSz = ( quint64 ) ( info.f_blocks - info.f_bfree ) * info.f_frsize;
-	devInfoP.dSz = ( quint64 ) ( info.f_blocks ) * info.f_frsize;
-
-	return NBDeviceInfo( devInfoP );
-};
-
-QStringList NBDeviceManager::getMounts() {
-
-	std::ifstream mounts;
-	mounts.open( "/proc/self/mounts" );
-
-	QStringList mountsInfo;
-
-	while ( not mounts.eof() ) {
-		char line[ 1024 ];
-		mounts.getline( line, 1024 );
-
-		mountsInfo << QString( line ).trimmed();
-	}
-
-	return mountsInfo;
-}
-
-QString NBDeviceManager::getMountsInfo( QString dev ) {
-
-	QStringList devList = getMounts();
-
-	// Regular device
-	if ( dev.startsWith( "/dev/" ) ) {
-		foreach( QString devLine, devList ) {
-			// From /proc/self/mounts - Starting with @p dev
-			if ( devLine.contains( dev ) )
-				return devLine;
-
-			// From /proc/self/mounts - Starting with /dev/disk/bu-uuid
-			if ( QFileInfo( devLine.split( " " ).at( 0 ) ).symLinkTarget() == dev )
-				return devLine;
-		}
-	}
-
-	// Special device: we provide path
-	else {
-		QString retPt;
-		foreach( QString devLine, devList ) {
-			if ( not devLine.count() )
-				continue;
-
-			QString mount = devLine.split( " " ).at( 1 );
-			if ( dev.contains( mount ) ) {
-				if ( not retPt.contains( mount ) )
-					retPt = devLine;
-			}
-		}
-
-		return ( retPt.size() ? retPt : QString() );
-	}
-
-	return QString();
-};
-
-QString NBDeviceManager::getDevLabel( QString dev ) {
-
-	QDir disks = QDir( "/dev/disk/by-label" );
-	disks.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System );
-	foreach( QString disk, disks.entryList() ) {
-		QFileInfo info( disks.filePath( disk ) );
-		if ( info.symLinkTarget() == dev ) {
-			return disk.replace( "\\x20", " " );
-		}
-	}
-
-	return QString();
-};
-
-QString NBDeviceManager::getDevType( QString dev, QString vfsType ) {
+inline QString getDevType( QString dev, QString vfsType ) {
 
 	QStringList cdTypes = QStringList() << "cdfs" << "iso9660" << "udf";
 	QString devType = QString( "unknown" );
@@ -272,6 +81,53 @@ QString NBDeviceManager::getDevType( QString dev, QString vfsType ) {
 	}
 
 	return devType;
+};
+
+inline QString getDevLabel( QString name1, QString name2 ) {
+
+	if ( ( name1 == "/" ) or ( name2 == "/" ) )
+		return "FileSystem";
+
+	if ( not name1.isEmpty() )
+		return name1;
+
+	else if ( not name2.isEmpty() )
+		return baseName( name2 );
+
+	else
+		return "Device X";
+};
+
+QList<NBDeviceInfo> NBDeviceManager::allDevices() {
+
+	QList<NBDeviceInfo> devices;
+	Q_FOREACH( QVolumeInfo vInfo, QVolumeInfo::volumes() )
+		devices << NBDeviceManager::deviceInfoForPath( vInfo.rootPath() );
+
+	return devices;
+};
+
+NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
+
+	QVolumeInfo vInfo;
+	vInfo.setPath( path );
+
+	NBDeviceInfoPrivate devInfoP;
+
+	devInfoP.dN = vInfo.device();
+	devInfoP.dL = getDevLabel( vInfo.name(), vInfo.displayName() );
+	devInfoP.fS = vInfo.fileSystemType();
+	devInfoP.dT = getDevType( devInfoP.dN, devInfoP.fS );
+	devInfoP.mP = vInfo.rootPath();
+	devInfoP.fSz = vInfo.bytesFree();
+	devInfoP.aSz = vInfo.bytesAvailable();
+	devInfoP.uSz = vInfo.bytesTotal() - vInfo.bytesFree();
+	devInfoP.dSz = vInfo.bytesTotal();
+
+	if ( devInfoP.mP == "/" )
+		devInfoP.dT = "hdd";
+
+	return NBDeviceInfo( devInfoP );
 };
 
 NBDeviceInfo::NBDeviceInfo() {

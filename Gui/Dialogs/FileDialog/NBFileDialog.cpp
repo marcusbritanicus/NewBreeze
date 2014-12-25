@@ -36,7 +36,7 @@ void NBFileDialog::createGUI() {
 	QHBoxLayout *btnLyt = new QHBoxLayout();
 
 	addressWidget = new NBAddressWidget();
-	sidePanel = new NBSidePanel();
+	sidePanel = new NBSidePanel( this );
 
 	mainView = new NBIconView( fsModel );
 	switch( type ) {

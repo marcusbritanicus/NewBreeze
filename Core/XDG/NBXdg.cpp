@@ -146,8 +146,7 @@ QString NBXdg::trashLocation( QString path ) {
 	}
 
 	else {
-		NBDeviceManager devMgr;
-		NBDeviceInfo trashDevInfo = devMgr.deviceInfoForPath( path );
+		NBDeviceInfo trashDevInfo = NBDeviceManager::deviceInfoForPath( path );
 
 		QString mountPoint = trashDevInfo.mountPoint();
 

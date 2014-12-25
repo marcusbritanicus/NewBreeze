@@ -193,6 +193,8 @@ void NBButtons::setSegmentEnabled( int segment ) {
 
 void NBButtons::insertSegment( QPushButton *button, int logicalPos ) {
 
+	button->setFixedHeight( myButtonHeight );
+
 	if ( logicalPos >= segments.count() ) {
 		segments << button;
 		btnsLyt->addWidget( Separator::vertical() );
@@ -209,8 +211,11 @@ void NBButtons::insertSegment( QPushButton *button, int logicalPos ) {
 
 void NBButtons::addSegment( QPushButton *button ) {
 
+	button->setFixedHeight( myButtonHeight );
+
 	if ( segments.count() )
 		btnsLyt->addWidget( Separator::vertical() );
+
 	btnsLyt->addWidget( button );
 	segments << button;
 };

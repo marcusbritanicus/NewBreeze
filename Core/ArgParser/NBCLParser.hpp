@@ -18,6 +18,7 @@ enum  optionIndex {
 	HELP,
 	USAGE,
 	VERSION,
+	SYSTRAY,
 	SETTINGS,
 	FORCENEW,
 	NORMAL

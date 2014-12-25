@@ -25,6 +25,7 @@ class NBServer : public QLocalServer {
 
 	Q_SIGNALS:
 		void newWindow( QString path );
+		void showTrayIcon();
 };
 
 class ThreadedReplier : public QObject {
@@ -43,6 +44,7 @@ class ThreadedReplier : public QObject {
 	Q_SIGNALS:
 		void finished();
 		void newWindow( QString path );
+		void showTrayIcon();
 };
 
 bool isServerRunning();

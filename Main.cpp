@@ -1,6 +1,6 @@
 /*
 	*
-	* Copyright 2013 Britanicus <marcusbritanicus@gmail.com>
+	* Copyright 2014 Britanicus <marcusbritanicus@gmail.com>
 	*
 
 	*
@@ -55,18 +55,18 @@ void startInstance( QApplication &app, bool startServer = false, bool otherCLO =
 
 	if ( otherCLO ) {
 		if ( app.arguments().count() >= 3 )
-			Gui = new NewBreeze( app.arguments().at( 2 ) );
+			Gui = new NewBreeze( app.arguments().at( 2 ), true );
 
 		else
-			Gui = new NewBreeze();
+			Gui = new NewBreeze( QString(), true );
 	}
 
 	else {
 		if ( app.arguments().count() >= 2 )
-			Gui = new NewBreeze( app.arguments().at( 1 ) );
+			Gui = new NewBreeze( app.arguments().at( 1 ), true );
 
 		else
-			Gui = new NewBreeze();
+			Gui = new NewBreeze( QString(), true );
 	}
 
 	if ( Settings->Session.Maximized )
@@ -75,8 +75,10 @@ void startInstance( QApplication &app, bool startServer = false, bool otherCLO =
 	else
 		Gui->showNormal();
 
-	if ( startServer )
+	if ( startServer ) {
 		app.connect( server, SIGNAL( newWindow( QString ) ), Gui, SLOT( newWindow( QString ) ) );
+		app.connect( server, SIGNAL( showTrayIcon() ), Gui, SIGNAL( showTrayIcon() ) );
+	}
 };
 
 int main( int argc, char **argv ) {
@@ -93,14 +95,62 @@ int main( int argc, char **argv ) {
 	app.setApplicationName( "NewBreeze" );
 	app.setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
 
+	if ( Settings->General.TrayIcon )
+		app.setQuitOnLastWindowClosed( false );
+
+	else
+		app.setQuitOnLastWindowClosed( true );
+
 	switch( NBArgParser( argc, argv ) ) {
+
+		/* We want only the server running in the tray */
+		case SYSTRAY : {
+			/* If an instance is already running, inform the user about it. */
+			if ( isServerRunning() ) {
+				qDebug() << "Found a running server. Requesting TrayIcon...";
+
+				QLocalSocket *client = new QLocalSocket();
+				client->connectToServer( "NewBreeze-1000" );
+				client->waitForConnected( 100 );
+
+				/* If we are connected... */
+				if ( client->state() == QLocalSocket::ConnectedState ) {
+					/* The server would have said 'Welcome...', wait for it and discard it */
+					if ( not client->bytesAvailable() )
+						client->waitForReadyRead();
+
+					client->readAll();
+					client->write( "Open in SystemTray" );
+					client->waitForBytesWritten( -1 );
+
+					client->disconnectFromServer();
+
+					return 0;
+				}
+			}
+
+			/* Else, start an instance. */
+			else {
+				qDebug() << "No running instance of the NBServer found";
+
+				NBServer *server = new NBServer();
+				server->start();
+
+				NewBreeze *Gui = new NewBreeze( QString(), true );
+				app.connect( server, SIGNAL( newWindow( QString ) ), Gui, SLOT( newWindow( QString ) ) );
+				app.connect( server, SIGNAL( showTrayIcon() ), Gui, SIGNAL( showTrayIcon() ) );
+
+				return app.exec();
+			}
+			break;
+		}
 
 		/* We want only the settings */
 		case SETTINGS : {
 			NBSettingsManager *settingsMgr = new NBSettingsManager();
-			settingsMgr->show();
+			settingsMgr->exec();
 
-			return app.exec();
+			return 0;
 		}
 
 		/* A forced opening */

@@ -76,6 +76,9 @@ class NBFlashLabel : public QLabel {
 		int flashesCompleted;
 		int maxFlashes;
 
+		/*  */
+		bool colorFlash;
+
 	protected :
 		void paintEvent( QPaintEvent* );
 		void mousePressEvent( QMouseEvent* );
@@ -85,6 +88,7 @@ class NBFlashLabel : public QLabel {
 
 	public slots:
 		void flashLabel();
+		void flashLabel( QColor );
 
 	Q_SIGNALS:
 		void clicked();

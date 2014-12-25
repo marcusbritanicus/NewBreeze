@@ -36,6 +36,7 @@ QScrollBar::handle:vertical {
 	background-color: <scrollcolor>;
 	max-width: 6px;
 	border-radius: 3px;
+	min-height: 20px;
 }
 
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
@@ -54,6 +55,7 @@ QScrollBar::handle:horizontal {
 	background-color: silver;
 	max-height: 6px;
 	border-radius: 3px;
+	min-width: 20px;
 }
 
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
