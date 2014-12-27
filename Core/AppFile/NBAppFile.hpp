@@ -137,7 +137,7 @@ class NBAppsList {
 
 	private:
 		QList<NBAppFile> __appsList;
-		bool __clearedOfDuplicates = false;
+		bool __clearedOfDuplicates;
 };
 
 uint qHash( const NBAppFile &app );
