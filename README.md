@@ -1,6 +1,8 @@
 #NewBreeze
 ## A fast and light-weight file manager based on Qt4
 
+###Note: NewBreeze 3.0 is in the oven. Expect several changes..!!
+
 Built on top of the Powerful Qt4 GUI Toolkit, this file manager is sleek, stylish and fast.
 Some of its features are
 
@@ -33,8 +35,8 @@ Some of its features are
 * Each theme should be in a separate folder
 * Each theme folder must contain index.theme file
 * To know how each theme must be structured check
-  - http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
-  - http://malcer.deviantart.com/art/Caledonia-Icons-264978107
+  - [FreeDesktop.Org](http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html)
+  - [Caledonia Icons](http://malcer.deviantart.com/art/Caledonia-Icons-264978107)
 
 ### Dependencies:
 * Qt4
