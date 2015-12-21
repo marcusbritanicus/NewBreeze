@@ -10,14 +10,14 @@
 
 #include <Global.hpp>
 #include <NBDialog.hpp>
-#include <NBGuiWidgets.hpp>
+#include <NBButton.hpp>
 #include <NBTools.hpp>
 
 class NBCustomActions : public NBDialog {
 	Q_OBJECT
 
 	public:
-		NBCustomActions();
+		NBCustomActions( QWidget *parent = 0 );
 		QString currentAction();
 
 	private:
@@ -26,8 +26,7 @@ class NBCustomActions : public NBDialog {
 		void setWidgetProperties();
 
 		QTableWidget *actionsTable;
-		NBToolButton *addBtn, *delBtn;
-		QPushButton *quitBtn;
+		NBButton *addBtn, *delBtn, *quitBtn;
 
 		bool editing;
 
@@ -43,7 +42,7 @@ class NBNewAction : public NBDialog {
 	Q_OBJECT
 
 	public:
-		NBNewAction();
+		NBNewAction( QWidget *parent = 0 );
 
 		QString actionName();
 		QString actionCommand();
@@ -54,8 +53,8 @@ class NBNewAction : public NBDialog {
 		void setActionFilters( QString );
 
 	private:
-		QLineEdit *actionNameLE, *actionCmdLE, *actionGlobLE;
-		NBToolButton *addBtn, *cancelBtn;
+		NBLineEdit *actionNameLE, *actionCmdLE, *actionGlobLE;
+		NBButton *addBtn, *cancelBtn;
 		bool addAction;
 };
 

@@ -16,9 +16,10 @@ NBTerminal::NBTerminal( QString wDir ) : QWidget() {
 		currentPath = QString( wDir );
 
 	QVBoxLayout *lyt = new QVBoxLayout();
+	lyt->setContentsMargins( QMargins( 2, 0, 2, 0 ) );
+	lyt->setSpacing( 0 );
 	Terminal = new NBTerminalWidget( currentPath );
 
-	lyt->addWidget( Separator::horizontal() );
 	lyt->addWidget( Terminal );
 	setLayout( lyt );
 
@@ -63,25 +64,7 @@ void NBTerminal::openNewTerminal() {
 
 NBTerminalWidget::NBTerminalWidget( QString wDir ) : QTermWidget( 0 ) {
 
-	if ( Settings->General.Style == QString( "TransDark" ) ) {
-		setTerminalOpacity( 0.81 );
-		setColorScheme( "WhiteOnBlack" );
-	}
-
-	else if ( Settings->General.Style == QString( "TransLight" ) ) {
-		setTerminalOpacity( 0.81 );
-		setColorScheme( "BlackOnWhite" );
-	}
-
-	else if ( Settings->General.Style == QString( "DullBlack" ) ) {
-		setTerminalOpacity( 1 );
-		setColorScheme( "DarkPastels" );
-	}
-
-	else {
-		setTerminalOpacity( 1 );
-		setColorScheme( "BlackOnLightGray" );
-	}
+	setColorScheme( "WhiteOnBlack" );
 
 	QAction *clearAct = new QAction( "Clear Terminal", this );
 	clearAct->setShortcut( tr( "Ctrl+Shift+X" ) );

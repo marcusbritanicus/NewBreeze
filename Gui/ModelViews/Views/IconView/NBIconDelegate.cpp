@@ -7,52 +7,43 @@
 #include <NBIconDelegate.hpp>
 #include <NBFileSystemModel.hpp>
 
-void NBIconDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
+void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
 
 	maxLines = 1;
 	textLines = 1;
-
-	if ( Settings->General.FolderView == QString( "IconsView" ) )
-		paintIcons( painter, option, index );
-
-	else if ( Settings->General.FolderView == QString( "TilesView" ) )
-		paintTiles( painter, option, index );
-
-	else
-		paintDetails( painter, option, index );
-}
-
-void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
 
 	if ( index.column() != 0 )
 		QItemDelegate::paint( painter, option, index );
 
 	else {
-		const NBFileSystemModel *model = static_cast<const NBFileSystemModel*>( index.model() );
-		QFileInfo ftype = model->nodeInfo( index );
+		// const NBFileSystemModel *model = static_cast<const NBFileSystemModel*>( index.model() );
 
 		QRect optionRect( option.rect );
 
-		// Font Mentrics for elided text;
+		/* Font Mentrics for elided text */
 		QFontMetrics fm( qApp->font() );
 
-		// Get icon size
+		/* Get icon size */
 		QSize iconSize( option.decorationSize );
 
-		QString text = model->data( index, Qt::DisplayRole ).toString();
+		/* Text to be displayed */
+		QString text = index.data( Qt::DisplayRole ).toString();
+
+		/* Icon to be painted */
 		QPixmap icon;
 		if ( option.state & QStyle::State_Selected )
-			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Selected );
+			icon = index.data( Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Selected );
 
 		else if ( option.state & QStyle::State_MouseOver )
-			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Active );
+			icon = index.data( Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Active );
 
 		else
-			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Normal );
+			icon = index.data( Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Normal );
 
 		if ( ( icon.size().width() > iconSize.width() ) or ( icon.size().height() > iconSize.height() ) )
 			icon = icon.scaled( iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 
+		/* Icon Size */
 		QSize iSize( icon.size() );
 
 		/*
@@ -102,6 +93,7 @@ void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &
 			maxLines = 6;
 		}
 
+		/* Icon rect */
 		QRect iconRect;
 		// Original X
 		iconRect.setX( optionRect.x() + ( optionRect.width() - iSize.width() ) / 2 );
@@ -112,106 +104,58 @@ void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &
 
 		painter->save();
 
-		// Basic Painter Settings
+		/* Antialiasing for rounded rect */
 		painter->setRenderHint( QPainter::Antialiasing, true );
-		painter->setRenderHint( QPainter::HighQualityAntialiasing, true );
-		painter->setRenderHint( QPainter::TextAntialiasing, true );
 
-		// Background Painter Settings and Background
+		/* Selection painter settings */
 		painter->setPen( QPen( Qt::NoPen ) );
-		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.SelectionMouseBrushColor.darker() );
+		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+			painter->setBrush( option.palette.color( QPalette::Highlight ).darker( 125 ) );
 
-			else
-				painter->setBrush( Settings->Colors.SelectionMouseBrushColor );
-		}
+		else if ( option.state & QStyle::State_Selected )
+			painter->setBrush( option.palette.color( QPalette::Highlight ) );
 
-		else if ( option.state & QStyle::State_Selected ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.SelectionBrushColor.darker() );
+		else if ( option.state & QStyle::State_MouseOver )
+			painter->setBrush( option.palette.color( QPalette::Highlight ).lighter( 125 ) );
 
-			else
-				painter->setBrush( Settings->Colors.SelectionBrushColor );
-		}
-
-		else if ( option.state & QStyle::State_MouseOver ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.MouseBrushColor.darker() );
-
-			else
-				painter->setBrush( Settings->Colors.MouseBrushColor );
-		}
-
-		else {
+		else
 			painter->setBrush( QBrush( Qt::transparent ) );
-		}
 
-		// Paint Background
-		painter->drawRoundedRect( optionRect.adjusted( padding / 2, padding / 2, -padding / 2, -padding / 2 ), 4, 4 );
+		/* Selection rectangle */
+		painter->drawRoundedRect( optionRect.adjusted( padding / 2, padding / 2, -padding / 2, -padding / 2 ), 3, 3 );
+		painter->restore();
 
-		// Focus Rectangle
+		painter->save();
+		/* Focus Rectangle - In our case focus under line */
 		if ( option.state & QStyle::State_HasFocus ) {
 			painter->setBrush( Qt::NoBrush );
 			QPoint bl = optionRect.bottomLeft() + QPoint( 7, -padding / 2 );
 			QPoint br = optionRect.bottomRight() - QPoint( 7, padding / 2 );
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) ) {
-				QLinearGradient hLine( bl, br );
-				hLine.setColorAt( 0, Qt::transparent );
-				hLine.setColorAt( 0.3, Settings->Colors.FocusPenColorAlt );
-				hLine.setColorAt( 0.7, Settings->Colors.FocusPenColorAlt );
-				hLine.setColorAt( 1, Qt::transparent );
-				painter->setPen( QPen( QBrush( hLine ), 2 ) );
-				painter->drawLine( bl, br );
-			}
 
-			else {
-				QLinearGradient hLine( bl, br );
-				hLine.setColorAt( 0, Qt::transparent );
-				hLine.setColorAt( 0.3, Settings->Colors.FocusPenColor );
-				hLine.setColorAt( 0.7, Settings->Colors.FocusPenColor );
-				hLine.setColorAt( 1, Qt::transparent );
-				painter->setPen( QPen( QBrush( hLine ), 2 ) );
-				painter->drawLine( bl, br );
-			}
+			QLinearGradient hLine( bl, br );
+
+			hLine.setColorAt( 0, Qt::transparent );
+			hLine.setColorAt( 0.3, option.palette.color( QPalette::BrightText ) );
+			hLine.setColorAt( 0.7, option.palette.color( QPalette::BrightText ) );
+			hLine.setColorAt( 1, Qt::transparent );
+
+			painter->setPen( QPen( QBrush( hLine ), 2 ) );
+			painter->drawLine( bl, br );
 		}
+		painter->restore();
 
 		// Paint Icon
 		painter->drawPixmap( iconRect, icon );
 
+		painter->save();
 		// Text Painter Settings
-		if ( ftype.isSymLink() ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.SymLinkPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.SymLinkPenColor );
-		}
-
-		else if ( ftype.isExecutable() && ftype.isFile() )
-			painter->setPen( Settings->Colors.ExecPenColor );
-
-		else if ( ftype.isHidden() ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.HiddenPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.HiddenPenColor );
-		}
-
-		else if ( !ftype.isReadable() )
-			painter->setPen( Settings->Colors.NoReadPenColor );
-
-		else {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.TextPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.TextPenColor );
-		}
+		painter->setPen( option.palette.color( QPalette::Text ) );
 
 		// Draw Text
 		painter->drawText( textRect, Qt::AlignHCenter, text );
+
+		// Draw the extra details
+		painter->setPen( option.palette.color( QPalette::ButtonText ) );
 		paintIconTextDetails( painter, textRect, index );
 
 		painter->restore();
@@ -219,6 +163,9 @@ void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &
 };
 
 void NBIconDelegate::paintTiles( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
+
+	maxLines = 1;
+	textLines = 1;
 
 	if ( index.column() != 0 )
 		QItemDelegate::paint( painter, option, index );
@@ -235,16 +182,16 @@ void NBIconDelegate::paintTiles( QPainter *painter, const QStyleOptionViewItem &
 		// Get icon size
 		QSize iconSize( option.decorationSize );
 
-		QString text = model->data( index, Qt::DisplayRole ).toString();
+		QString text = index.data( Qt::DisplayRole ).toString();
 		QPixmap icon;
 		if ( option.state & QStyle::State_Selected )
-			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Selected );
+			icon = index.data( Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Selected );
 
 		else if ( option.state & QStyle::State_MouseOver )
-			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Active );
+			icon = index.data( Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Active );
 
 		else
-			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Normal );
+			icon = index.data( Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Normal );
 
 		if ( ( icon.size().width() > iconSize.width() ) or ( icon.size().height() > iconSize.height() ) )
 			icon = icon.scaled( iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
@@ -307,103 +254,52 @@ void NBIconDelegate::paintTiles( QPainter *painter, const QStyleOptionViewItem &
 
 		painter->save();
 
-		// Basic Painter Settings
+		/* Antialiasing for rounded rect */
 		painter->setRenderHint( QPainter::Antialiasing, true );
-		painter->setRenderHint( QPainter::HighQualityAntialiasing, true );
-		painter->setRenderHint( QPainter::TextAntialiasing, true );
 
-		// Background Painter Settings and Background
+		/* Selection painter settings */
 		painter->setPen( QPen( Qt::NoPen ) );
-		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.SelectionMouseBrushColor.darker() );
+		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+			painter->setBrush( option.palette.color( QPalette::Highlight ).darker( 125 ) );
 
-			else
-				painter->setBrush( Settings->Colors.SelectionMouseBrushColor );
-		}
+		else if ( option.state & QStyle::State_Selected )
+			painter->setBrush( option.palette.color( QPalette::Highlight ) );
 
-		else if ( option.state & QStyle::State_Selected ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.SelectionBrushColor.darker() );
+		else if ( option.state & QStyle::State_MouseOver )
+			painter->setBrush( option.palette.color( QPalette::Highlight ).lighter( 125 ) );
 
-			else
-				painter->setBrush( Settings->Colors.SelectionBrushColor );
-		}
-
-		else if ( option.state & QStyle::State_MouseOver ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.MouseBrushColor.darker() );
-
-			else
-				painter->setBrush( Settings->Colors.MouseBrushColor );
-		}
-
-		else {
+		else
 			painter->setBrush( QBrush( Qt::transparent ) );
-		}
 
-		// Paint Background
-		painter->drawRoundedRect( optionRect.adjusted( padding / 2, padding / 2, -padding / 2, -padding / 2 ), 4, 4 );
+		/* Selection rectangle */
+		painter->drawRoundedRect( optionRect.adjusted( padding / 2, padding / 2, -padding / 2, -padding / 2 ), 3, 3 );
+		painter->restore();
 
-		// Focus Rectangle
+		painter->save();
+		/* Focus Rectangle - In our case focus under line */
 		if ( option.state & QStyle::State_HasFocus ) {
 			painter->setBrush( Qt::NoBrush );
 			QPoint bl = optionRect.bottomLeft() + QPoint( 7, -padding / 2 );
 			QPoint br = optionRect.bottomRight() - QPoint( 7, padding / 2 );
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) ) {
-				QLinearGradient hLine( bl, br );
-				hLine.setColorAt( 0, Qt::transparent );
-				hLine.setColorAt( 0.3, Settings->Colors.FocusPenColorAlt );
-				hLine.setColorAt( 0.7, Settings->Colors.FocusPenColorAlt );
-				hLine.setColorAt( 1, Qt::transparent );
-				painter->setPen( QPen( QBrush( hLine ), 2 ) );
-				painter->drawLine( bl, br );
-			}
 
-			else {
-				QLinearGradient hLine( bl, br );
-				hLine.setColorAt( 0, Qt::transparent );
-				hLine.setColorAt( 0.3, Settings->Colors.FocusPenColor );
-				hLine.setColorAt( 0.7, Settings->Colors.FocusPenColor );
-				hLine.setColorAt( 1, Qt::transparent );
-				painter->setPen( QPen( QBrush( hLine ), 2 ) );
-				painter->drawLine( bl, br );
-			}
+			QLinearGradient hLine( bl, br );
+
+			hLine.setColorAt( 0, Qt::transparent );
+			hLine.setColorAt( 0.3, option.palette.color( QPalette::BrightText ) );
+			hLine.setColorAt( 0.7, option.palette.color( QPalette::BrightText ) );
+			hLine.setColorAt( 1, Qt::transparent );
+
+			painter->setPen( QPen( QBrush( hLine ), 2 ) );
+			painter->drawLine( bl, br );
 		}
+		painter->restore();
 
 		// Paint Icon
 		painter->drawPixmap( iconRect, icon );
 
+		painter->save();
 		// Text Painter Settings
-		if ( ftype.isSymLink() ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.SymLinkPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.SymLinkPenColor );
-		}
-
-		else if ( ftype.isExecutable() && ftype.isFile() )
-			painter->setPen( Settings->Colors.ExecPenColor );
-
-		else if ( ftype.isHidden() ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.HiddenPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.HiddenPenColor );
-		}
-
-		else if ( !ftype.isReadable() )
-			painter->setPen( Settings->Colors.NoReadPenColor );
-
-		else {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.TextPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.TextPenColor );
-		}
+		painter->setPen( option.palette.color( QPalette::Text ) );
 
 		// Draw Text
 		if ( maxLines == 1 )
@@ -411,6 +307,9 @@ void NBIconDelegate::paintTiles( QPainter *painter, const QStyleOptionViewItem &
 
 		else
 			painter->drawText( textRect, text );
+
+		// Draw the extra details
+		painter->setPen( option.palette.color( QPalette::ButtonText ) );
 		paintTileTextDetails( painter, textRect, index );
 
 		painter->restore();
@@ -418,6 +317,9 @@ void NBIconDelegate::paintTiles( QPainter *painter, const QStyleOptionViewItem &
 };
 
 void NBIconDelegate::paintDetails( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
+
+	maxLines = 1;
+	textLines = 1;
 
 	if ( index.column() != 0 )
 		QItemDelegate::paint( painter, option, index );
@@ -434,16 +336,16 @@ void NBIconDelegate::paintDetails( QPainter *painter, const QStyleOptionViewItem
 		// Get icon size
 		QSize iconSize( option.decorationSize );
 
-		QString text = model->data( index, Qt::DisplayRole ).toString();
+		QString text = index.data( Qt::DisplayRole ).toString();
 		QPixmap icon;
 		if ( option.state & QStyle::State_Selected )
-			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Selected );
+			icon = index.data( Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Selected );
 
 		else if ( option.state & QStyle::State_MouseOver )
-			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Active );
+			icon = index.data( Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Active );
 
 		else
-			icon = model->data( index, Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Normal );
+			icon = index.data( Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Normal );
 
 		if ( ( icon.size().width() > iconSize.width() ) or ( icon.size().height() > iconSize.height() ) )
 			icon = icon.scaled( iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
@@ -485,22 +387,6 @@ void NBIconDelegate::paintDetails( QPainter *painter, const QStyleOptionViewItem
 		rectList << QRect( rectList.at( 1 ).x() + 100, textRect.y(), 100, textRect.height() );
 		rectList << QRect( rectList.at( 2 ).x() + 100, textRect.y(), 75, textRect.height() );
 
-		if ( iconSize.width() >= 40 ) {
-			maxLines = 2;
-		}
-		else if ( iconSize.width() >= 60 ) {
-			maxLines = 3;
-		}
-		else if ( iconSize.width() >= 90 ) {
-			maxLines = 4;
-		}
-		else if ( iconSize.width() == 128 ) {
-			maxLines = 6;
-		}
-		else {
-			maxLines = 1;
-		}
-
 		QRect iconRect;
 		// Original X + Image Left Border + Width to make the ima
 		iconRect.setX( optionRect.x() + padding + ( iconSize.width() - iSize.width() ) / 2 );
@@ -511,106 +397,58 @@ void NBIconDelegate::paintDetails( QPainter *painter, const QStyleOptionViewItem
 
 		painter->save();
 
-		// Basic Painter Settings
+		/* Antialiasing for rounded rect */
 		painter->setRenderHint( QPainter::Antialiasing, true );
-		painter->setRenderHint( QPainter::HighQualityAntialiasing, true );
-		painter->setRenderHint( QPainter::TextAntialiasing, true );
 
-		// Background Painter Settings and Background
+		/* Selection painter settings */
 		painter->setPen( QPen( Qt::NoPen ) );
-		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.SelectionMouseBrushColor.darker() );
+		if ( ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+			painter->setBrush( option.palette.color( QPalette::Highlight ).darker( 125 ) );
 
-			else
-				painter->setBrush( Settings->Colors.SelectionMouseBrushColor );
-		}
+		else if ( option.state & QStyle::State_Selected )
+			painter->setBrush( option.palette.color( QPalette::Highlight ) );
 
-		else if ( option.state & QStyle::State_Selected ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.SelectionBrushColor.darker() );
+		else if ( option.state & QStyle::State_MouseOver )
+			painter->setBrush( option.palette.color( QPalette::Highlight ).lighter( 125 ) );
 
-			else
-				painter->setBrush( Settings->Colors.SelectionBrushColor );
-		}
-
-		else if ( option.state & QStyle::State_MouseOver ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setBrush( Settings->Colors.MouseBrushColor.darker() );
-
-			else
-				painter->setBrush( Settings->Colors.MouseBrushColor );
-		}
-
-		else {
+		else
 			painter->setBrush( QBrush( Qt::transparent ) );
-		}
 
-		// Paint Background
-		painter->drawRoundedRect( optionRect.adjusted( padding / 2, padding / 2, -padding / 2, -padding / 2 ), 4, 4 );
+		/* Selection rectangle */
+		painter->drawRoundedRect( optionRect.adjusted( padding / 2, padding / 2, -padding / 2, -padding / 2 ), 3, 3 );
+		painter->restore();
 
-		// Focus Rectangle
+		painter->save();
+		/* Focus Rectangle - In our case focus under line */
 		if ( option.state & QStyle::State_HasFocus ) {
 			painter->setBrush( Qt::NoBrush );
 			QPoint bl = optionRect.bottomLeft() + QPoint( 7, -padding / 2 );
 			QPoint br = optionRect.bottomRight() - QPoint( 7, padding / 2 );
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) ) {
-				QLinearGradient hLine( bl, br );
-				hLine.setColorAt( 0, Qt::transparent );
-				hLine.setColorAt( 0.3, Settings->Colors.FocusPenColorAlt );
-				hLine.setColorAt( 0.7, Settings->Colors.FocusPenColorAlt );
-				hLine.setColorAt( 1, Qt::transparent );
-				painter->setPen( QPen( QBrush( hLine ), 2 ) );
-				painter->drawLine( bl, br );
-			}
 
-			else {
-				QLinearGradient hLine( bl, br );
-				hLine.setColorAt( 0, Qt::transparent );
-				hLine.setColorAt( 0.3, Settings->Colors.FocusPenColor );
-				hLine.setColorAt( 0.7, Settings->Colors.FocusPenColor );
-				hLine.setColorAt( 1, Qt::transparent );
-				painter->setPen( QPen( QBrush( hLine ), 2 ) );
-				painter->drawLine( bl, br );
-			}
+			QLinearGradient hLine( bl, br );
+
+			hLine.setColorAt( 0, Qt::transparent );
+			hLine.setColorAt( 0.3, option.palette.color( QPalette::BrightText ) );
+			hLine.setColorAt( 0.7, option.palette.color( QPalette::BrightText ) );
+			hLine.setColorAt( 1, Qt::transparent );
+
+			painter->setPen( QPen( QBrush( hLine ), 2 ) );
+			painter->drawLine( bl, br );
 		}
+		painter->restore();
 
 		// Paint Icon
 		painter->drawPixmap( iconRect, icon );
 
+		painter->save();
 		// Text Painter Settings
-		if ( ftype.isSymLink() ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.SymLinkPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.SymLinkPenColor );
-		}
-
-		else if ( ftype.isExecutable() && ftype.isFile() )
-			painter->setPen( Settings->Colors.ExecPenColor );
-
-		else if ( ftype.isHidden() ) {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.HiddenPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.HiddenPenColor );
-		}
-
-		else if ( !ftype.isReadable() )
-			painter->setPen( Settings->Colors.NoReadPenColor );
-
-		else {
-			if ( ( Settings->General.Style == QString( "LightGray" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				painter->setPen( Settings->Colors.TextPenColorAlt );
-
-			else
-				painter->setPen( Settings->Colors.TextPenColor );
-		}
+		painter->setPen( option.palette.color( QPalette::Text ) );
 
 		// Draw Text
 		painter->drawText( textRect, Qt::AlignVCenter, text );
+
+		// Draw the extra details
+		painter->setPen( option.palette.color( QPalette::ButtonText ) );
 		paintExtraDetails( painter, rectList, index );
 
 		painter->restore();
@@ -623,12 +461,9 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 	// Padding between the lines is 3px
 	// TextRect needs to be adjusted: y
 
-	painter->save();
-	if ( Settings->General.Style == QString( "TransDark" ) or Settings->General.Style == ( "DullBlack" ) )
-		painter->setPen( Settings->Colors.TextPenColor.darker() );
+	/* @painter will already have the correct color, we just have to draw the text */
 
-	else
-		painter->setPen( Settings->Colors.TextPenColor.darker( 135 ) );
+	painter->save();
 
 	int lineSpacing = ( textRect.height() - QFontInfo( qApp->font() ).pixelSize() * maxLines ) / ( maxLines + 1 );
 
@@ -735,11 +570,6 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 	// TextRect needs to be adjusted: y
 
 	painter->save();
-	if ( Settings->General.Style == QString( "TransDark" ) or Settings->General.Style == ( "DullBlack" ) )
-		painter->setPen( Settings->Colors.TextPenColor.darker() );
-
-	else
-		painter->setPen( Settings->Colors.TextPenColor.darker( 135 ) );
 
 	int lineSpacing = ( textRect.height() - QFontInfo( qApp->font() ).pixelSize() * maxLines ) / ( maxLines + 1 );
 
@@ -832,6 +662,8 @@ void NBIconDelegate::paintExtraDetails( QPainter *painter, QList<QRect> &textRec
 	// Padding between the lines is 3px
 	// TextRect needs to be adjusted: y
 
+	painter->save();
+
 	QRect textRect;
 
 	textRect = textRectList.at( 0 );
@@ -849,4 +681,6 @@ void NBIconDelegate::paintExtraDetails( QPainter *painter, QList<QRect> &textRec
 	textRect = textRectList.at( 3 );
 	detail = index.data( Qt::UserRole + 6 ).toString();
 	painter->drawText( textRect, Qt::AlignCenter | Qt::TextWordWrap, detail );
+
+	painter->restore();
 };

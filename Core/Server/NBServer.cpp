@@ -126,23 +126,12 @@ void ThreadedReplier::sendReplyToClient() {
 bool isServerRunning() {
 
 	QLocalSocket *client = new QLocalSocket();
-	client->connectToServer( "NewBreeze-1000", QLocalSocket::ReadOnly );
+	client->connectToServer( QString( "NewBreeze-%1" ).arg( getuid() ), QLocalSocket::ReadOnly );
 
-	if ( client->waitForConnected( 100 ) ) {
-		/* We must get a immediate reply */
-		client->waitForReadyRead();
-		if ( client->readAll() == "Welcome to NewBreeze!" ) {
-			client->disconnectFromServer();
-			return true;
-		}
+	/* Lets assume that the server is responsive */
+	if ( client->waitForConnected( 100 ) )
+		return true;
 
-		else {
-			client->disconnectFromServer();
-			return false;
-		}
-	}
-
-	else {
+	else
 		return false;
-	}
 };

@@ -118,5 +118,11 @@ void NBStartup() {
 		}
 	}
 
-	QThreadPool::globalInstance()->setMaxThreadCount( 5 );
+	/*
+		*
+		* QFont Substitutions
+		*
+	*/
+
+	QFont::insertSubstitutions( "Envy Code R", QStringList() << "DejaVu Sans Mono" << "mono" << "Courier" );
 };

@@ -89,13 +89,26 @@ inline QString getDevLabel( QString name1, QString name2 ) {
 		return "FileSystem";
 
 	if ( not name1.isEmpty() )
-		return name1;
+		return name1.replace( "\\x20", " " );
 
 	else if ( not name2.isEmpty() )
-		return baseName( name2 );
+		return baseName( name2 ).replace( "\\x20", " " );
 
 	else
 		return "Device X";
+};
+
+NBDeviceManager::NBDeviceManager( QObject *parent ) : QObject( parent ) {
+
+	QDrive::Monitor *mtr = new QDrive::Monitor( this );
+
+	connect( mtr, SIGNAL( partitionAdded( const QDBusObjectPath & ) ), this, SIGNAL( updateDevices() ) );
+	connect( mtr, SIGNAL( partitionRemoved( const QDBusObjectPath & ) ), this, SIGNAL( updateDevices() ) );
+};
+
+void NBDeviceManager::printDevInfo( const QDBusObjectPath &obj ) {
+
+	// qDebug() << obj.path();
 };
 
 QList<NBDeviceInfo> NBDeviceManager::allDevices() {

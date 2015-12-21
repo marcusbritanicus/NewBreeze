@@ -13,6 +13,9 @@
 
 #include <QtCore>
 
+#include <Monitor.h>
+#include <Partition.h>
+
 #include <QVolumeInfo.hpp>
 
 class NBDeviceInfoPrivate {
@@ -59,11 +62,20 @@ class NBDeviceInfo : public NBDeviceInfoPrivate {
 
 Q_DECLARE_METATYPE(NBDeviceInfo);
 
-class NBDeviceManager {
+class NBDeviceManager : public QObject {
+	Q_OBJECT
 
-	public:
+	public :
+		NBDeviceManager( QObject *parent = 0  );
+
 		static QList<NBDeviceInfo> allDevices();
 		static NBDeviceInfo deviceInfoForPath( QString path );
+
+	public slots:
+		void printDevInfo( const QDBusObjectPath & );
+
+	Q_SIGNALS :
+		void updateDevices();
 };
 
 #endif

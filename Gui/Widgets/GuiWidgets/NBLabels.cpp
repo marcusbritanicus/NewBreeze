@@ -28,6 +28,8 @@ NBClickLabel::NBClickLabel( QPixmap icon ) : QLabel() {
 
 NBClickLabel::NBClickLabel( QString text ) : QLabel() {
 
+	clickEnabled = true;
+
 	setText( text );
 	setAlignment( Qt::AlignCenter );
 };
@@ -35,7 +37,17 @@ NBClickLabel::NBClickLabel( QString text ) : QLabel() {
 void NBClickLabel::mousePressEvent( QMouseEvent *mEvent ) {
 
 	if ( clickEnabled )
+		emit pressed();
+
+	mEvent->accept();
+};
+
+void NBClickLabel::mouseReleaseEvent( QMouseEvent *mEvent ) {
+
+	if ( clickEnabled and rect().contains( mEvent->pos() ) ) {
 		emit clicked();
+		emit released();
+	}
 
 	mEvent->accept();
 };
@@ -48,7 +60,7 @@ void NBClickLabel::setClickable( bool canClick ) {
 NBInfoLabel::NBInfoLabel() : QLabel() {
 
 	setAlignment( Qt::AlignCenter );
-	setStyleSheet( "QLabel { font-family: Courier 10 Pitch, Courier New, Monotype; font-size: 12pt; }" );
+	setFont( QFont( "Envy Code R", 12 ) );
 };
 
 void NBInfoLabel::setText( QString name, QString size, QString type, QString perm ) {

@@ -22,21 +22,23 @@ class NBTrashManager : public NBDialog {
 	Q_OBJECT
 
 	public :
-		NBTrashManager();
+		NBTrashManager( QWidget *parent = 0 );
 
 		QModelIndexList getSelection();
 		bool hasSelection();
 
 	private :
-		QModelIndex indexAt( QPoint );
-
 		void setupGui();
 		void setDialogProperties();
 		void createAndSetupActions();
 
+		void updateButtons();
+
 		NBTrashView *TrashView;
 		NBTrashModel *tModel;
-		NBMenu *customMenu;
+		QMenu *customMenu;
+
+		NBButtons *restoreButtons, *deleteButtons;
 
 		QClipboard *ClipBoard;
 		QAction *reloadAct;

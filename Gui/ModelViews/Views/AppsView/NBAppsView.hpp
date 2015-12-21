@@ -11,6 +11,7 @@
 #include <Global.hpp>
 #include <NBApplicationsModel.hpp>
 #include <NBAppsDelegate.hpp>
+#include <NBGuiFunctions.hpp>
 #include <NBTools.hpp>
 
 class NBApplicationsView : public QAbstractItemView {

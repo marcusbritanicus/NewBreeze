@@ -6,9 +6,9 @@
 
 #include <NBFileSystemNode.hpp>
 
-static int __sortColumn = Settings->Session.SortColumn;
-static bool __sortCase = Settings->Session.SortCase;
-static bool __sortCategory = Settings->Session.SortCategory;
+static int __sortColumn = Settings->General.SortColumn;
+static bool __sortCase = Settings->General.SortCase;
+static bool __sortCategory = Settings->General.Grouping;
 
 NBFileSystemNode::NBFileSystemNode() {
 
@@ -102,6 +102,19 @@ QVariant NBFileSystemNode::data( int column, bool special ) const {
 		*
 		* If we want special data, i.e., we can choose column 0, 1, or 2
 		* If we want normal data, then we can choose columns 0 to 6, internally 3 to 9
+		*
+		* [
+		* 	dir/file/system
+		*   rawsize
+		*   icon ( string used with QIcon::fromTheme )
+		*   name = 0
+		*   size = 1
+		*   type = 2
+		*   mime = 3
+		*   time = 4
+		*   perm = 5
+		*   ownr = 6
+		* ]
 		*
 	*/
 

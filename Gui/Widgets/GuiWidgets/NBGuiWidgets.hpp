@@ -12,6 +12,16 @@
 #include <NBTools.hpp>
 #include <NBLabels.hpp>
 
+class NBLineEdit : public QLineEdit {
+	Q_OBJECT
+
+	public:
+		NBLineEdit( QWidget* );
+
+	protected:
+		void paintEvent( QPaintEvent* );
+};
+
 class NBSearchBar : public QWidget {
 	Q_OBJECT
 
@@ -25,28 +35,6 @@ class NBSearchBar : public QWidget {
 	Q_SIGNALS:
 		void searchString( QString );
 		void searchCleared();
-};
-
-class NBMenu : public QMenu {
-	Q_OBJECT
-
-	public:
-		NBMenu( QWidget *parent = 0 );
-		NBMenu( QString title, QWidget *parent = 0 );
-};
-
-class NBToolButton : public QToolButton {
-	Q_OBJECT
-
-	public:
-		NBToolButton( QString themeIcon = QString(), QString customIcon = QString() );
-};
-
-class NBPushButton : public QPushButton {
-	Q_OBJECT
-
-	public:
-		NBPushButton( QIcon icon, QString text );
 };
 
 class NBTitleIcon : public QLabel {
@@ -64,25 +52,6 @@ class NBTitleIcon : public QLabel {
 	signals:
 		void aboutNB();
 		void aboutQt4();
-};
-
-class NBViewModeButton: public QPushButton {
-	Q_OBJECT
-
-	public:
-		NBViewModeButton();
-		int checkedAction();
-
-	private :
-		QAction *tilesAct, *iconsAct, *detailsAct;
-		QActionGroup *viewsGroup;
-
-	public slots:
-		void showMenu();
-
-	Q_SIGNALS:
-		void changeViewMode();
-		void switchToNextView();
 };
 
 class NBDriveLabel : public QWidget {
@@ -120,8 +89,8 @@ class Separator : public QWidget {
 	Q_OBJECT
 
 	public:
-		static QWidget* vertical();
-		static QWidget* horizontal();
+		static QWidget* vertical( QWidget *parent = 0 );
+		static QWidget* horizontal( QWidget *parent = 0 );
 
 	private:
 		enum Mode {
@@ -129,7 +98,7 @@ class Separator : public QWidget {
 			Vertical
 		};
 
-		Separator( Separator::Mode mode );
+		Separator( Separator::Mode mode, QWidget *parent = 0 );
 
 		QLinearGradient vGrad, hGrad;
 		Separator::Mode mMode;
@@ -139,11 +108,25 @@ class Separator : public QWidget {
 		void resizeEvent( QResizeEvent * );
 };
 
-class NBSpacer {
+class NBSpacer : public QWidget {
+	Q_OBJECT
 
 	public:
-		static QWidget* vertical( int spacing = 1 );
-		static QWidget* horizontal( int spacing = 1 );
+		static QWidget* vertical( int spacing = 1, QWidget *parent = 0 );
+		static QWidget* horizontal( int spacing = 1, QWidget *parent = 0 );
+
+	private:
+		enum Mode {
+			Horizontal,
+			Vertical
+		};
+
+		NBSpacer( NBSpacer::Mode mode, int spacing = 1, QWidget *parent = 0 );
+		NBSpacer::Mode mMode;
+
+	protected:
+		void paintEvent( QPaintEvent * );
+		void resizeEvent( QResizeEvent * );
 };
 
 #endif

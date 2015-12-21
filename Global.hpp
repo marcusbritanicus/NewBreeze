@@ -47,6 +47,7 @@
 
 #include <NBSettings.hpp>
 #include <NBXdg.hpp>
+#include <NBPluginManager.hpp>
 
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>
@@ -92,5 +93,6 @@ typedef QMap<QString, QString> DeviceInfo;
 typedef QPair<QString, QString> BookMark;
 
 static NBSettings *Settings = NBSettings::instance();
+static NBPluginManager *PluginManager = NBPluginManager::instance();
 
 #endif

@@ -33,6 +33,8 @@ class NBCustomPeek : public QWidget {
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
 		void changeEvent( QEvent *cEvent );
+
+		void paintEvent( QPaintEvent *pEvent );
 };
 
 #endif

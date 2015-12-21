@@ -5,15 +5,12 @@
 */
 
 #pragma once
-#ifndef NBSIDEPANEL_HPP
-#define NBSIDEPANEL_HPP
 
 #include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBSidePanelModel.hpp>
+#include <NBAnimations.hpp>
 #include <NBFlashLabel.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBSidePanelView.hpp>
+#include <NBDeviceView.hpp>
+#include <NBBookmarkView.hpp>
 
 class NBSidePanel : public QWidget {
 	Q_OBJECT
@@ -21,62 +18,28 @@ class NBSidePanel : public QWidget {
 	public :
 		NBSidePanel( QWidget *parent );
 
-		void expand();
-		void contract();
+	private:
+		void populateSidePanel();
 
-	private :
-		void setupPanel();
+		NBWidthAnimation *anim;
 
-		QWidget *vSpacer;
-		NBSidePanelView *spView;
-		NBFlashLabel *dirLbl, *appLbl, *ctlLbl, *devLbl, *bmkLbl;
-		NBDeleteLabel *deleteLbl;
-
-		bool forcedOpen;
-		bool forcedOpenOnMenuShow;
-
-		bool showingDevices;
-		bool showingBookMarks;
-		bool animating;
-
-		QTimer *expandingTimer;
-		QTimer *contractingTimer;
-
-		int maxWidth;
-
-	public slots :
-		void flashBookmarks();
-		void flashDevices();
-
-		void flashFolders();
-		void flashCatalogs();
-		void flashApplications();
-
-		void updateBookmarks();
-		void updateDevices();
-
-	private slots:
-		void increaseWidth();
-		void decreaseWidth();
-
-		void toggleExpandContract();
-
-		void stayOpenOnMenuShow();
-		void restoreExpansionState();
+		NBFlashLabel *dirLbl, *appLbl, *ctlLbl;
+		NBTrashLabel *trashLabel;
+		NBDevicesIcon *devIcon;
+		NBBookmarksIcon *bmkIcon;
 
 	protected :
-		bool event( QEvent* );
+		void mousePressEvent( QMouseEvent *mEvent );
+		void mouseMoveEvent( QMouseEvent *mEvent );
 
-		void dragEnterEvent( QDragEnterEvent* );
-		void dragMoveEvent( QDragMoveEvent *dmEvent );
-		void dragLeaveEvent( QDragLeaveEvent* );
+	public slots:
+		void flashApplications();
+		void flashCatalogs();
+		void flashFolders();
+		void flashDevices();
+		void flashBookmarks();
 
-		void enterEvent( QEvent *eEvent );
-		void leaveEvent( QEvent *lEvent );
-
-		void paintEvent( QPaintEvent *pEvent );
-
-	Q_SIGNALS :
+	Q_SIGNALS:
 		void showFolders();
 		void showApplications();
 		void showCatalogs();
@@ -88,5 +51,3 @@ class NBSidePanel : public QWidget {
 		void copy( QStringList, QString, NBIOMode::Mode );
 		void move( QStringList, QString, NBIOMode::Mode );
 };
-
-#endif

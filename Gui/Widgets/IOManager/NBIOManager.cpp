@@ -48,11 +48,8 @@ NBIOWidget::NBIOWidget( NBFileIO *ioProc ) {
 	closeLbl->setClickable( true );
 	connect( closeLbl, SIGNAL( clicked() ), this, SLOT( cancelIO() ) );
 
-	totalBar = new NBProgressBar();
-	totalBar->setRange( 0, io->totalSize );
-
-	cfileBar = new NBProgressBar();
-	cfileBar->setRange( 0, io->fTotalBytes );
+	totalBar = new NBProgressBar( this );
+	cfileBar = new NBProgressBar( this );
 
 	QHBoxLayout *ttlLyt = new QHBoxLayout();
 	ttlLyt->addWidget( ttlLbl );
@@ -70,7 +67,6 @@ NBIOWidget::NBIOWidget( NBFileIO *ioProc ) {
 	baseLyt->addWidget( srcLbl );
 	baseLyt->addWidget( tgtLbl );
 	baseLyt->addLayout( spdLyt );
-	baseLyt->addWidget( new QLabel( "Total progress" ) );
 	baseLyt->addWidget( totalBar );
 	baseLyt->addWidget( cfileLbl );
 	baseLyt->addWidget( cfileBar );
@@ -90,7 +86,7 @@ void NBIOWidget::toggleDetails() {
 	if ( detailsAreSeen ) {
 		toggleDetailsLbl->setPixmap( QPixmap( ":/icons/arrow-down.png" ).scaled( QSize( 16, 16 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 
-		srcLbl->hide();
+		srcLbl->show();
 		tgtLbl->hide();
 		speedLbl->hide();
 		etcLbl->hide();
@@ -99,7 +95,7 @@ void NBIOWidget::toggleDetails() {
 
 		detailsAreSeen = false;
 
-		setFixedHeight( 70 );
+		setFixedHeight( 85 );
 	}
 
 	else {
@@ -140,10 +136,17 @@ void NBIOWidget::update() {
 
 	cfileLbl->setText( "Current file: " + baseName( io->ioTarget ) );
 
-	totalBar->setMaximum( io->totalSize );
-	cfileBar->setMaximum( io->fTotalBytes );
-	totalBar->setValue( io->copiedSize );
-	cfileBar->setValue( io->fWritten );
+	if ( io->totalSize > 0 )
+		totalBar->setValue( 1.0 * io->copiedSize / io->totalSize );
+
+	else
+		totalBar->setValue( 0 );
+
+	if ( io->fTotalBytes > 0 )
+		cfileBar->setValue( 1.0 * io->fWritten / io->fTotalBytes );
+
+	else
+		cfileBar->setValue( 0 );
 };
 
 void NBIOWidget::speedCalculator() {
@@ -188,7 +191,19 @@ void NBIOWidget::signalRemove() {
 	emit removeIO( io );
 };
 
-NBIOManager::NBIOManager( QList<NBFileIO*> jobList ) : NBDialog( "nxc" ) {
+void NBIOWidget::paintEvent( QPaintEvent *pEvent ) {
+
+	QWidget::paintEvent( pEvent );
+
+	QPainter *painter = new QPainter( this );
+	painter->setPen( Qt::gray );
+	painter->drawRect( rect().adjusted( 0, 0, -1, -1 ) );
+	painter->end();
+
+	pEvent->accept();
+};
+
+NBIOManager::NBIOManager( QList<NBFileIO*> jobList, QWidget *parent ) : NBDialog( "nxc", parent ) {
 
 	killIOOnClose = false;
 
@@ -200,7 +215,7 @@ NBIOManager::NBIOManager( QList<NBFileIO*> jobList ) : NBDialog( "nxc" ) {
 
 	QWidget *baseWidget = new QWidget();
 	baseLyt = new QVBoxLayout();
-	baseLyt->setContentsMargins( QMargins() );
+	baseLyt->setContentsMargins( QMargins( 5, 5, 5, 5 ) );
 
 	foreach( NBFileIO *io, jobList ) {
 		NBIOWidget *iow = new NBIOWidget( io );
@@ -268,7 +283,7 @@ void NBIOManager::closeEvent( QCloseEvent *cEvent ) {
 		}
 
 		/* This means we have running IO processes. Ask the user if we want to stop the IO */
-		int reply = NBMessageDialog::question(
+		int reply = NBMessageDialog::question( this,
 			tr( "Cancel all pending IO?" ),
 			question,
 			QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Yes << NBMessageDialog::No
@@ -296,7 +311,7 @@ void NBIOManager::removeIO( NBFileIO *io ) {
 	ioList.removeAll( io );
 };
 
-NBIOManagerMini::NBIOManagerMini() : QToolButton() {
+NBIOManagerMini::NBIOManagerMini( QWidget *parent ) : QToolButton( parent ) {
 
 	setIcon( QIcon::fromTheme( "help-about", QIcon( ":/icons/info.png" ) ) );
 	setIconSize( QSize( 24, 24 ) );
@@ -375,8 +390,8 @@ void NBIOManagerMini::paintEvent( QPaintEvent *pEvent ) {
 
 	/* A background color indicating 'checked' status */
 	if ( isChecked() ) {
-		painter->setBrush( QColor( 255, 255, 255, 30 ) );
-		painter->drawRoundedRect( 0, 0, 32, 32, 5, 5 );
+		painter->setBrush( QColor( 0, 0, 0, 90 ) );
+		painter->drawRoundedRect( 4, 4, 24, 24, 5, 5 );
 	}
 
 	quint64 jobs = jobList.count();
@@ -404,32 +419,24 @@ void NBIOManagerMini::paintEvent( QPaintEvent *pEvent ) {
 		/* Draw the total progress indicator */
 		painter->setPen( Qt::NoPen );
 		painter->setBrush( QColor( red, green, 0, 56 ) );
-		painter->drawRoundedRect( 0, 0, 32 * totalF, 32, 5, 5 );
+		painter->drawRoundedRect( 4, 4, 24 * totalF, 24, 5, 5 );
 
 		/* Draw text indicating total active jobs */
 		painter->setBrush( Qt::NoBrush );
-		if ( Settings->General.Style == QString( "TransDark" ) or Settings->General.Style == QString( "DullBlack" ) )
-			painter->setPen( Qt::white );
+		painter->setPen( Qt::gray );
+		painter->drawRoundedRect( 4, 4, 24, 24, 5, 5 );
 
-		else
-			painter->setPen( Qt::black );
-
-		painter->drawEllipse( QPoint( 16, 16 ), 10, 10 );
-		painter->drawEllipse( QPointF( 16, 16 ), 9.5, 9.5 );
+		painter->setPen( Qt::black );
 		painter->drawText( 0, 0, 32, 32, Qt::AlignCenter, QString( "%1" ).arg( jobs ) );
 	}
 
 	else {
 		/* Draw the pixmap */
 		painter->setBrush( Qt::NoBrush );
-		if ( Settings->General.Style == QString( "TransDark" ) or Settings->General.Style == QString( "DullBlack" ) )
-			painter->setPen( Qt::white );
+		painter->setPen( Qt::gray );
+		painter->drawRoundedRect( 4, 4, 24, 24, 5, 5 );
 
-		else
-			painter->setPen( Qt::black );
-
-		painter->drawEllipse( QPointF( 16.0, 16.0 ), 10.0, 10.0 );
-
+		painter->setPen( Qt::black );
 		painter->setFont( QFont( font().family(), 10, QFont::Bold ) );
 		painter->drawText( 0, 0, 32, 32, Qt::AlignCenter, QString( "i" ) );
 	}
@@ -503,24 +510,15 @@ void NBIOManagerMini::handleJobComplete() {
 	NBIOMode::Mode mode = io->ioMode();
 
 	if ( errors.count() ) {
-		QString title = QString( "Error %1 files" ).arg( ( mode == NBIOMode::Copy ) ? "copying" : "moving" );
+		QString title = QString( "NewBreeze - Error %1 files" ).arg( ( mode == NBIOMode::Copy ) ? "copying" : "moving" );
 		QString text = QString(
 			"<p>Some errors were encountered while %1 the files. Please check the copied data.</p>"		\
 			"<p>These errors were mostly caused due to insufficient permissions or invalid characters "	\
 			"in files names. You can rectify these problems and try again.</p>"
 		).arg( ( mode == NBIOMode::Copy ) ? "copying" : "moving" );
 
-		QListWidget *errorList = new QListWidget();
-		errorList->setFocusPolicy( Qt::NoFocus );
-		errorList->setIconSize( QSize( 32, 32 ) );
-
-		foreach( QString errorNode, errors ) {
-			QString iconName = NBIconProvider::icon( errorNode );
-			QListWidgetItem *item = new QListWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), errorNode );
-			errorList->addItem( item );
-		}
-
-		NBMessageDialog::error( title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok, errorList );
+		// NBErrorsDialog *errDlg = new NBErrorsDialog( title, text, errors, QStringList(), this );
+		// errDlg->exec();
 	}
 
 	jobList.removeOne( io );

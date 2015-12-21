@@ -14,7 +14,7 @@
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
 
-class NBCustomActionsMenu : public NBMenu {
+class NBCustomActionsMenu : public QMenu {
 	Q_OBJECT
 
 	public:
@@ -37,7 +37,7 @@ class NBCustomActionsMenu : public NBMenu {
 		void addToArchive( QStringList );
 };
 
-class NBOpenWithMenu : public NBMenu {
+class NBOpenWithMenu : public QMenu {
 	Q_OBJECT
 
 	public:
@@ -49,7 +49,7 @@ class NBOpenWithMenu : public NBMenu {
 		QString workingDir;
 };
 
-class NBAddToCatalogMenu : public NBMenu {
+class NBAddToCatalogMenu : public QMenu {
 	Q_OBJECT
 
 	public:

@@ -26,65 +26,25 @@ DesktopSession::Session DesktopSession::activeSession() {
 	QString DS2 = qgetenv( "KDE_FULL_SESSION" );
 	QString DS3 = qgetenv( "XDG_CURRENT_DESKTOP" );
 
-	// If $DESKTOP_SESSION is not empty
-	if ( !DS1.isEmpty() ) {
-		// A kde session, e.g. kde-plasma, openbox-kde
-		if ( DS1.toLower().contains( QString( "kde" ) ) )
-			return DesktopSession::KDE;
-
-		// XFCE Session, e.g. xfce, xfce4
-		else if ( DS1.toLower().contains( QString( "xfce" ) ) )
-			return DesktopSession::XFCE;
-
-		// GNOME Session, e.g. gnome-shell, gnome-fallback
-		else if ( DS1.toLower().contains( QString( "gnome" ) ) )
-			return DesktopSession::GNOME;
-
-		// RazorQt Session, e.g. razor, razor-openbox
-		else if ( DS1.toLower().contains( QString( "razor" ) ) )
-			return DesktopSession::RAZOR;
-
-		// LXDE Session: LXDE
-		else if ( DS1.toLower().contains( QString( "lxde" ) ) )
-			return DesktopSession::LXDE;
-
-		// I have no information about this desktop type
-		else
-			return DesktopSession::UNKNOWN;
-	}
-
-	// $DESKTOP_SESSION is not set, check if we have kde
-	else if ( DS2 == QString( "true" ) )
+	// A kde session, e.g. kde-plasma, openbox-kde
+	if ( DS1.toLower().contains( QString( "kde" ) ) or DS3.toLower().contains( QString( "kde" ) ) or DS2 == QString( "true" ) )
 		return DesktopSession::KDE;
 
-	// $DESKTOP_SESSION is not set, $KDE_FULL_SESSION not set
-	// Hopefully someone has set XDG_CURRENT_DESKTOP
-	// In LXDE it isset as LDXE
-	else if ( !DS3.isEmpty() ) {
-		// A kde session, e.g. kde-plasma, openbox-kde
-		if ( DS3.toLower().contains( QString( "kde" ) ) )
-			return DesktopSession::KDE;
+	// XFCE Session, e.g. xfce, xfce4
+	else if ( DS1.toLower().contains( QString( "xfce" ) ) or DS3.toLower().contains( QString( "xfce" ) ) )
+		return DesktopSession::XFCE;
 
-		// XFCE Session, e.g. xfce, xfce4
-		else if ( DS3.toLower().contains( QString( "xfce" ) ) )
-			return DesktopSession::XFCE;
+	// GNOME Session, e.g. gnome-shell, gnome-fallback
+	else if ( DS1.toLower().contains( QString( "gnome" ) ) or DS3.toLower().contains( QString( "gnome" ) ) )
+		return DesktopSession::GNOME;
 
-		// GNOME Session, e.g. gnome-shell, gnome-fallback
-		else if ( DS3.toLower().contains( QString( "gnome" ) ) )
-			return DesktopSession::GNOME;
+	// RazorQt Session, e.g. razor, razor-openbox
+	else if ( DS1.toLower().contains( QString( "razor" ) ) or  DS3.toLower().contains( QString( "razor" ) ) )
+		return DesktopSession::RAZOR;
 
-		// RazorQt Session, e.g. razor, razor-openbox
-		else if ( DS3.toLower().contains( QString( "razor" ) ) )
-			return DesktopSession::RAZOR;
-
-		// LXDE SEssion: LXDE
-		else if ( DS3.toLower().contains( QString( "lxde" ) ) )
-			return DesktopSession::LXDE;
-
-		// I have no information about this desktop type
-		else
-			return DesktopSession::UNKNOWN;
-	}
+	// LXDE Session: LXDE
+	else if ( DS1.toLower().contains( QString( "lxde" ) ) or DS3.toLower().contains( QString( "lxde" ) ) )
+		return DesktopSession::LXDE;
 
 	// I have no information about this desktop type
 	else

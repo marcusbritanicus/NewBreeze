@@ -24,14 +24,13 @@ void NBUtilityBar::createGUI() {
 
 	tabs = new NBTabWidget();
 
-	closeBtn = new NBToolButton( QString( ":/icons/delete.png" ) );
+	closeBtn = new NBButton( QIcon( ":/icons/close.png" ), this );
 	closeBtn->setObjectName( "quitBtn" );
-	closeBtn->setIconSize( QSize( 28, 28 ) );
-	closeBtn->setFixedSize( QSize( 32, 32 ) );
 	closeBtn->setShortcut( tr( "Ctrl+Q" ) );
+	closeBtn->setIconSize( QSize( 24, 24 ) );
 	connect( closeBtn, SIGNAL( clicked() ), this, SIGNAL( closeWindow() ) );
 
-	procWidget = new NBIOManagerMini();
+	procWidget = new NBIOManagerMini( this );
 
 	QHBoxLayout *lyt = new QHBoxLayout();
 	lyt->setContentsMargins( 5, 0, 5, 0 );
@@ -118,6 +117,8 @@ int NBTabWidget::addTab( QString path ) {
 	tabsLyt->addWidget( tab );
 
 	__currentIndex = tabsList.count() - 1;
+
+	return __currentIndex;
 };
 
 void NBTabWidget::removeTab( int tab ) {
@@ -182,8 +183,6 @@ NBTab::NBTab( QString icon, QString path ) {
 
 	__text = fm.elidedText( baseName( path ), Qt::ElideRight, 120 );
 	__icon = QIcon::fromTheme( icon, QIcon( icon ) );
-
-	bool __textVisible = false;
 
 	setToolTip( path );
 	repaint();

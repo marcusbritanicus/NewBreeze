@@ -6,7 +6,7 @@
 
 #include <NBFlashLabel.hpp>
 
-NBFlashLabel::NBFlashLabel() : QLabel() {
+NBFlashLabel::NBFlashLabel( QWidget *parent ) : QWidget( parent ) {
 
 
 	mPixmap = QPixmap();
@@ -40,20 +40,6 @@ void NBFlashLabel::setPixmap( QPixmap newPixmap ) {
 
 	mPixmap = newPixmap;
 	mText = QString();
-
-	repaint();
-};
-
-/* Override the QLabel text property handlers */
-QString NBFlashLabel::text() {
-
-	return mText;
-};
-
-void NBFlashLabel::setText( QString newText ) {
-
-	mText = newText;
-	mPixmap = QPixmap();
 
 	repaint();
 };
@@ -216,7 +202,6 @@ void NBFlashLabel::flashLabel() {
 /* Slot to access the flashing with a given color */
 void NBFlashLabel::flashLabel( QColor newColor ) {
 
-	QColor oldColor = flashColor();
 	setFlashColor( newColor );
 
 	if ( timer.isActive() )
@@ -226,7 +211,7 @@ void NBFlashLabel::flashLabel( QColor newColor ) {
 	flash = true;
 };
 
-NBDeleteLabel::NBDeleteLabel() : QLabel() {
+NBTrashLabel::NBTrashLabel( QWidget *parent ) : QWidget( parent ) {
 
 	mPixmap = QPixmap();
 	color = QColor( 255, 0, 0, 150 );
@@ -247,7 +232,12 @@ NBDeleteLabel::NBDeleteLabel() : QLabel() {
 };
 
 /* Overriding of paint event for showing flashes */
-void NBDeleteLabel::paintEvent( QPaintEvent *pEvent ) {
+void NBTrashLabel::paintEvent( QPaintEvent *pEvent ) {
+
+	QPainter *painter = new QPainter( this );
+	painter->save();
+
+	painter->fillRect( QRect( 0, 0, width(), height() ), Qt::transparent );
 
 	QRadialGradient bgGradient( 24, 24, radius );
 	if ( flash ) {
@@ -270,16 +260,11 @@ void NBDeleteLabel::paintEvent( QPaintEvent *pEvent ) {
 			bgGradient.setColorAt( 0.85, color );
 			bgGradient.setColorAt( 1, QColor( Qt::transparent ) );
 		}
+
+		painter->setPen( Qt::transparent );
+		painter->setBrush( bgGradient );
+		painter->drawEllipse( QPoint( 24, 24 ), radius, radius );
 	}
-
-	QPainter *painter = new QPainter( this );
-	painter->save();
-
-	painter->eraseRect( QRect( 0, 0, width(), height() ) );
-
-	painter->setPen( Qt::transparent );
-	painter->setBrush( bgGradient );
-	painter->drawEllipse( QPoint( 24, 24 ), radius, radius );
 
 	painter->setBrush( Qt::transparent );
 	painter->drawPixmap( 8, 8, 32, 32, mPixmap );
@@ -291,19 +276,19 @@ void NBDeleteLabel::paintEvent( QPaintEvent *pEvent ) {
 };
 
 /* Overriding QLabel::mousePressEvent to emit clicked signal */
-void NBDeleteLabel::mousePressEvent( QMouseEvent *mEvent ) {
+void NBTrashLabel::mousePressEvent( QMouseEvent *mEvent ) {
 
 	emit clicked();
 	mEvent->accept();
 };
 
-void NBDeleteLabel::dragEnterEvent( QDragEnterEvent *deEvent ) {
+void NBTrashLabel::dragEnterEvent( QDragEnterEvent *deEvent ) {
 
 	deEvent->acceptProposedAction();
 };
 
 /* Drop event handler for the delete label */
-void NBDeleteLabel::dropEvent( QDropEvent *dpEvent ) {
+void NBTrashLabel::dropEvent( QDropEvent *dpEvent ) {
 
 	const QMimeData *mData = dpEvent->mimeData();
 	if ( mData->hasUrls() ) {
@@ -358,7 +343,7 @@ void NBDeleteLabel::dropEvent( QDropEvent *dpEvent ) {
 };
 
 /* Slot to handle the deletion failures */
-void NBDeleteLabel::handleDeleteFailure( QStringList files, QStringList dirs ) {
+void NBTrashLabel::handleDeleteFailure( QStringList files, QStringList dirs ) {
 
 	if ( ( not files.count() ) and ( not dirs.count() ) )
 		return;
@@ -413,7 +398,7 @@ void NBDeleteLabel::handleDeleteFailure( QStringList files, QStringList dirs ) {
 		table->setItem( table->rowCount() - 1, 1, itm2 );
 	}
 
-	NBMessageDialog::error(
+	NBMessageDialog::error( this,
 		"NewBreeze - Error while deleting",
 		"Some errors were encountered while deleting the files and folders you requested. "			\
 		"As a result, some of the files and folders may not have been deleted. For the "			\
@@ -423,7 +408,7 @@ void NBDeleteLabel::handleDeleteFailure( QStringList files, QStringList dirs ) {
 };
 
 /* Slot to access the flashing */
-void NBDeleteLabel::flashLabel() {
+void NBTrashLabel::flashLabel() {
 
 	if ( timer.isActive() )
 		timer.stop();

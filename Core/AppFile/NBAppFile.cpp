@@ -234,9 +234,9 @@ NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
 	data << first.grade();
 
 	// LibreOffice Fix
-	if ( desktopName.toLower().contains( "libre" ) ) {
-		data[ 0 ] = desktopName.split( "-", QString::SkipEmptyParts ).at( 0 ) + "-startcenter.desktop";
-		data[ 1 ] = data[ 1 ].toString().left( 15 );
+	if ( desktopName.toLower().contains( "libreoffice" ) ) {
+		data[ 0 ] = "libreoffice-startcenter.desktop";
+		data[ 1 ] = "LibreOffice";
 		data[ 3 ] = first.execArgs().at( 0 ) + " %U";
 		data[ 4 ] = first.execArgs().at( 0 ) + "-startcenter";
 	}

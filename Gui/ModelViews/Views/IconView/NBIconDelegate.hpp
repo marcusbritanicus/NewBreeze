@@ -14,14 +14,11 @@ class NBIconDelegate : public QItemDelegate {
     Q_OBJECT
 
 	public:
-		void paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
-		// QSize sizeHint( const QStyleOptionViewItem &, const QModelIndex & ) const;
-
-	private:
-		void paintTiles( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
 		void paintIcons( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
+		void paintTiles( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
 		void paintDetails( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
 
+	private:
 		void paintIconTextDetails( QPainter *painter, QRect &textRect, const QModelIndex &index ) const;
 		void paintTileTextDetails( QPainter *painter, QRect &textRect, const QModelIndex &index ) const;
 		void paintExtraDetails( QPainter *painter, QList<QRect> &textRectList, const QModelIndex &index ) const;

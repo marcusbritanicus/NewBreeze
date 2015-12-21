@@ -6,7 +6,7 @@
 
 #include <NBTrashManager.hpp>
 
-NBTrashManager::NBTrashManager() : NBDialog( "nxc" ) {
+NBTrashManager::NBTrashManager( QWidget *parent ) : NBDialog( "nxc", parent ) {
 
 	ClipBoard = qApp->clipboard();
 
@@ -23,23 +23,35 @@ void NBTrashManager::setupGui() {
 	TrashView = new NBTrashView( tModel );
 
 	// Buttons
-	NBButtons *trashButtons = new NBButtons( QStringList() << "&Restore" << "Restore &All" << "&Delete" );
-	NBButtons *emptyButtons = new NBButtons( QStringList() << "&Empty Trash" );
+	restoreButtons = new NBButtons( QStringList() << "&Restore" << "Restore &All", this );
+	connect( restoreButtons->segment( 0 ), SIGNAL( clicked() ), this, SLOT( restoreSelected() ) );
+	connect( restoreButtons->segment( 1 ), SIGNAL( clicked() ), this, SLOT( restoreAll() ) );
 
-	connect( trashButtons->segment( 0 ), SIGNAL( clicked() ), this, SLOT( restoreSelected() ) );
-	connect( trashButtons->segment( 1 ), SIGNAL( clicked() ), this, SLOT( restoreAll() ) );
-	connect( trashButtons->segment( 2 ), SIGNAL( clicked() ), this, SLOT( deleteSelected() ) );
-	connect( emptyButtons->segment( 0 ), SIGNAL( clicked() ), this, SLOT( emptyTrash() ) );
+	restoreButtons->segment( 0 )->setObjectName( "okBtn" );
+	restoreButtons->segment( 1 )->setObjectName( "okBtn" );
+
+	QList<QIcon> icons = QList<QIcon>() << QIcon::fromTheme( "edit-delete" ) << QIcon::fromTheme( "trash-empty" );
+
+	deleteButtons = new NBButtons( QStringList() << "&Delete" << "&Empty Trash", icons, this );
+	connect( deleteButtons->segment( 0 ), SIGNAL( clicked() ), this, SLOT( deleteSelected() ) );
+	connect( deleteButtons->segment( 1 ), SIGNAL( clicked() ), this, SLOT( emptyTrash() ) );
+
+	deleteButtons->segment( 0 )->setObjectName( "cancelBtn" );
+	deleteButtons->segment( 1 )->setObjectName( "abortBtn" );
 
 	// Layouts
 	QHBoxLayout *btnLyt = new QHBoxLayout();
 	btnLyt->setContentsMargins( QMargins() );
-	btnLyt->addWidget( trashButtons );
+	btnLyt->setSpacing( 0 );
+
+	btnLyt->addWidget( restoreButtons );
 	btnLyt->addStretch();
-	btnLyt->addWidget( emptyButtons );
+	btnLyt->addWidget( deleteButtons );
 
 	QVBoxLayout *widgetLyt = new QVBoxLayout();
 	widgetLyt->setContentsMargins( QMargins() );
+	widgetLyt->setSpacing( 0 );
+
 	widgetLyt->addLayout( btnLyt );
 	widgetLyt->addWidget( TrashView );
 
@@ -55,6 +67,8 @@ void NBTrashManager::setupGui() {
 
 	// Do not accept focus
 	setFocusPolicy( Qt::NoFocus );
+
+	updateButtons();
 };
 
 void NBTrashManager::setDialogProperties() {
@@ -92,9 +106,21 @@ void NBTrashManager::createAndSetupActions() {
 	addAction( emptyAct );
 };
 
-bool NBTrashManager::hasSelection() {
+void NBTrashManager::updateButtons() {
 
-	return TrashView->selectionModel()->hasSelection();
+	if ( tModel->rowCount() ) {
+		restoreButtons->setSegmentEnabled( 0 );
+		restoreButtons->setSegmentEnabled( 1 );
+		deleteButtons->setSegmentEnabled( 0 );
+		deleteButtons->setSegmentEnabled( 1 );
+	}
+
+	else {
+		restoreButtons->setSegmentDisabled( 0 );
+		restoreButtons->setSegmentDisabled( 1 );
+		deleteButtons->setSegmentDisabled( 0 );
+		deleteButtons->setSegmentDisabled( 1 );
+	}
 };
 
 QModelIndexList NBTrashManager::getSelection() {
@@ -106,6 +132,11 @@ QModelIndexList NBTrashManager::getSelection() {
 			selectedList.removeAt( selectedList.indexOf( idx ) );
 
 	return selectedList;
+};
+
+bool NBTrashManager::hasSelection() {
+
+	return TrashView->selectionModel()->hasSelection();
 };
 
 void NBTrashManager::doReload() {
@@ -156,7 +187,7 @@ void NBTrashManager::handleFailedRestore( QModelIndexList failedIndexes ) {
 		table->setItem( table->rowCount() - 1, 1, itm2 );
 	}
 
-	NBMessageDialog::error(
+	NBMessageDialog::error( this,
 		"NewBreeze - Error while restoring",
 		"Some errors were encountered while restoring the files and folders from the trash. "			\
 		"As a result, some of the files and folders have not have been restored. For the "				\
@@ -169,6 +200,8 @@ void NBTrashManager::restoreSelected() {
 
 	if ( hasSelection() )
 		tModel->restore( getSelection() );
+
+	updateButtons();
 };
 
 void NBTrashManager::restoreAll() {
@@ -178,19 +211,46 @@ void NBTrashManager::restoreAll() {
 		selection << tModel->index( row, 0 , TrashView->rootIndex() );
 
 	tModel->restore( selection );
+
+	updateButtons();
 };
 
 void NBTrashManager::deleteSelected() {
 
-	if ( hasSelection() )
-		tModel->removeFromDisk( getSelection() );
+	if ( hasSelection() ) {
+		int reply = NBMessageDialog::question( this,
+			"Empty Trash?",
+			"<p>You are about to remove all the selected files and folders in trash, from the disk. "
+			"This operation cannot be undone, and the deleted data cannot be recoverd.</p>"
+			"<p>Do you want to proceed?</p>",
+			QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Yes << NBMessageDialog::No
+		);
+
+		if ( reply == NBMessageDialog::Yes )
+			tModel->removeFromDisk( getSelection() );
+	}
+
+	updateButtons();
 };
 
 void NBTrashManager::emptyTrash() {
 
-	QModelIndexList selection;
-	for( int row = 0; row < tModel->rowCount(); row++ )
-		selection << tModel->index( row, 0 , TrashView->rootIndex() );
+	int reply = NBMessageDialog::question( this,
+		"Empty Trash?",
+		"<p>You are about to remove all the files and folders in trash, from the disk. "
+		"This operation cannot be undone, and the deleted data cannot be recoverd.</p>"
+		"<p>Do you want to proceed?</p>",
+		QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Yes << NBMessageDialog::No,
+		new QPushButton( "ABCD" )
+	);
 
-	tModel->removeFromDisk( selection );
+	if ( reply == NBMessageDialog::Yes ) {
+		QModelIndexList selection;
+		for( int row = 0; row < tModel->rowCount(); row++ )
+			selection << tModel->index( row, 0 , TrashView->rootIndex() );
+
+		tModel->removeFromDisk( selection );
+	}
+
+	updateButtons();
 };

@@ -15,7 +15,6 @@ class NBAppsDelegate : public QItemDelegate {
 
 	public:
 		void paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
-		QSize sizeHint( const QStyleOptionViewItem &, const QModelIndex & ) const;
 };
 
 #endif

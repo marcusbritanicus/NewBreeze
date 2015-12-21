@@ -54,12 +54,7 @@ void NBFolderFlash::createGUI() {
 void NBFolderFlash::setWindowProperties() {
 
 	setFixedSize( 720, 540 );
-
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
 	setWindowFlags( Qt::FramelessWindowHint );
-
-	setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
 
 	QDesktopWidget dw;
 	int hpos = (int)( ( dw.width() - 720 ) / 2 );
@@ -88,6 +83,18 @@ void NBFolderFlash::changeEvent( QEvent *event ) {
 		QWidget::changeEvent( event );
 		event->accept();
 	}
+};
+
+void NBFolderFlash::paintEvent( QPaintEvent *pEvent ) {
+
+	QWidget::paintEvent( pEvent );
+	QPainter *painter = new QPainter( this );
+
+	painter->setPen( QPen( palette().color( QPalette::Window ).darker(), 2.0 ) );
+	painter->drawRect( rect().adjusted( +1, +1, -2, -2 ) );
+
+	painter->end();
+	pEvent->accept();
 };
 
 void NBFolderFlash::loadFolder() {

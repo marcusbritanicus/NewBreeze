@@ -68,11 +68,6 @@ class NBCatalogModel : public QAbstractItemModel {
 		QHash<QString, QList<int> > catalogRowMap;
 		QHash<QString, bool> catalogVisibilityMap;
 
-		struct loadStatus {
-			bool loading = false;
-			bool stopLoading = false;
-		} curentLoadStatus;
-
 	private slots:
 		void loadIcons();
 

@@ -1,12 +1,10 @@
 /*
 	*
-	* NBProgressBar.hpp - ProgressBar Class Header
+	* NBProgressBar.hpp - NBProgressBar.cpp header
 	*
 */
 
 #pragma once
-#ifndef NBPROGRESSBAR_HPP
-#define NBPROGRESSBAR_HPP
 
 #include <Global.hpp>
 
@@ -14,30 +12,22 @@ class NBProgressBar: public QWidget {
 	Q_OBJECT
 
 	public:
-		NBProgressBar();
+		NBProgressBar( QWidget* );
 
-		void setProgressFraction( qreal );
 		void setValue( qreal );
-
-		qreal minimum();
-		qreal maximum();
-
-		void setMinimum( qreal );
-		void setMaximum( qreal );
-		void setRange( qreal, qreal );
+		void setProgressText( QString );
 
 	private:
 		qreal mMin, mMax;
 		qreal mFraction;
 
+		QString progressText;
+
 		QColor uncoveredBorder;
 		QColor coveredBorder;
 
 		QLinearGradient uncoveredGradient;
-		QLinearGradient coveredGradient;
 
 	protected:
 		void paintEvent( QPaintEvent* );
 };
-
-#endif

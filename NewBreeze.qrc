@@ -18,6 +18,7 @@
 		<file>icons/catalogs-alt.png</file>
 		<file>icons/catalogs.png</file>
 		<file>icons/checkbox_checked.png</file>
+		<file>icons/checkbox_halfchecked.png</file>
 		<file>icons/checkbox_unchecked.png</file>
 		<file>icons/close.png</file>
 		<file>icons/comp.png</file>
@@ -28,7 +29,6 @@
 		<file>icons/desktop.png</file>
 		<file>icons/documents.png</file>
 		<file>icons/down.png</file>
-		<file>icons/DullBlack.png</file>
 		<file>icons/edit-clear.png</file>
 		<file>icons/edit.png</file>
 		<file>icons/encfs.png</file>
@@ -49,7 +49,6 @@
 		<file>icons/inode-fifo.png</file>
 		<file>icons/inode-socket.png</file>
 		<file>icons/keybindings.png</file>
-		<file>icons/LightGray.png</file>
 		<file>icons/list-add.png</file>
 		<file>icons/list-remove.png</file>
 		<file>icons/maximize.png</file>
@@ -69,6 +68,7 @@
 		<file>icons/paste.png</file>
 		<file>icons/peek.png</file>
 		<file>icons/perms.png</file>
+		<file>icons/plugins.png</file>
 		<file>icons/prev.png</file>
 		<file>icons/props.png</file>
 		<file>icons/QtLogo.png</file>
@@ -81,12 +81,11 @@
 		<file>icons/search.png</file>
 		<file>icons/select1.png</file>
 		<file>icons/selectall.png</file>
+		<file>icons/shortcuts.png</file>
 		<file>icons/show-folders.png</file>
 		<file>icons/size.png</file>
 		<file>icons/stop.png</file>
 		<file>icons/text.png</file>
-		<file>icons/TransDark.png</file>
-		<file>icons/TransLight.png</file>
 		<file>icons/trash.png</file>
 		<file>icons/unknown.png</file>
 		<file>icons/up.png</file>
@@ -102,18 +101,13 @@
 
 		<file>Data/NBFSExtData.conf</file>
 
-		<file>StyleSheets/Template/NBAddressBar.qss</file>
-		<file>StyleSheets/Template/NBButtons.qss</file>
 		<file>StyleSheets/Template/NBDialog.qss</file>
 		<file>StyleSheets/Template/NBInfoBar.qss</file>
-		<file>StyleSheets/Template/NBMenu.qss</file>
 		<file>StyleSheets/Template/NBPreview.qss</file>
 		<file>StyleSheets/Template/NBShowHideButton.qss</file>
 		<file>StyleSheets/Template/NBSidePanel.qss</file>
 		<file>StyleSheets/Template/NBTitleBar.qss</file>
-		<file>StyleSheets/Template/NBToolButton.qss</file>
 		<file>StyleSheets/Template/NewBreeze.qss</file>
-		<file>StyleSheets/Template/CustomWebkit.qss</file>
 
 	</qresource>
 </RCC>

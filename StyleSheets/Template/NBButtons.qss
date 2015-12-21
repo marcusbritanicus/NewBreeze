@@ -1,17 +1,1 @@
-QWidget#btnsBase {
-	border: 1px solid gray;
-	border-radius: 4px;
-}
 
-QPushButton {
-	border: none;
-}
-
-QPushButton:focus {
-	border: none;
-	outline: none;
-}
-
-QPushButton:disabled {
-	color: gray;;
-}

@@ -6,7 +6,7 @@
 
 #include <NBCustomActions.hpp>
 
-NBCustomActions::NBCustomActions() : NBDialog() {
+NBCustomActions::NBCustomActions( QWidget *parent ) : NBDialog( parent ) {
 
 	createGUI();
 	setWidgetProperties();
@@ -14,20 +14,21 @@ NBCustomActions::NBCustomActions() : NBDialog() {
 
 void NBCustomActions::createGUI() {
 
-	QVBoxLayout *layout = new QVBoxLayout();
-	QHBoxLayout *btnsLyt = new QHBoxLayout();
+	QHBoxLayout *layout = new QHBoxLayout();
+	QVBoxLayout *btnsLyt = new QVBoxLayout();
+	btnsLyt->setContentsMargins( QMargins() );
 
 	actionsTable = new QTableWidget();
 	setupTable();
 
-	addBtn = new NBToolButton( ":/icons/list-add.png" );
+	addBtn = new NBButton( QIcon( ":/icons/list-add.png" ), "Add Action", this );
 	addBtn->setShortcut( Settings->Shortcuts.AddCustomAction.at( 0 ) );
 	connect( addBtn, SIGNAL( clicked() ), this, SLOT( addCustomAction() ) );
 
-	delBtn = new NBToolButton( ":/icons/list-remove.png" );
+	delBtn = new NBButton( QIcon( ":/icons/list-remove.png" ), "Remove Action", this );
 	connect( delBtn, SIGNAL( clicked() ), this, SLOT( removeCustomActions() ) );
 
-	quitBtn = new QPushButton( QIcon::fromTheme( "dialog-close" ), "&Close" );
+	quitBtn = new NBButton( QIcon::fromTheme( "dialog-close" ), "&Close", this );
 	quitBtn->setObjectName( "cancelBtn" );
 	connect( quitBtn, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
@@ -36,7 +37,6 @@ void NBCustomActions::createGUI() {
 	btnsLyt->addStretch( 0 );
 	btnsLyt->addWidget( quitBtn );
 
-	layout->addWidget( Separator::horizontal() );
 	layout->addWidget( actionsTable );
 	layout->addWidget( Separator::horizontal() );
 	layout->addLayout( btnsLyt );
@@ -108,14 +108,11 @@ void NBCustomActions::setWidgetProperties() {
 	setFixedSize( 720, 540 );
 	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
 	setWindowModality( Qt::ApplicationModal );
-
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
 };
 
 void NBCustomActions::addCustomAction() {
 
-	NBNewAction *newAction = new NBNewAction();
+	NBNewAction *newAction = new NBNewAction( this );
 	newAction->exec();
 
 	QString group = QString( newAction->actionName() ).replace( " ", "" );
@@ -175,7 +172,7 @@ void NBCustomActions::editCustomAction( int row, int col ) {
 	QString exec = actionsTable->item( row, 2 )->text();
 	QString group = actionsTable->item( row, 3 )->text();
 
-	NBNewAction *newAction = new NBNewAction();
+	NBNewAction *newAction = new NBNewAction( this );
 	newAction->setActionName( name );
 	newAction->setActionFilters( glob );
 	newAction->setActionCommand( exec );
@@ -224,7 +221,7 @@ QString NBCustomActions::currentAction() {
 	return actionsTable->item( actionsTable->currentRow(), 1 )->text();
 };
 
-NBNewAction::NBNewAction() {
+NBNewAction::NBNewAction( QWidget *parent ) : NBDialog( parent ) {
 
 	QHBoxLayout *lblBtnLyt = new QHBoxLayout();
 	QVBoxLayout *layout = new QVBoxLayout();
@@ -251,18 +248,18 @@ NBNewAction::NBNewAction() {
 	QLabel *actionGlobLbl = new QLabel ( "Action &Filters" );
 	QLabel *actionCmdLbl = new QLabel( "Action &Command" );
 
-	actionNameLE = new QLineEdit();
-	actionGlobLE = new QLineEdit();
-	actionCmdLE = new QLineEdit();
+	actionNameLE = new NBLineEdit( this );
+	actionGlobLE = new NBLineEdit( this );
+	actionCmdLE = new NBLineEdit( this );
 
 	actionNameLbl->setBuddy( actionNameLE );
 	actionGlobLbl->setBuddy( actionGlobLE );
 	actionCmdLbl->setBuddy( actionCmdLE );
 
-	addBtn = new NBToolButton( QString( ":/icons/list-add.png" ) );
+	addBtn = new NBButton( QIcon( ":/icons/list-add.png" ), this );
 	addBtn->setObjectName( "okBtn" );
 
-	cancelBtn = new NBToolButton( QString( ":/icons/delete.png" ) );
+	cancelBtn = new NBButton( QIcon( ":/icons/delete.png" ), this );
 	cancelBtn->setObjectName( "cancelBtn" );
 
 	connect( addBtn, SIGNAL( clicked() ), this, SLOT( accept() ) );
@@ -285,9 +282,9 @@ NBNewAction::NBNewAction() {
 	widgetLyt->setContentsMargins( QMargins() );
 	setLayout( widgetLyt );
 
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
 	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
+
+	setDialogTitle( "New Custom Action" );
 
 	setFixedWidth( 360 );
 };

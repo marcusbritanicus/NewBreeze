@@ -229,6 +229,7 @@ void NBCatalogModel::setupModelData() {
 			rootItem->addChild( new NBCatalogItem( data, ctlg, rootItem ) );
 		}
 	}
+
 	/* Custom Catalogs */
 	catalogsSettings.beginGroup( "Custom" );
 	foreach( QString ctlg, catalogsSettings.childKeys() ) {
@@ -260,12 +261,14 @@ void NBCatalogModel::setupModelData() {
 	catalogRowMap.clear();
 	catalogVisibilityMap.clear();
 
-	// Create a map of catalogIdndex versus rows
+	// Create a map of catalogIndex versus rows
 	foreach( NBCatalogItem *item, rootItem->children() )
 		catalogRowMap[ item->catalogName() ] << item->row();
 
-	foreach( QString mCatalogName, rootItem->catalogList )
+	foreach( QString mCatalogName, rootItem->catalogList ) {
+		// qDebug() << mCatalogName << catalogRowMap[ mCatalogName ].count();
 		catalogVisibilityMap[ mCatalogName ] = true;
+	}
 };
 
 void NBCatalogModel::loadIcons() {

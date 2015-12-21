@@ -13,6 +13,7 @@
 #include <NBTrashDelegate.hpp>
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
+#include <NBGuiFunctions.hpp>
 
 class NBTrashView : public QAbstractItemView {
 	Q_OBJECT

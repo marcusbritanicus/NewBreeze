@@ -22,13 +22,21 @@ class NBSettings {
 		// General Settings
 		class GeneralSettings {
 			public:
-				QString Style;
-				QString FolderView;
-				QString IconTheme;
-				bool ImagePreviews;
-				bool NativeTitleBar;
-				bool TrayIcon;
-				bool OpenWithCatalog;
+				QString Style;									// Gui theme
+				QString ViewMode;								// Icons, Tiles or Details
+				QString IconTheme;								// Icon Theme
+				bool ImagePreviews;								// Show image previews?
+				bool NativeTitleBar;							// Use native title bar?
+				bool TrayIcon;									// Minimize to tray?
+				bool OpenWithCatalog;							// Show catalog on NB Open?
+				bool SidePanel;									// Show sidepanel?
+				bool ShowHidden;								// Show Hidden files and folders?
+				QSize IconSize;									// Default Icon Size
+				int SortColumn;									// Default Sort Column
+				bool SortCase;									// Is sorting case sensitive
+				bool Grouping;									// Enable grouping?
+				bool PerFolderViews;							// Enable per folder views?
+				bool FilterFolders;								// Filter folders while searching?
 		} General;
 
 		// Special Settings
@@ -43,15 +51,6 @@ class NBSettings {
 				QRect Geometry;
 				QString LastDir;
 				bool Maximized;
-				QSize Splitter;
-				bool SidePanel;
-				bool ShowHidden;
-				QSize IconSize;
-				int SortColumn;
-				bool SortCase;
-				bool SortCategory;
-				bool ExpandDevices;
-				bool ExpandBookmarks;
 		} Session;
 
 		// Shortcut Settings
@@ -92,24 +91,6 @@ class NBSettings {
 				QList<QKeySequence> FocusSearchBar;
 				QList<QKeySequence> ClearSearchBar;
 		} Shortcuts;
-
-		// Color Settings
-		class ColorSettings {
-			public:
-				QColor ExecPenColor;
-				QColor HiddenPenColor;
-				QColor HiddenPenColorAlt;
-				QColor NoReadPenColor;
-				QColor TextPenColor;
-				QColor TextPenColorAlt;
-				QColor SymLinkPenColor;
-				QColor SymLinkPenColorAlt;
-				QColor FocusPenColor;
-				QColor FocusPenColorAlt;
-				QColor SelectionBrushColor;
-				QColor MouseBrushColor;
-				QColor SelectionMouseBrushColor;
-		} Colors;
 
 		static NBSettings* defaultInstance();
 		static NBSettings* instance();

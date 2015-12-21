@@ -12,9 +12,12 @@
 #include <NBIconView.hpp>
 #include <NBContextMenu.hpp>
 #include <NBFileSystemModel.hpp>
-#include <NBFVDialogs.hpp>
+#include <NBRenameDialog.hpp>
+#include <NBRunCmdDialog.hpp>
+#include <NBNewNodeDialog.hpp>
 #include <NBFileDialog.hpp>
 #include <NBConfirmDeleteDialog.hpp>
+#include <NBErrorsDialog.hpp>
 #include <NBPropertiesDialog.hpp>
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
@@ -26,7 +29,7 @@
 #include <NBAppsView.hpp>
 #include <NBCatalogView.hpp>
 #include <NBStyleManager.hpp>
-#include <NBDefaultPlugins.hpp>
+#include <NBPreviewInterface.hpp>
 #include <NBCustomPeek.hpp>
 #include <NBFolderFlash.hpp>
 
@@ -34,7 +37,7 @@ class NBFolderView : public QStackedWidget {
 	Q_OBJECT
 
 	public :
-		NBFolderView();
+		NBFolderView( QWidget *parent = NULL);
 
 		void updateViewMode();
 
@@ -115,7 +118,6 @@ class NBFolderView : public QStackedWidget {
 		void extract( QString );
 		void compress( QStringList );
 
-		void updateModel( QString );
 		void updateProgress( QString, float, float );
 		void handleDeleteFailure( QStringList, QStringList );
 
@@ -137,6 +139,9 @@ class NBFolderView : public QStackedWidget {
 		void toggleGroups();
 
 		void updateAddressBar( QString );
+
+		void hideStatusBar();
+		void showStatusBar();
 };
 
 #endif

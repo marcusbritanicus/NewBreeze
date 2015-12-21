@@ -10,26 +10,22 @@
 
 #include <Global.hpp>
 
+#include <NBTools.hpp>
 #include <NBLibBZip2.hpp>
 #include <NBLibGZip.hpp>
 #include <NBLibLzma.hpp>
-#include <NBLibTar.hpp>
-#include <NBLibZip.hpp>
-#include <NBTools.hpp>
+#include <NBZipFile.hpp>
+#include <NBTarFile.hpp>
 
 class NBArchive {
 
 	public:
 		enum Type {
-			TAR,		// Tar Archive
-			ZIP,		// Zip Compressed Archive
-			BZ2,		// BZip2 Compressed Archive
-			GZ,			// GZip Compressed Archive
-			XZ,			// XZ Compressed Archive
-			TZIP,		// Zip Compressed Tar Archive: .tar.zip - Unusual
-			TBZ2,		// BZip2 Compressed Tar Archive: .tar.bz2, .tbz2
-			TGZ,		// GZip Compressed Tar Archive: .tar.gz, .tgz
-			TXZ			// XZ Compressed Tar Archive: .tar.xz, .txz =>THIS IS OUR DEFAULT TYPE
+			TAR,		// Tar Archive: .tar,.tar.xz, .tar.gz, .tar.bz2
+			ZIP,		// Zip Compressed Archive: .zip
+			BZ2,		// BZip2 Compressed Archive: .bz2
+			GZ,			// GZip Compressed Archive: .gz
+			XZ,			// XZ Compressed Archive: .xz
 		};
 
 		enum Mode {
@@ -44,36 +40,28 @@ class NBArchive {
 		void create();
 		void extract();
 
-		QStringList inputList;
-		QString dest;
-		QString src;
-
 	private:
 		void createTar();
 		void createZip();
 		void createBZ2();
 		void createGZ();
 		void createXZ();
-		void createTZip();
-		void createTBZ2();
-		void createTGZ();
-		void createTXZ();
 
 		void extractTar();
 		void extractZip();
 		void extractBZ2();
 		void extractGZ();
 		void extractXZ();
-		void extractTZip();
-		void extractTBZ2();
-		void extractTGZ();
-		void extractTXZ();
 
 		static QString archiveName;
 		static NBArchive::Mode archiveMode;
 		static NBArchive::Type archiveType;
 
 		QString tempArchiveName;
+
+		QStringList inputList;
+		QString dest;
+		QString src;
 };
 
 #endif

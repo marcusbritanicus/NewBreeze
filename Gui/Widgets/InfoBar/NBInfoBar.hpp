@@ -18,7 +18,7 @@ class NBInfoBar : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBInfoBar();
+		NBInfoBar( QWidget *parnet = NULL );
 
 		// FileSystem Mode
 		void updateInfoBarCF( QString );

@@ -11,6 +11,9 @@ NBTrashModel::NBTrashModel() : QAbstractItemModel() {
 	mCategorizationEnabled = true;
 	updatedNodes = 0;
 
+	currentLoadStatus.loading = false;
+	currentLoadStatus.stopLoading = false;
+
 	oldRoots.clear();
 	curIndex = 0;
 
@@ -433,7 +436,7 @@ void NBTrashModel::setupModelData() {
 
 	__childNames.clear();
 	rootNode->clearChildren();
-	curentLoadStatus.loading = true;
+	currentLoadStatus.loading = true;
 
 	emit trashLoading();
 
@@ -447,9 +450,9 @@ void NBTrashModel::setupModelData() {
 		trash.setNameFilters( QStringList() << "*.trashinfo" );
 		Q_FOREACH( QString entry, trash.entryList() ) {
 
-			if ( curentLoadStatus.stopLoading ) {
+			if ( currentLoadStatus.stopLoading ) {
 				endResetModel();
-				curentLoadStatus.stopLoading = false;
+				currentLoadStatus.stopLoading = false;
 				return;
 			}
 
@@ -480,9 +483,9 @@ void NBTrashModel::setupModelData() {
 			trash.setNameFilters( QStringList() << "*.trashinfo" );
 			Q_FOREACH( QString entry, trash.entryList() ) {
 
-				if ( curentLoadStatus.stopLoading ) {
+				if ( currentLoadStatus.stopLoading ) {
 					endResetModel();
-					curentLoadStatus.stopLoading = false;
+					currentLoadStatus.stopLoading = false;
 					return;
 				}
 
@@ -502,7 +505,7 @@ void NBTrashModel::setupModelData() {
 
 	sort();
 
-	curentLoadStatus.loading = false;
+	currentLoadStatus.loading = false;
 
 	emit trashLoaded();
 };

@@ -47,7 +47,7 @@ NBTrashView::NBTrashView( NBTrashModel *model ) : QAbstractItemView() {
 	setItemDelegate( new NBTrashDelegate() );
 
 	// Icon Size
-	setIconSize( Settings->Session.IconSize );
+	setIconSize( QSize( 48, 48 ) );
 
 	// Update View
 	updateViewMode();
@@ -412,6 +412,39 @@ void NBTrashView::paintEvent( QPaintEvent* event ) {
 			option.state |= QStyle::State_MouseOver;
 
 		option.decorationSize = myIconSize;
+
+		/* Palette */
+		QPalette pltt = qApp->palette();
+
+		/* Dark text colors will suit here */
+		if ( isBrightColor( pltt.color( QPalette::Base ), pltt.color( QPalette::Highlight ) ) ) {
+			if ( option.state & QStyle::State_Selected )
+				pltt.setColor( QPalette::Text, pltt.color( QPalette::HighlightedText ) );
+
+			else
+				pltt.setColor( QPalette::Text, palette().color( QPalette::Text ) );
+
+			/* Bright text will be used for drawing the 'current rect' */
+			pltt.setColor( QPalette::BrightText, pltt.color( QPalette::Highlight ).darker() );
+
+			/* ButtonText will be used to paint the extra details */
+			pltt.setColor( QPalette::BrightText, pltt.color( QPalette::Text ).lighter( 135 ) );
+		}
+
+		/* Light text colors to be used here */
+		else {
+			if ( option.state & QStyle::State_Selected )
+				pltt.setColor( QPalette::Text, pltt.color( QPalette::HighlightedText ) );
+
+			else
+				pltt.setColor( QPalette::Text, palette().color( QPalette::Text ) );
+
+			/* Bright text will be used for drawing the 'current rect' */
+			pltt.setColor( QPalette::BrightText, pltt.color( QPalette::Highlight ).lighter() );
+		}
+
+		option.palette = pltt;
+
 		itemDelegate()->paint( &painter, option, idx );
 	}
 
@@ -840,8 +873,6 @@ void NBTrashView::zoomIn() {
 
 	else
 		setIconSize( myIconSize + QSize( 4, 4 ) );
-
-	Settings->Session.IconSize = myIconSize;
 };
 
 void NBTrashView::zoomOut() {
@@ -851,6 +882,4 @@ void NBTrashView::zoomOut() {
 
 	else
 		setIconSize( myIconSize - QSize( 4, 4 ) );
-
-	Settings->Session.IconSize = myIconSize;
 };

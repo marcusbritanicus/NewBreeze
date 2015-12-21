@@ -13,7 +13,7 @@
 #include <NBMessageDialog.hpp>
 #include <NBConfirmDeleteDialog.hpp>
 
-class NBFlashLabel : public QLabel {
+class NBFlashLabel : public QWidget {
 	Q_OBJECT
 
 	/* Color properties */
@@ -28,15 +28,11 @@ class NBFlashLabel : public QLabel {
 	Q_PROPERTY( int flashFrames READ flashFrames WRITE setFlashFrames )
 
 	public:
-		NBFlashLabel();
+		NBFlashLabel( QWidget* );
 
 		/* Override the QLabel pixmap property handlers */
 		QPixmap pixmap();
 		void setPixmap( QPixmap );
-
-		/* Override the QLabel text property handlers */
-		QString text();
-		void setText( QString );
 
 		/* Color property handlers */
 		QColor flashColor();
@@ -96,11 +92,11 @@ class NBFlashLabel : public QLabel {
 		void exited();
 };
 
-class NBDeleteLabel : public QLabel {
+class NBTrashLabel : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBDeleteLabel();
+		NBTrashLabel( QWidget* );
 
 	private :
 		QPixmap mPixmap;

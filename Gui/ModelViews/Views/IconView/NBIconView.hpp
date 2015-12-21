@@ -13,17 +13,12 @@
 #include <NBIconDelegate.hpp>
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
+#include <NBGuiFunctions.hpp>
 
 class NBIconView : public QAbstractItemView {
 	Q_OBJECT
 
 	public:
-		enum ViewType {
-			TilesView             = 0x01,
-			IconsView             = 0x02,
-			DetailsView           = 0x03
-		};
-
 		NBIconView( NBFileSystemModel* );
 
 		// Set the item model
@@ -70,6 +65,12 @@ class NBIconView : public QAbstractItemView {
 		// Get the category at a given point
 		QString categoryAt( const QPoint &position ) const;
 
+		// Return the selected indexes
+		QModelIndexList selection();
+
+		// Is the index visible in the viewport?
+		bool isIndexVisible( QModelIndex ) const;
+
 	protected slots:
 		void dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
 		void rowsInserted( const QModelIndex &parent, int start, int end );
@@ -86,17 +87,20 @@ class NBIconView : public QAbstractItemView {
 		void setSelection( const QRect &rect, QFlags<QItemSelectionModel::SelectionFlag> flags );
 		QRegion visualRegionForSelection( const QItemSelection &selection ) const;
 
+		QModelIndexList selectedIndexes();
+
 		void paintEvent( QPaintEvent* );
 		void resizeEvent( QResizeEvent* );
 
 		void mousePressEvent( QMouseEvent * );
 		void mouseMoveEvent( QMouseEvent * );
-		void mouseReleaseEvent( QMouseEvent * );
 		void mouseDoubleClickEvent( QMouseEvent * );
 
 		void dragEnterEvent( QDragEnterEvent* );
 		void dragMoveEvent( QDragMoveEvent* );
 		void dropEvent( QDropEvent* );
+
+		void keyPressEvent( QKeyEvent* );
 
 	private:
 		// Grid size for the indexes: myGridSizeMin, myGridSize
@@ -104,6 +108,21 @@ class NBIconView : public QAbstractItemView {
 
 		QModelIndex moveCursorCategorized( QAbstractItemView::CursorAction cursorAction );
 		QModelIndex moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction );
+
+		void toggleCategorySelection( QString );
+		void setCategorySelected( QString, bool );
+
+		// Cursor Movement Helpers
+		QModelIndex nextIndex();
+		QModelIndex prevIndex();
+		QModelIndex aboveIndex();
+		QModelIndex belowIndex();
+
+		QModelIndex firstIndex();
+		QModelIndex lastIndex();
+
+		QModelIndex indexPageBelow();
+		QModelIndex indexPageAbove();
 
 		void calculateRectsIfNecessary() const;
 
@@ -126,7 +145,19 @@ class NBIconView : public QAbstractItemView {
 		void paintSelection( QPainter *painter, const QModelIndexList ) const;
 		QPixmap pixmapForCategory( QString ) const;
 
+		void showHideCategory( QString );
+		bool canShowIndex( QModelIndex );
+
+		// FileSystem Model
 		NBFileSystemModel *cModel;
+
+		// ViewMode
+		mutable QString currentViewMode;
+
+		// Selection
+		mutable QModelIndexList mSelectedIndexes;
+		mutable QStringList mSelectedCategories;
+		mutable QModelIndex mSelStartIdx;
 
 		// Icon rects
 		mutable int idealHeight;
@@ -161,6 +192,12 @@ class NBIconView : public QAbstractItemView {
 		mutable int itemsPerRow;
 		mutable int numberOfRows;
 		mutable int padding;
+
+		// Category List
+		mutable QStringList categoryList;
+
+		// Hidden Categories
+		mutable QStringList hiddenCategories;
 
 		QPoint dragStartPosition;
 		QRubberBand *rBand;

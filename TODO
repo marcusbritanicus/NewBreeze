@@ -1,14 +1,45 @@
 Widgets
-	☐ NBFolderView:
-		☐ NBPicsView: NBPicsView, NBPicsDelegate, NBFileSystemModel( QAbstractItemModel )                                           [ 1 of 3 ]
+	☑ NBIconView:                                                                                                                    [ 3 of 3 ]
+		☑ Per directory view options
+		☒ Single click Open (point to select)
+		☑ Selections
 
-	☐ MyComputer: NBDeviceView, NBDeviceDelegate, NBDeviceModel( QStringListModel )                                                 [ 0 of 3 ]
+	☐ NewBreeze start up: Windows 8 Style [Important Folders + Devices]
 
 Undo-Redo Sequences
 	☐ Undo/Redo Rename, IO, Trash etc
 
-NBFolderView
-	☐ Intelligent file handling, eg, option for executing a shell script in the inline terminal, or directly viewing it.
-	☐
+NBFolderView - ?
+	☐ True indexed folder view
+	☐ Vertical and horizontal model
 
-Inbuilt text viewer
+
+	+------------+_
+	|            |A|  +-----------------------------+
+	|            |-|  |                             |
+	|            |B|  |                             |
+	|            |-|  |                             |
+	|            |C|  |                             |
+	|            |-|  |                             |
+	|            |D|  |_____________________________|
+	|            |-|   | F | A | E | G | P | F | G |
+	|            |E|   +---------------------------+
+	+------------+-
+
+NBIconView
+	☐ Fix the horrible selection model - Mouse click is not removed by the cursor keys
+	☐ Fix @aboveIndex @belowIndex
+
+NewBreeze Theming and Styling
+	☑ Remove all the redundant stylesheets
+	☐ Enable user defined theming
+	☐ Create a subclass of QIconProvider for our own icons
+
+Archives
+	☐ Zip and tar preview
+	  Extract the zip/tar archive in /tmp, and show that folder
+	☐ Gui-blocking message: Reading archive - OR - show it in the NBProcessManager?
+	☐ Use a thread to do the work later
+	☐ Writing archives will be done in NBProcessManager, show the percentage of data compressed.
+	☐ Extraction of archives to be done in NBProcessManager, show the percentage of data processed
+	☐ Single member extraction is not enabled

@@ -5,12 +5,10 @@
 */
 
 #pragma once
-#ifndef NBFILEDIALOG_HPP
-#define NBFILEDIALOG_HPP
 
 #include <Global.hpp>
 #include <NBAddressBar.hpp>
-#include <NBIconView.hpp>
+#include <NBIconViewRestricted.hpp>
 #include <NBSidePanel.hpp>
 #include <NBDialog.hpp>
 #include <NBMessageDialog.hpp>
@@ -30,7 +28,7 @@ class NBFileDialog : public NBDialog {
 			ExistingDirectories
 		};
 
-		NBFileDialog( QString icon, QString title, QString location = QDir::homePath(), FileType type = NBFileDialog::ExistingFile );
+		NBFileDialog( QString icon, QString title, QString location = QDir::homePath(), FileType type = NBFileDialog::ExistingFile, QWidget *parent = 0 );
 		void setNameFilters( QStringList, QString );
 
 		QString selectedItem();
@@ -50,10 +48,10 @@ class NBFileDialog : public NBDialog {
 		NBFileSystemModel *fsModel;
 
 		NBAddressWidget *addressWidget;
-		NBIconView *mainView;
+		NBIconViewRestricted *mainView;
 		NBSidePanel *sidePanel;
 
-		QLineEdit *nameLE;
+		NBLineEdit *nameLE;
 		QComboBox *filtersCB;
 
 		QStringList filters;
@@ -71,5 +69,3 @@ class NBFileDialog : public NBDialog {
 		void resetFilters();
 		void updateToolBar();
 };
-
-#endif

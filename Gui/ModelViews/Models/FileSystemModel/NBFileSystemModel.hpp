@@ -50,7 +50,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 
 		// Children Info
 		int rowCount( const QModelIndex &parent = QModelIndex() ) const;
-		int rowCount( const QString mCategory ) const;
+		int rowCount( const QString category ) const;
 		int categoryCount() const;
 
 		int columnCount( const QModelIndex &parent = QModelIndex() ) const;
@@ -76,19 +76,12 @@ class NBFileSystemModel : public QAbstractItemModel {
 		int categoryIndex( const QModelIndex &index = QModelIndex() ) const;
 		QStringList categories() const;
 
-		// Show Hide Categories
-		void hideCategory( QString category );
-		void showCategory( QString category );
-		bool isCategoryVisible( QString mCategory ) const;
-
 		int indexListCountForCategory( QString ) const;
 		QModelIndexList indexListForCategory( QString ) const;
+		QModelIndexList categorySiblings( QModelIndex ) const;
 
 		bool showHidden() const;
 		void setShowHidden( bool );
-
-		bool readOnly() const;
-		void setReadOnly( bool );
 
 		// Drag and Drop
 		Qt::DropActions supportedDropActions() const;
@@ -103,19 +96,14 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void setNameFilters( QStringList );
 		void clearNameFilters();
 
+		bool filterFolders() const;
+		void setFilterFolders( bool );
+
 		void sort( int column, bool cs, bool categorized );
-		int sortColumn() const;
-		bool sortCaseSensitivity() const;
-		bool sortCategorized() const;
 		void reload();
 
 		// FS Modification
-		bool mkdir( QString );
-		bool remove( QString );
-		bool copy( QString, QString );
-		bool move( QString, QString );
 		bool rename( QString, QString );
-		bool chmod( QString, int );
 
 		// FS Navigation
 		QString nodeName( const QModelIndex ) const;
@@ -157,24 +145,23 @@ class NBFileSystemModel : public QAbstractItemModel {
 		QHash<QString, QList<int> > categoryRowMap;
 		QHash<QString, bool> categoryVisibilityMap;
 
-		bool mCategorizationEnabled = false;
+		bool mCategorizationEnabled;
 
 		struct __prevSort {
-			int column = Settings->Session.SortColumn;
-			bool cs = Settings->Session.SortCase;
-			bool categorized = Settings->Session.SortCategory;
+			int column;
+			bool cs;
+			bool categorized;
 		} prevSort;
 
 		struct loadStatus {
-			bool loading = false;
-			bool stopLoading = false;
-		} curentLoadStatus;
+			bool loading;
+			bool stopLoading;
+		} currentLoadStatus;
 
 		bool __showHidden;
-		bool __readOnly;
 
-		QList<Filters> __currentFilters;
 		QStringList __nameFilters;
+		bool __filterFolders;
 
 		// History
 		QStringList oldRoots;

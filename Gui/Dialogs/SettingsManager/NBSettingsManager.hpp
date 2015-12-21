@@ -5,13 +5,15 @@
 */
 
 #pragma once
-#ifndef NBSETTINGSMANAGER_HPP
-#define NBSETTINGSMANAGER_HPP
 
 #include <Global.hpp>
 #include <NBDialog.hpp>
 #include <NBGuiWidgets.hpp>
+#include <NBSGeneralWidget.hpp>
+#include <NBSIconsWidget.hpp>
 #include <NBSettingsWidgets.hpp>
+#include <NBSKeyBindingsWidget.hpp>
+#include <NBSSideBar.hpp>
 
 class NBViewsWidget : public QWidget {
 	Q_OBJECT
@@ -22,55 +24,17 @@ class NBViewsWidget : public QWidget {
 	private:
 		void createGUI();
 
-		QRadioButton *tlRB, *tdRB, *dbRB, *ntRB;
-		QLabel *imageLbl;
-		QCheckBox *nativeTitleBarCB;
-		QCheckBox *TrayIconCB;
-		QCheckBox *sidePanelOpen;
-		QCheckBox *openWithCatalogCB;
+		QRadioButton *defaultThemeRB;
 
 	private slots:
-		void handleThemeChanged();
-		void handleNativeTitleBarToggle( bool );
-		void handleTrayIconChanged( bool );
-		void handleSidePanelOpenToggled( bool );
-		void handleOpenWithCatalogToggled( bool );
-};
-
-class NBIconThemeWidget : public QWidget {
-	Q_OBJECT
-
-	public:
-		NBIconThemeWidget();
-
-	private:
-		void createGUI();
-		void updateListView();
-
-		NBIconThemeChooserWidget *iconThemesWidget;
-		NBIconThemeViewerWidget *folderViewWidget;
-		QCheckBox *imagePreviewCB;
-
-	private slots:
-		void setIconTheme();
-		void handleCheckStateChanged( int );
-};
-
-class NBKeyBindingsWidget : public QWidget {
-	Q_OBJECT
-
-	public:
-		NBKeyBindingsWidget();
-
-	private:
-		void createGUI();
+		// void handleThemeChanged();
 };
 
 class NBSettingsManager : public NBDialog {
 	Q_OBJECT
 
 	public:
-		NBSettingsManager();
+		NBSettingsManager( QWidget *parent = 0 );
 		void addNewTerminal();
 
 	private:
@@ -82,7 +46,7 @@ class NBSettingsManager : public NBDialog {
 		void setWindowProperties();
 
 		QStackedLayout *widgetLyt;
-		NBSettingChooserWidget *chooserWidget;
+		NBSSideBar *chooserWidget;
 		NBViewsWidget *viewWidget;
 		NBIconThemeWidget *iconWidget;
 		NBKeyBindingsWidget *keysWidget;
@@ -93,5 +57,3 @@ class NBSettingsManager : public NBDialog {
 	protected:
 		void keyPressEvent( QKeyEvent* );
 };
-
-#endif

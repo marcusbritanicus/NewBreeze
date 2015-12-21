@@ -1,5 +1,5 @@
-NewBreeze - Fast and light-weight File Manager
-==============================================
+NewBreeze - A fast and light-weight file manager based on Qt4
+=============================================================
 
 Built on top of the Powerful Qt4 GUI Toolkit, this file manager is sleek, stylish and fast.
 Some of its features are
@@ -16,7 +16,7 @@ Some of its features are
     - BreadCrumbs Navigation Bar
     - Custom Actions
     - Inline terminal
-    - Server for resource sharing
+    - SingleApplication Mode for resource sharing
 
 Please READ the ReleaseNotes for information on the new features
 
@@ -43,11 +43,17 @@ Notes for installing icon themes (Windows only):
 Dependencies:
     - Qt4
     - libmagic and libmagic-dev
+    - zlib
+    - liblzma
+    - libtar
+    - libzip
+    - libbzip2
 
-Windows and Linux Source Available
+Linux Source Available
 
-Bugs
-    - Large paths run away from BreadCrumbs Bar
+Known Bugs
+    - Some issues with cut-copy-paste files and folders
+    - Issues with delete folders
 
 List of shortcuts
 +==============================================================+============================+
@@ -88,6 +94,7 @@ List of shortcuts
 +==============================================================+============================+
 
 Upcoming
+    - Qt5 support
     - Unified Folder, Application, and Catalog Viewer
     - Application Editor ( Desktop file editor )
     - Any other feature you request for... :)

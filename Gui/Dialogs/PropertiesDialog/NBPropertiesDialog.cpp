@@ -402,8 +402,18 @@ void NBPermissionsWidget::createGUI() {
 
 	smartExecCheck = new QCheckBox( "Enable &Smart Executable" );
 	smartExecCheck->setToolTip( "Set all the files which have an executable ancenstry to Executable" );
+	smartExecCheck->setDisabled( true );
 
 	carryCheck = new QCheckBox( "Appl&y changes to all subfolders and their contents" );
+	carryCheck->setDisabled( true );
+
+	delProtectCheck = new QCheckBox( "&Protect against accidental deletion" );
+	delProtectCheck->setToolTip(
+		"<p>Enabling this will generate a warning and a security check to make "
+		"sure you really want to delete the protected file/directory.</p>"
+		"<p><b>Note: Protection will be enabled only in NewBreeze FM. This is not "
+		"a universal linux filesystem property.</b></p>"
+	);
 
 	connect( uReadCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
 	connect( uWritCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
@@ -417,6 +427,7 @@ void NBPermissionsWidget::createGUI() {
 
 	connect( smartExecCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
 	connect( carryCheck, SIGNAL( clicked() ), this, SLOT( applyPermissions() ) );
+	connect( delProtectCheck, SIGNAL( clicked() ), this, SLOT( applyProtection() ) );
 
 	readPermissions();
 
@@ -424,31 +435,41 @@ void NBPermissionsWidget::createGUI() {
 	permsLyt->setContentsMargins( QMargins() );
 	permsLyt->setSpacing( 10 );
 
-	permsLyt->addWidget( new QLabel( tr( "Read" ) ), 0, 1 );
-	permsLyt->addWidget( new QLabel( tr( "Write" ) ), 0, 2 );
-	permsLyt->addWidget( new QLabel( tr( "Exec" ) ), 0, 3 );
+	NBClickLabel *r = new NBClickLabel( tr( "Read" ) );
+	connect( r, SIGNAL( clicked() ), this, SLOT( setReadAll() ) );
+
+	NBClickLabel *w = new NBClickLabel( tr( "Write" ) );
+	connect( w, SIGNAL( clicked() ), this, SLOT( setWriteOwner() ) );
+
+	NBClickLabel *x = new NBClickLabel( tr( "Exec" ) );
+	connect( x, SIGNAL( clicked() ), this, SLOT( setExecOwner() ) );
+
+	permsLyt->addWidget( r, 0, 1 );
+	permsLyt->addWidget( w, 0, 2 );
+	permsLyt->addWidget( x, 0, 3 );
 
 	permsLyt->addWidget( new QLabel( tr( "Owner" ) ), 1, 0 );
 
-	permsLyt->addWidget( uReadCheck, 1, 1 );
-	permsLyt->addWidget( uWritCheck, 1, 2 );
-	permsLyt->addWidget( uExecCheck, 1, 3 );
+	permsLyt->addWidget( uReadCheck, 1, 1, Qt::AlignCenter );
+	permsLyt->addWidget( uWritCheck, 1, 2, Qt::AlignCenter );
+	permsLyt->addWidget( uExecCheck, 1, 3, Qt::AlignCenter );
 
 	permsLyt->addWidget( new QLabel( tr( "Group" ) ), 2, 0 );
-	permsLyt->addWidget( gReadCheck, 2, 1 );
-	permsLyt->addWidget( gWritCheck, 2, 2 );
-	permsLyt->addWidget( gExecCheck, 2, 3 );
+	permsLyt->addWidget( gReadCheck, 2, 1, Qt::AlignCenter );
+	permsLyt->addWidget( gWritCheck, 2, 2, Qt::AlignCenter );
+	permsLyt->addWidget( gExecCheck, 2, 3, Qt::AlignCenter );
 
 	permsLyt->addWidget( new QLabel( tr( "Other" ) ), 3, 0 );
-	permsLyt->addWidget( oReadCheck, 3, 1 );
-	permsLyt->addWidget( oWritCheck, 3, 2 );
-	permsLyt->addWidget( oExecCheck, 3, 3 );
+	permsLyt->addWidget( oReadCheck, 3, 1, Qt::AlignCenter );
+	permsLyt->addWidget( oWritCheck, 3, 2, Qt::AlignCenter );
+	permsLyt->addWidget( oExecCheck, 3, 3, Qt::AlignCenter );
 
 	QVBoxLayout *frameLyt = new QVBoxLayout();
 	frameLyt->setSpacing( 10 );
 	frameLyt->addLayout( permsLyt );
 	frameLyt->addWidget( smartExecCheck );
 	frameLyt->addWidget( carryCheck );
+	frameLyt->addWidget( delProtectCheck );
 
 	QWidget *permsFrame = new QWidget( this );
 	permsFrame->setLayout( frameLyt );
@@ -563,6 +584,27 @@ void NBPermissionsWidget::readPermissions() {
 
 	else
 		oExecCheck->setCheckState( Qt::Checked );
+
+	/* Check if we have protection set */
+	QSettings nbSettings( "NewBreeze", "NewBreeze" );
+	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
+
+	int pCount = 0;
+	Q_FOREACH( QString path, pathsList )
+		if ( safeNodes.contains( path ) )
+			pCount++;
+
+	/* All the nodes have protection enabled */
+	if ( pCount == pathsList.count() )
+		delProtectCheck->setCheckState( Qt::Checked );
+
+	/* Only some modes have protection enabled */
+	else if ( ( pCount > 0 ) and ( pCount < pathsList.count() ) )
+		delProtectCheck->setCheckState( Qt::PartiallyChecked );
+
+	/* None of the selected nodes have protection enabled */
+	else
+		delProtectCheck->setCheckState( Qt::Unchecked );
 };
 
 void NBPermissionsWidget::applyPermissions() {
@@ -656,7 +698,56 @@ void NBPermissionsWidget::applyTo( const char *node, QFile::Permissions perms ) 
 	closedir( d_fh );
 };
 
-NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab, bool *term ) : NBDialog( NBDialog::Close ) {
+void NBPermissionsWidget::applyProtection() {
+
+	QSettings nbSettings( "NewBreeze", "NewBreeze" );
+	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
+
+	/* If we have a partial check state, it means some are protected and some are not. */
+	/* We will do nothing about it. */
+	if ( delProtectCheck->checkState() == Qt::PartiallyChecked )
+		return;
+
+	if ( delProtectCheck->isChecked() ) {
+		Q_FOREACH( QString path, pathsList )
+			safeNodes << path;
+	}
+
+	else {
+		Q_FOREACH( QString path, pathsList ) {
+			if ( safeNodes.contains( path ) )
+				safeNodes.removeAll( path );
+		}
+	}
+
+	nbSettings.setValue( "ProtectedNodes", safeNodes );
+	nbSettings.sync();
+};
+
+void NBPermissionsWidget::setReadAll() {
+
+	uReadCheck->setChecked( true );
+	gReadCheck->setChecked( true );
+	oReadCheck->setChecked( true );
+
+	applyPermissions();
+};
+
+void NBPermissionsWidget::setWriteOwner() {
+
+	uWritCheck->setChecked( true );
+
+	applyPermissions();
+};
+
+void NBPermissionsWidget::setExecOwner() {
+
+	uExecCheck->setChecked( true );
+
+	applyPermissions();
+};
+
+NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab, bool *term, QWidget *parent ) : NBDialog( NBDialog::Close, parent ) {
 
 	pathsList << paths;
 
@@ -701,7 +792,6 @@ void NBPropertiesDialog::switchToTab( int newTab ) {
 
 	tabs->setCurrentIndex( newTab );
 	stack->setCurrentIndex( newTab );
-	setFixedSize( 530, 370 );
 
 	if ( newTab )
 		disconnect( propsB, SIGNAL( setDirIcon() ), this, SLOT( setDirIcon() ) );

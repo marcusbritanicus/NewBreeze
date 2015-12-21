@@ -18,12 +18,6 @@ class NBIconViewRestricted : public NBIconView {
 	Q_OBJECT
 
 	public:
-		enum class ViewType {
-			TilesView             = 0x01,
-			IconsView             = 0x02,
-			DetailsView           = 0x03
-		};
-
 		NBIconViewRestricted( NBFileSystemModel* );
 
 		NBFileSystemModel* mdl;

@@ -27,7 +27,6 @@
 
 #include <Global.hpp>
 #include <NBTools.hpp>
-#include <NBServer.hpp>
 #include <NewBreeze.hpp>
 #include <NBSettingsManager.hpp>
 
@@ -35,51 +34,7 @@
 #include <NBFileIO.hpp>
 
 #include <NBCLParser.hpp>
-
-void startInstance( QApplication &app, bool startServer = false, bool otherCLO = false ) {
-	/* @app -> QApplication instance */
-	/* @startServer -> Whether a server should be started */
-	/* @otherCLO -> Is the second command line option the location? */
-
-	NBServer *server;
-	NewBreeze *Gui;
-
-	if ( startServer ) {
-		server = new NBServer();
-		qDebug( "Starting server: %s", ( server->start() ? "[ DONE ]" :"[FAILED]" ) );
-	}
-
-	qDebug( "Starting NewBreeze instance..." );
-
-	NBStartup();
-
-	if ( otherCLO ) {
-		if ( app.arguments().count() >= 3 )
-			Gui = new NewBreeze( app.arguments().at( 2 ), true );
-
-		else
-			Gui = new NewBreeze( QString(), true );
-	}
-
-	else {
-		if ( app.arguments().count() >= 2 )
-			Gui = new NewBreeze( app.arguments().at( 1 ), true );
-
-		else
-			Gui = new NewBreeze( QString(), true );
-	}
-
-	if ( Settings->Session.Maximized )
-		Gui->showMaximized();
-
-	else
-		Gui->showNormal();
-
-	if ( startServer ) {
-		app.connect( server, SIGNAL( newWindow( QString ) ), Gui, SLOT( newWindow( QString ) ) );
-		app.connect( server, SIGNAL( showTrayIcon() ), Gui, SIGNAL( showTrayIcon() ) );
-	}
-};
+#include <NBApplication.hpp>
 
 int main( int argc, char **argv ) {
 
@@ -88,12 +43,12 @@ int main( int argc, char **argv ) {
 	#else
 		qInstallMsgHandler( NBMessageOutput );
 	#endif
+
 	qRegisterMetaType<NBDeviceInfo>( "NBDeviceInfo" );
 
-	QApplication app( argc, argv );
+	NBApplication app( argc, argv, "NewBreeze" );
 	app.setOrganizationName( "NewBreeze" );
 	app.setApplicationName( "NewBreeze" );
-	app.setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
 
 	if ( Settings->General.TrayIcon )
 		app.setQuitOnLastWindowClosed( false );
@@ -106,47 +61,43 @@ int main( int argc, char **argv ) {
 		/* We want only the server running in the tray */
 		case SYSTRAY : {
 			/* If an instance is already running, inform the user about it. */
-			if ( isServerRunning() ) {
-				qDebug() << "Found a running server. Requesting TrayIcon...";
-
-				QLocalSocket *client = new QLocalSocket();
-				client->connectToServer( "NewBreeze-1000" );
-				client->waitForConnected( 100 );
-
-				/* If we are connected... */
-				if ( client->state() == QLocalSocket::ConnectedState ) {
-					/* The server would have said 'Welcome...', wait for it and discard it */
-					if ( not client->bytesAvailable() )
-						client->waitForReadyRead();
-
-					client->readAll();
-					client->write( "Open in SystemTray" );
-					client->waitForBytesWritten( -1 );
-
-					client->disconnectFromServer();
-
-					return 0;
-				}
+			if ( app.isRunning() ) {
+				qDebug() << "Found a running instance. Requesting TrayIcon...";
+				app.sendMessage( "Open in SystemTray" );
+				return 0;
 			}
 
 			/* Else, start an instance. */
 			else {
-				qDebug() << "No running instance of the NBServer found";
-
-				NBServer *server = new NBServer();
-				server->start();
+				qDebug() << "No running instance of the NewBreeze found";
 
 				NewBreeze *Gui = new NewBreeze( QString(), true );
-				app.connect( server, SIGNAL( newWindow( QString ) ), Gui, SLOT( newWindow( QString ) ) );
-				app.connect( server, SIGNAL( showTrayIcon() ), Gui, SIGNAL( showTrayIcon() ) );
+				QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( messageReciever( const QString ) ) );
+
+				if ( Gui->canOpenUI() ) {
+					if ( Settings->Session.Maximized )
+						Gui->showMaximized();
+
+					else
+						Gui->showNormal();
+				}
+
+				else  {
+					NBTrayIcon* trayIcon = new NBTrayIcon();
+					trayIcon->show();
+
+					QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
+				}
 
 				return app.exec();
 			}
+
 			break;
 		}
 
 		/* We want only the settings */
 		case SETTINGS : {
+			qDebug() << "Showing settings manager";
 			NBSettingsManager *settingsMgr = new NBSettingsManager();
 			settingsMgr->exec();
 
@@ -155,82 +106,115 @@ int main( int argc, char **argv ) {
 
 		/* A forced opening */
 		case FORCENEW : {
-			qCritical( "Killing the existing server" );
-			qWarning( "This may have caused data loss. Be warned." );
+			if ( app.isRunning() ) {
+				qCritical( "Killing the existing server" );
+				qWarning( "This may have caused data loss. Be warned." );
 
-			startInstance( app, true, true );
+				app.disconnect();
+			}
+
+			NewBreeze *Gui;
+			if ( app.arguments().count() >= 3 )
+				Gui = new NewBreeze( app.arguments().at( 2 ), true );
+
+			else
+				Gui = new NewBreeze( QString(), true );
+
+			QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( messageReciever( const QString ) ) );
+
+			if ( Gui->canOpenUI() ) {
+				if ( Settings->Session.Maximized )
+					Gui->showMaximized();
+
+				else
+					Gui->showNormal();
+			}
+
+			else  {
+				NBTrayIcon* trayIcon = new NBTrayIcon();
+				trayIcon->show();
+
+				QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
+			}
+
 			return app.exec();
 		}
 
 		/* A normal opening */
 		case NORMAL : {
 			/* If the server is running */
-			if ( isServerRunning() ) {
+			if ( app.isRunning() ) {
 				qDebug( "Running server found" );
 				qDebug( "Requesting server for new window" );
 
-				/* Connect to the server */
-				QLocalSocket *client = new QLocalSocket();
-				client->connectToServer( "NewBreeze-1000" );
-				client->waitForConnected( 100 );
+				/* Prepare the query */
+				QString query;
+				/* Assume the second argument is the path to be opened */
+				if ( argc >= 2 )
+					query = QString::fromLocal8Bit( argv[ 1 ] );
 
-				/* If we are connected... */
-				if ( client->state() == QLocalSocket::ConnectedState ) {
-					/* The server would have said 'Welcome...', wait for it and discard it */
-					if ( not client->bytesAvailable() )
-						client->waitForReadyRead();
+				/* There was no argument. Try to open the last opened folder, failing which we open the home directory */
+				else
+					query = ( NBSettings::instance()->Session.LastDir.isEmpty() ? QDir::homePath() : NBSettings::instance()->Session.LastDir );
 
-					client->readAll();
+				/* Query for a new window */
+				int result = app.sendMessage( query );
+				qDebug() << "Requesting the server to open the path:" << query << ":" << ( result ? "Request sent" : "Request failed" );
 
-					/* Prepare the query */
-					QString query;
-					/* Assume the second argument is the path to be opened */
-					if ( argc >= 2 )
-						query = QString::fromLocal8Bit( argv[ 1 ] );
+				if ( not result ) {
+					/* Disconnect from server */
+					app.disconnect();
 
-					/* There was no argument. Try to open the last opened folder, failing which we open the home directory */
-					else
-						query = ( NBSettings::instance()->Session.LastDir.isEmpty() ? QDir::homePath() : NBSettings::instance()->Session.LastDir );
+					NewBreeze *Gui = new NewBreeze( query, true );
+					QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( messageReciever( const QString ) ) );
 
-					/* Query for a new window */
-					qDebug() << "Requesting the server to open the path:" << query;
-					client->write( QString( "NewWindow @ %1" ).arg( query ).toLatin1() );
-					qDebug() << ( client->waitForBytesWritten( -1 ) ? "Request sent" : "Request failed" );
+					if ( Gui->canOpenUI() ) {
+						if ( Settings->Session.Maximized )
+							Gui->showMaximized();
 
-					/* Wait 30 secs for the server to ackowledge. The reply must be within a second. */
-					client->waitForReadyRead();
-
-					/* If the server said okay */
-					/* 		=> Actually the server would have said 'Welcome ...' which we did not bother reading */
-					/* 		=> We must take that into consideration */
-					QString reply = client->readAll();
-					if ( reply.contains( "Done" ) ) {
-						qDebug() << "Server opening the given path.";
-						qDebug() << "Good Bye!";
+						else
+							Gui->showNormal();
 					}
 
-					/* Server didnot respond in 30 secs. Something must ahve gone wrong. Tell the user. */
-					else {
-						qDebug() << "Server said:" << reply;
-						qCritical() << "Something wicked has happened. Server did not respond appropriately.";
-						qCritical() << "Try" << argv[ 0 ] << "--force-new to open without talking to server.";
+					else  {
+						NBTrayIcon* trayIcon = new NBTrayIcon();
+						trayIcon->show();
+
+						QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
 					}
 
-					return 0;
+					return app.exec();
 				}
 
-				/* Some how we were disconnected from the server before asking for new window */
-				else {
-					qCritical() << "Unable to communicate with Server.";
-					qCritical() << "Starting separate process";
-
-					startInstance( app, false );
-				}
+				return 0;
 			}
 
-			/* No server is running */
+				/* Some how we were disconnected from the server before asking for new window */
 			else {
-				startInstance( app, true );
+				NewBreeze *Gui;
+				if ( app.arguments().count() >= 2 )
+					Gui = new NewBreeze( app.arguments().at( 1 ), true );
+
+				else
+					Gui = new NewBreeze( QString(), true );
+
+				QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
+
+				if ( Gui->canOpenUI() ) {
+					if ( Settings->Session.Maximized )
+						Gui->showMaximized();
+
+					else
+						Gui->showNormal();
+				}
+
+				else  {
+					NBTrayIcon* trayIcon = new NBTrayIcon();
+					trayIcon->show();
+
+					QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
+				}
+
 				return app.exec();
 			}
 		}

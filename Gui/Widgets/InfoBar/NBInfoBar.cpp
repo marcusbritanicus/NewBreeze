@@ -40,7 +40,7 @@ inline QString getPermissions( QString path ) {
 	return text;
 };
 
-NBInfoBar::NBInfoBar() : QWidget() {
+NBInfoBar::NBInfoBar( QWidget *parent ) : QWidget( parent ) {
 
 	setFixedHeight( 64 );
 	setContentsMargins( QMargins() );
@@ -60,7 +60,7 @@ NBInfoBar::NBInfoBar() : QWidget() {
 	baseLyt->addWidget( infoLbl );
 	baseLyt->addStretch( 0 );
 
-	setStyleSheet( getStyleSheet( "NBInfoBar", Settings->General.Style ) );
+	setFont( QFont( font().family(), 11 ) );
 
 	setLayout( baseLyt );
 };

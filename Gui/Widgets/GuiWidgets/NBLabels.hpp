@@ -38,9 +38,12 @@ class NBClickLabel : public QLabel {
 
 	protected:
 		void mousePressEvent( QMouseEvent * );
+		void mouseReleaseEvent( QMouseEvent * );
 
 	signals:
+		void pressed();
 		void clicked();
+		void released();
 };
 
 class NBInfoLabel : public QLabel {

@@ -22,7 +22,7 @@ QString dirName( QString path ) {
 	if ( path.endsWith( "/" ) )
 		path.chop( 1 );
 
-	char *dupPath = strdup( qPrintable( path ) );
+	char *dupPath = strdup( path.toLocal8Bit().data() );
 	QString dirPth = QString( dirname( dupPath ) ) + "/";
 	free( dupPath );
 
@@ -34,7 +34,7 @@ QString baseName( QString path ) {
 	if ( path.endsWith( "/" ) )
 		path.chop( 1 );
 
-	char *dupPath = strdup( qPrintable( path ) );
+	char *dupPath = strdup( path.toLocal8Bit().data() );
 	QString basePth = QString( basename( dupPath ) );
 	free( dupPath );
 
@@ -56,7 +56,7 @@ QString getMimeTypeAlt( QString path ) {
 	magic_t mgcMime = magic_open( MAGIC_MIME_TYPE );
 	magic_load( mgcMime, NULL );
 
-	return QString( magic_file( mgcMime, qPrintable( path ) ) );
+	return QString( magic_file( mgcMime, path.toLocal8Bit().data() ) );
 };
 
 QString termFormatString( QString file ) {
@@ -77,7 +77,7 @@ QString MD5( QString data ) {
 bool isFile( QString path ) {
 
 	struct stat statbuf;
-	if ( stat( qPrintable( path ), &statbuf ) == 0 )
+	if ( stat( path.toLocal8Bit().data(), &statbuf ) == 0 )
 
 		if ( S_ISREG( statbuf.st_mode ) or S_ISLNK( statbuf.st_mode ) )
 			return true;
@@ -92,7 +92,7 @@ bool isFile( QString path ) {
 bool isDir( QString path ) {
 
 	struct stat statbuf;
-	if ( stat( qPrintable( path ), &statbuf ) == 0 )
+	if ( stat( path.toLocal8Bit().data(), &statbuf ) == 0 )
 
 		if ( S_ISDIR( statbuf.st_mode ) )
 			return true;
@@ -107,7 +107,7 @@ bool isDir( QString path ) {
 bool isLink( QString path ) {
 
 	struct stat statbuf;
-	if ( lstat( qPrintable( path ), &statbuf ) == 0 )
+	if ( lstat( path.toLocal8Bit().data(), &statbuf ) == 0 )
 		if ( S_ISLNK( statbuf.st_mode ) )
 			return true;
 
@@ -120,13 +120,13 @@ bool isLink( QString path ) {
 
 bool exists( QString path ) {
 
-	return not access( qPrintable( path ), F_OK );
+	return not access( path.toLocal8Bit().data(), F_OK );
 }
 
 QString readLink( QString path ) {
 
 	char linkTarget[ 1024 ] = { 0 };
-	readlink( qPrintable( path ), linkTarget, 1023 );
+	readlink( path.toLocal8Bit().data(), linkTarget, 1023 );
 
 	return QString( linkTarget );
 };
@@ -155,171 +155,23 @@ bool removeDir( QString dirName ) {
 
 bool isReadable( QString path ) {
 
-	/*
-		*
-		* If the path is a folder, then both read bit and exec bit must be set
-		* If the path is a file, then only read bit is sufficient
-		*
-	*/
+	if ( isDir( path ) )
+		return not access( path.toLocal8Bit().data(), R_OK | X_OK );
 
-	// FIXME: Check the validity of this code below: L203
-
-	struct stat fileMode;
-	QList<int> groupList;
-	gid_t groups[ 1024 ] = { 0 };
-
-	if ( stat( qPrintable( path ), &fileMode ) != 0 )
-		return false;
-
-	int ngrps = getgroups( 1024, groups );
-	if ( ngrps > 0 )
-		for( int i = 0; i < ngrps; i++ )
-			groupList << groups[ i ];
-
-	if ( geteuid() == fileMode.st_uid ) {
-		if ( S_ISDIR( fileMode.st_mode ) ) {
-			if ( ( fileMode.st_mode & S_IRUSR ) and ( fileMode.st_mode & S_IXUSR ) )
-				return true;
-
-			else
-				return false;
-		}
-
-		else {
-			if ( fileMode.st_mode & S_IRUSR )
-				return true;
-
-			else
-				return false;
-		}
-	}
-
-	// Possible erroneous code
-	else if ( groupList.contains( fileMode.st_gid ) ) {
-		if ( S_ISDIR( fileMode.st_mode ) ) {
-			if ( ( fileMode.st_mode & S_IRGRP ) and ( fileMode.st_mode & S_IXGRP ) )
-				return true;
-
-			else
-				return false;
-		}
-
-		else {
-			if ( fileMode.st_mode & S_IRGRP )
-				return true;
-
-			else
-				return false;
-		}
-	}
-
-	else {
-		if ( S_ISDIR( fileMode.st_mode ) ) {
-			if ( ( fileMode.st_mode & S_IROTH ) and ( fileMode.st_mode & S_IXOTH ) )
-				return true;
-
-			else
-				return false;
-		}
-
-		else {
-			if ( fileMode.st_mode & S_IROTH )
-				return true;
-
-			else
-				return false;
-		}
-	}
-
-	return false;
+	else
+		return not access( path.toLocal8Bit().data(), R_OK );
 };
 
 bool isWritable( QString path ) {
 
-	/*
-		*
-		* If the path is a folder, then both read bit and exec bit must be set
-		* If the path is a file, then only read bit is sufficient
-		*
-	*/
-
-	// FIXME: Check the validity of this code below: L283
-
-	struct stat fileMode;
-	QList<int> groupList;
-	gid_t groups[ 1024 ] = { 0 };
-
-	if ( stat( qPrintable( path ), &fileMode ) != 0 )
-		return false;
-
-	int ngrps = getgroups( getgroups( 0, groups ), groups );
-	if ( ngrps > 0 )
-		for( int i = 0; i < ngrps; i++ )
-			groupList << groups[ i ];
-
-	if ( geteuid() == fileMode.st_uid ) {
-		if ( S_ISDIR( fileMode.st_mode ) ) {
-			if ( ( fileMode.st_mode & S_IWUSR ) and ( fileMode.st_mode & S_IXUSR ) )
-				return true;
-
-			else
-				return false;
-		}
-
-		else {
-			if ( fileMode.st_mode & S_IWUSR )
-				return true;
-
-			else
-				return false;
-		}
-	}
-
-	// Possible erroneous code
-	else if ( groupList.contains( fileMode.st_gid ) ) {
-		if ( S_ISDIR( fileMode.st_mode ) ) {
-			if ( ( fileMode.st_mode & S_IWGRP ) and ( fileMode.st_mode & S_IXGRP ) )
-				return true;
-
-			else
-				return false;
-		}
-
-		else {
-			if ( fileMode.st_mode & S_IWGRP )
-				return true;
-
-			else
-				return false;
-		}
-	}
-
-	else {
-		if ( S_ISDIR( fileMode.st_mode ) ) {
-			if ( ( fileMode.st_mode & S_IWOTH ) and ( fileMode.st_mode & S_IXOTH ) )
-				return true;
-
-			else
-				return false;
-		}
-
-		else {
-			if ( fileMode.st_mode & S_IWOTH )
-				return true;
-
-			else
-				return false;
-		}
-	}
-
-	return false;
+	return not access( path.toLocal8Bit().data(), W_OK );
 };
 
 qint64 nChildren( QString path ) {
 
 	qint64 entries = 0;
 	struct dirent *ent;
-	DIR *dir = opendir( qPrintable( path ) );
+	DIR *dir = opendir( path.toLocal8Bit().data() );
 
 	if ( dir != NULL ) {
 		while ( ( ent = readdir( dir ) ) != NULL)
@@ -336,7 +188,7 @@ qint64 nChildren( QString path ) {
 qint64 getSize( QString path ) {
 
 	struct stat statbuf;
-	if ( stat( qPrintable( path ), &statbuf ) == 0 )
+	if ( stat( path.toLocal8Bit().data(), &statbuf ) == 0 )
 		return statbuf.st_size;
 
 	else
@@ -346,7 +198,7 @@ qint64 getSize( QString path ) {
 mode_t getMode( QString path ) {
 
 	struct stat fileAtts;
-	if ( stat( qPrintable( path ), &fileAtts ) != 0 ) {
+	if ( stat( path.toLocal8Bit().data(), &fileAtts ) != 0 ) {
 		return -1;
 	}
 
@@ -390,7 +242,7 @@ bool isText( QString path ) {
 bool isExec( QString path ) {
 
 	/* If the exec bit set there is not point continuing */
-	if ( access( qPrintable( path ), X_OK ) )
+	if ( access( path.toLocal8Bit().data(), X_OK ) )
 		return false;
 
 	/* If this is and application/x-executable, it can be executed */

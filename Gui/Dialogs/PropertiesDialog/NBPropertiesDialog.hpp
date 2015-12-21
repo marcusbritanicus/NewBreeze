@@ -11,6 +11,7 @@
 #include <Global.hpp>
 #include <NBDialog.hpp>
 #include <NBGuiWidgets.hpp>
+#include <NBLabels.hpp>
 #include <NBIconProvider.hpp>
 #include <NBDeviceInfo.hpp>
 #include <NBTools.hpp>
@@ -96,10 +97,16 @@ class NBPermissionsWidget: public QWidget {
 
 		QCheckBox *smartExecCheck;
 		QCheckBox *carryCheck;
+		QCheckBox *delProtectCheck;
 
 	private slots:
 		void applyPermissions();
 		void applyTo( const char*, QFile::Permissions );
+		void applyProtection();
+
+		void setReadAll();
+		void setWriteOwner();
+		void setExecOwner();
 };
 
 void smartExecutable( QString );
@@ -122,7 +129,7 @@ class NBPropertiesDialog: public NBDialog {
 			OpenWith    = 0x02
 		};
 
-		NBPropertiesDialog( QStringList paths, PropertiesTab tab, bool *term );
+		NBPropertiesDialog( QStringList paths, PropertiesTab tab, bool *term, QWidget *parent = 0 );
 
 	private:
 		QStackedWidget *stack;

@@ -6,7 +6,7 @@
 
 #include <NBFileDialog.hpp>
 
-NBFileDialog::NBFileDialog( QString wIcon, QString wTitle, QString fLocation, FileType dType ) : NBDialog() {
+NBFileDialog::NBFileDialog( QString wIcon, QString wTitle, QString fLocation, FileType dType, QWidget *parent ) : NBDialog( parent ) {
 
 	icon = wIcon;
 	title = wTitle;
@@ -14,9 +14,9 @@ NBFileDialog::NBFileDialog( QString wIcon, QString wTitle, QString fLocation, Fi
 	type = dType;
 
 	fsModel = new NBFileSystemModel();
-	fsModel->setShowHidden( Settings->Session.ShowHidden );
-	fsModel->setCategorizationEnabled( Settings->Session.SortCategory );
-	fsModel->setReadOnly( true );
+	fsModel->setShowHidden( Settings->General.ShowHidden );
+	fsModel->setCategorizationEnabled( Settings->General.Grouping );
+	fsModel->setFilterFolders( false );
 
 	createGUI();
 	createAndSetupActions();
@@ -38,7 +38,7 @@ void NBFileDialog::createGUI() {
 	addressWidget = new NBAddressWidget();
 	sidePanel = new NBSidePanel( this );
 
-	mainView = new NBIconView( fsModel );
+	mainView = new NBIconViewRestricted( fsModel );
 	switch( type ) {
 		case ExistingFile :
 		case SaveFile :
@@ -55,7 +55,9 @@ void NBFileDialog::createGUI() {
 	};
 
 	QLabel *nameLbl = new QLabel( "File&name:" );
-	nameLE = new QLineEdit();
+	nameLE = new NBLineEdit( this );
+	nameLE->setDisabled( true );
+	nameLE->hide();
 	nameLbl->setBuddy( nameLE );
 
 	QLabel *filtersLbl = new QLabel( "&Filters:" );
@@ -255,7 +257,7 @@ void NBFileDialog::openAddressBar() {
 			"<tt><b>%1</b></tt>. Please check the path entered."
 		).arg(  addressWidget->addressEdit->text() );
 
-		NBMessageDialog::error( title, text );
+		NBMessageDialog::error( this, title, text );
 		return;
 	}
 

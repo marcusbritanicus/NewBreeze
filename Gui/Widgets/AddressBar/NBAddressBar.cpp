@@ -82,9 +82,15 @@ void NBToggleButton::paintEvent( QPaintEvent *pEvent ) {
 
 NBAddressWidget::NBAddressWidget( QWidget *parent ) : QWidget( parent ) {
 
-	addressEdit = new QLineEdit( this );
-	crumbsBar = new NBBreadCrumbsBar( this, "/" );
-	crumbsBar->setAutoLoadNewPath( false );
+	addressEdit = new NBLineEdit( this );
+	addressEdit->setFont( QFont( "Envy Code R", 11 ) );
+	addressEdit->setStyleSheet( "border: none; background: transparent;" );
+	addressEdit->setFocusPolicy( Qt::NoFocus );
+
+	connect( addressEdit, SIGNAL( returnPressed() ), this, SLOT( revertToCrumbsBar() ) );
+
+	crumbsBar = new NBCrumbsBar( this );
+	connect( crumbsBar, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
 
 	toggleBtn = new NBToggleButton( this );
 	QHBoxLayout *lyt = new QHBoxLayout();
@@ -108,6 +114,16 @@ NBAddressWidget::NBAddressWidget( QWidget *parent ) : QWidget( parent ) {
 	setWidgetProperties();
 };
 
+void NBAddressWidget::setFocus() {
+
+	if ( not toggleBtn->isChecked() ) {
+		toggleBtn->setChecked( true );
+		crumbsBar->hide();
+		addressEdit->show();
+		addressEdit->setFocus();
+	}
+};
+
 void NBAddressWidget::setShowHidden( bool shown ) {
 
 	if ( shown )
@@ -129,8 +145,6 @@ void NBAddressWidget::setWidgetProperties() {
 	toggleBtn->setShortcut( Settings->Shortcuts.ToggleCrumbLE.at( 0 ).toString() );
 
 	connect( toggleBtn, SIGNAL( clicked() ), this, SLOT( toggleCrumbsBarAndEdit() ) );
-
-	setStyleSheet( getStyleSheet( "NBAddressBar", Settings->General.Style ) );
 };
 
 void NBAddressWidget::toggleCrumbsBarAndEdit() {
@@ -138,7 +152,7 @@ void NBAddressWidget::toggleCrumbsBarAndEdit() {
 	if ( toggleBtn->isChecked() ) {
 		crumbsBar->hide();
 		addressEdit->show();
-		if ( Settings->Session.ShowHidden )
+		if ( Settings->General.ShowHidden )
 			dModel->setFilter(  QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden );
 
 		else
@@ -151,6 +165,17 @@ void NBAddressWidget::toggleCrumbsBarAndEdit() {
 	}
 };
 
+void NBAddressWidget::revertToCrumbsBar() {
+
+	if ( toggleBtn->isChecked() ) {
+		toggleBtn->setChecked( false );
+		crumbsBar->show();
+		addressEdit->hide();
+
+		emit openLocation( addressEdit->text() );
+	}
+};
+
 NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 
 	setFrameStyle( NoFrame );
@@ -159,19 +184,16 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	QHBoxLayout *fLyt = new QHBoxLayout();
 	fLyt->setContentsMargins( QMargins() );
 
-	reloadBtn = new  QPushButton();
-	reloadBtn->setIcon( QIcon( ":/icons/reload.png" ) );
-	reloadBtn->setFixedSize( QSize( 24, 24 ) );
+	reloadBtn = new NBButton( QIcon( ":/icons/reload.png" ), this );
 
-	viewModeBtn = new NBViewModeButton();
+	viewModeBtn = new NBViewModeButton( this );
 
-	openVTEBtn = new QPushButton();
-	openVTEBtn->setIcon( QIcon(  ":/icons/vte.png"  ) );
-	openVTEBtn->setFixedSize( QSize( 24, 24 ) );
+	openVTEBtn = new NBButton( QIcon( ":/icons/vte.png" ), this );
 
 	addressWidget = new NBAddressWidget( this );
 	searchBar = new NBSearchBar();
-	addressButtons = new NBButtons();
+	addressButtons = new NBButtons( this );
+	mProcWidget = new NBIOManagerMini( this );
 
 	searchBar->setFixedHeight( 24 );
 
@@ -197,6 +219,57 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	fLyt->addWidget( searchBar );
 	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( addressButtons );
+	if ( Settings->General.NativeTitleBar ) {
+		fLyt->addWidget( Separator::vertical() );
+		fLyt->addWidget( mProcWidget );
+	}
+
+	else
+		mProcWidget->hide();
 
 	setLayout( fLyt );
+
+	connect( openVTEBtn, SIGNAL( clicked() ), this, SIGNAL( openTerminal() ) );
+	connect( reloadBtn, SIGNAL( clicked() ), this, SIGNAL( reload() ) );
+	connect( viewModeBtn, SIGNAL( switchToNextView() ), this, SIGNAL( switchToNextView() ) );
+	connect( viewModeBtn, SIGNAL( changeViewMode() ), this, SIGNAL( changeViewMode() ) );
+	connect( addressWidget, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
+	connect( searchBar, SIGNAL( searchString( QString ) ), this, SIGNAL( search( QString ) ) );
+	connect( searchBar, SIGNAL( searchCleared() ), this, SIGNAL( clearSearch() ) );
+};
+
+NBIOManagerMini *NBAddressBar::procWidget() {
+
+	return mProcWidget;
+};
+
+QString NBAddressBar::address() {
+
+	return addressWidget->addressEdit->text();
+};
+
+void NBAddressBar::setAddress( QString url ) {
+
+	addressWidget->addressEdit->setText( url );
+	addressWidget->crumbsBar->setCurrentDirectory( url );
+};
+
+int NBAddressBar::checkedAction() {
+
+	return viewModeBtn->checkedAction();
+};
+
+void NBAddressBar::focusAddressEdit() {
+
+	addressWidget->setFocus();
+};
+
+void NBAddressBar::focusSearchBar() {
+
+	searchBar->searchLE->setFocus();
+};
+
+void NBAddressBar::clearSearchBar() {
+
+	searchBar->searchLE->clear();
 };

@@ -18,10 +18,19 @@ inline bool matchesFilter( QStringList filters, QString text ) {
 NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 
 	__showHidden = false;
-	__readOnly = true;
+	__filterFolders = Settings->General.FilterFolders;
 	updatedNodes = 0;
 
 	__terminate = false;
+
+	mCategorizationEnabled = false;
+
+	currentLoadStatus.loading = false;
+	currentLoadStatus.stopLoading = false;
+
+	prevSort.column = Settings->General.SortColumn;
+	prevSort.cs = Settings->General.SortCase;
+	prevSort.categorized = Settings->General.Grouping;
 
 	oldRoots.clear();
 	curIndex = 0;
@@ -94,11 +103,11 @@ Qt::ItemFlags NBFileSystemModel::flags( const QModelIndex & index ) const {
 	if ( not index.isValid() )
 		return Qt::NoItemFlags;
 
-	if ( __readOnly )
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+	if ( isDir( nodePath( index ) ) )
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
 
 	else
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
 };
 
 QVariant NBFileSystemModel::data( const QModelIndex &index, int role ) const {
@@ -416,26 +425,6 @@ QStringList NBFileSystemModel::categories() const {
 	return rootNode->categoryList();
 };
 
-void NBFileSystemModel::hideCategory( QString mCategory ) {
-
-	if ( rootNode->categoryList().contains( mCategory ) )
-		categoryVisibilityMap[ mCategory ] = false;
-};
-
-void NBFileSystemModel::showCategory( QString mCategory ) {
-
-	if ( rootNode->categoryList().contains( mCategory ) )
-		categoryVisibilityMap[ mCategory ] = true;
-};
-
-bool NBFileSystemModel::isCategoryVisible( QString mCategory ) const {
-
-	if ( rootNode->categoryList().contains( mCategory ) )
-		return categoryVisibilityMap[ mCategory ];
-
-	return false;
-};
-
 int NBFileSystemModel::indexListCountForCategory( QString mCategory ) const {
 
 	if ( not rootNode->categoryList().contains( mCategory ) or mCategory.isEmpty() or mCategory.isNull() )
@@ -458,6 +447,17 @@ QModelIndexList NBFileSystemModel::indexListForCategory( QString mCategory ) con
 	return mList;
 };
 
+QModelIndexList NBFileSystemModel::categorySiblings( QModelIndex idx ) const {
+
+	if ( not idx.isValid() )
+		return QModelIndexList();
+
+	QModelIndexList mList = indexListForCategory( category( idx ) );
+	mList.removeAll( idx );
+
+	return mList;
+};
+
 bool NBFileSystemModel::showHidden() const {
 
 	return __showHidden;
@@ -469,16 +469,6 @@ void NBFileSystemModel::setShowHidden( bool shown ) {
 
 	if ( not __rootPath.isNull() or not __rootPath.isEmpty() )
 		setupModelData();
-};
-
-bool NBFileSystemModel::readOnly() const {
-
-	return __readOnly;
-};
-
-void NBFileSystemModel::setReadOnly( bool ro ) {
-
-	__readOnly = ro;
 };
 
 Qt::DropActions NBFileSystemModel::supportedDragActions() const {
@@ -541,6 +531,17 @@ void NBFileSystemModel::clearNameFilters() {
 	setupModelData();
 };
 
+bool NBFileSystemModel::filterFolders() const {
+
+	return __filterFolders;
+};
+
+void NBFileSystemModel::setFilterFolders( bool filter) {
+
+	__filterFolders = filter;
+	setupModelData();
+};
+
 void NBFileSystemModel::sort( int column, bool cs, bool categorized ) {
 
 	prevSort.column = column;
@@ -555,25 +556,7 @@ void NBFileSystemModel::sort( int column, bool cs, bool categorized ) {
 	foreach( NBFileSystemNode *item, rootNode->children() )
 		categoryRowMap[ item->category() ] << item->row();
 
-	foreach( QString mCategory, rootNode->categoryList() )
-		categoryVisibilityMap[ mCategory ] = true;
-
-	emit directoryLoaded( __rootPath );
-};
-
-int NBFileSystemModel::sortColumn() const {
-
-	return prevSort.column;
-};
-
-bool NBFileSystemModel::sortCaseSensitivity() const {
-
-	return prevSort.cs;
-};
-
-bool NBFileSystemModel::sortCategorized() const {
-
-	return prevSort.categorized;
+	emit layoutChanged();
 };
 
 void NBFileSystemModel::reload() {
@@ -581,57 +564,31 @@ void NBFileSystemModel::reload() {
 	setupModelData();
 };
 
-bool NBFileSystemModel::mkdir( QString folderTree ) {
-
-	if ( __readOnly )
-		return false;
-
-	return QDir( __rootPath ).mkpath( folderTree );
-};
-
-bool NBFileSystemModel::remove( QString path ) {
-
-	Q_UNUSED( path );
-
-	if ( __readOnly )
-		return false;
-
-	return true;
-};
-
-bool NBFileSystemModel::copy( QString, QString ) {
-
-	if ( __readOnly )
-		return false;
-
-	return true;
-};
-
-bool NBFileSystemModel::move( QString, QString ) {
-
-	if ( __readOnly )
-		return false;
-
-	return true;
-};
-
 bool NBFileSystemModel::rename( QString oldName, QString newName ) {
 
-	NBFileSystemNode *node = rootNode->child( baseName( oldName ) );
-	node->setData( 0, baseName( newName ) );
+	/* If the file @oldName is not from the current directory */
+	if ( dirName( oldName ) != __rootPath ) {
+		insertNode( baseName( newName ) );
+		return true;
+	}
 
-	QModelIndex idx = index( baseName( oldName ) );
-	emit dataChanged( idx, idx );
+	/* If the file @newName is not in the current dir */
+	else if ( dirName( oldName ) != __rootPath ) {
+		removeNode( baseName( oldName ) );
+		return true;
+	}
 
-	return true;
-};
+	else {
+		/* Same folder */
+		NBFileSystemNode *node = rootNode->child( baseName( oldName ) );
+		node->setData( 0, baseName( newName ) );
+		updateNode( baseName( newName ) );
 
-bool NBFileSystemModel::chmod( QString, int ) {
+		return true;
+	}
 
-	if ( __readOnly )
-		return false;
-
-	return true;
+	/* This can never happen! */
+	return false;
 };
 
 QString NBFileSystemModel::nodeName( const QModelIndex index ) const {
@@ -683,13 +640,26 @@ void NBFileSystemModel::setRootPath( QString path ) {
 	oldRoots << __rootPath;
 	curIndex = oldRoots.count() - 1;
 
+	/* Proper link to /proc/<pid>/cwd: Remove it then, recreate it */
+	chdir( __rootPath.toLocal8Bit().constData() );
+
+	/* We have set per-folder settings */
+	QSettings sett( __rootPath + ".directory", QSettings::NativeFormat );
+
+	__showHidden = sett.value( "NewBreeze/Hidden", false ).toBool();
+
+	prevSort.column = sett.value( "NewBreeze/SortColumn", Settings->General.SortColumn ).toInt();
+	prevSort.cs = sett.value( "NewBreeze/SortCase", Settings->General.SortCase ).toBool();
+	prevSort.categorized = sett.value( "NewBreeze/Grouping", Settings->General.Grouping ).toBool();
+	mCategorizationEnabled = prevSort.categorized;
+
 	emit loadFolders();
 
 	delete rootNode;
 
 	rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( path ), "" );
-	if ( curentLoadStatus.loading )
-		curentLoadStatus.stopLoading = true;
+	if ( currentLoadStatus.loading )
+		currentLoadStatus.stopLoading = true;
 
 	if ( __rootPath != "/dev/" ) {
 		watcher->setWatchPath( path );
@@ -815,7 +785,7 @@ QString NBFileSystemModel::currentDir() const {
 QString NBFileSystemModel::parentDir() const {
 
 	QString path = __rootPath.section( "/", 0, -3 );
-	return ( path.endsWith( "/" ) ? path : path + "?" );
+	return ( path.endsWith( "/" ) ? path : path + "/" );
 };
 
 void NBFileSystemModel::setupModelData() {
@@ -826,36 +796,40 @@ void NBFileSystemModel::setupModelData() {
 
 	__childNames.clear();
 	rootNode->clearChildren();
-	curentLoadStatus.loading = true;
+	currentLoadStatus.loading = true;
 
 	emit dirLoading( __rootPath );
 
 	beginResetModel();
 	if ( dir != NULL ) {
 		while ( ( ent = readdir( dir ) ) != NULL) {
-			if ( curentLoadStatus.stopLoading ) {
+			if ( currentLoadStatus.stopLoading ) {
 				endResetModel();
-				curentLoadStatus.stopLoading = false;
+				currentLoadStatus.stopLoading = false;
 				closedir( dir );
 				return;
 			}
+
 			/*
 				*
 				* Do not show . and ..
 				*
 			*/
-
 			QString nodeName = QString::fromLocal8Bit( ent->d_name );
 			if ( ( nodeName.compare( "." ) == 0 ) or ( nodeName.compare( ".." ) == 0 ) )
 				continue;
 
 			QVariantList data = quickDataGatherer->getQuickFileInfo( __rootPath + nodeName );
+			/* Show Hidden */
 			if ( __showHidden ) {
+				/* We should be able to filter folders if need be */
 				if ( __nameFilters.count() ) {
-					if ( isDir( __rootPath + nodeName ) ) {
+					/* If filter folders is false, don't bother about filtering folders */
+					if ( not __filterFolders and ent->d_type == DT_DIR ) {
 						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 						__childNames << nodeName;
 					}
+
 					else if ( matchesFilter( __nameFilters, nodeName ) ) {
 						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 						__childNames << nodeName;
@@ -866,18 +840,23 @@ void NBFileSystemModel::setupModelData() {
 					__childNames << nodeName;
 				}
 			}
+
+			/* Hide Hidden */
 			else {
 				if ( not nodeName.startsWith( "." ) ) {
+					/* We want to filter folders too */
 					if ( __nameFilters.count() ) {
-						if ( isDir( __rootPath + nodeName ) ) {
+						if ( not __filterFolders and ent->d_type == DT_DIR ) {
 							rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 							__childNames << nodeName;
 						}
+
 						else if ( matchesFilter( __nameFilters, nodeName ) ) {
 							rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 							__childNames << nodeName;
 						}
 					}
+
 					else {
 						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
 						__childNames << nodeName;
@@ -892,7 +871,7 @@ void NBFileSystemModel::setupModelData() {
 
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
-	curentLoadStatus.loading = false;
+	currentLoadStatus.loading = false;
 
 	emit loadFileInfo();
 	emit directoryLoaded( __rootPath );

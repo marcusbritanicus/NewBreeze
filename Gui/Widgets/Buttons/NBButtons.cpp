@@ -6,7 +6,7 @@
 
 #include <NBButtons.hpp>
 
-NBButtons::NBButtons() : QWidget() {
+NBButtons::NBButtons( QWidget *parent ) : QWidget( parent ) {
 
 	myButtonHeight = 24;
 	setContentsMargins( QMargins() );
@@ -21,15 +21,17 @@ NBButtons::NBButtons() : QWidget() {
 
 	QHBoxLayout *baseLyt = new QHBoxLayout();
 	baseLyt->setContentsMargins( QMargins() );
+	baseLyt->setSpacing( 0 );
 	baseLyt->setAlignment( Qt::AlignCenter );
 	baseLyt->addWidget( btnsBase );
 
 	setLayout( baseLyt );
 
-	setStyleSheet( getStyleSheet( "NBButtons", Settings->General.Style ) );
+	/* Internal styling hack: until we learn to draw smooth rounded rects */
+	setStyleSheet( "QWidget#btnsBase { border: 1px solid gray; border-radius: 4px; }" );
 };
 
-NBButtons::NBButtons( QList<QIcon> icons ) : QWidget() {
+NBButtons::NBButtons( QList<QIcon> icons, QWidget *parent ) : QWidget( parent ) {
 
 	setContentsMargins( QMargins() );
 
@@ -40,12 +42,7 @@ NBButtons::NBButtons( QList<QIcon> icons ) : QWidget() {
 	segments.clear();
 	int max = icons.count();
 	for( int i = 0; i < max; i++ ) {
-		QPushButton *btn = new QPushButton( this );
-		btn->setIcon( icons.value( i ) );
-
-		btn->setFixedHeight( myButtonHeight );
-		btn->setFocusPolicy( Qt::NoFocus );
-
+		NBButton *btn = new NBButton( icons.value( i ), this );
 		connect( btn, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
 
 		segments << btn;
@@ -60,15 +57,18 @@ NBButtons::NBButtons( QList<QIcon> icons ) : QWidget() {
 
 	QHBoxLayout *baseLyt = new QHBoxLayout();
 	baseLyt->setContentsMargins( QMargins() );
+	baseLyt->setSpacing( 0 );
+	baseLyt->setSpacing( 0 );
 	baseLyt->setAlignment( Qt::AlignCenter );
 	baseLyt->addWidget( btnsBase );
 
 	setLayout( baseLyt );
 
-	setStyleSheet( getStyleSheet( "NBButtons", Settings->General.Style ) );
+	/* Internal styling hack: until we learn to draw smooth rounded rects */
+	setStyleSheet( "QWidget#btnsBase { border: 1px solid gray; border-radius: 4px; }" );
 };
 
-NBButtons::NBButtons( QStringList labels ) : QWidget() {
+NBButtons::NBButtons( QStringList labels, QWidget *parent ) : QWidget( parent ) {
 
 	setContentsMargins( QMargins() );
 
@@ -79,12 +79,7 @@ NBButtons::NBButtons( QStringList labels ) : QWidget() {
 	segments.clear();
 	int max = labels.count();
 	for( int i = 0; i < max; i++ ) {
-		QPushButton *btn = new QPushButton( this );
-		btn->setText( labels.value( i ) );
-
-		btn->setFixedHeight( myButtonHeight );
-		btn->setFocusPolicy( Qt::NoFocus );
-
+		NBButton *btn = new NBButton( labels.value( i ), this );
 		connect( btn, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
 
 		segments << btn;
@@ -99,15 +94,17 @@ NBButtons::NBButtons( QStringList labels ) : QWidget() {
 
 	QHBoxLayout *baseLyt = new QHBoxLayout();
 	baseLyt->setContentsMargins( QMargins() );
+	baseLyt->setSpacing( 0 );
 	baseLyt->setAlignment( Qt::AlignCenter );
 	baseLyt->addWidget( btnsBase );
 
 	setLayout( baseLyt );
 
-	setStyleSheet( getStyleSheet( "NBButtons", Settings->General.Style ) );
+	/* Internal styling hack: until we learn to draw smooth rounded rects */
+	setStyleSheet( "QWidget#btnsBase { border: 1px solid gray; border-radius: 4px; }" );
 };
 
-NBButtons::NBButtons( QStringList labels, QList<QIcon> icons ) : QWidget() {
+NBButtons::NBButtons( QStringList labels, QList<QIcon> icons, QWidget *parent ) : QWidget( parent ) {
 
 	setContentsMargins( QMargins() );
 
@@ -118,13 +115,7 @@ NBButtons::NBButtons( QStringList labels, QList<QIcon> icons ) : QWidget() {
 	segments.clear();
 	int max = qMax( labels.count(), icons.count() );
 	for( int i = 0; i < max; i++ ) {
-		QPushButton *btn = new QPushButton( this );
-		btn->setText( labels.value( i ) );
-		btn->setIcon( icons.value( i ) );
-
-		btn->setFixedHeight( myButtonHeight );
-		btn->setFocusPolicy( Qt::NoFocus );
-
+		NBButton *btn = new NBButton( icons.value( i ), labels.value( i ), this );
 		connect( btn, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
 
 		segments << btn;
@@ -139,15 +130,17 @@ NBButtons::NBButtons( QStringList labels, QList<QIcon> icons ) : QWidget() {
 
 	QHBoxLayout *baseLyt = new QHBoxLayout();
 	baseLyt->setContentsMargins( QMargins() );
+	baseLyt->setSpacing( 0 );
 	baseLyt->setAlignment( Qt::AlignCenter );
 	baseLyt->addWidget( btnsBase );
 
 	setLayout( baseLyt );
 
-	setStyleSheet( getStyleSheet( "NBButtons", Settings->General.Style ) );
+	/* Internal styling hack: until we learn to draw smooth rounded rects */
+	setStyleSheet( "QWidget#btnsBase { border: 1px solid gray; border-radius: 4px; }" );
 };
 
-QPushButton* NBButtons::segment( int sgmnt ) {
+NBButton* NBButtons::segment( int sgmnt ) {
 
 	return segments.at( sgmnt );
 };
@@ -164,16 +157,11 @@ void NBButtons::setSegmentText( int segment, QString segText ) {
 
 void NBButtons::setSegmentWidth( int width ) {
 
-	Q_FOREACH( QPushButton *pBtn, segments )
-		pBtn->setFixedWidth( width );
+	Q_FOREACH( NBButton *pBtn, segments )
+		pBtn->resize( width, 0 );
 
-	setFixedWidth( segments.count() * width + segments.count() * 2 );
-};
-
-void NBButtons::setSegmentHeight( int height ) {
-
-	Q_FOREACH( QPushButton *pBtn, segments )
-		pBtn->setFixedHeight( height );
+	/* Sum of the width of all the segments + sum of the width of the separators; */
+	resize( segments.count() * width + ( segments.count() - 1 ) * 2, myButtonHeight );
 };
 
 void NBButtons::setSegmentShortcut( int segment, QKeySequence shortcut ) {
@@ -191,9 +179,10 @@ void NBButtons::setSegmentEnabled( int segment ) {
 	segments.at( segment )->setEnabled( true );
 };
 
-void NBButtons::insertSegment( QPushButton *button, int logicalPos ) {
+void NBButtons::insertSegment( NBButton *button, int logicalPos ) {
 
-	button->setFixedHeight( myButtonHeight );
+	button->setParent( this );
+	connect( button, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
 
 	if ( logicalPos >= segments.count() ) {
 		segments << button;
@@ -202,19 +191,20 @@ void NBButtons::insertSegment( QPushButton *button, int logicalPos ) {
 	}
 
 	else {
-		connect( button, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
 		segments.insert( logicalPos, button );
 		btnsLyt->insertWidget( logicalPos * 2, button );
 		btnsLyt->insertWidget( logicalPos * 2 + 1, Separator::vertical() );
 	}
 };
 
-void NBButtons::addSegment( QPushButton *button ) {
+void NBButtons::addSegment( NBButton *button ) {
 
-	button->setFixedHeight( myButtonHeight );
+	button->setParent( this );
 
 	if ( segments.count() )
 		btnsLyt->addWidget( Separator::vertical() );
+
+	connect( button, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
 
 	btnsLyt->addWidget( button );
 	segments << button;
@@ -222,6 +212,6 @@ void NBButtons::addSegment( QPushButton *button ) {
 
 void NBButtons::handleSegmentClick() {
 
-	QPushButton *btn = qobject_cast<QPushButton*>( sender() );
+	NBButton *btn = qobject_cast<NBButton*>( sender() );
 	emit segmentClicked( segments.indexOf( btn ) );
 };

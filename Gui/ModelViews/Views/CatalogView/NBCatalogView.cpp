@@ -428,7 +428,7 @@ QModelIndex NBCatalogView::moveCursor( QAbstractItemView::CursorAction cursorAct
 			}
 
 			case QAbstractItemView::MoveDown: {
-				if ( Settings->General.FolderView == "DetailsView" ) {
+				if ( Settings->General.ViewMode == "DetailsView" ) {
 					if ( idx.row() == catalogModel->rowCount() - 1 ) {
 						return catalogModel->index( 0, 0, idx.parent() );
 					}
@@ -469,7 +469,7 @@ QModelIndex NBCatalogView::moveCursor( QAbstractItemView::CursorAction cursorAct
 
 			case QAbstractItemView::MoveUp: {
 
-				if ( Settings->General.FolderView == "DetailsView" ) {
+				if ( Settings->General.ViewMode == "DetailsView" ) {
 					if ( idx.row() == 0 ) {
 						return catalogModel->index( catalogModel->rowCount() - 1, 0, idx.parent() );
 					}
@@ -632,6 +632,38 @@ void NBCatalogView::paintEvent( QPaintEvent* event ) {
 
 		option.decorationSize = myIconSize;
 
+		/* Palette */
+		QPalette pltt = qApp->palette();
+
+		/* Dark text colors will suit here */
+		if ( isBrightColor( pltt.color( QPalette::Base ), pltt.color( QPalette::Highlight ) ) ) {
+			if ( option.state & QStyle::State_Selected )
+				pltt.setColor( QPalette::Text, pltt.color( QPalette::HighlightedText ) );
+
+			else
+				pltt.setColor( QPalette::Text, palette().color( QPalette::Text ) );
+
+			/* Bright text will be used for drawing the 'current rect' */
+			pltt.setColor( QPalette::BrightText, pltt.color( QPalette::Highlight ).darker() );
+
+			/* ButtonText will be used to paint the extra details */
+			pltt.setColor( QPalette::BrightText, pltt.color( QPalette::Text ).lighter( 135 ) );
+		}
+
+		/* Light text colors to be used here */
+		else {
+			if ( option.state & QStyle::State_Selected )
+				pltt.setColor( QPalette::Text, pltt.color( QPalette::HighlightedText ) );
+
+			else
+				pltt.setColor( QPalette::Text, palette().color( QPalette::Text ) );
+
+			/* Bright text will be used for drawing the 'current rect' */
+			pltt.setColor( QPalette::BrightText, pltt.color( QPalette::Highlight ).lighter() );
+		}
+
+		option.palette = pltt;
+
 		itemDelegate()->paint( &painter, option, index );
 	}
 
@@ -767,7 +799,7 @@ void NBCatalogView::mouseDoubleClickEvent( QMouseEvent *event ) {
 				"However this location does not exist. If this folder "
 				"has been deleted, you may want to delete this catalog entry."
 			).arg( target );
-			NBMessageDialog::error( "Location Unavailable", text );
+			NBMessageDialog::error( this, "Location Unavailable", text );
 		}
 	}
 
@@ -786,13 +818,13 @@ void NBCatalogView::openCatalogItem(const QModelIndex &index ) {
 			"However this location does not exist. If this folder "
 			"has been deleted, you may want to delete this catalog entry."
 		).arg( target );
-		NBMessageDialog::error( "Location Unavailable", text );
+		NBMessageDialog::error( this, "Location Unavailable", text );
 	}
 };
 
 void NBCatalogView::showContextMenu( const QPoint &point ) {
 
-	NBMenu *menu = new NBMenu();
+	QMenu *menu = new QMenu();
 
 	QAction *openAct = new QAction( QIcon(), "&Open Location", this );
 	connect( openAct, SIGNAL( triggered() ), this, SLOT( openCatalogItem() ) );
@@ -823,7 +855,7 @@ void NBCatalogView::openCatalogItem() {
 			"However this location does not exist. If this folder "
 			"has been deleted, you may want to delete this catalog entry."
 		).arg( target );
-		NBMessageDialog::error( "Location Unavailable", text );
+		NBMessageDialog::error( this, "Location Unavailable", text );
 	}
 };
 

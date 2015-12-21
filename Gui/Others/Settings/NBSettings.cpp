@@ -28,27 +28,27 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings = new NBSettings();
 	defaultSettings->init = true;
 
-	defaultSettings->General.Style = QString( "LightGray" );
-	defaultSettings->General.FolderView = QString( "IconsView" );
+	defaultSettings->General.Style = QString( "Default" );
+	defaultSettings->General.ViewMode = QString( "IconsView" );
 	defaultSettings->General.IconTheme = NBSystemIconTheme();
 	defaultSettings->General.ImagePreviews = true;
 	defaultSettings->General.NativeTitleBar = false;
 	defaultSettings->General.TrayIcon = true;
 	defaultSettings->General.OpenWithCatalog = true;
+	defaultSettings->General.SidePanel = true;
+	defaultSettings->General.ShowHidden = false;
+	defaultSettings->General.IconSize = QSize( 48, 48 );
+	defaultSettings->General.SortColumn = 0;
+	defaultSettings->General.SortCase = false;
+	defaultSettings->General.Grouping = false;
+	defaultSettings->General.PerFolderViews = true;
+	defaultSettings->General.FilterFolders = true;
 
 	defaultSettings->Special.ClosingDown = false;
 
 	defaultSettings->Session.Geometry = QRect( 900, 600, 0, 0 );
 	defaultSettings->Session.LastDir = QDir::homePath();
 	defaultSettings->Session.Maximized = true;
-	defaultSettings->Session.SidePanel = true;
-	defaultSettings->Session.ShowHidden = false;
-	defaultSettings->Session.IconSize = QSize( 48, 48 );
-	defaultSettings->Session.SortColumn = 0;
-	defaultSettings->Session.SortCase = false;
-	defaultSettings->Session.SortCategory = false;
-	defaultSettings->Session.ExpandDevices = true;
-	defaultSettings->Session.ExpandBookmarks = true;
 
 	defaultSettings->Shortcuts.AboutNB = QList<QKeySequence>() << QKeySequence( "Shift+F1" );
 	defaultSettings->Shortcuts.AboutQt = QList<QKeySequence>() << QKeySequence( "Shift+F2" );
@@ -85,20 +85,6 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->Shortcuts.FocusSearchBar = QList<QKeySequence>() << QKeySequence( "Ctrl+F" );
 	defaultSettings->Shortcuts.ClearSearchBar = QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+F" );
 
-	defaultSettings->Colors.ExecPenColor = QColor( 0, 100, 0, 255 );
-	defaultSettings->Colors.HiddenPenColor = QColor( 110, 110, 110, 255 );
-	defaultSettings->Colors.HiddenPenColorAlt = QColor( 61, 61, 61, 255 );
-	defaultSettings->Colors.NoReadPenColor = QColor( 162, 42, 42, 255 );
-	defaultSettings->Colors.TextPenColor = QColor( 255, 255, 255, 255 );
-	defaultSettings->Colors.TextPenColorAlt = QColor( 0, 0, 0, 255 );
-	defaultSettings->Colors.SymLinkPenColor = QColor( 175, 238, 238, 255 );
-	defaultSettings->Colors.SymLinkPenColorAlt = QColor( 124, 104, 238, 255 );
-	defaultSettings->Colors.FocusPenColor = QColor( 255, 255, 255, 255 );
-	defaultSettings->Colors.FocusPenColorAlt = QColor( 0, 0, 0, 255 );
-	defaultSettings->Colors.SelectionBrushColor = QColor( 160, 160, 160, 90 );
-	defaultSettings->Colors.MouseBrushColor = QColor( 160, 160, 160, 60 );
-	defaultSettings->Colors.SelectionMouseBrushColor = QColor( 160, 160, 160, 120 );
-
 	return defaultSettings;
 };
 
@@ -118,8 +104,8 @@ NBSettings* NBSettings::instance() {
 	if ( gaKeys.contains( QString( "Style" ) ) )
 		settings->General.Style = gSettings.value( "Style" ).toString();
 
-	if ( gaKeys.contains( QString( "FolderView" ) ) )
-		settings->General.FolderView = gSettings.value( "FolderView" ).toString();
+	if ( gaKeys.contains( QString( "ViewMode" ) ) )
+		settings->General.ViewMode = gSettings.value( "ViewMode" ).toString() + "View";
 
 	if ( gaKeys.contains( QString( "IconTheme" ) ) )
 		settings->General.IconTheme = gSettings.value( "IconTheme" ).toString();
@@ -136,6 +122,30 @@ NBSettings* NBSettings::instance() {
 	if ( gaKeys.contains( QString( "OpenWithCatalog" ) ) )
 		settings->General.OpenWithCatalog = gSettings.value( "OpenWithCatalog" ).toBool();
 
+	if ( gaKeys.contains( QString( "SidePanel" ) ) )
+		settings->General.SidePanel = gSettings.value( "SidePanel" ).toBool();
+
+	if ( gaKeys.contains( QString( "ShowHidden" ) ) )
+		settings->General.ShowHidden = gSettings.value( "ShowHidden" ).toBool();
+
+	if ( gaKeys.contains( QString( "IconSize" ) ) )
+		settings->General.IconSize = gSettings.value( "IconSize" ).toSize();
+
+	if ( gaKeys.contains( QString( "SortColumn" ) ) )
+		settings->General.SortColumn = gSettings.value( "SortColumn" ).toInt();
+
+	if ( gaKeys.contains( QString( "SortCase" ) ) )
+		settings->General.SortCase = gSettings.value( "SortCase" ).toBool();
+
+	if ( gaKeys.contains( QString( "Grouping" ) ) )
+		settings->General.Grouping = gSettings.value( "Grouping" ).toBool();
+
+	if ( gaKeys.contains( QString( "PerFolderViews" ) ) )
+		settings->General.PerFolderViews = gSettings.value( "PerFolderViews" ).toBool();
+
+	if ( gaKeys.contains( QString( "FilterFolders" ) ) )
+		settings->General.FilterFolders = gSettings.value( "FilterFolders" ).toBool();
+
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		settings->Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
 
@@ -144,30 +154,6 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "Session/Maximized" ) ) )
 		settings->Session.Maximized = gSettings.value( "Session/Maximized" ).toBool();
-
-	if ( gaKeys.contains( QString( "Session/SidePanel" ) ) )
-		settings->Session.SidePanel = gSettings.value( "Session/SidePanel" ).toBool();
-
-	if ( gaKeys.contains( QString( "Session/ShowHidden" ) ) )
-		settings->Session.ShowHidden = gSettings.value( "Session/ShowHidden" ).toBool();
-
-	if ( gaKeys.contains( QString( "Session/IconSize" ) ) )
-		settings->Session.IconSize = gSettings.value( "Session/IconSize" ).toSize();
-
-	if ( gaKeys.contains( QString( "Session/SortColumn" ) ) )
-		settings->Session.SortColumn = gSettings.value( "Session/SortColumn" ).toInt();
-
-	if ( gaKeys.contains( QString( "Session/SortCase" ) ) )
-		settings->Session.SortCase = gSettings.value( "Session/SortCase" ).toBool();
-
-	if ( gaKeys.contains( QString( "Session/SortCategory" ) ) )
-		settings->Session.SortCategory = gSettings.value( "Session/SortCategory" ).toBool();
-
-	if ( gaKeys.contains( QString( "Session/ExpandDevices" ) ) )
-		settings->Session.ExpandDevices = gSettings.value( "Session/ExpandDevices" ).toBool();
-
-	if ( gaKeys.contains( QString( "Session/ExpandBookmarks" ) ) )
-		settings->Session.ExpandBookmarks = gSettings.value( "Session/ExpandBookmarks" ).toBool();
 
 	if ( saKeys.contains( QString( "AboutNB" ) ) )
 		settings->Shortcuts.AboutNB = getShortcuts( "AboutNB" );
@@ -292,7 +278,7 @@ void NBSettings::reload() {
 		General.Style = gSettings.value( "Style" ).toString();
 
 	if ( gaKeys.contains( QString( "FolderView" ) ) )
-		General.FolderView = gSettings.value( "FolderView" ).toString();
+		General.ViewMode = gSettings.value( "ViewMode" ).toString() + "View";
 
 	if ( gaKeys.contains( QString( "IconTheme" ) ) )
 		General.IconTheme = gSettings.value( "IconTheme" ).toString();
@@ -318,29 +304,29 @@ void NBSettings::reload() {
 	if ( gaKeys.contains( QString( "Session/Maximized" ) ) )
 		Session.Maximized = gSettings.value( "Session/Maximized" ).toBool();
 
-	if ( gaKeys.contains( QString( "Session/SidePanel" ) ) )
-		Session.SidePanel = gSettings.value( "Session/SidePanel" ).toBool();
+	if ( gaKeys.contains( QString( "General/SidePanel" ) ) )
+		General.SidePanel = gSettings.value( "General/SidePanel" ).toBool();
 
-	if ( gaKeys.contains( QString( "Session/ShowHidden" ) ) )
-		Session.ShowHidden = gSettings.value( "Session/ShowHidden" ).toBool();
+	if ( gaKeys.contains( QString( "General/ShowHidden" ) ) )
+		General.ShowHidden = gSettings.value( "General/ShowHidden" ).toBool();
 
-	if ( gaKeys.contains( QString( "Session/IconSize" ) ) )
-		Session.IconSize = gSettings.value( "Session/IconSize" ).toSize();
+	if ( gaKeys.contains( QString( "General/IconSize" ) ) )
+		General.IconSize = gSettings.value( "General/IconSize" ).toSize();
 
-	if ( gaKeys.contains( QString( "Session/SortColumn" ) ) )
-		Session.SortColumn = gSettings.value( "Session/SortColumn" ).toInt();
+	if ( gaKeys.contains( QString( "General/SortColumn" ) ) )
+		General.SortColumn = gSettings.value( "General/SortColumn" ).toInt();
 
-	if ( gaKeys.contains( QString( "Session/SortCase" ) ) )
-		Session.SortCase = gSettings.value( "Session/SortCase" ).toBool();
+	if ( gaKeys.contains( QString( "General/SortCase" ) ) )
+		General.SortCase = gSettings.value( "General/SortCase" ).toBool();
 
-	if ( gaKeys.contains( QString( "Session/SortCategory" ) ) )
-		Session.SortCategory = gSettings.value( "Session/SortCategory" ).toBool();
+	if ( gaKeys.contains( QString( "General/Grouping" ) ) )
+		General.Grouping = gSettings.value( "General/Grouping" ).toBool();
 
-	if ( gaKeys.contains( QString( "Session/ExpandDevices" ) ) )
-		Session.ExpandDevices = gSettings.value( "Session/ExpandDevices" ).toBool();
+	if ( gaKeys.contains( QString( "General/PerFolderViews" ) ) )
+		General.PerFolderViews = gSettings.value( "General/PerFolderViews" ).toBool();
 
-	if ( gaKeys.contains( QString( "Session/ExpandBookmarks" ) ) )
-		Session.ExpandBookmarks = gSettings.value( "Session/ExpandBookmarks" ).toBool();
+	if ( gaKeys.contains( QString( "General/FilterFolders" ) ) )
+		General.FilterFolders = gSettings.value( "General/FilterFolders" ).toBool();
 
 	if ( saKeys.contains( QString( "AboutNB" ) ) )
 		Shortcuts.AboutNB = getShortcuts( "AboutNB" );

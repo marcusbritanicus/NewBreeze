@@ -6,17 +6,29 @@
 
 #include <NBGuiWidgets.hpp>
 
+NBLineEdit::NBLineEdit( QWidget *parent ) : QLineEdit( parent ) {
+	;
+};
+
+void NBLineEdit::paintEvent( QPaintEvent *pEvent ) {
+
+	QLineEdit::paintEvent( pEvent );
+	QPainter painter( this );
+
+	painter.setPen( palette().color( QPalette::Base ).darker() );
+	painter.drawRect( rect().adjusted( 0, 0, -1, -1 ) );
+
+	painter.end();
+};
+
 NBSearchBar::NBSearchBar() : QWidget() {
 
 	searchLE = new QLineEdit();
 	searchLE->setFocusPolicy( Qt::ClickFocus );
+	searchLE->setStyleSheet( "border: none; background: transparent;" );
 	QLabel *searchLbl = new QLabel();
 
-	if ( Settings->General.Style == "Natural" )
-		searchLbl->setPixmap( QPixmap( ":icons/searchn.png" ).scaled( 20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-
-	else
-		searchLbl->setPixmap( QPixmap( ":icons/search.png" ).scaled( 20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	searchLbl->setPixmap( QIcon::fromTheme( "edit-find" ).pixmap( 20 ) );
 
 	QHBoxLayout *srchLyt = new QHBoxLayout();
 	srchLyt->setContentsMargins( QMargins() );
@@ -27,7 +39,6 @@ NBSearchBar::NBSearchBar() : QWidget() {
 	setLayout( srchLyt );
 
 	setFixedWidth( 150 );
-	setStyleSheet( getStyleSheet( "NBAddressBar", Settings->General.Style ) );
 	connect( searchLE, SIGNAL( textEdited( QString ) ), this, SLOT( searchChanged( QString ) ) );
 };
 
@@ -40,59 +51,12 @@ void NBSearchBar::searchChanged( QString query ) {
 		emit searchString( query );
 };
 
-NBMenu::NBMenu( QWidget *parent ) : QMenu( parent ) {
-
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
-
-	setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
-};
-
-NBMenu::NBMenu( QString title, QWidget *parent ) : QMenu( title, parent ) {
-
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
-
-	setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
-};
-
-NBToolButton::NBToolButton( QString themeIcon, QString customIcon ) : QToolButton() {
-
-	if ( customIcon.isEmpty() )
-		customIcon = QString( themeIcon );
-
-	setFixedSize( QSize( 24, 24 ) );
-	setIconSize( QSize( 20, 20 ) );
-	setAutoRaise( true );
-
-	if ( customIcon == QString( "#textBtn" ) )
-		setText( themeIcon );
-
-	else
-		setIcon( QIcon::fromTheme( themeIcon, QIcon( customIcon ) ) );
-
-	setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
-};
-
-NBPushButton::NBPushButton( QIcon icon, QString text ) : QPushButton() {
-
-	setFixedHeight( 24 );
-	setMinimumWidth( 128 );
-	setIconSize( QSize( 16, 16 ) );
-
-	setIcon( icon );
-	setText( text );
-
-	setStyleSheet( getStyleSheet( "NBToolButton", Settings->General.Style ) );
-};
-
 NBTitleIcon::NBTitleIcon( QString icon ) : QLabel() {
 
 	setPixmap( QPixmap( icon ).scaled( QSize( 21, 21 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 	setContextMenuPolicy( Qt::CustomContextMenu );
 
 	menu.setAttribute( Qt::WA_TranslucentBackground );
-	menu.setStyleSheet( getStyleSheet( "NBMenu", Settings->General.Style ) );
 
 	QAction *aboutNBAct = new QAction( QIcon( ":/icons/info.png" ), "&About NewBreeze", this );
 	connect( aboutNBAct, SIGNAL( triggered() ), this, SIGNAL( aboutNB() ) );
@@ -110,71 +74,6 @@ void NBTitleIcon::mousePressEvent( QMouseEvent *mpEvent ) {
 
 	menu.exec( QWidget::mapToGlobal( QPoint( x() + width() / 2, y() + height() / 2 ) ) );
 	mpEvent->accept();
-};
-
-NBViewModeButton::NBViewModeButton() : QPushButton() {
-
-	setFixedSize( QSize( 36, 24 ) );
-
-	setIcon( QIcon( ":/icons/view-choose.png" ) );
-
-	connect( this, SIGNAL( clicked() ), this, SIGNAL( switchToNextView() ) );
-
-	NBMenu *menu = new NBMenu( this );
-
-	tilesAct = new QAction( QIcon::fromTheme( "view-list-details" ), "&Tiles View", this );
-	tilesAct->setCheckable( true );
-	connect( tilesAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
-
-	iconsAct = new QAction( QIcon::fromTheme( "view-list-icons" ), "&Icons View", this );
-	iconsAct->setCheckable( true );
-	connect( iconsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
-
-	detailsAct = new QAction( QIcon::fromTheme( "view-list-text" ), "&Details View", this );
-	detailsAct->setCheckable( true );
-	connect( detailsAct, SIGNAL( triggered() ), this, SIGNAL( changeViewMode() ) );
-
-	viewsGroup = new QActionGroup( this );
-
-	menu->addAction( viewsGroup->addAction( tilesAct ) );
-	menu->addAction( viewsGroup->addAction( iconsAct ) );
-	menu->addAction( viewsGroup->addAction( detailsAct ) );
-	setMenu( menu );
-
-	if ( Settings->General.FolderView == QString( "TilesView" ) )
-		tilesAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "IconsView" ) )
-		iconsAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "DetailsView" ) )
-		detailsAct->setChecked( true );
-};
-
-int NBViewModeButton::checkedAction() {
-
-	if ( viewsGroup->checkedAction() == tilesAct )
-		return 0;
-
-	else if ( viewsGroup->checkedAction() == iconsAct )
-		return 1;
-
-	else
-		return 2;
-};
-
-void NBViewModeButton::showMenu() {
-
-	if ( Settings->General.FolderView == QString( "TilesView" ) )
-		tilesAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "IconsView" ) )
-		iconsAct->setChecked( true );
-
-	else if ( Settings->General.FolderView == QString( "DetailsView" ) )
-		detailsAct->setChecked( true );
-
-	QPushButton::showMenu();
 };
 
 NBDriveLabel::NBDriveLabel( const QString path ) : QWidget() {
@@ -202,12 +101,7 @@ void NBDriveLabel::paintEvent( QPaintEvent *pEvent ) {
 
 	QPixmap pix = QIcon::fromTheme( "drive-harddisk" ).pixmap( 28, 28 );
 
-	if ( Settings->General.Style == "Natural" )
-		painter->setPen( QColor( 0, 0, 0 ) );
-
-	else
-		painter->setPen( QColor( 255, 255, 255 ) );
-
+	painter->setPen( palette().color( QPalette::WindowText ) );
 
 	// 10 px padding along X
 	int pixX = 7;
@@ -290,14 +184,14 @@ void NBDriveInfo::paintEvent( QPaintEvent *pEvent ) {
 	pEvent->accept();
 };
 
-QWidget* Separator::vertical() {
+QWidget* Separator::vertical( QWidget *parent ) {
 
-	return new Separator( Separator::Vertical );
+	return new Separator( Separator::Vertical, parent );
 };
 
-QWidget* Separator::horizontal() {
+QWidget* Separator::horizontal( QWidget *parent ) {
 
-	return new Separator( Separator::Horizontal );
+	return new Separator( Separator::Horizontal, parent );
 
 	QWidget *hSep = new QWidget();
 	hSep->setContentsMargins( QMargins() );
@@ -307,7 +201,7 @@ QWidget* Separator::horizontal() {
 	return hSep;
 };
 
-Separator::Separator( Separator::Mode mode ) {
+Separator::Separator( Separator::Mode mode, QWidget *parent ) : QWidget( parent ) {
 
 	mMode = mode;
 
@@ -342,6 +236,9 @@ Separator::Separator( Separator::Mode mode ) {
 
 void Separator::resizeEvent( QResizeEvent *rEvent ) {
 
+	QWidget::resizeEvent( rEvent );
+	rEvent->accept();
+
 	switch( mMode ) {
 		case Separator::Horizontal : {
 			hGrad.setFinalStop( 0, rEvent->size().width() );
@@ -355,7 +252,6 @@ void Separator::resizeEvent( QResizeEvent *rEvent ) {
 	}
 
 	repaint();
-	rEvent->accept();
 };
 
 void Separator::paintEvent( QPaintEvent *pEvent ) {
@@ -387,22 +283,46 @@ void Separator::paintEvent( QPaintEvent *pEvent ) {
 	pEvent->accept();
 };
 
-QWidget* NBSpacer::vertical( int spacing ) {
+QWidget* NBSpacer::vertical( int spacing, QWidget *parent ) {
 
-	QWidget *vSpace = new QWidget();
-	vSpace->setContentsMargins( QMargins() );
-	vSpace->setFixedHeight( spacing );
-	vSpace->setStyleSheet( "background-color: transparent;" );
-
-	return vSpace;
+	return new NBSpacer( NBSpacer::Vertical, spacing, parent );
 };
 
-QWidget* NBSpacer::horizontal( int spacing ) {
+QWidget* NBSpacer::horizontal( int spacing, QWidget *parent ) {
 
-	QWidget *hSpace = new QWidget();
-	hSpace->setContentsMargins( QMargins() );
-	hSpace->setFixedWidth( spacing );
-	hSpace->setStyleSheet( "background-color: transparent;" );
+	return new NBSpacer( NBSpacer::Horizontal, spacing, parent );
+};
 
-	return hSpace;
+NBSpacer::NBSpacer( NBSpacer::Mode mode, int spacing, QWidget *parent ) : QWidget( parent ) {
+
+	switch( mode ) {
+		case Vertical: {
+			setFixedHeight( spacing );
+			setContentsMargins( QMargins() );
+			break;
+		}
+
+		case Horizontal: {
+			setFixedWidth( spacing );
+			setContentsMargins( QMargins() );
+			break;
+		}
+	}
+};
+
+void NBSpacer::resizeEvent( QResizeEvent *rEvent ) {
+
+	QWidget::resizeEvent( rEvent );
+	rEvent->accept();
+
+	repaint();
+};
+
+void NBSpacer::paintEvent( QPaintEvent *pEvent ) {
+
+	QPainter *painter = new QPainter( this );
+	painter->fillRect( rect(), Qt::transparent );
+	painter->end();
+
+	pEvent->accept();
 };

@@ -13,7 +13,7 @@ inline QString getTempArchiveName( QString name ) {
 
 QString NBArchive::archiveName = QString();
 NBArchive::Mode NBArchive::archiveMode = NBArchive::READ;
-NBArchive::Type NBArchive::archiveType = NBArchive::TXZ;
+NBArchive::Type NBArchive::archiveType = NBArchive::TAR;
 
 NBArchive::NBArchive( QString archive, NBArchive::Mode mode, NBArchive::Type type ) {
 
@@ -75,30 +75,6 @@ void NBArchive::create() {
 			createXZ();
 			break;
 		}
-
-		case NBArchive::TZIP: {
-			tempArchiveName = getTempArchiveName( archiveName );
-			createTZip();
-			break;
-		}
-
-		case NBArchive::TBZ2: {
-			tempArchiveName = getTempArchiveName( archiveName );
-			createTBZ2();
-			break;
-		}
-
-		case NBArchive::TGZ: {
-			tempArchiveName = getTempArchiveName( archiveName );
-			createTGZ();
-			break;
-		}
-
-		case NBArchive::TXZ: {
-			tempArchiveName = getTempArchiveName( archiveName );
-			createTXZ();
-			break;
-		}
 	}
 };
 
@@ -129,126 +105,75 @@ void NBArchive::extract() {
 			extractXZ();
 			break;
 		}
-
-		case NBArchive::TZIP: {
-			tempArchiveName = getTempArchiveName( archiveName );
-			extractTZip();
-			break;
-		}
-
-		case NBArchive::TBZ2: {
-			tempArchiveName = getTempArchiveName( archiveName );
-			extractTBZ2();
-			break;
-		}
-
-		case NBArchive::TGZ: {
-			tempArchiveName = getTempArchiveName( archiveName );
-			extractTGZ();
-			break;
-		}
-
-		case NBArchive::TXZ: {
-			tempArchiveName = getTempArchiveName( archiveName );
-			extractTXZ();
-			break;
-		}
 	}
 };
 
 void NBArchive::createTar() {
 
-	NBTar *archive = new NBTar( archiveName, NBTar::WRITE );
-	archive->create( inputList, src );
+	TarFile tf( archiveName, TarFile::Write, TarFile::AUTOFilter );
+	Q_FOREACH( QString infile, inputList )
+		if ( isDir( infile ) )
+			tf.addDir( infile );
+
+		else
+			tf.addFile( infile );
+
+	tf.writeArchive();
+	tf.close();
 };
 
 void NBArchive::createZip() {
 
-	NBZip *archive = new NBZip( archiveName, NBZip::WRITE );
-	archive->create( inputList, src );
+	ZipFile zf( archiveName, ZipFile::Write );
+	Q_FOREACH( QString infile, inputList )
+		if ( isDir( infile ) )
+			zf.addDir( infile );
+
+		else
+			zf.addFile( infile );
+
+	zf.writeArchive();
+	zf.close();
 };
 
 void NBArchive::createBZ2() {
 
-	NBBZip2 *archive = new NBBZip2( archiveName, NBBZip2::WRITE, inputList.at( 0 ) );
-	archive->create();
+	Q_FOREACH( QString input, inputList ) {
+		NBBZip2 *archive = new NBBZip2( archiveName, NBBZip2::WRITE, input );
+		archive->create();
+	}
 };
 
 void NBArchive::createGZ() {
 
-	NBGZip *archive = new NBGZip( archiveName, NBGZip::WRITE, inputList.at( 0 )  );
-	archive->create();
+	Q_FOREACH( QString input, inputList ) {
+		NBGZip *archive = new NBGZip( archiveName, NBGZip::WRITE, input );
+		archive->create();
+	}
 };
 
 void NBArchive::createXZ() {
 
-	NBLzma *archive = new NBLzma( archiveName, NBLzma::WRITE, inputList.at( 0 )  );
-	archive->create();
+	Q_FOREACH( QString input, inputList ) {
+		NBLzma *archive = new NBLzma( archiveName, NBLzma::WRITE, input  );
+		archive->create();
+	}
 };
-
-void NBArchive::createTZip() {
-
-	// Create a temporary tar archive
-	NBTar *archiveT = new NBTar( tempArchiveName, NBTar::WRITE );
-	archiveT->create( inputList, src );
-
-	// Now compress it
-	NBZip *archive = new NBZip( "/tmp/trial.tzip", NBZip::WRITE );
-	archive->create( QStringList() << tempArchiveName, src );
-
-	QFile::remove( tempArchiveName );
-};
-
-void NBArchive::createTBZ2() {
-
-	// Create a temporary tar archive
-	NBTar *archiveT = new NBTar( tempArchiveName, NBTar::WRITE );
-	archiveT->create( inputList, src );
-
-	// Now compress it
-	NBBZip2 *archive = new NBBZip2( archiveName, NBBZip2::WRITE, tempArchiveName );
-	archive->create();
-
-	QFile::remove( tempArchiveName );
-};
-
-void NBArchive::createTGZ() {
-
-	// Create a temporary tar archive
-	NBTar *archiveT = new NBTar( tempArchiveName, NBTar::WRITE );
-	archiveT->create( inputList, src );
-
-	// Now compress it
-	NBGZip *archive = new NBGZip( archiveName, NBGZip::WRITE, tempArchiveName );
-	archive->create();
-
-	QFile::remove( tempArchiveName );
-};
-
-void NBArchive::createTXZ() {
-
-	// Create a temporary tar archive
-	NBTar *archiveT = new NBTar( tempArchiveName, NBTar::WRITE );
-	archiveT->create( inputList, src );
-
-	// Now compress it
-	NBLzma *archive = new NBLzma( archiveName, NBLzma::WRITE, tempArchiveName );
-	archive->create();
-
-	QFile::remove( tempArchiveName );
-};
-
 
 void NBArchive::extractTar() {
 
-	NBTar *archive = new NBTar( archiveName, NBTar::READ );
-	archive->extract( dest );
+	TarFile tf( archiveName, TarFile::Read, TarFile::AUTOFilter );
+	tf.readArchive();
+	tf.extract();
+	tf.close();
 };
 
 void NBArchive::extractZip() {
 
-	NBZip *archive = new NBZip( archiveName, NBZip::READ );
-	archive->extract( dest );
+	ZipFile zf( archiveName, ZipFile::Read );
+	zf.readArchive();
+	zf.extract();
+	zf.close();
 };
 
 void NBArchive::extractBZ2() {
@@ -267,56 +192,4 @@ void NBArchive::extractXZ() {
 
 	NBLzma *archive = new NBLzma( archiveName, NBLzma::READ, dest );
 	archive->extract();
-};
-
-void NBArchive::extractTZip() {
-
-	// Extract Zip to temp Location
-	NBZip *archive = new NBZip( archiveName, NBZip::READ );
-	archive->extract( tempArchiveName );
-
-	// Now extract it completely
-	NBTar *archiveT = new NBTar( tempArchiveName, NBTar::READ );
-	archiveT->extract( dest );
-
-	QFile::remove( tempArchiveName );
-};
-
-void NBArchive::extractTBZ2() {
-
-	// Extract BZip2 to temp Location
-	NBBZip2 *archive = new NBBZip2( archiveName, NBBZip2::READ, tempArchiveName );
-	archive->extract();
-
-	// Now extract it completely
-	NBTar *archiveT = new NBTar( tempArchiveName, NBTar::READ );
-	archiveT->extract( dest );
-
-	QFile::remove( tempArchiveName );
-};
-
-void NBArchive::extractTGZ() {
-
-	// Extract Zip to temp Location
-	NBGZip *archive = new NBGZip( archiveName, NBGZip::READ, tempArchiveName );
-	archive->extract();
-
-	// Now extract it completely
-	NBTar *archiveT = new NBTar( tempArchiveName, NBTar::READ );
-	archiveT->extract( dest );
-
-	QFile::remove( tempArchiveName );
-};
-
-void NBArchive::extractTXZ() {
-
-	// Extract Zip to temp Location
-	NBLzma *archive = new NBLzma( archiveName, NBLzma::READ, tempArchiveName );
-	archive->extract();
-
-	// Now extract it completely
-	NBTar *archiveT = new NBTar( tempArchiveName, NBTar::READ );
-	archiveT->extract( dest );
-
-	QFile::remove( tempArchiveName );
 };

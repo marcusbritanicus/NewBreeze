@@ -29,7 +29,7 @@ class NBUtilityBar : public QWidget {
 		void createGUI();
 		void setupConnections();
 
-		NBToolButton *closeBtn;
+		NBButton *closeBtn;
 
 	protected:
 		void mouseDoubleClickEvent( QMouseEvent * );

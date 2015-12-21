@@ -18,15 +18,14 @@ inline static void setXClipBoardData( QStringList paths ) {
 	pclose( xclip );
 };
 
-NBFolderView::NBFolderView() : QStackedWidget() {
+NBFolderView::NBFolderView( QWidget *parent ) : QStackedWidget( parent ) {
 
 	// ClipBoard
 	clipBoard = QApplication::clipboard();
 
 	// Set Data Model
 	fsModel = new NBFileSystemModel();
-	fsModel->setReadOnly( false );
-	fsModel->setCategorizationEnabled( Settings->Session.SortCategory );
+	fsModel->setCategorizationEnabled( Settings->General.Grouping );
 
 	// Setup the views
 	IconView = new NBIconView( fsModel );
@@ -242,7 +241,7 @@ void NBFolderView::createAndSetupActions() {
 	sortGroup->addAction( sortBySizeAct );
 	sortGroup->addAction( sortByDateAct );
 
-	switch( Settings->Session.SortColumn ) {
+	switch( Settings->General.SortColumn ) {
 		case 0: {
 			sortByNameAct->setChecked( true );
 			break;
@@ -263,7 +262,7 @@ void NBFolderView::createAndSetupActions() {
 
 	groupsAct = new QAction( QIcon::fromTheme( "view-group", QIcon( ":/icons/groups.png" ) ), "Show in &Groups", this );
 	groupsAct->setCheckable( true );
-	groupsAct->setChecked( Settings->Session.SortCategory );
+	groupsAct->setChecked( Settings->General.Grouping );
 	connect( groupsAct, SIGNAL( triggered() ), this, SIGNAL( toggleGroups() ) );
 
 	// Focus the search bar
@@ -284,7 +283,7 @@ void NBFolderView::createAndSetupActions() {
 QModelIndexList NBFolderView::getSelection() {
 
 	QModelIndexList selectedList;
-	selectedList << IconView->selectionModel()->selectedIndexes();
+	selectedList << IconView->selection();
 	foreach( QModelIndex idx, selectedList )
 		if ( idx.column() )
 			selectedList.removeAt( selectedList.indexOf( idx ) );
@@ -320,13 +319,13 @@ void NBFolderView::doOpenHome() {
 
 void NBFolderView::newFile() {
 
-	NBNewFileFolderDialog *newFile = new NBNewFileFolderDialog( "file", QDir( fsModel->currentDir() ) );
+	NBNewNodeDialog *newFile = new NBNewNodeDialog( "file", QDir( fsModel->currentDir() ), QString(), this );
 	newFile->exec();
 };
 
 void NBFolderView::newFolder() {
 
-	NBNewFileFolderDialog *newFolder = new NBNewFileFolderDialog( "dir", QDir( fsModel->currentDir() ) );
+	NBNewNodeDialog *newFolder = new NBNewNodeDialog( "dir", QDir( fsModel->currentDir() ), QString(), this );
 	newFolder->exec();
 };
 
@@ -339,14 +338,22 @@ void NBFolderView::doOpen( QString loc ) {
 
 	if ( not isReadable( loc ) ) {
 		QString title = tr( "Access Error" );
-		QString text = tr( "You do not have enough permissions to open <b>%1</b>. " ).arg( baseName( loc ) );
+		QString text;
+		text += tr( "<p>You do not have enough permissions to open the %1:</p><p><center><b>%2</b></center></p>" );
+		text += tr(  "<p>Please change the permissions of the %1 to enter it." );
 		if ( isDir( loc ) )
-			text += tr( "Please change the permissions of the directory to enter it." );
+			text = text.arg( "directory" ).arg( loc );
 
 		else
-			text += tr( "Please change the permissions of the file to edit/view it." );
+			text = text.arg( "file" ).arg( loc );
 
-		NBMessageDialog::error( title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+		if ( fsModel->rootPath().isEmpty() )
+			text += tr( "<br>Instead, I will be opening your <b>home</b> folder for you.</p>" );
+
+		NBMessageDialog::error( this, title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+
+		fsModel->setRootPath( NBXdg::home() );
+
 		return;
 	}
 
@@ -403,7 +410,7 @@ void NBFolderView::doOpen( QString loc ) {
 		QString title = QString( "Error opening file" );
 		QString text = QString( "I really do not have any idea how to open <tt><b>%1</b></tt>" ).arg( loc );
 
-		NBMessageDialog::error( title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+		NBMessageDialog::error( this, title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
 		return;
 	}
 
@@ -428,7 +435,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			else
 				text += tr( "Please change the permissions of the file to edit/view it." );
 
-			NBMessageDialog::error( title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+			NBMessageDialog::error( this, title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
 			return;
 		}
 
@@ -488,7 +495,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			QString title = QString( "Error" );
 			QString text = QString( "I really do not have any idea how to open <b>%1</b>." ).arg( index.data().toString() );
 
-			NBMessageDialog::error( title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+			NBMessageDialog::error( this, title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
 			return;
 		}
 	}
@@ -560,18 +567,24 @@ void NBFolderView::showApplications() {
 
 	setCurrentIndex( 1 );
 	currentWidget()->setFocus();
+
+	emit hideStatusBar();
 };
 
 void NBFolderView::showCatalogs() {
 
 	setCurrentIndex( 2 );
 	currentWidget()->setFocus();
+
+	emit hideStatusBar();
 };
 
 void NBFolderView::showFolders() {
 
 	setCurrentIndex( 0 );
 	currentWidget()->setFocus();
+
+	emit showStatusBar();
 };
 
 void NBFolderView::doPeek() {
@@ -589,144 +602,56 @@ void NBFolderView::doPeek() {
 	}
 
 	QString currentNode = QDir( fsModel->currentDir() ).absoluteFilePath( curIndex.data().toString() );
-	QString mimeType = getMimeType( currentNode );
 
 	if ( not isReadable( currentNode ) ) {
-		NBMessageDialog::error(
+		NBMessageDialog::error( this,
 			QString( "Cannot Open Location" ),
 			QString(
 				"You do not have enough permissions to preview the location. "		\
-				"Please change the permissions of the directory to see its contents"
+				"Please change the permissions of the file/directory to see its contents."
 			)
 		);
 
 		return;
 	}
 
-	/* Load the peek plugin */
-	QStringList pluginPaths = QStringList() << QString( DATA_DIR ) + "/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
-	QString peekPlugin;
-	Q_FOREACH( QString path, pluginPaths ) {
-		if ( exists( path + "libPeekPlugins.so" ) ) {
-			peekPlugin = path + "libPeekPlugins.so";
-			break;
-		}
-	}
+	/* Get the mime type data of the current node */
+	QString mimeType = getMimeType( currentNode );
 
-	QPluginLoader loader( QDir( peekPlugin ).canonicalPath() );
-	NBPeekPlugin *plugin = 0;
-	QObject *pluginObject = loader.instance();
-	if ( pluginObject ) {
-		plugin = qobject_cast<NBPeekPlugin *>( pluginObject );
-	}
-
+	/* For directories we use the inbuild previewer */
 	if ( isDir( currentNode ) ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing folder: %s", qPrintable( currentNode ) );
 		NBFolderFlash *previewer = new NBFolderFlash( currentNode );
 
 		connect( previewer, SIGNAL( loadFolder( QString ) ), this, SLOT( doOpen( QString ) ) );
 		previewer->show();
+
+		return;
 	}
 
-	else if ( plugin ) {
-		if ( mimeType.contains( "html" ) ) {
-			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing html: %s", qPrintable( currentNode ) );
-			QWidget *previewer = plugin->htmlPreviewWidget( currentNode );
+	/* Other mimetypes, we depend on the PluginManager */
+	/* If the PluginManager returns a valid path, we use it */
+	else if ( PluginManager->hasPluginForMimeType( mimeType ) ) {
 
+		QPluginLoader loader( PluginManager->pluginForMimeType( mimeType ) );
+		QObject *pObj = loader.instance();
+		NBPreviewInterface *plugin = 0;
+
+		if ( pObj ) {
+			plugin = qobject_cast<NBPreviewInterface*>( pObj );
+
+			QDialog *previewer = plugin->getPreviewWidget( currentNode );
 			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
-			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				previewer->setAttribute( Qt::WA_TranslucentBackground );
+			previewer->exec();
 
-			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
-			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
-
-			previewer->show();
-		}
-
-		else if ( isText( currentNode ) ) {
-			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing text: %s", qPrintable( currentNode ) );
-			QWidget *previewer = plugin->textPreviewWidget( currentNode );
-
-			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
-			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				previewer->setAttribute( Qt::WA_TranslucentBackground );
-
-			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
-			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
-
-			previewer->show();
-		}
-
-		else if ( isImage( currentNode ) ) {
-			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing image: %s", qPrintable( currentNode ) );
-			QWidget *previewer = plugin->imagePreviewWidget( currentNode );
-
-			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
-			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				previewer->setAttribute( Qt::WA_TranslucentBackground );
-
-			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
-			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
-
-			previewer->show();
-		}
-
-		else if ( mimeType.contains( "opendocument.text" ) ) {
-			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing image: %s", qPrintable( currentNode ) );
-			QWidget *previewer = plugin->odfPreviewWidget( currentNode );
-
-			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
-			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				previewer->setAttribute( Qt::WA_TranslucentBackground );
-
-			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
-			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
-
-			previewer->show();
-		}
-
-		else if ( mimeType.contains( "pdf" ) ) {
-			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing PDF: %s", qPrintable( currentNode ) );
-			QWidget *previewer = plugin->pdfPreviewWidget( currentNode );
-
-			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
-			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				previewer->setAttribute( Qt::WA_TranslucentBackground );
-
-			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
-			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
-
-			previewer->show();
-		}
-
-		else if ( mimeType.contains( "djvu" ) ) {
-			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing DjVu: %s", qPrintable( currentNode ) );
-			QWidget *previewer = plugin->djvuPreviewWidget( currentNode );
-
-			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
-			if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-				previewer->setAttribute( Qt::WA_TranslucentBackground );
-
-			previewer->setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
-			previewer->setStyleSheet( getStyleSheet( "NBPreview", Settings->General.Style ) );
-
-			previewer->show();
-		}
-
-		else {
-			// Custom Peeking
-			NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", qPrintable( currentNode ) );
-			NBCustomPeek *previewer = new NBCustomPeek( currentNode );
-			previewer->show();
+			return;
 		}
 	}
 
-	else {
-		// Custom Peeking
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", qPrintable( currentNode ) );
-		NBCustomPeek *previewer = new NBCustomPeek( currentNode );
-		previewer->show();
-	}
+	// Custom Peeking
+	NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", qPrintable( currentNode ) );
+	NBCustomPeek *previewer = new NBCustomPeek( currentNode );
+	previewer->show();
 
 	currentWidget()->setFocus();
 };
@@ -749,7 +674,7 @@ void NBFolderView::doToggleHidden() {
 		fsModel->setShowHidden( true );
 	}
 
-	Settings->Session.ShowHidden = fsModel->showHidden();
+	Settings->General.ShowHidden = fsModel->showHidden();
 };
 
 void NBFolderView::prepareCopy() {
@@ -824,7 +749,7 @@ void NBFolderView::prepareIO() {
 	}
 
 	else {
-		NBNewFileFolderDialog *newFolder = new NBNewFileFolderDialog( "else", fsModel->currentDir(), mimeData->text() );
+		NBNewNodeDialog *newFolder = new NBNewNodeDialog( "else", fsModel->currentDir(), mimeData->text() );
 		newFolder->exec();
 	}
 };
@@ -840,6 +765,22 @@ void NBFolderView::doSendToTrash() {
 	QStringList toBeDeleted;
 	foreach( QModelIndex idx, selectedList )
 		toBeDeleted << QDir( fsModel->rootPath() ).filePath( idx.data().toString() );
+
+	/* Check if we have protection set */
+	QSettings nbSettings( "NewBreeze", "NewBreeze" );
+	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
+
+	Q_FOREACH( QString path, toBeDeleted ) {
+		if ( safeNodes.contains( path ) ) {
+			NBMessageDialog::error( NULL, "Unable to delete files",
+				"You have enabled <b><tt>Accidental Delete Protection</tt></b> for some of the files or folders. "
+				"As a result I cannot send all the selected files to trash. Kindly, remove the protection, "
+				"or, deslect the protected files and retry.",
+				QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok
+			);
+			return;
+		}
+	}
 
 	NBDeleteManager *deleteManager = new NBDeleteManager( this, true );
 	connect(
@@ -864,7 +805,23 @@ void NBFolderView::doDelete() {
 
 	toBeDeleted.removeDuplicates();
 
-	NBConfirmDeleteDialog *deleteMsg = new NBConfirmDeleteDialog( toBeDeleted, true );
+	/* Check if we have protection set */
+	QSettings nbSettings( "NewBreeze", "NewBreeze" );
+	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
+
+	Q_FOREACH( QString path, toBeDeleted ) {
+		if ( safeNodes.contains( path ) ) {
+			NBMessageDialog::error( this, "Unable to delete files",
+				"You have enabled <b><tt>Accidental Delete Protection</tt></b> for some of the files and folders. "
+				"As a result I cannot delete all the selected files. Kindly, remove the protection, "
+				"or, deslect the protected files and retry.",
+				QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok
+			);
+			return;
+		}
+	}
+
+	NBConfirmDeleteDialog *deleteMsg = new NBConfirmDeleteDialog( toBeDeleted, true, this );
 	if ( not deleteMsg->exec() )
 		return;
 
@@ -885,18 +842,18 @@ void NBFolderView::doRename() {
 		return;
 
 	QString curFile = curIndex.data().toString();
-	NBRenameDialog *renamer = new NBRenameDialog( curFile, QDir( fsModel->currentDir() ) );
+	NBRenameDialog *renamer = new NBRenameDialog( curFile, QDir( fsModel->currentDir() ), this );
 	renamer->exec();
 
 	currentWidget()->setFocus();
 
-	if ( !renamer->renameOk ) {
+	if ( !renamer->canRename() ) {
 		qDebug() << "Renaming" << curFile << "[Cancelled]";
 		return;
 	}
 
 	QString opath = QDir( fsModel->currentDir() ).filePath( curFile );
-	QString npath = QDir( fsModel->currentDir() ).filePath( renamer->le->text() );
+	QString npath = QDir( fsModel->currentDir() ).filePath( renamer->newName() );
 
 	NBDebugMsg( DbgMsgPart::HEAD, "Renaming %s to %s... ", qPrintable( opath ), qPrintable( npath ) );
 	if ( rename( qPrintable( opath ), qPrintable( npath ) ) )
@@ -904,8 +861,6 @@ void NBFolderView::doRename() {
 
 	else
 		NBDebugMsg( DbgMsgPart::TAIL, "[Done]" );
-
-	// doReload();
 };
 
 void NBFolderView::sortByName() {
@@ -915,6 +870,9 @@ void NBFolderView::sortByName() {
 
 	else
 		fsModel->sort( 0, Qt::CaseInsensitive, false );
+
+	QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+	sett.setValue( "NewBreeze/SortColumn", 0 );
 };
 
 void NBFolderView::sortBySize() {
@@ -924,6 +882,9 @@ void NBFolderView::sortBySize() {
 
 	else
 		fsModel->sort( 1, Qt::CaseInsensitive, false );
+
+	QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+	sett.setValue( "NewBreeze/SortColumn", 1 );
 };
 
 void NBFolderView::sortByType() {
@@ -933,6 +894,9 @@ void NBFolderView::sortByType() {
 
 	else
 		fsModel->sort( 2, Qt::CaseInsensitive, false );
+
+	QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+	sett.setValue( "NewBreeze/SortColumn", 2 );
 };
 
 void NBFolderView::sortByDate() {
@@ -942,6 +906,9 @@ void NBFolderView::sortByDate() {
 
 	else
 		fsModel->sort( 4, Qt::CaseInsensitive, false );
+
+	QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+	sett.setValue( "NewBreeze/SortColumn", 4 );
 };
 
 void NBFolderView::selectAll() {
@@ -978,7 +945,7 @@ void NBFolderView::handleWatchDogBark( QString path ) {
 		QString title = QString( "Error" );
 		QString text = QString( "This directory has been deleted by an external process. Loading home dir." );
 
-		NBMessageDialog::error( title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+		NBMessageDialog::error( this, title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
 		fsModel->goHome();
 	}
 
@@ -996,26 +963,23 @@ void NBFolderView::extract( QString archive ) {
 	else if ( archive.endsWith( ".tar" ) )
 		type = NBArchive::TAR;
 
-	else if ( archive.endsWith( ".tzip" ) )
-		type = NBArchive::TZIP;
-
 	else if ( archive.endsWith( ".tar.bz2" ) )
-		type = NBArchive::TBZ2;
+		type = NBArchive::TAR;
 
 	else if ( archive.endsWith( ".tar.gz" ) )
-		type = NBArchive::TGZ;
+		type = NBArchive::TAR;
 
 	else if ( archive.endsWith( ".tar.xz" ) )
-		type = NBArchive::TXZ;
+		type = NBArchive::TAR;
 
 	else if ( archive.endsWith( ".tbz2" ) )
-		type = NBArchive::TBZ2;
+		type = NBArchive::TAR;
 
 	else if ( archive.endsWith( ".tgz" ) )
-		type = NBArchive::TGZ;
+		type = NBArchive::TAR;
 
 	else if ( archive.endsWith( ".txz" ) )
-		type = NBArchive::TXZ;
+		type = NBArchive::TAR;
 
 	else if ( archive.endsWith( ".bz2" ) )
 		type = NBArchive::BZ2;
@@ -1026,57 +990,30 @@ void NBFolderView::extract( QString archive ) {
 	else if ( archive.endsWith( ".xz" ) )
 		type = NBArchive::XZ;
 
-	else
-		// We cannot process this type
+	else {
+		NBMessageDialog::information(
+			this,
+			"NewBreeze | Invalid Archive Format",
+			"I am extremely sorry, but I still do not know how to handle this archive format. Sorry for the inconvenience."
+		);
 		return;
+	}
 
 	QString dest = fsModel->nodePath( QFileInfo( archive ).baseName() );
 	// Create the dest folder if it does nor exist
 	if ( not exists( dest ) )
 		QDir::current().mkdir( dest );
 
-	// QProcess Hack!! ===> TO BE FIXED <=== //
-	switch( type ) {
-		case NBArchive::ZIP : {
-			QProcess::startDetached( "unzip", QStringList() << archive << "-d" << dest );
-			break;
-		}
-		case NBArchive::GZ : {
-			QProcess::startDetached( "gunzip", QStringList() << archive );
-			break;
-		}
-		case NBArchive::BZ2 : {
-			QProcess::startDetached( "bunzip2", QStringList() << archive );
-			break;
-		}
-		case NBArchive::XZ : {
-			QProcess::startDetached( "unxz", QStringList() << archive );
-			break;
-		}
-		case NBArchive::TGZ : {
-			QProcess::startDetached( "tar", QStringList() << "-xf" << archive << "-C" << dest );
-			break;
-		}
-		case NBArchive::TBZ2 : {
-			QProcess::startDetached( "tar", QStringList() << "-xf" << archive << "-C" << dest );
-			break;
-		}
-		case NBArchive::TXZ : {
-			QProcess::startDetached( "tar", QStringList() << "-xf" << archive << "-C" << dest );
-			break;
-		}
-		case NBArchive::TZIP : {
-			// I am not handling this currently
-			break;
-		}
-	};
+	NBArchive arc( archive, NBArchive::READ, type );
+	arc.setDestination( dest );
+	arc.extract();
 };
 
 void NBFolderView::compress( QStringList archiveList ) {
 
 	/*
 		*
-		* Use custom getSaveFileName from NBFVDialogs.hpp to get the archive name
+		* Use custom getSaveFileName from NBNewNodeDialog.hpp to get the archive name
 		*
 	*/
 
@@ -1088,7 +1025,6 @@ void NBFolderView::compress( QStringList archiveList ) {
 				QStringList() << "XZ Compressed Tar (*.txz)"
 								<< "BZ2 Compressed Tar (*.tbz2)"
 								<< "GZ Compressed Tar (*.tgz)"
-								<< "Zip Compressed Tar (*.tzip)"
 								<< "XZ File (*.xz)"
 								<< "GZip File (*.gz)"
 								<< "BZip2 File (*.bz2)"
@@ -1099,16 +1035,13 @@ void NBFolderView::compress( QStringList archiveList ) {
 	if ( not archiveName.isEmpty() ) {
 		NBArchive *arc;
 		if ( archiveName.endsWith( ".txz" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TXZ );
+			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TAR );
 
 		else if ( archiveName.endsWith( ".tbz2" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TBZ2 );
+			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TAR );
 
 		else if ( archiveName.endsWith( ".tgz" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TGZ );
-
-		else if ( archiveName.endsWith( ".tzip" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TZIP );
+			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TAR );
 
 		else if ( archiveName.endsWith( ".xz" ) )
 			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::XZ );
@@ -1143,66 +1076,8 @@ void NBFolderView::updateProgress( QString nodePath, float fileCopied, float tot
 
 void NBFolderView::handleDeleteFailure( QStringList files, QStringList dirs ) {
 
-	if ( ( not files.count() ) and ( not dirs.count() ) )
-		return;
-
-	QTableWidget *table = new QTableWidget( 0, 2 );
-	table->setFocusPolicy( Qt::NoFocus );
-
-	table->verticalHeader()->hide();
-	table->setHorizontalHeaderLabels( QStringList() << "File Name" << "Size" );
-
-	table->setShowGrid( false );
-	table->setSelectionBehavior( QAbstractItemView::SelectRows );
-
-	QHeaderView *headerView = new QHeaderView( Qt::Horizontal, table );
-	table->setHorizontalHeader( headerView );
-	#if QT_VERSION >= 0x050000
-		headerView->setSectionResizeMode( 0, QHeaderView::Stretch );
-		headerView->setSectionResizeMode( 1, QHeaderView::Fixed );
-		table->verticalHeader()->setSectionResizeMode( QHeaderView::Fixed );
-	#else
-		headerView->setResizeMode( 0, QHeaderView::Stretch );
-		headerView->setResizeMode( 1, QHeaderView::Fixed );
-		table->verticalHeader()->setResizeMode( QHeaderView::Fixed );
-	#endif
-
-	table->setColumnWidth( 1, 100 );
-
-	foreach( QString path, dirs ) {
-		QString iconName = NBIconProvider::icon( path );
-		QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), path );
-		QTableWidgetItem *itm2 = new QTableWidgetItem( formatSize( getSize( path ) ) );
-
-		itm1->setFlags( itm1->flags() & ~Qt::ItemIsEditable );
-		itm2->setFlags( itm2->flags() & ~Qt::ItemIsEditable );
-
-		table->insertRow( table->rowCount() );
-
-		table->setItem( table->rowCount() - 1, 0, itm1 );
-		table->setItem( table->rowCount() - 1, 1, itm2 );
+	if ( ( files.count() ) or ( dirs.count() ) ) {
+		NBDeleteErrorsDialog *delErrDlg = new NBDeleteErrorsDialog( files, dirs, this );
+		delErrDlg->exec();
 	}
-	foreach( QString path, files ) {
-		QString iconName = NBIconProvider::icon( path );
-		QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), path );
-		QTableWidgetItem *itm2 = new QTableWidgetItem( formatSize( getSize( path ) ) );
-
-		itm1->setFlags( itm1->flags() & ~Qt::ItemIsEditable );
-		itm2->setFlags( itm2->flags() & ~Qt::ItemIsEditable );
-
-		table->insertRow( table->rowCount() );
-
-		table->setItem( table->rowCount() - 1, 0, itm1 );
-		table->setItem( table->rowCount() - 1, 1, itm2 );
-	}
-
-	NBMessageDialog::error(
-		"NewBreeze - Error while deleting",
-		"Some errors were encountered while deleting the files and folders you requested. "			\
-		"As a result, some of the files and folders may not have been deleted. For the "			\
-		"list for files and folder not deleted click <u>M</u>ore",
-		QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok, table
-	);
 };
-
-void NBFolderView::updateModel( QString ) {};

@@ -109,9 +109,9 @@ class NBTrashModel : public QAbstractItemModel {
 		bool mCategorizationEnabled;
 
 		struct loadStatus {
-			bool loading = false;
-			bool stopLoading = false;
-		} curentLoadStatus;
+			bool loading;
+			bool stopLoading;
+		} currentLoadStatus;
 
 		QList<Filters> __currentFilters;
 		QStringList __nameFilters;

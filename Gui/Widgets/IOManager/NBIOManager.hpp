@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBIOManager_HPP
-#define NBIOManager_HPP
 
 #include <Global.hpp>
 #include <NBTools.hpp>
@@ -16,6 +14,7 @@
 #include <NBIconProvider.hpp>
 #include <NBMessageDialog.hpp>
 #include <NBStyleManager.hpp>
+#include <NBErrorsDialog.hpp>
 
 class NBIOWidget : public QWidget {
 	Q_OBJECT
@@ -45,6 +44,9 @@ class NBIOWidget : public QWidget {
 		void speedCalculator();
 		void signalRemove();
 
+	protected:
+		void paintEvent( QPaintEvent *pEvent );
+
 	Q_SIGNALS:
 		void removeIO( NBFileIO* );
 };
@@ -53,7 +55,7 @@ class NBIOManager : public NBDialog {
 	Q_OBJECT
 
 	public:
-		NBIOManager( QList<NBFileIO*> );
+		NBIOManager( QList<NBFileIO*>, QWidget *parent = 0 );
 		void addIO( NBFileIO * );
 		void showCritical();
 
@@ -75,7 +77,7 @@ class NBIOManagerMini : public QToolButton {
 
 	public:
 		// Init all variables
-		NBIOManagerMini();
+		NBIOManagerMini( QWidget *parent );
 
 		// Destroy all variables
 		~NBIOManagerMini();
@@ -115,5 +117,3 @@ class NBIOManagerMini : public QToolButton {
 		// handleJobComplete()
 		void handleJobComplete();
 };
-
-#endif

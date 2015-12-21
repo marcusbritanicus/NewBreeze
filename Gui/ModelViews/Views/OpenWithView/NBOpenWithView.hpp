@@ -11,6 +11,7 @@
 #include <Global.hpp>
 #include <NBApplicationsModel.hpp>
 #include <NBOpenWithDelegate.hpp>
+#include <NBGuiFunctions.hpp>
 #include <NBTools.hpp>
 
 class NBOpenWithView : public QAbstractItemView {

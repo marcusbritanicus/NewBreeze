@@ -31,6 +31,8 @@ class NBFolderFlash : public QWidget {
 		void keyPressEvent( QKeyEvent *keyEvent );
 		void changeEvent( QEvent *cEvent );
 
+		void paintEvent( QPaintEvent *pEvent );
+
 	Q_SIGNALS:
 		void loadFolder( QString );
 };

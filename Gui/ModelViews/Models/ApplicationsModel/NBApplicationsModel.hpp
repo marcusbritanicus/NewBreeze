@@ -76,11 +76,6 @@ class NBApplicationsModel : public QAbstractItemModel {
 		QHash<QString, QList<int> > categoryRowMap;
 		QHash<QString, bool> categoryVisibilityMap;
 
-		struct loadStatus {
-			bool loading = false;
-			bool stopLoading = false;
-		} curentLoadStatus;
-
 	private slots:
 		void loadIcons();
 

@@ -7,7 +7,7 @@
 #include <NBSettingsManager.hpp>
 #include <NBTools.hpp>
 
-NBSettingsManager::NBSettingsManager() : NBDialog() {
+NBSettingsManager::NBSettingsManager( QWidget *parent ) : NBDialog( parent ) {
 
 	createGUI();
 	setWindowProperties();
@@ -29,20 +29,18 @@ QHBoxLayout* NBSettingsManager::createBodyLayout() {
 	QHBoxLayout *splitLyt = new QHBoxLayout();
 	widgetLyt = new QStackedLayout();
 
-	chooserWidget = new NBSettingChooserWidget();
-	chooserWidget->addItem( new NBSCWidgetItem( QIcon( ":/icons/appearance.png" ), "Appearance" ) );
-	chooserWidget->addItem( new NBSCWidgetItem( QIcon( ":/icons/iconthemes.png" ), "Icons" ) );
-	chooserWidget->addItem( new NBSCWidgetItem( QIcon( ":/icons/keybindings.png" ), "KeyBindings" ) );
-	chooserWidget->item( 0 )->setSelected( true );
+	chooserWidget = new NBSSideBar( this );
+	connect( chooserWidget, SIGNAL( loadSettingsCategory( int ) ), this, SLOT( settingCategoryChosen( int ) ) );
 
-	connect( chooserWidget, SIGNAL( currentRowChanged( int ) ), this, SLOT( settingCategoryChosen( int ) ) );
-
-	viewWidget = new NBViewsWidget();
+	NBSGeneralWidget *generalWidget = new NBSGeneralWidget( this );
 	iconWidget = new NBIconThemeWidget();
+	viewWidget = new NBViewsWidget();
 	keysWidget = new NBKeyBindingsWidget();
 
-	widgetLyt->addWidget( viewWidget );
+	widgetLyt->addWidget( generalWidget );
 	widgetLyt->addWidget( iconWidget );
+	widgetLyt->addWidget( viewWidget );
+	widgetLyt->addWidget( new QWidget( this ) );
 	widgetLyt->addWidget( keysWidget );
 
 	splitLyt->addWidget( chooserWidget );
@@ -56,10 +54,7 @@ QHBoxLayout* NBSettingsManager::createFooterLayout() {
 
 	QHBoxLayout *btnLyt = new QHBoxLayout();
 
-	QPushButton *closeBtn = new QPushButton();
-	closeBtn->setObjectName( "cancelBtn" );
-	closeBtn->setText( "&Close" );
-	closeBtn->setIcon( QIcon( ":/icons/close.png" ) );
+	NBButton *closeBtn = new NBButton( QIcon( ":/icons/close.png" ), "&Close", this );
 
 	btnLyt->addStretch( 0 );
 	btnLyt->addWidget( closeBtn );
@@ -92,7 +87,7 @@ void NBSettingsManager::setWindowProperties() {
 	setWindowModality( Qt::ApplicationModal );
 
 	setFixedWidth( 810 );
-	setMinimumHeight( 480 );
+	setMinimumHeight( 550 );
 
 	QDesktopWidget dw;
 	int hpos = ( int )( ( dw.width() - 810 ) / 2 );
@@ -107,253 +102,20 @@ NBViewsWidget::NBViewsWidget() {
 
 void NBViewsWidget::createGUI() {
 
-	QGridLayout *themeLyt = new QGridLayout();
+	QVBoxLayout *themeLyt = new QVBoxLayout();
+	QVBoxLayout *baseLyt = new QVBoxLayout();
 
-	tlRB = new QRadioButton( "Light Transparent" );
-	connect( tlRB, SIGNAL( clicked() ), this, SLOT( handleThemeChanged() ) );
+	defaultThemeRB = new QRadioButton( "&Default" );
 
-	tdRB = new QRadioButton( "Dark Transparent" );
-	connect( tdRB, SIGNAL( clicked() ), this, SLOT( handleThemeChanged() ) );
+	defaultThemeRB->setChecked( true );
 
-	dbRB = new QRadioButton( "Dull Black" );
-	connect( dbRB, SIGNAL( clicked() ), this, SLOT( handleThemeChanged() ) );
+	QGroupBox *themeGB = new QGroupBox( "Theming", this );
 
-	ntRB = new QRadioButton( "Light Gray" );
-	connect( ntRB, SIGNAL( clicked() ), this, SLOT( handleThemeChanged() ) );
+	themeLyt->addWidget( defaultThemeRB );
+	themeLyt->addStretch( 0 );
 
-	imageLbl = new QLabel();
-	imageLbl->setFixedSize( 540, 290 );
-	imageLbl->setAlignment( Qt::AlignCenter );
-
-	nativeTitleBarCB = new QCheckBox( "&Use native title bar" );
-	nativeTitleBarCB->setChecked( Settings->General.NativeTitleBar );
-	connect( nativeTitleBarCB, SIGNAL( toggled( bool ) ), this, SLOT( handleNativeTitleBarToggle( bool ) ) );
-
-	TrayIconCB = new QCheckBox( "&Minimize to tray" );
-	TrayIconCB->setChecked( Settings->General.TrayIcon );
-	connect( TrayIconCB, SIGNAL( toggled( bool ) ), this, SLOT( handleTrayIconChanged( bool ) ) );
-
-	openWithCatalogCB = new QCheckBox( "Open Catalog &View every time NewBreeze starts" );
-	openWithCatalogCB->setChecked( Settings->General.OpenWithCatalog );
-	connect( openWithCatalogCB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithCatalogToggled( bool ) ) );
-
-	sidePanelOpen = new QCheckBox( "&Keep the SidePanel always open");
-	QSettings settings( "NewBreeze", "NewBreeze" );
-	sidePanelOpen->setChecked( settings.value( "SidePanelOpen" ).toBool() );
-	connect( sidePanelOpen, SIGNAL( toggled( bool ) ), this, SLOT( handleSidePanelOpenToggled( bool ) ) );
-
-	if ( Settings->General.Style == QString( "TransLight" ) ) {
-		tlRB->setChecked( true );
-		imageLbl->setPixmap( QPixmap( ":/icons/TransLight.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	}
-
-	else if ( Settings->General.Style == QString( "TransDark" ) ) {
-		tdRB->setChecked( true );
-		imageLbl->setPixmap( QPixmap( ":/icons/TransDark.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	}
-
-	else if ( Settings->General.Style == QString( "DullBlack" ) ) {
-		dbRB->setChecked( true );
-		imageLbl->setPixmap( QPixmap( ":/icons/DullBlack.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	}
-
-	else {
-		ntRB->setChecked( true );
-		imageLbl->setPixmap( QPixmap( ":/icons/LightGray.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	}
-
-	themeLyt->addWidget( tlRB, 0, 0 );
-	themeLyt->addWidget( tdRB, 0, 1 );
-	themeLyt->addWidget( dbRB, 0, 2 );
-	themeLyt->addWidget( ntRB, 0, 3 );
-	themeLyt->addWidget( imageLbl, 1, 0, 1, 4, Qt::AlignCenter );
-	themeLyt->addWidget( nativeTitleBarCB, 2, 0, 1, 4, Qt::AlignLeft );
-	themeLyt->addWidget( TrayIconCB, 3, 0 );
-	themeLyt->addWidget( sidePanelOpen, 4, 0, 1, 4, Qt::AlignLeft );
-	themeLyt->addWidget( openWithCatalogCB, 5, 0, 1, 5, Qt::AlignLeft );
-
-	setLayout( themeLyt );
-};
-
-void NBViewsWidget::handleThemeChanged() {
-
-	if ( tlRB->isChecked() ) {
-		Settings->setValue( "Style", QVariant( QString( "TransLight" ) ) );
-		imageLbl->setPixmap( QPixmap( ":/icons/TransLight.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-		Settings->General.Style = QString( "TransLight" );
-	}
-
-	else if ( tdRB->isChecked() ) {
-		Settings->setValue( "Style", QVariant( QString( "TransDark" ) ) );
-		imageLbl->setPixmap( QPixmap( ":/icons/TransDark.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-		Settings->General.Style = QString( "TransDark" );
-	}
-
-	else if ( dbRB->isChecked() ) {
-		Settings->setValue( "Style", QVariant( QString( "DullBlack" ) ) );
-		imageLbl->setPixmap( QPixmap( ":/icons/DullBlack.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-		Settings->General.Style = QString( "DullBlack" );
-	}
-
-	else {
-		Settings->setValue( "Style", QVariant( QString( "LightGray" ) ) );
-		imageLbl->setPixmap( QPixmap( ":/icons/LightGray.png" ).scaled( 540, 290, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-		Settings->General.Style = QString( "LightGray" );
-	}
-};
-
-void NBViewsWidget::handleNativeTitleBarToggle( bool useNative ) {
-
-	Settings->setValue( "NativeTitleBar", useNative );
-	Settings->General.NativeTitleBar = useNative;
-};
-
-void NBViewsWidget::handleOpenWithCatalogToggled( bool open ) {
-
-	Settings->setValue( "OpenWithCatalog", open );
-	Settings->General.OpenWithCatalog = open;
-};
-
-void NBViewsWidget::handleTrayIconChanged( bool value ) {
-
-	Settings->setValue( "TrayIcon", value );
-	Settings->General.TrayIcon = value;
-};
-
-void NBViewsWidget::handleSidePanelOpenToggled( bool keepOpen ) {
-
-	QSettings settings( "NewBreeze", "NewBreeze" );
-	settings.setValue( "SidePanelOpen", keepOpen );
-	settings.sync();
-};
-
-NBIconThemeWidget::NBIconThemeWidget() {
-
-	createGUI();
-};
-
-void NBIconThemeWidget::createGUI() {
-
-	iconThemesWidget = new NBIconThemeChooserWidget();
-	folderViewWidget = new NBIconThemeViewerWidget();
-
-	imagePreviewCB = new QCheckBox( "&Show Image Previews" );
-	imagePreviewCB->setChecked( Settings->General.ImagePreviews );
-
-	connect( iconThemesWidget, SIGNAL( reloadIcons() ), folderViewWidget, SLOT( loadIcons() ) );
-	connect( imagePreviewCB, SIGNAL( stateChanged( int ) ), this, SLOT( handleCheckStateChanged( int ) ) );
-
-	QVBoxLayout *wLyt = new QVBoxLayout();
-	wLyt->addWidget( iconThemesWidget );
-	wLyt->addWidget( folderViewWidget );
-	wLyt->addWidget( imagePreviewCB );
-
-	setLayout( wLyt );
-};
-
-void NBIconThemeWidget::setIconTheme() {
-
-};
-
-void NBIconThemeWidget::handleCheckStateChanged( int state ) {
-
-	switch( state ) {
-		case Qt::Unchecked :
-			Settings->setValue( "ImagePreviews", false );
-			Settings->General.ImagePreviews = false;
-			break;
-
-		case Qt::PartiallyChecked :
-		case Qt::Checked :
-			Settings->setValue( "ImagePreviews", true );
-			Settings->General.ImagePreviews = true;
-			break;
-	}
-}
-
-NBKeyBindingsWidget::NBKeyBindingsWidget() {
-
-	QScrollArea *scroller = new QScrollArea();
-	scroller->setStyleSheet( scroller->styleSheet() + "\nQScrollArea { border: none; }" );
-	scroller->setWidgetResizable( true );
-
-	QGridLayout *keysLyt = new QGridLayout();
-	keysLyt->setSpacing( 0 );
-
-	keysLyt->addWidget( new QLabel( "AboutNB" ), 0, 0 );
-	keysLyt->addWidget( new QLabel( "Toggle CrumbsBar" ), 1, 0 );
-	keysLyt->addWidget( new QLabel( "ViewMode" ), 2, 0 );
-	keysLyt->addWidget( new QLabel( "Add Custom Action" ), 3, 0 );
-	keysLyt->addWidget( new QLabel( "Go Home" ), 4, 0 );
-	keysLyt->addWidget( new QLabel( "Go Up" ), 5, 0 );
-	keysLyt->addWidget( new QLabel( "Go Prev Dir" ), 6, 0 );
-	keysLyt->addWidget( new QLabel( "Go Next Dir" ), 7, 0 );
-	keysLyt->addWidget( new QLabel( "New Folder" ), 8, 0 );
-	keysLyt->addWidget( new QLabel( "New File" ), 9, 0 );
-	keysLyt->addWidget( new QLabel( "Peek" ), 10, 0 );
-	keysLyt->addWidget( new QLabel( "Reload" ), 11, 0 );
-	keysLyt->addWidget( new QLabel( "Toggle Hidden Files" ), 12, 0 );
-	keysLyt->addWidget( new QLabel( "Select All" ), 13, 0 );
-	keysLyt->addWidget( new QLabel( "Toggle SideBar" ), 14, 0 );
-	keysLyt->addWidget( new QLabel( "Cut" ), 15, 0 );
-	keysLyt->addWidget( new QLabel( "Copy" ), 16, 0 );
-	keysLyt->addWidget( new QLabel( "Paste" ), 17, 0 );
-	keysLyt->addWidget( new QLabel( "Rename" ), 18, 0 );
-	keysLyt->addWidget( new QLabel( "Delete" ), 19, 0 );
-	keysLyt->addWidget( new QLabel( "Trash" ), 20, 0 );
-	keysLyt->addWidget( new QLabel( "Properties" ), 21, 0 );
-	keysLyt->addWidget( new QLabel( "Terminal" ), 22, 0 );
-	keysLyt->addWidget( new QLabel( "Show Inline Terminal" ), 23, 0 );
-	keysLyt->addWidget( new QLabel( "Show NBInfo" ), 24, 0 );
-	keysLyt->addWidget( new QLabel( "Settings" ), 25, 0 );
-	keysLyt->addWidget( new QLabel( "Custom Actions" ), 26, 0 );
-	keysLyt->addWidget( new QLabel( "Focus AddressBar" ), 27, 0 );
-	keysLyt->addWidget( new QLabel( "New Window" ), 28, 0 );
-	keysLyt->addWidget( new QLabel( "Add Bookmark" ), 29, 0 );
-	keysLyt->addWidget( new QLabel( "Focus SearchBar" ), 30, 0 );
-	keysLyt->addWidget( new QLabel( "Clear SearchBar" ), 31, 0 );
-
-	keysLyt->addWidget( new NBShortcutsWidget( "AboutNB" ), 0, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "ToggleCrumbLE" ), 1, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "ViewMode" ), 2, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "AddCustomAction" ), 3, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "GoHome" ), 4, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "GoUp" ), 5, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "GoLeft" ), 6, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "GoRight" ), 7, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "NewFolder" ), 8, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "NewFile" ), 9, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Peek" ), 10, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Reload" ), 11, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "ToggleHidden" ), 12, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "SelectAll" ), 13, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "ToggleSideBar" ), 14, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Cut" ), 15, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Copy" ), 16, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Paste" ), 17, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Rename" ), 18, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Delete" ), 19, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Trash" ), 20, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Properties" ), 21, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Terminal" ), 22, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "InlineTerminal" ), 23, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "NBInfo" ), 24, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "Settings" ), 25, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "CustomActions" ), 26, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "FocusAddressBar" ), 27, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "NewWindow" ), 28, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "AddBookmark" ), 29, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "FocusSearchBar" ), 30, 1 );
-	keysLyt->addWidget( new NBShortcutsWidget( "ClearSearchBar" ), 31, 1 );
-
-	QWidget *scrollWidget = new QWidget();
-	scrollWidget->setLayout( keysLyt );
-
-	scroller->setWidget( scrollWidget );
-
-	QHBoxLayout *baseLyt = new QHBoxLayout();
-	baseLyt->setContentsMargins( QMargins() );
-	baseLyt->addWidget( scroller );
+	themeGB->setLayout( themeLyt );
+	baseLyt->addWidget( themeGB );
 
 	setLayout( baseLyt );
 };

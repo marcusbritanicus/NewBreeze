@@ -7,7 +7,7 @@
 #include <NBContextMenu.hpp>
 #include <NBFolderView.hpp>
 
-NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QString dir ) : NBMenu() {
+NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QString dir ) : QMenu() {
 	/*
 		*
 		* We set the custom actions based on the indexes
@@ -177,7 +177,7 @@ void NBCustomActionsMenu::doCustomAction() {
 		QProcess::startDetached( cmdList.takeFirst(), cmdList );
 };
 
-NBOpenWithMenu::NBOpenWithMenu( QString icon, QString name, QWidget *parent ) : NBMenu( parent ) {
+NBOpenWithMenu::NBOpenWithMenu( QString icon, QString name, QWidget *parent ) : QMenu( parent ) {
 
 	setIcon( QIcon( icon ) );
 	setTitle( name );
@@ -360,7 +360,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 	}
 };
 
-NBAddToCatalogMenu::NBAddToCatalogMenu( QString wNode, QModelIndexList nodeList ) : NBMenu() {
+NBAddToCatalogMenu::NBAddToCatalogMenu( QString wNode, QModelIndexList nodeList ) : QMenu() {
 
 	setTitle( "Add to Catalo&g" );
 	setIcon( QIcon( ":/icons/catalogs.png" ) );
@@ -402,6 +402,59 @@ NBAddToCatalogMenu::NBAddToCatalogMenu( QString wNode, QModelIndexList nodeList 
 	addAction( addToNewCtlgAct );
 };
 
+void NBAddToCatalogMenu::addToCatalog() {
+
+	QAction *act = qobject_cast<QAction*>( sender() );
+	QString catalog = act->text().replace( "&", "" );
+
+	QSettings catalogsConf( "NewBreeze", "Catalogs" );
+
+	if ( catalogsConf.childKeys().contains( catalog ) ){
+		QStringList existing = catalogsConf.value( catalog ).toStringList();
+
+		if ( sNodes.count() ) {
+			foreach( QModelIndex idx, sNodes ) {
+				QString node = QDir( workNode ).filePath( idx.data().toString() );
+				if ( isDir( node ) )
+					existing << node;
+			}
+		}
+
+		else {
+			existing << workNode;
+		}
+
+		existing.removeDuplicates();
+		catalogsConf.setValue( catalog, existing );
+	}
+
+	else {
+		catalogsConf.beginGroup( "Custom" );
+
+		QStringList existing = catalogsConf.value( catalog ).toStringList();
+
+		if ( sNodes.count() ) {
+			foreach( QModelIndex idx, sNodes ) {
+				QString node = QDir( workNode ).filePath( idx.data().toString() );
+				if ( isDir( node ) )
+					existing << node;
+			}
+		}
+
+		else {
+			existing << workNode;
+		}
+
+		existing.removeDuplicates();
+		catalogsConf.setValue( catalog, existing );
+		catalogsConf.endGroup();
+	}
+
+	catalogsConf.sync();
+
+	emit reloadCatalogs();
+};
+
 void NBAddToCatalogMenu::addToNewCatalog() {
 
 	QAction *action = qobject_cast<QAction*>( sender() );
@@ -433,45 +486,15 @@ void NBAddToCatalogMenu::addToNewCatalog() {
 	emit reloadCatalogs();
 };
 
-void NBAddToCatalogMenu::addToCatalog() {
-
-	QString catalog = QInputDialog::getText( this, "New Catalog", QString( "Enter the name of the new catalog" ) );
-
-	QSettings catalogsConf( "NewBreeze", "Catalogs" );
-	if ( not catalogsConf.childKeys().contains( catalog ) )
-		catalogsConf.beginGroup( "Custom" );
-
-	QStringList existing = catalogsConf.value( catalog ).toStringList();
-
-	if ( sNodes.count() ) {
-		foreach( QModelIndex idx, sNodes ) {
-			QString node = QDir( workNode ).filePath( idx.data().toString() );
-			if ( isDir( node ) )
-				existing << node;
-		}
-	}
-
-	else {
-		existing << workNode;
-	}
-
-	existing.removeDuplicates();
-
-	catalogsConf.setValue( catalog, existing );
-	catalogsConf.sync();
-
-	emit reloadCatalogs();
-};
-
 void NBFolderView::showContextMenu( QPoint position ) {
 
 	QList<QModelIndex> selectedList = getSelection();
 
-	NBMenu *menu = new NBMenu();
+	QMenu *menu = new QMenu();
 	if ( selectedList.isEmpty() ) {
 
 		// Create a new file/directory
-		NBMenu *createNewMenu = new NBMenu( "Create &New" );
+		QMenu *createNewMenu = new QMenu( "Create &New" );
 		createNewMenu->setIcon( QIcon::fromTheme( "archive-insert" ) );
 
 		createNewMenu->addAction( actNewDir );
@@ -482,7 +505,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 
 		// File/directory sorting
-		NBMenu *sortMenu = new NBMenu( "&Sort by" );
+		QMenu *sortMenu = new QMenu( "&Sort by" );
 		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
 
 		sortMenu->addAction( sortByNameAct );
@@ -539,7 +562,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
 
 		// File/directory sorting
-		NBMenu *sortMenu = new NBMenu( "&Sort by" );
+		QMenu *sortMenu = new QMenu( "&Sort by" );
 		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
 
 		sortMenu->addAction( sortByNameAct );
@@ -596,7 +619,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
 
 		// File/directory sorting
-		NBMenu *sortMenu = new NBMenu( "&Sort by" );
+		QMenu *sortMenu = new QMenu( "&Sort by" );
 		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
 
 		sortMenu->addAction( sortByNameAct );

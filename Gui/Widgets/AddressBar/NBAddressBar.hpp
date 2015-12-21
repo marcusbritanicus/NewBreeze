@@ -10,9 +10,12 @@
 
 #include <Global.hpp>
 #include <NBGuiWidgets.hpp>
-#include <NBBreadCrumbsBar.hpp>
+#include <NBCrumbsBar.hpp>
 #include <NBTools.hpp>
+#include <NBButton.hpp>
 #include <NBButtons.hpp>
+#include <NBIOManager.hpp>
+#include <NBViewModeButton.hpp>
 
 class NBToggleButton : public QWidget {
 	Q_OBJECT
@@ -47,8 +50,11 @@ class NBAddressWidget : public QWidget {
 		NBAddressWidget( QWidget *parent = NULL );
 		void setShowHidden( bool );
 
-		QLineEdit *addressEdit;
-		NBBreadCrumbsBar *crumbsBar;
+		NBLineEdit *addressEdit;
+		NBCrumbsBar *crumbsBar;
+
+	public slots:
+		void setFocus();
 
 	private :
 		void setWidgetProperties();
@@ -58,6 +64,10 @@ class NBAddressWidget : public QWidget {
 
 	private slots:
 		void toggleCrumbsBarAndEdit();
+		void revertToCrumbsBar();
+
+	Q_SIGNALS:
+		void openLocation( QString );
 };
 
 class NBAddressBar : public QFrame {
@@ -66,11 +76,34 @@ class NBAddressBar : public QFrame {
 	public:
 		NBAddressBar( QWidget *parent = NULL );
 
+		QString address();
+		void setAddress( QString );
+
+		NBIOManagerMini *procWidget();
+
+		int checkedAction();
+
+	private:
 		NBButtons *addressButtons;
-		QPushButton *reloadBtn, *openVTEBtn;
+		NBButton *reloadBtn, *openVTEBtn;
 		NBViewModeButton *viewModeBtn;
 		NBAddressWidget *addressWidget;
 		NBSearchBar *searchBar;
+		NBIOManagerMini *mProcWidget;
+
+	public slots:
+		void focusAddressEdit();
+		void focusSearchBar();
+		void clearSearchBar();
+
+	Q_SIGNALS:
+		void openTerminal();
+		void reload();
+		void switchToNextView();
+		void changeViewMode();
+		void openLocation( QString );
+		void search( QString );
+		void clearSearch();
 };
 
 #endif
