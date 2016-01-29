@@ -8,7 +8,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 	QT += concurrent
 }
 
-LIBS += -lmagic -lzip -ltar -lbz2 -llzma -lz
+LIBS += -lmagic -larchive -lbz2 -llzma -lz
 
 # Source Paths
 INCLUDEPATH += . Core Core/Animations Core/AppFile Core/Archive Core/ArgParser Core/BookmarksManager Core/ClipBoard Core/ConfigParser Core/CoreProcess Core/CoreTools
@@ -43,11 +43,6 @@ HEADERS += Core/Archive/NBArchive.hpp
 HEADERS += Core/Archive/NBLibBZip2.hpp
 HEADERS += Core/Archive/NBLibGZip.hpp
 HEADERS += Core/Archive/NBLibLzma.hpp
-HEADERS += Core/Archive/NBTarFile.hpp
-HEADERS += Core/Archive/NBTarHeader.hpp
-# HEADERS += Core/Archive/NBTarUtils.hpp
-HEADERS += Core/Archive/NBZipFile.hpp
-# HEADERS += Core/Archive/NBZipUtils.hpp
 HEADERS += Core/ArgParser/NBCLParser.hpp
 HEADERS += Core/BookmarksManager/NBBookmarksInfo.hpp
 HEADERS += Core/ConfigParser/NBConfigParser.hpp
@@ -210,14 +205,6 @@ SOURCES += Core/Archive/NBArchive.cpp
 SOURCES += Core/Archive/NBLibBZip2.cpp
 SOURCES += Core/Archive/NBLibGZip.cpp
 SOURCES += Core/Archive/NBLibLzma.cpp
-SOURCES += Core/Archive/NBTarFileBZ2Filter.cpp
-SOURCES += Core/Archive/NBTarFile.cpp
-SOURCES += Core/Archive/NBTarFileGZFilter.cpp
-SOURCES += Core/Archive/NBTarFileXZFilter.cpp
-SOURCES += Core/Archive/NBTarHeader.cpp
-# SOURCES += Core/Archive/NBTarUtils.cpp
-SOURCES += Core/Archive/NBZipFile.cpp
-# SOURCES += Core/Archive/NBZipUtils.cpp
 SOURCES += Core/ArgParser/NBCLParser.cpp
 SOURCES += Core/BookmarksManager/NBBookmarksInfo.cpp
 SOURCES += Core/ConfigParser/NBConfigParser.cpp
