@@ -7,8 +7,13 @@
 #ifndef GLOBAL_HPP
 #define GLOBAL_HPP
 
+// STL
 #include <iostream>
 #include <fstream>
+
+// LibArchive
+#include <archive.h>
+#include <archive_entry.h>
 
 // Qt Headers
 #include <QtGui>

@@ -1,4 +1,0 @@
-Reading the compressed data can be done on two ways,
-	[1] In-memory decompression followed by reading of the tar headers, and discarding all data.
-	[2] We extract that tar archive completely to /tmp/ and display that.
-While both methods have their plus points, I personally find it better to use method 2

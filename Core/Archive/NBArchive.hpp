@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBARCHIVE_HPP
-#define NBARCHIVE_HPP
 
 #include <Global.hpp>
 
@@ -20,48 +18,26 @@
 class NBArchive {
 
 	public:
-		enum Type {
-			TAR,		// Tar Archive: .tar,.tar.xz, .tar.gz, .tar.bz2
-			ZIP,		// Zip Compressed Archive: .zip
-			BZ2,		// BZip2 Compressed Archive: .bz2
-			GZ,			// GZip Compressed Archive: .gz
-			XZ,			// XZ Compressed Archive: .xz
-		};
+		NBArchive( QString );
 
-		enum Mode {
-			READ,			// Read a zip file
-			WRITE,			// Write a zip file
-		};
-
-		NBArchive( QString, NBArchive::Mode, NBArchive::Type );
+		// Convinience Functions
 		void updateInputFiles( QStringList );
 		void setWorkingDir( QString );
 		void setDestination( QString );
+
+		// Workers
 		void create();
-		void extract();
+		int extract();
 
 	private:
-		void createTar();
-		void createZip();
-		void createBZ2();
-		void createGZ();
-		void createXZ();
+		int copyData( struct archive *ar, struct archive *aw );
+		int setFilterFormat( struct archive *ar, QMimeType mType );
 
-		void extractTar();
-		void extractZip();
-		void extractBZ2();
-		void extractGZ();
-		void extractXZ();
-
-		static QString archiveName;
-		static NBArchive::Mode archiveMode;
-		static NBArchive::Type archiveType;
-
-		QString tempArchiveName;
+		QString archiveName;
+		LibArchive::Mode archiveMode;
+		LibArchive::Type archiveType;
 
 		QStringList inputList;
 		QString dest;
 		QString src;
 };
-
-#endif
