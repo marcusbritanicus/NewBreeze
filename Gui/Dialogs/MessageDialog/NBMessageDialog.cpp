@@ -39,77 +39,65 @@ NBMessageDialog::NBMessageDialog( QString icon, QString title, QString text, QLi
 		infoWidget = qobject_cast<QWidget *>( info );
 		infoWidget->hide();
 
-		detailsBtn = new NBButton( QIcon( ":/icons/info.png" ), "&More", this );
+		detailsBtn = new NBSegmentControl( this );
+		detailsBtn->setSegmentIcon( 0, QIcon( ":/icons/info.png" ) );
+		detailsBtn->setSegmentText( 0, tr( "&More..." ) );
 		detailsBtn->resize( 100, 0 );
-		connect( detailsBtn, SIGNAL( clicked() ), this, SLOT( toggleInfoWidget() ) );
+		connect( detailsBtn, SIGNAL( clicked( int ) ), this, SLOT( toggleInfoWidget() ) );
 		btnLyt->addWidget( detailsBtn );
 	}
 
 	btnLyt->addStretch( 0 );
-	segBtns = new NBButtons( this );
 
-	foreach( StandardButton btn, btns ) {
-		NBButton *button;
-		switch( btn ) {
+	segBtns = new NBSegmentControl( this );
+	segBtns->setCount( btns.count() );
+	connect( segBtns, SIGNAL( clicked( int ) ), this, SLOT(buttonClickHandler( int ) ) );
+
+	for( int i = 0; i < btns.count(); i++ ) {
+		switch( btns[ i ] ) {
 			case NBMessageDialog::Ok :
-				button = new NBButton( QIcon( ":/icons/ok.png" ), "&Ok", this );
-				button->setObjectName( tr( "okBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( i, QIcon( ":/icons/ok.png" ) );
+				segBtns->setSegmentText( i, tr( "&Ok" ) );
 				break;
 
 			case NBMessageDialog::Yes :
-				button = new NBButton( QIcon( ":/icons/ok.png" ), "&Yes", this );
-				button->setObjectName( tr( "okBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( i, QIcon( ":/icons/ok.png" ) );
+				segBtns->setSegmentText( i, tr( "&Yes" ) );
 				break;
 
 			case NBMessageDialog::YesToAll :
-				button = new NBButton( QIcon( ":/icons/ok.png" ), "Yes to &All", this );
-				button->setObjectName( tr( "okBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( i, QIcon( ":/icons/ok.png" ) );
+				segBtns->setSegmentText( i, tr( "Yes to &All" ) );
 				break;
 
 			case NBMessageDialog::No :
-				button = new NBButton( QIcon( ":/icons/delete.png" ), "&No", this );
-				button->setObjectName( tr( "cancelBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( i, QIcon( ":/icons/delete.png" ) );
+				segBtns->setSegmentText( i, tr( "&No" ) );
 				break;
 
 			case NBMessageDialog::NoToAll :
-				button = new NBButton( QIcon( ":/icons/delete.png" ), "N&o to All", this );
-				button->setObjectName( tr( "cancelBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( i, QIcon( ":/icons/delete.png" ) );
+				segBtns->setSegmentText( i, tr( "N&o to All" ) );
 				break;
 
 			case NBMessageDialog::Abort :
-				button = new NBButton( QIcon( ":/icons/abort.png" ), "A&bort", this );
-				button->setObjectName( tr( "abortBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( i, QIcon( ":/icons/abort.png" ) );
+				segBtns->setSegmentText( i, tr( "A&bort" ) );
 				break;
 
 			case NBMessageDialog::Retry :
-				button = new NBButton( QIcon( ":/icons/refresh.png" ), "&Retry", this );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( i, QIcon( ":/icons/refresh.png" ) );
+				segBtns->setSegmentText( i, tr( "&Retry" ) );
 				break;
 
 			case NBMessageDialog::Ignore :
-				button = new NBButton( QIcon( ":/icons/ok.png" ), "&Ignore", this );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( i, QIcon( ":/icons/ok.png" ) );
+				segBtns->setSegmentText( i, tr( "&Ignore" ) );
 				break;
 
 			case NBMessageDialog::Cancel :
-				button = new NBButton( QIcon::fromTheme( "dialog-cancel" ), "&Cancel", this );
-				button->setObjectName( tr( "cancelBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( i, QIcon::fromTheme( "dialog-cancel" ) );
+				segBtns->setSegmentText( i, tr( "&Cancel" ) );
 				break;
 
 			default:
@@ -155,79 +143,60 @@ void NBMessageDialog::setButtons( QList<StandardButton> btns ) {
 	if ( btns.count() ) {
 		segBtns->show();
 		updateGeometry();
+		segBtns->setCount( segBtns->count() + btns.count() );
 	}
 
-	foreach( StandardButton btn, btns ) {
-		NBButton *button;
-		switch( btn ) {
+	for( int i = 0; i < btns.count(); i++ ) {
+		switch( btns[ i ] ) {
 			case NBMessageDialog::Ok :
-				button = new NBButton( QIcon( ":/icons/ok.png" ), "&Ok", this );
-				button->setObjectName( tr( "okBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( segBtns->count() + i, QIcon( ":/icons/ok.png" ) );
+				segBtns->setSegmentText( segBtns->count() + i, tr( "&Ok" ) );
 				break;
 
 			case NBMessageDialog::Yes :
-				button = new NBButton( QIcon( ":/icons/ok.png" ), "&Yes", this );
-				button->setObjectName( tr( "okBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( segBtns->count() + i, QIcon( ":/icons/ok.png" ) );
+				segBtns->setSegmentText( segBtns->count() + i, tr( "&Yes" ) );
 				break;
 
 			case NBMessageDialog::YesToAll :
-				button = new NBButton( QIcon( ":/icons/ok.png" ), "Yes to &All", this );
-				button->setObjectName( tr( "okBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( segBtns->count() + i, QIcon( ":/icons/ok.png" ) );
+				segBtns->setSegmentText( segBtns->count() + i, tr( "Yes to &All" ) );
 				break;
 
 			case NBMessageDialog::No :
-				button = new NBButton( QIcon( ":/icons/delete.png" ), "&No", this );
-				button->setObjectName( tr( "cancelBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( segBtns->count() + i, QIcon( ":/icons/delete.png" ) );
+				segBtns->setSegmentText( segBtns->count() + i, tr( "&No" ) );
 				break;
 
 			case NBMessageDialog::NoToAll :
-				button = new NBButton( QIcon( ":/icons/delete.png" ), "N&o to All", this );
-				button->setObjectName( tr( "cancelBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( segBtns->count() + i, QIcon( ":/icons/delete.png" ) );
+				segBtns->setSegmentText( segBtns->count() + i, tr( "N&o to All" ) );
 				break;
 
 			case NBMessageDialog::Abort :
-				button = new NBButton( QIcon( ":/icons/abort.png" ), "A&bort", this );
-				button->setObjectName( tr( "abortBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( segBtns->count() + i, QIcon( ":/icons/abort.png" ) );
+				segBtns->setSegmentText( segBtns->count() + i, tr( "A&bort" ) );
 				break;
 
 			case NBMessageDialog::Retry :
-				button = new NBButton( QIcon( ":/icons/refresh.png" ), "&Retry", this );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( segBtns->count() + i, QIcon( ":/icons/refresh.png" ) );
+				segBtns->setSegmentText( segBtns->count() + i, tr( "&Retry" ) );
 				break;
 
 			case NBMessageDialog::Ignore :
-				button = new NBButton( QIcon( ":/icons/ok.png" ), "&Ignore", this );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( segBtns->count() + i, QIcon( ":/icons/ok.png" ) );
+				segBtns->setSegmentText( segBtns->count() + i, tr( "&Ignore" ) );
 				break;
 
 			case NBMessageDialog::Cancel :
-				button = new NBButton( QIcon::fromTheme( "dialog-cancel" ), "&Cancel", this );
-				button->setObjectName( tr( "cancelBtn" ) );
-				connect( button, SIGNAL( clicked() ), this, SLOT( buttonClickHandler() ) );
-				segBtns->addSegment( button );
+				segBtns->setSegmentIcon( segBtns->count() + i, QIcon::fromTheme( "dialog-cancel" ) );
+				segBtns->setSegmentText( segBtns->count() + i, tr( "&Cancel" ) );
 				break;
 
 			default:
-				qDebug() << "No Button added!!";
 				break;
 		}
 	}
-
-	segBtns->setSegmentWidth( 128 );
 };
 
 void NBMessageDialog::keyPressEvent( QKeyEvent *keyEvent ) {
@@ -249,7 +218,7 @@ void NBMessageDialog::close() {
 void NBMessageDialog::toggleInfoWidget() {
 
 	if ( infoWidget->isVisible() ) {
-		detailsBtn->setText( "&More..." );
+		detailsBtn->setSegmentText( 0, "&More..." );
 		infoWidget->hide();
 
 		restoreGeometry( origGeometry );
@@ -258,16 +227,16 @@ void NBMessageDialog::toggleInfoWidget() {
 	else {
 		origGeometry = saveGeometry();
 
-		detailsBtn->setText( "&Less..." );
+		detailsBtn->setSegmentText( 0, "&Less..." );
 		infoWidget->show();
 
 		adjustSize();
 	}
 };
 
-void NBMessageDialog::buttonClickHandler() {
+void NBMessageDialog::buttonClickHandler( int segment ) {
 
-	QString text = qobject_cast<NBButton*>( sender() )->text();
+	QString text = segBtns->segmentText( segment );
 
 	if ( text == QString( "&Ok" ) ) {
 		retValue = NBMessageDialog::Ok;

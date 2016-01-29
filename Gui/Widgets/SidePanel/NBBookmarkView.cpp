@@ -57,9 +57,8 @@ NBBookmarksIcon::NBBookmarksIcon( QWidget *parent ) : QWidget( parent ) {
 	setFixedSize( 48, 48 );
 
 	// BookmarksView
-	bmkView = new NBBookmarksView( NULL );
-	connect( bmkView, SIGNAL( close() ), this, SLOT( hideBookmarks() ) );
-	connect( bmkView, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	bmkView = new QMenu( this );
+	connect( bmkView, SIGNAL( triggered( QAction* ) ), this, SLOT( clickDrive( QAction* ) ) );
 
 	// bmkView animation
 	anim2 = new NBWidthAnimation( bmkView );
@@ -242,9 +241,6 @@ void NBBookmarksIcon::timerEvent( QTimerEvent *tEvent ) {
 		delayTimer.stop();
 		if ( QRect( 0, 0, 48, 48 ).contains( mapFromGlobal( QCursor::pos() ) ) )
 			showBookmarks();
-
-		else
-			hideBookmarks();
 	}
 };
 
@@ -261,8 +257,6 @@ void NBBookmarksIcon::flashLabel() {
 
 	timer.start();
 	flash = true;
-
-	bmkView->repopulate();
 };
 
 /* Slot to access the flashing with a given color */
@@ -279,221 +273,32 @@ void NBBookmarksIcon::flashLabel( QColor newColor ) {
 
 void NBBookmarksIcon::showBookmarks() {
 
-	bmkView->move( mapToGlobal( QPoint( 48, 0 ) ) );
-	bmkView->show();
+	bmkView->clear();
 
-	anim2->stop();
+	// Spacer Label
+	QLabel *lbl = new QLabel( "<h4>&nbsp;&nbsp;&nbsp;&nbsp;Bookmarks</h4>" );
+	lbl->setFixedHeight( 48 );
+	lbl->setMinimumWidth( 150 );
 
-	anim2->setEasingCurve( QEasingCurve( QEasingCurve::OutQuart ) );
-	anim2->setStartValue( width() );
-	anim2->setEndValue( bmkView->idealWidth() );
-	anim2->start();
-};
+	QWidgetAction *lblAct = new QWidgetAction( bmkView );
+	lblAct->setIcon( QIcon() );
+	lblAct->setDefaultWidget( lbl );
+	lblAct->setDisabled( true );
 
-void NBBookmarksIcon::hideBookmarks() {
-
-	if ( QRect( 0, 0, 48, 48 ).contains( mapFromGlobal( QCursor::pos() ) ) )
-		return;
-
-	anim2->stop();
-
-	anim2->setEasingCurve( QEasingCurve( QEasingCurve::InQuart ) );
-	anim2->setStartValue( width() );
-	anim2->setEndValue( 0 );
-	anim2->start();
-};
-
-NBBookmarksView::NBBookmarksView( QWidget *parent ) : QWidget( parent ) {
-
-	/* To track mouse movements */
-	setMouseTracking( true );
-
-	/* Cursor position */
-	cursor = QPoint();
-
-	/* Compute the ideal width and set the default size */
-	computeIdealWidth();
-	setFixedSize( QSize( 0, allBookmarks().count() * 32 ) );
-
-	/* Update the bookmarks-rect list */
-	bmkRectMap.clear();
-	int y = 0;
-	Q_FOREACH( NBBookmarkInfo info, allBookmarks() ) {
-		bmkRectMap[ y ] = info.mountPoint;
-		y += 32;
-	}
-
-	/* Window Flags; */
-	setWindowFlags( Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
-	setWindowModality( Qt::ApplicationModal );
-};
-
-void NBBookmarksView::repopulate() {
-
-	/* Update the bookmarks-rect list */
-	bmkRectMap.clear();
-	int y = 0;
-	Q_FOREACH( NBBookmarkInfo info, allBookmarks() ) {
-		bmkRectMap[ y ] = info.mountPoint;
-		y += 32;
-	}
-
-	if ( isVisible() ) {
-
-		setFixedHeight( allBookmarks().count() * 32 );
-		computeIdealWidth();
-		repaint();
-	}
-};
-
-int NBBookmarksView::idealWidth() {
-
-	return mIdealWidth;
-};
-
-/* Overriding of paint event for showing flashes */
-void NBBookmarksView::paintEvent( QPaintEvent *pEvent ) {
-
-	QPainter *painter = new QPainter( this );
-	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
-
-	painter->save();
-
-	/* Normal Text */
-	painter->setFont( QFont( font().family(), font().pointSize(), QFont::Normal, false ) );
-
-	int y = 0;
-
-	QFontMetrics fm( font() );
+	bmkView->addAction( lblAct );
 
 	Q_FOREACH( NBBookmarkInfo info, allBookmarks() ) {
-		QRect devRect( QPoint( 0, y ), QSize( mIdealWidth, 32 ) );
-		y += 32;
+		QAction *act = new QAction( QIcon::fromTheme( info.displayIcon , QIcon( ":/icons/bookmark.png" ) ), info.displayLabel, bmkView );
+		act->setData( info.mountPoint );
 
-		/* Mouse over highlight */
-		if ( devRect.contains( mapFromGlobal( QCursor::pos() ) ) ) {
-			painter->fillRect( devRect, palette().color( QPalette::Highlight ) );
-			painter->setPen( palette().color( QPalette::HighlightedText ) );
-		}
-
-		else {
-			painter->fillRect( devRect, Qt::transparent );
-			painter->setPen( palette().color( QPalette::WindowText ) );
-		}
-
-		QRect iconRect( devRect.topLeft() + QPoint( 4, 4 ), QSize( 24, 24 ) );
-		painter->drawPixmap( iconRect, QIcon::fromTheme( "bookmarks" ).pixmap( 24 ) );
-
-		QRect textRect( devRect.adjusted( 32, 0, 0, 0 ) );
-		painter->drawText( textRect, Qt::AlignVCenter, fm.elidedText( info.displayLabel, Qt::ElideRight, mIdealWidth - 32 - 48 ) );
+		bmkView->addAction( act );
 	}
 
-	painter->restore();
-
-	/* Widget border */
-	painter->save();
-	painter->setPen( QPen( Qt::darkGray, 1.0 ) );
-	painter->drawRect( rect() );
-	painter->restore();
-
-	painter->end();
-	pEvent->accept();
+	bmkView->exec( mapToGlobal( QPoint( 49, 0 ) ) );
 };
 
-void NBBookmarksView::computeIdealWidth() {
+void NBBookmarksIcon::clickDrive( QAction *act ) {
 
-	/* IconWidth (32) + MaxTextWidth (computed below) + Buffer (48) */
-	mIdealWidth = 32 + 48;
-
-	int maxWidth = -1;
-
-	QFontMetrics fm( font() );
-	Q_FOREACH( NBBookmarkInfo info, allBookmarks() ) {
-		if ( fm.width( info.displayLabel ) > maxWidth )
-			maxWidth = fm.width( info.displayLabel );
-	}
-
-	mIdealWidth += maxWidth;
-	if ( mIdealWidth < 180 )
-		mIdealWidth = 180;
-};
-
-/* Overriding QLabel::mousePressEvent to emit clicked signal */
-void NBBookmarksView::mousePressEvent( QMouseEvent *mEvent ) {
-
-	Q_FOREACH( int y, bmkRectMap.keys() ) {
-		if ( QRect( QPoint( 0, y ), QSize( mIdealWidth, 32 ) ).contains( mEvent->pos() ) ) {
-			emit driveClicked( bmkRectMap.value( y ) );
-			emit close();
-			break;
-		}
-	}
-
-	mEvent->accept();
-};
-
-/* Overriding QLabel::mouseMoveEvent to expand the view */
-void NBBookmarksView::mouseMoveEvent( QMouseEvent *mEvent ) {
-
-	Q_FOREACH( int y, bmkRectMap.keys() ) {
-		QRect devRect( QPoint( 0, y ), QSize( mIdealWidth, 32 ) );
-		if ( devRect.contains( mEvent->pos() ) ) {
-			/* It by default, comes under the mouse, so push it down right */
-			QToolTip::showText( mapToGlobal( mEvent->pos() ) + QPoint( 20, 20 ), bmkRectMap.value( y ) );
-
-			cursor = mEvent->pos();
-
-			repaint();
-			qApp->processEvents();
-
-			break;
-		}
-	}
-
-	mEvent->accept();
-};
-
-/* Overriding QWidget::keyPressEvent to handle escape */
-void NBBookmarksView::keyPressEvent( QKeyEvent *kEvent ) {
-
-	switch( kEvent->key() ) {
-		case Qt::Key_Escape:
-			emit close();
-			break;
-
-		default:
-			QWidget::keyPressEvent( kEvent );
-			break;
-	}
-
-	kEvent->accept();
-};
-
-/* Overriding QLabel::enterEvent to emit entered signal */
-void NBBookmarksView::enterEvent( QEvent *eEvent ) {
-
-	/* Stop the close timer */
-	closeTimer.stop();
-	eEvent->accept();
-};
-
-/* Overriding QLabel::leaveEvent to emit exited signal */
-void NBBookmarksView::leaveEvent( QEvent *lEvent ) {
-
-	/* Start the close timer: in 500 ms the panel closes */
-	closeTimer.stop();
-	closeTimer.start( 500, this );
-
-	lEvent->accept();
-};
-
-void NBBookmarksView::timerEvent( QTimerEvent *tEvent ) {
-
-	if ( tEvent->timerId() == closeTimer.timerId() ) {
-		if ( not rect().contains( mapFromGlobal( QCursor::pos() ) ) ) {
-			emit close();
-
-			closeTimer.stop();
-		}
-	}
+	QString mtpt = act->data().toString();
+	emit driveClicked( mtpt );
 };

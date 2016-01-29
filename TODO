@@ -4,36 +4,18 @@ Widgets
 		☒ Single click Open (point to select)
 		☑ Selections
 
-	☐ NewBreeze start up: Windows 8 Style [Important Folders + Devices]
-
-Undo-Redo Sequences
+Undo-Redo Sequences > NBProcessManager
 	☐ Undo/Redo Rename, IO, Trash etc
 
-NBFolderView - ?
-	☐ True indexed folder view
-	☐ Vertical and horizontal model
-
-
-	+------------+_
-	|            |A|  +-----------------------------+
-	|            |-|  |                             |
-	|            |B|  |                             |
-	|            |-|  |                             |
-	|            |C|  |                             |
-	|            |-|  |                             |
-	|            |D|  |_____________________________|
-	|            |-|   | F | A | E | G | P | F | G |
-	|            |E|   +---------------------------+
-	+------------+-
-
-NBIconView
-	☐ Fix the horrible selection model - Mouse click is not removed by the cursor keys
+NBIconView                                                                                                                           [ 1 of 3 ]
+	☑ Fix the horrible selection model - Mouse click is not removed by the cursor keys
 	☐ Fix @aboveIndex @belowIndex
+	☐ Enable PageUp and PageDown navigation
 
-NewBreeze Theming and Styling
+NewBreeze Theming and Styling                                                                                                        [ 1 of 3 ]
 	☑ Remove all the redundant stylesheets
 	☐ Enable user defined theming
-	☐ Create a subclass of QIconProvider for our own icons
+	☑ Faster icon loading - images
 
 Archives
 	☐ Zip and tar preview
@@ -43,3 +25,4 @@ Archives
 	☐ Writing archives will be done in NBProcessManager, show the percentage of data compressed.
 	☐ Extraction of archives to be done in NBProcessManager, show the percentage of data processed
 	☐ Single member extraction is not enabled
+	☐ Use an external library to do the work - libarchive

@@ -38,11 +38,12 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.SidePanel = true;
 	defaultSettings->General.ShowHidden = false;
 	defaultSettings->General.IconSize = QSize( 48, 48 );
-	defaultSettings->General.SortColumn = 0;
+	defaultSettings->General.SortColumn = 2;
 	defaultSettings->General.SortCase = false;
-	defaultSettings->General.Grouping = false;
+	defaultSettings->General.Grouping = true;
 	defaultSettings->General.PerFolderViews = true;
 	defaultSettings->General.FilterFolders = true;
+	defaultSettings->General.CombiHome = false;
 
 	defaultSettings->Special.ClosingDown = false;
 
@@ -145,6 +146,9 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "FilterFolders" ) ) )
 		settings->General.FilterFolders = gSettings.value( "FilterFolders" ).toBool();
+
+	if ( gaKeys.contains( QString( "CombiHome" ) ) )
+		settings->General.CombiHome = gSettings.value( "CombiHome" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		settings->Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
@@ -327,6 +331,9 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "General/FilterFolders" ) ) )
 		General.FilterFolders = gSettings.value( "General/FilterFolders" ).toBool();
+
+	if ( gaKeys.contains( QString( "General/CombiHome" ) ) )
+		General.CombiHome = gSettings.value( "General/CombiHome" ).toBool();
 
 	if ( saKeys.contains( QString( "AboutNB" ) ) )
 		Shortcuts.AboutNB = getShortcuts( "AboutNB" );

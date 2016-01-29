@@ -264,20 +264,6 @@ void NBFolderView::createAndSetupActions() {
 	groupsAct->setCheckable( true );
 	groupsAct->setChecked( Settings->General.Grouping );
 	connect( groupsAct, SIGNAL( triggered() ), this, SIGNAL( toggleGroups() ) );
-
-	// Focus the search bar
-	QAction *focusSearchAct = new QAction( "Focus SearchBar", this );
-	focusSearchAct->setShortcuts( Settings->Shortcuts.FocusSearchBar );
-
-	connect( focusSearchAct, SIGNAL( triggered() ), this, SIGNAL( focusSearchBar() ) );
-	addAction( focusSearchAct );
-
-	// Clear the search bar
-	QAction *clearSearchAct = new QAction( "Clear SearchBar", this );
-	clearSearchAct->setShortcuts( Settings->Shortcuts.ClearSearchBar );
-
-	connect( clearSearchAct, SIGNAL( triggered() ), this, SIGNAL( clearSearchBar() ) );
-	addAction( clearSearchAct );
 };
 
 QModelIndexList NBFolderView::getSelection() {
@@ -314,7 +300,12 @@ void NBFolderView::goForward() {
 
 void NBFolderView::doOpenHome() {
 
-	fsModel->goHome();
+	NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", qPrintable( NBXdg::home() ) );
+	if ( Settings->General.CombiHome )
+		fsModel->loadCombiView();
+
+	else
+		fsModel->goHome();
 };
 
 void NBFolderView::newFile() {
@@ -848,7 +839,7 @@ void NBFolderView::doRename() {
 	currentWidget()->setFocus();
 
 	if ( !renamer->canRename() ) {
-		qDebug() << "Renaming" << curFile << "[Cancelled]";
+		qDebug() << "Renaming" << curFile << "[Canceled]";
 		return;
 	}
 
@@ -856,11 +847,17 @@ void NBFolderView::doRename() {
 	QString npath = QDir( fsModel->currentDir() ).filePath( renamer->newName() );
 
 	NBDebugMsg( DbgMsgPart::HEAD, "Renaming %s to %s... ", qPrintable( opath ), qPrintable( npath ) );
-	if ( rename( qPrintable( opath ), qPrintable( npath ) ) )
-		NBDebugMsg( DbgMsgPart::TAIL, "[Failed]" );
+	if ( rename( qPrintable( opath ), qPrintable( npath ) ) ) {
 
-	else
+		NBDebugMsg( DbgMsgPart::TAIL, "[Failed]" );
+	}
+
+	else {
+
 		NBDebugMsg( DbgMsgPart::TAIL, "[Done]" );
+		// To spare the trouble with NBFileSystemWatcher
+		fsModel->rename( opath, npath );
+	}
 };
 
 void NBFolderView::sortByName() {

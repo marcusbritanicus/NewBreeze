@@ -26,8 +26,8 @@ NBSearchBar::NBSearchBar() : QWidget() {
 	searchLE = new QLineEdit();
 	searchLE->setFocusPolicy( Qt::ClickFocus );
 	searchLE->setStyleSheet( "border: none; background: transparent;" );
-	QLabel *searchLbl = new QLabel();
 
+	QLabel *searchLbl = new QLabel();
 	searchLbl->setPixmap( QIcon::fromTheme( "edit-find" ).pixmap( 20 ) );
 
 	QHBoxLayout *srchLyt = new QHBoxLayout();

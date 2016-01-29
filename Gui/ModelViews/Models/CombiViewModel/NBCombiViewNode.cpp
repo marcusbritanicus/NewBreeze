@@ -18,8 +18,6 @@ NBFileSystemNode::NBFileSystemNode() {
 	mCategoryList.clear();
 	myCategory = "Uncategorized";
 	parentNode = 0;
-
-	m_Combi = false;
 };
 
 NBFileSystemNode::NBFileSystemNode( QVariantList data, QString category, NBFileSystemNode *parent ) {
@@ -28,16 +26,6 @@ NBFileSystemNode::NBFileSystemNode( QVariantList data, QString category, NBFileS
 	myCategory = category;
 
 	parentNode = parent;
-};
-
-bool NBFileSystemNode::combi() const {
-
-	return m_Combi;
-};
-
-void NBFileSystemNode::setCombi( bool truth ) {
-
-	m_Combi = truth;
 };
 
 void NBFileSystemNode::addChild( NBFileSystemNode *node ) {
@@ -84,8 +72,6 @@ int NBFileSystemNode::categoryCount() {
 
 void NBFileSystemNode::clearChildren() {
 
-	m_Combi = false;
-
 	childNodes.clear();
 	mCategoryList.clear();
 };
@@ -128,7 +114,6 @@ QVariant NBFileSystemNode::data( int column, bool special ) const {
 		*   time = 4
 		*   perm = 5
 		*   ownr = 6
-		*   mtpt = 7
 		* ]
 		*
 	*/
@@ -141,10 +126,10 @@ QVariant NBFileSystemNode::data( int column, bool special ) const {
 	}
 
 	else {
-		if ( ( column < 0 ) or ( column > 8 ) )
+		if ( ( column < 0 ) or ( column > 7 ) )
 			return QVariant();
 
-		return nodeData.value( 3 + column, QString() );
+		return nodeData.at( 3 + column );
 	}
 };
 
@@ -215,7 +200,7 @@ void NBFileSystemNode::updateCategories() {
 
 	if ( __sortCategory )
 		mCategoryList = sortCategoryList( mCategoryList );
-};
+}
 
 bool columnSort2( NBFileSystemNode *first, NBFileSystemNode *second )  {
 
@@ -382,91 +367,5 @@ inline bool listLessThanB( QString a, QString b ) {
 
 QStringList sortCategoryList( QStringList& cList ) {
 
-	switch( __sortColumn ) {
-		/* Name sort */
-		case 0: {
-			qSort( cList.begin(), cList.end(), listLessThanA );
-			return cList;
-		};
-
-		/* Size sort */
-		/* The order should be: Folders, Tiny, Small, Medium, Large, Massive */
-		case 1: {
-			QStringList nList;
-			if ( cList.contains( "Folders" ) )
-				nList << "Folders";
-
-			if ( cList.contains( "Tiny" ) )
-				nList << "Tiny";
-
-			if ( cList.contains( "Small" ) )
-				nList << "Small";
-
-			if ( cList.contains( "Medium" ) )
-				nList << "Medium";
-
-			if ( cList.contains( "Large" ) )
-				nList << "Large";
-
-			if ( cList.contains( "Massive" ) )
-				nList << "Massive";
-
-			return nList;
-		};
-
-		/* Type sort */
-		/* Folder must be the first item Then come the files */
-		case 2: {
-			if ( cList.contains( "Folders" ) ) {
-				cList.removeAll( "Folders" );
-				qSort( cList.begin(), cList.end(), listLessThanB );
-				cList.insert( 0, "Folders" );
-			}
-
-			else {
-				qSort( cList.begin(), cList.end(), listLessThanB );
-			}
-
-			return cList;
-		};
-
-		/* Date sort */
-		/* We convert all the String dates to QDates, sort them and then convert them back to String */
-		case 4: {
-			QStringList alphaDates = QStringList() << "Today" <<"This Week" << "Last Week" << "This Month" << "Last Month";
-
-			QList<QDate> dList;
-			QStringList nList;
-			Q_FOREACH( QString date, cList ) {
-				if ( not alphaDates.contains( date ) )
-					dList << QDate::fromString( date, "MMMM yyyy" );
-			}
-
-			qSort( dList.begin(), dList.end() );
-			Q_FOREACH( QDate date, dList )
-				nList << date.toString( "MMMM yyyy" );
-
-			/* This ensures that the user sees the Alphabetic dates at first */
-			if ( cList.contains( "Last Month" ) )
-				nList.insert( 0, "Last Month" );
-
-			if ( cList.contains( "This Month" ) )
-				nList.insert( 0, "This Month" );
-
-			if ( cList.contains( "Last Week" ) )
-				nList.insert( 0, "Last Week" );
-
-			if ( cList.contains( "This Week" ) )
-				nList.insert( 0, "This Week" );
-
-			if ( cList.contains( "Today" ) )
-				nList.insert( 0, "Today" );
-
-			return nList;
-		};
-
-		default: {
-			return cList;
-		}
-	};
+	return QStringList() << "My Computer" << "Favorites" << "Recent Files";
 };

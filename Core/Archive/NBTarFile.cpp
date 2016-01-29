@@ -98,7 +98,7 @@ TarFile::TarFile( QString fileName, TarFile::OpenMode mode, TarFile::Filter filt
 			mMode = mode;
 
 			/* Open the file for IO */
-			tarFile.open( fileName.toLocal8Bit().data(), std::ios_base::in | std::ios_base::binary );
+			tarFile.open( fileName.toLatin1().data(), std::ios_base::in | std::ios_base::binary );
 
 			break;
 		}
@@ -199,7 +199,7 @@ bool TarFile::readArchive() {
 	struct stat fileAtts;
 
 	/* If we are unable to read the attributes, then we set validity to false */
-	if ( stat( mFileName.toLocal8Bit().data(), &fileAtts ) != 0 )
+	if ( stat( mFileName.toLatin1().data(), &fileAtts ) != 0 )
 		return false;
 
 	off_t tarSize = qlonglong( fileAtts.st_size );
@@ -318,7 +318,7 @@ bool TarFile::extract( QString target, QStringList members ) {
 		/* Get the target filename */
 		QString fName = target + hdr->value( TarHeader::Name ).toString();
 
-		switch( hdr->value( TarHeader::Type ).toChar().toAscii() ) {
+		switch( hdr->value( TarHeader::Type ).toChar().toLatin1() ) {
 			/* Regular file */
 			case '0' : {
 				/* Get the target file size */
@@ -331,7 +331,7 @@ bool TarFile::extract( QString target, QStringList members ) {
 				QDir( target ).mkpath( dirName( hdr->value( TarHeader::Name ).toString() ) );
 
 				/* Open the C++ File Object */
-				f.open( fName.toLocal8Bit().data(), std::ios_base::out | std::ios_base::binary );
+				f.open( fName.toLatin1().data(), std::ios_base::out | std::ios_base::binary );
 
 				/* Buffer to read the file into */
 				char *buf;
@@ -376,13 +376,13 @@ bool TarFile::extract( QString target, QStringList members ) {
 				}
 
 				/* Set the file property: mode */
-				chmod( fName.toLocal8Bit().data(), hdr->value( TarHeader::Mode ).toLongLong() );
+				chmod( fName.toLatin1().data(), hdr->value( TarHeader::Mode ).toLongLong() );
 
 				/* Set the dir property: mode */
 				struct utimbuf times;
 				times.actime = hdr->value( TarHeader::Time ).toLongLong();
 				times.modtime = hdr->value( TarHeader::Time ).toLongLong();
-				utime( fName.toLocal8Bit().data(), &times );
+				utime( fName.toLatin1().data(), &times );
 
 				break;
 			}
@@ -393,7 +393,7 @@ bool TarFile::extract( QString target, QStringList members ) {
 				QDir( target ).mkpath( dirName( hdr->value( TarHeader::Name ).toString() ) );
 
 				QString path = hdr->value( TarHeader::Target ).toString();
-				symlink( path.toLocal8Bit().data(), fName.toLocal8Bit().data() );
+				symlink( path.toLatin1().data(), fName.toLatin1().data() );
 
 				break;
 			}
@@ -404,13 +404,13 @@ bool TarFile::extract( QString target, QStringList members ) {
 				QDir( target ).mkpath( hdr->value( TarHeader::Name ).toString() );
 
 				/* Set the dir property: mode */
-				chmod( fName.toLocal8Bit().data(), hdr->value( TarHeader::Mode ).toLongLong() );
+				chmod( fName.toLatin1().data(), hdr->value( TarHeader::Mode ).toLongLong() );
 
 				/* Set the dir property: time */
 				struct utimbuf times;
 				times.actime = hdr->value( TarHeader::Time ).toLongLong();
 				times.modtime = hdr->value( TarHeader::Time ).toLongLong();
-				utime( fName.toLocal8Bit().data(), &times );
+				utime( fName.toLatin1().data(), &times );
 
 				break;
 			}
@@ -433,7 +433,7 @@ void TarFile::addFile( QString fn ) {
 		files << QDir::cleanPath( fn );
 
 	else
-		qDebug() << "Skipping unreadable file" << fn.toLocal8Bit().data();
+		qDebug() << "Skipping unreadable file" << fn.toLatin1().data();
 };
 
 void TarFile::addDir( QString dn ) {
@@ -441,7 +441,7 @@ void TarFile::addDir( QString dn ) {
 	dn = QDir::cleanPath( dn );
 
 	if ( not isReadable( dn ) )
-		qDebug() << "Skipping unreadable directory" << dn.toLocal8Bit().data();
+		qDebug() << "Skipping unreadable directory" << dn.toLatin1().data();
 
 
 	if ( not dn.endsWith( "/" ) )
@@ -452,7 +452,7 @@ void TarFile::addDir( QString dn ) {
 
 	DIR *dir;
 	struct dirent *ent;
-	dir = opendir( dn.toLocal8Bit().data() );
+	dir = opendir( dn.toLatin1().data() );
 
 	if ( dir != NULL ) {
 		while ( ( ent = readdir( dir ) ) != NULL) {
@@ -498,7 +498,7 @@ bool TarFile::writeArchive() {
 		case TarFile::NOFilter: {
 
 			/* Open the file for IO */
-			tarFile.open( mFileName.toLocal8Bit().data(), std::ios_base::out | std::ios_base::binary );
+			tarFile.open( mFileName.toLatin1().data(), std::ios_base::out | std::ios_base::binary );
 
 			if ( not tarFile.is_open() ) {
 				qDebug() << "Error opening archive file" << mFileName;
@@ -518,7 +518,7 @@ bool TarFile::writeArchive() {
 
 					/* Read and write the input file */
 					std::ifstream infile;
-					infile.open( fn.toLocal8Bit().data() );
+					infile.open( fn.toLatin1().data() );
 					while( not infile.eof() ) {
 						char *buffer = new char[BUFSIZ];
 						infile.read( buffer, BUFSIZ );

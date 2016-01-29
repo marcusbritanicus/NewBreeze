@@ -20,8 +20,6 @@ class NBBookmarkInfo {
 
 Q_DECLARE_METATYPE(NBBookmarkInfo);
 
-class NBBookmarksView;
-
 QList<NBBookmarkInfo> allBookmarks();
 
 class NBBookmarksIcon : public QWidget {
@@ -88,11 +86,11 @@ class NBBookmarksIcon : public QWidget {
 		/* should the flash be colored */
 		bool colorFlash;
 
-		NBBookmarksView *bmkView;
+		QMenu *bmkView;
 
 	private slots:
 		void showBookmarks();
-		void hideBookmarks();
+		void clickDrive( QAction* );
 
 	protected :
 		void paintEvent( QPaintEvent* );
@@ -110,45 +108,4 @@ class NBBookmarksIcon : public QWidget {
 
 	Q_SIGNALS:
 		void driveClicked( QString );
-};
-
-class NBBookmarksView : public QWidget {
-	Q_OBJECT
-
-	public:
-		NBBookmarksView( QWidget* );
-
-		/* Repopulate on new device add */
-		void repopulate();
-
-		/* Ideal width for the deviceView */
-		int idealWidth();
-
-	private :
-		void computeIdealWidth();
-
-		QBasicTimer closeTimer;
-
-		/* Label, MountPoint piar for each device */
-		QMap<int, QString> bmkRectMap;
-		mutable QPoint cursor;
-
-		int mIdealWidth;
-
-	protected :
-		void paintEvent( QPaintEvent* );
-
-		void mousePressEvent( QMouseEvent* );
-		void mouseMoveEvent( QMouseEvent* );
-
-		void keyPressEvent( QKeyEvent * );
-
-		void enterEvent( QEvent* );		// => Expand
-		void leaveEvent( QEvent* );		// => Contract
-
-		void timerEvent( QTimerEvent* );		// => Contract
-
-	Q_SIGNALS:
-		void driveClicked( QString );
-		void close();
 };

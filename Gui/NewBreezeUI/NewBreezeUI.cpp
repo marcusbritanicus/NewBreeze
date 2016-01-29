@@ -16,15 +16,13 @@ NewBreezeUI::NewBreezeUI( QString loc ) : QWidget() {
 
 	// By default we do not show hidden files, but if the user
 	// had closed while viewing the hidden files, let's show it.
-<<<<<<< HEAD
 	if ( Settings->General.ShowHidden )
-=======
-	if ( Settings->Session.ShowHidden )
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 		FolderView->fsModel->setShowHidden( true );
 
 	FolderView->doOpen( loc );
 	FolderView->currentWidget()->setFocus();
+
+	// qDebug() << "NewBreeze UI setup";
 };
 
 void NewBreezeUI::createGUI() {
@@ -41,50 +39,30 @@ void NewBreezeUI::createGUI() {
 	BodyLayout->setContentsMargins( QMargins() );
 	BodyLayout->setSpacing( 0 );
 
-<<<<<<< HEAD
 	uBar = new NBUtilityBar();
 	AddressBar = new NBAddressBar( this );
 	SidePanel = new NBSidePanel( this );
 	FolderView = new NBFolderView( this );
 	InfoBar = new NBInfoBar( this );
-=======
-	AddressBar = new NBAddressBar();
-	QuickMenuBar = new NBQuickMenuBar();
-	SidePanel = new NBSidePanel( this );
-	FolderView = new NBFolderView();
-	InfoBar = new NBInfoBar();
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	Terminal = new NBTerminal();
+	FilterWidget = new NBFilterWidget( FolderView );
 
 	// Widgets layout
 	ViewLayout->addWidget( AddressBar );
-<<<<<<< HEAD
 	ViewLayout->addWidget( FolderView );
 
 	BodyLayout->addWidget( SidePanel );
 	// BodyLayout->addWidget( NBSpacer::horizontal( 3 ) );
-=======
-	ViewLayout->addWidget( Separator::horizontal() );
-	ViewLayout->addWidget( QuickMenuBar );
-	ViewLayout->addWidget( FolderView );
-
-	BodyLayout->addWidget( SidePanel );
-	BodyLayout->addWidget( Separator::vertical() );
-	BodyLayout->addWidget( NBSpacer::horizontal( 3 ) );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	BodyLayout->addLayout( ViewLayout );
 
 	BodyWidget->setLayout( BodyLayout );
 
-<<<<<<< HEAD
 	if ( not Settings->General.NativeTitleBar )
 		MainLayout->addWidget( uBar );
 
 	else
 		MainLayout->setContentsMargins( QMargins( 0, 5, 0, 0 ) );
 
-=======
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	MainLayout->addWidget( BodyWidget );
 	MainLayout->addWidget( Terminal );
 	MainLayout->addWidget( Separator::horizontal() );
@@ -93,21 +71,11 @@ void NewBreezeUI::createGUI() {
 	setLayout( MainLayout );
 
 	// Widget Properties
-	AddressBar->setFixedHeight( 24 );
-<<<<<<< HEAD
+	AddressBar->setFixedHeight( 32 );
 	Terminal->setFixedHeight( 270 );
 	Terminal->hide();
+	FilterWidget->hide();
 
-=======
-	QuickMenuBar->setFixedHeight( 24 );
-	FolderView->setObjectName( "mainList" );
-	Terminal->setFixedHeight( 270 );
-	Terminal->hide();
-
-	if ( not Settings->Session.SidePanel )
-		SidePanel->hide();
-
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	AddressBar->setFocusPolicy( Qt::NoFocus );
 	SidePanel->setFocusPolicy( Qt::NoFocus );
 	FolderView->setFocusPolicy( Qt::StrongFocus );
@@ -118,7 +86,6 @@ void NewBreezeUI::createGUI() {
 
 void NewBreezeUI::createAndSetupActions() {
 
-<<<<<<< HEAD
 	connect( uBar, SIGNAL( titleBarMousePress( QMouseEvent * ) ), this, SIGNAL( titleBarMousePress( QMouseEvent * ) ) );
 	connect( uBar, SIGNAL( titleBarMouseMove( QMouseEvent * ) ), this, SIGNAL( titleBarMouseMove( QMouseEvent * ) ) );
 	connect( uBar, SIGNAL( closeWindow() ), this, SIGNAL( closeWindow() ) );
@@ -126,33 +93,17 @@ void NewBreezeUI::createAndSetupActions() {
 	connect( uBar, SIGNAL( maximizeWindow() ), this, SIGNAL( maximizeWindow() ) );
 	connect( uBar, SIGNAL( restoreWindow() ), this, SIGNAL( restoreWindow() ) );
 
-	connect( AddressBar, SIGNAL( openTerminal() ), FolderView, SLOT( openTerminal() ) );
-	connect( AddressBar, SIGNAL( reload() ), FolderView, SLOT( doReload() ) );
-	connect( AddressBar, SIGNAL( switchToNextView() ), this, SLOT( switchToNextView() ) );
-	connect( AddressBar, SIGNAL( changeViewMode() ), this, SLOT( changeViewMode() ) );
+	connect( AddressBar, SIGNAL( changeViewMode( int ) ), this, SLOT( changeViewMode( int ) ) );
 	connect( AddressBar, SIGNAL( openLocation( QString ) ), this, SLOT( openAddress( QString ) ) );
-	connect( AddressBar, SIGNAL( search( QString ) ), this, SLOT( filterFiles( QString ) ) );
-	connect( AddressBar, SIGNAL( clearSearch() ), this, SLOT( clearFilters() ) );
+	connect( AddressBar, SIGNAL( openSearch() ), FilterWidget, SLOT( show() ) );
 
-	// connect( QuickMenu, SIGNAL( openWithClicked() ), this, SLOT( openWithList() ) );
-	// connect( QuickMenu, SIGNAL( deleteClicked() ), FolderView, SLOT( doDelete() ) );
-	// connect( QuickMenu, SIGNAL( propsClicked() ), this, SLOT( showProperties() ) );
-	// connect( QuickMenu, SIGNAL( permsClicked() ), this, SLOT( showPermissions() ) );
-=======
-	connect( AddressBar->openVTEBtn, SIGNAL( clicked() ), FolderView, SLOT( openTerminal() ) );
-	connect( AddressBar->reloadBtn, SIGNAL( clicked() ), FolderView, SLOT( doReload() ) );
-	connect( AddressBar->viewModeBtn, SIGNAL( switchToNextView() ), this, SLOT( switchToNextView() ) );
-	connect( AddressBar->viewModeBtn, SIGNAL( changeViewMode() ), this, SLOT( changeViewMode() ) );
-	connect( AddressBar->addressWidget->addressEdit, SIGNAL( returnPressed() ), this, SLOT( openAddressBar() ) );
-	connect( AddressBar->addressWidget->crumbsBar, SIGNAL( openLocation( QString ) ), this, SLOT( openAddress( QString ) ) );
-	connect( AddressBar->searchBar, SIGNAL( searchString( QString ) ), this, SLOT( filterFiles( QString ) ) );
-	connect( AddressBar->searchBar, SIGNAL( searchCleared() ), this, SLOT( clearFilters() ) );
+	connect( FilterWidget, SIGNAL( search( QString ) ), this, SLOT( filterFiles( QString ) ) );
+	connect( FilterWidget, SIGNAL( shown() ), AddressBar, SLOT( hideSearchButton() ) );
+	connect( FilterWidget, SIGNAL( hidden() ), AddressBar, SLOT( showSearchButton() ) );
+	connect( FilterWidget, SIGNAL( hidden() ), this, SLOT( clearSearch() ) );
 
-	connect( QuickMenuBar, SIGNAL( openWithClicked() ), this, SLOT( openWithList() ) );
-	connect( QuickMenuBar, SIGNAL( deleteClicked() ), FolderView, SLOT( doDelete() ) );
-	connect( QuickMenuBar, SIGNAL( propsClicked() ), this, SLOT( showProperties() ) );
-	connect( QuickMenuBar, SIGNAL( permsClicked() ), this, SLOT( showPermissions() ) );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
+	connect( AddressBar, SIGNAL( goBack() ), FolderView, SLOT( goBack() ) );
+	connect( AddressBar, SIGNAL( goForward() ), FolderView, SLOT( goForward() ) );
 
 	connect( SidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
 	connect( SidePanel, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
@@ -174,45 +125,24 @@ void NewBreezeUI::createAndSetupActions() {
 
 	connect( FolderView, SIGNAL( showProperties() ), this, SLOT( showProperties() ) );
 	connect( FolderView, SIGNAL( showPermissions() ), this, SLOT( showPermissions() ) );
-<<<<<<< HEAD
-	connect( FolderView, SIGNAL( focusSearchBar() ), AddressBar, SLOT( focusSearchBar() ) );
-	connect( FolderView, SIGNAL( clearSearchBar() ), this, SLOT( clearSearch() ) );
+
 	connect( FolderView, SIGNAL( newWindow( QString ) ), this, SIGNAL( newWindow( QString ) ) );
 	connect( FolderView, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ), this, SLOT( updateInfoBar() ) );
-=======
-	connect( FolderView, SIGNAL( focusSearchBar() ), this, SLOT( focusSearch() ) );
-	connect( FolderView, SIGNAL( clearSearchBar() ), this, SLOT( clearSearch() ) );
-	connect( FolderView, SIGNAL( newWindow( QString ) ), this, SIGNAL( newWindow( QString ) ) );
-	connect( FolderView, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ), this, SLOT( updateInfoBar() ) );
-	connect( FolderView, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ), this, SLOT( updateQuickMenuBar() ) );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	connect( FolderView, SIGNAL( reloadCatalogs() ), FolderView->widget( 2 ), SLOT( reload() ) );
 	connect( FolderView, SIGNAL( toggleGroups() ), this, SLOT( toggleGrouping() ) );
 	connect( FolderView, SIGNAL( updateAddressBar( QString ) ), this, SLOT( updateVarious( QString ) ) );
 
-<<<<<<< HEAD
 	connect( FolderView, SIGNAL( hideStatusBar() ), InfoBar, SLOT( hide() ) );
 	connect( FolderView, SIGNAL( showStatusBar() ), InfoBar, SLOT( show() ) );
 
 	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateInfoBar() ) );
-=======
-	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
-	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateInfoBar() ) );
-	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateQuickMenuBar() ) );
-	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateQuickMenuBar() ) );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
-
 	connect( FolderView->widget( 2 ), SIGNAL( openLocation( QString ) ), this, SLOT( openAddress( QString ) ) );
 
 	// Focus AddressBar
 	QAction *focusAddressBarAct = new QAction( this );
 	focusAddressBarAct->setShortcuts( Settings->Shortcuts.FocusAddressBar );
-<<<<<<< HEAD
 	connect( focusAddressBarAct, SIGNAL( triggered() ), AddressBar, SLOT( focusAddressEdit() ) );
-=======
-	connect( focusAddressBarAct, SIGNAL( triggered() ), AddressBar->addressWidget->addressEdit, SLOT( setFocus() ) );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 
 	// Open new window
 	QAction *newWindowAct = new QAction( this );
@@ -260,6 +190,16 @@ void NewBreezeUI::createAndSetupActions() {
 	showFoldersAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Alt+Shift+F" ) );
 	connect( showFoldersAct, SIGNAL( triggered() ), this, SLOT( showFolders() ) );
 
+	// Focus the search bar
+	QAction *focusSearchAct = new QAction( "Focus SearchBar", this );
+	focusSearchAct->setShortcuts( Settings->Shortcuts.FocusSearchBar );
+	connect( focusSearchAct, SIGNAL( triggered() ), FilterWidget, SLOT( show() ) );
+
+	// Clear the search bar
+	QAction *clearSearchAct = new QAction( "Clear SearchBar", this );
+	clearSearchAct->setShortcuts( Settings->Shortcuts.ClearSearchBar );
+	connect( clearSearchAct, SIGNAL( triggered() ), this, SLOT( clearSearch() ) );
+
 	addAction( focusAddressBarAct );
 	addAction( newWindowAct );
 	addAction( addBookMarkAct );
@@ -269,9 +209,10 @@ void NewBreezeUI::createAndSetupActions() {
 	addAction( showApplicationsAct );
 	addAction( showCatalogsAct );
 	addAction( showFoldersAct );
+	addAction( focusSearchAct );
+	addAction( clearSearchAct );
 };
 
-<<<<<<< HEAD
 void NewBreezeUI::setFocus() {
 
 	FolderView->setFocus();
@@ -293,19 +234,6 @@ void NewBreezeUI::showActiveJobs() {
 
 	else
 		AddressBar->procWidget()->showAllIODialogs();
-=======
-void NewBreezeUI::updateGUI() {
-
-	AddressBar->setStyleSheet( getStyleSheet( "NBTooBar", Settings->General.Style ) );
-	SidePanel->setStyleSheet( getStyleSheet( "NBSidePanel", Settings->General.Style ) );
-	Terminal->setStyleSheet( getStyleSheet( "NBTerminal", Settings->General.Style ) );
-	InfoBar->setStyleSheet( getStyleSheet( "NBInfoBar", Settings->General.Style ) );
-};
-
-void NewBreezeUI::setFocus() {
-
-	FolderView->setFocus();
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 };
 
 void NewBreezeUI::toggleSideBarVisible() {
@@ -355,7 +283,6 @@ void NewBreezeUI::showHideTermWidget() {
 
 void NewBreezeUI::openAddressBar() {
 
-<<<<<<< HEAD
 	if ( !QFileInfo( AddressBar->address() ).exists() ) {
 		QString text = QString( "There is no file or directory named: "		\
 			"<tt><b>%1</b></tt>. Please check the path entered."
@@ -364,25 +291,11 @@ void NewBreezeUI::openAddressBar() {
 		QString title = QString( "NewBreeze - Invalid Location" );
 
 		NBMessageDialog::error( this, title, text );
-=======
-	if ( !QFileInfo( AddressBar->addressWidget->addressEdit->text() ).exists() ) {
-		QString text = QString( "There is no file or directory named: "		\
-			"<tt><b>%1</b></tt>. Please check the path entered."
-		).arg(  AddressBar->addressWidget->addressEdit->text() );
-
-		QString title = QString( "NewBreeze - Invalid Location" );
-
-		NBMessageDialog::error( title, text );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 
 		return;
 	}
 
-<<<<<<< HEAD
 	FolderView->doOpen( AddressBar->address() );
-=======
-	FolderView->doOpen( AddressBar->addressWidget->addressEdit->text() );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 };
 
 void NewBreezeUI::openAddress( QString path ) {
@@ -400,20 +313,9 @@ void NewBreezeUI::openNewWindow() {
 	emit newWindow( location );
 };
 
-<<<<<<< HEAD
 void NewBreezeUI::clearSearch() {
 
-	AddressBar->clearSearchBar();
-=======
-void NewBreezeUI::focusSearch() {
-
-	AddressBar->searchBar->searchLE->setFocus();
-};
-
-void NewBreezeUI::clearSearch() {
-
-	AddressBar->searchBar->searchLE->clear();
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
+	FilterWidget->clear();
 	clearFilters();
 
 	FolderView->setFocus();
@@ -431,11 +333,7 @@ void NewBreezeUI::showProperties() {
 		foreach( QModelIndex idx, selectedList )
 			paths << FolderView->fsModel->nodePath( idx );
 
-<<<<<<< HEAD
 	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, &__terminate, this );
-=======
-	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, &__terminate );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	propsDlg->show();
 };
 
@@ -451,11 +349,7 @@ void NewBreezeUI::showPermissions() {
 		foreach( QModelIndex idx, selectedList )
 			paths << FolderView->fsModel->nodePath( idx );
 
-<<<<<<< HEAD
 	NBPropertiesDialog *permsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Permissions, &__terminate, this );
-=======
-	NBPropertiesDialog *permsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Permissions, &__terminate );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	permsDlg->show();
 };
 
@@ -477,12 +371,7 @@ void NewBreezeUI::showApplications() {
 		SidePanel->flashApplications();
 
 	FolderView->doOpen( "NB://Applications" );
-<<<<<<< HEAD
 	AddressBar->setAddress( "NB://Applications" );
-=======
-	AddressBar->addressWidget->addressEdit->setText( "NB://Applications" );
-	AddressBar->addressWidget->crumbsBar->setCurrentDirectory( "NB://Applications" );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 };
 
 void NewBreezeUI::showCatalogs() {
@@ -491,12 +380,7 @@ void NewBreezeUI::showCatalogs() {
 		SidePanel->flashCatalogs();
 
 	FolderView->doOpen( "NB://Catalogs" );
-<<<<<<< HEAD
 	AddressBar->setAddress( "NB://Catalogs" );
-=======
-	AddressBar->addressWidget->addressEdit->setText( "NB://Catalogs" );
-	AddressBar->addressWidget->crumbsBar->setCurrentDirectory( "NB://Catalogs" );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 };
 
 void NewBreezeUI::showFolders() {
@@ -525,15 +409,11 @@ void NewBreezeUI::clearFilters() {
 
 void NewBreezeUI::initiateIO( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {
 
-<<<<<<< HEAD
 	if ( not Settings->General.NativeTitleBar )
 		uBar->procWidget->addJob( sourceList, target, iomode );
 
 	else
 		AddressBar->procWidget()->addJob( sourceList, target, iomode );
-=======
-	emit addJob( sourceList, target, iomode );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 };
 
 void NewBreezeUI::openWithList() {
@@ -552,7 +432,6 @@ void NewBreezeUI::openWithList() {
 
 	openWithMenu->exec( itemView->mapToGlobal( pos ) );
 };
-<<<<<<< HEAD
 
 void NewBreezeUI::updateVarious( QString url ) {
 
@@ -584,15 +463,15 @@ void NewBreezeUI::updateInfoBar() {
 		InfoBar->updateInfoBarCF( FolderView->fsModel->currentDir() );
 };
 
-void NewBreezeUI::changeViewMode() {
+void NewBreezeUI::changeViewMode( int mode ) {
 
 	QStringList viewModes = QStringList() << "TilesView" << "IconsView" << "DetailsView";
-	Settings->General.ViewMode = viewModes.at( AddressBar->checkedAction() );
-
-	FolderView->updateViewMode();
+	Settings->General.ViewMode = viewModes.at( mode );
 
 	QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
 	sett.setValue( "NewBreeze/ViewMode", Settings->General.ViewMode );
+
+	FolderView->updateViewMode();
 };
 
 void NewBreezeUI::switchToNextView() {
@@ -626,5 +505,3 @@ void NewBreezeUI::toggleGrouping() {
 	QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
 	sett.setValue( "NewBreeze/Grouping", Settings->General.Grouping );
 };
-=======
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223

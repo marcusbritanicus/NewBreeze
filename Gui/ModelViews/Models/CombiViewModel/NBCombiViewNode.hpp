@@ -5,17 +5,15 @@
 */
 
 #pragma once
+#ifndef NBFILESYSTEMNODE_HPP
+#define NBFILESYSTEMNODE_HPP
 
 #include <Global.hpp>
 
 class NBFileSystemNode {
-
 	public:
 		NBFileSystemNode();
 		NBFileSystemNode( QVariantList, QString, NBFileSystemNode *parent = 0 );
-
-		bool combi() const;
-		void setCombi( bool );
 
 		int childCount();
 		int categoryCount();
@@ -57,9 +55,9 @@ class NBFileSystemNode {
 
 		QString myCategory;
 		QIcon mIcon;
-
-		bool m_Combi;
 };
 
 bool columnSort2( NBFileSystemNode *first, NBFileSystemNode *second );
 QStringList sortCategoryList( QStringList& );
+
+#endif

@@ -11,7 +11,8 @@
 #include <NBDeviceManager.hpp>
 #include <NBAnimations.hpp>
 
-class NBDeviceView;
+class NBDeviceAction;
+class NBDeviceMenu;
 
 class NBDevicesIcon : public QWidget {
 	Q_OBJECT
@@ -56,6 +57,7 @@ class NBDevicesIcon : public QWidget {
 
 	private :
 		QBasicTimer delayTimer;
+		QBasicTimer closeTimer;
 		QTimer timer;
 
 		QPixmap mPixmap;
@@ -72,24 +74,18 @@ class NBDevicesIcon : public QWidget {
 		int flashesCompleted;
 		int maxFlashes;
 
-		NBWidthAnimation *anim2;
-
-		/* should the flash be colored */
-		// bool colorFlash;
-
-		NBDeviceView *devView;
+		NBDeviceMenu *devView;
 
 	private slots:
 		void showDevices();
-		void hideDevices();
+		void clickDrive( QAction* );
 
 	protected :
 		void paintEvent( QPaintEvent* );
 		void mousePressEvent( QMouseEvent* );
 		void mouseMoveEvent( QMouseEvent* );
 
-		void enterEvent( QEvent* );		// => Expand
-		void leaveEvent( QEvent* );		// => Contract
+		void enterEvent( QEvent* );
 
 		void timerEvent( QTimerEvent * );
 
@@ -101,43 +97,33 @@ class NBDevicesIcon : public QWidget {
 		void driveClicked( QString );
 };
 
-class NBDeviceView : public QWidget {
+class NBDeviceMenu : public QMenu {
 	Q_OBJECT
 
 	public:
-		NBDeviceView( QWidget* );
+		NBDeviceMenu( QWidget* );
 
-		/* Repopulate on new device add */
-		void repopulate();
+	protected:
+		void changeEvent( QEvent* );
+};
 
-		/* Ideal width for the deviceView */
-		int idealWidth();
+class NBDeviceAction : public QWidget {
+	Q_OBJECT
 
-	private :
-		void computeIdealWidth();
+	public:
+		NBDeviceAction( NBDeviceInfo );
+		QString mountPoint();
 
-		QBasicTimer closeTimer;
+	private:
+		QString mMountPoint;
+		quint64 percentUsed;
+		QIcon icon;
+		QString mDeviceLabel;
 
-		/* Label, MountPoint piar for each device */
-		QMap<int, QString> devRectMap;
-		mutable QPoint cursor;
-
-		int mIdealWidth;
+		bool select;
 
 	protected :
 		void paintEvent( QPaintEvent* );
-
-		void mousePressEvent( QMouseEvent* );
-		void mouseMoveEvent( QMouseEvent* );
-
-		void keyPressEvent( QKeyEvent * );
-
-		void enterEvent( QEvent* );		// => Expand
-		void leaveEvent( QEvent* );		// => Contract
-
-		void timerEvent( QTimerEvent * );
-
-	Q_SIGNALS:
-		void driveClicked( QString );
-		void close();
+		void enterEvent( QEvent* );
+		void leaveEvent( QEvent* );
 };

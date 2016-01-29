@@ -129,9 +129,6 @@ class NBFolderView : public QStackedWidget {
 		void move( QStringList, QString, NBIOMode::Mode );
 		void copy( QStringList, QString, NBIOMode::Mode );
 
-		void focusSearchBar();
-		void clearSearchBar();
-
 		void showProperties();
 		void showPermissions();
 

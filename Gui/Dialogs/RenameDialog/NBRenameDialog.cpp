@@ -37,18 +37,17 @@ void NBRenameDialog::createGUI() {
 	replaceCB->setText( "Replace E&xisting" );
 	replaceCB->setChecked( false );
 
-	okBtn = new NBButton( QIcon( ":/icons/ok.png" ), "&Rename", this );
-	okBtn->setObjectName( "okBtn" );
-	okBtn->setDisabled( true );
+	segBtns = new NBSegmentControl( this );
+	segBtns->setCount( 2 );
 
-	cancelBtn = new NBButton( QIcon( ":/icons/cancel.png" ), "&Cancel", this );
-	cancelBtn->setObjectName( "cancelBtn" );
+	segBtns->setSegmentIcon( 0, QIcon( ":/icons/ok.png" ) );
+	segBtns->setSegmentText( 0, tr( "&Rename" ) );
+	segBtns->setSegmentEnabled( 0, false );
 
-	NBButtons *segBtns = new NBButtons( this );
+	segBtns->setSegmentIcon( 1, QIcon( ":/icons/cancel.png" ) );
+	segBtns->setSegmentText( 1, tr( "&Cancel" ) );
 
-	segBtns->addSegment( okBtn );
-	segBtns->addSegment( cancelBtn );
-	segBtns->setSegmentWidth( 90 );
+	connect( segBtns, SIGNAL( clicked( int ) ), this, SLOT( handleSegmentClick( int ) ) );
 
 	btnLyt->addWidget( replaceCB );
 	btnLyt->addStretch( 0 );
@@ -61,9 +60,6 @@ void NBRenameDialog::createGUI() {
 	connect( le, SIGNAL( textEdited( QString ) ), this, SLOT( handleTextChanged( QString ) ) );
 	connect( le, SIGNAL( returnPressed() ), this, SLOT( rename() ) );
 	connect( replaceCB, SIGNAL( stateChanged( int ) ), this, SLOT( handleCBStateChanged() ) );
-
-	connect( okBtn, SIGNAL( clicked() ), this, SLOT( rename() ) );
-	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( cancel() ) );
 
 	setLayout( lyt );
 	le->setFocus();
@@ -82,27 +78,27 @@ bool NBRenameDialog::canRename() {
 void NBRenameDialog::handleTextChanged( QString newText ) {
 
 	if ( newText.isEmpty() ) {
-		okBtn->setDisabled( true );
+		segBtns->setSegmentEnabled( 0, false );
 		return;
 	}
 
 	if ( newText == name )
-		okBtn->setDisabled( true );
+		segBtns->setSegmentEnabled( 0, false );
 
 	else if ( replaceCB->isChecked() ) {
 		if ( isDir( dir.filePath( newText ) ) )
-			okBtn->setDisabled( true );
+			segBtns->setSegmentEnabled( 0, false );
 
 		else
-			okBtn->setEnabled( true );
+			segBtns->setSegmentEnabled( 0, true );
 	}
 
 	else {
 		if ( dir.entryList().contains( newText ) )
-			okBtn->setDisabled( true );
+			segBtns->setSegmentEnabled( 0, false );
 
 		else
-			okBtn->setEnabled( true );
+			segBtns->setSegmentEnabled( 0, true );
 	}
 };
 
@@ -111,33 +107,44 @@ void NBRenameDialog::handleCBStateChanged() {
 	QString newText = le->text();
 
 	if ( newText.isEmpty() ) {
-		okBtn->setDisabled( true );
+		segBtns->setSegmentEnabled( 0, false );
 		return;
 	}
 
 	if ( newText == name )
-		okBtn->setDisabled( true );
+		segBtns->setSegmentEnabled( 0, false );
 
 	else if ( replaceCB->isChecked() ) {
 		if ( isDir( dir.filePath( newText ) ) )
-			okBtn->setDisabled( true );
+			segBtns->setSegmentEnabled( 0, false );
 
 		else
-			okBtn->setEnabled( true );
+			segBtns->setSegmentEnabled( 0, true );
 	}
 
 	else {
 		if ( dir.entryList().contains( newText ) )
-			okBtn->setDisabled( true );
+			segBtns->setSegmentEnabled( 0, false );
 
 		else
-			okBtn->setEnabled( true );
+			segBtns->setSegmentEnabled( 0, true );
+	}
+};
+
+void NBRenameDialog::handleSegmentClick( int seg ) {
+
+	switch( seg ) {
+		case 0:
+			return rename();
+
+		case 1:
+			return cancel();
 	}
 };
 
 void NBRenameDialog::rename() {
 
-	if ( okBtn->isEnabled() ) {
+	if ( segBtns->segmentEnabled( 0 ) ) {
 		renameOk = true;
 		close();
 	}

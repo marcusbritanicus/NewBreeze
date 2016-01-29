@@ -1,22 +1,12 @@
 /*
 	*
-	* NBIconView.cpp - NewBreeze IconView Class
+	* NBCombiView.cpp - NewBreeze MyCompter Class
 	*
 */
 
-#include <NBIconView.hpp>
+#include <NBCombiView.hpp>
 
-static inline bool isExecutable( QString path ) {
-
-	struct stat statbuf;
-	if ( stat( path.toLocal8Bit().data(), &statbuf ) == 0 )
-		return ( statbuf.st_mode & S_IXUSR );
-
-	else
-		return false;
-};
-
-NBIconView::NBIconView( NBFileSystemModel *fsModel ) : QAbstractItemView() {
+NBCombiView::NBCombiView( NBFileSystemModel *fsModel ) : QAbstractItemView() {
 
 	// Current folder viewMode
 	currentViewMode = Settings->General.ViewMode;
@@ -51,7 +41,7 @@ NBIconView::NBIconView( NBFileSystemModel *fsModel ) : QAbstractItemView() {
 	padding = 0;
 
 	// Set the Apps Delegate
-	setItemDelegate( new NBIconDelegate() );
+	setItemDelegate( new NBCombiDelegate() );
 
 	// Applications Model
 	cModel = fsModel;
@@ -111,14 +101,14 @@ NBIconView::NBIconView( NBFileSystemModel *fsModel ) : QAbstractItemView() {
 	addAction( zoomOutAct );
 };
 
-void NBIconView::setModel( QAbstractItemModel *model ) {
+void NBCombiView::setModel( QAbstractItemModel *model ) {
 
 	QAbstractItemView::setModel( model );
 
 	hashIsDirty = true;
 };
 
-void NBIconView::updateViewMode() {
+void NBCombiView::updateViewMode() {
 
 	currentViewMode = Settings->General.ViewMode;
 	computeGridSize( Settings->General.IconSize );
@@ -126,12 +116,12 @@ void NBIconView::updateViewMode() {
 	return;
 };
 
-int NBIconView::categoryHeight() const {
+int NBCombiView::categoryHeight() const {
 
 	return myCategoryHeight;
 };
 
-void NBIconView::setCategoryHeight( int newCategoryHeight ) {
+void NBCombiView::setCategoryHeight( int newCategoryHeight ) {
 
 	myCategoryHeight = newCategoryHeight;
 
@@ -139,12 +129,12 @@ void NBIconView::setCategoryHeight( int newCategoryHeight ) {
 	calculateRectsIfNecessary();
 };
 
-QSize NBIconView::iconSize() const {
+QSize NBCombiView::iconSize() const {
 
 	return myIconSize;
 };
 
-void NBIconView::setIconSize( QSize newIconSize ) {
+void NBCombiView::setIconSize( QSize newIconSize ) {
 
 	myIconSize = newIconSize;
 	computeGridSize( myIconSize );
@@ -152,17 +142,17 @@ void NBIconView::setIconSize( QSize newIconSize ) {
 	viewport()->update();
 };
 
-void NBIconView::setIconSize( int nWidth, int nHeight ) {
+void NBCombiView::setIconSize( int nWidth, int nHeight ) {
 
 	setIconSize( QSize( nWidth, nHeight ) );
 };
 
-QMargins NBIconView::contentsMargins() const {
+QMargins NBCombiView::contentsMargins() const {
 
 	return myContentsMargins;
 };
 
-void NBIconView::setContentsMargins( QMargins newContentsMargins ) {
+void NBCombiView::setContentsMargins( QMargins newContentsMargins ) {
 
 	myContentsMargins = newContentsMargins;
 
@@ -170,17 +160,17 @@ void NBIconView::setContentsMargins( QMargins newContentsMargins ) {
 	calculateRectsIfNecessary();
 };
 
-void NBIconView::setContentsMargins( int nLeft, int nTop, int nRight, int nBottom ) {
+void NBCombiView::setContentsMargins( int nLeft, int nTop, int nRight, int nBottom ) {
 
 	setContentsMargins( QMargins( nLeft, nTop, nRight, nBottom ) );
 };
 
-QMargins NBIconView::inlayMargins() const {
+QMargins NBCombiView::inlayMargins() const {
 
 	return myInlayMargins;
 };
 
-void NBIconView::setInlayMargins( QMargins newInlayMargins ) {
+void NBCombiView::setInlayMargins( QMargins newInlayMargins ) {
 
 	myInlayMargins = newInlayMargins;
 
@@ -188,7 +178,7 @@ void NBIconView::setInlayMargins( QMargins newInlayMargins ) {
 	calculateRectsIfNecessary();
 };
 
-void NBIconView::setInlayMargins( int nLeft, int nTop, int nRight, int nBottom ) {
+void NBCombiView::setInlayMargins( int nLeft, int nTop, int nRight, int nBottom ) {
 
 	setInlayMargins( QMargins( nLeft, nTop, nRight, nBottom ) );
 
@@ -196,12 +186,12 @@ void NBIconView::setInlayMargins( int nLeft, int nTop, int nRight, int nBottom )
 	calculateRectsIfNecessary();
 };
 
-int NBIconView::categorySpacing() const {
+int NBCombiView::categorySpacing() const {
 
 	return myCategorySpacing;
 };
 
-void NBIconView::setCategorySpacing( int newCategorySpacing ) {
+void NBCombiView::setCategorySpacing( int newCategorySpacing ) {
 
 	myCategorySpacing = newCategorySpacing;
 
@@ -209,7 +199,7 @@ void NBIconView::setCategorySpacing( int newCategorySpacing ) {
 	calculateRectsIfNecessary();
 };
 
-QRect NBIconView::visualRect( const QModelIndex &index ) const {
+QRect NBCombiView::visualRect( const QModelIndex &index ) const {
 
 	QRect rect;
 	if ( index.isValid() )
@@ -218,7 +208,7 @@ QRect NBIconView::visualRect( const QModelIndex &index ) const {
 	return rect;
 };
 
-QRect NBIconView::categoryRect( int categoryIndex ) const {
+QRect NBCombiView::categoryRect( int categoryIndex ) const {
 
 	calculateRectsIfNecessary();
 	QRect rect = rectForCategory.value( categoryIndex );
@@ -228,7 +218,7 @@ QRect NBIconView::categoryRect( int categoryIndex ) const {
     return QRect( rect.x(), rect.y() - verticalScrollBar()->value(), rect.width(), rect.height() );
 };
 
-void NBIconView::scrollTo( const QModelIndex &index, QAbstractItemView::ScrollHint ) {
+void NBCombiView::scrollTo( const QModelIndex &index, QAbstractItemView::ScrollHint ) {
 
 	QRect viewRect = viewport()->rect();
 	QRect itemRect = visualRect( index );
@@ -246,7 +236,7 @@ void NBIconView::scrollTo( const QModelIndex &index, QAbstractItemView::ScrollHi
 	viewport()->update();
 };
 
-QModelIndex NBIconView::indexAt( const QPoint &point_ ) const {
+QModelIndex NBCombiView::indexAt( const QPoint &point_ ) const {
 
 	QPoint point( point_ );
 	point.ry() += verticalScrollBar()->value();
@@ -263,7 +253,7 @@ QModelIndex NBIconView::indexAt( const QPoint &point_ ) const {
 	return QModelIndex();
 };
 
-QString NBIconView::categoryAt( const QPoint &point_ ) const {
+QString NBCombiView::categoryAt( const QPoint &point_ ) const {
 
 	QPoint point( point_ );
 	point.ry() += verticalScrollBar()->value();
@@ -279,25 +269,25 @@ QString NBIconView::categoryAt( const QPoint &point_ ) const {
 	return QString();
 };
 
-void NBIconView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight ) {
+void NBCombiView::dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight ) {
 
 	hashIsDirty = true;
 	QAbstractItemView::dataChanged( topLeft, bottomRight );
 };
 
-void NBIconView::rowsInserted( const QModelIndex &parent, int start, int end ) {
+void NBCombiView::rowsInserted( const QModelIndex &parent, int start, int end ) {
 
 	hashIsDirty = true;
 	QAbstractItemView::rowsInserted( parent, start, end );
 };
 
-void NBIconView::rowsAboutToBeRemoved( const QModelIndex &parent, int start, int end ) {
+void NBCombiView::rowsAboutToBeRemoved( const QModelIndex &parent, int start, int end ) {
 
 	hashIsDirty = true;
 	QAbstractItemView::rowsAboutToBeRemoved( parent, start, end );
 };
 
-void NBIconView::updateGeometries() {
+void NBCombiView::updateGeometries() {
 
 	computeRowsAndColumns();
 
@@ -314,7 +304,7 @@ void NBIconView::updateGeometries() {
 	}
 };
 
-void NBIconView::reload() {
+void NBCombiView::reload() {
 
 	/* Change view mode according to the .desktop file */
 	QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
@@ -335,7 +325,7 @@ void NBIconView::reload() {
 	calculateRectsIfNecessary();
 };
 
-QModelIndex NBIconView::moveCursor( QAbstractItemView::CursorAction cursorAction, Qt::KeyboardModifiers ) {
+QModelIndex NBCombiView::moveCursor( QAbstractItemView::CursorAction cursorAction, Qt::KeyboardModifiers ) {
 	/*
 		*
 		* We still do not handle keyboard modifiers. This is yet to be implemented
@@ -349,23 +339,23 @@ QModelIndex NBIconView::moveCursor( QAbstractItemView::CursorAction cursorAction
 		return moveCursorNonCategorized( cursorAction );
 };
 
-int NBIconView::horizontalOffset() const {
+int NBCombiView::horizontalOffset() const {
 
 	return horizontalScrollBar()->value();
 };
 
-int NBIconView::verticalOffset() const {
+int NBCombiView::verticalOffset() const {
 
 	return verticalScrollBar()->value();
 };
 
-void NBIconView::scrollContentsBy( int dx, int dy ) {
+void NBCombiView::scrollContentsBy( int dx, int dy ) {
 
 	scrollDirtyRegion( dx, dy );
 	viewport()->scroll( dx, dy );
 };
 
-void NBIconView::setSelection( const QRect &rect, QFlags<QItemSelectionModel::SelectionFlag> flags ) {
+void NBCombiView::setSelection( const QRect &rect, QFlags<QItemSelectionModel::SelectionFlag> flags ) {
 
 	QRect rectangle = rect.translated( horizontalScrollBar()->value(), verticalScrollBar()->value() ).normalized();
 
@@ -394,7 +384,7 @@ void NBIconView::setSelection( const QRect &rect, QFlags<QItemSelectionModel::Se
 	}
 };
 
-QRegion NBIconView::visualRegionForSelection( const QItemSelection &selection ) const {
+QRegion NBCombiView::visualRegionForSelection( const QItemSelection &selection ) const {
 
 	QRegion region;
 	foreach ( const QItemSelectionRange &range, selection ) {
@@ -409,7 +399,7 @@ QRegion NBIconView::visualRegionForSelection( const QItemSelection &selection ) 
 	return region;
 };
 
-QModelIndexList NBIconView::selectedIndexes() {
+QModelIndexList NBCombiView::selectedIndexes() {
 
 	QSet<QModelIndex> idxSet;
 	idxSet.unite( QSet<QModelIndex>::fromList( mSelectedIndexes ) );
@@ -418,12 +408,12 @@ QModelIndexList NBIconView::selectedIndexes() {
 	return idxSet.toList();
 };
 
-QModelIndexList NBIconView::selection() {
+QModelIndexList NBCombiView::selection() {
 
 	return selectedIndexes();
 };
 
-bool NBIconView::isIndexVisible( QModelIndex idx ) const {
+bool NBCombiView::isIndexVisible( QModelIndex idx ) const {
 
 	// /* See if the index is in the hidden categories list */
 	// if
@@ -436,7 +426,7 @@ bool NBIconView::isIndexVisible( QModelIndex idx ) const {
 		return true;
 };
 
-void NBIconView::paintEvent( QPaintEvent* event ) {
+void NBCombiView::paintEvent( QPaintEvent* event ) {
 
 	QPainter painter( viewport() );
 	painter.setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing );
@@ -545,7 +535,7 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 
 		option.palette = pltt;
 
-		NBIconDelegate *dlgt = qobject_cast<NBIconDelegate*>( itemDelegate() );
+		NBCombiDelegate *dlgt = qobject_cast<NBCombiDelegate*>( itemDelegate() );
 		if ( currentViewMode == QString( "IconsView" ) )
 			dlgt->paintIcons( &painter, option, idx );
 
@@ -560,7 +550,7 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 	event->accept();
 };
 
-void NBIconView::paintSelection( QPainter *painter, const QModelIndexList indexes ) const {
+void NBCombiView::paintSelection( QPainter *painter, const QModelIndexList indexes ) const {
 
 	if ( not indexes.count() )
 		return;
@@ -580,13 +570,13 @@ void NBIconView::paintSelection( QPainter *painter, const QModelIndexList indexe
 	painter->restore();
 };
 
-void NBIconView::resizeEvent( QResizeEvent* ) {
+void NBCombiView::resizeEvent( QResizeEvent* ) {
 
 	hashIsDirty = true;
 	calculateRectsIfNecessary();
 };
 
-void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
+void NBCombiView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 	if ( mpEvent->button() != Qt::LeftButton ) {
 		QAbstractItemView::mousePressEvent( mpEvent );
@@ -718,7 +708,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 	mpEvent->accept();
 };
 
-void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
+void NBCombiView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 
 	/* Left Mouse Button is pressed down */
 	if ( mmEvent->buttons() & Qt::LeftButton ) {
@@ -779,7 +769,7 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 	QAbstractItemView::mouseMoveEvent( mmEvent );
 };
 
-void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
+void NBCombiView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 
 	if ( mEvent->button() == Qt::LeftButton ) {
 		QModelIndex idx = indexAt( mEvent->pos() );
@@ -794,12 +784,12 @@ void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 	mEvent->accept();
 };
 
-void NBIconView::dragEnterEvent( QDragEnterEvent *deEvent ) {
+void NBCombiView::dragEnterEvent( QDragEnterEvent *deEvent ) {
 
 	deEvent->acceptProposedAction();
 };
 
-void NBIconView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
+void NBCombiView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 
 	const QMimeData *mData = dmEvent->mimeData();
 	if ( not mData->hasUrls() )
@@ -844,7 +834,7 @@ void NBIconView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 		dmEvent->ignore();
 };
 
-void NBIconView::dropEvent( QDropEvent *dpEvent ) {
+void NBCombiView::dropEvent( QDropEvent *dpEvent ) {
 
 	QModelIndex idx = indexAt( dpEvent->pos() );
 	QString mtpt = cModel->nodePath( cModel->data( idx ).toString() );
@@ -922,7 +912,7 @@ void NBIconView::dropEvent( QDropEvent *dpEvent ) {
 	dpEvent->accept();
 };
 
-void NBIconView::keyPressEvent( QKeyEvent *kEvent ) {
+void NBCombiView::keyPressEvent( QKeyEvent *kEvent ) {
 
 	if ( ( kEvent->key() == Qt::Key_Return ) and ( selectionModel()->isSelected( currentIndex() ) ) )
 		emit open( currentIndex() );
@@ -930,7 +920,7 @@ void NBIconView::keyPressEvent( QKeyEvent *kEvent ) {
 	QAbstractItemView::keyPressEvent( kEvent );
 };
 
-void NBIconView::computeGridSize( QSize iconSize ) {
+void NBCombiView::computeGridSize( QSize iconSize ) {
 
 	if ( currentViewMode == "IconsView" ) {
 		/*
@@ -958,7 +948,7 @@ void NBIconView::computeGridSize( QSize iconSize ) {
 	calculateRectsIfNecessary();
 };
 
-QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction cursorAction ) {
+QModelIndex NBCombiView::moveCursorCategorized( QAbstractItemView::CursorAction cursorAction ) {
 
 	/* Clear mouse selection */
 	mSelectedIndexes.clear();
@@ -986,81 +976,65 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 
 		switch( cursorAction ) {
 			case QAbstractItemView::MoveNext:
-				emit selectionChanged();
 				return nextIndex();
 
 			case QAbstractItemView::MoveRight:
-				emit selectionChanged();
 				return nextIndex();
 
 			case QAbstractItemView::MovePrevious:
-				emit selectionChanged();
 				return prevIndex();
 
 			case QAbstractItemView::MoveLeft:
-				emit selectionChanged();
 				return prevIndex();
 
 			case QAbstractItemView::MoveDown: {
 				if ( currentViewMode == "DetailsView" ) {
-					if ( idx.row() == cModel->rowCount() - 1 ) {
-						emit selectionChanged();
+					if ( idx.row() == cModel->rowCount() - 1 )
 						return cModel->index( 0, 0, idx.parent() );
-					}
 
-					else {
-						emit selectionChanged();
+					else
 						return cModel->index( idx.row() + 1, 0, idx.parent() );
-					}
 				}
 
-				emit selectionChanged();
 				return belowIndex();
+
 			}
 
 			case QAbstractItemView::MoveUp: {
 
 				if ( currentViewMode == "DetailsView" ) {
 					if ( idx.row() == 0 ) {
-						emit selectionChanged();
 						return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
 					}
 					else {
-						emit selectionChanged();
 						return cModel->index( idx.row() - 1, 0, idx.parent() );
 					}
 				}
 
-				emit selectionChanged();
 				return aboveIndex();
 			}
 
 			case QAbstractItemView::MoveHome: {
 
-				emit selectionChanged();
 				return firstIndex();
 			}
 
 			case QAbstractItemView::MoveEnd: {
 
-				emit selectionChanged();
 				return lastIndex();
 			}
 
 			case QAbstractItemView::MovePageUp: {
 
-				emit selectionChanged();
 				return indexPageAbove();
 			}
 
 			case QAbstractItemView::MovePageDown: {
 
-				emit selectionChanged();
 				return indexPageBelow();
 			}
 
 			default: {
-				emit selectionChanged();
 				return QModelIndex();
 			}
 		}
@@ -1070,48 +1044,39 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 	else {
 		switch( cursorAction ) {
 			case QAbstractItemView::MoveHome:
-				emit selectionChanged();
 				return firstIndex();
 
 			case QAbstractItemView::MoveRight:
-				emit selectionChanged();
 				return firstIndex();
 
 			case QAbstractItemView::MoveNext:
-				emit selectionChanged();
 				return firstIndex();
 
 			case QAbstractItemView::MoveDown:
-				emit selectionChanged();
 				return firstIndex();
 
 			case QAbstractItemView::MoveEnd:
-				emit selectionChanged();
 				return lastIndex();
 
 			case QAbstractItemView::MoveLeft:
-				emit selectionChanged();
 				return lastIndex();
 
 			case QAbstractItemView::MovePrevious:
-				emit selectionChanged();
 				return lastIndex();
 
 			case QAbstractItemView::MoveUp:
-				emit selectionChanged();
 				return firstIndex();
 
 			default:
-				emit selectionChanged();
 				return firstIndex();
+
 		}
 	}
 
-	emit selectionChanged();
 	return idx;
 };
 
-void NBIconView::toggleCategorySelection( QString category ) {
+void NBCombiView::toggleCategorySelection( QString category ) {
 
 	if ( mSelectedCategories.contains( category ) ) {
 		mSelectedCategories.removeAll( category );
@@ -1128,7 +1093,7 @@ void NBIconView::toggleCategorySelection( QString category ) {
 	}
 };
 
-void NBIconView::setCategorySelected( QString category, bool yes ) {
+void NBCombiView::setCategorySelected( QString category, bool yes ) {
 
 	if ( yes ) {
 		if ( not mSelectedCategories.contains( category ) ) {
@@ -1147,7 +1112,7 @@ void NBIconView::setCategorySelected( QString category, bool yes ) {
 	}
 };
 
-QModelIndex NBIconView::nextIndex() {
+QModelIndex NBCombiView::nextIndex() {
 
 	QModelIndex idx = currentIndex();
 	/*
@@ -1210,7 +1175,7 @@ QModelIndex NBIconView::nextIndex() {
 	}
 };
 
-QModelIndex NBIconView::prevIndex() {
+QModelIndex NBCombiView::prevIndex() {
 
 	QModelIndex idx = currentIndex();
 	/*
@@ -1263,7 +1228,7 @@ QModelIndex NBIconView::prevIndex() {
 	}
 };
 
-QModelIndex NBIconView::belowIndex() {
+QModelIndex NBCombiView::belowIndex() {
 
 	QModelIndex idx = currentIndex();
 	/*
@@ -1345,7 +1310,7 @@ QModelIndex NBIconView::belowIndex() {
 	}
 };
 
-QModelIndex NBIconView::aboveIndex() {
+QModelIndex NBCombiView::aboveIndex() {
 
 	QModelIndex idx = currentIndex();
 	/*
@@ -1417,7 +1382,7 @@ QModelIndex NBIconView::aboveIndex() {
 		return pIdxList.last();
 };
 
-QModelIndex NBIconView::firstIndex() {
+QModelIndex NBCombiView::firstIndex() {
 
 	persistentVCol = 0;
 
@@ -1436,7 +1401,7 @@ QModelIndex NBIconView::firstIndex() {
 		return QModelIndex();
 };
 
-QModelIndex NBIconView::lastIndex() {
+QModelIndex NBCombiView::lastIndex() {
 
 	int lastVisibleCatIdx = -1;
 	for( int i = categoryList.count() - 1; i >= 0; i-- ) {
@@ -1455,7 +1420,7 @@ QModelIndex NBIconView::lastIndex() {
 		return QModelIndex();
 };
 
-QModelIndex NBIconView::indexPageBelow() {
+QModelIndex NBCombiView::indexPageBelow() {
 
 	QModelIndex idx = currentIndex();
 	QScrollBar *bar = verticalScrollBar();
@@ -1494,12 +1459,12 @@ QModelIndex NBIconView::indexPageBelow() {
 		return cIdxList.last();
 };
 
-QModelIndex NBIconView::indexPageAbove() {
+QModelIndex NBCombiView::indexPageAbove() {
 
 	return QModelIndex();
 };
 
-QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction ) {
+QModelIndex NBCombiView::moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction ) {
 
 	QModelIndex idx = currentIndex();
 	if ( idx.isValid() ) {
@@ -1509,14 +1474,12 @@ QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorActio
 				/* If the current index is not the last visible index */
 				if ( idx.row() >= 0 and idx.row() < cModel->rowCount() - 1 ) {
 					persistentVCol = ( idx.row() + 1 ) % itemsPerRow;
-					emit selectionChanged();
 					return cModel->index( idx.row() + 1, 0, rootIndex() );
 				}
 
 				/* Current index is the last visible index */
 				else {
 					persistentVCol = 0;
-					emit selectionChanged();
 					return cModel->index( 0, 0, rootIndex() );
 				}
 			}
@@ -1525,14 +1488,12 @@ QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorActio
 				/* The current index is anything but the first one */
 				if ( idx.row() > 0 and idx.row() < cModel->rowCount() ) {
 					persistentVCol = ( idx.row() - 1 ) % itemsPerRow;
-					emit selectionChanged();
 					return cModel->index( idx.row() - 1, 0, rootIndex() );
 				}
 
 				/* The current index is the first one */
 				else {
 					persistentVCol = ( cModel->rowCount() - 1 ) % itemsPerRow;
-					emit selectionChanged();
 					return cModel->index( cModel->rowCount() - 1, 0, rootIndex() );
 				}
 			}
@@ -1540,93 +1501,71 @@ QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorActio
 			case QAbstractItemView::MoveDown: {
 				if ( currentViewMode == "DetailsView" ) {
 					if ( idx.row() == cModel->rowCount() - 1 ) {
-						emit selectionChanged();
 						return cModel->index( 0, 0, idx.parent() );
 					}
 					else {
-						emit selectionChanged();
 						return cModel->index( idx.row() + 1, 0, idx.parent() );
 					}
 				}
 
 				int nextRow = idx.row() + itemsPerRow;
-				if ( nextRow >= cModel->rowCount() ) {
-					emit selectionChanged();
+				if ( nextRow >= cModel->rowCount() )
 					return cModel->index( cModel->rowCount() - 1, 0, rootIndex() );
-				}
 
-				else {
-					emit selectionChanged();
+				else
 					return cModel->index( nextRow, 0, rootIndex() );
-				}
 			}
 
 			case QAbstractItemView::MoveUp: {
 				if ( currentViewMode == "DetailsView" ) {
 					if ( idx.row() == 0 ) {
-						emit selectionChanged();
 						return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
 					}
 					else {
-						emit selectionChanged();
 						return cModel->index( idx.row() - 1, 0, idx.parent() );
 					}
 				}
 
 				int prevRow = idx.row() - itemsPerRow;
-				if ( prevRow < 0 ) {
-					emit selectionChanged();
+				if ( prevRow < 0 )
 					return cModel->index( 0, 0, rootIndex() );
-				}
 
-				else {
-					emit selectionChanged();
+				else
 					return cModel->index( prevRow, 0, rootIndex() );
-				}
 			}
 
 			case QAbstractItemView::MoveHome: {
 
 				persistentVCol = 0;
 				verticalScrollBar()->setValue( 0 );
-				emit selectionChanged();
 				return cModel->index( 0, 0, idx.parent() );
 			}
 
 			case QAbstractItemView::MoveEnd: {
 
 				persistentVCol = ( cModel->rowCount() - 1 ) % itemsPerRow;
-				emit selectionChanged();
 				return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
 			}
 
 			case QAbstractItemView::MoveNext: {
 				/* If the current index is not the last visible index */
-				if ( idx.row() >= 0 and idx.row() < cModel->rowCount() - 1 ) {
-					emit selectionChanged();
+				if ( idx.row() >= 0 and idx.row() < cModel->rowCount() - 1 )
 					return cModel->index( idx.row() + 1, 0, rootIndex() );
-				}
 
 				/* Current index is the last visible index */
-				else {
-					emit selectionChanged();
+				else
 					return cModel->index( 0, 0, rootIndex() );
-				}
 			}
 
 			case QAbstractItemView::MovePrevious: {
 
 				/* The current index is anything but the first one */
-				if ( idx.row() > 0 and idx.row() < cModel->rowCount() ) {
-					emit selectionChanged();
+				if ( idx.row() > 0 and idx.row() < cModel->rowCount() )
 					return cModel->index( idx.row() - 1, 0, rootIndex() );
-				}
 
 				/* The current index is the first one */
-				else {
-					emit selectionChanged();
+				else
 					return cModel->index( cModel->rowCount() - 1, 0, rootIndex() );
-				}
 			}
 
 			case QAbstractItemView::MovePageUp: {
@@ -1635,12 +1574,9 @@ QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorActio
 				int itemsInVisualArea = rowsInVisualArea * itemsPerRow;
 
 				int prevIdx = idx.row() - itemsInVisualArea;
-				if ( not cModel->index( prevIdx, 0, rootIndex() ).isValid() ) {
-					emit selectionChanged();
+				if ( not cModel->index( prevIdx, 0, rootIndex() ).isValid() )
 					return cModel->index( 0, 0, rootIndex() );
-				}
 
-				emit selectionChanged();
 				return cModel->index( prevIdx, 0, rootIndex() );
 			}
 
@@ -1650,17 +1586,13 @@ QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorActio
 				int itemsInVisualArea = rowsInVisualArea * itemsPerRow;
 
 				int nextIdx = idx.row() + itemsInVisualArea;
-				if ( not cModel->index( nextIdx, 0, rootIndex() ).isValid() ) {
-					emit selectionChanged();
+				if ( not cModel->index( nextIdx, 0, rootIndex() ).isValid() )
 					return cModel->index( cModel->rowCount() - 1, 0, rootIndex() );
-				}
 
-				emit selectionChanged();
 				return cModel->index( nextIdx, 0, rootIndex() );
 			}
 
 			default: {
-				emit selectionChanged();
 				return cModel->index( 0, 0, rootIndex() );
 			}
 		}
@@ -1671,30 +1603,26 @@ QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorActio
 			case QAbstractItemView::MoveHome: {
 
 				persistentVCol = 0;
-				emit selectionChanged();
 				return cModel->index( 0, 0, idx.parent() );
 			}
 
 			case QAbstractItemView::MoveEnd: {
 
 				persistentVCol = ( cModel->rowCount() - 1 ) % itemsPerRow;
-				emit selectionChanged();
 				return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
 			}
 
 			default: {
 
-				emit selectionChanged();
 				return cModel->index( 0, 0, rootIndex() );
 			}
 		}
 	}
 
-	emit selectionChanged();
 	return idx;
 };
 
-void NBIconView::calculateRectsIfNecessary() const {
+void NBCombiView::calculateRectsIfNecessary() const {
 
 	if ( not hashIsDirty )
 		return;
@@ -1723,7 +1651,7 @@ void NBIconView::calculateRectsIfNecessary() const {
 	}
 };
 
-void NBIconView::calculateCategorizedRects() const {
+void NBCombiView::calculateCategorizedRects() const {
 
 	if ( currentViewMode == QString( "IconsView" ) )
 		calculateCategorizedIconsRects();
@@ -1735,7 +1663,7 @@ void NBIconView::calculateCategorizedRects() const {
 		calculateCategorizedTilesRects();
 };
 
-void NBIconView::calculateCategorizedIconsRects() const {
+void NBCombiView::calculateCategorizedIconsRects() const {
 
 	int x = 0, y = 0, prevRows = 0, totalRows = 0;
 
@@ -1781,7 +1709,7 @@ void NBIconView::calculateCategorizedIconsRects() const {
 	viewport()->update();
 };
 
-void NBIconView::calculateCategorizedTilesRects() const {
+void NBCombiView::calculateCategorizedTilesRects() const {
 
 	int x = 0, y = 0, prevRows = 0, totalRows = 0;
 
@@ -1827,7 +1755,7 @@ void NBIconView::calculateCategorizedTilesRects() const {
 	viewport()->update();
 };
 
-void NBIconView::calculateCategorizedDetailsRects() const {
+void NBCombiView::calculateCategorizedDetailsRects() const {
 
 	if ( not hashIsDirty )
 		return;
@@ -1874,7 +1802,7 @@ void NBIconView::calculateCategorizedDetailsRects() const {
 	viewport()->update();
 };
 
-void NBIconView::calculateNonCategorizedRects() const {
+void NBCombiView::calculateNonCategorizedRects() const {
 
 	if ( currentViewMode == QString( "IconsView" ) )
 		calculateNonCategorizedIconsRects();
@@ -1886,7 +1814,7 @@ void NBIconView::calculateNonCategorizedRects() const {
 		calculateNonCategorizedTilesRects();
 };
 
-void NBIconView::calculateNonCategorizedIconsRects() const {
+void NBCombiView::calculateNonCategorizedIconsRects() const {
 
 	int x = 0, y = 0, totalRows = 0;
 
@@ -1914,7 +1842,7 @@ void NBIconView::calculateNonCategorizedIconsRects() const {
 	viewport()->update();
 };
 
-void NBIconView::calculateNonCategorizedTilesRects() const {
+void NBCombiView::calculateNonCategorizedTilesRects() const {
 
 	int x = 0, y = 0, totalRows = 0;
 
@@ -1942,7 +1870,7 @@ void NBIconView::calculateNonCategorizedTilesRects() const {
 	viewport()->update();
 };
 
-void NBIconView::calculateNonCategorizedDetailsRects() const {
+void NBCombiView::calculateNonCategorizedDetailsRects() const {
 
 	int x = 0, y = 0, totalRows = cModel->rowCount();
 
@@ -1960,7 +1888,7 @@ void NBIconView::calculateNonCategorizedDetailsRects() const {
 	viewport()->update();
 };
 
-void NBIconView::computeRowsAndColumns() const {
+void NBCombiView::computeRowsAndColumns() const {
 
 	int vWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
 	vWidth = vWidth - myInlayMargins.left() - myInlayMargins.right();
@@ -1982,7 +1910,7 @@ void NBIconView::computeRowsAndColumns() const {
 	myGridSize = QSize( newGridWidth, myGridSizeMin.height() );
 };
 
-QRect NBIconView::viewportRectForRow( int row ) const {
+QRect NBCombiView::viewportRectForRow( int row ) const {
 
 	calculateRectsIfNecessary();
 	QPoint pt = rectForRow.value( row );
@@ -1992,7 +1920,7 @@ QRect NBIconView::viewportRectForRow( int row ) const {
     return QRect( pt.x(), pt.y() - verticalScrollBar()->value(), myGridSize.width(), myGridSize.height() );
 };
 
-void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const {
+void NBCombiView::paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const {
 
 	painter->save();
 
@@ -2022,7 +1950,7 @@ void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const
 	painter->restore();
 };
 
-QPixmap NBIconView::pixmapForCategory( QString categoryText ) const {
+QPixmap NBCombiView::pixmapForCategory( QString categoryText ) const {
 
 	if ( hiddenCategories.contains( categoryText ) )
 		return QIcon::fromTheme( "arrow-right" ).pixmap( 16, 16 );
@@ -2031,7 +1959,7 @@ QPixmap NBIconView::pixmapForCategory( QString categoryText ) const {
 		return QIcon::fromTheme( "arrow-down" ).pixmap( 16, 16 );
 };
 
-void NBIconView::zoomIn() {
+void NBCombiView::zoomIn() {
 
 	if ( currentViewMode == QString( "DetailsView" ) ) {
 		if ( myIconSize.width() >= 64 )
@@ -2053,7 +1981,7 @@ void NBIconView::zoomIn() {
 	sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
 };
 
-void NBIconView::zoomOut() {
+void NBCombiView::zoomOut() {
 
 	if ( myIconSize.width() <= 16 )
 		setIconSize( QSize( 16, 16 ) );
@@ -2065,7 +1993,7 @@ void NBIconView::zoomOut() {
 	sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
 };
 
-void NBIconView::emitCML() {
+void NBCombiView::emitCML() {
 
 	QAction *act = qobject_cast<QAction*>( sender() );
 
@@ -2088,7 +2016,7 @@ void NBIconView::emitCML() {
 	}
 };
 
-void NBIconView::showHideCategory( QString category ) {
+void NBCombiView::showHideCategory( QString category ) {
 
 	if ( hiddenCategories.contains( category ) )
 		hiddenCategories.removeAll( category );
@@ -2100,7 +2028,7 @@ void NBIconView::showHideCategory( QString category ) {
 	calculateRectsIfNecessary();
 };
 
-bool NBIconView::canShowIndex( QModelIndex idx ) {
+bool NBCombiView::canShowIndex( QModelIndex idx ) {
 
 	return not hiddenCategories.contains( cModel->category( idx ) );
 };

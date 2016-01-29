@@ -12,7 +12,10 @@ Version 3.0.0 Alpha
 	- QuickMenuBar is removed, as its more of a hinderance
 	- The /proc/pid/cwd link points to the current directory
 	- Peek Plugins interface has been rewritten to enable support for dynamic loading of any plugin.
+	- NBProcessManager replaces NBIOManager with better functionality [To be done]
+	- File copy/move is now based on QtSolutions QtCopyDialog [To be done]
 	- BugFix: Unmounting a drive is possible when NB3 is open
+	- BugFix: Removed buggy tabs
 
 Version 2.4.0
     - Feature: Animated Catalog <-> FolderView <-> ApplicationView switching

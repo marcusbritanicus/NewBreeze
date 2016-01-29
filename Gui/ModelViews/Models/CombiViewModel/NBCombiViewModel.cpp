@@ -23,8 +23,6 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 
 	__terminate = false;
 
-	__mCombiShown = false;
-
 	mCategorizationEnabled = false;
 
 	currentLoadStatus.loading = false;
@@ -407,7 +405,7 @@ QModelIndex NBFileSystemModel::parent( const QModelIndex &index ) const {
 QString NBFileSystemModel::category( const QModelIndex &index ) const {
 
 	if ( not index.isValid() )
-		return QString( "" );
+		return QString();
 
 	NBFileSystemNode *childItem = ( NBFileSystemNode * )index.internalPointer();
 	return childItem->category();
@@ -568,10 +566,6 @@ void NBFileSystemModel::reload() {
 
 bool NBFileSystemModel::rename( QString oldName, QString newName ) {
 
-	// Do nothing: This should never happen
-	if ( __mCombiShown )
-		return true;
-
 	/* If the file @oldName is not from the current directory */
 	if ( dirName( oldName ) != __rootPath ) {
 		insertNode( baseName( newName ) );
@@ -604,34 +598,17 @@ QString NBFileSystemModel::nodeName( const QModelIndex index ) const {
 
 QString NBFileSystemModel::nodePath( const QModelIndex index ) const {
 
-	if ( __mCombiShown ) {
-		NBFileSystemNode *node = static_cast<NBFileSystemNode*>( index.internalPointer() );
-		return node->data( 7 ).toString();
-	}
-
-	else
-		return __rootPath + index.data( 0 ).toString();
+	return __rootPath + index.data( 0 ).toString();
 };
 
 QString NBFileSystemModel::nodePath( const QString path ) const {
 
-	if ( __mCombiShown ) {
-		QModelIndex idx = index( path );
-		return idx.data( 7 ).toString();
-	}
-
-	else
-		return __rootPath + path;
+	return __rootPath + path;
 };
 
 QFileInfo NBFileSystemModel::nodeInfo( const QModelIndex index ) const {
 
-	if ( __mCombiShown ) {
-		return QFileInfo( nodePath( index ) );
-	}
-
-	else
-		return QFileInfo( __rootPath + index.data( 0 ).toString() );
+	return QFileInfo( __rootPath + index.data( 0 ).toString() );
 };
 
 QString NBFileSystemModel::rootPath() const {
@@ -656,23 +633,19 @@ void NBFileSystemModel::setRootPath( QString path ) {
 	}
 
 	__rootPath = ( path.endsWith( "/" ) ? path : path + "/" );
-	__mCombiShown = false;
 
-	/* Navigation: If we are in the middle, remove all 'forawrd' roots */
 	if ( oldRoots.count() )
 		oldRoots.erase( oldRoots.begin() + curIndex + 1, oldRoots.end() );
 
-	/* Append this root to navigation list */
 	oldRoots << __rootPath;
 	curIndex = oldRoots.count() - 1;
 
-	/* chdir( __rootPath ) to set the correct link to /pwd/<pid>/cwd */
+	/* Proper link to /proc/<pid>/cwd: Remove it then, recreate it */
 	chdir( __rootPath.toLocal8Bit().constData() );
 
 	/* We have set per-folder settings */
 	QSettings sett( __rootPath + ".directory", QSettings::NativeFormat );
 
-	/* Check per folder view settings */
 	__showHidden = sett.value( "NewBreeze/Hidden", false ).toBool();
 
 	prevSort.column = sett.value( "NewBreeze/SortColumn", Settings->General.SortColumn ).toInt();
@@ -680,30 +653,23 @@ void NBFileSystemModel::setRootPath( QString path ) {
 	prevSort.categorized = sett.value( "NewBreeze/Grouping", Settings->General.Grouping ).toBool();
 	mCategorizationEnabled = prevSort.categorized;
 
-	/* If we are in NB://Applications or NB://Catalogs mode, come to FolderView mode */
 	emit loadFolders();
 
-	/* Delete the old node */
 	delete rootNode;
 
-	/* Create a fresh root node */
 	rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( path ), "" );
-
-	/* Stop loading thumbs, or even nodes */
 	if ( currentLoadStatus.loading )
 		currentLoadStatus.stopLoading = true;
 
-	/* If the root path is /dev/, then stop the watcher */
-	if ( __rootPath == "/dev/" ) {
-		if ( watcher->isRunning() )
-			watcher->stopWatch();
-	}
-
-	/* For all the other folders, we can happily start the watcher */
-	else {
+	if ( __rootPath != "/dev/" ) {
 		watcher->setWatchPath( path );
 		if ( not watcher->isRunning() )
 			watcher->startWatch();
+	}
+
+	else {
+		if ( watcher->isRunning() )
+			watcher->stopWatch();
 	}
 
 	setupModelData();
@@ -761,11 +727,6 @@ void NBFileSystemModel::goForward() {
 	}
 };
 
-void NBFileSystemModel::loadCombiView() {
-
-	goHome();
-};
-
 void NBFileSystemModel::goUp() {
 
 	if ( canGoUp() ) {
@@ -804,7 +765,7 @@ QString NBFileSystemModel::previousDir() const {
 		return oldRoots.at( curIndex - 1 );
 
 	else
-		return QString( "" );
+		return QString();
 };
 
 QString NBFileSystemModel::nextDir() const {
@@ -813,7 +774,7 @@ QString NBFileSystemModel::nextDir() const {
 		return oldRoots.at( curIndex + 1 );
 
 	else
-		return QString( "" );
+		return QString();
 };
 
 QString NBFileSystemModel::currentDir() const {
@@ -840,72 +801,6 @@ void NBFileSystemModel::setupModelData() {
 	emit dirLoading( __rootPath );
 
 	beginResetModel();
-	if ( dir != NULL ) {
-		while ( ( ent = readdir( dir ) ) != NULL) {
-			if ( currentLoadStatus.stopLoading ) {
-				endResetModel();
-				currentLoadStatus.stopLoading = false;
-				closedir( dir );
-				return;
-			}
-
-			/*
-				*
-				* Do not show . and ..
-				*
-			*/
-			QString nodeName = QString::fromLocal8Bit( ent->d_name );
-			if ( ( nodeName.compare( "." ) == 0 ) or ( nodeName.compare( ".." ) == 0 ) )
-				continue;
-
-			QVariantList data = quickDataGatherer->getQuickFileInfo( __rootPath + nodeName );
-			/* Show Hidden */
-			if ( __showHidden ) {
-				/* We should be able to filter folders if need be */
-				if ( __nameFilters.count() ) {
-					/* If filter folders is false, don't bother about filtering folders */
-					if ( not __filterFolders and ent->d_type == DT_DIR ) {
-						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
-						__childNames << nodeName;
-					}
-
-					else if ( matchesFilter( __nameFilters, nodeName ) ) {
-						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
-						__childNames << nodeName;
-					}
-				}
-				else {
-					rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
-					__childNames << nodeName;
-				}
-			}
-
-			/* Hide Hidden */
-			else {
-				if ( not nodeName.startsWith( "." ) ) {
-					/* We want to filter folders too */
-					if ( __nameFilters.count() ) {
-						if ( not __filterFolders and ent->d_type == DT_DIR ) {
-							rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
-							__childNames << nodeName;
-						}
-
-						else if ( matchesFilter( __nameFilters, nodeName ) ) {
-							rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
-							__childNames << nodeName;
-						}
-					}
-
-					else {
-						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
-						__childNames << nodeName;
-					}
-				}
-			}
-		}
-
-		closedir( dir );
-	}
 	endResetModel();
 
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
@@ -1002,11 +897,7 @@ QString NBFileSystemModel::getCategory( QVariantList data ) {
 void NBFileSystemModel::recategorize() {
 
 	foreach( NBFileSystemNode *node, rootNode->children() )
-		if ( __mCombiShown )
-			node->setCategory( "My Computer" );
-
-		else
-			node->setCategory( getCategory( node->allData() ) );
+		node->setCategory( getCategory( node->allData() ) );
 
 	rootNode->updateCategories();
 };
@@ -1061,16 +952,11 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 
 void NBFileSystemModel::handleNodeCreated( QString node ) {
 
-	qDebug() << node;
-
 	if ( baseName( node ).startsWith( "." ) and not __showHidden )
 		return;
 
 	if ( dirName( node ) == currentDir() )
 		insertNode( baseName( node ) );
-
-	else
-		qDebug() << dirName( node ) << currentDir();
 };
 
 void NBFileSystemModel::handleNodeChanged( QString node ) {

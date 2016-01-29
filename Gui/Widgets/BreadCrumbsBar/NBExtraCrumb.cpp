@@ -75,16 +75,7 @@ void NBExtraCrumb::paintEvent( QPaintEvent *pEvent ) {
 
 	QPainter *painter = new QPainter( this );
 
-	/* We need a placeholder */
-	if ( not m_Required ) {
-		/* Make sure the previous paintings are undone */
-		painter->fillRect( rect(), Qt::transparent );
-		painter->end();
-		pEvent->accept();
-
-		return;
-	}
-
+	// Background
 	if ( m_Pressed ) {
 		painter->save();
 		painter->setPen( Qt::NoPen );
@@ -108,9 +99,15 @@ void NBExtraCrumb::paintEvent( QPaintEvent *pEvent ) {
 		painter->fillRect( rect(), Qt::transparent );
 	}
 
+	// Colors
 	if ( m_Pressed ) {
 		painter->setPen( palette().color( QPalette::Active, QPalette::HighlightedText ) );
 		painter->setBrush( palette().color( QPalette::Active, QPalette::HighlightedText ) );
+	}
+
+	else if ( not m_Required ) {
+		painter->setPen( palette().color( QPalette::Active, QPalette::Window ).darker() );
+		painter->setBrush( palette().color( QPalette::Active, QPalette::Window ).darker() );
 	}
 
 	else {

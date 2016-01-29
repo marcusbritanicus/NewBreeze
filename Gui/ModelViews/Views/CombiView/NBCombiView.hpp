@@ -1,25 +1,22 @@
 /*
 	*
-	* NBIconView.hpp - NewBreeze Icon Viewer Class Header
+	* NBCombiView.hpp - NewBreeze MyComputer Viewer Class Header
 	*
 */
 
 #pragma once
-#ifndef NBICONVIEW_HPP
-#define NBICONVIEW_HPP
-
 #include <Global.hpp>
 #include <NBFileSystemModel.hpp>
-#include <NBIconDelegate.hpp>
+#include <NBCombiDelegate.hpp>
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
 #include <NBGuiFunctions.hpp>
 
-class NBIconView : public QAbstractItemView {
+class NBCombiView : public QAbstractItemView {
 	Q_OBJECT
 
 	public:
-		NBIconView( NBFileSystemModel* );
+		NBCombiView( NBCombiModel* );
 
 		// Set the item model
 		void setModel( QAbstractItemModel *model );
@@ -95,10 +92,6 @@ class NBIconView : public QAbstractItemView {
 		void mousePressEvent( QMouseEvent * );
 		void mouseMoveEvent( QMouseEvent * );
 		void mouseDoubleClickEvent( QMouseEvent * );
-
-		void dragEnterEvent( QDragEnterEvent* );
-		void dragMoveEvent( QDragMoveEvent* );
-		void dropEvent( QDropEvent* );
 
 		void keyPressEvent( QKeyEvent* );
 
@@ -215,7 +208,6 @@ class NBIconView : public QAbstractItemView {
 		void copy( QStringList, QString );
 		void move( QStringList, QString );
 		void link( QStringList, QString );
-		void selectionChanged();
 };
 
 #endif

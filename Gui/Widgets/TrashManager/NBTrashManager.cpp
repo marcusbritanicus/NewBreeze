@@ -6,7 +6,7 @@
 
 #include <NBTrashManager.hpp>
 
-NBTrashManager::NBTrashManager( QWidget *parent ) : NBDialog( "nxc", parent ) {
+NBTrashManager::NBTrashManager( QWidget *parent ) : NBDialog( parent ) {
 
 	ClipBoard = qApp->clipboard();
 

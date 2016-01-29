@@ -1,61 +1,43 @@
 NewBreeze v3.0.0
 ================
 
-NewBreeze v2.3.0
-================
+This is a completely native style GUI application. NewBreeze Native UI has been deprecated and removed. The main application itself is now natively styled. These are the
+few changes in NewBreeze 3.
 
-This release onwards I am supporting a Native GUI. i.e., GUI with window manager borders and background and system colors.
-To download the Native GUI, please check https://github.com/marcusbritanicus/NewBreeze-native/
+=> Qt5 Support
+   - This release onwards Qt5 builds are supported. Use qmake-qt5 to build using Qt5.
 
-=> NBFileSystemModel( QAbstractItemModel )
-   - NBFileSystemModel is now a categorized item model. Categories can be name, size, type or modification time based. Categorization can
-     easily be switched on or off via setCategorizationEnabled( bool )
-   - NBFileSystem now detects file size changes and automatically updates it.
+=> User interface rebuiltm integrating code from NewBreeze and NewBreezeUI
+   - File/Folder filtering
 
-=> NBIconView( QAbstractItemView )
-   NBIconView is now categorized item view. It supports both a categorized and a non categorized item model.
+=> NBFileSystemWatcher
+    NBFileSystemWatcher has been rewritten with a cleaner code based on the inotify-example.c from http://www.lanedo.com/users/amorgado/fanotify/inotify-example.c
 
-=> 'Show in groups'
-   This switch helps to switch on or of the Categorization of the Model and the View.
+=> NBFileSystemModel( QAbsractItemModel )
+   - NBFileSystemModel provides upto 50% faster thumbnails for images
 
-=> QActionGroup
-   The older approach of using radiobuttons and making them exclusive to provide 'View Modes' list and 'Sort By' menu has been replaced by the
-   cleaner QActionGroup approach. This is much more elegant and clean.
+=> NBIconView( QAbstractItemModel )
+   - Per-folder views are now enabled. Each folder remembers its previous state ( size, grouping, list view, etc )
+   - Fixed the small issue of mouse/cursor selection conflict.
+   - Fixed the SegFault with cursor up and down movements.
 
-=> Move
-   The intra-device move is now purely a renaming action.
-   In case a directory which is being moved exists then a full-fledged FileIO will be performed.
+=> NBAddressBar redesigned
+   - NBBreadCrumbsBar is now called NBCrumbsBar.
+   - It redesigned to make sure long paths do not run out of the widget.
+   - The full path can be displayed using FlowLayout at anytime.
 
-=> FileIO
-   While copying/moving a file, if by chance, the target exists, then the newly copied file will be renamed as *basename* - Copy.*ext*
-   While copying/moving a folder, if by chance, the target exist, then folder being copied gets merged with the existing folder, and newly
-   copied files renamed as above
+=> NBSidePanel
+   - A redesigned sidepanel with elegant menu showing devices and bookmarks as a menu.
+   - Devices show the space usage.
 
-=> View Modes
-   I have done away with the predefined view modes with fixed sizes. Now we have three view modes, the tiles view, the icons view and the
-   details view. Icon size can be dynamically changed by pressing the 'Zoom In' and 'Zoom Out' key sequences. This changes the icon size by
-   4px
-   -> Icons And Tiles view: 16px <-->128px
-   -> Tree view: 16px <--> 64px
+=> NBSegmentControl
+   - NBButtons is replaced by NBSegmentControl a more elegantly designed UI for multisegment buttons.
 
-=> Details
-   Depending on the Icon Size, extra details will be shown for all the items in the tiles and the icons views. For now the order of details
-   which are unveiled are hard coded into the program. This *may* be changed at a later date.
+=> NBPreviewInterface
+   - All plugins are updated to use the standard NBPreviewInteface.
+   - NBInterface can be used easily to extend Preview support for NewBreeze.
 
-=> Delete GUI
-   Since the delete process is very fast a gui is not required.
-
-=> SidePanel
-   > A much more compact panel is provided. The icons are folders, appications, catalogs, devices, bookmarks and trash.
-   > When the mouse moves over the devices or the bookmarks icon, the panel expands to reveal the devices/bookmarks.
-   > Similiar behaviour is observed when you drag items to the devices/bookmarks icons.
-   > To delete files and folders, you can simply drag and drop them while pressing [ SHIFT ] button.
-
-=> ODT and PDF preview
-   It is now possible to preview odt file (Open Document Text) from LibreOffice/OpenOffice, and PDF files via the Peek option.
-   ODT has limited support, but let's hope we do get some native support from Qt for rendering ODT in the future.
-   Support for PDF is dependent on the poppler-qt4 library
-
-=> Trash
-   NewBreeze is now trash enabled. You can simple drag the files you want to trash into the trash icon of the side bar.
-   Clicking the trash icon of the sidebar opens the trash gui, where you can see the files/folders you have trashed, sorted date wise.
+=> NBArchive extended
+   - NBArchive is now rebuilt using libarchive for archive processing
+   - GZip, BZip2, and XZ files are processed independently
+   - Archive creation and extraction now show a pretty dialog for various options

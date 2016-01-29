@@ -14,11 +14,6 @@ NBProgressBar::NBProgressBar( QWidget *parent ) : QWidget( parent ) {
 
 	progressText = QString();
 	setFixedHeight( 24 );
-
-	uncoveredGradient = QLinearGradient( 0, 0, 0, 24 );
-	uncoveredGradient.setColorAt( 0.000, QColor(  0x80, 0x00, 0x00 ) );
-	uncoveredGradient.setColorAt( 0.500, Qt::transparent );
-	uncoveredGradient.setColorAt( 1.000, QColor(  0x80, 0x00, 0x00 ) );
 };
 
 void NBProgressBar::setValue( qreal value ) {

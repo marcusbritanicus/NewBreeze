@@ -5,6 +5,8 @@
 */
 
 #pragma once
+#ifndef NBFILESYSTEMMODEL_HPP
+#define NBFILESYSTEMMODEL_HPP
 
 #include <Global.hpp>
 #include <NBTools.hpp>
@@ -112,9 +114,6 @@ class NBFileSystemModel : public QAbstractItemModel {
 		QString rootPath() const;
 		void setRootPath( QString );
 
-		// Load CombiView
-		void loadCombiView();
-
 		void goUp();
 		void goBack();
 		void goForward();
@@ -133,14 +132,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void terminateInfoGathering();
 
 	private:
-		// CombiData
-		QVariant combiData( const QModelIndex &index, int role = Qt::DisplayRole ) const;
-
-		// Model Data for normal filesystem
 		void setupModelData();
-
-		// Model Data for combi view
-		void setupCombiViewData();
 
 		QString getCategory( QVariantList );
 		void recategorize();
@@ -170,9 +162,6 @@ class NBFileSystemModel : public QAbstractItemModel {
 
 		QStringList __nameFilters;
 		bool __filterFolders;
-
-		// CombiView
-		bool __mCombiShown;
 
 		// History
 		QStringList oldRoots;
@@ -211,3 +200,5 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void loadCatalogs();
 		void loadFolders();
 };
+
+#endif

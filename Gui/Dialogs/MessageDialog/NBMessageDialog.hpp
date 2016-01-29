@@ -9,6 +9,7 @@
 #define NBMESSAGEDIALOG_HPP
 
 #include <Global.hpp>
+#include <NBSegmentControl.hpp>
 #include <NBDialog.hpp>
 
 class NBMessageDialog : public NBDialog {
@@ -44,8 +45,8 @@ class NBMessageDialog : public NBDialog {
 
 	private:
 		QLabel *iconLbl, *textLbl;
-		NBButtons *segBtns;
-		NBButton *detailsBtn;
+		NBSegmentControl *segBtns;
+		NBSegmentControl *detailsBtn;
 		QWidget *infoWidget;
 
 		QByteArray origGeometry;
@@ -58,7 +59,7 @@ class NBMessageDialog : public NBDialog {
 
 	private slots:
 		void toggleInfoWidget();
-		void buttonClickHandler();
+		void buttonClickHandler( int btn );
 
 	signals:
 		void closed();

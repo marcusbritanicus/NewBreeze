@@ -4,7 +4,6 @@
 	*
 */
 
-<<<<<<< HEAD
 #include <NewBreeze.hpp>
 #include <NBSystemInfo.hpp>
 
@@ -15,7 +14,6 @@ NewBreeze::NewBreeze( QString loc, bool tray ) : QMainWindow() {
 
 	/* If loc is non-empty and is a file, just open it and quit */
 	if ( loc.count() and isFile( loc ) ) {
-		qDebug() << "Init open file";
 		openFile( loc );
 		close();
 		return;
@@ -58,6 +56,8 @@ NewBreeze::NewBreeze( QString loc, bool tray ) : QMainWindow() {
 		if ( Settings->General.OpenWithCatalog and loc.isEmpty() )
 			UI->FolderView->setCurrentIndex( 2 );
 	}
+
+	// qDebug() << "NewBreeze v3. Ready for Action...!";
 };
 
 bool NewBreeze::canOpenUI() {
@@ -69,69 +69,6 @@ void NewBreeze::createGUI() {
 
 	UI = new NewBreezeUI( initDir );
 	setCentralWidget( UI );
-=======
-// Local Headers
-#include <NewBreeze.hpp>
-
-NewBreeze::NewBreeze( QString loc, bool tray ) : QMainWindow() {
-
-	if ( not loc.isEmpty() ) {
-		if ( loc.endsWith( "/" ) )
-			loc.chop( 1 );
-	}
-
-	__currentIndex = 0;
-	__terminate = false;
-
-	/* If we are opening NewBreeze, open Catalogs, otherwise open the folder */
-	if ( not loc.isEmpty() )
-		initDir = QString( loc );
-
-	else {
-		if ( exists( Settings->Session.LastDir ) )
-			initDir = QString( Settings->Session.LastDir );
-
-		else
-			initDir = QString( QDir::homePath() );
-	}
-
-	if ( tray ) {
-		NBTrayIcon* trayIcon = new NBTrayIcon();
-		trayIcon->show();
-
-		connect( this, SIGNAL( showTrayIcon() ), trayIcon, SLOT( showInfo() ) );
-		connect( trayIcon, SIGNAL( newWindow() ), this, SLOT( newWindow() ) );
-	};
-
-	createGUI();
-	createAndSetupActions();
-	setWindowProperties();
-
-	if ( Settings->General.OpenWithCatalog and loc.isEmpty() )
-		UI->FolderView->setCurrentIndex( 2 );
-};
-
-void NewBreeze::createGUI() {
-
-	QWidget *MainWidget = new QWidget();
-
-	MainWidget->setContentsMargins( QMargins() );
-	MainWidget->setObjectName( tr( "mainWidget" ) );
-
-	QVBoxLayout *MainLayout = new QVBoxLayout();
-	MainLayout->setContentsMargins( QMargins() );
-
-	uBar = new NBUtilityBar();
-	UI = new NewBreezeUI( initDir );
-
-	// Widgets layout
-	MainLayout->addWidget( uBar );
-	MainLayout->addWidget( UI );
-
-	MainWidget->setLayout( MainLayout );
-	setCentralWidget( MainWidget );
-
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	UI->setFocus();
 };
 
@@ -144,24 +81,8 @@ void NewBreeze::setWindowProperties() {
 
 	setGeometry( Settings->Session.Geometry );
 
-<<<<<<< HEAD
 	if ( not Settings->General.NativeTitleBar )
 		setWindowFlags( Qt::FramelessWindowHint );
-=======
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		setAttribute( Qt::WA_TranslucentBackground );
-
-	if ( not Settings->General.NativeTitleBar )
-		setWindowFlags( Qt::FramelessWindowHint );
-
-	setPalette( NBStyleManager::getPalette( Settings->General.Style ) );
-
-	if ( Settings->General.Style == QString( "TransDark" ) )
-		setStyleSheet( QString( "QWidget#mainWidget { background-image: url(:/icons/bg.png); }" ) + getStyleSheet( "NewBreeze", Settings->General.Style ) );
-
-	else
-		setStyleSheet( getStyleSheet( "NewBreeze", Settings->General.Style ) );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 };
 
 void NewBreeze::setWindowTitle( QString title ) {
@@ -174,7 +95,6 @@ void NewBreeze::setWindowIcon( QIcon icon ) {
 	QMainWindow::setWindowIcon( icon );
 };
 
-<<<<<<< HEAD
 bool NewBreeze::showTrayIcon() {
 
 	return mShowTrayIcon;
@@ -201,18 +121,6 @@ void NewBreeze::createAndSetupActions() {
 		connect( UI, SIGNAL( restoreWindow() ), this, SLOT( toggleMaximizeRestore() ) );
 	}
 
-=======
-void NewBreeze::createAndSetupActions() {
-
-	connect( uBar, SIGNAL( titleBarMousePress( QMouseEvent * ) ), this, SLOT( windowPressStart( QMouseEvent * ) ) );
-	connect( uBar, SIGNAL( titleBarMouseMove( QMouseEvent * ) ), this, SLOT( windowMoveStart( QMouseEvent * ) ) );
-	connect( uBar, SIGNAL( closeWindow() ), this, SLOT( close() ) );
-	connect( uBar, SIGNAL( minimizeWindow() ), this, SLOT( showMinimized() ) );
-	connect( uBar, SIGNAL( maximizeWindow() ), this, SLOT( toggleMaximizeRestore() ) );
-	connect( uBar, SIGNAL( restoreWindow() ), this, SLOT( toggleMaximizeRestore() ) );
-
-	connect( UI, SIGNAL( addJob( QStringList, QString, NBIOMode::Mode ) ), this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	connect( UI, SIGNAL( newWindow( QString ) ), this, SLOT( newWindow( QString ) ) );
 
 	// About NB
@@ -241,7 +149,6 @@ void NewBreeze::createAndSetupActions() {
 	addAction( showSettingsAct );
 };
 
-<<<<<<< HEAD
 void NewBreeze::openFile( QString file ) {
 
 	NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", qPrintable( file ) );
@@ -310,27 +217,17 @@ void NewBreeze::showAboutNB() {
 
 	AboutNB *about = new AboutNB( this );
 	about->exec();
-=======
-void NewBreeze::showAboutNB() {
-
-	NBMessageDialog::aboutNewBreeze();
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 };
 
 void NewBreeze::showAboutQt4() {
 
-<<<<<<< HEAD
 	QMessageBox::aboutQt( this, QObject::tr( "About Qt %1" ).arg( QLatin1String( QT_VERSION_STR ) ) );
-=======
-	NBMessageDialog::aboutQt();
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 };
 
 void NewBreeze::showSettingsDialog() {
 
 	hide();
 
-<<<<<<< HEAD
 	NBSettingsManager *settingsMgr = new NBSettingsManager( this );
 	settingsMgr->exec();
 
@@ -401,31 +298,10 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 		chdir( NBXdg::home().toLocal8Bit().constData() );
 		UI->Terminal->changeDir( NBXdg::home() );
 	}
-=======
-	NBSettingsManager *settingsMgr = new NBSettingsManager();
-	settingsMgr->exec();
-
-	UI->updateGUI();
-	show();
-};
-
-void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
-
-	// Close down Info Gathering
-	UI->FolderView->fsModel->terminateInfoGathering();
-
-	// Close down recursive size checker in Properties
-	__terminate = true;
-
-	// If there are background FileIO jobs, bring them to front
-	if ( uBar->procWidget->activeJobs() )
-		uBar->procWidget->showAllIODialogs();
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 
 	// Now hide this window, other processes may take a while longer to close down
 	hide();
 
-<<<<<<< HEAD
 	cEvent->accept();
 
 	qDebug( "Good Bye!" );
@@ -453,38 +329,13 @@ void NewBreeze::paintEvent( QPaintEvent *pEvent ) {
 	painter->end();
 
 	pEvent->accept();
-=======
-	// Store the previous session - geometry, and open directory.
-	Settings->setValue( "FolderView", Settings->General.FolderView );
-	Settings->setValue( "Session/Geometry", geometry() );
-	Settings->setValue( "Session/LastDir", UI->FolderView->fsModel->currentDir() );
-	Settings->setValue( "Session/ShowHidden", UI->FolderView->fsModel->showHidden() );
-	Settings->setValue( "Session/SortColumn", UI->FolderView->fsModel->sortColumn() );
-	Settings->setValue( "Session/SortCase", UI->FolderView->fsModel->sortCaseSensitivity() );
-	Settings->setValue( "Session/SortCategory", UI->FolderView->fsModel->sortCategorized() );
-	Settings->setValue( "Session/Maximized", isMaximized() );
-
-	qDebug( "Good Bye!" );
-
-	cEvent->accept();
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 };
 
 void NewBreeze::showInfoDlg() {
 
-<<<<<<< HEAD
 	NBDialog *infoDlg = new NBDialog( this );
 	infoDlg->setDialogTitle( "NewBreeze Info" );
 	infoDlg->setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
-=======
-	QDialog *shortcutDlg = new QDialog();
-
-	if ( ( Settings->General.Style == QString( "TransDark" ) ) or ( Settings->General.Style == QString( "TransLight" ) ) )
-		shortcutDlg->setAttribute( Qt::WA_TranslucentBackground );
-
-	if ( not Settings->General.NativeTitleBar )
-		shortcutDlg->setWindowFlags( Qt::FramelessWindowHint );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 
 	QHBoxLayout *dlgLyt = new QHBoxLayout();
 	dlgLyt->setContentsMargins( 0, 0, 0, 0 );
@@ -493,16 +344,12 @@ void NewBreeze::showInfoDlg() {
 	QHBoxLayout *btnLyt = new QHBoxLayout();
 
 	QTextBrowser *nbInfo = new QTextBrowser();
-<<<<<<< HEAD
 
-=======
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	QFile nbInfoF( ":/README" );
 	nbInfoF.open( QFile::ReadOnly );
 	nbInfo->setText( QString( nbInfoF.readAll() ) );
 	nbInfoF.close();
 	nbInfo->setFocusPolicy( Qt::NoFocus );
-<<<<<<< HEAD
 	nbInfo->setFont( QFont( "Courier 10 Pitch", 9 ) );
 
 	QPushButton *okBtn = new QPushButton( "&Ok" );
@@ -513,23 +360,11 @@ void NewBreeze::showInfoDlg() {
 	btnLyt->addWidget( okBtn );
 	btnLyt->addStretch();
 
-=======
-
-	QPushButton *okBtn = new QPushButton( "&Ok" );
-	okBtn->setObjectName( "okBtn" );
-	connect( okBtn, SIGNAL( clicked() ), shortcutDlg, SLOT( close() ) );
-
-	btnLyt->addWidget( okBtn );
-
-	if ( not Settings->General.NativeTitleBar )
-		baseLyt->addWidget( new QLabel( "<h3>NewBreeze Info</h3>" ), 0, Qt::AlignCenter );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 	baseLyt->addWidget( nbInfo );
 	baseLyt->addWidget( Separator::horizontal() );
 	baseLyt->addLayout( btnLyt );
 
 	QWidget *widget = new QWidget();
-<<<<<<< HEAD
 	widget->setLayout( baseLyt );
 
 	dlgLyt->addWidget( widget );
@@ -539,32 +374,13 @@ void NewBreeze::showInfoDlg() {
 
 	infoDlg->setWindowIcon( QIcon( ":/icons/newbreeze2.png" ) );
 	infoDlg->setWindowTitle( tr( "NewBreeze Info" ) );
-=======
-	widget->setObjectName( "infoDlg" );
-	widget->setLayout( baseLyt );
-
-	dlgLyt->addWidget( widget );
-	shortcutDlg->setLayout( dlgLyt );
-	shortcutDlg->setStyleSheet( getStyleSheet( "NBDialog", Settings->General.Style ) );
-
-	shortcutDlg->setFixedSize( QSize( 720, 630 ) );
-
-	shortcutDlg->setWindowIcon( QIcon( ":/icons/newbreeze2.png" ) );
-	shortcutDlg->setWindowTitle( tr( "NewBreeze Info" ) );
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 
 	QDesktopWidget dw;
 	int hpos = (int)( ( dw.width() - 720 ) / 2 );
 	int vpos = (int)( ( dw.height() - 630 ) / 2 );
-<<<<<<< HEAD
 	infoDlg->move( hpos, vpos );
 
 	infoDlg->exec();
-=======
-	shortcutDlg->move( hpos, vpos );
-
-	shortcutDlg->exec();
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 };
 
 void NewBreeze::showCustomActionsDialog() {
@@ -585,14 +401,6 @@ void NewBreeze::newWindow( QString location ) {
 		newbreeze->showNormal();
 };
 
-<<<<<<< HEAD
-=======
-void NewBreeze::initiateIO( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {
-
-	uBar->procWidget->addJob( sourceList, target, iomode );
-};
-
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 void NewBreeze::toggleMaximizeRestore() {
 
 	if ( isMaximized() ) {

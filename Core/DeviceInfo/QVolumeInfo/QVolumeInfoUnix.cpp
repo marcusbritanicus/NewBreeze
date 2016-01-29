@@ -45,11 +45,7 @@
 #include <QtCore/qfileinfo.h>
 #include <QtCore/qtextstream.h>
 
-<<<<<<< HEAD
 #define EINTR_LOOP(var, cmd) do { var = cmd; } while (var == -1 && errno == EINTR)
-=======
-#include <QtCore/private/qcore_unix_p.h>
->>>>>>> 6502fc82ae37a0c63e10954c84d1c0a501a1a223
 
 #include <errno.h>
 #include <sys/stat.h>

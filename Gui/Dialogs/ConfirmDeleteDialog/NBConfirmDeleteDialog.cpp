@@ -52,20 +52,16 @@ void NBConfirmDeleteDialog::setupGUI( bool permanent ) {
 	msgLyt->addWidget( iconLbl );
 	msgLyt->addWidget( textLbl );
 
-	deleteBtn = new NBButton( QIcon( ":/icons/delete.png" ), "&Delete", this );
-	deleteBtn->setObjectName( "abortBtn" );
-	deleteBtn->installEventFilter( this );
-	connect( deleteBtn, SIGNAL( clicked() ), this, SLOT( deleteOk() ) );
+	segBtns = new NBSegmentControl( this );
+	segBtns->setCount( 2 );
 
-	cancelBtn = new NBButton( QIcon( ":/icons/cancel.png" ), "&Cancel", this );
-	cancelBtn->setObjectName( "cancelBtn" );
-	cancelBtn->installEventFilter( this );
-	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( deleteCancel() ) );
+	segBtns->setSegmentIcon( 0, QIcon( ":/icons/deletek.png" ) );
+	segBtns->setSegmentText( 0, tr( "&Delete" ) );
 
-	segBtns = new NBButtons( this );
-	segBtns->addSegment( deleteBtn );
-	segBtns->addSegment( cancelBtn );
-	segBtns->setSegmentWidth( 100 );
+	segBtns->setSegmentIcon( 1, QIcon( ":/icons/cancel.png" ) );
+	segBtns->setSegmentText( 1, tr( "&Cancel" ) );
+
+	connect( segBtns, SIGNAL( clicked( int ) ), this, SLOT( handleSegmentClick( int ) ) );
 
 	btnLyt->addStretch( 0 );
 	btnLyt->addWidget( segBtns );
@@ -78,8 +74,6 @@ void NBConfirmDeleteDialog::setupGUI( bool permanent ) {
 	NBDialog::setLayout( dlgLyt );
 
 	setFixedSize( 480, 480 );
-
-	cancelBtn->setFocus();
 };
 
 void NBConfirmDeleteDialog::setupTable() {
@@ -159,6 +153,17 @@ int NBConfirmDeleteDialog::exec() {
 	return deleteFiles;
 };
 
+void NBConfirmDeleteDialog::handleSegmentClick( int seg ) {
+
+	switch( seg ) {
+		case 0:
+			return deleteOk();
+
+		case 1:
+			return deleteCancel();
+	}
+};
+
 void NBConfirmDeleteDialog::deleteOk() {
 
 	deleteFiles = true;
@@ -204,14 +209,12 @@ void NBDeleteErrorsDialog::setupGUI() {
 	msgLyt->addWidget( iconLbl );
 	msgLyt->addWidget( textLbl );
 
-	okayBtn = new NBButton( QIcon( ":/icons/ok.png" ), "&Ok", this );
-	okayBtn->setObjectName( "okBtn" );
-	okayBtn->installEventFilter( this );
-	connect( okayBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
+	segBtns = new NBSegmentControl( this );
+	segBtns->setCount( 1 );
 
-	segBtns = new NBButtons( this );
-	segBtns->addSegment( okayBtn );
-	segBtns->setSegmentWidth( 100 );
+	segBtns->setSegmentIcon( 0, QIcon( ":/icons/ok.png" ) );
+	segBtns->setSegmentText( 0, tr( "&Okay" ) );
+	segBtns->setSegmentEnabled( 0, false );
 
 	btnLyt->addStretch( 0 );
 	btnLyt->addWidget( segBtns );

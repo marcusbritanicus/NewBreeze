@@ -38,13 +38,8 @@ NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 	setFixedSize( 48, 48 );
 
 	// DeviceView
-	devView = new NBDeviceView( NULL );
-	connect( devView, SIGNAL( close() ), this, SLOT( hideDevices() ) );
-	connect( devView, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
-
-	// DevView animation
-	anim2 = new NBWidthAnimation( devView );
-	anim2->setDuration( 250 );
+	devView = new NBDeviceMenu( this );
+	connect( devView, SIGNAL( triggered( QAction* ) ), this, SLOT( clickDrive( QAction* ) ) );
 
 	// Device Manager
 	NBDeviceManager *mgr = new NBDeviceManager();
@@ -183,6 +178,9 @@ void NBDevicesIcon::paintEvent( QPaintEvent *pEvent ) {
 /* Overriding QLabel::mousePressEvent to emit clicked signal */
 void NBDevicesIcon::mousePressEvent( QMouseEvent *mEvent ) {
 
+	if ( devView->isVisible() )
+		devView->close();
+
 	mEvent->accept();
 };
 
@@ -201,39 +199,28 @@ void NBDevicesIcon::enterEvent( QEvent *eEvent ) {
 	eEvent->accept();
 };
 
-void NBDevicesIcon::leaveEvent( QEvent *lEvent ) {
-
-	/* If the mouse is in the devView, don't contract */
-	if ( devView->isVisible() ) {
-		if ( QRect( mapToGlobal( QPoint( 48, 0 ) ), QSize( devView->idealWidth(), devView->height() ) ).contains( QCursor::pos() ) ) {
-
-			return;
-		}
-	}
-
-	/* Start the delay timer */
-	delayTimer.stop();
-	delayTimer.start( 250, this );
-
-	lEvent->accept();
-};
-
 void NBDevicesIcon::timerEvent( QTimerEvent *tEvent ) {
 
 	if ( tEvent->timerId() == delayTimer.timerId() ) {
+
 		delayTimer.stop();
-		if ( devView->isVisible() ) {
-
-			hideDevices();
-		}
-
-		else {
-			if ( not QRect( 0, 0, 48, 48 ).contains( mapFromGlobal( QCursor::pos() ) ) )
-				return;
+		if ( not devView->isVisible() and QRect( 0, 0, 48, 48 ).contains( mapFromGlobal( QCursor::pos() ) ) ) {
 
 			showDevices();
 		}
 	}
+
+	else if ( tEvent->timerId() == closeTimer.timerId() ) {
+
+		closeTimer.stop();
+		if ( devView->isVisible() )
+			devView->close();
+	}
+
+	else
+		QWidget::timerEvent( tEvent );
+
+	tEvent->accept();
 };
 
 /* Slot to access the flashing */
@@ -247,8 +234,6 @@ void NBDevicesIcon::flashLabel() {
 
 	timer.start();
 	flash = true;
-
-	devView->repopulate();
 };
 
 /* Slot to access the flashing with a given color */
@@ -265,228 +250,155 @@ void NBDevicesIcon::flashLabel( QColor newColor ) {
 
 void NBDevicesIcon::showDevices() {
 
-	devView->move( mapToGlobal( QPoint( 48, 0 ) ) );
-	devView->show();
+	devView->clear();
 
-	anim2->stop();
+	// Spacer Label
+	QLabel *lbl = new QLabel( "<h4>&nbsp;&nbsp;&nbsp;&nbsp;Devices</h4>" );
+	lbl->setFixedHeight( 48 );
+	lbl->setMinimumWidth( 150 );
 
-	anim2->setEasingCurve( QEasingCurve( QEasingCurve::OutQuart ) );
-	anim2->setStartValue( width() );
-	anim2->setEndValue( devView->idealWidth() );
-	anim2->start();
+	QWidgetAction *lblAct = new QWidgetAction( devView );
+	lblAct->setIcon( QIcon() );
+	lblAct->setDefaultWidget( lbl );
+	lblAct->setDisabled( true );
+
+	devView->addAction( lblAct );
+
+	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDevices() ) {
+		QWidgetAction *wa = new QWidgetAction( devView );
+		wa->setData( info.mountPoint() );
+
+		NBDeviceAction *actWdgt = new NBDeviceAction( info );
+		wa->setDefaultWidget( actWdgt );
+
+		devView->addAction( wa );
+	};
+
+	closeTimer.start( 10000, this );
+	devView->exec( mapToGlobal( QPoint( 49, 0 ) ) );
 };
 
-void NBDevicesIcon::hideDevices() {
+void NBDevicesIcon::clickDrive( QAction *act ) {
 
-	if ( QRect( 0, 0, 48, 48 ).contains( mapFromGlobal( QCursor::pos() ) ) )
-		return;
+	QWidgetAction *wAct = qobject_cast<QWidgetAction*>( act );
+	NBDeviceAction *devAct = qobject_cast<NBDeviceAction*>( wAct->defaultWidget() );
 
-	anim2->stop();
-
-	anim2->setEasingCurve( QEasingCurve( QEasingCurve::OutQuint ) );
-	anim2->setStartValue( width() );
-	anim2->setEndValue( 0 );
-	anim2->start();
+	if ( devAct )
+		emit driveClicked( devAct->mountPoint() );
 };
 
-NBDeviceView::NBDeviceView( QWidget *parent ) : QWidget( parent ) {
+NBDeviceMenu::NBDeviceMenu( QWidget *parent ) : QMenu( parent ) {
 
-	// To track mouse movements
+};
+
+void NBDeviceMenu::changeEvent( QEvent *event ) {
+
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) )
+		close();
+
+	else
+		QWidget::changeEvent( event );
+
+	event->accept();
+};
+
+NBDeviceAction::NBDeviceAction( NBDeviceInfo info ) : QWidget() {
+
 	setMouseTracking( true );
 
-	// Cursor position
-	cursor = QPoint();
+	select = false;
 
-	// Compute the ideal width and set the default size
-	computeIdealWidth();
-	setFixedSize( QSize( 0, 48 + NBDeviceManager::allDevices().count() * 32 ) );
-
-	// Update the device-rect list
-	repopulate();
-
-	// Window Flags;
-	setWindowFlags( Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
-	setWindowModality( Qt::ApplicationModal );
-};
-
-void NBDeviceView::repopulate() {
-
-	// Update the device-rect list
-	devRectMap.clear();
-	int y = 48;
-	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDevices() ) {
-		devRectMap[ y ] = info.mountPoint();
-		y += 32;
-	}
-
-	setFixedHeight( y );
-	computeIdealWidth();
-
-	if ( isVisible() ) {
-
-		resize( 0, 0 );
-		updateGeometry();
-
-		repaint();
-	}
-};
-
-int NBDeviceView::idealWidth() {
-
-	return mIdealWidth;
-};
-
-/* Overriding of paint event for showing flashes */
-void NBDeviceView::paintEvent( QPaintEvent *pEvent ) {
-
-	QPainter *painter = new QPainter( this );
-
-	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
-
-	/* Devices label */
-	painter->save();
-	painter->setPen( Qt::black );
-	painter->setFont( QFont( font().family(), font().pointSize(), QFont::Bold )  );
-	painter->drawText( QRect( 10, 0, mIdealWidth - 10, 48 ), Qt::AlignVCenter | Qt::AlignLeft, "Devices" );
-	painter->restore();
-
-	painter->save();
-
-	// Normal Text
-	painter->setFont( QFont( font().family(), font().pointSize(), QFont::Normal, false ) );
-
-	int y = 48;
+	setFixedHeight( 32 );
 
 	QFontMetrics fm( font() );
+	setMinimumWidth( qMax( 32 + fm.width( info.driveLabel() ) + 10, 150 ) );
 
-	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDevices() ) {
-		QRect devRect( QPoint( 0, y ), QSize( mIdealWidth, 32 ) );
-		y += 32;
+	mDeviceLabel = info.driveLabel();
+	icon = QIcon( ":/icons/" + info.driveType() + ".png" );
+	mMountPoint = info.mountPoint();
 
-		// Mouse over highlight
-		if ( devRect.contains( mapFromGlobal( QCursor::pos() ) ) ) {
-			painter->fillRect( devRect, palette().color( QPalette::Highlight ) );
-			painter->setPen( palette().color( QPalette::HighlightedText ) );
-		}
+	percentUsed = ( int )( info.usedSpace() * 100.0 / info.driveSize() );
+};
 
-		else {
-			painter->fillRect( devRect, Qt::transparent );
-			painter->setPen( palette().color( QPalette::WindowText ) );
-		}
+QString NBDeviceAction::mountPoint() {
 
-		QRect iconRect( devRect.topLeft() + QPoint( 4, 4 ), QSize( 24, 24 ) );
-		painter->drawPixmap( iconRect, QIcon( ":/icons/" + info.driveType() + ".png" ).pixmap( 24 ) );
+	return mMountPoint;
+};
 
-		QRect textRect( devRect.adjusted( 32, 0, 0, 0 ) );
-		painter->drawText( textRect, Qt::AlignVCenter, fm.elidedText( info.driveLabel(), Qt::ElideRight, mIdealWidth - 32 - 48 ) );
+
+void NBDeviceAction::paintEvent( QPaintEvent *pEvent ) {
+
+	QPainter painter( this );
+
+	painter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
+
+	// Selection Background
+	if ( select ) {
+		painter.save();
+		QPalette pltt = palette();
+		painter.setPen( Qt::NoPen );
+		painter.setBrush( pltt.color( QPalette::Highlight ) );
+		painter.drawRect( rect() );
+		painter.restore();
 	}
 
-	painter->restore();
+	// Label
+	painter.save();
 
-	// Widget border
-	painter->save();
-	painter->setPen( QPen( Qt::darkGray, 1.0 ) );
-	painter->drawRect( rect() );
-	painter->restore();
+	painter.drawText( QRect( 32, 0, width() - 32 - 10, 20 ), Qt::AlignLeft | Qt::AlignVCenter, mDeviceLabel );
 
-	painter->end();
-	pEvent->accept();
-};
+	painter.restore();
 
-void NBDeviceView::computeIdealWidth() {
+	// Icon
+	painter.save();
 
-	/* IconWidth (32) + MaxTextWidth (computed below) + Buffer (48) */
-	mIdealWidth = 32 + 48;
+	painter.setPen( Qt::NoPen );
+	painter.drawPixmap( QRect( 4, 4, 24, 24 ), icon.pixmap( 24 ) );
 
-	int maxWidth = -1;
+	painter.restore();
 
-	QFontMetrics fm( font() );
-	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDevices() ) {
-		if ( fm.width( info.driveLabel() ) > maxWidth )
-			maxWidth = fm.width( info.driveLabel() );
+	// Used/Free Size
+	painter.save();
+	double mFraction = percentUsed / 100.0;
+
+	int red = 0, green = 0;
+	// Lots of free space
+	if ( mFraction <= 0.4 ) {
+		green = ( int )( 255 );
+		red = ( int )( mFraction * 638 );
 	}
 
-	mIdealWidth += maxWidth;
-	if ( mIdealWidth < 180 )
-		mIdealWidth = 180;
-};
-
-/* Overriding QWidget::mousePressEvent to emit clicked signal */
-void NBDeviceView::mousePressEvent( QMouseEvent *mEvent ) {
-
-	Q_FOREACH( int y, devRectMap.keys() ) {
-		if ( QRect( QPoint( 0, y ), QSize( mIdealWidth, 32 ) ).contains( mEvent->pos() ) ) {
-			emit driveClicked( devRectMap.value( y ) );
-			emit close();
-			break;
-		}
+	// Around 50% free space remains
+	else if ( mFraction <= 0.6 ) {
+		red = 255;
+		green = 255;
 	}
 
-	mEvent->accept();
-};
-
-/* Overriding QWidget::mouseMoveEvent to expand the view */
-void NBDeviceView::mouseMoveEvent( QMouseEvent *mEvent ) {
-
-	Q_FOREACH( int y, devRectMap.keys() ) {
-		QRect devRect( QPoint( 0, y ), QSize( mIdealWidth, 32 ) );
-		if ( devRect.contains( mEvent->pos() ) ) {
-			/* It by default, comes under the mouse, so push it down right */
-			QToolTip::showText( mapToGlobal( mEvent->pos() ) + QPoint( 20, 20 ), devRectMap.value( y ) );
-
-			cursor = mEvent->pos();
-
-			repaint();
-			qApp->processEvents();
-
-			break;
-		}
+	// Very less free space remaining
+	else {
+		green = ( int )( ( 1 - mFraction ) * 638 );
+		red = ( int )( 255 );
 	}
 
-	mEvent->accept();
+	painter.setPen( Qt::NoPen );
+	painter.setBrush( QColor( red, green, 0 ) );
+	painter.drawRoundedRect( QRect( 32, 20, ( width() - 32 - 10 ) * mFraction, 6 ), 4.0, 4.0 );
+
+	painter.restore();
+
+	painter.end();
 };
 
-/* Overriding QWidget::keyPressEvent to handle escape */
-void NBDeviceView::keyPressEvent( QKeyEvent *kEvent ) {
+/* Overriding QLabel::enterEvent to emit entered signal */
+void NBDeviceAction::enterEvent( QEvent *eEvent ) {
 
-	switch( kEvent->key() ) {
-		case Qt::Key_Escape:
-			emit close();
-			break;
-
-		default:
-			QWidget::keyPressEvent( kEvent );
-			break;
-	}
-
-	kEvent->accept();
+	select = true;
+	repaint();
 };
 
-/* Overriding QWidget::enterEvent to emit entered signal */
-void NBDeviceView::enterEvent( QEvent *eEvent ) {
+/* Overriding QLabel::leaveEvent to emit exited signal */
+void NBDeviceAction::leaveEvent( QEvent *lEvent ) {
 
-	/* Stop the close timer */
-	closeTimer.stop();
-	eEvent->accept();
-};
-
-/* Overriding QWidget::leaveEvent to emit exited signal */
-void NBDeviceView::leaveEvent( QEvent *lEvent ) {
-
-	/* Start the close timer: in 500 ms the panel closes */
-	closeTimer.stop();
-	closeTimer.start( 500, this );
-
-	lEvent->accept();
-};
-
-void NBDeviceView::timerEvent( QTimerEvent *tEvent ) {
-
-	if ( tEvent->timerId() == closeTimer.timerId() ) {
-		if ( not rect().contains( mapFromGlobal( QCursor::pos() ) ) ) {
-			emit close();
-
-			closeTimer.stop();
-		}
-	}
+	select = false;
+	repaint();
 };

@@ -5,129 +5,197 @@
 */
 
 #include <NBFileSystemWatcher.hpp>
+#include <poll.h>
 
 NBFileSystemWatcher::NBFileSystemWatcher() : QThread() {
 
-	inotifyFD = -1;
-	WD = -1;
-	buffer[ BUF_LEN ] = { 0 };
+	mStopWatch = false;
 
-	originalName = QString();
-	prevEvent = 0;
+	monitor.wd = -1;
+	cookie = -1;
+	mask = -1;
 
-	watchPath = QString();
-
-	__stopWatch = false;
-
-	inotifyFD = inotify_init();
-	if ( inotifyFD < 0 )
+	inotify_fd = inotify_init();
+	if ( inotify_fd < 0 ) {
 		qCritical() << "Failed initialize inotify";
+		emit watchFailed();
+	}
 };
 
 NBFileSystemWatcher::~NBFileSystemWatcher() {
 
-	__stopWatch = true;
+	free( monitor.path );
+	inotify_rm_watch( inotify_fd, monitor.wd );
 
-	inotify_rm_watch( inotifyFD, WD );
-	close( inotifyFD );
+	close( inotify_fd );
 };
 
 void NBFileSystemWatcher::setWatchPath( QString wPath ) {
 
-	// Set @v watchPath
-	watchPath = QString( wPath );
+	stopWatch();
 
-	// Save the old Watch Descriptor
-	int oldWD = WD;
-
-	// Add anew watch
-	WD = inotify_add_watch( inotifyFD, qPrintable( watchPath ), IN_ALL_EVENTS );
-	if ( WD == -1 ) {
-		qCritical() << "Couldn't add watch: " << qPrintable( watchPath );
+	monitor.path = strdup( wPath.toLatin1().data() );
+	monitor.wd = inotify_add_watch( inotify_fd, monitor.path, IN_ALL_EVENTS );
+	if ( monitor.wd < 0 ) {
+		qCritical() << "Failed to add watch:" << monitor.path;
+		qCritical() << "inotify_add_watch(...) returned error:" << errno << strerror( errno );
 		emit watchFailed();
 	}
-
-	// Now delete the old watch
-	if ( oldWD >= 0 )
-		inotify_rm_watch( inotifyFD, oldWD );
 };
 
 void NBFileSystemWatcher::startWatch() {
 
-	__stopWatch = false;
+	mStopWatch = false;
+
 	start();
 };
 
 void NBFileSystemWatcher::stopWatch() {
 
-	__stopWatch = true;
+	mStopWatch = true;
+
+	if ( monitor.wd >= 0 ) {
+		inotify_rm_watch( inotify_fd, monitor.wd );
+		free( monitor.path );
+	}
 };
 
 void NBFileSystemWatcher::run() {
 
-	while ( not __stopWatch ) {
-		int length = 0, i = 0;
-		while( true ) {
-			i = 0;
-			length = read( inotifyFD, buffer, BUF_LEN );
+	struct pollfd fds[ 1 ];
+	fds[ 0 ].fd = inotify_fd;
+	fds[ 0 ].events = POLLIN;
 
-			// If for some reason length < 0, continue with trying to read.
-			if ( length < 0 )
-				continue;
+	while ( not mStopWatch ) {
+		/* End watch */
+		if ( mStopWatch )
+			break;
 
-			if ( __stopWatch )
-				return;
+		/* Block until there is something to be read */
+		if ( poll( fds, 1, -1 ) < 0 )
+			qCritical() << "Couldn't poll():" << strerror( errno );
 
-			while ( i < length ) {
-				if ( __stopWatch )
-					return;
+		/* Inotify event received? */
+		if ( fds[ 0 ].revents & POLLIN and not mStopWatch ) {
+			char buffer[INOTIFY_BUFFER_SIZE];
+			size_t length;
 
-				struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
-				// If this is a transition between two watches, ignore the old watch events
-				if ( event->wd != WD )
-					break;
+			/* Read from the FD. It will read all events available up to * the given buffer size. */
+			if ( ( length = read ( fds[ 0 ].fd, buffer, INOTIFY_BUFFER_SIZE ) ) > 0 ) {
+				struct inotify_event *event;
+				size_t i = 0;
 
-				if ( event->mask & IN_DELETE_SELF ) {
-					emit watchPathDeleted();
+				while ( i < length ) {
+					if ( mStopWatch )
+						break;
+
+					event = ( struct inotify_event * ) &buffer[ i ];
+					i += EVENT_SIZE + event->len;
+
+					processEvent( event );
 				}
-
-				if ( ( event->mask & IN_CREATE ) ) {
-
-					prevEvent = IN_CREATE;
-					emit nodeCreated( watchPath + "/" + event->name );
-				}
-
-				if ( event->mask & IN_MODIFY ) {
-
-					prevEvent = IN_MODIFY;
-					emit nodeChanged( watchPath + "/" + event->name );
-				}
-
-				if ( ( event->mask & IN_MOVED_FROM ) ) {
-
-					prevEvent = IN_MOVED_FROM;
-					originalName = QString( watchPath + "/" + event->name );
-				}
-
-				if ( ( event->mask & IN_MOVED_TO ) ) {
-
-					if ( prevEvent == IN_MOVED_FROM )
-						emit nodeRenamed( originalName, watchPath + "/" + event->name );
-
-					else
-						emit nodeCreated( watchPath + "/" + event->name );
-
-					prevEvent = IN_MOVED_TO;
-				}
-
-				if ( ( event->mask & IN_DELETE ) ) {
-
-					prevEvent = IN_MOVED_TO;
-					emit nodeDeleted( watchPath + "/" + event->name );
-				}
-
-				i += EVENT_SIZE + event->len;
 			}
 		}
+	}
+};
+
+/* Eventually we will emit signals from here, corresponding to each event */
+void NBFileSystemWatcher::processEvent( struct inotify_event *event ) {
+
+	if ( monitor.wd == event->wd ) {
+		if ( ( mask == IN_MOVED_FROM ) and ( cookie != event->cookie ) ) {
+			mask = -1;
+			cookie = -1;
+
+			emit nodeDeleted( oldName );
+		}
+
+		if ( event->mask & IN_ACCESS ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_ATTRIB ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_OPEN ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_CLOSE_WRITE ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_CLOSE_NOWRITE ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_CREATE ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			emit nodeCreated( QString( monitor.path ) + event->name );
+		}
+
+		if ( event->mask & IN_MODIFY ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			emit nodeChanged( QString( monitor.path ) + event->name );
+		}
+
+		if ( event->mask & IN_DELETE ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			emit nodeDeleted( QString( monitor.path ) + event->name );
+		}
+
+		if ( event->mask & IN_DELETE_SELF ) {
+			mask = event->mask;
+			cookie = event->cookie;
+
+			emit watchPathDeleted();
+			stopWatch();
+		}
+
+		if ( event->mask & IN_MOVE_SELF ) {
+			mask = event->mask;
+			cookie = event->cookie;
+
+			emit watchPathDeleted();
+			stopWatch();
+		}
+
+		if ( event->mask & IN_MOVED_FROM ) {
+			mask = IN_MOVED_FROM;
+			cookie = event->cookie;
+
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_MOVED_TO ) {
+			/* If we have the same cookie, and last event was IN_MOVED_FROM */
+			if ( ( cookie == event->cookie ) and ( mask == IN_MOVED_FROM ) ) {
+				mask = -1;
+				cookie = -1;
+				emit nodeRenamed( oldName, QString( monitor.path ) + event->name );
+			}
+
+			/* If the cookie is different or mask is not IN_MOVED_FROM */
+			else {
+				emit nodeCreated( QString( monitor.path ) + event->name );
+			}
+		}
+
+		fflush( stdout );
+		return;
 	}
 };

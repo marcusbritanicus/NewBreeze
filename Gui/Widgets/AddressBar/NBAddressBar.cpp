@@ -179,46 +179,56 @@ void NBAddressWidget::revertToCrumbsBar() {
 NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 
 	setFrameStyle( NoFrame );
-	setFixedHeight( 24 );
+	setFixedHeight( 32 );
 
 	QHBoxLayout *fLyt = new QHBoxLayout();
 	fLyt->setContentsMargins( QMargins() );
 
-	reloadBtn = new NBButton( QIcon( ":/icons/reload.png" ), this );
+	// Previous button
+	backBtn = new NBButton( QIcon::fromTheme( "go-previous" ) );
+	backBtn->setFocusPolicy( Qt::NoFocus );
 
-	viewModeBtn = new NBViewModeButton( this );
+	// Next Button
+	forwardBtn = new NBButton( QIcon::fromTheme( "go-next" ) );
+	forwardBtn->setFocusPolicy( Qt::NoFocus );
 
-	openVTEBtn = new NBButton( QIcon( ":/icons/vte.png" ), this );
-
+	// AddressWidget
 	addressWidget = new NBAddressWidget( this );
-	searchBar = new NBSearchBar();
-	addressButtons = new NBButtons( this );
+
+	// View Modes
+	viewModes = new NBSegmentControl( this );
+	viewModes->setFocusPolicy( Qt::NoFocus );
+	viewModes->setCount( 3 );
+	viewModes->setSelectionBehavior( NBSegmentControl::SelectOne );
+
+	// Tiles
+	viewModes->setSegmentIcon( 0, QIcon::fromTheme( "view-list-details" ) );
+
+	// Icons
+	viewModes->setSegmentIcon( 1, QIcon::fromTheme( "view-list-icons" ) );
+
+	// Details
+	viewModes->setSegmentIcon( 2, QIcon::fromTheme( "view-list-text" ) );
+
+	// FilterButton
+	filterBtn = new NBButton( QIcon::fromTheme( "edit-find", QIcon( ":/icons/search.png" ) ) );
+	filterBtn->setFocusPolicy( Qt::NoFocus );
+
+	// Process Widget
 	mProcWidget = new NBIOManagerMini( this );
-
-	searchBar->setFixedHeight( 24 );
-
-	addressButtons->addSegment( reloadBtn );
-	addressButtons->addSegment( viewModeBtn );
-	addressButtons->addSegment( openVTEBtn );
-
-	addressButtons->setFixedHeight( 24 );
-
-	openVTEBtn->setFocusPolicy( Qt::NoFocus );
-	reloadBtn->setFocusPolicy( Qt::NoFocus );
-	viewModeBtn->setFocusPolicy( Qt::NoFocus );
 
 	addressWidget->addressEdit->setFocusPolicy( Qt::ClickFocus );
 	addressWidget->crumbsBar->setFocusPolicy( Qt::NoFocus );
 
-	reloadBtn->setToolTip( tr( "Reload view" ) );
-	viewModeBtn->setToolTip( tr( "Switch to list mode" ) );
-	openVTEBtn->setToolTip( tr( "Open a terminal emulator here" ) );
-
+	fLyt->addWidget( backBtn );
+	fLyt->addWidget( forwardBtn );
+	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( addressWidget );
 	fLyt->addWidget( Separator::vertical() );
-	fLyt->addWidget( searchBar );
+	fLyt->addWidget( filterBtn );
 	fLyt->addWidget( Separator::vertical() );
-	fLyt->addWidget( addressButtons );
+	fLyt->addWidget( viewModes );
+
 	if ( Settings->General.NativeTitleBar ) {
 		fLyt->addWidget( Separator::vertical() );
 		fLyt->addWidget( mProcWidget );
@@ -229,13 +239,11 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 
 	setLayout( fLyt );
 
-	connect( openVTEBtn, SIGNAL( clicked() ), this, SIGNAL( openTerminal() ) );
-	connect( reloadBtn, SIGNAL( clicked() ), this, SIGNAL( reload() ) );
-	connect( viewModeBtn, SIGNAL( switchToNextView() ), this, SIGNAL( switchToNextView() ) );
-	connect( viewModeBtn, SIGNAL( changeViewMode() ), this, SIGNAL( changeViewMode() ) );
+	connect( backBtn, SIGNAL( clicked() ), this, SIGNAL( goBack() ) );
+	connect( forwardBtn, SIGNAL( clicked() ), this, SIGNAL( goForward() ) );
 	connect( addressWidget, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
-	connect( searchBar, SIGNAL( searchString( QString ) ), this, SIGNAL( search( QString ) ) );
-	connect( searchBar, SIGNAL( searchCleared() ), this, SIGNAL( clearSearch() ) );
+	connect( filterBtn, SIGNAL( clicked() ), this, SIGNAL( openSearch() ) );
+	connect( viewModes, SIGNAL( segmentSelected( int ) ), this, SIGNAL( changeViewMode( int ) ) );
 };
 
 NBIOManagerMini *NBAddressBar::procWidget() {
@@ -256,7 +264,7 @@ void NBAddressBar::setAddress( QString url ) {
 
 int NBAddressBar::checkedAction() {
 
-	return viewModeBtn->checkedAction();
+	return 1;
 };
 
 void NBAddressBar::focusAddressEdit() {
@@ -264,12 +272,12 @@ void NBAddressBar::focusAddressEdit() {
 	addressWidget->setFocus();
 };
 
-void NBAddressBar::focusSearchBar() {
+void NBAddressBar::hideSearchButton() {
 
-	searchBar->searchLE->setFocus();
+	filterBtn->setIcon( QIcon() );
 };
 
-void NBAddressBar::clearSearchBar() {
+void NBAddressBar::showSearchButton() {
 
-	searchBar->searchLE->clear();
+	filterBtn->setIcon( QIcon::fromTheme( "edit-find", QIcon( ":/icons/search.png" ) ) );
 };

@@ -8,8 +8,7 @@
 
 #include <Global.hpp>
 #include <NBDialog.hpp>
-#include <NBButton.hpp>
-#include <NBButtons.hpp>
+#include <NBSegmentControl.hpp>
 #include <NBTools.hpp>
 
 class NBRenameDialog : public NBDialog {
@@ -23,14 +22,17 @@ class NBRenameDialog : public NBDialog {
 	private:
 		void createGUI();
 
+		NBSegmentControl *segBtns;
+
 		NBLineEdit *le;
-		NBButton *okBtn, *cancelBtn;
+
 		QCheckBox *replaceCB;
 		QString name;
 		QDir dir;
 		bool renameOk;
 
 	private slots :
+		void handleSegmentClick( int );
 		void rename();
 		void cancel();
 		void handleTextChanged( QString newText );

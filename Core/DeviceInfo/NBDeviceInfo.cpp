@@ -8,6 +8,10 @@
 #include <sys/statvfs.h>
 #include <sys/stat.h>
 
+#if QT_VERSION >= 0x050000
+    #include <QStorageInfo>
+#endif
+
 inline QString readLink( QString path ) {
 
 	char linkTarget[ 1024 ] = { 0 };
@@ -114,33 +118,54 @@ void NBDeviceManager::printDevInfo( const QDBusObjectPath &obj ) {
 QList<NBDeviceInfo> NBDeviceManager::allDevices() {
 
 	QList<NBDeviceInfo> devices;
-	Q_FOREACH( QVolumeInfo vInfo, QVolumeInfo::volumes() )
-		devices << NBDeviceManager::deviceInfoForPath( vInfo.rootPath() );
+
+	#if QT_VERSION >= 0x050000
+		Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() )
+			devices << NBDeviceManager::deviceInfoForPath( sInfo.rootPath() );
+	#else
+		Q_FOREACH( QVolumeInfo vInfo, QVolumeInfo::volumes() )
+			devices << NBDeviceManager::deviceInfoForPath( vInfo.rootPath() );
+	#endif
 
 	return devices;
 };
 
 NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
 
-	QVolumeInfo vInfo;
-	vInfo.setPath( path );
+	NBDeviceInfo devInfo;
 
-	NBDeviceInfoPrivate devInfoP;
+	#if QT_VERSION >= 0x050000
+		QStorageInfo sInfo;
+		sInfo.setPath( path );
 
-	devInfoP.dN = vInfo.device();
-	devInfoP.dL = getDevLabel( vInfo.name(), vInfo.displayName() );
-	devInfoP.fS = vInfo.fileSystemType();
-	devInfoP.dT = getDevType( devInfoP.dN, devInfoP.fS );
-	devInfoP.mP = vInfo.rootPath();
-	devInfoP.fSz = vInfo.bytesFree();
-	devInfoP.aSz = vInfo.bytesAvailable();
-	devInfoP.uSz = vInfo.bytesTotal() - vInfo.bytesFree();
-	devInfoP.dSz = vInfo.bytesTotal();
+		devInfo.dN = sInfo.device();
+		devInfo.dL = getDevLabel( sInfo.name(), sInfo.displayName() );
+		devInfo.fS = sInfo.fileSystemType();
+		devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
+		devInfo.mP = sInfo.rootPath();
+		devInfo.fSz = sInfo.bytesFree();
+		devInfo.aSz = sInfo.bytesAvailable();
+		devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
+		devInfo.dSz = sInfo.bytesTotal();
+	#else
+		QVolumeInfo vInfo;
+		vInfo.setPath( path );
 
-	if ( devInfoP.mP == "/" )
-		devInfoP.dT = "hdd";
+		devInfo.dN = vInfo.device();
+		devInfo.dL = getDevLabel( vInfo.name(), vInfo.displayName() );
+		devInfo.fS = vInfo.fileSystemType();
+		devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
+		devInfo.mP = vInfo.rootPath();
+		devInfo.fSz = vInfo.bytesFree();
+		devInfo.aSz = vInfo.bytesAvailable();
+		devInfo.uSz = vInfo.bytesTotal() - vInfo.bytesFree();
+		devInfo.dSz = vInfo.bytesTotal();
+	#endif
 
-	return NBDeviceInfo( devInfoP );
+	if ( devInfo.mP == "/" )
+		devInfo.dT = "hdd";
+
+	return devInfo;
 };
 
 NBDeviceInfo::NBDeviceInfo() {
@@ -156,17 +181,17 @@ NBDeviceInfo::NBDeviceInfo() {
 	dSz = 0;
 };
 
-NBDeviceInfo::NBDeviceInfo( const NBDeviceInfoPrivate other ) {
+NBDeviceInfo::NBDeviceInfo( const NBDeviceInfo& other ) {
 
-	dN = other.dN;
-	dL = other.dL;
-	fS = other.fS;
-	dT = other.dT;
-	mP = other.mP;
-	fSz = other.fSz;
-	aSz = other.aSz;
-	uSz = other.uSz;
-	dSz = other.dSz;
+	dN = other.driveName();
+	dL = other.driveLabel();
+	fS = other.driveFS();
+	dT = other.driveType();
+	mP = other.mountPoint();
+	fSz = other.freeSpace();
+	aSz = other.availSpace();
+	uSz = other.usedSpace();
+	dSz = other.driveSize();
 };
 
 QString NBDeviceInfo::driveName() const {
@@ -179,7 +204,7 @@ QString NBDeviceInfo::driveLabel() const {
 	return dL;
 };
 
-QString NBDeviceInfo::driveFS() {
+QString NBDeviceInfo::driveFS() const {
 
 	return fS;
 };
@@ -194,22 +219,22 @@ QString NBDeviceInfo::mountPoint() const {
 	return mP;
 };
 
-quint64 NBDeviceInfo::freeSpace() {
+quint64 NBDeviceInfo::freeSpace() const {
 
 	return fSz;
 };
 
-quint64 NBDeviceInfo::availSpace() {
+quint64 NBDeviceInfo::availSpace() const {
 
 	return aSz;
 };
 
-quint64 NBDeviceInfo::usedSpace() {
+quint64 NBDeviceInfo::usedSpace() const {
 
 	return uSz;
 };
 
-quint64 NBDeviceInfo::driveSize() {
+quint64 NBDeviceInfo::driveSize() const {
 
 	return dSz;
 };

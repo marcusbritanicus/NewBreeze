@@ -13,8 +13,8 @@ LIBS += -lmagic -lzip -ltar -lbz2 -llzma -lz
 # Source Paths
 INCLUDEPATH += . Core Core/Animations Core/AppFile Core/Archive Core/ArgParser Core/BookmarksManager Core/ClipBoard Core/ConfigParser Core/CoreProcess Core/CoreTools
 INCLUDEPATH += Core/DeleteManager Core/DeviceInfo Core/DeviceInfo/QVolumeInfo Core/DeviceManager Core/FileIO Core/FSWatcher Core/IconProvider Core/MimeHandler
-INCLUDEPATH += Core/MultiFile Core/StandardPaths Core/SystemInfo Core/XDG Gui Gui/Dialogs Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
-INCLUDEPATH += Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
+INCLUDEPATH += Core/MultiFile Core/StandardPaths Core/SystemInfo Core/XDG Gui Gui/Dialogs Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
+INCLUDEPATH += Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
 INCLUDEPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel
 INCLUDEPATH += Gui/ModelViews/Models/CatalogModel Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
 INCLUDEPATH += Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView
@@ -25,8 +25,8 @@ INCLUDEPATH += Gui/Widgets/QuickMenu Gui/Widgets/SidePanel Gui/Widgets/Terminal 
 
 DEPENDPATH += . Core Core/Animations Core/AppFile Core/Archive Core/ArgParser Core/BookmarksManager Core/ClipBoard Core/ConfigParser Core/CoreProcess Core/CoreTools
 DEPENDPATH += Core/DeleteManager Core/DeviceInfo Core/DeviceInfo/QVolumeInfo Core/DeviceManager Core/FileIO Core/FSWatcher Core/IconProvider Core/MimeHandler
-DEPENDPATH += Core/MultiFile Core/StandardPaths Core/SystemInfo Core/XDG Gui Gui/Dialogs Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
-DEPENDPATH += Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
+DEPENDPATH += Core/MultiFile Core/StandardPaths Core/SystemInfo Core/XDG Gui Gui/Dialogs Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
+DEPENDPATH += Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
 DEPENDPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel
 DEPENDPATH += Gui/ModelViews/Models/CatalogModel Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
 DEPENDPATH += Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView
@@ -72,15 +72,17 @@ HEADERS += Core/DeviceManager/Version.h
 HEADERS += Core/FileIO/NBFileIO.hpp
 HEADERS += Core/FSWatcher/NBFileSystemWatcher.hpp
 HEADERS += Core/IconProvider/NBIconProvider.hpp
-HEADERS += Core/MimeHandler/NBMimeDatabase.hpp
-HEADERS += Core/MimeHandler/NBMimeDatabase_p.hpp
-HEADERS += Core/MimeHandler/NBMimeGlobPattern_p.hpp
-HEADERS += Core/MimeHandler/NBMimeMagicRuleMatcher_p.hpp
-HEADERS += Core/MimeHandler/NBMimeMagicRule_p.hpp
-HEADERS += Core/MimeHandler/NBMimeProvider_p.hpp
-HEADERS += Core/MimeHandler/NBMimeType.hpp
-HEADERS += Core/MimeHandler/NBMimeTypeParser_p.hpp
-HEADERS += Core/MimeHandler/NBMimeType_p.hpp
+lessThan(QT_MAJOR_VERSION, 5) {
+	HEADERS += Core/MimeHandler/NBMimeDatabase.hpp
+	HEADERS += Core/MimeHandler/NBMimeDatabase_p.hpp
+	HEADERS += Core/MimeHandler/NBMimeGlobPattern_p.hpp
+	HEADERS += Core/MimeHandler/NBMimeMagicRuleMatcher_p.hpp
+	HEADERS += Core/MimeHandler/NBMimeMagicRule_p.hpp
+	HEADERS += Core/MimeHandler/NBMimeProvider_p.hpp
+	HEADERS += Core/MimeHandler/NBMimeType.hpp
+	HEADERS += Core/MimeHandler/NBMimeTypeParser_p.hpp
+	HEADERS += Core/MimeHandler/NBMimeType_p.hpp
+}
 HEADERS += Core/StandardPaths/NBStandardPaths.hpp
 HEADERS += Core/SystemInfo/NBSystemInfo.hpp
 HEADERS += Core/XDG/NBXdg.hpp
@@ -140,13 +142,14 @@ HEADERS += Gui/Widgets/BreadCrumbsBar/NBCrumbsBar.hpp
 HEADERS += Gui/Widgets/BreadCrumbsBar/NBExtraCrumb.hpp
 HEADERS += Gui/Widgets/Buttons/NBButton.hpp
 HEADERS += Gui/Widgets/Buttons/NBButtons.hpp
-HEADERS += Gui/Widgets/Buttons/NBViewModeButton.hpp
+HEADERS += Gui/Widgets/Buttons/NBSegmentControl.hpp
 HEADERS += Gui/Widgets/ContextMenu/NBContextMenu.hpp
 HEADERS += Gui/Widgets/CustomActions/NBCustomActions.hpp
 HEADERS += Gui/Widgets/CustomPeek/NBCustomPeek.hpp
 HEADERS += Gui/Widgets/FolderFlash/NBFolderFlash.hpp
 HEADERS += Gui/Widgets/FolderView/NBFolderView.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBActionButtons.hpp
+HEADERS += Gui/Widgets/GuiWidgets/NBFilterWidget.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBFlashLabel.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBGuiWidgets.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBLabels.hpp
@@ -239,13 +242,15 @@ SOURCES += Core/DeviceManager/Version.cpp
 SOURCES += Core/FileIO/NBFileIO.cpp
 SOURCES += Core/FSWatcher/NBFileSystemWatcher.cpp
 SOURCES += Core/IconProvider/NBIconProvider.cpp
-SOURCES += Core/MimeHandler/NBMimeDatabase.cpp
-SOURCES += Core/MimeHandler/NBMimeGlobPattern.cpp
-SOURCES += Core/MimeHandler/NBMimeMagicRule.cpp
-SOURCES += Core/MimeHandler/NBMimeMagicRuleMatcher.cpp
-SOURCES += Core/MimeHandler/NBMimeProvider.cpp
-SOURCES += Core/MimeHandler/NBMimeType.cpp
-SOURCES += Core/MimeHandler/NBMimeTypeParser.cpp
+lessThan(QT_MAJOR_VERSION, 5) {
+	SOURCES += Core/MimeHandler/NBMimeDatabase.cpp
+	SOURCES += Core/MimeHandler/NBMimeGlobPattern.cpp
+	SOURCES += Core/MimeHandler/NBMimeMagicRule.cpp
+	SOURCES += Core/MimeHandler/NBMimeMagicRuleMatcher.cpp
+	SOURCES += Core/MimeHandler/NBMimeProvider.cpp
+	SOURCES += Core/MimeHandler/NBMimeType.cpp
+	SOURCES += Core/MimeHandler/NBMimeTypeParser.cpp
+}
 SOURCES += Core/MultiFile/bsdiff.c
 SOURCES += Core/MultiFile/bspatch.c
 SOURCES += Core/StandardPaths/NBStandardPaths.cpp
@@ -309,13 +314,14 @@ SOURCES += Gui/Widgets/BreadCrumbsBar/NBCrumbsBar.cpp
 SOURCES += Gui/Widgets/BreadCrumbsBar/NBExtraCrumb.cpp
 SOURCES += Gui/Widgets/Buttons/NBButton.cpp
 SOURCES += Gui/Widgets/Buttons/NBButtons.cpp
-SOURCES += Gui/Widgets/Buttons/NBViewModeButton.cpp
+SOURCES += Gui/Widgets/Buttons/NBSegmentControl.cpp
 SOURCES += Gui/Widgets/ContextMenu/NBContextMenu.cpp
 SOURCES += Gui/Widgets/CustomActions/NBCustomActions.cpp
 SOURCES += Gui/Widgets/CustomPeek/NBCustomPeek.cpp
 SOURCES += Gui/Widgets/FolderFlash/NBFolderFlash.cpp
 SOURCES += Gui/Widgets/FolderView/NBFolderView.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBActionButtons.cpp
+SOURCES += Gui/Widgets/GuiWidgets/NBFilterWidget.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBFlashLabel.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBGuiWidgets.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBLabels.cpp
@@ -367,7 +373,7 @@ RESOURCES += NewBreeze.qrc
 #QMAKE_CXXFLAGS += -std=c++11
 
 # Enable warnings and threading support
-CONFIG += thread silent release warn_off
+CONFIG += thread silent debug warn_off
 
 # Disable Debug on Release
 # CONFIG(release):DEFINES += QT_NO_DEBUG_OUTPUT

@@ -35,13 +35,13 @@ QString get_kb_layout_dir()
     if (d.exists())
         rval = QCoreApplication::applicationDirPath() + "/../Resources/kb-layouts/";
 #endif
-#ifdef QT_DEBUG
-    if(!rval.isEmpty()) {
-        qDebug() << "Using kb-layouts: " << rval;
-    } else {
-        qDebug() << "Cannot find kb-layouts in any location!";
-    }
-#endif
+// #ifdef QT_DEBUG
+    // if(!rval.isEmpty()) {
+        // qDebug() << "Using kb-layouts: " << rval;
+    // } else {
+        // qDebug() << "Cannot find kb-layouts in any location!";
+    // }
+// #endif
     return rval;
 #endif // BUNDLE_KEYBOARDLAYOUTS
 }
@@ -76,13 +76,13 @@ QString get_color_schemes_dir()
     if (d.exists())
         rval = QCoreApplication::applicationDirPath() + "/../Resources/color-schemes/";
 #endif
-#ifdef QT_DEBUG
-    if(!rval.isEmpty()) {
-        qDebug() << "Using color-schemes: " << rval;
-    } else {
-        qDebug() << "Cannot find color-schemes in any location!";
-    }
-#endif
+// #ifdef QT_DEBUG
+    // if(!rval.isEmpty()) {
+        // qDebug() << "Using color-schemes: " << rval;
+    // } else {
+        // qDebug() << "Cannot find color-schemes in any location!";
+    // }
+// #endif
     return rval;
 #endif // BUNDLE_COLORSCHEMES
 }

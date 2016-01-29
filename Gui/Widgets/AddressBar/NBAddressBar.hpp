@@ -84,26 +84,25 @@ class NBAddressBar : public QFrame {
 		int checkedAction();
 
 	private:
-		NBButtons *addressButtons;
-		NBButton *reloadBtn, *openVTEBtn;
-		NBViewModeButton *viewModeBtn;
+		NBButton *backBtn, *forwardBtn;
+		NBButton *settingsBtn, *filterBtn;
+		NBSegmentControl *viewModes;
 		NBAddressWidget *addressWidget;
-		NBSearchBar *searchBar;
 		NBIOManagerMini *mProcWidget;
 
 	public slots:
 		void focusAddressEdit();
-		void focusSearchBar();
-		void clearSearchBar();
+
+		void showSearchButton();
+		void hideSearchButton();
 
 	Q_SIGNALS:
-		void openTerminal();
-		void reload();
-		void switchToNextView();
-		void changeViewMode();
 		void openLocation( QString );
-		void search( QString );
-		void clearSearch();
+		void openSearch();
+		void changeViewMode( int );
+
+		void goBack();
+		void goForward();
 };
 
 #endif

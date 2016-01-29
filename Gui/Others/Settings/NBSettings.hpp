@@ -37,6 +37,7 @@ class NBSettings {
 				bool Grouping;									// Enable grouping?
 				bool PerFolderViews;							// Enable per folder views?
 				bool FilterFolders;								// Filter folders while searching?
+				bool CombiHome;									// Use CombiView as Home
 		} General;
 
 		// Special Settings

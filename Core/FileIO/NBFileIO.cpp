@@ -42,7 +42,8 @@ NBFileIO::NBFileIO() {
 
 void NBFileIO::setSources( QStringList sources ) {
 
-	sourceList << sources;
+	Q_FOREACH( QString src, sources )
+		sourceList << src.replace( "\n", "" );
 };
 
 QStringList NBFileIO::sources() {

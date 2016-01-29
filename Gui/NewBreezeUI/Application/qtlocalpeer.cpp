@@ -41,6 +41,7 @@
 #include <qtlocalpeer.hpp>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTime>
+#include <QtCore/QDataStream>
 
 #include <time.h>
 #include <unistd.h>

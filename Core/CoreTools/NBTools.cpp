@@ -19,6 +19,9 @@ QDir NBDir( QString path ) {
 
 QString dirName( QString path ) {
 
+	while( path.contains( "//" ) )
+		path = path.replace( "//", "/" );
+
 	if ( path.endsWith( "/" ) )
 		path.chop( 1 );
 
@@ -30,6 +33,9 @@ QString dirName( QString path ) {
 };
 
 QString baseName( QString path ) {
+
+	while( path.contains( "//" ) )
+		path = path.replace( "//", "/" );
 
 	if ( path.endsWith( "/" ) )
 		path.chop( 1 );
@@ -358,23 +364,23 @@ QString getStyleSheet( QString Widget, QString Style ) {
 QStringList getTerminal() {
 
 	QSettings sett;
-	if ( !sett.value( "terminals/nbterminal" ).toStringList().isEmpty() )
-		return sett.value( "terminals/nbterminal" ).toStringList();
+	if ( sett.value( "Terminals/nbterminal" ).toStringList().count() )
+		return sett.value( "Terminals/nbterminal" ).toStringList();
 
-	if ( !sett.value( "terminals/konsole" ).toStringList().isEmpty() )
-		return sett.value( "terminals/konsole" ).toStringList();
+	if ( sett.value( "Terminals/konsole" ).toStringList().count() )
+		return sett.value( "Terminals/konsole" ).toStringList();
 
-	if ( !sett.value( "terminals/gnome-terminal" ).toStringList().isEmpty() )
-		return sett.value( "terminals/gnome-terminal" ).toStringList();
+	if ( sett.value( "Terminals/gnome-terminal" ).toStringList().count() )
+		return sett.value( "Terminals/gnome-terminal" ).toStringList();
 
-	if ( !sett.value( "terminals/mate-terminal" ).toStringList().isEmpty() )
-		return sett.value( "terminals/mate-terminal" ).toStringList();
+	if ( sett.value( "Terminals/mate-terminal" ).toStringList().count() )
+		return sett.value( "Terminals/mate-terminal" ).toStringList();
 
-	if ( !sett.value( "terminals/xfce4-terminal" ).toStringList().isEmpty() )
-		return sett.value( "terminals/xfce4-terminal" ).toStringList();
+	if ( sett.value( "Terminals/xfce4-terminal" ).toStringList().count() )
+		return sett.value( "Terminals/xfce4-terminal" ).toStringList();
 
-	if ( !sett.value( "terminals/xterm" ).toStringList().isEmpty() )
-		return sett.value( "terminals/xterm" ).toStringList();
+	if ( sett.value( "Terminals/xterm" ).toStringList().count() )
+		return sett.value( "Terminals/xterm" ).toStringList();
 
 	return QStringList();
 };

@@ -57,7 +57,7 @@ bool TarFile::readArchiveGZ( QString target ) {
 			TarHeader *hdr = TarHeader::createHeader( buf );
 			QString fName = hdr->value( TarHeader::Name ).toString();
 
-			switch( hdr->value( TarHeader::Type ).toChar().toAscii() ) {
+			switch( hdr->value( TarHeader::Type ).toChar().toLatin1() ) {
 				/* Regular file */
 				case '0' : {
 					/* Get the target file size */
@@ -70,7 +70,7 @@ bool TarFile::readArchiveGZ( QString target ) {
 					QDir( target ).mkpath( dirName( fName ) );
 
 					/* Open the C++ File Object */
-					f.open( fName.toLocal8Bit().data(), std::ios_base::out | std::ios_base::binary );
+					f.open( fName.toLatin1().data(), std::ios_base::out | std::ios_base::binary );
 
 					/* Buffer to read the file into */
 					char *buf;
@@ -115,13 +115,13 @@ bool TarFile::readArchiveGZ( QString target ) {
 					}
 
 					/* Set the file property: mode */
-					chmod( fName.toLocal8Bit().data(), hdr->value( TarHeader::Mode ).toLongLong() );
+					chmod( fName.toLatin1().data(), hdr->value( TarHeader::Mode ).toLongLong() );
 
 					/* Set the dir property: mode */
 					struct utimbuf times;
 					times.actime = hdr->value( TarHeader::Time ).toLongLong();
 					times.modtime = hdr->value( TarHeader::Time ).toLongLong();
-					utime( fName.toLocal8Bit().data(), &times );
+					utime( fName.toLatin1().data(), &times );
 
 					break;
 				}
@@ -132,7 +132,7 @@ bool TarFile::readArchiveGZ( QString target ) {
 					QDir( target ).mkpath( dirName( fName ) );
 
 					QString path = hdr->value( TarHeader::Target ).toString();
-					symlink( path.toLocal8Bit().data(), fName.toLocal8Bit().data() );
+					symlink( path.toLatin1().data(), fName.toLatin1().data() );
 
 					break;
 				}
@@ -143,13 +143,13 @@ bool TarFile::readArchiveGZ( QString target ) {
 					QDir( target ).mkpath( fName );
 
 					/* Set the dir property: mode */
-					chmod( fName.toLocal8Bit().data(), hdr->value( TarHeader::Mode ).toLongLong() );
+					chmod( fName.toLatin1().data(), hdr->value( TarHeader::Mode ).toLongLong() );
 
 					/* Set the dir property: time */
 					struct utimbuf times;
 					times.actime = hdr->value( TarHeader::Time ).toLongLong();
 					times.modtime = hdr->value( TarHeader::Time ).toLongLong();
-					utime( fName.toLocal8Bit().data(), &times );
+					utime( fName.toLatin1().data(), &times );
 
 					break;
 				}
@@ -178,7 +178,7 @@ bool TarFile::writeArchiveGZ() {
 	int error;
 
 	/* File object for GZ Compressor */
-	gzFile gzip = gzopen( mFileName.toLocal8Bit().data(), "wb" );
+	gzFile gzip = gzopen( mFileName.toLatin1().data(), "wb" );
 
 	if ( gzip == NULL ) {
 		qDebug() << "Error initializing GZ Stream";
@@ -204,7 +204,7 @@ bool TarFile::writeArchiveGZ() {
 
 			/* Read and write the input file */
 			std::ifstream infile;
-			infile.open( fn.toLocal8Bit().data() );
+			infile.open( fn.toLatin1().data() );
 			while( not infile.eof() ) {
 				char *buffer = new char[BUFSIZ];
 				infile.read( buffer, BUFSIZ );

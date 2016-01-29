@@ -747,7 +747,7 @@ void NBPermissionsWidget::setExecOwner() {
 	applyPermissions();
 };
 
-NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab, bool *term, QWidget *parent ) : NBDialog( NBDialog::Close, parent ) {
+NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab, bool *term, QWidget *parent ) : NBDialog( parent ) {
 
 	pathsList << paths;
 

@@ -5,15 +5,14 @@
 */
 
 #pragma once
-#ifndef NBFILESYSTEMWATCHER_HPP
-#define NBFILESYSTEMWATCHER_HPP
 
 #include <Global.hpp>
 
+/* Size of buffer to use when reading inotify events */
 #define MAX_EVENTS				1024
 #define LEN_NAME				256
 #define EVENT_SIZE				( sizeof ( struct inotify_event ) )
-#define BUF_LEN	 				( MAX_EVENTS * ( EVENT_SIZE + LEN_NAME ) )
+#define INOTIFY_BUFFER_SIZE 	( MAX_EVENTS * ( EVENT_SIZE + LEN_NAME ) )
 
 class NBFileSystemWatcher : public QThread {
 	Q_OBJECT
@@ -37,17 +36,25 @@ class NBFileSystemWatcher : public QThread {
 		void run();
 
 	private:
-		void waitForWatchEnded();
+		/* A function to check for all the event masks */
+		void processEvent( struct inotify_event *event );
 
-		int inotifyFD;
-		int WD;
-		char buffer[ BUF_LEN ];
+		/* Structure to keep track of monitored directories */
+		struct monitor_t {
+			/* Path of the directory */
+			char *path;
+			/* inotify watch descriptor */
+			int wd;
+		} monitor;
 
-		QString watchPath;
-		QString originalName;
-		int prevEvent;
+		int inotify_fd;
+		bool mStopWatch;
+		bool mWatching;
 
-		bool __stopWatch;
+		uint32_t cookie;
+		uint32_t mask;
+
+		QString oldName;
 
 	Q_SIGNALS :
 		void nodeCreated( QString );
@@ -59,5 +66,3 @@ class NBFileSystemWatcher : public QThread {
 
 		void watchFailed();
 };
-
-#endif

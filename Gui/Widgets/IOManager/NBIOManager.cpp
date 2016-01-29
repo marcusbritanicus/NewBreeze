@@ -203,7 +203,7 @@ void NBIOWidget::paintEvent( QPaintEvent *pEvent ) {
 	pEvent->accept();
 };
 
-NBIOManager::NBIOManager( QList<NBFileIO*> jobList, QWidget *parent ) : NBDialog( "nxc", parent ) {
+NBIOManager::NBIOManager( QList<NBFileIO*> jobList, QWidget *parent ) : NBDialog( parent ) {
 
 	killIOOnClose = false;
 
