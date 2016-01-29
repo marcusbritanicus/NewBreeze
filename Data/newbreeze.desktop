@@ -8,4 +8,4 @@ Type=Application
 Categories=FileManager;Utility;Core;Qt;System;FileTools
 StartupNotify=true
 Terminal=false
-MimeType=inode/directory;
+MimeType=inode/directory;application/x-encrypted-folder;

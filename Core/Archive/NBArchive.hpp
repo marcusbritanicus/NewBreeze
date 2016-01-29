@@ -12,8 +12,6 @@
 #include <NBLibBZip2.hpp>
 #include <NBLibGZip.hpp>
 #include <NBLibLzma.hpp>
-#include <NBZipFile.hpp>
-#include <NBTarFile.hpp>
 
 class NBArchive {
 
@@ -34,8 +32,6 @@ class NBArchive {
 		int setFilterFormat( struct archive *ar, QMimeType mType );
 
 		QString archiveName;
-		LibArchive::Mode archiveMode;
-		LibArchive::Type archiveType;
 
 		QStringList inputList;
 		QString dest;

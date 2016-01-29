@@ -953,108 +953,35 @@ void NBFolderView::handleWatchDogBark( QString path ) {
 
 void NBFolderView::extract( QString archive ) {
 
-	NBArchive::Type type;
-	if ( archive.endsWith( ".zip" ) )
-		type = NBArchive::ZIP;
-
-	else if ( archive.endsWith( ".tar" ) )
-		type = NBArchive::TAR;
-
-	else if ( archive.endsWith( ".tar.bz2" ) )
-		type = NBArchive::TAR;
-
-	else if ( archive.endsWith( ".tar.gz" ) )
-		type = NBArchive::TAR;
-
-	else if ( archive.endsWith( ".tar.xz" ) )
-		type = NBArchive::TAR;
-
-	else if ( archive.endsWith( ".tbz2" ) )
-		type = NBArchive::TAR;
-
-	else if ( archive.endsWith( ".tgz" ) )
-		type = NBArchive::TAR;
-
-	else if ( archive.endsWith( ".txz" ) )
-		type = NBArchive::TAR;
-
-	else if ( archive.endsWith( ".bz2" ) )
-		type = NBArchive::BZ2;
-
-	else if ( archive.endsWith( ".gz" ) )
-		type = NBArchive::GZ;
-
-	else if ( archive.endsWith( ".xz" ) )
-		type = NBArchive::XZ;
-
-	else {
-		NBMessageDialog::information(
-			this,
-			"NewBreeze | Invalid Archive Format",
-			"I am extremely sorry, but I still do not know how to handle this archive format. Sorry for the inconvenience."
-		);
-		return;
-	}
-
 	QString dest = fsModel->nodePath( QFileInfo( archive ).baseName() );
 	// Create the dest folder if it does nor exist
 	if ( not exists( dest ) )
 		QDir::current().mkdir( dest );
 
-	NBArchive arc( archive, NBArchive::READ, type );
+	NBArchive arc( archive );
 	arc.setDestination( dest );
 	arc.extract();
 };
 
 void NBFolderView::compress( QStringList archiveList ) {
 
-	/*
-		*
-		* Use custom getSaveFileName from NBNewNodeDialog.hpp to get the archive name
-		*
-	*/
-
 	QString archiveName = NBFileDialog::getSaveFileName(
 			QString( ":/icons/newbreeze2.png" ),
 			tr( "NewBreeze - Save Archive As" ),
 			fsModel->currentDir(),
 			QStringList(
-				QStringList() << "XZ Compressed Tar (*.txz)"
-								<< "BZ2 Compressed Tar (*.tbz2)"
-								<< "GZ Compressed Tar (*.tgz)"
+				QStringList() << "XZ Compressed Tar (*.txz *.tar.xz)"
+								<< "BZ2 Compressed Tar (*.tbz2 *.tar.bz2)"
+								<< "GZ Compressed Tar (*.tgz *.tar.bz2)"
 								<< "XZ File (*.xz)"
 								<< "GZip File (*.gz)"
 								<< "BZip2 File (*.bz2)"
 								<< "Zip File (*.zip)" ),
-			QString( "BZ2 Compressed Tar (*.tbz2)" )
+			QString( "BZ2 Compressed Tar (*.tbz2 *.tar.bz2)" )
 	);
 
 	if ( not archiveName.isEmpty() ) {
-		NBArchive *arc;
-		if ( archiveName.endsWith( ".txz" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TAR );
-
-		else if ( archiveName.endsWith( ".tbz2" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TAR );
-
-		else if ( archiveName.endsWith( ".tgz" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TAR );
-
-		else if ( archiveName.endsWith( ".xz" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::XZ );
-
-		else if ( archiveName.endsWith( ".bz2" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::BZ2 );
-
-		else if ( archiveName.endsWith( ".gz" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::GZ );
-
-		else if ( archiveName.endsWith( ".zip" ) )
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::ZIP );
-
-		else
-			arc = new NBArchive( archiveName, NBArchive::WRITE, NBArchive::TAR );
-
+		NBArchive *arc = new NBArchive( archiveName );
 		arc->updateInputFiles( archiveList );
 		arc->setWorkingDir( fsModel->currentDir() );
 		arc->create();

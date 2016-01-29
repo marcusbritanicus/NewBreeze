@@ -78,7 +78,7 @@ void NBPluginManager::reloadPlugins() {
 		mimePluginMap[ mType.name() ] = QStringList();
 
 	/* For now we will be handling just the plugins based on the PreviewInterface */
-	QDir pPath( NBXdg::home() + "/.config/NewBreeze/plugins5/" );
+	QDir pPath( NBXdg::home() + "/.config/NewBreeze/plugins/" );
 	NBPreviewInterface *plugin = 0;
 	QObject *pObj = 0;
 	Q_FOREACH( QString pluginSo, pPath.entryList( QStringList() << "*.so", QDir::Files, QDir::Name | QDir::IgnoreCase ) ) {

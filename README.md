@@ -1,7 +1,9 @@
 # NewBreeze
-## A fast and light-weight file manager based on Qt4
+## A fast and light-weight file manager based on Qt
 
-###Note: NewBreeze 3.0 is in the oven. Expect several changes..!!
+### Qt5 builds are now supported
+
+### Note: NewBreeze 3.0 is in the oven. Expect several changes..!!
 
 Built on top of the Powerful Qt4 GUI Toolkit, this file manager is sleek, stylish and fast.
 Some of its features are
@@ -44,9 +46,8 @@ Some of its features are
 * libmagic and libmagic-dev
 * zlib
 * liblzma
-* libtar
-* libzip
 * libbzip2
+* libarchive
 
 ### Known Bugs
 * Some issues with cut-copy-paste files and folders

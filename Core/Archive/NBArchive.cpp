@@ -6,11 +6,9 @@
 
 #include <NBArchive.hpp>
 
-NBArchive::NBArchive( QString archive, NBArchive::Mode mode, NBArchive::Type type ) {
+NBArchive::NBArchive( QString archive ) {
 
 	archiveName = QString( archive );
-	archiveMode = mode;
-	archiveType = type;
 };
 
 void NBArchive::updateInputFiles( QStringList inFiles ) {
@@ -130,7 +128,7 @@ void NBArchive::create() {
 	}
 };
 
-void NBArchive::extract() {
+int NBArchive::extract() {
 
 	QMimeType mime = mimeDb.mimeTypeForFile( archiveName );
 
@@ -142,7 +140,7 @@ void NBArchive::extract() {
 	}
 
 	else if ( mime == mimeDb.mimeTypeForFile( "file.bz2" ) ) {
-		Q_FOREACH( QString dest, destList ) {
+		Q_FOREACH( QString dest, inputList ) {
 			NBBZip2 *archive = new NBBZip2( archiveName, NBBZip2::READ, dest );
 			archive->extract();
 		}
@@ -153,7 +151,7 @@ void NBArchive::extract() {
 	}
 
 	else if ( mime == mimeDb.mimeTypeForFile( "file.xz" ) ) {
-		Q_FOREACH( QString dest, destList ) {
+		Q_FOREACH( QString dest, inputList ) {
 			NBLzma *archive = new NBLzma( archiveName, NBLzma::READ, dest  );
 			archive->extract();
 		}
@@ -245,6 +243,8 @@ void NBArchive::extract() {
 
 		return 0;
 	}
+
+	return 0;
 };
 
 int NBArchive::copyData( struct archive *ar, struct archive *aw ) {
