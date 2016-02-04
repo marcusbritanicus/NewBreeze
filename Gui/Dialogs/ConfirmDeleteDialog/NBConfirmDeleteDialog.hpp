@@ -11,7 +11,7 @@
 #include <NBGuiWidgets.hpp>
 #include <NBTools.hpp>
 #include <NBIconProvider.hpp>
-#include <NBSegmentControl.hpp>
+#include <NBButtons.hpp>
 
 class NBConfirmDeleteDialog : public NBDialog {
 	Q_OBJECT
@@ -21,7 +21,7 @@ class NBConfirmDeleteDialog : public NBDialog {
 
 	private:
 		QLabel *iconLbl, *textLbl;
-		NBSegmentControl *segBtns;
+		NBSegmentButton *segBtns;
 		QTableWidget *table;
 		QStringList deletePaths;
 
@@ -55,7 +55,7 @@ class NBDeleteErrorsDialog : public NBDialog {
 
 	private:
 		QLabel *iconLbl, *textLbl;
-		NBSegmentControl *segBtns;
+		NBSegmentButton *segBtns;
 		QTableWidget *table;
 		QStringList fileList, dirList;
 

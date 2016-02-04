@@ -34,12 +34,12 @@ QHBoxLayout* NBSettingsManager::createBodyLayout() {
 
 	NBSGeneralWidget *generalWidget = new NBSGeneralWidget( this );
 	iconWidget = new NBIconThemeWidget();
-	viewWidget = new NBViewsWidget();
+	styleWidget = new NBSStyleWidget( this );
 	keysWidget = new NBKeyBindingsWidget();
 
 	widgetLyt->addWidget( generalWidget );
 	widgetLyt->addWidget( iconWidget );
-	widgetLyt->addWidget( viewWidget );
+	widgetLyt->addWidget( styleWidget );
 	widgetLyt->addWidget( new QWidget( this ) );
 	widgetLyt->addWidget( keysWidget );
 
@@ -93,29 +93,4 @@ void NBSettingsManager::setWindowProperties() {
 	int hpos = ( int )( ( dw.width() - 810 ) / 2 );
 	int vpos = ( int )( ( dw.height() - 480 ) / 2 );
 	move( hpos, vpos );
-};
-
-NBViewsWidget::NBViewsWidget() {
-
-	createGUI();
-};
-
-void NBViewsWidget::createGUI() {
-
-	QVBoxLayout *themeLyt = new QVBoxLayout();
-	QVBoxLayout *baseLyt = new QVBoxLayout();
-
-	defaultThemeRB = new QRadioButton( "&Default" );
-
-	defaultThemeRB->setChecked( true );
-
-	QGroupBox *themeGB = new QGroupBox( "Theming", this );
-
-	themeLyt->addWidget( defaultThemeRB );
-	themeLyt->addStretch( 0 );
-
-	themeGB->setLayout( themeLyt );
-	baseLyt->addWidget( themeGB );
-
-	setLayout( baseLyt );
 };

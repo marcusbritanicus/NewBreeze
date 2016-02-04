@@ -287,7 +287,7 @@ QString NBIconProvider::getCustomIcon( QString mime ) {
 bool NBIconProvider::saveThumb( QString path, QString hashPath ) {
 
 	// Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/
-	QImage thumb = QImage( path ).scaled( 512, 512 ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+	QImage thumb = QImage( path ).scaled( 512, 512, Qt::KeepAspectRatio ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 
 	if ( thumb.save( hashPath, "PNG", 0 ) ) {
 		thumbsInfo.setValue( path, QFileInfo( path ).lastModified() );

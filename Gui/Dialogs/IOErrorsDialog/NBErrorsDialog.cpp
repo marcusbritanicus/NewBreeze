@@ -43,7 +43,7 @@ void NBErrorsDialog::setupGUI() {
 	okayBtn->installEventFilter( this );
 	connect( okayBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
 
-	segBtns = new NBButtons( this );
+	segBtns = new NBSegmentButton( this );
 	segBtns->addSegment( okayBtn );
 	segBtns->setSegmentWidth( 100 );
 

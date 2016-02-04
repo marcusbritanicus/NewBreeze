@@ -1,14 +1,15 @@
 /*
 	*
-	* NBButtons.cpp - The Segmented Buttons Class
+	* NBSegmentButton.cpp - The Segmented Buttons Class
 	*
 */
 
 #include <NBButtons.hpp>
 
-NBButtons::NBButtons( QWidget *parent ) : QWidget( parent ) {
+NBSegmentButton::NBSegmentButton( QWidget *parent ) : QWidget( parent ) {
 
-	myButtonHeight = 24;
+	myButtonHeight = 28;
+	myWidgetWidth = 28;
 	setContentsMargins( QMargins() );
 
 	btnsLyt = new QHBoxLayout();
@@ -31,7 +32,7 @@ NBButtons::NBButtons( QWidget *parent ) : QWidget( parent ) {
 	setStyleSheet( "QWidget#btnsBase { border: 1px solid gray; border-radius: 4px; }" );
 };
 
-NBButtons::NBButtons( QList<QIcon> icons, QWidget *parent ) : QWidget( parent ) {
+NBSegmentButton::NBSegmentButton( QList<QIcon> icons, QWidget *parent ) : QWidget( parent ) {
 
 	setContentsMargins( QMargins() );
 
@@ -66,9 +67,12 @@ NBButtons::NBButtons( QList<QIcon> icons, QWidget *parent ) : QWidget( parent ) 
 
 	/* Internal styling hack: until we learn to draw smooth rounded rects */
 	setStyleSheet( "QWidget#btnsBase { border: 1px solid gray; border-radius: 4px; }" );
+
+	/* AutoResize */
+	autoResize();
 };
 
-NBButtons::NBButtons( QStringList labels, QWidget *parent ) : QWidget( parent ) {
+NBSegmentButton::NBSegmentButton( QStringList labels, QWidget *parent ) : QWidget( parent ) {
 
 	setContentsMargins( QMargins() );
 
@@ -102,9 +106,12 @@ NBButtons::NBButtons( QStringList labels, QWidget *parent ) : QWidget( parent ) 
 
 	/* Internal styling hack: until we learn to draw smooth rounded rects */
 	setStyleSheet( "QWidget#btnsBase { border: 1px solid gray; border-radius: 4px; }" );
+
+	/* AutoResize */
+	autoResize();
 };
 
-NBButtons::NBButtons( QStringList labels, QList<QIcon> icons, QWidget *parent ) : QWidget( parent ) {
+NBSegmentButton::NBSegmentButton( QStringList labels, QList<QIcon> icons, QWidget *parent ) : QWidget( parent ) {
 
 	setContentsMargins( QMargins() );
 
@@ -138,48 +145,85 @@ NBButtons::NBButtons( QStringList labels, QList<QIcon> icons, QWidget *parent ) 
 
 	/* Internal styling hack: until we learn to draw smooth rounded rects */
 	setStyleSheet( "QWidget#btnsBase { border: 1px solid gray; border-radius: 4px; }" );
+
+	/* AutoResize */
+	autoResize();
 };
 
-NBButton* NBButtons::segment( int sgmnt ) {
+int NBSegmentButton::count() {
+
+	return segments.count();
+};
+
+void NBSegmentButton::setCount( int count ) {
+
+	if ( segments.count() > count ) {
+		qWarning() << "You are attempting to remove some buttons, which is not possible";
+		return;
+	}
+
+	else if ( segments.count() == count ) {
+		qWarning() << "There are already" << count << "segments in this SegmentButton. What are you trying to do?";
+		return;
+	}
+
+	else {
+		for( int i = segments.count(); i < count; i++ )
+			addSegment( new NBButton( this ) );
+
+		resetStyleSheets();
+	}
+
+	/* AutoResize */
+	autoResize();
+};
+
+NBButton* NBSegmentButton::segment( int sgmnt ) {
 
 	return segments.at( sgmnt );
 };
 
-void NBButtons::setSegmentIcon( int segment, QIcon segIcon ) {
+void NBSegmentButton::setSegmentIcon( int segment, QIcon segIcon ) {
 
 	segments.at( segment )->setIcon( segIcon );
+
+	/* AutoResize */
+	autoResize();
 };
 
-void NBButtons::setSegmentText( int segment, QString segText ) {
+void NBSegmentButton::setSegmentText( int segment, QString segText ) {
 
 	segments.at( segment )->setText( segText );
+
+	/* AutoResize */
+	autoResize();
 };
 
-void NBButtons::setSegmentWidth( int width ) {
+void NBSegmentButton::setSegmentWidth( int width ) {
 
 	Q_FOREACH( NBButton *pBtn, segments )
 		pBtn->resize( width, 0 );
 
-	/* Sum of the width of all the segments + sum of the width of the separators; */
-	resize( segments.count() * width + ( segments.count() - 1 ) * 2, myButtonHeight );
+	/* AutoResize */
+	autoResize();
 };
 
-void NBButtons::setSegmentShortcut( int segment, QKeySequence shortcut ) {
+void NBSegmentButton::setSegmentShortcut( int segment, QKeySequence shortcut ) {
 
 	segments.at( segment )->setShortcut( shortcut );
 };
 
-void NBButtons::setSegmentDisabled( int segment ) {
+void NBSegmentButton::setSegmentDisabled( int segment ) {
 
 	segments.at( segment )->setDisabled( true );
 };
 
-void NBButtons::setSegmentEnabled( int segment ) {
+void NBSegmentButton::setSegmentEnabled( int segment ) {
 
 	segments.at( segment )->setEnabled( true );
 };
 
-void NBButtons::insertSegment( NBButton *button, int logicalPos ) {
+void NBSegmentButton::insertSegment( NBButton *button, int logicalPos ) {
 
 	button->setParent( this );
 	connect( button, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
@@ -195,9 +239,14 @@ void NBButtons::insertSegment( NBButton *button, int logicalPos ) {
 		btnsLyt->insertWidget( logicalPos * 2, button );
 		btnsLyt->insertWidget( logicalPos * 2 + 1, Separator::vertical() );
 	}
+
+	resetStyleSheets();
+
+	/* AutoResize */
+	autoResize();
 };
 
-void NBButtons::addSegment( NBButton *button ) {
+void NBSegmentButton::addSegment( NBButton *button ) {
 
 	button->setParent( this );
 
@@ -208,10 +257,57 @@ void NBButtons::addSegment( NBButton *button ) {
 
 	btnsLyt->addWidget( button );
 	segments << button;
+
+	resetStyleSheets();
+
+	/* AutoResize */
+	autoResize();
 };
 
-void NBButtons::handleSegmentClick() {
+QSize NBSegmentButton::size() {
+
+	return QSize( myWidgetWidth, myButtonHeight );
+};
+
+QSize NBSegmentButton::sizeHint() {
+
+	return QSize( myWidgetWidth, myButtonHeight );
+};
+
+void NBSegmentButton::resetStyleSheets() {
+
+	if ( segments.count() == 1 ) {
+		segments.at( 0 )->setSegment( NBButton::SingleButton );
+		return;
+	}
+
+	for( int i = 0; i < segments.count(); i++ ) {
+		if ( i == 0 )
+			segments.at( i )->setSegment( NBButton::FirstSegment );
+
+		else if ( i == segments.count() - 1 )
+			segments.at( i )->setSegment( NBButton::LastSegment );
+
+		else
+			segments.at( i )->setSegment( NBButton::MiddleSegment );
+	}
+};
+
+void NBSegmentButton::autoResize() {
+
+	myWidgetWidth = 0;
+	/* Sum of the width of all the segments + sum of the width of the separators; */
+	Q_FOREACH( NBButton *btn, segments )
+		myWidgetWidth += btn->width();
+
+	myWidgetWidth += ( segments.count() - 1 ) * 2;
+	resize( myWidgetWidth, myButtonHeight );
+
+	setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ) );
+};
+
+void NBSegmentButton::handleSegmentClick() {
 
 	NBButton *btn = qobject_cast<NBButton*>( sender() );
-	emit segmentClicked( segments.indexOf( btn ) );
+	emit clicked( segments.indexOf( btn ) );
 };

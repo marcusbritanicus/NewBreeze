@@ -1,26 +1,29 @@
 /*
 	*
-	* NBButtons.hpp - The Segmented Buttons Class Header
+	* NBSegmentButton.hpp - The Segmented Buttons Class Header
 	*
 */
 
 #pragma once
-#ifndef NBBUTTONS_HPP
-#define NBBUTTONS_HPP
 
 #include <Global.hpp>
 #include <NBTools.hpp>
 #include <NBButton.hpp>
 #include <NBGuiWidgets.hpp>
 
-class NBButtons : public QWidget {
+class NBSegmentButton : public QWidget {
 	Q_OBJECT
 
+	enum SelectionBehavior { SelectOne, SelectAll, SelectNone };
+
 	public:
-		NBButtons( QWidget* );
-		NBButtons( QList<QIcon>, QWidget* );
-		NBButtons( QStringList, QWidget* );
-		NBButtons( QStringList, QList<QIcon>, QWidget* );
+		NBSegmentButton( QWidget* );
+		NBSegmentButton( QList<QIcon>, QWidget* );
+		NBSegmentButton( QStringList, QWidget* );
+		NBSegmentButton( QStringList, QList<QIcon>, QWidget* );
+
+		int count();
+		void setCount( int );
 
 		QList<NBButton*> buttons();
 
@@ -39,17 +42,26 @@ class NBButtons : public QWidget {
 		void insertSegment( NBButton *button, int logicalPos );
 		void addSegment( NBButton *button );
 
+		void setSelectionBehavior(SelectionBehavior behavior);
+		SelectionBehavior selectionBehavior() const;
+
+		QSize size();
+		QSize sizeHint();
+
 	private:
+		void resetStyleSheets();
+		void autoResize();
+
 		QHBoxLayout *btnsLyt;
 		QList<NBButton*> segments;
 
 		int myButtonHeight;
+		int myWidgetWidth;
+		int mSelectionBehavior;
 
 	private slots:
 		void handleSegmentClick();
 
 	Q_SIGNALS:
-		void segmentClicked( int );
+		void clicked( int );
 };
-
-#endif

@@ -9,10 +9,19 @@
 #include <Global.hpp>
 #include <NBGuiWidgets.hpp>
 
-class NBButton : public QAbstractButton {
+class NBButton : public QPushButton {
 	Q_OBJECT
 
+	Q_ENUMS(Segment)
+
 	public:
+		enum Segment {
+			FirstSegment,
+			MiddleSegment,
+			LastSegment,
+			SingleButton
+		};
+
 		/* A button */
 		NBButton( QWidget *parent = NULL );
 
@@ -25,45 +34,41 @@ class NBButton : public QAbstractButton {
 		/* PushButton */
 		NBButton( QIcon, QString, QWidget *parent = NULL  );
 
-		/* Get/Set text */
-		QString text();
-		void setText( QString );
-
 		/* Get/Set icon */
 		QIcon icon();
 		void setIcon( QIcon );
+
+		/* Get/Set text */
+		QString text();
+		void setText( QString );
 
 		/* Get/Set icon size */
 		QSize iconSize();
 		void setIconSize( QSize );
 
-		/* Get/Set a menu */
-		QMenu *menu();
-		void setMenu( QMenu* );
-
-		/* Shortcut handling */
-		QKeySequence shortcut();
-		void setShortcut( QKeySequence );
-
 		/* Button Size */
 		QSize size();
-		void resize( QSize );
-		void resize( int, int );
 
 		/* Size hint */
 		QSize sizeHint() const;
 
-	public slots:
-		void showMenu();
+		/* ObjectName */
+		void setObjectName( QString );
+
+		/* Segment in a SegmentButton */
+		int segment();
+		void setSegment( NBButton::Segment );
+
+		/* Highly customized stylesheet */
+		void setButtonStyle();
 
 	private:
 		void initPrivateVariables();
 
-		void paintToolButton( QPainter* );
-		void paintPushButton( QPainter* );
-
-		/* Icon/Text */
+		/* Icon */
 		QIcon mIcon;
+
+		/* Text */
 		QString mText;
 
 		/* Icon Size */
@@ -72,41 +77,10 @@ class NBButton : public QAbstractButton {
 		/* Button Size */
 		int mHeight, mWidth;
 
-		/* Button type: 0 tool, 1 push */
-		int m_ButtonType;
+		/* Button Segment */
+		NBButton::Segment mSegment;
 
-		/* Menu */
-		QMenu *mMenu;
-		bool m_HasMenu;
-
-		/* Shortcut */
-		QKeySequence mShortcut;
-		int mShortcutId;
-
-		/* Menu button was pressed */
-		bool m_MenuButtonPressed;
-
-		/* This button was pressed and held */
-		bool m_Pressed;
-
-		/* Animtaion timer */
-		QBasicTimer animateTimer;
-
-	private slots:
-		void animateClick();
-
-	protected:
-		bool event( QEvent* );
-		void timerEvent( QTimerEvent* );
-
-		void mousePressEvent( QMouseEvent* );
-		void mouseReleaseEvent( QMouseEvent* );
-
-		void paintEvent( QPaintEvent* );
-
-	Q_SIGNALS:
-		void pressed();
-		void released();
-
-		void clicked();
+		/* Button StyleSheet info */
+		QColor mButtonColor;
+		QStringList radius;
 };

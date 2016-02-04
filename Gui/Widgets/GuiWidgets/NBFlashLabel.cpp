@@ -402,8 +402,7 @@ void NBTrashLabel::handleDeleteFailure( QStringList files, QStringList dirs ) {
 		"NewBreeze - Error while deleting",
 		"Some errors were encountered while deleting the files and folders you requested. "			\
 		"As a result, some of the files and folders may not have been deleted. For the "			\
-		"list for files and folder not deleted click <u>M</u>ore",
-		QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok, table
+		"list for files and folder not deleted click <u>M</u>ore"
 	);
 };
 

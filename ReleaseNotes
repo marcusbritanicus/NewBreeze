@@ -30,12 +30,14 @@ few changes in NewBreeze 3.
    - A redesigned sidepanel with elegant menu showing devices and bookmarks as a menu.
    - Devices show the space usage.
 
-=> NBSegmentControl
-   - NBButtons is replaced by NBSegmentControl a more elegantly designed UI for multisegment buttons.
+=> NBButton
+   - NBButton has been rewritten to be a subclass of QPushButton, with better styling.
+   - Issues with NBSegmentControl has caused me to go back to NBButtons, which "look" better.
 
 => NBPreviewInterface
    - All plugins are updated to use the standard NBPreviewInteface.
    - NBInterface can be used easily to extend Preview support for NewBreeze.
+   - Defaults Plugins will now be shipped with NewBreeze rather than as a separate repo.
 
 => NBArchive extended
    - NBArchive is now rebuilt using libarchive for archive processing

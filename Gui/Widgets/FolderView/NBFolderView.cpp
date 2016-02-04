@@ -341,7 +341,7 @@ void NBFolderView::doOpen( QString loc ) {
 		if ( fsModel->rootPath().isEmpty() )
 			text += tr( "<br>Instead, I will be opening your <b>home</b> folder for you.</p>" );
 
-		NBMessageDialog::error( this, title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+		NBMessageDialog::error( this, title, text );
 
 		fsModel->setRootPath( NBXdg::home() );
 
@@ -401,7 +401,7 @@ void NBFolderView::doOpen( QString loc ) {
 		QString title = QString( "Error opening file" );
 		QString text = QString( "I really do not have any idea how to open <tt><b>%1</b></tt>" ).arg( loc );
 
-		NBMessageDialog::error( this, title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+		NBMessageDialog::error( this, title, text );
 		return;
 	}
 
@@ -426,7 +426,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			else
 				text += tr( "Please change the permissions of the file to edit/view it." );
 
-			NBMessageDialog::error( this, title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+			NBMessageDialog::error( this, title, text );
 			return;
 		}
 
@@ -486,7 +486,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			QString title = QString( "Error" );
 			QString text = QString( "I really do not have any idea how to open <b>%1</b>." ).arg( index.data().toString() );
 
-			NBMessageDialog::error( this, title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+			NBMessageDialog::error( this, title, text );
 			return;
 		}
 	}
@@ -763,11 +763,11 @@ void NBFolderView::doSendToTrash() {
 
 	Q_FOREACH( QString path, toBeDeleted ) {
 		if ( safeNodes.contains( path ) ) {
-			NBMessageDialog::error( NULL, "Unable to delete files",
+			NBMessageDialog::error( NULL,
+				"Unable to delete files",
 				"You have enabled <b><tt>Accidental Delete Protection</tt></b> for some of the files or folders. "
 				"As a result I cannot send all the selected files to trash. Kindly, remove the protection, "
-				"or, deslect the protected files and retry.",
-				QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok
+				"or, deslect the protected files and retry."
 			);
 			return;
 		}
@@ -802,11 +802,11 @@ void NBFolderView::doDelete() {
 
 	Q_FOREACH( QString path, toBeDeleted ) {
 		if ( safeNodes.contains( path ) ) {
-			NBMessageDialog::error( this, "Unable to delete files",
+			NBMessageDialog::error( this,
+				"Unable to delete files",
 				"You have enabled <b><tt>Accidental Delete Protection</tt></b> for some of the files and folders. "
 				"As a result I cannot delete all the selected files. Kindly, remove the protection, "
-				"or, deslect the protected files and retry.",
-				QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok
+				"or, deslect the protected files and retry."
 			);
 			return;
 		}
@@ -942,7 +942,7 @@ void NBFolderView::handleWatchDogBark( QString path ) {
 		QString title = QString( "Error" );
 		QString text = QString( "This directory has been deleted by an external process. Loading home dir." );
 
-		NBMessageDialog::error( this, title, text, QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok );
+		NBMessageDialog::error( this, title, text );
 		fsModel->goHome();
 	}
 

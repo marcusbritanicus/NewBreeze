@@ -283,11 +283,7 @@ void NBIOManager::closeEvent( QCloseEvent *cEvent ) {
 		}
 
 		/* This means we have running IO processes. Ask the user if we want to stop the IO */
-		int reply = NBMessageDialog::question( this,
-			tr( "Cancel all pending IO?" ),
-			question,
-			QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Yes << NBMessageDialog::No
-		);
+		int reply = NBMessageDialog::question( this, tr( "Cancel all pending IO?" ), question );
 
 		/* If yes, stop them and get out */
 		if ( reply == NBMessageDialog::Yes ) {
@@ -303,6 +299,7 @@ void NBIOManager::closeEvent( QCloseEvent *cEvent ) {
 		}
 	}
 
+	emit closed();
 	cEvent->accept();
 };
 

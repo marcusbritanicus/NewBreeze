@@ -50,11 +50,11 @@ void NBRunCmdDialog::createGUI() {
 	cancelBtn = new NBButton( QIcon( ":/icons/cancel.png" ), tr( "&Cancel" ), this );
 	cancelBtn->setObjectName( "cancelBtn" );
 
-	NBButtons *segBtn = new NBButtons( this );
+	NBSegmentButton *segBtn = new NBSegmentButton( this );
 	segBtn->addSegment( defaultAndRunBtn );
 	segBtn->setSegmentWidth( 180 );
 
-	NBButtons *segBtns = new NBButtons( this );
+	NBSegmentButton *segBtns = new NBSegmentButton( this );
 	segBtns->addSegment( okBtn );
 	segBtns->addSegment( cancelBtn );
 	segBtns->setSegmentWidth( 90 );

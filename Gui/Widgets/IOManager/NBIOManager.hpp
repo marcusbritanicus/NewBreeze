@@ -70,6 +70,9 @@ class NBIOManager : public NBDialog {
 
 	protected:
 		void closeEvent( QCloseEvent* );
+
+	Q_SIGNALS:
+		void closed();
 };
 
 class NBIOManagerMini : public QToolButton {

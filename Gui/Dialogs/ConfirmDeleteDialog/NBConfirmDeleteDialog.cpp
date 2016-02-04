@@ -52,14 +52,17 @@ void NBConfirmDeleteDialog::setupGUI( bool permanent ) {
 	msgLyt->addWidget( iconLbl );
 	msgLyt->addWidget( textLbl );
 
-	segBtns = new NBSegmentControl( this );
+	segBtns = new NBSegmentButton( this );
 	segBtns->setCount( 2 );
 
-	segBtns->setSegmentIcon( 0, QIcon( ":/icons/deletek.png" ) );
+	segBtns->setSegmentIcon( 0, QIcon( ":/icons/delete.png" ) );
 	segBtns->setSegmentText( 0, tr( "&Delete" ) );
+	segBtns->segment( 0 )->setObjectName( "abortBtn" );
 
 	segBtns->setSegmentIcon( 1, QIcon( ":/icons/cancel.png" ) );
 	segBtns->setSegmentText( 1, tr( "&Cancel" ) );
+	segBtns->segment( 1 )->setObjectName( "cancelBtn" );
+	segBtns->segment( 1 )->setFocus();
 
 	connect( segBtns, SIGNAL( clicked( int ) ), this, SLOT( handleSegmentClick( int ) ) );
 
@@ -209,12 +212,12 @@ void NBDeleteErrorsDialog::setupGUI() {
 	msgLyt->addWidget( iconLbl );
 	msgLyt->addWidget( textLbl );
 
-	segBtns = new NBSegmentControl( this );
+	segBtns = new NBSegmentButton( this );
 	segBtns->setCount( 1 );
 
 	segBtns->setSegmentIcon( 0, QIcon( ":/icons/ok.png" ) );
 	segBtns->setSegmentText( 0, tr( "&Okay" ) );
-	segBtns->setSegmentEnabled( 0, false );
+	segBtns->setSegmentDisabled( 0 );
 
 	btnLyt->addStretch( 0 );
 	btnLyt->addWidget( segBtns );

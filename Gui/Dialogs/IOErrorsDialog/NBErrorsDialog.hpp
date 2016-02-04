@@ -21,7 +21,7 @@ class NBErrorsDialog : public NBDialog {
 
 	private:
 		QLabel *iconLbl, *textLbl;
-		NBButtons *segBtns;
+		NBSegmentButton *segBtns;
 		NBButton *okayBtn;
 		QTableWidget *table;
 		QStringList fileList, dirList;

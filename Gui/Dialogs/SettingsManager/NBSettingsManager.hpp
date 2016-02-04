@@ -11,24 +11,9 @@
 #include <NBGuiWidgets.hpp>
 #include <NBSGeneralWidget.hpp>
 #include <NBSIconsWidget.hpp>
-#include <NBSettingsWidgets.hpp>
 #include <NBSKeyBindingsWidget.hpp>
+#include <NBSStyleWidget.hpp>
 #include <NBSSideBar.hpp>
-
-class NBViewsWidget : public QWidget {
-	Q_OBJECT
-
-	public:
-		NBViewsWidget();
-
-	private:
-		void createGUI();
-
-		QRadioButton *defaultThemeRB;
-
-	private slots:
-		// void handleThemeChanged();
-};
 
 class NBSettingsManager : public NBDialog {
 	Q_OBJECT
@@ -47,7 +32,7 @@ class NBSettingsManager : public NBDialog {
 
 		QStackedLayout *widgetLyt;
 		NBSSideBar *chooserWidget;
-		NBViewsWidget *viewWidget;
+		NBSStyleWidget *styleWidget;
 		NBIconThemeWidget *iconWidget;
 		NBKeyBindingsWidget *keysWidget;
 

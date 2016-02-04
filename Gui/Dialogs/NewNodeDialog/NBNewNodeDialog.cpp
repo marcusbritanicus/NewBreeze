@@ -36,7 +36,7 @@ NBNewNodeDialog::NBNewNodeDialog( QString type, QDir curDir, QString text, QWidg
 	cancelBtn = new NBButton( QIcon( ":/icons/cancel.png" ), "&Cancel", this );
 	cancelBtn->setObjectName( tr( "cancelBtn" ) );
 
-	NBButtons *segBtns = new NBButtons( this );
+	NBSegmentButton *segBtns = new NBSegmentButton( this );
 	segBtns->addSegment( okBtn );
 	segBtns->addSegment( cancelBtn );
 	segBtns->setSegmentWidth( 90 );

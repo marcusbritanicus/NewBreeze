@@ -185,21 +185,23 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	fLyt->setContentsMargins( QMargins() );
 
 	// Previous button
-	backBtn = new NBButton( QIcon::fromTheme( "go-previous" ) );
+	backBtn = new NBButton( QIcon::fromTheme( "go-previous" ), this );
 	backBtn->setFocusPolicy( Qt::NoFocus );
+	backBtn->setFlat( true );
 
 	// Next Button
-	forwardBtn = new NBButton( QIcon::fromTheme( "go-next" ) );
+	forwardBtn = new NBButton( QIcon::fromTheme( "go-next" ), this );
 	forwardBtn->setFocusPolicy( Qt::NoFocus );
+	forwardBtn->setFlat( true );
 
 	// AddressWidget
 	addressWidget = new NBAddressWidget( this );
 
 	// View Modes
-	viewModes = new NBSegmentControl( this );
+	viewModes = new NBSegmentButton( this );
 	viewModes->setFocusPolicy( Qt::NoFocus );
 	viewModes->setCount( 3 );
-	viewModes->setSelectionBehavior( NBSegmentControl::SelectOne );
+	// viewModes->setSelectionBehavior( NBSegmentControl::SelectOne );
 
 	// Tiles
 	viewModes->setSegmentIcon( 0, QIcon::fromTheme( "view-list-details" ) );
@@ -243,7 +245,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	connect( forwardBtn, SIGNAL( clicked() ), this, SIGNAL( goForward() ) );
 	connect( addressWidget, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
 	connect( filterBtn, SIGNAL( clicked() ), this, SIGNAL( openSearch() ) );
-	connect( viewModes, SIGNAL( segmentSelected( int ) ), this, SIGNAL( changeViewMode( int ) ) );
+	connect( viewModes, SIGNAL( clicked( int ) ), this, SIGNAL( changeViewMode( int ) ) );
 };
 
 NBIOManagerMini *NBAddressBar::procWidget() {

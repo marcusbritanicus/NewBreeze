@@ -37,15 +37,17 @@ void NBRenameDialog::createGUI() {
 	replaceCB->setText( "Replace E&xisting" );
 	replaceCB->setChecked( false );
 
-	segBtns = new NBSegmentControl( this );
+	segBtns = new NBSegmentButton( this );
 	segBtns->setCount( 2 );
 
 	segBtns->setSegmentIcon( 0, QIcon( ":/icons/ok.png" ) );
 	segBtns->setSegmentText( 0, tr( "&Rename" ) );
-	segBtns->setSegmentEnabled( 0, false );
+	segBtns->segment( 0 )->setObjectName( "okBtn" );
+	segBtns->setSegmentDisabled( 0 );
 
 	segBtns->setSegmentIcon( 1, QIcon( ":/icons/cancel.png" ) );
 	segBtns->setSegmentText( 1, tr( "&Cancel" ) );
+	segBtns->segment( 1 )->setObjectName( "cancelBtn" );
 
 	connect( segBtns, SIGNAL( clicked( int ) ), this, SLOT( handleSegmentClick( int ) ) );
 
@@ -78,27 +80,27 @@ bool NBRenameDialog::canRename() {
 void NBRenameDialog::handleTextChanged( QString newText ) {
 
 	if ( newText.isEmpty() ) {
-		segBtns->setSegmentEnabled( 0, false );
+		segBtns->setSegmentDisabled( 0 );
 		return;
 	}
 
 	if ( newText == name )
-		segBtns->setSegmentEnabled( 0, false );
+		segBtns->setSegmentDisabled( 0 );
 
 	else if ( replaceCB->isChecked() ) {
 		if ( isDir( dir.filePath( newText ) ) )
-			segBtns->setSegmentEnabled( 0, false );
+			segBtns->setSegmentDisabled( 0 );
 
 		else
-			segBtns->setSegmentEnabled( 0, true );
+			segBtns->setSegmentEnabled( 0 );
 	}
 
 	else {
 		if ( dir.entryList().contains( newText ) )
-			segBtns->setSegmentEnabled( 0, false );
+			segBtns->setSegmentDisabled( 0 );
 
 		else
-			segBtns->setSegmentEnabled( 0, true );
+			segBtns->setSegmentEnabled( 0 );
 	}
 };
 
@@ -107,27 +109,27 @@ void NBRenameDialog::handleCBStateChanged() {
 	QString newText = le->text();
 
 	if ( newText.isEmpty() ) {
-		segBtns->setSegmentEnabled( 0, false );
+		segBtns->setSegmentDisabled( 0 );
 		return;
 	}
 
 	if ( newText == name )
-		segBtns->setSegmentEnabled( 0, false );
+		segBtns->setSegmentDisabled( 0 );
 
 	else if ( replaceCB->isChecked() ) {
 		if ( isDir( dir.filePath( newText ) ) )
-			segBtns->setSegmentEnabled( 0, false );
+			segBtns->setSegmentDisabled( 0 );
 
 		else
-			segBtns->setSegmentEnabled( 0, true );
+			segBtns->setSegmentEnabled( 0 );
 	}
 
 	else {
 		if ( dir.entryList().contains( newText ) )
-			segBtns->setSegmentEnabled( 0, false );
+			segBtns->setSegmentDisabled( 0 );
 
 		else
-			segBtns->setSegmentEnabled( 0, true );
+			segBtns->setSegmentEnabled( 0 );
 	}
 };
 
@@ -144,7 +146,7 @@ void NBRenameDialog::handleSegmentClick( int seg ) {
 
 void NBRenameDialog::rename() {
 
-	if ( segBtns->segmentEnabled( 0 ) ) {
+	if ( segBtns->segment( 0 )->isEnabled() ) {
 		renameOk = true;
 		close();
 	}

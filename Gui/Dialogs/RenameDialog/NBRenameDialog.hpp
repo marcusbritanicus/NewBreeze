@@ -8,7 +8,7 @@
 
 #include <Global.hpp>
 #include <NBDialog.hpp>
-#include <NBSegmentControl.hpp>
+#include <NBButtons.hpp>
 #include <NBTools.hpp>
 
 class NBRenameDialog : public NBDialog {
@@ -22,7 +22,7 @@ class NBRenameDialog : public NBDialog {
 	private:
 		void createGUI();
 
-		NBSegmentControl *segBtns;
+		NBSegmentButton *segBtns;
 
 		NBLineEdit *le;
 

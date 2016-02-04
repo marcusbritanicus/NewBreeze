@@ -20,7 +20,6 @@
 #include <NBTools.hpp>
 #include <NBCustomActions.hpp>
 #include <NBSettingsManager.hpp>
-#include <NBMessageDialog.hpp>
 #include <NBTrashManager.hpp>
 #include <NewBreezeTray.hpp>
 #include <AboutNB.hpp>

@@ -1,18 +1,18 @@
 /*
 	*
-	* NBDialog.cpp - NewBreeze Dialog Class
+	* AboutNB.cpp - AboutNB Class for NewBreeze
 	*
 */
 
 #include <AboutNB.hpp>
 
-AboutNB::AboutNB( QWidget *parent ) : NBDialog( parent ) {
+AboutNB::AboutNB( QWidget *parent ) : QDialog( parent ) {
 
-	setDialogTitle( "About NewBreeze v3.0.0" );
-	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	createGui();
+	setWindowProperties();
+};
 
-	setFixedWidth( 540 );
-
+void AboutNB::createGui() {
 	QString title = QString( "About NewBreeze v3.0.0" );
 	QString text = QString(
 		"<p>Built on top of the Powerful Qt4 GUI Toolkit, this file manager "	\
@@ -52,7 +52,8 @@ AboutNB::AboutNB( QWidget *parent ) : NBDialog( parent ) {
 	bodyLbl->setWordWrap( true );
 	bodyLbl->setText( text );
 
-	NBButton *okBtn = new NBButton( QIcon::fromTheme( "dialog-ok" ), "&Close" );
+	NBButton *okBtn = new NBButton( QIcon::fromTheme( "dialog-ok" ), "&Close", this );
+	okBtn->setObjectName( "okBtn" );
 	connect( okBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
 
 	QHBoxLayout *tLyt = new QHBoxLayout();
@@ -74,4 +75,16 @@ AboutNB::AboutNB( QWidget *parent ) : NBDialog( parent ) {
 	dlgLyt->addLayout( bLyt );
 
 	setLayout( dlgLyt );
+};
+
+void AboutNB::setWindowProperties() {
+
+	/* Dialogs without close button */
+	setWindowFlags( Qt::CustomizeWindowHint | Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint );
+	setWindowModality( Qt::ApplicationModal);
+
+	setWindowTitle( "About NewBreeze v3.0.0" );
+	setWindowIcon( QIcon( ":/icons/newbreeze2.png" ) );
+
+	setFixedWidth( 540 );
 };

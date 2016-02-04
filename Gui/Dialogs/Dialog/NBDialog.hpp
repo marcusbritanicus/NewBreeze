@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBDIALOG_HPP
-#define NBDIALOG_HPP
 
 #include <Global.hpp>
 #include <NBTools.hpp>
@@ -27,7 +25,5 @@ class NBDialog : public QDialog {
 		void setupActions();
 		void setupDialogProperties();
 
-		QFrame *BodyFrame;
+		QWidget *Base;
 };
-
-#endif

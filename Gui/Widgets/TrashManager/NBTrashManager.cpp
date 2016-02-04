@@ -23,7 +23,7 @@ void NBTrashManager::setupGui() {
 	TrashView = new NBTrashView( tModel );
 
 	// Buttons
-	restoreButtons = new NBButtons( QStringList() << "&Restore" << "Restore &All", this );
+	restoreButtons = new NBSegmentButton( QStringList() << "&Restore" << "Restore &All", this );
 	connect( restoreButtons->segment( 0 ), SIGNAL( clicked() ), this, SLOT( restoreSelected() ) );
 	connect( restoreButtons->segment( 1 ), SIGNAL( clicked() ), this, SLOT( restoreAll() ) );
 
@@ -32,7 +32,7 @@ void NBTrashManager::setupGui() {
 
 	QList<QIcon> icons = QList<QIcon>() << QIcon::fromTheme( "edit-delete" ) << QIcon::fromTheme( "trash-empty" );
 
-	deleteButtons = new NBButtons( QStringList() << "&Delete" << "&Empty Trash", icons, this );
+	deleteButtons = new NBSegmentButton( QStringList() << "&Delete" << "&Empty Trash", icons, this );
 	connect( deleteButtons->segment( 0 ), SIGNAL( clicked() ), this, SLOT( deleteSelected() ) );
 	connect( deleteButtons->segment( 1 ), SIGNAL( clicked() ), this, SLOT( emptyTrash() ) );
 
@@ -191,8 +191,7 @@ void NBTrashManager::handleFailedRestore( QModelIndexList failedIndexes ) {
 		"NewBreeze - Error while restoring",
 		"Some errors were encountered while restoring the files and folders from the trash. "			\
 		"As a result, some of the files and folders have not have been restored. For the "				\
-		"list for files and folders not restored click <tt><u>M</u>ore</tt>.",
-		QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Ok, table
+		"list for files and folders not restored click <tt><u>M</u>ore</tt>."
 	);
 };
 
@@ -222,8 +221,7 @@ void NBTrashManager::deleteSelected() {
 			"Empty Trash?",
 			"<p>You are about to remove all the selected files and folders in trash, from the disk. "
 			"This operation cannot be undone, and the deleted data cannot be recoverd.</p>"
-			"<p>Do you want to proceed?</p>",
-			QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Yes << NBMessageDialog::No
+			"<p>Do you want to proceed?</p>"
 		);
 
 		if ( reply == NBMessageDialog::Yes )
@@ -239,9 +237,7 @@ void NBTrashManager::emptyTrash() {
 		"Empty Trash?",
 		"<p>You are about to remove all the files and folders in trash, from the disk. "
 		"This operation cannot be undone, and the deleted data cannot be recoverd.</p>"
-		"<p>Do you want to proceed?</p>",
-		QList<NBMessageDialog::StandardButton>() << NBMessageDialog::Yes << NBMessageDialog::No,
-		new QPushButton( "ABCD" )
+		"<p>Do you want to proceed?</p>"
 	);
 
 	if ( reply == NBMessageDialog::Yes ) {

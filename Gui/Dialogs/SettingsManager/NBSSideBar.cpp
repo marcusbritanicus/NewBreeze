@@ -16,13 +16,8 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	generalBtn->setIcon( QIcon( ":/icons/newbreeze2.png" ) );
 	generalBtn->setText( "General" );
 	generalBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-
-	QToolButton *themeBtn = new QToolButton();
-	themeBtn->setFixedSize( 81, 81 );
-	themeBtn->setIconSize( QSize( 48, 48 ) );
-	themeBtn->setIcon( QIcon( ":/icons/appearance.png" ) );
-	themeBtn->setText( "Theme" );
-	themeBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+	generalBtn->setCheckable( true );
+	generalBtn->setFocusPolicy( Qt::NoFocus );
 
 	QToolButton *iconsBtn = new QToolButton();
 	iconsBtn->setFixedSize( 81, 81 );
@@ -30,6 +25,17 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	iconsBtn->setIcon( QIcon( ":/icons/iconthemes.png" ) );
 	iconsBtn->setText( "Icons" );
 	iconsBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+	iconsBtn->setCheckable( true );
+	iconsBtn->setFocusPolicy( Qt::NoFocus );
+
+	QToolButton *themeBtn = new QToolButton();
+	themeBtn->setFixedSize( 81, 81 );
+	themeBtn->setIconSize( QSize( 48, 48 ) );
+	themeBtn->setIcon( QIcon( ":/icons/appearance.png" ) );
+	themeBtn->setText( "Theme" );
+	themeBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+	themeBtn->setCheckable( true );
+	themeBtn->setFocusPolicy( Qt::NoFocus );
 
 	QToolButton *pluginsBtn = new QToolButton();
 	pluginsBtn->setFixedSize( 81, 81 );
@@ -37,6 +43,8 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	pluginsBtn->setIcon( QIcon( ":/icons/plugins.png" ) );
 	pluginsBtn->setText( "Plugins" );
 	pluginsBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+	pluginsBtn->setCheckable( true );
+	pluginsBtn->setFocusPolicy( Qt::NoFocus );
 
 	QToolButton *keyBindingsBtn = new QToolButton();
 	keyBindingsBtn->setFixedSize( 81, 81 );
@@ -44,6 +52,8 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	keyBindingsBtn->setIcon( QIcon( ":/icons/keybindings.png" ) );
 	keyBindingsBtn->setText( "Key Bindings" );
 	keyBindingsBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+	keyBindingsBtn->setCheckable( true );
+	keyBindingsBtn->setFocusPolicy( Qt::NoFocus );
 
 	QVBoxLayout *baseLyt = new QVBoxLayout();
 	baseLyt->addWidget( generalBtn );
@@ -55,6 +65,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	setLayout( baseLyt );
 
 	QButtonGroup *btnGrp = new QButtonGroup();
+	btnGrp->setExclusive( true );
 	btnGrp->addButton( generalBtn, 0 );
 	btnGrp->addButton( iconsBtn, 1 );
 	btnGrp->addButton( themeBtn, 2 );
@@ -62,4 +73,6 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	btnGrp->addButton( keyBindingsBtn, 4 );
 
 	connect( btnGrp, SIGNAL( buttonClicked( int ) ), this, SIGNAL( loadSettingsCategory( int ) ) );
+
+	generalBtn->setChecked( true );
 };

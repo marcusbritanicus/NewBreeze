@@ -86,7 +86,7 @@ class NBAddressBar : public QFrame {
 	private:
 		NBButton *backBtn, *forwardBtn;
 		NBButton *settingsBtn, *filterBtn;
-		NBSegmentControl *viewModes;
+		NBSegmentButton *viewModes;
 		NBAddressWidget *addressWidget;
 		NBIOManagerMini *mProcWidget;
 

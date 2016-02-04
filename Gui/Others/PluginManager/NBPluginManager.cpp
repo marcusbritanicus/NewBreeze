@@ -64,7 +64,12 @@ NBPluginManager::NBPluginManager() {
 void NBPluginManager::reloadPlugins() {
 
 	/* For now we will be reading just the plugins folder of the home directory */
-	QStringList pluginPaths = QStringList() << /*QString( DATA_DIR ) + "/plugins/" <<*/ NBXdg::home() + "/.config/NewBreeze/plugins5/";
+	QStringList pluginPaths;
+	#if QT_VERSION >= 0x050000
+		pluginPaths << /*QString( DATA_DIR ) + "/plugins5/" <<*/ NBXdg::home() + "/.config/NewBreeze/plugins5/";
+	#else
+		pluginPaths << /*QString( DATA_DIR ) + "/plugins/" <<*/ NBXdg::home() + "/.config/NewBreeze/plugins/";
+	#endif
 
 	/* Our MimeDatabase object */
 	QMimeDatabase mdb;
@@ -78,7 +83,13 @@ void NBPluginManager::reloadPlugins() {
 		mimePluginMap[ mType.name() ] = QStringList();
 
 	/* For now we will be handling just the plugins based on the PreviewInterface */
-	QDir pPath( NBXdg::home() + "/.config/NewBreeze/plugins/" );
+	QDir pPath;
+	#if QT_VERSION >= 0x050000
+		pPath.setPath( NBXdg::home() + "/.config/NewBreeze/plugins5/" );
+	#else
+		pPath.setPath( NBXdg::home() + "/.config/NewBreeze/plugins/" );
+	#endif
+
 	NBPreviewInterface *plugin = 0;
 	QObject *pObj = 0;
 	Q_FOREACH( QString pluginSo, pPath.entryList( QStringList() << "*.so", QDir::Files, QDir::Name | QDir::IgnoreCase ) ) {

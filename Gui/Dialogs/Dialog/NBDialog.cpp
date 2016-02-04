@@ -15,20 +15,10 @@ NBDialog::NBDialog( QWidget *parent ) : QDialog( parent ) {
 
 void NBDialog::setupGUI() {
 
-	BodyFrame = new QFrame();
-	BodyFrame->setContentsMargins( 0, 0, 0, 0 );
-
-	QVBoxLayout *baseLyt = new QVBoxLayout();
-	baseLyt->setContentsMargins( 5, 5, 5, 5 );
-
 	QAction *closeAct = new QAction( "&Close", this );
 	closeAct->setShortcut( QKeySequence( Qt::Key_Escape ) );
 	connect( closeAct, SIGNAL( triggered() ), this, SLOT( reject() ) );
 	addAction( closeAct );
-
-	baseLyt->addWidget( BodyFrame );
-
-	QWidget::setLayout( baseLyt );
 };
 
 void NBDialog::setupDialogProperties() {
@@ -48,7 +38,8 @@ void NBDialog::setupDialogProperties() {
 
 void NBDialog::setLayout( QLayout *lyt ) {
 
-	BodyFrame->setLayout( lyt );
+	lyt->setContentsMargins( QMargins( 5, 5, 5, 5 ) );
+	QDialog::setLayout( lyt );
 };
 
 void NBDialog::setDialogTitle( QString title ) {

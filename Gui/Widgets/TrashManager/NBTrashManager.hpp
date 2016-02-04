@@ -38,7 +38,7 @@ class NBTrashManager : public NBDialog {
 		NBTrashModel *tModel;
 		QMenu *customMenu;
 
-		NBButtons *restoreButtons, *deleteButtons;
+		NBSegmentButton *restoreButtons, *deleteButtons;
 
 		QClipboard *ClipBoard;
 		QAction *reloadAct;
