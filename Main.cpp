@@ -131,7 +131,6 @@ int main( int argc, char **argv ) {
 				trayIcon->show();
 
 				QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
-				QObject::connect( trayIcon, SIGNAL( toggleVisible() ), Gui, SLOT( toggleVisible() ) );
 			}
 
 			return app.exec();
@@ -181,7 +180,6 @@ int main( int argc, char **argv ) {
 						trayIcon->show();
 
 						QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
-						QObject::connect( trayIcon, SIGNAL( toggleVisible() ), Gui, SLOT( toggleVisible() ) );
 					}
 
 					return app.exec();
@@ -212,7 +210,6 @@ int main( int argc, char **argv ) {
 					trayIcon->show();
 
 					QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
-					QObject::connect( trayIcon, SIGNAL( toggleVisible() ), Gui, SLOT( toggleVisible() ) );
 				}
 
 				return app.exec();

@@ -9,29 +9,30 @@
 #define NBFOLDERVIEW_HPP
 
 #include <Global.hpp>
-#include <NBIconView.hpp>
+#include <NBAppsView.hpp>
+#include <NBArchiveDialog.hpp>
+#include <NBArchive.hpp>
+#include <NBCatalogView.hpp>
+#include <NBConfirmDeleteDialog.hpp>
 #include <NBContextMenu.hpp>
+#include <NBCustomActions.hpp>
+#include <NBCustomPeek.hpp>
+#include <NBDeleteManager.hpp>
+#include <NBErrorsDialog.hpp>
+#include <NBFileDialog.hpp>
 #include <NBFileSystemModel.hpp>
+#include <NBFolderFlash.hpp>
+#include <NBGuiWidgets.hpp>
+#include <NBIconProvider.hpp>
+#include <NBIconView.hpp>
+#include <NBMessageDialog.hpp>
+#include <NBNewNodeDialog.hpp>
+#include <NBPreviewInterface.hpp>
+#include <NBPropertiesDialog.hpp>
 #include <NBRenameDialog.hpp>
 #include <NBRunCmdDialog.hpp>
-#include <NBNewNodeDialog.hpp>
-#include <NBFileDialog.hpp>
-#include <NBConfirmDeleteDialog.hpp>
-#include <NBErrorsDialog.hpp>
-#include <NBPropertiesDialog.hpp>
-#include <NBTools.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBArchive.hpp>
-#include <NBCustomActions.hpp>
-#include <NBMessageDialog.hpp>
-#include <NBDeleteManager.hpp>
-#include <NBIconProvider.hpp>
-#include <NBAppsView.hpp>
-#include <NBCatalogView.hpp>
 #include <NBStyleManager.hpp>
-#include <NBPreviewInterface.hpp>
-#include <NBCustomPeek.hpp>
-#include <NBFolderFlash.hpp>
+#include <NBTools.hpp>
 
 class NBFolderView : public QStackedWidget {
 	Q_OBJECT

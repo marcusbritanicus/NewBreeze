@@ -1061,8 +1061,6 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 
 void NBFileSystemModel::handleNodeCreated( QString node ) {
 
-	qDebug() << node;
-
 	if ( baseName( node ).startsWith( "." ) and not __showHidden )
 		return;
 

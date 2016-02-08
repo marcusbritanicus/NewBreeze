@@ -13,7 +13,25 @@ NBArchive::NBArchive( QString archive ) {
 
 void NBArchive::updateInputFiles( QStringList inFiles ) {
 
-	inputList.append( inFiles );
+	inFiles.removeDuplicates();
+
+	QStringList tempList;
+	Q_FOREACH( QString file, inFiles ) {
+		if ( isDir( file ) )
+			tempList.append( recDirWalk( file ) );
+
+		else
+			tempList.append( file );
+	}
+
+	/* Convert full path to relative to workingDirectory */
+	Q_FOREACH( QString file, tempList ) {
+		QString newFn = file.replace( src, "" );
+		if ( newFn.startsWith( "/" ) )
+			newFn.remove( 0, 1 );
+		inputList.append( newFn );
+	}
+
 	inputList.sort();
 	inputList.removeDuplicates();
 }
@@ -25,19 +43,16 @@ void NBArchive::setWorkingDir( QString wDir ) {
 
 void NBArchive::setDestination( QString path ) {
 
-	/*
-		*
-		* @p path will be a absolute.
-		* So QDir we construct will be home path
-		*
-	*/
-
 	dest = QString( path );
 	if ( not QFileInfo( dest ).exists() )
 		QDir::home().mkpath( path );
 };
 
 void NBArchive::create() {
+
+	char srcDir[ 10240 ] = { 0 };
+	getcwd( srcDir, 10240 );
+	chdir( src.toLocal8Bit().data() );
 
 	QMimeType mime = mimeDb.mimeTypeForFile( archiveName );
 
@@ -103,12 +118,17 @@ void NBArchive::create() {
 			filename = new char[ file.count() + 1 ];
 			strcpy( filename, file.toLatin1().data() );
 
+			// qDebug() << file.toLocal8Bit().data() << exists( file );
+
 			stat( filename, &st );
 			entry = archive_entry_new();
 			archive_entry_set_pathname( entry, filename );
 			archive_entry_set_size( entry, st.st_size );
 			archive_entry_set_filetype( entry, st.st_mode );
 			archive_entry_set_perm( entry, st.st_mode );
+			archive_entry_set_atime( entry, st.st_atime, 0 );
+			archive_entry_set_mtime( entry, st.st_mtime, 0 );
+			archive_entry_set_ctime( entry, st.st_ctime, 0 );
 
 			archive_write_header( a, entry );
 
@@ -126,6 +146,8 @@ void NBArchive::create() {
 		archive_write_close( a );
 		archive_write_free( a );
 	}
+
+	chdir( srcDir );
 };
 
 int NBArchive::extract() {

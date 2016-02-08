@@ -24,6 +24,4 @@ class NBDialog : public QDialog {
 		void setupGUI();
 		void setupActions();
 		void setupDialogProperties();
-
-		QWidget *Base;
 };

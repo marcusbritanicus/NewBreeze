@@ -161,22 +161,9 @@ void NBSSPreviewWidget::showStyle( const QString style ) {
 	QStyle *newStyle = QStyleFactory::create( style );
 
 	setStyle( newStyle );
-	tabWidget->setStyle( newStyle );
 
-	pushButton->setStyle( newStyle );
-	toolButton->setStyle( newStyle );
-	checkBox->setStyle( newStyle );
-	radioButton->setStyle( newStyle );
-	scrollBar->setStyle( newStyle );
-	comboBox->setStyle( newStyle );
-
-	spinBox->setStyle( newStyle );
-	doubleSpinBox->setStyle( newStyle );
-	lineEditE->setStyle( newStyle );
-	lineEditD->setStyle( newStyle );
-	groupBox1->setStyle( newStyle );
-	groupBox2->setStyle( newStyle );
-	slider->setStyle( newStyle );
+	Q_FOREACH( QWidget *w, findChildren<QWidget*>() )
+		w->setStyle( newStyle );
 };
 
 void NBSStyleWidget::applyStyle() {

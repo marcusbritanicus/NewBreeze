@@ -949,6 +949,17 @@ void NBFolderView::handleWatchDogBark( QString path ) {
 	}
 };
 
+void NBFolderView::compress( QStringList archiveList ) {
+
+	NBArchive *arc = NBArchiveDialog::newArchive( this );
+	if ( arc == NULL )
+		return;
+
+	arc->setWorkingDir( fsModel->currentDir() );
+	arc->updateInputFiles( archiveList );
+	arc->create();
+};
+
 void NBFolderView::extract( QString archive ) {
 
 	QString dest = fsModel->nodePath( QFileInfo( archive ).baseName() );
@@ -958,32 +969,7 @@ void NBFolderView::extract( QString archive ) {
 
 	NBArchive arc( archive );
 	arc.setDestination( dest );
-	arc.extract();
-};
-
-void NBFolderView::compress( QStringList archiveList ) {
-
-	QString archiveName = NBFileDialog::getSaveFileName(
-			QString( ":/icons/newbreeze.png" ),
-			tr( "NewBreeze - Save Archive As" ),
-			fsModel->currentDir(),
-			QStringList(
-				QStringList() << "XZ Compressed Tar (*.txz *.tar.xz)"
-								<< "BZ2 Compressed Tar (*.tbz2 *.tar.bz2)"
-								<< "GZ Compressed Tar (*.tgz *.tar.bz2)"
-								<< "XZ File (*.xz)"
-								<< "GZip File (*.gz)"
-								<< "BZip2 File (*.bz2)"
-								<< "Zip File (*.zip)" ),
-			QString( "BZ2 Compressed Tar (*.tbz2 *.tar.bz2)" )
-	);
-
-	if ( not archiveName.isEmpty() ) {
-		NBArchive *arc = new NBArchive( archiveName );
-		arc->updateInputFiles( archiveList );
-		arc->setWorkingDir( fsModel->currentDir() );
-		arc->create();
-	}
+	QtConcurrent::run( arc, &NBArchive::extract );
 };
 
 void NBFolderView::updateProgress( QString nodePath, float fileCopied, float totalCopied ) {
