@@ -26,10 +26,10 @@
 */
 
 #include <Global.hpp>
-#include <NBTools.hpp>
 #include <NewBreeze.hpp>
 #include <NBSettingsManager.hpp>
 #include <NBMessageDialog.hpp>
+#include <NewBreezeTray.hpp>
 
 #include <NBCLParser.hpp>
 #include <NBApplication.hpp>

@@ -4,10 +4,10 @@
 	*
 */
 
-#ifndef NEWBREEZETRAY_HPP
-#define NEWBREEZETRAY_HPP
+#pragma once
 
 #include <Global.hpp>
+#include <NewBreeze.hpp>
 
 class NBTrayIcon : public QSystemTrayIcon {
 	Q_OBJECT
@@ -19,11 +19,10 @@ class NBTrayIcon : public QSystemTrayIcon {
 		void handleActivation( QSystemTrayIcon::ActivationReason reason );
 
 	private slots:
+		void toggleVisible();
 		void showInfo();
+		void quit();
 
 	Q_SIGNALS:
 		void newWindow();
-		void toggleVisible();
 };
-
-#endif

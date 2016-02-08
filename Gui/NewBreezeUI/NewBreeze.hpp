@@ -24,7 +24,6 @@
 #include <NBTerminal.hpp>
 #include <NBTools.hpp>
 #include <NBTrashManager.hpp>
-#include <NewBreezeTray.hpp>
 
 class NewBreeze : public QMainWindow {
 	Q_OBJECT

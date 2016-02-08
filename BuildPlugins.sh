@@ -18,7 +18,7 @@ build() {
 	cd ..
 }
 
-cleanObjs() {
+clean() {
 	# Switch to Plugins folder
 	cd Plugins
 
@@ -54,14 +54,62 @@ distclean() {
 	cd ..
 }
 
+install() {
+	# Switch to Plugins folder
+	cd Plugins
+
+	# Build Default Plugin Set
+	cd Default
+	make install
+	cd ..
+
+	# Build MarkDown Plugin
+	cd MarkDown
+	make install
+	cd ..
+
+	# Switch to current directory
+	cd ..
+}
+
+installLocal() {
+	# Switch to Plugins folder
+	cd Plugins
+
+	# Build Default Plugin Set
+	cd Default
+	cp -f libDefaultPeekPlugins.so ~/.config/NewBreeze/plugins/ 2> /dev/null
+	cp -f libDefaultPeekPlugins5.so ~/.config/NewBreeze/plugins5/ 2> /dev/null
+	cd ..
+
+	# Build MarkDown Plugin
+	cd MarkDown
+	cp -f libMarkDownPreview.so ~/.config/NewBreeze/plugins/ 2> /dev/null
+	cp -f libMarkDownPreview5.so ~/.config/NewBreeze/plugins5/ 2> /dev/null
+	cd ..
+
+	# Switch to current directory
+	cd ..
+}
+
 if [ "$1" == "build" ]; then
 	build
 
 elif [ "$1" == "clean" ]; then
-	cleanObjs
+	clean
 
 elif [ "$1" == "distclean" ]; then
 	distclean
+
+elif [ "$1" == "install" ]; then
+	if [ "$(id -u)" != "0" ]; then
+		echo "Warning: You may need to run install as root."
+		read -n 1 -s
+	fi
+	install
+
+elif [ "$1" == "local" ]; then
+	installLocal
 
 else
 	build

@@ -277,7 +277,6 @@ void NBApplication::disconnect() {
 	peer->shutdown();
 }
 
-
 /*!
     \fn void NBApplication::messageReceived( const QString& message )
 
