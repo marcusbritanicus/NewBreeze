@@ -15,7 +15,6 @@
 #include <NBButton.hpp>
 #include <NBButtons.hpp>
 #include <NBIOManager.hpp>
-#include <NBViewModeButton.hpp>
 
 class NBToggleButton : public QWidget {
 	Q_OBJECT
@@ -78,6 +77,8 @@ class NBAddressBar : public QFrame {
 
 		QString address();
 		void setAddress( QString );
+
+		void updateNavigationButtons( bool, bool );
 
 		NBIOManagerMini *procWidget();
 

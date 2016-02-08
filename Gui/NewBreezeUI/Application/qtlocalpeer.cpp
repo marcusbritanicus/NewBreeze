@@ -54,7 +54,7 @@ const char* QtLocalPeer::ack = "ack";
 QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId)
     : QObject(parent), id(appId)
 {
-    mSocketName = QLatin1String("NewBreeze3-SingleApp");
+    mSocketName = QLatin1String("NewBreeze3-SingleApp-") + QString::number( getuid() );
 
     server = new QLocalServer(this);
     QString lockName = QDir( QDir::tempPath() ).absolutePath() + QLatin1Char('/') + mSocketName + QLatin1String("-lockfile");

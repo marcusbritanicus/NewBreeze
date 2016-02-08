@@ -12,17 +12,13 @@ NBIconView                                                                      
 	☐ Fix @aboveIndex @belowIndex
 	☐ Enable PageUp and PageDown navigation
 
-NewBreeze Theming and Styling                                                                                                        [ 1 of 3 ]
+NewBreeze Theming and Styling                                                                                                        [ 3 of 3 ]
 	☑ Remove all the redundant stylesheets
-	☐ Enable user defined theming
+	☒ Enable user defined theming
 	☑ Faster icon loading - images
 
-Archives
-	☐ Zip and tar preview
-	  Extract the zip/tar archive in /tmp, and show that folder
-	☐ Gui-blocking message: Reading archive - OR - show it in the NBProcessManager?
-	☐ Use a thread to do the work later
-	☐ Writing archives will be done in NBProcessManager, show the percentage of data compressed.
-	☐ Extraction of archives to be done in NBProcessManager, show the percentage of data processed
-	☐ Single member extraction is not enabled
-	☐ Use an external library to do the work - libarchive
+Archives                                                                                                                             [ 3 of 4 ]
+	☐ Zip and tar preview: PeekPlugin using archivemount
+	☒ Writing archives will be done in NBProcessManager, show the percentage of data compressed.
+	☒ Extraction of archives to be done in NBProcessManager, show the percentage of data processed
+	☑ Use an external library to do the work - libarchive

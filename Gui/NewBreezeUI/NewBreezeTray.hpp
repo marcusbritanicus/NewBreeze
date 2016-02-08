@@ -23,6 +23,7 @@ class NBTrayIcon : public QSystemTrayIcon {
 
 	Q_SIGNALS:
 		void newWindow();
+		void toggleVisible();
 };
 
 #endif

@@ -71,7 +71,7 @@ NBIOWidget::NBIOWidget( NBFileIO *ioProc ) {
 	baseLyt->addWidget( cfileLbl );
 	baseLyt->addWidget( cfileBar );
 
-	QWidget *baseWidget = new QWidget();
+	QWidget *baseWidget = new QWidget( this );
 	baseWidget->setObjectName( "guiBase" );
 	baseWidget->setLayout( baseLyt );
 
@@ -213,7 +213,7 @@ NBIOManager::NBIOManager( QList<NBFileIO*> jobList, QWidget *parent ) : NBDialog
 	scroller->setWidgetResizable( true );
 	scroller->setPalette( NBStyleManager::transparentPalette() );
 
-	QWidget *baseWidget = new QWidget();
+	QWidget *baseWidget = new QWidget( this );
 	baseLyt = new QVBoxLayout();
 	baseLyt->setContentsMargins( QMargins( 5, 5, 5, 5 ) );
 
@@ -235,7 +235,7 @@ NBIOManager::NBIOManager( QList<NBFileIO*> jobList, QWidget *parent ) : NBDialog
 	setWindowModality( Qt::NonModal );
 
 	setDialogTitle( "NewBreeze IO Manager" );
-	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
 
 	setMinimumSize( QSize( 800, 500 ) );
 };

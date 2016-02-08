@@ -1,17 +1,21 @@
 Version 3.0.0 Alpha
 	- Feature: Per-folder View options
-	- Feature: PictureMode for NBIconView
+	- Feature: Scaling for NBIconView
+	- NewBreeze uses QtSingleApplication for one instance multiple windows
+	- Redesigned UI for better code maintenance
 	- Redesigned NBCrumbsBar (formerly, NBBreadCrumbsBar)
 	- Redesigned NBSidePanel
 	- View delegates are now view agnostic
 	- NBIconView mouseEvent handlers are rewritten
 	- Selections handling is better
-	- NBDialog and NBMessageDialog are polished for better appearance
-	- Categories can be hidden, selected with single click
+	- NBDialog polished for better appearance
+	- NBMessageDialog is a now a subclass of QMessageBox
+	- Categories can be hidden, selected/deselected with single click
 	- Removed default transparency, better integration with the native desktop
 	- QuickMenuBar is removed, as its more of a hinderance
+	- UtilityBar (custom title bar) is removed, uses native title bar
 	- The /proc/pid/cwd link points to the current directory
-	- Peek Plugins interface has been rewritten to enable support for dynamic loading of any plugin.
+	- PeekPlugins interface has been rewritten to enable support for dynamic loading of any plugin.
 	- NBProcessManager replaces NBIOManager with better functionality [To be done]
 	- File copy/move is now based on QtSolutions QtCopyDialog [To be done]
 	- BugFix: Unmounting a drive is possible when NB3 is open

@@ -16,7 +16,7 @@ NBSegmentButton::NBSegmentButton( QWidget *parent ) : QWidget( parent ) {
 	btnsLyt->setContentsMargins( QMargins() );
 	btnsLyt->setSpacing( 0 );
 
-	QWidget *btnsBase = new QWidget();
+	QWidget *btnsBase = new QWidget( this );
 	btnsBase->setObjectName( "btnsBase" );
 	btnsBase->setLayout( btnsLyt );
 
@@ -52,7 +52,7 @@ NBSegmentButton::NBSegmentButton( QList<QIcon> icons, QWidget *parent ) : QWidge
 			btnsLyt->addWidget( Separator::vertical() );
 	}
 
-	QWidget *btnsBase = new QWidget();
+	QWidget *btnsBase = new QWidget( this );
 	btnsBase->setObjectName( "btnsBase" );
 	btnsBase->setLayout( btnsLyt );
 
@@ -92,7 +92,7 @@ NBSegmentButton::NBSegmentButton( QStringList labels, QWidget *parent ) : QWidge
 			btnsLyt->addWidget( Separator::vertical() );
 	}
 
-	QWidget *btnsBase = new QWidget();
+	QWidget *btnsBase = new QWidget( this );
 	btnsBase->setObjectName( "btnsBase" );
 	btnsBase->setLayout( btnsLyt );
 
@@ -131,7 +131,7 @@ NBSegmentButton::NBSegmentButton( QStringList labels, QList<QIcon> icons, QWidge
 			btnsLyt->addWidget( Separator::vertical() );
 	}
 
-	QWidget *btnsBase = new QWidget();
+	QWidget *btnsBase = new QWidget( this );
 	btnsBase->setObjectName( "btnsBase" );
 	btnsBase->setLayout( btnsLyt );
 

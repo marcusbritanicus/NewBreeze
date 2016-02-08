@@ -45,6 +45,11 @@ NBBookmarksIcon::NBBookmarksIcon( QWidget *parent ) : QWidget( parent ) {
 	flashesCompleted = 0;
 	maxFlashes = 2;
 
+	createGUI();
+};
+
+void NBBookmarksIcon::createGUI() {
+
 	timer.setInterval( mFlashDuration / flashSteps );
 	timer.setSingleShot( false );
 
@@ -58,11 +63,8 @@ NBBookmarksIcon::NBBookmarksIcon( QWidget *parent ) : QWidget( parent ) {
 
 	// BookmarksView
 	bmkView = new QMenu( this );
+	bmkView->setObjectName( "NBBookmarksMenu" );
 	connect( bmkView, SIGNAL( triggered( QAction* ) ), this, SLOT( clickDrive( QAction* ) ) );
-
-	// bmkView animation
-	anim2 = new NBWidthAnimation( bmkView );
-	anim2->setDuration( 250 );
 };
 
 /* Override the QLabel pixmap property handlers */
@@ -238,10 +240,25 @@ void NBBookmarksIcon::leaveEvent( QEvent *lEvent ) {
 void NBBookmarksIcon::timerEvent( QTimerEvent *tEvent ) {
 
 	if ( tEvent->timerId() == delayTimer.timerId() ) {
+
 		delayTimer.stop();
-		if ( QRect( 0, 0, 48, 48 ).contains( mapFromGlobal( QCursor::pos() ) ) )
+		if ( not bmkView->isVisible() and QRect( 0, 0, 48, 48 ).contains( mapFromGlobal( QCursor::pos() ) ) ) {
+
 			showBookmarks();
+		}
 	}
+
+	else if ( tEvent->timerId() == closeTimer.timerId() ) {
+
+		closeTimer.stop();
+		if ( bmkView->isVisible() )
+			bmkView->close();
+	}
+
+	else
+		QWidget::timerEvent( tEvent );
+
+	tEvent->accept();
 };
 
 /* Slot to access the flashing */
@@ -294,6 +311,7 @@ void NBBookmarksIcon::showBookmarks() {
 		bmkView->addAction( act );
 	}
 
+	closeTimer.start( 10000, this );
 	bmkView->exec( mapToGlobal( QPoint( 49, 0 ) ) );
 };
 

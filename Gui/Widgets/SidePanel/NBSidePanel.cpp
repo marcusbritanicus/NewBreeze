@@ -13,9 +13,6 @@ NBSidePanel::NBSidePanel( QWidget *parent ) : QWidget( parent ) {
 	setMouseTracking( true );
 
 	populateSidePanel();
-
-	anim = new NBWidthAnimation( this );
-	anim->setDuration( 250 );
 };
 
 void NBSidePanel::populateSidePanel() {
@@ -44,10 +41,18 @@ void NBSidePanel::populateSidePanel() {
 	/* The 'Devices' Label */
 	devIcon = new NBDevicesIcon( this );
 	connect( devIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	QAction *showDevicesAct = new QAction( QIcon( ":/icons/comp.png" ), "Show &Devices", devIcon );
+	showDevicesAct->setShortcut( tr( "Alt+D" ) );
+	connect( showDevicesAct, SIGNAL( triggered() ), devIcon, SLOT( showDevices() ) );
+	addAction( showDevicesAct );
 
 	/* The 'Bookmarks' Label */
 	bmkIcon = new NBBookmarksIcon( this );
 	connect( bmkIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	QAction *showBookmarksAct = new QAction( QIcon( ":/icons/bookmark.png" ), "Show &Bookmarks", devIcon );
+	showBookmarksAct->setShortcut( tr( "Alt+B" ) );
+	connect( showBookmarksAct, SIGNAL( triggered() ), bmkIcon, SLOT( showBookmarks() ) );
+	addAction( showBookmarksAct );
 
 	/* The 'Trash' Label */
 	trashLabel = new NBTrashLabel( this );

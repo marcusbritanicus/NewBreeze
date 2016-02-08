@@ -211,8 +211,7 @@
  *
  */
 
-#ifndef OPTIONPARSER_H_
-#define OPTIONPARSER_H_
+#pragma once
 
 /** @brief The namespace of The Lean Mean C++ Option Parser. */
 namespace option
@@ -2811,5 +2810,3 @@ void printUsage(Function* prn, Stream* stream, const Descriptor usage[], int wid
 
 }
 // namespace option
-
-#endif /* OPTIONPARSER_H_ */

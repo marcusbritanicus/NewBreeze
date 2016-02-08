@@ -731,8 +731,7 @@ void QMimeXMLProvider::ensureLoaded()
         }
 
         if (!fdoXmlFound) {
-            // We could instead install the file as part of installing Qt?
-            allFiles.prepend( QLatin1String( DATA_DIR ) + QLatin1String( "/freedesktop.org.xml" ) );
+            allFiles.prepend( QLatin1String( ":/Data/freedesktop.org.xml" ) );
         }
 
         if (m_allFiles == allFiles)

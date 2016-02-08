@@ -46,7 +46,7 @@ void NBConfirmDeleteDialog::setupGUI( bool permanent ) {
 	table = new QTableWidget( 0, 2 );
 	table->setFocusPolicy( Qt::NoFocus );
 
-	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
 	setDialogTitle( "Delete Files?" );
 
 	msgLyt->addWidget( iconLbl );
@@ -229,7 +229,7 @@ void NBDeleteErrorsDialog::setupGUI() {
 
 	NBDialog::setLayout( dlgLyt );
 
-	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
 	setDialogTitle( "NewBreeze - Error while deleting" );
 
 	setFixedSize( 480, 480 );

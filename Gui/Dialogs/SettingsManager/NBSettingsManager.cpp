@@ -33,9 +33,9 @@ QHBoxLayout* NBSettingsManager::createBodyLayout() {
 	connect( chooserWidget, SIGNAL( loadSettingsCategory( int ) ), this, SLOT( settingCategoryChosen( int ) ) );
 
 	NBSGeneralWidget *generalWidget = new NBSGeneralWidget( this );
-	iconWidget = new NBIconThemeWidget();
+	iconWidget = new NBIconThemeWidget( this );
 	styleWidget = new NBSStyleWidget( this );
-	keysWidget = new NBKeyBindingsWidget();
+	keysWidget = new NBKeyBindingsWidget( this );
 
 	widgetLyt->addWidget( generalWidget );
 	widgetLyt->addWidget( iconWidget );
@@ -44,7 +44,7 @@ QHBoxLayout* NBSettingsManager::createBodyLayout() {
 	widgetLyt->addWidget( keysWidget );
 
 	splitLyt->addWidget( chooserWidget );
-	splitLyt->addWidget( Separator::vertical() );
+	splitLyt->addWidget( Separator::vertical( this ) );
 	splitLyt->addLayout( widgetLyt );
 
 	return splitLyt;

@@ -55,7 +55,7 @@
 		<file>icons/minimize.png</file>
 		<file>icons/move.png</file>
 		<file>icons/network.png</file>
-		<file>icons/newbreeze2.png</file>
+		<file>icons/newbreeze.png</file>
 		<file>icons/newfolder.png</file>
 		<file>icons/newwin.png</file>
 		<file>icons/next.png</file>
@@ -109,6 +109,6 @@
 		<file>StyleSheets/Template/NBTitleBar.qss</file>
 		<file>StyleSheets/Template/NewBreeze.qss</file>
 
-		<file alias="freedesktop.org.xml">Data/freedesktop.org.xml</file>
+		<file>Data/freedesktop.org.xml</file>
 	</qresource>
 </RCC>

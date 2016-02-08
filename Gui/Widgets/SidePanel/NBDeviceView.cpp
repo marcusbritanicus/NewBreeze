@@ -5,7 +5,6 @@
 */
 
 #include <NBDeviceView.hpp>
-#include <NBDeviceManager.hpp>
 
 NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 
@@ -38,12 +37,9 @@ NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 	setFixedSize( 48, 48 );
 
 	// DeviceView
-	devView = new NBDeviceMenu( this );
+	devView = new QMenu( this );
+	devView->setObjectName( "NBDeviceMenu" );
 	connect( devView, SIGNAL( triggered( QAction* ) ), this, SLOT( clickDrive( QAction* ) ) );
-
-	// Device Manager
-	NBDeviceManager *mgr = new NBDeviceManager();
-	connect( mgr, SIGNAL( updateDevices() ), this, SLOT( flashLabel() ) );
 };
 
 /* Override the QLabel pixmap property handlers */
@@ -268,7 +264,7 @@ void NBDevicesIcon::showDevices() {
 		QWidgetAction *wa = new QWidgetAction( devView );
 		wa->setData( info.mountPoint() );
 
-		NBDeviceAction *actWdgt = new NBDeviceAction( info );
+		NBDeviceAction *actWdgt = new NBDeviceAction( info, devView );
 		wa->setDefaultWidget( actWdgt );
 
 		devView->addAction( wa );
@@ -287,22 +283,7 @@ void NBDevicesIcon::clickDrive( QAction *act ) {
 		emit driveClicked( devAct->mountPoint() );
 };
 
-NBDeviceMenu::NBDeviceMenu( QWidget *parent ) : QMenu( parent ) {
-
-};
-
-void NBDeviceMenu::changeEvent( QEvent *event ) {
-
-	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) )
-		close();
-
-	else
-		QWidget::changeEvent( event );
-
-	event->accept();
-};
-
-NBDeviceAction::NBDeviceAction( NBDeviceInfo info ) : QWidget() {
+NBDeviceAction::NBDeviceAction( NBDeviceInfo info, QWidget *parent ) : QWidget( parent ) {
 
 	setMouseTracking( true );
 

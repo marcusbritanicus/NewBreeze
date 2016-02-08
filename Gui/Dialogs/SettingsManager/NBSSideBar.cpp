@@ -13,7 +13,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	QToolButton *generalBtn = new QToolButton();
 	generalBtn->setFixedSize( 81, 81 );
 	generalBtn->setIconSize( QSize( 48, 48 ) );
-	generalBtn->setIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	generalBtn->setIcon( QIcon( ":/icons/newbreeze.png" ) );
 	generalBtn->setText( "General" );
 	generalBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	generalBtn->setCheckable( true );

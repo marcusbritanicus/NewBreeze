@@ -19,7 +19,7 @@ class NBIconThemeWidget : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBIconThemeWidget();
+		NBIconThemeWidget( QWidget *parent );
 
 	private:
 		void createGUI();
@@ -36,7 +36,7 @@ class NBIconThemeChooserWidget : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBIconThemeChooserWidget();
+		NBIconThemeChooserWidget( QWidget * );
 		void loadThemes();
 		QStringList themesList;
 
@@ -58,7 +58,7 @@ class NBIconThemeViewerWidget: public QListWidget {
 	Q_OBJECT
 
 	public:
-		NBIconThemeViewerWidget();
+		NBIconThemeViewerWidget( QWidget * );
 
 	public slots:
 		void loadIcons();

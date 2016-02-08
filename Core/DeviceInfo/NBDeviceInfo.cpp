@@ -104,15 +104,6 @@ inline QString getDevLabel( QString name1, QString name2 ) {
 
 NBDeviceManager::NBDeviceManager( QObject *parent ) : QObject( parent ) {
 
-	QDrive::Monitor *mtr = new QDrive::Monitor( this );
-
-	connect( mtr, SIGNAL( partitionAdded( const QDBusObjectPath & ) ), this, SIGNAL( updateDevices() ) );
-	connect( mtr, SIGNAL( partitionRemoved( const QDBusObjectPath & ) ), this, SIGNAL( updateDevices() ) );
-};
-
-void NBDeviceManager::printDevInfo( const QDBusObjectPath &obj ) {
-
-	// qDebug() << obj.path();
 };
 
 QList<NBDeviceInfo> NBDeviceManager::allDevices() {

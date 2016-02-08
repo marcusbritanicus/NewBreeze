@@ -29,9 +29,7 @@
 #include <NBTools.hpp>
 #include <NewBreeze.hpp>
 #include <NBSettingsManager.hpp>
-
-#include <NBIOManager.hpp>
-#include <NBFileIO.hpp>
+#include <NBMessageDialog.hpp>
 
 #include <NBCLParser.hpp>
 #include <NBApplication.hpp>
@@ -47,8 +45,13 @@ int main( int argc, char **argv ) {
 	qRegisterMetaType<NBDeviceInfo>( "NBDeviceInfo" );
 
 	NBApplication app( argc, argv, "NewBreeze" );
+
+	/* About Application */
 	app.setOrganizationName( "NewBreeze" );
 	app.setApplicationName( "NewBreeze" );
+
+	/* Application style */
+	app.setStyle( QStyleFactory::create( Settings->General.Style ) );
 
 	if ( Settings->General.TrayIcon )
 		app.setQuitOnLastWindowClosed( false );
@@ -62,8 +65,12 @@ int main( int argc, char **argv ) {
 		case SYSTRAY : {
 			/* If an instance is already running, inform the user about it. */
 			if ( app.isRunning() ) {
-				qDebug() << "Found a running instance. Requesting TrayIcon...";
-				app.sendMessage( "Open in SystemTray" );
+				qDebug() << "Found a running instance. Exiting";
+				NBMessageDialog::information(
+					NULL,
+					"NewBreeze - Open in try",
+					"NewBreeze is now open in SystemTray. Left click to show/hide all the open windows, Double click to open a new window, middle click to quit."
+				);
 				return 0;
 			}
 
@@ -71,23 +78,14 @@ int main( int argc, char **argv ) {
 			else {
 				qDebug() << "No running instance of the NewBreeze found";
 
-				NewBreeze *Gui = new NewBreeze( QString(), true );
-				QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( messageReciever( const QString ) ) );
+				/* Here we do not request the tray icon as we directly open it */
+				NewBreeze *Gui = new NewBreeze( QString() );
+				QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
-				if ( Gui->canOpenUI() ) {
-					if ( Settings->Session.Maximized )
-						Gui->showMaximized();
+				NBTrayIcon* trayIcon = new NBTrayIcon();
+				trayIcon->show();
 
-					else
-						Gui->showNormal();
-				}
-
-				else  {
-					NBTrayIcon* trayIcon = new NBTrayIcon();
-					trayIcon->show();
-
-					QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
-				}
+				QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
 
 				return app.exec();
 			}
@@ -115,26 +113,25 @@ int main( int argc, char **argv ) {
 
 			NewBreeze *Gui;
 			if ( app.arguments().count() >= 3 )
-				Gui = new NewBreeze( app.arguments().at( 2 ), true );
+				Gui = new NewBreeze( app.arguments().at( 2 ) );
 
 			else
-				Gui = new NewBreeze( QString(), true );
+				Gui = new NewBreeze( QString() );
 
-			QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( messageReciever( const QString ) ) );
+			QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
-			if ( Gui->canOpenUI() ) {
-				if ( Settings->Session.Maximized )
-					Gui->showMaximized();
+			if ( Settings->Session.Maximized )
+				Gui->showMaximized();
 
-				else
-					Gui->showNormal();
-			}
+			else
+				Gui->showNormal();
 
-			else  {
+			if ( Settings->General.TrayIcon ) {
 				NBTrayIcon* trayIcon = new NBTrayIcon();
 				trayIcon->show();
 
 				QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
+				QObject::connect( trayIcon, SIGNAL( toggleVisible() ), Gui, SLOT( toggleVisible() ) );
 			}
 
 			return app.exec();
@@ -161,26 +158,30 @@ int main( int argc, char **argv ) {
 				int result = app.sendMessage( query );
 				qDebug() << "Requesting the server to open the path:" << query << ":" << ( result ? "Request sent" : "Request failed" );
 
+				/* Some how we were disconnected from the server before asking for new window */
 				if ( not result ) {
 					/* Disconnect from server */
 					app.disconnect();
 
-					NewBreeze *Gui = new NewBreeze( query, true );
-					QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( messageReciever( const QString ) ) );
+					/* Close all top level widgets */
+					Q_FOREACH( QWidget *w, app.topLevelWidgets() )
+						w->close();
 
-					if ( Gui->canOpenUI() ) {
-						if ( Settings->Session.Maximized )
-							Gui->showMaximized();
+					NewBreeze *Gui = new NewBreeze( query );
+					QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
-						else
-							Gui->showNormal();
-					}
+					if ( Settings->Session.Maximized )
+						Gui->showMaximized();
 
-					else  {
+					else
+						Gui->showNormal();
+
+					if ( Settings->General.TrayIcon ) {
 						NBTrayIcon* trayIcon = new NBTrayIcon();
 						trayIcon->show();
 
 						QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
+						QObject::connect( trayIcon, SIGNAL( toggleVisible() ), Gui, SLOT( toggleVisible() ) );
 					}
 
 					return app.exec();
@@ -189,30 +190,29 @@ int main( int argc, char **argv ) {
 				return 0;
 			}
 
-				/* Some how we were disconnected from the server before asking for new window */
+			/* Server not running */
 			else {
 				NewBreeze *Gui;
 				if ( app.arguments().count() >= 2 )
-					Gui = new NewBreeze( app.arguments().at( 1 ), true );
+					Gui = new NewBreeze( app.arguments().at( 1 ) );
 
 				else
-					Gui = new NewBreeze( QString(), true );
+					Gui = new NewBreeze( QString() );
 
 				QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
-				if ( Gui->canOpenUI() ) {
-					if ( Settings->Session.Maximized )
-						Gui->showMaximized();
+				if ( Settings->Session.Maximized )
+					Gui->showMaximized();
 
-					else
-						Gui->showNormal();
-				}
+				else
+					Gui->showNormal();
 
-				else  {
+				if ( Settings->General.TrayIcon ) {
 					NBTrayIcon* trayIcon = new NBTrayIcon();
 					trayIcon->show();
 
 					QObject::connect( trayIcon, SIGNAL( newWindow() ), Gui, SLOT( newWindow() ) );
+					QObject::connect( trayIcon, SIGNAL( toggleVisible() ), Gui, SLOT( toggleVisible() ) );
 				}
 
 				return app.exec();

@@ -6,7 +6,7 @@
 
 #include <NBPropertiesDialog.hpp>
 
-NBPropertiesBase::NBPropertiesBase( QStringList paths ) : QWidget() {
+NBPropertiesBase::NBPropertiesBase( QStringList paths, QWidget *parent ) : QWidget( parent ) {
 
 	pathsList << paths;
 
@@ -85,7 +85,7 @@ void NBPropertiesBase::setNewIcon( QString icoStr ) {
 	iconLabel->setPixmap( QIcon( icoStr ).pixmap( 48 ) );
 };
 
-NBPropertiesWidget::NBPropertiesWidget( QStringList paths, bool *term ) : QWidget() {
+NBPropertiesWidget::NBPropertiesWidget( QStringList paths, bool *term, QWidget *parent ) : QWidget( parent ) {
 
 	files = 0;
 	folders = 0;
@@ -234,14 +234,14 @@ void NBPropertiesWidget::createGUI() {
 	fileLyt->addWidget( timeLabel );
 
 	NBDriveLabel *driveIcon;
-	QLabel *driveName = new QLabel();
+	QLabel *driveName = new QLabel( this );
 	NBDriveInfo *driveInfo;
 
 	NBDeviceInfo deviceInfo = NBDeviceManager::deviceInfoForPath( pathsList.at( 0 ) );
 
-	driveIcon = new NBDriveLabel( deviceInfo.driveLabel() );
+	driveIcon = new NBDriveLabel( deviceInfo.driveLabel(), this );
 	driveName->setText( deviceInfo.driveName() );
-	driveInfo = new NBDriveInfo( deviceInfo.usedSpace(), deviceInfo.driveSize() );
+	driveInfo = new NBDriveInfo( deviceInfo.usedSpace(), deviceInfo.driveSize(), this );
 
 	QVBoxLayout *driveLyt = new QVBoxLayout();
 	QGridLayout *subLytDrive1 = new QGridLayout();
@@ -350,7 +350,7 @@ void NBPropertiesWidget::update() {
 	sizeTypeLabel->setText( sizeTypeStr.arg( formatSize( totalSize ) ).arg( totalSize ).arg( contentsStr ) );
 };
 
-NBPermissionsWidget::NBPermissionsWidget( QStringList paths ) : QWidget() {
+NBPermissionsWidget::NBPermissionsWidget( QStringList paths, QWidget *parent ) : QWidget( parent ) {
 
 	pathsList << paths;
 
@@ -753,9 +753,9 @@ NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab, bo
 
 	setFixedSize( QSize( 530, 400 ) );
 
-	propsB = new NBPropertiesBase( paths );
-	propsW = new NBPropertiesWidget( paths, term );
-	permsW = new NBPermissionsWidget( paths );
+	propsB = new NBPropertiesBase( paths, this );
+	propsW = new NBPropertiesWidget( paths, term, this );
+	permsW = new NBPermissionsWidget( paths, this );
 
 	tabs = new QTabBar();
 	tabs->addTab( QIcon( ":/icons/props.png" ), QString( "P&roperties" ) );
@@ -777,7 +777,7 @@ NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab, bo
 	setLayout( lyt );
 
 	setDialogTitle( tr( "NewBreeze - Properties" ) );
-	setDialogIcon( QIcon( ";/icons/newbreeze2.png" ) );
+	setDialogIcon( QIcon( ";/icons/newbreeze.png" ) );
 
 	setWindowModality( Qt::NonModal );
 
@@ -803,7 +803,7 @@ void NBPropertiesDialog::switchToTab( int newTab ) {
 void NBPropertiesDialog::setDirIcon() {
 
 	QString iconName = NBFileDialog::getExistingFileName(
-			QString( ":/icons/newbreeze2.png" ),
+			QString( ":/icons/newbreeze.png" ),
 			tr( "NewBreeze - Select Icon" ),
 			QDir::homePath(),
 			QStringList(

@@ -6,7 +6,7 @@
 
 #include <NBFolderFlash.hpp>
 
-NBFolderFlash::NBFolderFlash( QString pth ) : QWidget() {
+NBFolderFlash::NBFolderFlash( QString pth, QWidget *parent ) : QWidget( parent ) {
 
 	path = QString( pth );
 
@@ -27,7 +27,7 @@ void NBFolderFlash::createGUI() {
 	openBtn->setAutoRaise( true );
 	openBtn->setFocusPolicy( Qt::NoFocus );
 
-	QWidget *baseWidget = new QWidget();
+	QWidget *baseWidget = new QWidget( this );
 	baseWidget->setObjectName( tr( "guiBase" ) );
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( loadFolder() ) );

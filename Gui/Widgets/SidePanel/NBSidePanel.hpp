@@ -7,7 +7,6 @@
 #pragma once
 
 #include <Global.hpp>
-#include <NBAnimations.hpp>
 #include <NBFlashLabel.hpp>
 #include <NBDeviceView.hpp>
 #include <NBBookmarkView.hpp>
@@ -20,8 +19,6 @@ class NBSidePanel : public QWidget {
 
 	private:
 		void populateSidePanel();
-
-		NBWidthAnimation *anim;
 
 		NBFlashLabel *dirLbl, *appLbl, *ctlLbl;
 		NBTrashLabel *trashLabel;

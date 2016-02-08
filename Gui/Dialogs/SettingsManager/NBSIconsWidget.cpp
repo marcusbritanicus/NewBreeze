@@ -6,15 +6,15 @@
 
 #include <NBSIconsWidget.hpp>
 
-NBIconThemeWidget::NBIconThemeWidget() {
+NBIconThemeWidget::NBIconThemeWidget( QWidget *parent ) :QWidget( parent ) {
 
 	createGUI();
 };
 
 void NBIconThemeWidget::createGUI() {
 
-	iconThemesWidget = new NBIconThemeChooserWidget();
-	folderViewWidget = new NBIconThemeViewerWidget();
+	iconThemesWidget = new NBIconThemeChooserWidget( this );
+	folderViewWidget = new NBIconThemeViewerWidget( this );
 
 	connect( iconThemesWidget, SIGNAL( reloadIcons() ), folderViewWidget, SLOT( loadIcons() ) );
 
@@ -29,7 +29,7 @@ void NBIconThemeWidget::setIconTheme() {
 
 };
 
-NBIconThemeChooserWidget::NBIconThemeChooserWidget() : QWidget() {
+NBIconThemeChooserWidget::NBIconThemeChooserWidget( QWidget *parent ) : QWidget( parent ) {
 
 	QHBoxLayout *wLyt = new QHBoxLayout();
 
@@ -112,7 +112,7 @@ void NBIconThemeChooserWidget::previousTheme() {
 	emit reloadIcons();
 };
 
-NBIconThemeViewerWidget::NBIconThemeViewerWidget() : QListWidget() {
+NBIconThemeViewerWidget::NBIconThemeViewerWidget( QWidget *parent ) : QListWidget( parent ) {
 
 	// View, Sizes and Resize Modes
 	setViewMode( QListView::IconMode );

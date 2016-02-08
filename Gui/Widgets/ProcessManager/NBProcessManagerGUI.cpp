@@ -71,7 +71,7 @@ NBProcWidget::NBProcWidget( NBCoreProcess *proc ) {
 	baseLyt->addWidget( cfileLbl );
 	baseLyt->addWidget( cfileBar );
 
-	QWidget *baseWidget = new QWidget();
+	QWidget *baseWidget = new QWidget( this );
 	baseWidget->setObjectName( "guiBase" );
 	baseWidget->setLayout( baseLyt );
 
@@ -213,7 +213,7 @@ NBProcessManagerGUI::NBProcessManagerGUI( QWidget *parent ) : NBDialog( parent )
 	scroller->setWidgetResizable( true );
 	scroller->setPalette( NBStyleManager::transparentPalette() );
 
-	QWidget *baseWidget = new QWidget();
+	QWidget *baseWidget = new QWidget( this );
 	baseLyt = new QVBoxLayout();
 	baseLyt->setContentsMargins( QMargins( 5, 5, 5, 5 ) );
 
@@ -235,7 +235,7 @@ NBProcessManagerGUI::NBProcessManagerGUI( QWidget *parent ) : NBDialog( parent )
 	setWindowModality( Qt::NonModal );
 
 	setDialogTitle( "NewBreeze IO Manager" );
-	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
 
 	setMinimumSize( QSize( 800, 500 ) );
 };

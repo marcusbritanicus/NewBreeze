@@ -8,11 +8,8 @@
 
 #include <Global.hpp>
 #include <NBDeviceInfo.hpp>
-#include <NBDeviceManager.hpp>
-#include <NBAnimations.hpp>
 
 class NBDeviceAction;
-class NBDeviceMenu;
 
 class NBDevicesIcon : public QWidget {
 	Q_OBJECT
@@ -74,7 +71,7 @@ class NBDevicesIcon : public QWidget {
 		int flashesCompleted;
 		int maxFlashes;
 
-		NBDeviceMenu *devView;
+		QMenu *devView;
 
 	private slots:
 		void showDevices();
@@ -97,21 +94,11 @@ class NBDevicesIcon : public QWidget {
 		void driveClicked( QString );
 };
 
-class NBDeviceMenu : public QMenu {
-	Q_OBJECT
-
-	public:
-		NBDeviceMenu( QWidget* );
-
-	protected:
-		void changeEvent( QEvent* );
-};
-
 class NBDeviceAction : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBDeviceAction( NBDeviceInfo );
+		NBDeviceAction( NBDeviceInfo, QWidget* );
 		QString mountPoint();
 
 	private:

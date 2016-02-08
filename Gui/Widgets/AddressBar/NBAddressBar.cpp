@@ -205,12 +205,15 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 
 	// Tiles
 	viewModes->setSegmentIcon( 0, QIcon::fromTheme( "view-list-details" ) );
+	viewModes->segment( 0 )->setFocusPolicy( Qt::NoFocus );
 
 	// Icons
 	viewModes->setSegmentIcon( 1, QIcon::fromTheme( "view-list-icons" ) );
+	viewModes->segment( 1 )->setFocusPolicy( Qt::NoFocus );
 
 	// Details
 	viewModes->setSegmentIcon( 2, QIcon::fromTheme( "view-list-text" ) );
+	viewModes->segment( 2 )->setFocusPolicy( Qt::NoFocus );
 
 	// FilterButton
 	filterBtn = new NBButton( QIcon::fromTheme( "edit-find", QIcon( ":/icons/search.png" ) ) );
@@ -246,6 +249,12 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	connect( addressWidget, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
 	connect( filterBtn, SIGNAL( clicked() ), this, SIGNAL( openSearch() ) );
 	connect( viewModes, SIGNAL( clicked( int ) ), this, SIGNAL( changeViewMode( int ) ) );
+};
+
+void NBAddressBar::updateNavigationButtons( bool bBtn, bool fBtn ) {
+
+	backBtn->setEnabled( bBtn );
+	forwardBtn->setEnabled( fBtn );
 };
 
 NBIOManagerMini *NBAddressBar::procWidget() {

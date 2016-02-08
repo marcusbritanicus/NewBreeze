@@ -15,7 +15,7 @@ class NBTerminalWidget : public QTermWidget {
 	Q_OBJECT
 
 	public :
-		NBTerminalWidget( QString wDir );
+		NBTerminalWidget( QString wDir, QWidget * );
 		QString currentWorkingDirectory();
 };
 
@@ -23,7 +23,7 @@ class NBTerminal : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBTerminal( QString wDir = QString() );
+		NBTerminal( QString wDir = QString(), QWidget *parent = NULL );
 		void changeDir( QString );
 
 	private:

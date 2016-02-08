@@ -11,20 +11,6 @@
 #include <Global.hpp>
 #include <NBTools.hpp>
 
-class NBPicLabel : public QLabel {
-	Q_OBJECT
-
-	public:
-		NBPicLabel( QPixmap, QString );
-		QString Style;
-
-	protected:
-		virtual void mousePressEvent( QMouseEvent * );
-
-	signals:
-		void clicked();
-};
-
 class NBClickLabel : public QLabel {
 	Q_OBJECT
 

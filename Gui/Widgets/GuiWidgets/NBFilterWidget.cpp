@@ -34,7 +34,7 @@ void NBFilterWidget::setupUI() {
 	srchLyt->addWidget( findLbl );
 	srchLyt->addWidget( findLE );
 
-	QWidget *base = new QWidget();
+	QWidget *base = new QWidget( this );
 	base->setObjectName( "guiBase" );
 	base->setLayout( srchLyt );
 

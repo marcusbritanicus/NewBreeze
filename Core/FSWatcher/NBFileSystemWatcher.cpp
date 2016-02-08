@@ -81,7 +81,7 @@ void NBFileSystemWatcher::run() {
 			size_t length;
 
 			/* Read from the FD. It will read all events available up to * the given buffer size. */
-			if ( ( length = read ( fds[ 0 ].fd, buffer, INOTIFY_BUFFER_SIZE ) ) > 0 ) {
+			if ( ( length = read( fds[ 0 ].fd, buffer, INOTIFY_BUFFER_SIZE ) ) > 0 ) {
 				struct inotify_event *event;
 				size_t i = 0;
 

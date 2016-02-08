@@ -24,7 +24,7 @@ class NBPropertiesBase: public QWidget {
 	Q_OBJECT
 
 	public:
-		NBPropertiesBase( QStringList );
+		NBPropertiesBase( QStringList, QWidget * );
 		void setNewIcon( QString );
 
 	private:
@@ -40,7 +40,7 @@ class NBPropertiesWidget: public QWidget {
     Q_OBJECT
 
 	public:
-		NBPropertiesWidget( QStringList, bool *term );
+		NBPropertiesWidget( QStringList, bool *term, QWidget * );
 		~NBPropertiesWidget();
 
 	private:
@@ -80,7 +80,7 @@ class NBPermissionsWidget: public QWidget {
     Q_OBJECT
 
 	public:
-		NBPermissionsWidget( QStringList );
+		NBPermissionsWidget( QStringList, QWidget * );
 
 	private:
 		void createGUI();

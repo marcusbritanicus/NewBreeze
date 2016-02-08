@@ -8,7 +8,6 @@
 
 #include <Global.hpp>
 #include <NBTools.hpp>
-#include <NBAnimations.hpp>
 
 class NBBookmarkInfo {
 
@@ -64,7 +63,10 @@ class NBBookmarksIcon : public QWidget {
 		void setFlashFrames( int );
 
 	private :
+		void createGUI();
+
 		QBasicTimer delayTimer;
+		QBasicTimer closeTimer;
 		QTimer timer;
 
 		QPixmap mPixmap;
@@ -80,8 +82,6 @@ class NBBookmarksIcon : public QWidget {
 		bool flash;
 		int flashesCompleted;
 		int maxFlashes;
-
-		NBWidthAnimation *anim2;
 
 		/* should the flash be colored */
 		bool colorFlash;

@@ -17,7 +17,7 @@ class NBCustomPeek : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBCustomPeek( QString path = QDir::homePath() );
+		NBCustomPeek( QString path = QDir::homePath(), QWidget *parent = NULL );
 		QString path;
 		QWidget *peekWidgetBase;
 		QLabel *iconLbl, *nameLbl, *pathLbl, *mimeLbl, *sizeLbl, *timeLbl, *ugidLbl;

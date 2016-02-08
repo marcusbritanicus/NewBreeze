@@ -21,62 +21,7 @@ void NBLineEdit::paintEvent( QPaintEvent *pEvent ) {
 	painter.end();
 };
 
-NBSearchBar::NBSearchBar() : QWidget() {
-
-	searchLE = new QLineEdit();
-	searchLE->setFocusPolicy( Qt::ClickFocus );
-	searchLE->setStyleSheet( "border: none; background: transparent;" );
-
-	QLabel *searchLbl = new QLabel();
-	searchLbl->setPixmap( QIcon::fromTheme( "edit-find" ).pixmap( 20 ) );
-
-	QHBoxLayout *srchLyt = new QHBoxLayout();
-	srchLyt->setContentsMargins( QMargins() );
-
-	srchLyt->addWidget( searchLbl );
-	srchLyt->addWidget( searchLE );
-
-	setLayout( srchLyt );
-
-	setFixedWidth( 150 );
-	connect( searchLE, SIGNAL( textEdited( QString ) ), this, SLOT( searchChanged( QString ) ) );
-};
-
-void NBSearchBar::searchChanged( QString query ) {
-
-	if ( query.isEmpty() or query.isNull() )
-		emit searchCleared();
-
-	else
-		emit searchString( query );
-};
-
-NBTitleIcon::NBTitleIcon( QString icon ) : QLabel() {
-
-	setPixmap( QPixmap( icon ).scaled( QSize( 21, 21 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	setContextMenuPolicy( Qt::CustomContextMenu );
-
-	menu.setAttribute( Qt::WA_TranslucentBackground );
-
-	QAction *aboutNBAct = new QAction( QIcon( ":/icons/info.png" ), "&About NewBreeze", this );
-	connect( aboutNBAct, SIGNAL( triggered() ), this, SIGNAL( aboutNB() ) );
-
-	QAction *aboutQt4Act = new QAction( QIcon( ":/icons/info.png" ), "About &Qt4", this );
-	connect( aboutQt4Act, SIGNAL( triggered() ), this, SIGNAL( aboutQt4() ) );
-
-	addAction( aboutNBAct );
-
-	menu.addAction( aboutNBAct );
-	menu.addAction( aboutQt4Act );
-};
-
-void NBTitleIcon::mousePressEvent( QMouseEvent *mpEvent ) {
-
-	menu.exec( QWidget::mapToGlobal( QPoint( x() + width() / 2, y() + height() / 2 ) ) );
-	mpEvent->accept();
-};
-
-NBDriveLabel::NBDriveLabel( const QString path ) : QWidget() {
+NBDriveLabel::NBDriveLabel( const QString path, QWidget *parent ) : QWidget( parent ) {
 
 	painter = new QPainter();
 	label = QString( path );
@@ -126,7 +71,7 @@ void NBDriveLabel::paintEvent( QPaintEvent *pEvent ) {
 	pEvent->accept();
 };
 
-NBDriveInfo::NBDriveInfo( qint64 used, qint64 total ) : QFrame() {
+NBDriveInfo::NBDriveInfo( qint64 used, qint64 total, QWidget *parent ) : QFrame( parent ) {
 
 	setFrameStyle( QFrame::StyledPanel | QFrame::Plain );
 	setMaximumHeight( 32 );
@@ -193,7 +138,7 @@ QWidget* Separator::horizontal( QWidget *parent ) {
 
 	return new Separator( Separator::Horizontal, parent );
 
-	QWidget *hSep = new QWidget();
+	QWidget *hSep = new QWidget( parent );
 	hSep->setContentsMargins( QMargins() );
 	hSep->setFixedHeight( 1 );
 	hSep->setStyleSheet( "background-color: gray;" );
@@ -278,50 +223,6 @@ void Separator::paintEvent( QPaintEvent *pEvent ) {
 		}
 	}
 
-	painter->end();
-
-	pEvent->accept();
-};
-
-QWidget* NBSpacer::vertical( int spacing, QWidget *parent ) {
-
-	return new NBSpacer( NBSpacer::Vertical, spacing, parent );
-};
-
-QWidget* NBSpacer::horizontal( int spacing, QWidget *parent ) {
-
-	return new NBSpacer( NBSpacer::Horizontal, spacing, parent );
-};
-
-NBSpacer::NBSpacer( NBSpacer::Mode mode, int spacing, QWidget *parent ) : QWidget( parent ) {
-
-	switch( mode ) {
-		case Vertical: {
-			setFixedHeight( spacing );
-			setContentsMargins( QMargins() );
-			break;
-		}
-
-		case Horizontal: {
-			setFixedWidth( spacing );
-			setContentsMargins( QMargins() );
-			break;
-		}
-	}
-};
-
-void NBSpacer::resizeEvent( QResizeEvent *rEvent ) {
-
-	QWidget::resizeEvent( rEvent );
-	rEvent->accept();
-
-	repaint();
-};
-
-void NBSpacer::paintEvent( QPaintEvent *pEvent ) {
-
-	QPainter *painter = new QPainter( this );
-	painter->fillRect( rect(), Qt::transparent );
 	painter->end();
 
 	pEvent->accept();

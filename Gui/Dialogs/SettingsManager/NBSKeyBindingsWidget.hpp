@@ -14,7 +14,7 @@ class NBKeyBindingsWidget : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBKeyBindingsWidget();
+		NBKeyBindingsWidget( QWidget *parent );
 
 	private:
 		void createGUI();

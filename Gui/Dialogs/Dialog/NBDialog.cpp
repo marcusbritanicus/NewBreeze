@@ -27,7 +27,7 @@ void NBDialog::setupDialogProperties() {
 	setWindowFlags( Qt::CustomizeWindowHint | Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint );
 
 	/* NewBreeze speciality */
-	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
 
 	setWindowModality( Qt::ApplicationModal);
 

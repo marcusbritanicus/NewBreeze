@@ -6,18 +6,6 @@
 
 #include <NBLabels.hpp>
 
-NBPicLabel::NBPicLabel( QPixmap pixmap, QString style ) : QLabel() {
-
-	setPixmap( pixmap );
-	Style = QString( style );
-};
-
-void NBPicLabel::mousePressEvent( QMouseEvent *mEvent ) {
-
-	emit clicked();
-	mEvent->accept();
-}
-
 NBClickLabel::NBClickLabel( QPixmap icon ) : QLabel() {
 
 	clickEnabled = true;

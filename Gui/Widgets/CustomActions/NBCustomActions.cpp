@@ -228,7 +228,7 @@ NBNewAction::NBNewAction( QWidget *parent ) : NBDialog( parent ) {
 	QHBoxLayout *btnsLyt = new QHBoxLayout();
 	QHBoxLayout *widgetLyt = new QHBoxLayout();
 
-	QWidget *baseWidget = new QWidget();
+	QWidget *baseWidget = new QWidget( this );
 	baseWidget->setObjectName( tr( "guiBase" ) );
 
 	QLabel *lbl = new QLabel( tr( "Add Custom Action" ) );

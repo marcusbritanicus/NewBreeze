@@ -6,7 +6,7 @@
 
 #include <NBSKeyBindingsWidget.hpp>
 
-NBKeyBindingsWidget::NBKeyBindingsWidget() {
+NBKeyBindingsWidget::NBKeyBindingsWidget( QWidget *parent ) : QWidget( parent ) {
 
 	QScrollArea *scroller = new QScrollArea();
 	scroller->setStyleSheet( scroller->styleSheet() + "\nQScrollArea { border: none; }" );
@@ -114,7 +114,7 @@ NBKeyBindingsWidget::NBKeyBindingsWidget() {
 	keysLyt->addWidget( focusSearchBarKS, 30, 1 );
 	keysLyt->addWidget( clearSearchBarKS, 31, 1 );
 
-	QWidget *scrollWidget = new QWidget();
+	QWidget *scrollWidget = new QWidget( this );
 	scrollWidget->setLayout( keysLyt );
 
 	scroller->setWidget( scrollWidget );

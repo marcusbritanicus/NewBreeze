@@ -7,7 +7,7 @@
 #include <NBTerminal.hpp>
 #include <NBGuiWidgets.hpp>
 
-NBTerminal::NBTerminal( QString wDir ) : QWidget() {
+NBTerminal::NBTerminal( QString wDir, QWidget *parent ) : QWidget( parent ) {
 
 	if ( wDir.isEmpty() )
 		currentPath = QDir::homePath();
@@ -18,7 +18,7 @@ NBTerminal::NBTerminal( QString wDir ) : QWidget() {
 	QVBoxLayout *lyt = new QVBoxLayout();
 	lyt->setContentsMargins( QMargins( 2, 0, 2, 0 ) );
 	lyt->setSpacing( 0 );
-	Terminal = new NBTerminalWidget( currentPath );
+	Terminal = new NBTerminalWidget( currentPath, this );
 
 	lyt->addWidget( Terminal );
 	setLayout( lyt );
@@ -54,7 +54,7 @@ void NBTerminal::openNewTerminal() {
 	layout()->removeWidget( Terminal );
 	delete Terminal;
 
-	Terminal = new NBTerminalWidget( currentPath );
+	Terminal = new NBTerminalWidget( currentPath, this );
 	connect( Terminal, SIGNAL( finished() ), this, SLOT( openNewTerminal() ) );
 
 	qobject_cast<QVBoxLayout *>( layout() )->insertWidget( 1, Terminal );
@@ -62,7 +62,7 @@ void NBTerminal::openNewTerminal() {
 	hide();
 };
 
-NBTerminalWidget::NBTerminalWidget( QString wDir ) : QTermWidget( 0 ) {
+NBTerminalWidget::NBTerminalWidget( QString wDir, QWidget *parent ) : QTermWidget( 0, parent ) {
 
 	setColorScheme( "WhiteOnBlack" );
 

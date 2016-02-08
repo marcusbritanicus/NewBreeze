@@ -66,9 +66,9 @@ void NBPluginManager::reloadPlugins() {
 	/* For now we will be reading just the plugins folder of the home directory */
 	QStringList pluginPaths;
 	#if QT_VERSION >= 0x050000
-		pluginPaths << /*QString( DATA_DIR ) + "/plugins5/" <<*/ NBXdg::home() + "/.config/NewBreeze/plugins5/";
+		pluginPaths << "/usr/share/newbreeze/plugins5/" << NBXdg::home() + "/.config/NewBreeze/plugins5/";
 	#else
-		pluginPaths << /*QString( DATA_DIR ) + "/plugins/" <<*/ NBXdg::home() + "/.config/NewBreeze/plugins/";
+		pluginPaths << "/usr/share/newbreeze/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
 	#endif
 
 	/* Our MimeDatabase object */

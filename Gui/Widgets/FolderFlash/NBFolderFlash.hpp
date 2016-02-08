@@ -16,7 +16,7 @@ class NBFolderFlash : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBFolderFlash( QString path = QDir::homePath() );
+		NBFolderFlash( QString path = QDir::homePath(), QWidget *parent = NULL );
 		QString path;
 		NBIconViewRestricted *peekWidgetBase;
 

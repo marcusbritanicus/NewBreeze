@@ -55,7 +55,7 @@ void NBTrashManager::setupGui() {
 	widgetLyt->addLayout( btnLyt );
 	widgetLyt->addWidget( TrashView );
 
-	QWidget *widget = new QWidget();
+	QWidget *widget = new QWidget( this );
 	widget->setLayout( widgetLyt );
 
 	QHBoxLayout *baseLyt = new QHBoxLayout();
@@ -74,7 +74,7 @@ void NBTrashManager::setupGui() {
 void NBTrashManager::setDialogProperties() {
 
 	setDialogTitle( "NewBreeze Trash Manager" );
-	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
 
 	setMinimumSize( QSize( 900, 600 ) );
 };

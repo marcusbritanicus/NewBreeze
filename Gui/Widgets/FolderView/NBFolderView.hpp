@@ -135,8 +135,6 @@ class NBFolderView : public QStackedWidget {
 		void reloadCatalogs();
 		void toggleGroups();
 
-		void updateAddressBar( QString );
-
 		void hideStatusBar();
 		void showStatusBar();
 };

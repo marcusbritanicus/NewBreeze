@@ -285,7 +285,6 @@ void NBFolderView::goUp() {
 void NBFolderView::goBack() {
 
 	if ( fsModel->canGoBack() ) {
-		emit updateAddressBar( fsModel->previousDir() );
 		fsModel->goBack();
 	}
 };
@@ -293,7 +292,6 @@ void NBFolderView::goBack() {
 void NBFolderView::goForward() {
 
 	if ( fsModel->canGoForward() ) {
-		emit updateAddressBar( fsModel->nextDir() );
 		fsModel->goForward();
 	}
 };
@@ -612,7 +610,7 @@ void NBFolderView::doPeek() {
 	/* For directories we use the inbuild previewer */
 	if ( isDir( currentNode ) ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing folder: %s", qPrintable( currentNode ) );
-		NBFolderFlash *previewer = new NBFolderFlash( currentNode );
+		NBFolderFlash *previewer = new NBFolderFlash( currentNode, this );
 
 		connect( previewer, SIGNAL( loadFolder( QString ) ), this, SLOT( doOpen( QString ) ) );
 		previewer->show();
@@ -641,7 +639,7 @@ void NBFolderView::doPeek() {
 
 	// Custom Peeking
 	NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", qPrintable( currentNode ) );
-	NBCustomPeek *previewer = new NBCustomPeek( currentNode );
+	NBCustomPeek *previewer = new NBCustomPeek( currentNode, this );
 	previewer->show();
 
 	currentWidget()->setFocus();
@@ -966,7 +964,7 @@ void NBFolderView::extract( QString archive ) {
 void NBFolderView::compress( QStringList archiveList ) {
 
 	QString archiveName = NBFileDialog::getSaveFileName(
-			QString( ":/icons/newbreeze2.png" ),
+			QString( ":/icons/newbreeze.png" ),
 			tr( "NewBreeze - Save Archive As" ),
 			fsModel->currentDir(),
 			QStringList(

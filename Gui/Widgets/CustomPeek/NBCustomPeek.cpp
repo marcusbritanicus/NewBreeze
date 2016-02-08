@@ -6,7 +6,7 @@
 
 #include <NBCustomPeek.hpp>
 
-NBCustomPeek::NBCustomPeek( QString pth ) : QWidget() {
+NBCustomPeek::NBCustomPeek( QString pth, QWidget *parent ) : QWidget( parent ) {
 
 	path = QString( pth );
 
@@ -27,12 +27,12 @@ void NBCustomPeek::createGUI() {
 	openBtn->setAutoRaise( true );
 	openBtn->setFocusPolicy( Qt::NoFocus );
 
-	QWidget *baseWidget = new QWidget();
+	QWidget *baseWidget = new QWidget( this );
 	baseWidget->setObjectName( tr( "guiBase" ) );
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
-	peekWidgetBase = new QWidget();
+	peekWidgetBase = new QWidget( this );
 	peekWidgetBase->setFixedSize( 700, 500 );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
 

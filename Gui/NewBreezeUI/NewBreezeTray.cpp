@@ -8,7 +8,7 @@
 
 NBTrayIcon::NBTrayIcon() : QSystemTrayIcon() {
 
-	setIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	setIcon( QIcon( ":/icons/newbreeze.png" ) );
 	connect( this, SIGNAL( activated( QSystemTrayIcon::ActivationReason ) ), this, SLOT( handleActivation( QSystemTrayIcon::ActivationReason ) ) );
 };
 
@@ -24,6 +24,11 @@ void NBTrayIcon::handleActivation( QSystemTrayIcon::ActivationReason reason ) {
 			qApp->quit();
 			break;
 		};
+
+		case NBTrayIcon::Trigger: {
+			emit toggleVisible();
+			break;
+		}
 
 		case NBTrayIcon::DoubleClick: {
 			emit newWindow();

@@ -11,9 +11,6 @@
 
 #include <QtCore>
 
-#include <Monitor.h>
-#include <Partition.h>
-
 #include <QVolumeInfo.hpp>
 
 class NBDeviceManager;
@@ -58,9 +55,6 @@ class NBDeviceManager : public QObject {
 
 		static QList<NBDeviceInfo> allDevices();
 		static NBDeviceInfo deviceInfoForPath( QString path );
-
-	public slots:
-		void printDevInfo( const QDBusObjectPath & );
 
 	Q_SIGNALS :
 		void updateDevices();

@@ -824,7 +824,7 @@ void NBCatalogView::openCatalogItem(const QModelIndex &index ) {
 
 void NBCatalogView::showContextMenu( const QPoint &point ) {
 
-	QMenu *menu = new QMenu();
+	QMenu *menu = new QMenu( this );
 
 	QAction *openAct = new QAction( QIcon(), "&Open Location", this );
 	connect( openAct, SIGNAL( triggered() ), this, SLOT( openCatalogItem() ) );

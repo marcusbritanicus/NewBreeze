@@ -7,7 +7,7 @@
 #include <NBContextMenu.hpp>
 #include <NBFolderView.hpp>
 
-NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QString dir ) : QMenu() {
+NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QString dir, QWidget *parent ) : QMenu( parent ) {
 	/*
 		*
 		* We set the custom actions based on the indexes
@@ -360,7 +360,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 	}
 };
 
-NBAddToCatalogMenu::NBAddToCatalogMenu( QString wNode, QModelIndexList nodeList ) : QMenu() {
+NBAddToCatalogMenu::NBAddToCatalogMenu( QString wNode, QModelIndexList nodeList, QWidget *parent ) : QMenu( parent ) {
 
 	setTitle( "Add to Catalo&g" );
 	setIcon( QIcon( ":/icons/catalogs.png" ) );
@@ -490,7 +490,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 	QList<QModelIndex> selectedList = getSelection();
 
-	QMenu *menu = new QMenu();
+	QMenu *menu = new QMenu( this );
 	if ( selectedList.isEmpty() ) {
 
 		// Create a new file/directory
@@ -501,7 +501,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		createNewMenu->addAction( actNewFile );
 
 		// Add this folder to catalog
-		NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList );
+		NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 		connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 
 		// File/directory sorting
@@ -557,7 +557,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		openWithMenu->setWorkingDirectory( fsModel->currentDir() );
 		openWithMenu->buildMenu( selectedList );
 
-		customMenu = new NBCustomActionsMenu( selectedList, fsModel->currentDir() );
+		customMenu = new NBCustomActionsMenu( selectedList, fsModel->currentDir(), this );
 		connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
 		connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
 
@@ -577,7 +577,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 		// Add this node to catalog only if its a folder
 		if ( fInfo.isDir() ) {
-			NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList );
+			NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 			connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 			menu->addMenu( addToCatalogMenu );
 			menu->addSeparator();
@@ -611,10 +611,10 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		openWithMenu->buildMenu( selectedList );
 
 		// Add this folder to catalog
-		NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList );
+		NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 		connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 
-		customMenu = new NBCustomActionsMenu( selectedList, fsModel->currentDir() );
+		customMenu = new NBCustomActionsMenu( selectedList, fsModel->currentDir(), this );
 		connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
 		connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
 

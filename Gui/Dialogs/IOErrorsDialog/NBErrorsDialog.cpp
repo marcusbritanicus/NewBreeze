@@ -57,7 +57,7 @@ void NBErrorsDialog::setupGUI() {
 
 	NBDialog::setLayout( dlgLyt );
 
-	setDialogIcon( QIcon( ":/icons/newbreeze2.png" ) );
+	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
 	setDialogTitle( mTitle );
 
 	setFixedSize( 480, 480 );

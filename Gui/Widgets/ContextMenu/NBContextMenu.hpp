@@ -18,7 +18,7 @@ class NBCustomActionsMenu : public QMenu {
 	Q_OBJECT
 
 	public:
-		NBCustomActionsMenu( QList<QModelIndex>, QString );
+		NBCustomActionsMenu( QList<QModelIndex>, QString, QWidget * );
 		QStringList command();
 
 	private:
@@ -53,7 +53,7 @@ class NBAddToCatalogMenu : public QMenu {
 	Q_OBJECT
 
 	public:
-		NBAddToCatalogMenu( QString, QModelIndexList );
+		NBAddToCatalogMenu( QString, QModelIndexList, QWidget * );
 
 	private:
 		QString workNode;
