@@ -31,6 +31,13 @@ void NBStartup() {
 
 	/*
 		*
+		* Application style
+		*
+	*/
+	qApp->setStyle( QStyleFactory::create( Settings->General.Style ) );
+
+	/*
+		*
 		* Set hard coded CustomActions: Open as SU, Open in terminal.
 		*
 	*/

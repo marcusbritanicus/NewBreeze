@@ -56,6 +56,9 @@ class NewBreeze : public QMainWindow {
 
 		bool mTerminate;
 
+	public Q_SLOTS:
+		void show();
+
 	private Q_SLOTS:
 		void showAboutNB();
 		void showAboutQt4();

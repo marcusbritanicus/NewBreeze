@@ -27,7 +27,7 @@ few changes in NewBreeze 3.
    - The full path can be displayed using FlowLayout at anytime.
 
 => NBSidePanel
-   - A redesigned sidepanel with elegant menu showing devices and bookmarks as a menu.
+   - A redesigned sidepanel with elegant menu listing the devices and bookmarks.
    - Devices show the space usage.
 
 => NBButton
@@ -42,4 +42,5 @@ few changes in NewBreeze 3.
 => NBArchive extended
    - NBArchive is now rebuilt using libarchive for archive processing
    - GZip, BZip2, and XZ files are processed independently
-   - Archive creation and extraction now show a pretty dialog for various options
+   - Archive creation now shows a pretty dialog with some options
+   - Archive creationand extraction is done via QtConcurrent::run( ... )

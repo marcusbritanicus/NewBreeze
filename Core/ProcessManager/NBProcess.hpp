@@ -1,6 +1,6 @@
 /*
 	*
-	* NBCoreProcess.hpp - NBCoreProcess.cpp header
+	* NBProcess.hpp - NBProcess.cpp header
 	*
 */
 
@@ -8,59 +8,43 @@
 
 #include <Global.hpp>
 
-class NBProgress {
-	QStringList sourceList;
+typedef struct NBProgress_t {
+	QString sourceDir;
 	QString targetDir;
 	quint64 totalBytes;
 	quint64 totalBytesCopied;
 	QString currentFile;
 	quint64 fileBytes;
 	quint64 fileBytesCopied;
-};
+} NBProgress;
 
-class NBCoreProcess : public QThread {
+class NBProcess : public QThread {
 	Q_OBJECT
 
 	public:
 		enum ProcessType {
 			Copy,
 			Move,
-			Permisson,
-			ArchiveRead,
-			ArchiveWrite,
 			Delete,
 			Trash
 		};
 
-		NBCoreProcess( QObject *parent ) {
-		};
+		NBProcess( QObject *parent );
 
 		virtual NBProgress progress();
 };
 
-class NBIOProcess : public NBCoreProcess {
+class NBIOProcess : public NBProcess {
 	Q_OBJECT
 
 	public:
-		NBIOProcess( QStringList sources, QString target, NBCoreProcess::ProcessType )
+		NBIOProcess( QStringList sources, QString target, NBProcess::ProcessType, NBProgress *progress )
 
 		// Set the sources - What to Copy/Move/ACopy
 		void setSources( QStringList );
 
-		// Return the source list
-		QStringList sources();
-
 		// Set the target - Where to Copy/Move/ACopy
 		void setTarget( QString );
-
-		// Return the target
-		QString target();
-
-		// Set the mode - How to do the IO: Copy or Move or ACopy
-		void setIOMode( NBIOMode::Mode );
-
-		// Return the mode of IO
-		NBIOMode::Mode ioMode();
 
 		// The list of nodes which could not be copied/moved/archived
 		QStringList errors();
@@ -73,9 +57,6 @@ class NBIOProcess : public NBCoreProcess {
 
 		// Resume the paused IO
 		void resume();
-
-		// Progress
-		NBProgress progress();
 
 	protected:
 		void run();
@@ -108,10 +89,4 @@ class NBIOProcess : public NBCoreProcess {
 		NBIOMode::Mode mode;
 
 		NBProgress mProgress;
-};
-
-class NBPermissionSettings : public NBCoreProcess {
-
-	public:
-		NBPermissionSettings( QObject *parent );
 };

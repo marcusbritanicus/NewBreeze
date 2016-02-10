@@ -83,9 +83,6 @@ namespace NBInfoMode {
 
 static QMimeDatabase mimeDb;
 
-// MimeType and Progams mapping cache location
-const QString mimeProgsCache( QDir( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) ).filePath( "NewBreeze/NBMimeProgs.cache" ) );
-
 // Thumbnails Storage Directory
 const QString thumbsDir( QDir( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) ).filePath( "NewBreeze/Thumbs/" ) );
 

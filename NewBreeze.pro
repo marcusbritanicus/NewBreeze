@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 LIBS += -lmagic -larchive -lbz2 -llzma -lz
 
 # Source Paths
-INCLUDEPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/ClipBoard Core/ConfigParser Core/CoreProcess Core/CoreTools Core/DeleteManager Core/DeviceInfo
+INCLUDEPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/CoreProcess Core/CoreTools Core/DeleteManager Core/DeviceInfo
 INCLUDEPATH += Core/DeviceInfo/QVolumeInfo Core/FileIO Core/FSWatcher Core/IconProvider Core/MimeHandler Core/MultiFile Core/StandardPaths Core/SystemInfo Core/XDG Gui
 INCLUDEPATH += Gui/Dialogs Gui/Dialogs/Archive  Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog
 INCLUDEPATH += Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog Gui/Dialogs/RunCmdDialog
@@ -23,7 +23,7 @@ INCLUDEPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/Cus
 INCLUDEPATH += Gui/Widgets/InfoBar Gui/Widgets/IOManager Gui/Widgets/ProcessManager Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
 INCLUDEPATH += Gui/Widgets/TrashManager StyleSheets
 
-DEPENDPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/ClipBoard Core/ConfigParser Core/CoreProcess Core/CoreTools Core/DeleteManager Core/DeviceInfo
+DEPENDPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/CoreProcess Core/CoreTools Core/DeleteManager Core/DeviceInfo
 DEPENDPATH += Core/DeviceInfo/QVolumeInfo Core/FileIO Core/FSWatcher Core/IconProvider Core/MimeHandler Core/MultiFile Core/StandardPaths Core/SystemInfo Core/XDG Gui
 DEPENDPATH += Gui/Dialogs Gui/Dialogs/Archive  Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog
 DEPENDPATH += Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog Gui/Dialogs/RunCmdDialog
@@ -43,8 +43,6 @@ HEADERS += Core/Archive/NBLibBZip2.hpp
 HEADERS += Core/Archive/NBLibGZip.hpp
 HEADERS += Core/Archive/NBLibLzma.hpp
 HEADERS += Core/ArgParser/NBCLParser.hpp
-HEADERS += Core/ConfigParser/NBConfigParser.hpp
-HEADERS += Core/ConfigParser/NBDesktopFile.hpp
 
 # HEADERS += Core/CoreProcess/NBCoreProcess.hpp
 
@@ -178,8 +176,6 @@ SOURCES += Core/Archive/NBLibBZip2.cpp
 SOURCES += Core/Archive/NBLibGZip.cpp
 SOURCES += Core/Archive/NBLibLzma.cpp
 SOURCES += Core/ArgParser/NBCLParser.cpp
-SOURCES += Core/ConfigParser/NBConfigParser.cpp
-SOURCES += Core/ConfigParser/NBDesktopFile.cpp
 
 # SOURCES += Core/CoreProcess/NBCoreProcess.cpp
 

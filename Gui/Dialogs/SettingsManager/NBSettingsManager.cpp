@@ -40,7 +40,7 @@ QHBoxLayout* NBSettingsManager::createBodyLayout() {
 	widgetLyt->addWidget( generalWidget );
 	widgetLyt->addWidget( iconWidget );
 	widgetLyt->addWidget( styleWidget );
-	widgetLyt->addWidget( new QWidget( this ) );
+	widgetLyt->addWidget( new QLabel( "<center>Plugin Manager options will appear here soon.<center>", this ) );
 	widgetLyt->addWidget( keysWidget );
 
 	splitLyt->addWidget( chooserWidget );

@@ -1,6 +1,8 @@
 Version 3.0.0 Alpha
 	- Feature: Per-folder View options
 	- Feature: Scaling for NBIconView
+	- Feature: NBArchiveDialog helps to create an archive
+	- Archive creation and extraction are performed using QtConcurrent::run
 	- Plugins can now are part of the NewBreeze source tree
 	- NewBreeze uses QtSingleApplication for one instance multiple windows
 	- Redesigned UI for better code maintenance
@@ -13,8 +15,8 @@ Version 3.0.0 Alpha
 	- NBMessageDialog is a now a subclass of QMessageBox
 	- Categories can be hidden, selected/deselected with single click
 	- Removed default transparency, better integration with the native desktop
-	- QuickMenuBar is removed, as its more of a hinderance
-	- UtilityBar (custom title bar) is removed, uses native title bar
+	- QuickMenuBar removed, as its more of a hinderance
+	- UtilityBar (custom title bar) removed, uses native title bar
 	- The /proc/pid/cwd link points to the current directory
 	- PeekPlugins interface has been rewritten to enable support for dynamic loading of any plugin.
 	- NBProcessManager replaces NBIOManager with better functionality [To be done]

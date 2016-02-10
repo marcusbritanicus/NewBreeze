@@ -18,6 +18,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	generalBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	generalBtn->setCheckable( true );
 	generalBtn->setFocusPolicy( Qt::NoFocus );
+	generalBtn->setShortcut( tr( "Ctrl+1" ) );
 
 	QToolButton *iconsBtn = new QToolButton();
 	iconsBtn->setFixedSize( 81, 81 );
@@ -27,15 +28,17 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	iconsBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	iconsBtn->setCheckable( true );
 	iconsBtn->setFocusPolicy( Qt::NoFocus );
+	iconsBtn->setShortcut( tr( "Ctrl+2" ) );
 
-	QToolButton *themeBtn = new QToolButton();
-	themeBtn->setFixedSize( 81, 81 );
-	themeBtn->setIconSize( QSize( 48, 48 ) );
-	themeBtn->setIcon( QIcon( ":/icons/appearance.png" ) );
-	themeBtn->setText( "Theme" );
-	themeBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-	themeBtn->setCheckable( true );
-	themeBtn->setFocusPolicy( Qt::NoFocus );
+	QToolButton *styleBtn = new QToolButton();
+	styleBtn->setFixedSize( 81, 81 );
+	styleBtn->setIconSize( QSize( 48, 48 ) );
+	styleBtn->setIcon( QIcon( ":/icons/appearance.png" ) );
+	styleBtn->setText( "Style" );
+	styleBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+	styleBtn->setCheckable( true );
+	styleBtn->setFocusPolicy( Qt::NoFocus );
+	styleBtn->setShortcut( tr( "Ctrl+3" ) );
 
 	QToolButton *pluginsBtn = new QToolButton();
 	pluginsBtn->setFixedSize( 81, 81 );
@@ -45,6 +48,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	pluginsBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	pluginsBtn->setCheckable( true );
 	pluginsBtn->setFocusPolicy( Qt::NoFocus );
+	pluginsBtn->setShortcut( tr( "Ctrl+4" ) );
 
 	QToolButton *keyBindingsBtn = new QToolButton();
 	keyBindingsBtn->setFixedSize( 81, 81 );
@@ -54,11 +58,12 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	keyBindingsBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	keyBindingsBtn->setCheckable( true );
 	keyBindingsBtn->setFocusPolicy( Qt::NoFocus );
+	keyBindingsBtn->setShortcut( tr( "Ctrl+5" ) );
 
 	QVBoxLayout *baseLyt = new QVBoxLayout();
 	baseLyt->addWidget( generalBtn );
 	baseLyt->addWidget( iconsBtn );
-	baseLyt->addWidget( themeBtn );
+	baseLyt->addWidget( styleBtn );
 	baseLyt->addWidget( pluginsBtn );
 	baseLyt->addWidget( keyBindingsBtn );
 
@@ -68,7 +73,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	btnGrp->setExclusive( true );
 	btnGrp->addButton( generalBtn, 0 );
 	btnGrp->addButton( iconsBtn, 1 );
-	btnGrp->addButton( themeBtn, 2 );
+	btnGrp->addButton( styleBtn, 2 );
 	btnGrp->addButton( pluginsBtn, 3 );
 	btnGrp->addButton( keyBindingsBtn, 4 );
 

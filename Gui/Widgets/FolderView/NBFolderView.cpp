@@ -957,7 +957,7 @@ void NBFolderView::compress( QStringList archiveList ) {
 
 	arc->setWorkingDir( fsModel->currentDir() );
 	arc->updateInputFiles( archiveList );
-	arc->create();
+	QtConcurrent::run( arc, &NBArchive::create );
 };
 
 void NBFolderView::extract( QString archive ) {

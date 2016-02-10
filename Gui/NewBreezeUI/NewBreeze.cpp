@@ -348,6 +348,17 @@ void NewBreeze::openFile( QString file ) {
 	}
 };
 
+void NewBreeze::show() {
+
+	qDebug() << mTerminate;
+
+	if ( mTerminate )
+		return;
+
+	else
+		QMainWindow::show();
+};
+
 void NewBreeze::showAboutNB() {
 
 	AboutNB *about = new AboutNB( this );
@@ -765,7 +776,7 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	Terminal->changeDir( NBXdg::home() );
 
 	// Now hide this window, other processes may take a while longer to close down
-	hide();
+	QMainWindow::close();
 
 	cEvent->accept();
 	qDebug( "Good Bye!" );

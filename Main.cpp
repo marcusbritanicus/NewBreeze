@@ -50,8 +50,8 @@ int main( int argc, char **argv ) {
 	app.setOrganizationName( "NewBreeze" );
 	app.setApplicationName( "NewBreeze" );
 
-	/* Application style */
-	app.setStyle( QStyleFactory::create( Settings->General.Style ) );
+	/* Startup */
+	NBStartup();
 
 	if ( Settings->General.TrayIcon )
 		app.setQuitOnLastWindowClosed( false );

@@ -12,14 +12,13 @@ NBTrayIcon::NBTrayIcon() : QSystemTrayIcon() {
 	connect( this, SIGNAL( activated( QSystemTrayIcon::ActivationReason ) ), this, SLOT( handleActivation( QSystemTrayIcon::ActivationReason ) ) );
 
 	QMenu *menu = new QMenu( "TrayMenu" );
+	menu->addAction( QIcon( ":/icons/newbreeze.png" ), "New &Window", this, SIGNAL( newWindow() ) );
 	menu->addAction( "&Toggle Visible Windows", this, SLOT( toggleVisible() ) );
 	menu->addAction( QIcon::fromTheme( "application-exit", QIcon( ":/icons/delete.png" ) ), "&Quit NewBreeze", this, SLOT( quit() ) );
 	setContextMenu( menu );
 };
 
 void NBTrayIcon::handleActivation( QSystemTrayIcon::ActivationReason reason ) {
-
-	qDebug() << reason;
 
 	switch( reason ) {
 		case NBTrayIcon::Context: {
@@ -52,7 +51,7 @@ void NBTrayIcon::toggleVisible() {
 	bool visible = true;
 	Q_FOREACH( QWidget *nb, qApp->topLevelWidgets() ) {
 		if ( qobject_cast<NewBreeze*>( nb ) ) {
-			if ( not nb->isVisible() ) {
+			if ( not nb->isHidden() ) {
 				visible = false;
 				break;
 			}

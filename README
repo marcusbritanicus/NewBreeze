@@ -5,7 +5,7 @@ Qt5 builds are now supported
 
 Note: NewBreeze 3.0 is in the oven. Expect several changes..!!
 
-Built on top of the Powerful Qt4 GUI Toolkit, this file manager is sleek, stylish and fast.
+Built on top of the Powerful Qt4/Qt5 GUI Toolkit, this file manager is sleek, stylish and fast.
 Some of its features are
     - Fast startup and browsing
     - Folder, text, html, image, odt, and pdf quick preview
@@ -29,21 +29,6 @@ Notes for compiling - linux:
     - Go to NewBreeze
     - Open the terminal and type: qmake && make
 
-Additional notes for compiling on windows
-    - Download and Extract the tar file
-    - Go to NewBreeze
-    - Please edit the $$PREFIX qmake variable to your choice
-    - Open the terminal and type: qmake && make && make install
-      This installs the data files and font files required by New Breeze
-
-Notes for installing icon themes (Windows only):
-    - Copy the icon theme into the folder $$PREFIX/icons/
-    - Each theme should be in a separate folder
-    - Each theme folder must contain index.theme file
-    - To know how each theme must be structured check
-        > http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
-        > http://malcer.deviantart.com/art/Caledonia-Icons-264978107
-
 Dependencies:
     - Qt4/Qt5
     - libmagic and libmagic-dev
@@ -52,11 +37,8 @@ Dependencies:
     - libbzip2
     - libarchive
 
-Linux Source Available
-
 Known Bugs
-    - Some issues with cut-copy-paste files and folders
-    - Issues with delete folders
+    - SegmentationFault in NBIconView ::aboveIndex(...), ::belowIndex(...)
 
 List of shortcuts
 +==============================================================+============================+
@@ -97,7 +79,5 @@ List of shortcuts
 +==============================================================+============================+
 
 Upcoming
-    - Qt5 support
-    - Unified Folder, Application, and Catalog Viewer
     - Application Editor ( Desktop file editor )
     - Any other feature you request for... :)

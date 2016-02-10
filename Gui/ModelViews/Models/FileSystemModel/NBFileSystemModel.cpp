@@ -702,8 +702,8 @@ void NBFileSystemModel::setRootPath( QString path ) {
 	/* For all the other folders, we can happily start the watcher */
 	else {
 		watcher->setWatchPath( path );
-		if ( not watcher->isRunning() )
-			watcher->startWatch();
+		// if ( not watcher->isRunning() )
+			// watcher->startWatch();
 	}
 
 	setupModelData();

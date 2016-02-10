@@ -103,8 +103,9 @@ elif [ "$1" == "distclean" ]; then
 
 elif [ "$1" == "install" ]; then
 	if [ "$(id -u)" != "0" ]; then
-		echo "Warning: You may need to run install as root."
+		echo "[Error]: You need to run install as root."
 		read -n 1 -s
+		exit 1
 	fi
 	install
 
