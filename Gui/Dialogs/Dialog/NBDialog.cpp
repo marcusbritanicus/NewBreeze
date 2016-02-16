@@ -5,7 +5,6 @@
 */
 
 #include <NBDialog.hpp>
-#include <NBStyleManager.hpp>
 
 NBDialog::NBDialog( QWidget *parent ) : QDialog( parent ) {
 

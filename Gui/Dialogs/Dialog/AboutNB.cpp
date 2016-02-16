@@ -112,6 +112,7 @@ QWidget* AboutNB::createLicense() {
 		"GNU General Public License for more details.</p>"
 
 		"<p>Press Ctrl+Shift+L while running NewBreeze to see the full license.<br>"
+		"Also the LICENSE file is available with the source for your convenience.<br>"
 		"Alternatively, you may visit http://www.gnu.org/licenses/gpl.html</p>"
 	);
 
@@ -194,5 +195,5 @@ License::License( QWidget *parent ) : QDialog( parent ) {
 	setWindowTitle( "NewBreeze v3.0.0 License" );
 	setWindowIcon( QIcon( ":/icons/newbreeze.png" ) );
 
-	setMinimumSize( QSize( 540, 630 ) );
+	setMinimumSize( QSize( 630, 630 ) );
 };

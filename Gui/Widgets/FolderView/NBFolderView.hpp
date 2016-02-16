@@ -31,7 +31,6 @@
 #include <NBPropertiesDialog.hpp>
 #include <NBRenameDialog.hpp>
 #include <NBRunCmdDialog.hpp>
-#include <NBStyleManager.hpp>
 #include <NBTools.hpp>
 
 class NBFolderView : public QStackedWidget {

@@ -13,7 +13,6 @@
 #include <NBProgressBar.hpp>
 #include <NBIconProvider.hpp>
 #include <NBMessageDialog.hpp>
-#include <NBStyleManager.hpp>
 #include <NBErrorsDialog.hpp>
 
 class NBIOWidget : public QWidget {

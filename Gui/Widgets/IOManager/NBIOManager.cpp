@@ -211,7 +211,6 @@ NBIOManager::NBIOManager( QList<NBFileIO*> jobList, QWidget *parent ) : NBDialog
 
 	QScrollArea *scroller = new QScrollArea();
 	scroller->setWidgetResizable( true );
-	scroller->setPalette( NBStyleManager::transparentPalette() );
 
 	QWidget *baseWidget = new QWidget( this );
 	baseLyt = new QVBoxLayout();

@@ -38,8 +38,6 @@
 #include "ScreenWindow.h"
 #include "TerminalCharacterDecoder.h"
 
-QString getStyleSheet( QString );
-
 using namespace Konsole;
 
 #ifndef loc

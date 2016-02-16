@@ -5,7 +5,6 @@
 */
 
 #include <NBTools.hpp>
-#include <NBStyleManager.hpp>
 
 QDir NBDir( QString path ) {
 
@@ -354,11 +353,6 @@ QString formatSize( qint64 num ) {
 	else total = QString( "%1 byte%2" ).arg( num ).arg( num > 1 ? "s": "" );
 
 	return total;
-};
-
-QString getStyleSheet( QString Widget, QString Style ) {
-
-	return NBStyleManager::getStyleSheet( Widget, Style );
 };
 
 QStringList getTerminal() {
