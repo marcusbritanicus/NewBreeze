@@ -26,9 +26,12 @@
 */
 
 #include <Global.hpp>
+
 #include <NewBreeze.hpp>
-#include <NBSettingsManager.hpp>
+
 #include <NBMessageDialog.hpp>
+#include <AboutNB.hpp>
+#include <NBSettingsManager.hpp>
 #include <NewBreezeTray.hpp>
 
 #include <NBCLParser.hpp>
@@ -68,7 +71,7 @@ int main( int argc, char **argv ) {
 				qDebug() << "Found a running instance. Exiting";
 				NBMessageDialog::information(
 					NULL,
-					"NewBreeze - Open in try",
+					"NewBreeze - Open in tray",
 					"NewBreeze is now open in SystemTray. Left click to show/hide all the open windows, Double click to open a new window, middle click to quit."
 				);
 				return 0;
@@ -95,9 +98,27 @@ int main( int argc, char **argv ) {
 
 		/* We want only the settings */
 		case SETTINGS : {
-			qDebug() << "Showing settings manager";
+			qDebug() << "Showing Settings Dialog";
 			NBSettingsManager *settingsMgr = new NBSettingsManager();
 			settingsMgr->exec();
+
+			return 0;
+		}
+
+		/* We want only the about dialog */
+		case ABOUTNB : {
+			qDebug() << "Showing About NB dialog";
+			AboutNB *aboutNB = new AboutNB();
+			aboutNB->exec();
+
+			return 0;
+		}
+
+		/* We want only the about dialog */
+		case LICENSE : {
+			qDebug() << "Showing NewBreeze License";
+			License *license = new License();
+			license->exec();
 
 			return 0;
 		}

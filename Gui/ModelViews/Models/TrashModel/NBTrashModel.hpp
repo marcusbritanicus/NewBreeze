@@ -5,14 +5,10 @@
 */
 
 #pragma once
-#ifndef NBTRASHMODEL_HPP
-#define NBTRASHMODEL_HPP
 
 #include <Global.hpp>
 #include <NBTools.hpp>
 #include <NBTrashNode.hpp>
-#include <NBFileInfoGatherer.hpp>
-#include <NBFileSystemWatcher.hpp>
 
 class NBTrashModel : public QAbstractItemModel {
     Q_OBJECT
@@ -121,9 +117,6 @@ class NBTrashModel : public QAbstractItemModel {
 		long curIndex;
 		mutable int updatedNodes;
 
-		NBQuickFileInfoGatherer *quickDataGatherer;
-		NBFileSystemWatcher *watcher;
-
 	public slots:
 		void sort();
 
@@ -142,5 +135,3 @@ class NBTrashModel : public QAbstractItemModel {
 		void restored( QModelIndexList );
 		void deleted( QModelIndexList );
 };
-
-#endif

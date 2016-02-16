@@ -17,11 +17,18 @@ class AboutNB : public QDialog {
 	public:
 		AboutNB( QWidget *parent = NULL );
 
-		void setDisplayTab( int );
-
 	private:
 		void createGui();
 		void setWindowProperties();
 
-		int mDisplayTab;
+		QWidget* createAboutNB();
+		QWidget* createLicense();
+		QWidget* createCredits();
+};
+
+class License : public QDialog {
+	Q_OBJECT
+
+	public:
+		License( QWidget *parent = NULL );
 };

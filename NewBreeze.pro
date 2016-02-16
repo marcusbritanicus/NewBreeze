@@ -21,7 +21,7 @@ INCLUDEPATH += Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView G
 INCLUDEPATH += Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
 INCLUDEPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets
 INCLUDEPATH += Gui/Widgets/InfoBar Gui/Widgets/IOManager Gui/Widgets/ProcessManager Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
-INCLUDEPATH += Gui/Widgets/TrashManager StyleSheets
+INCLUDEPATH += Gui/Widgets/TrashManager StyleSheets Data
 
 DEPENDPATH += . Core Core/AppFile Core/Archive Core/ArgParser Core/CoreProcess Core/CoreTools Core/DeleteManager Core/DeviceInfo
 DEPENDPATH += Core/DeviceInfo/QVolumeInfo Core/FileIO Core/FSWatcher Core/IconProvider Core/MimeHandler Core/MultiFile Core/StandardPaths Core/SystemInfo Core/XDG Gui
@@ -33,7 +33,7 @@ DEPENDPATH += Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView Gu
 DEPENDPATH += Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
 DEPENDPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets
 DEPENDPATH += Gui/Widgets/InfoBar Gui/Widgets/IOManager Gui/Widgets/ProcessManager Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
-DEPENDPATH += Gui/Widgets/TrashManager StyleSheets
+DEPENDPATH += Gui/Widgets/TrashManager StyleSheets Data
 
 # Headers
 HEADERS += Core/AppFile/NBAppEngine.hpp

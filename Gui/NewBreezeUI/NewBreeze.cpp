@@ -187,10 +187,15 @@ void NewBreeze::createAndSetupActions() {
 	aboutNBAct->setShortcuts( Settings->Shortcuts.AboutNB );
 	connect( aboutNBAct, SIGNAL( triggered() ), this, SLOT( showAboutNB() ) );
 
-	// About Qt4
+	// About Qt
 	QAction *aboutQtAct = new QAction( this );
 	aboutQtAct->setShortcuts( Settings->Shortcuts.AboutQt );
-	connect( aboutQtAct, SIGNAL( triggered() ), this, SLOT( showAboutQt4() ) );
+	connect( aboutQtAct, SIGNAL( triggered() ), this, SLOT( showAboutQt() ) );
+
+	// About Qt
+	QAction *licenseAct = new QAction( this );
+	licenseAct->setShortcut( tr( "Ctrl+Shift+L" ) );
+	connect( licenseAct, SIGNAL( triggered() ), this, SLOT( showLicense() ) );
 
 	// NB Info
 	QAction *showInfoAct = new QAction( this );
@@ -276,6 +281,7 @@ void NewBreeze::createAndSetupActions() {
 	addAction( clearSearchAct );
 	addAction( aboutNBAct );
 	addAction( aboutQtAct );
+	addAction( licenseAct );
 	addAction( showInfoAct );
 	addAction( showSettingsAct );
 
@@ -365,9 +371,15 @@ void NewBreeze::showAboutNB() {
 	about->exec();
 };
 
-void NewBreeze::showAboutQt4() {
+void NewBreeze::showAboutQt() {
 
 	QMessageBox::aboutQt( this, QObject::tr( "About Qt %1" ).arg( QLatin1String( QT_VERSION_STR ) ) );
+};
+
+void NewBreeze::showLicense() {
+
+	License *license = new License( this );
+	license->exec();
 };
 
 void NewBreeze::showInfoDlg() {

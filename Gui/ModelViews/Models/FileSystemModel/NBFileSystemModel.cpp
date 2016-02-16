@@ -17,16 +17,25 @@ inline bool matchesFilter( QStringList filters, QString text ) {
 
 NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 
+	/* By default we don't show hidden files */
 	__showHidden = false;
+
+	/* Filter both files and folders? */
 	__filterFolders = Settings->General.FilterFolders;
+
+	/* Number of updated files */
 	updatedNodes = 0;
 
+	/* Switch for temination of data gathering */
 	__terminate = false;
 
+	/* Do we show the CombiView */
 	__mCombiShown = false;
 
-	mCategorizationEnabled = false;
+	/* Categrorization enabled by default */
+	mCategorizationEnabled = true;
 
+	/* Useless swtiches */
 	currentLoadStatus.loading = false;
 	currentLoadStatus.stopLoading = false;
 
@@ -37,19 +46,20 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 	oldRoots.clear();
 	curIndex = 0;
 
+	/* Root node */
 	rootNode = new NBFileSystemNode();
 
 	quickDataGatherer = new NBQuickFileInfoGatherer();
 
+	/* NBFileSystemWatcher */
 	watcher = new NBFileSystemWatcher();
-
 	connect( watcher, SIGNAL( nodeCreated( QString ) ), this, SLOT( handleNodeCreated( QString ) ) );
 	connect( watcher, SIGNAL( nodeChanged( QString ) ), this, SLOT( handleNodeChanged( QString ) ) );
 	connect( watcher, SIGNAL( nodeDeleted( QString ) ), this, SLOT( handleNodeDeleted( QString ) ) );
 	connect( watcher, SIGNAL( nodeRenamed( QString, QString ) ), this, SLOT( handleNodeRenamed( QString, QString ) ) );
-
 	connect( watcher, SIGNAL( watchPathDeleted() ), this, SLOT( loadHome() ) );
 
+	/* File info gathering and sorting */
 	connect( this, SIGNAL( loadFileInfo() ), this, SLOT( gatherFileInfo() ) );
 	connect( this, SIGNAL( updatedAllNodes() ), this, SLOT( sort() ) );
 };
@@ -694,17 +704,12 @@ void NBFileSystemModel::setRootPath( QString path ) {
 		currentLoadStatus.stopLoading = true;
 
 	/* If the root path is /dev/, then stop the watcher */
-	if ( __rootPath == "/dev/" ) {
-		if ( watcher->isRunning() )
-			watcher->stopWatch();
-	}
+	if ( __rootPath == "/dev/" )
+		newWatch( QString() );
 
 	/* For all the other folders, we can happily start the watcher */
-	else {
-		watcher->setWatchPath( path );
-		// if ( not watcher->isRunning() )
-			// watcher->startWatch();
-	}
+	else
+		newWatch( path );
 
 	setupModelData();
 };
@@ -916,6 +921,36 @@ void NBFileSystemModel::setupModelData() {
 	emit directoryLoaded( __rootPath );
 };
 
+void NBFileSystemModel::newWatch( QString path ) {
+
+	/* If there is a watch running: delete it and create a new watcher object */
+	if ( watcher->isRunning() ) {
+
+		/* Delete the current watch */
+		watcher->stopWatch();
+		delete watcher;
+
+		/* Create a new watch */
+		watcher = new NBFileSystemWatcher();
+		connect( watcher, SIGNAL( nodeCreated( QString ) ), this, SLOT( handleNodeCreated( QString ) ) );
+		connect( watcher, SIGNAL( nodeChanged( QString ) ), this, SLOT( handleNodeChanged( QString ) ) );
+		connect( watcher, SIGNAL( nodeDeleted( QString ) ), this, SLOT( handleNodeDeleted( QString ) ) );
+		connect( watcher, SIGNAL( nodeRenamed( QString, QString ) ), this, SLOT( handleNodeRenamed( QString, QString ) ) );
+		connect( watcher, SIGNAL( watchPathDeleted() ), this, SLOT( loadHome() ) );
+
+		/* Path is not empty and exists, start the watch */
+		if ( path.count() and exists( path ) )
+			watcher->startWatch( path );
+	}
+
+	/* At this point there will always be a valid watcher object */
+	else {
+		/* Path is not empty and exists, start the watch */
+		if ( path.count() and exists( path ) )
+			watcher->startWatch( path );
+	}
+};
+
 QString NBFileSystemModel::getCategory( QVariantList data ) {
 
 	switch( prevSort.column ) {
@@ -1068,7 +1103,7 @@ void NBFileSystemModel::handleNodeCreated( QString node ) {
 		insertNode( baseName( node ) );
 
 	else
-		qDebug() << dirName( node ) << currentDir();
+		qDebug() << dirName( node ) << currentDir() << node;
 };
 
 void NBFileSystemModel::handleNodeChanged( QString node ) {

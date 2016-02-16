@@ -20,6 +20,8 @@ enum  optionIndex {
 	VERSION,
 	SYSTRAY,
 	SETTINGS,
+	ABOUTNB,
+	LICENSE,
 	FORCENEW,
 	NORMAL
 };

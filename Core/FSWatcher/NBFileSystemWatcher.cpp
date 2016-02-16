@@ -1,195 +1,205 @@
 /*
 	*
-	* NBFileSystemWatcher.cpp - An advanced wrapper based on QFileSystemWatcher
+	* NBFileSystemWatcher.cpp - INotify Class for Qt4
 	*
 */
 
 #include <NBFileSystemWatcher.hpp>
+#include <poll.h>
 
-QMutex mutex;
+NBFileSystemWatcher::NBFileSystemWatcher() : QThread() {
 
-static inline QStringList entries( QString mPath ) {
+	mStopWatch = false;
 
-	QStringList contents;
+	monitor.wd = -1;
+	cookie = -1;
+	mask = -1;
 
-	DIR *dir;
-	struct dirent *ent;
-	dir = opendir( mPath.toLocal8Bit().constData() );
-
-	if ( dir != NULL ) {
-		while ( ( ent = readdir( dir ) ) != NULL) {
-
-			/* Do not show . and .. */
-			QString nodeName = QString::fromLocal8Bit( ent->d_name );
-			if ( ( nodeName.compare( "." ) == 0 ) or ( nodeName.compare( ".." ) == 0 ) )
-				continue;
-
-			/* Show Hidden */
-			if ( ent->d_type == DT_DIR )
-				contents << mPath + nodeName + "/";
-
-			else
-				contents << mPath + nodeName;
-		}
-
-		closedir( dir );
-
-		return contents;
-	}
-
-	return QStringList();
-};
-
-static inline QPair<QStringList, QStringList> difference( QStringList oldList, QStringList newList ) {
-
-	QPair<QStringList, QStringList> pair;
-
-	/* Items in first list not found in second: deleted */
-	Q_FOREACH( QString itm, oldList ) {
-		if ( not newList.contains( itm ) )
-			pair.first << itm;
-	}
-
-	/* Items in second list not found in first: created */
-	Q_FOREACH( QString itm, newList ) {
-		if ( not oldList.contains( itm ) )
-			pair.second << itm;
-	}
-
-	return pair;
-};
-
-NBFileSystemWatcher::NBFileSystemWatcher() : QFileSystemWatcher() {
-
-	connect( this, SIGNAL( directoryChanged( QString ) ), this, SLOT( handleChanged( QString ) ) );
-	connect( this, SIGNAL( fileChanged( QString ) ), this, SLOT( handleChanged( QString ) ) );
-
-	renames.clear();
-};
-
-void NBFileSystemWatcher::setWatchPath( QString path ) {
-
-	if ( not path.endsWith( "/" ) )
-		path += "/";
-
-	/* Remove old watches: directories */
-	Q_FOREACH( QString path, directories() )
-		removePath( path );
-
-	/* Remove old watches: files */
-	Q_FOREACH( QString path, files() )
-		removePath( path );
-
-	addPath( path );
-	watchPath = QString( path );
-
-	contents.clear();
-	contents << entries( path );
-
-	if ( QFileInfo( path ).isDir() ) {
-		Q_FOREACH( QString entry, contents ) {
-			addPath( entry );
-		}
+	inotify_fd = inotify_init();
+	if ( inotify_fd < 0 ) {
+		qCritical() << "Failed initialize inotify";
+		emit watchFailed();
 	}
 };
 
-bool NBFileSystemWatcher::isRunning() {
+NBFileSystemWatcher::~NBFileSystemWatcher() {
 
-	return ( directories().count() and files().count() );
+	if ( monitor.wd >= 0 )
+		stopWatch();
+};
+
+void NBFileSystemWatcher::startWatch( QString wPath ) {
+
+	if ( not wPath.endsWith( "/" ) )
+		wPath += "/";
+
+	monitor.path = strdup( wPath.toLatin1().data() );
+	monitor.wd = inotify_add_watch( inotify_fd, monitor.path, IN_ALL_EVENTS );
+	if ( monitor.wd < 0 ) {
+		qCritical() << "Failed to add watch:" << monitor.path;
+		qCritical() << "inotify_add_watch(...) returned error:" << errno << strerror( errno );
+		emit watchFailed();
+	}
+
+	mStopWatch = false;
+	start();
 };
 
 void NBFileSystemWatcher::stopWatch() {
 
-	/* Remove old watches: directories */
-	Q_FOREACH( QString path, directories() )
-		removePath( path );
+	mStopWatch = true;
 
-	/* Remove old watches: files */
-	Q_FOREACH( QString path, files() )
-		removePath( path );
+	if ( monitor.wd >= 0 ) {
+		inotify_rm_watch( inotify_fd, monitor.wd );
+		free( monitor.path );
+
+		monitor.wd = -1;
+	}
+	close( inotify_fd );
+
+	/* Quit the thread */
+	quit();
+
+	/* Wait for the thread to finish */
+	wait();
 };
 
-void NBFileSystemWatcher::handleChanged( QString cPath ) {
+void NBFileSystemWatcher::run() {
 
-	QMutexLocker locaker( &mutex );
+	struct pollfd fds[ 1 ];
+	fds[ 0 ].fd = inotify_fd;
+	fds[ 0 ].events = POLLIN;
 
-	QFileInfo info( cPath );
+	while ( not mStopWatch ) {
+		/* End watch */
+		if ( mStopWatch )
+			break;
 
-	if ( info.isDir() and not cPath.endsWith( "/") )
-		cPath += "/";
+		/* Block until there is something to be read */
+		if ( poll( fds, 1, -1 ) < 0 )
+			qCritical() << "Couldn't poll():" << strerror( errno );
 
-	if ( cPath != watchPath ) {
-		/* True modification, not rename, delete, etc */
-		if ( info.exists() )
-			emit nodeChanged( cPath );
+		/* Inotify event received? */
+		if ( fds[ 0 ].revents & POLLIN and not mStopWatch ) {
+			char buffer[INOTIFY_BUFFER_SIZE];
+			size_t length;
 
-		/* False deletes due to renames */
-		else if ( not renames.contains( cPath ) )
-			emit nodeDeleted( cPath );
+			/* Read from the FD. It will read all events available up to * the given buffer size. */
+			if ( ( length = read( fds[ 0 ].fd, buffer, INOTIFY_BUFFER_SIZE ) ) > 0 ) {
+				struct inotify_event *event;
+				size_t i = 0;
 
+				while ( i < length ) {
+					if ( mStopWatch )
+						break;
+
+					event = ( struct inotify_event * ) &buffer[ i ];
+					i += EVENT_SIZE + event->len;
+
+					processEvent( event );
+				}
+			}
+		}
+	}
+};
+
+/* Eventually we will emit signals from here, corresponding to each event */
+void NBFileSystemWatcher::processEvent( struct inotify_event *event ) {
+
+	if ( monitor.wd == event->wd ) {
+		if ( ( mask == IN_MOVED_FROM ) and ( cookie != event->cookie ) ) {
+			mask = -1;
+			cookie = -1;
+
+			emit nodeDeleted( oldName );
+		}
+
+		if ( event->mask & IN_ACCESS ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_ATTRIB ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_OPEN ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_CLOSE_WRITE ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_CLOSE_NOWRITE ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_CREATE ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			emit nodeCreated( QString( monitor.path ) + event->name );
+		}
+
+		if ( event->mask & IN_MODIFY ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			emit nodeChanged( QString( monitor.path ) + event->name );
+		}
+
+		if ( event->mask & IN_DELETE ) {
+			mask = event->mask;
+			cookie = event->cookie;
+			emit nodeDeleted( QString( monitor.path ) + event->name );
+		}
+
+		if ( event->mask & IN_DELETE_SELF ) {
+			mask = event->mask;
+			cookie = event->cookie;
+
+			emit watchPathDeleted();
+			stopWatch();
+		}
+
+		if ( event->mask & IN_MOVE_SELF ) {
+			mask = event->mask;
+			cookie = event->cookie;
+
+			emit watchPathDeleted();
+			stopWatch();
+		}
+
+		if ( event->mask & IN_MOVED_FROM ) {
+			mask = IN_MOVED_FROM;
+			cookie = event->cookie;
+
+			oldName = QString( monitor.path ) + event->name;
+		}
+
+		if ( event->mask & IN_MOVED_TO ) {
+			/* If we have the same cookie, and last event was IN_MOVED_FROM */
+			if ( ( cookie == event->cookie ) and ( mask == IN_MOVED_FROM ) ) {
+				mask = -1;
+				cookie = -1;
+				emit nodeRenamed( oldName, QString( monitor.path ) + event->name );
+			}
+
+			/* If the cookie is different or mask is not IN_MOVED_FROM */
+			else {
+				emit nodeCreated( QString( monitor.path ) + event->name );
+			}
+		}
+
+		fflush( stdout );
 		return;
 	}
-
-	/* Fresh event. Clear renames */
-	renames.clear();
-
-	QStringList newContents = entries( watchPath );
-	QPair<QStringList, QStringList> pair = difference( contents, newContents );
-
-	/* Add the new nodes to watch */
-	Q_FOREACH( QString node, pair.second )
-		addPath( node );
-
-	/* Remove the non existing nodes */
-	Q_FOREACH( QString node, pair.first )
-		removePath( node );
-
-	/* First list empty, Second list has contents: Files added */
-	/* Please not that the lists should technically have only one element each */
-	/* The exception is as Qt points out changes in very quick succession */
-	if ( not pair.first.size() and pair.second.size() ) {
-		Q_FOREACH( QString node, pair.second )
-			emit nodeCreated( node );
-	}
-
-	/*
-		*
-		* If the size of the lists is more than one, then we are screwed.
-		* The reason is Qt: Multiple events in fast succession may cause only one signal
-		* Hopefully this does not happen except in cases like batch renaming
-		* Since the renames are one to one mapping, we can match randomly
-		*
-	*/
-	else if ( pair.first.size() == pair.second.size() ) {
-		for( int i = 0; i < pair.first.size(); i++ )
-			emit nodeRenamed( pair.first.at( i ), pair.second.at( i ) );
-
-		renames << pair.first;
-	}
-
-	/* First list has contents, second list empty: Files deleted */
-	/* Please not that the lists should technically have only one element each */
-	/* The exception is as Qt points out changes in very quick succession */
-	else if ( pair.first.size() and not pair.second.size() ) {
-		Q_FOREACH( QString node, pair.second )
-			emit nodeDeleted( node );
-	}
-
-	/*
-		*
-		* This should not happen except in cases where several files have been deleted very fast and
-		* several files have been added very fast resulting in just one signal. We just handle it to
-		* avoid ugly consequences.
-		*
-	*/
-	else if ( pair.first.size() and pair.second.size() ) {
-		Q_FOREACH( QString node, pair.second )
-			emit nodeDeleted( node );
-
-		Q_FOREACH( QString node, pair.second )
-			emit nodeCreated( node );
-	}
-
-	contents.clear();
-	contents << newContents;
 };

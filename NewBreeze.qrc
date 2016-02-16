@@ -24,6 +24,7 @@
 		<file>icons/comp.png</file>
 		<file>icons/compress.png</file>
 		<file>icons/copy.png</file>
+		<file>icons/credits.png</file>
 		<file>icons/cut.png</file>
 		<file>icons/delete.png</file>
 		<file>icons/desktop.png</file>
@@ -49,6 +50,7 @@
 		<file>icons/inode-fifo.png</file>
 		<file>icons/inode-socket.png</file>
 		<file>icons/keybindings.png</file>
+		<file>icons/license.png</file>
 		<file>icons/list-add.png</file>
 		<file>icons/list-remove.png</file>
 		<file>icons/maximize.png</file>
@@ -100,8 +102,10 @@
 		<file>README</file>
 
 		<file>Data/NBFSExtData.conf</file>
+		<file>Data/GPL3.html</file>
+		<file>Data/Credits.html</file>
 
-		<file>StyleSheets/Template/NBDialog.qss</file>
+ 		<file>StyleSheets/Template/NBDialog.qss</file>
 		<file>StyleSheets/Template/NBInfoBar.qss</file>
 		<file>StyleSheets/Template/NBPreview.qss</file>
 		<file>StyleSheets/Template/NBShowHideButton.qss</file>

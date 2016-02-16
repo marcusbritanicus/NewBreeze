@@ -113,6 +113,13 @@ elif [ "$1" == "local" ]; then
 	installLocal
 
 else
-	build
+	echo "BuildPlugins.sh - NewBreeze Plugins Builder"
+	echo
+	echo "Usage:"
+	echo "    ./BuildPlugins.sh build          # Build Plugins"
+	echo "    ./BuildPlugins.sh clean          # Do 'make clean' recursively for all plugins"
+	echo "    ./BuildPlugins.sh distclean      # Do 'make distclean' recursively for all plugins"
+	echo "    ./BuildPlugins.sh install        # Install Plugins globally: to /usr/share/newbreeze/plugins"
+	echo "    ./BuildPlugins.sh local          # Install Plugins locally: to /usr/share/newbreeze/plugins"
 
 fi

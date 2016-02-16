@@ -27,8 +27,8 @@ struct Arg: public option::Arg {
 
 const option::Descriptor usage[] = {
     /* Help prefix */
-    { UNKNOWN,    0,   "",     "",            Arg::Unknown,     "NewBreeze version 2.3.0\n"
-		                                                        "Copyright (C) 2014 Marcus Britanicus\n\n"
+    { UNKNOWN,    0,   "",     "",            Arg::Unknown,     "NewBreeze version 3.0.0 Alpha\n"
+		                                                        "Copyright (C) 2016 Marcus Britanicus\n\n"
 		                                                        "This is free software and is released under the GPLv3 license.\n"
 		                                                        "There is ABSOLUTELY NO WARRANTY; not even for MERCHANTABILITY or "
 		                                                        "FITNESS FOR A PARTICULAR PURPOSE.\n\n"
@@ -53,6 +53,12 @@ const option::Descriptor usage[] = {
 	/* Print the settings option */
     { SETTINGS,   0,   "s",    "settings",    Arg::None,        "    -s, --settings   Open the settings dialog." },
 
+	/* Print the about option */
+    { ABOUTNB,      0,   "a",    "about",     Arg::None,        "    -a, --about      Show the about NewBreeze dialog." },
+
+	/* Print the about option */
+    { LICENSE,      0,   "l",    "license",   Arg::None,        "    -l, --license    Show the NewBreeze License dialog." },
+
 	/* Print the force-new option */
     { FORCENEW,   0,   "f",    "force-new",   Arg::None,        "    -f, --force-new  Kill the old server and start a new one." },
 
@@ -67,10 +73,12 @@ const option::Descriptor usage[] = {
                                                                 "    newbreeze2 -t                           # Opens an instance in tray\n"
                                                                 "    newbreeze2 -s                           # Opens the settings dialog\n"
                                                                 "    newbreeze2 --settings                   # Opens the settings dialog\n"
+                                                                "    newbreeze2 -a                           # Opens the about NB dialog\n"
+                                                                "    newbreeze2 --license                    # Opens the NB license dialog\n"
                                                                 "    newbreeze2 --force-new                  # Kills the existsing server and "
-                                                                                                    "opens window at the last opened location\n"
+                                                                                                             "opens window at the last opened location\n"
                                                                 "    newbreeze2 --force-new /home/cosmos     # Kills the existsing server and "
-                                                                                                              "opens a window at /home/cosmos\n"
+                                                                                                             "opens a window at /home/cosmos\n"
     },
 
     /* End of options */
@@ -154,6 +162,20 @@ int NBArgParser( int argc, char** argv ) {
 			fprintf( stdout, "Ignoring the %d extra arguments specified...\n", parse.optionsCount() + parse.nonOptionsCount() - 1 );
 
 		return SETTINGS;
+	}
+
+	if ( options[ ABOUTNB ] ) {
+		if( argc > 1 )
+			fprintf( stdout, "Ignoring the %d extra arguments specified...\n", parse.optionsCount() + parse.nonOptionsCount() - 1 );
+
+		return ABOUTNB;
+	}
+
+	if ( options[ LICENSE ] ) {
+		if( argc > 1 )
+			fprintf( stdout, "Ignoring the %d extra arguments specified...\n", parse.optionsCount() + parse.nonOptionsCount() - 1 );
+
+		return LICENSE;
 	}
 
 	/* If there some other argument was given to @a --settings, ignore it, but print it to let the user know */

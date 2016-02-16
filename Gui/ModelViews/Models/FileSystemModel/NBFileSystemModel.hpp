@@ -142,6 +142,9 @@ class NBFileSystemModel : public QAbstractItemModel {
 		// Model Data for combi view
 		void setupCombiViewData();
 
+		/* New watch */
+		void newWatch( QString );
+
 		QString getCategory( QVariantList );
 		void recategorize();
 

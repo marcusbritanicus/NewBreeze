@@ -61,7 +61,9 @@ class NewBreeze : public QMainWindow {
 
 	private Q_SLOTS:
 		void showAboutNB();
-		void showAboutQt4();
+		void showAboutQt();
+		void showLicense();
+
 		void showInfoDlg();
 		void showSettingsDialog();
 		void showCustomActionsDialog();
