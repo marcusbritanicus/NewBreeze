@@ -105,14 +105,6 @@
 		<file>Data/GPL3.html</file>
 		<file>Data/Credits.html</file>
 
- 		<file>StyleSheets/Template/NBDialog.qss</file>
-		<file>StyleSheets/Template/NBInfoBar.qss</file>
-		<file>StyleSheets/Template/NBPreview.qss</file>
-		<file>StyleSheets/Template/NBShowHideButton.qss</file>
-		<file>StyleSheets/Template/NBSidePanel.qss</file>
-		<file>StyleSheets/Template/NBTitleBar.qss</file>
-		<file>StyleSheets/Template/NewBreeze.qss</file>
-
 		<file>Data/freedesktop.org.xml</file>
 	</qresource>
 </RCC>

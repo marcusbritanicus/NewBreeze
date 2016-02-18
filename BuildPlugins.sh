@@ -18,6 +18,24 @@ build() {
 	cd ..
 }
 
+build5() {
+	# Switch to Plugins folder
+	cd Plugins
+
+	# Build Default Plugin Set
+	cd Default
+	qmake-qt5 && make
+	cd ..
+
+	# Build MarkDown Plugin
+	cd MarkDown
+	qmake-qt5 && make
+	cd ..
+
+	# Switch to current directory
+	cd ..
+}
+
 clean() {
 	# Switch to Plugins folder
 	cd Plugins
@@ -55,6 +73,9 @@ distclean() {
 }
 
 install() {
+	# First make sure we have built the libs
+	build
+
 	# Switch to Plugins folder
 	cd Plugins
 
@@ -73,6 +94,9 @@ install() {
 }
 
 installLocal() {
+	# First make sure we have built the libs
+	build
+
 	# Switch to Plugins folder
 	cd Plugins
 

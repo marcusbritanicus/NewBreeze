@@ -1,47 +1,39 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Ivan Komissarov
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2014 Ivan Komissarov <ABBAPOH@gmail.com>
+** Contact: http://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL$
+** $QT_BEGIN_LICENSE:LGPL21$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
+** a written agreement between you and The Qt Company. For licensing terms
+** and conditions see http://www.qt.io/terms-conditions. For further
+** information use the contact form at http://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 2.1 or version 3 as published by the Free
+** Software Foundation and appearing in the file LICENSE.LGPLv21 and
+** LICENSE.LGPLv3 included in the packaging of this file. Please review the
+** following information to ensure the GNU Lesser General Public License
+** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
+** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
+** As a special exception, The Qt Company gives you certain additional
+** rights. These rights are described in The Qt Company LGPL Exception
 ** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 3.0 as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU General Public License version 3.0 requirements will be
-** met: http://www.gnu.org/copyleft/gpl.html.
-**
 **
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
 
-#include <QVolumeInfoP.hpp>
+#include "QVolumeInfoP.hpp"
 
-#include <QtCore>
+#include <QtCore/qdiriterator.h>
 #include <QtCore/qfileinfo.h>
 #include <QtCore/qtextstream.h>
 
@@ -49,26 +41,55 @@
 
 #include <errno.h>
 #include <sys/stat.h>
-#include <sys/vfs.h>
 
 #if defined(Q_OS_BSD4)
 #  include <sys/mount.h>
-#elif defined(Q_OS_LINUX)
-#  include <mntent.h>
 #  include <sys/statvfs.h>
 #elif defined(Q_OS_ANDROID)
 #  include <sys/mount.h>
+#  include <sys/vfs.h>
 #  include <mntent.h>
+#elif defined(Q_OS_LINUX)
+#  include <mntent.h>
+#  include <sys/statvfs.h>
 #elif defined(Q_OS_SOLARIS)
 #  include <sys/mnttab.h>
+#  include <sys/statvfs.h>
+#elif defined(Q_OS_HAIKU)
+#  include <Directory.h>
+#  include <Path.h>
+#  include <Volume.h>
+#  include <VolumeRoster.h>
+#  include <fs_info.h>
+#  include <sys/statvfs.h>
+#else
+#  include <sys/statvfs.h>
 #endif
 
 #if defined(Q_OS_BSD4)
-#  define QT_STATFSBUF struct statvfs
-#  define QT_STATFS    ::statvfs
+#  if defined(Q_OS_NETBSD)
+     define QT_STATFSBUF struct statvfs
+     define QT_STATFS    ::statvfs
+#  else
+#    define QT_STATFSBUF struct statfs
+#    define QT_STATFS    ::statfs
+#  endif
+
+#  if !defined(ST_RDONLY)
+#    define ST_RDONLY MNT_RDONLY
+#  endif
+#  if !defined(_STATFS_F_FLAGS)
+#    define _STATFS_F_FLAGS 1
+#  endif
 #elif defined(Q_OS_ANDROID)
 #  define QT_STATFS    ::statfs
 #  define QT_STATFSBUF struct statfs
+#  if !defined(ST_RDONLY)
+#    define ST_RDONLY 1 // hack for missing define on Android
+#  endif
+#elif defined(Q_OS_HAIKU)
+#  define QT_STATFSBUF struct statvfs
+#  define QT_STATFS    ::statvfs
 #else
 #  if defined(QT_LARGEFILE_SUPPORT)
 #    define QT_STATFSBUF struct statvfs64
@@ -79,49 +100,32 @@
 #  endif // QT_LARGEFILE_SUPPORT
 #endif // Q_OS_BSD4
 
-#if QT_VERSION <= 0x050000
-	# define Q_NULLPTR         NULL
-#endif
-
 QT_BEGIN_NAMESPACE
 
 static bool isPseudoFs(const QString &mountDir, const QByteArray &type)
 {
-    if (type.startsWith('/'))
-        return false;
-
-	#if QT_VERSION >= 0x050000
-		if (mountDir.startsWith(QStringLiteral("/dev"))
-			|| mountDir.startsWith(QStringLiteral("/proc"))
-			|| mountDir.startsWith(QStringLiteral("/run"))
-			|| mountDir.startsWith(QStringLiteral("/sys"))
-			|| mountDir.startsWith(QStringLiteral("/var/run"))
-			|| mountDir.startsWith(QStringLiteral("/var/lock"))) {
-			return true;
-	#else
-		if (mountDir.startsWith(QString("/dev"))
-			|| mountDir.startsWith(QString("/proc"))
-			|| mountDir.startsWith(QString("/run"))
-			|| mountDir.startsWith(QString("/sys"))
-			|| mountDir.startsWith(QString("/var/run"))
-			|| mountDir.startsWith(QString("/var/lock"))) {
-			return true;
-	#endif
+    if (mountDir.startsWith(QLatin1String("/dev"))
+        || mountDir.startsWith(QLatin1String("/proc"))
+        || mountDir.startsWith(QLatin1String("/sys"))
+        || mountDir.startsWith(QLatin1String("/var/run"))
+        || mountDir.startsWith(QLatin1String("/var/lock"))) {
+        return true;
     }
-
+    if (type == "tmpfs")
+        return true;
 #if defined(Q_OS_LINUX)
-    if (type == "rootfs")
+    if (type == "rootfs" || type == "rpc_pipefs")
         return true;
 #endif
 
     return false;
 }
 
-class QVolumeIterator
+class QStorageIterator
 {
 public:
-    QVolumeIterator();
-    ~QVolumeIterator();
+    QStorageIterator();
+    ~QStorageIterator();
 
     inline bool isValid() const;
     inline bool next();
@@ -130,165 +134,305 @@ public:
     inline QByteArray device() const;
 private:
 #if defined(Q_OS_BSD4)
-    statfs *stat_buf;
+    QT_STATFSBUF *stat_buf;
     int entryCount;
     int currentIndex;
+#elif defined(Q_OS_SOLARIS)
+    FILE *fp;
+    mnttab mnt;
+#elif defined(Q_OS_ANDROID)
+    QFile file;
+    QByteArray m_rootPath;
+    QByteArray m_fileSystemType;
+    QByteArray m_device;
 #elif defined(Q_OS_LINUX)
     FILE *fp;
     mntent mnt;
     QByteArray buffer;
-#elif defined(Q_OS_SOLARIS)
-    FILE *fp;
-    mnttab mnt;
+#elif defined(Q_OS_HAIKU)
+    BVolumeRoster m_volumeRoster;
+
+    QByteArray m_rootPath;
+    QByteArray m_fileSystemType;
+    QByteArray m_device;
 #endif
 };
 
 #if defined(Q_OS_BSD4)
 
-inline QVolumeIterator::QVolumeIterator()
+inline QStorageIterator::QStorageIterator()
     : entryCount(::getmntinfo(&stat_buf, 0)),
       currentIndex(-1)
 {
 }
 
-inline QVolumeIterator::~QVolumeIterator()
+inline QStorageIterator::~QStorageIterator()
 {
 }
 
-inline bool QVolumeIterator::isValid() const
+inline bool QStorageIterator::isValid() const
 {
     return entryCount != -1;
 }
 
-inline bool QVolumeIterator::next()
+inline bool QStorageIterator::next()
 {
     return ++currentIndex < entryCount;
 }
 
-inline QString QVolumeIterator::rootPath() const
+inline QString QStorageIterator::rootPath() const
 {
     return QFile::decodeName(stat_buf[currentIndex].f_mntonname);
 }
 
-inline QByteArray QVolumeIterator::fileSystemType() const
+inline QByteArray QStorageIterator::fileSystemType() const
 {
     return QByteArray(stat_buf[currentIndex].f_fstypename);
 }
 
-inline QByteArray QVolumeIterator::device() const
+inline QByteArray QStorageIterator::device() const
 {
     return QByteArray(stat_buf[currentIndex].f_mntfromname);
 }
 
 #elif defined(Q_OS_SOLARIS)
 
-static const char pathMounted[] = "/etc/mtab";
+static const char pathMounted[] = "/etc/mnttab";
 
-inline QVolumeIterator::QVolumeIterator()
+inline QStorageIterator::QStorageIterator()
 {
     const int fd = qt_safe_open(pathMounted, O_RDONLY);
     fp = ::fdopen(fd, "r");
 }
 
-inline QVolumeIterator::~QVolumeIterator()
+inline QStorageIterator::~QStorageIterator()
 {
     if (fp)
         ::fclose(fp);
 }
 
-inline bool QVolumeIterator::isValid() const
+inline bool QStorageIterator::isValid() const
 {
-    return fp != Q_NULLPTR;
+    return fp != NULL;
 }
 
-inline bool QVolumeIterator::next()
+inline bool QStorageIterator::next()
 {
-    return ::getmntent(fp, &mnt) == Q_NULLPTR;
+    return ::getmntent(fp, &mnt) == 0;
 }
 
-inline QString QVolumeIterator::rootPath() const
+inline QString QStorageIterator::rootPath() const
 {
-    return QFile::decodeName(mnt->mnt_mountp);
+    return QFile::decodeName(mnt.mnt_mountp);
 }
 
-inline QByteArray QVolumeIterator::fileSystemType() const
+inline QByteArray QStorageIterator::fileSystemType() const
 {
-    return QByteArray(mnt->mnt_fstype);
+    return QByteArray(mnt.mnt_fstype);
 }
 
-inline QByteArray QVolumeIterator::device() const
+inline QByteArray QStorageIterator::device() const
 {
-    return QByteArray(mnt->mnt_mntopts);
+    return QByteArray(mnt.mnt_mntopts);
 }
 
-#else
+#elif defined(Q_OS_ANDROID)
+
+static const char pathMounted[] = "/proc/mounts";
+
+inline QStorageIterator::QStorageIterator()
+{
+    file.setFileName(pathMounted);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+}
+
+inline QStorageIterator::~QStorageIterator()
+{
+}
+
+inline bool QStorageIterator::isValid() const
+{
+    return file.isOpen();
+}
+
+inline bool QStorageIterator::next()
+{
+    QList<QByteArray> data;
+    do {
+        const QByteArray line = file.readLine();
+        data = line.split(' ');
+    } while (data.count() < 3 && !file.atEnd());
+
+    if (file.atEnd())
+        return false;
+    m_device = data.at(0);
+    m_rootPath = data.at(1);
+    m_fileSystemType = data.at(2);
+
+    return true;
+}
+
+inline QString QStorageIterator::rootPath() const
+{
+    return QFile::decodeName(m_rootPath);
+}
+
+inline QByteArray QStorageIterator::fileSystemType() const
+{
+    return m_fileSystemType;
+}
+
+inline QByteArray QStorageIterator::device() const
+{
+    return m_device;
+}
+
+#elif defined(Q_OS_LINUX)
 
 static const char pathMounted[] = "/etc/mtab";
 static const int bufferSize = 3*PATH_MAX; // 2 paths (mount point+device) and metainfo
 
-inline QVolumeIterator::QVolumeIterator() :
-    buffer(bufferSize, 0)
+inline QStorageIterator::QStorageIterator() :
+    buffer(QByteArray(bufferSize, 0))
 {
-#if defined(Q_OS_ANDROID)
-    const int fd = qt_safe_open(pathMounted, O_RDONLY);
-    fp = ::fdopen(fd, "r");
-#else
     fp = ::setmntent(pathMounted, "r");
-#endif
 }
 
-inline QVolumeIterator::~QVolumeIterator()
+inline QStorageIterator::~QStorageIterator()
 {
-#if defined(Q_OS_ANDROID)
-    if (fp)
-        ::fclose(fp);
-#else
     if (fp)
         ::endmntent(fp);
-#endif
 }
 
-inline bool QVolumeIterator::isValid() const
+inline bool QStorageIterator::isValid() const
 {
-    return fp != Q_NULLPTR;
+    return fp != NULL;
 }
 
-inline bool QVolumeIterator::next()
+inline bool QStorageIterator::next()
 {
-    return ::getmntent_r(fp, &mnt, buffer.data(), buffer.size()) != Q_NULLPTR;
+    return ::getmntent_r(fp, &mnt, buffer.data(), buffer.size()) != NULL;
 }
 
-inline QString QVolumeIterator::rootPath() const
+inline QString QStorageIterator::rootPath() const
 {
     return QFile::decodeName(mnt.mnt_dir);
 }
 
-inline QByteArray QVolumeIterator::fileSystemType() const
+inline QByteArray QStorageIterator::fileSystemType() const
 {
     return QByteArray(mnt.mnt_type);
 }
 
-inline QByteArray QVolumeIterator::device() const
+inline QByteArray QStorageIterator::device() const
 {
     return QByteArray(mnt.mnt_fsname);
 }
 
+#elif defined(Q_OS_HAIKU)
+inline QStorageIterator::QStorageIterator()
+{
+}
+
+inline QStorageIterator::~QStorageIterator()
+{
+}
+
+inline bool QStorageIterator::isValid() const
+{
+    return true;
+}
+
+inline bool QStorageIterator::next()
+{
+    BVolume volume;
+
+    if (m_volumeRoster.GetNextVolume(&volume) != B_OK)
+        return false;
+
+    BDirectory directory;
+    if (volume.GetRootDirectory(&directory) != B_OK)
+        return false;
+
+    const BPath path(&directory);
+
+    fs_info fsInfo;
+    memset(&fsInfo, 0, sizeof(fsInfo));
+
+    if (fs_stat_dev(volume.Device(), &fsInfo) != 0)
+        return false;
+
+    m_rootPath = path.Path();
+    m_fileSystemType = QByteArray(fsInfo.fsh_name);
+
+    const QByteArray deviceName(fsInfo.device_name);
+    m_device = (deviceName.isEmpty() ? QByteArray::number(qint32(volume.Device())) : deviceName);
+
+    return true;
+}
+
+inline QString QStorageIterator::rootPath() const
+{
+    return QFile::decodeName(m_rootPath);
+}
+
+inline QByteArray QStorageIterator::fileSystemType() const
+{
+    return m_fileSystemType;
+}
+
+inline QByteArray QStorageIterator::device() const
+{
+    return m_device;
+}
+
+#else
+
+inline QStorageIterator::QStorageIterator()
+{
+}
+
+inline QStorageIterator::~QStorageIterator()
+{
+}
+
+inline bool QStorageIterator::isValid() const
+{
+    return false;
+}
+
+inline bool QStorageIterator::next()
+{
+    return false;
+}
+
+inline QString QStorageIterator::rootPath() const
+{
+    return QString();
+}
+
+inline QByteArray QStorageIterator::fileSystemType() const
+{
+    return QByteArray();
+}
+
+inline QByteArray QStorageIterator::device() const
+{
+    return QByteArray();
+}
+
 #endif
 
-void QVolumeInfoPrivate::initRootPath()
+void QStorageInfoPrivate::initRootPath()
 {
     rootPath = QFileInfo(rootPath).canonicalFilePath();
 
     if (rootPath.isEmpty())
         return;
 
-    QVolumeIterator it;
+    QStorageIterator it;
     if (!it.isValid()) {
-		#if QT_VERSION >= 0x050000
-			rootPath = QStringLiteral("/");
-		#else
-			rootPath = QString( "/" );
-		#endif
+        rootPath = QString("/");
         return;
     }
 
@@ -323,6 +467,19 @@ static inline QString retrieveLabel(const QByteArray &device)
         if (fileInfo.isSymLink() && fileInfo.symLinkTarget().toLocal8Bit() == device)
             return fileInfo.fileName();
     }
+#elif defined Q_OS_HAIKU
+    fs_info fsInfo;
+    memset(&fsInfo, 0, sizeof(fsInfo));
+
+    int32 pos = 0;
+    dev_t dev;
+    while ((dev = next_dev(&pos)) >= 0) {
+        if (fs_stat_dev(dev, &fsInfo) != 0)
+            continue;
+
+        if (qstrcmp(fsInfo.device_name, device.constData()) == 0)
+            return QString::fromLocal8Bit(fsInfo.volume_name);
+    }
 #else
     Q_UNUSED(device);
 #endif
@@ -330,40 +487,17 @@ static inline QString retrieveLabel(const QByteArray &device)
     return QString();
 }
 
-void QVolumeInfoPrivate::doStat(uint requiredFlags)
+void QStorageInfoPrivate::doStat()
 {
-    if (getCachedFlag(requiredFlags))
+    initRootPath();
+    if (rootPath.isEmpty())
         return;
 
-    if (!getCachedFlag(CachedRootPathFlag | CachedDeviceFlag | CachedFileSystemTypeFlag)) {
-        initRootPath();
-        setCachedFlag(CachedRootPathFlag | CachedDeviceFlag | CachedFileSystemTypeFlag);
-    }
-
-    if (rootPath.isEmpty() || (getCachedFlag(CachedValidFlag) && !valid))
-        return;
-
-    if (!getCachedFlag(CachedValidFlag))
-        requiredFlags |= CachedValidFlag; // force volume validation
-
-    uint bitmask = CachedBytesTotalFlag | CachedBytesFreeFlag | CachedBytesAvailableFlag
-            | CachedReadOnlyFlag | CachedReadyFlag | CachedValidFlag;
-    if (requiredFlags & bitmask) {
-        retreiveVolumeInfo();
-        setCachedFlag(bitmask);
-
-        if (!valid)
-            return;
-    }
-
-    bitmask = CachedLabelFlag;
-    if (requiredFlags & bitmask) {
-        name = retrieveLabel(device);
-        setCachedFlag(bitmask);
-    }
+    retrieveVolumeInfo();
+    name = retrieveLabel(device);
 }
 
-void QVolumeInfoPrivate::retreiveVolumeInfo()
+void QStorageInfoPrivate::retrieveVolumeInfo()
 {
     QT_STATFSBUF statfs_buf;
     int result;
@@ -375,22 +509,23 @@ void QVolumeInfoPrivate::retreiveVolumeInfo()
         bytesTotal = statfs_buf.f_blocks * statfs_buf.f_bsize;
         bytesFree = statfs_buf.f_bfree * statfs_buf.f_bsize;
         bytesAvailable = statfs_buf.f_bavail * statfs_buf.f_bsize;
-
-#if defined(Q_OS_ANDROID)
-        readOnly = (statfs_buf.f_flags & 1 /* MS_RDONLY */) != 0;
+#if defined(Q_OS_ANDROID) || defined (Q_OS_BSD4)
+#if defined(_STATFS_F_FLAGS)
+        readOnly = (statfs_buf.f_flags & ST_RDONLY) != 0;
+#endif
 #else
         readOnly = (statfs_buf.f_flag & ST_RDONLY) != 0;
 #endif
     }
 }
 
-QList<QVolumeInfo> QVolumeInfoPrivate::volumes()
+QList<QStorageInfo> QStorageInfoPrivate::mountedVolumes()
 {
-    QVolumeIterator it;
+    QStorageIterator it;
     if (!it.isValid())
-        return QList<QVolumeInfo>() << rootVolume();
+        return QList<QStorageInfo>() << root();
 
-    QList<QVolumeInfo> volumes;
+    QList<QStorageInfo> volumes;
 
     while (it.next()) {
         const QString mountDir = it.rootPath();
@@ -398,26 +533,15 @@ QList<QVolumeInfo> QVolumeInfoPrivate::volumes()
         if (isPseudoFs(mountDir, fsName))
             continue;
 
-        QVolumeInfoPrivate *data = new QVolumeInfoPrivate;
-        data->rootPath = mountDir;
-        data->device = QByteArray(it.device());
-        data->fileSystemType = fsName;
-        data->setCachedFlag(CachedRootPathFlag |
-                            CachedFileSystemTypeFlag |
-                            CachedDeviceFlag);
-        volumes.append(QVolumeInfo(*data));
+        volumes.append(QStorageInfo(mountDir));
     }
 
     return volumes;
 }
 
-QVolumeInfo QVolumeInfoPrivate::rootVolume()
+QStorageInfo QStorageInfoPrivate::root()
 {
-	#if QT_VERSION >= 0x050000
-		return QVolumeInfo(QStringLiteral("/"));
-	#else
-		return QVolumeInfo(QString("/"));
-	#endif
+    return QStorageInfo(QString("/"));
 }
 
 QT_END_NAMESPACE

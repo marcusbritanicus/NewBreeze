@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBDELETEMANAGER_HPP
-#define NBDELETEMANAGER_HPP
 
 #include <Global.hpp>
 
@@ -74,5 +72,3 @@ class NBTrasher : public QObject {
 	Q_SIGNALS:
 		void completed( QStringList, QStringList );
 };
-
-#endif

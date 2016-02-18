@@ -48,5 +48,5 @@ class NBPluginInterface {
 };
 
 QT_BEGIN_NAMESPACE
-Q_DECLARE_INTERFACE( NBPluginInterface, "com.trolltech.NewBreeze.NBPluginInterface/1.0")
+Q_DECLARE_INTERFACE( NBPluginInterface, "com.NewBreeze.NBPluginInterface/3.0.0")
 QT_END_NAMESPACE

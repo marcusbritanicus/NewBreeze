@@ -10,13 +10,6 @@ VERSION = "3.0.0"
 # Boost Libs
 LIBS += -lboost_regex
 
-# Qt5 Support
-# ===========
-greaterThan(QT_MAJOR_VERSION, 4) {
-	QT += widgets
-	QT += webkitwidgets
-}
-
 # Plugin Mode
 # ===========
 CONFIG += plugin
@@ -24,6 +17,13 @@ CONFIG += plugin
 # Webkit Support for WebWatch
 # ===========================
 QT += webkit
+
+# Qt5 Support
+# ===========
+greaterThan(QT_MAJOR_VERSION, 4) {
+	QT += widgets
+	QT += webkitwidgets
+}
 
 # NBPreviewInterface.hpp
 # ====================

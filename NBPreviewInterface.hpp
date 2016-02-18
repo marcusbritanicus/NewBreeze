@@ -5,16 +5,10 @@
 */
 
 #pragma once
-#ifndef NBPREVIEWINTERFACE_HPP
-#define NBPREVIEWINTERFACE_HPP
 
-#include <QtPlugin>
-
-QT_BEGIN_NAMESPACE
-class QString;
-class QStringList;
-class QDialog;
-QT_END_NAMESPACE
+#include <QString>;
+#include <QStringList>;
+#include <QDialog>;
 
 class NBPreviewInterface {
 
@@ -29,7 +23,5 @@ class NBPreviewInterface {
 };
 
 QT_BEGIN_NAMESPACE
-Q_DECLARE_INTERFACE( NBPreviewInterface, "com.trolltech.NewBreeze.NBPreviewInterface/1.0")
+Q_DECLARE_INTERFACE( NBPreviewInterface, "org.NewBreeze.NBPreviewInterface" )
 QT_END_NAMESPACE
-
-#endif

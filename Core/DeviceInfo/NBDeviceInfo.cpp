@@ -110,13 +110,8 @@ QList<NBDeviceInfo> NBDeviceManager::allDevices() {
 
 	QList<NBDeviceInfo> devices;
 
-	#if QT_VERSION >= 0x050000
-		Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() )
-			devices << NBDeviceManager::deviceInfoForPath( sInfo.rootPath() );
-	#else
-		Q_FOREACH( QVolumeInfo vInfo, QVolumeInfo::volumes() )
-			devices << NBDeviceManager::deviceInfoForPath( vInfo.rootPath() );
-	#endif
+	Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() )
+		devices << NBDeviceManager::deviceInfoForPath( sInfo.rootPath() );
 
 	return devices;
 };
@@ -125,33 +120,19 @@ NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
 
 	NBDeviceInfo devInfo;
 
-	#if QT_VERSION >= 0x050000
-		QStorageInfo sInfo;
-		sInfo.setPath( path );
+	QStorageInfo sInfo;
+	sInfo.setPath( path );
 
-		devInfo.dN = sInfo.device();
-		devInfo.dL = getDevLabel( sInfo.name(), sInfo.displayName() );
-		devInfo.fS = sInfo.fileSystemType();
-		devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
-		devInfo.mP = sInfo.rootPath();
-		devInfo.fSz = sInfo.bytesFree();
-		devInfo.aSz = sInfo.bytesAvailable();
-		devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
-		devInfo.dSz = sInfo.bytesTotal();
-	#else
-		QVolumeInfo vInfo;
-		vInfo.setPath( path );
+	devInfo.dN = sInfo.device();
+	devInfo.dL = getDevLabel( sInfo.name(), sInfo.displayName() );
+	devInfo.fS = sInfo.fileSystemType();
+	devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
+	devInfo.mP = sInfo.rootPath();
+	devInfo.fSz = sInfo.bytesFree();
+	devInfo.aSz = sInfo.bytesAvailable();
+	devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
+	devInfo.dSz = sInfo.bytesTotal();
 
-		devInfo.dN = vInfo.device();
-		devInfo.dL = getDevLabel( vInfo.name(), vInfo.displayName() );
-		devInfo.fS = vInfo.fileSystemType();
-		devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
-		devInfo.mP = vInfo.rootPath();
-		devInfo.fSz = vInfo.bytesFree();
-		devInfo.aSz = vInfo.bytesAvailable();
-		devInfo.uSz = vInfo.bytesTotal() - vInfo.bytesFree();
-		devInfo.dSz = vInfo.bytesTotal();
-	#endif
 
 	if ( devInfo.mP == "/" )
 		devInfo.dT = "hdd";

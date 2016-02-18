@@ -4,10 +4,10 @@
 	*
 */
 
-#ifndef NBPREVIEWWIDGET_HPP
-#define NBPREVIEWWIDGET_HPP
+#pragma once
 
 #include <NBPreviewInterface.hpp>
+
 #include <NBDjvuDisplay.hpp>
 #include <NBImagePeek.hpp>
 #include <NBOdfOgle.hpp>
@@ -15,20 +15,21 @@
 #include <NBWebWatch.hpp>
 #include <NBWordView.hpp>
 
-QT_BEGIN_NAMESPACE
-class QString;
-class QStringList;
-class QWidget;
-QT_END_NAMESPACE
+#include <QtPlugin>
+#include <Global.hpp>
 
-class NBPreviewWidget : public QObject, public NBPreviewInterface {
+#if QT_VERSION < 0x050000
+	#define Q_DECL_OVERRIDE
+#endif
 
+class NBPreviewWidget : public QObject, NBPreviewInterface {
 	Q_OBJECT
+	#if QT_VERSION >= 0x050000
+		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPreviewInterface" FILE "DefaultPeekPlugins5.json" )
+	#endif
 	Q_INTERFACES( NBPreviewInterface )
 
 	public:
-		QStringList mimeTypesHandled() const;
-		QDialog* getPreviewWidget( const QString & );
+		QStringList mimeTypesHandled() const Q_DECL_OVERRIDE;
+		QDialog* getPreviewWidget( const QString & ) Q_DECL_OVERRIDE;
 };
-
-#endif

@@ -337,9 +337,16 @@ isEmpty( BUILD_PREFIX ) {
 }
 
 MOC_DIR 	= $$BUILD_PREFIX/moc-X
-OBJECTS_DIR = $$BUILD_PREFIX/objs-X
+OBJECTS_DIR = $$BUILD_PREFIX/obj-X
 RCC_DIR		= $$BUILD_PREFIX/qrc-X
 UI_DIR      = $$BUILD_PREFIX/uic-X
+
+greaterThan(QT_MAJOR_VERSION, 4) {
+	MOC_DIR 	= $$BUILD_PREFIX/moc-X5
+	OBJECTS_DIR = $$BUILD_PREFIX/obj-X5
+	RCC_DIR		= $$BUILD_PREFIX/qrc-X5
+	UI_DIR      = $$BUILD_PREFIX/uic-X5
+}
 
 unix {
 	isEmpty(PREFIX) {
@@ -369,5 +376,6 @@ DEFINES += "KB_LAYOUT_DIR=\\\""$$PREFIX/share/newbreeze/kb-layouts"\\\""
 DEFINES += "COLORSCHEMES_DIR=\\\""$$PREFIX/share/newbreeze/color-schemes"\\\""
 
 # Plugins
-plugins.commands = sh BuildPlugins.sh
-QMAKE_EXTRA_TARGETS = plugins
+plugins.commands = ./BuildPlugins.sh local
+QMAKE_EXTRA_TARGETS += plugins
+POST_TARGET_DEPS += plugins

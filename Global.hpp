@@ -51,8 +51,6 @@
 #include <grp.h>
 
 #include <NBSettings.hpp>
-#include <NBXdg.hpp>
-#include <NBPluginManager.hpp>
 
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>
@@ -84,7 +82,7 @@ namespace NBInfoMode {
 static QMimeDatabase mimeDb;
 
 // Thumbnails Storage Directory
-const QString thumbsDir( QDir( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) ).filePath( "NewBreeze/Thumbs/" ) );
+const QString thumbsDir( QDir( QStandardPaths::writableLocation( QStandardPaths::GenericCacheLocation ) ).filePath( "NewBreeze/Thumbs/" ) );
 
 // NewBreeze Preferences
 static QSettings actionSettings( "NewBreeze", "CustomActions" );
@@ -95,6 +93,5 @@ typedef QMap<QString, QString> DeviceInfo;
 typedef QPair<QString, QString> BookMark;
 
 static NBSettings *Settings = NBSettings::instance();
-static NBPluginManager *PluginManager = NBPluginManager::instance();
 
 #endif

@@ -8,7 +8,11 @@
 #define NBPDFPEEP_HPP
 
 #include <Global.hpp>
-#include <poppler-qt4.h>
+#if QT_VERSION >= 0x050000
+	#include <poppler-qt5.h>
+#else
+	#include <poppler-qt4.h>
+#endif
 
 class NBPdfPeep : public QDialog {
 	Q_OBJECT

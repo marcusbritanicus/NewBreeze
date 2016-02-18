@@ -4,18 +4,16 @@
 	*
 */
 
-#ifndef NBPREVIEWWIDGET_HPP
-#define NBPREVIEWWIDGET_HPP
+#pragma once
 
 #include <NBPreviewInterface.hpp>
+
 #include <Global.hpp>
 #include <QtWebKit>
 
-QT_BEGIN_NAMESPACE
-class QString;
-class QStringList;
-class QWidget;
-QT_END_NAMESPACE
+#if QT_VERSION >= 0x050000
+	#include <QtWebKitWidgets>
+#endif
 
 class NBWebWatch : public QDialog {
 	Q_OBJECT
@@ -39,15 +37,14 @@ class NBWebWatch : public QDialog {
 		void paintEvent( QPaintEvent *pEvent );
 };
 
-class NBMarkDownPreview : public QObject, public NBPreviewInterface {
-
+class NBMarkDownPreview : public QObject, NBPreviewInterface {
 	Q_OBJECT
+	#if QT_VERSION >= 0x050000
+		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPreviewInterface" FILE "MarkDownPreview5.json" )
+	#endif
 	Q_INTERFACES( NBPreviewInterface )
 
 	public:
 		QStringList mimeTypesHandled() const;
 		QDialog* getPreviewWidget( const QString & );
-
 };
-
-#endif

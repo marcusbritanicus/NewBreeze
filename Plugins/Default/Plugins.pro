@@ -7,6 +7,12 @@ INCLUDEPATH += . MimeHandler DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch Word
 # Same as NewBreeze version
 VERSION = "3.0.0"
 
+# Needs libz
+LIBS += -lz
+
+# Needs QtXml
+QT += xml
+
 # Qt5 Support
 # ===========
 greaterThan(QT_MAJOR_VERSION, 4) {
@@ -36,8 +42,17 @@ else {
 
 # Poppler-Qt4
 # ===========
-INCLUDEPATH  += /usr/include/poppler/qt4
-LIBS         += -L/usr/lib -lpoppler-qt4 -ldjvulibre
+lessThan( QT_MAJOR_VERSION, 5 ) {
+	INCLUDEPATH  += /usr/include/poppler/qt4
+	LIBS         += -L/usr/lib -lpoppler-qt4 -ldjvulibre
+}
+
+# Poppler-Qt5
+# ===========
+greaterThan( QT_MAJOR_VERSION, 4 ) {
+	INCLUDEPATH  += /usr/include/poppler/qt5
+	LIBS         += -L/usr/lib -lpoppler-qt5 -ldjvulibre
+}
 
 # C++11/C11 Support
 # =================
@@ -77,15 +92,17 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 HEADERS += NBPreviewWidget.hpp
 SOURCES += NBPreviewWidget.cpp
 
-# MimeTypes
-# =========
-HEADERS += MimeHandler/NBMimeDatabase.hpp MimeHandler/NBMimeDatabase_p.hpp MimeHandler/NBMimeGlobPattern_p.hpp MimeHandler/NBMimeMagicRuleMatcher_p.hpp
-HEADERS += MimeHandler/NBMimeMagicRule_p.hpp MimeHandler/NBMimeProvider_p.hpp MimeHandler/NBMimeType.hpp MimeHandler/NBMimeTypeParser_p.hpp MimeHandler/NBMimeType_p.hpp
-HEADERS += MimeHandler/NBStandardPaths.hpp
+# MimeTypes - Only for Qt4
+# ========================
+lessThan( QT_MAJOR_VERSION, 5 ) {
+	HEADERS += MimeHandler/NBMimeDatabase.hpp MimeHandler/NBMimeDatabase_p.hpp MimeHandler/NBMimeGlobPattern_p.hpp MimeHandler/NBMimeMagicRuleMatcher_p.hpp
+	HEADERS += MimeHandler/NBMimeMagicRule_p.hpp MimeHandler/NBMimeProvider_p.hpp MimeHandler/NBMimeType.hpp MimeHandler/NBMimeTypeParser_p.hpp
+	HEADERS +=  MimeHandler/NBMimeType_p.hpp MimeHandler/NBStandardPaths.hpp
 
-SOURCES += MimeHandler/NBMimeDatabase.cpp MimeHandler/NBMimeGlobPattern.cpp MimeHandler/NBMimeMagicRule.cpp MimeHandler/NBMimeMagicRuleMatcher.cpp
-SOURCES += MimeHandler/NBMimeProvider.cpp MimeHandler/NBMimeType.cpp MimeHandler/NBMimeTypeParser.cpp MimeHandler/NBStandardPaths.cpp MimeHandler/NBStandardPaths_unix.cpp
-
+	SOURCES += MimeHandler/NBMimeDatabase.cpp MimeHandler/NBMimeGlobPattern.cpp MimeHandler/NBMimeMagicRule.cpp MimeHandler/NBMimeMagicRuleMatcher.cpp
+	SOURCES += MimeHandler/NBMimeProvider.cpp MimeHandler/NBMimeType.cpp MimeHandler/NBMimeTypeParser.cpp MimeHandler/NBStandardPaths.cpp
+	SOURCES += MimeHandler/NBStandardPaths_unix.cpp
+}
 
 ## DjvuDisplay
 ## ===========

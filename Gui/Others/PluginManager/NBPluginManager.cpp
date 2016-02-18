@@ -83,24 +83,24 @@ void NBPluginManager::reloadPlugins() {
 		mimePluginMap[ mType.name() ] = QStringList();
 
 	/* For now we will be handling just the plugins based on the PreviewInterface */
-	QDir pPath;
+	QDir pPathDir;
 	#if QT_VERSION >= 0x050000
-		pPath.setPath( NBXdg::home() + "/.config/NewBreeze/plugins5/" );
+		pPathDir.setPath( NBXdg::home() + "/.config/NewBreeze/plugins5/" );
 	#else
-		pPath.setPath( NBXdg::home() + "/.config/NewBreeze/plugins/" );
+		pPathDir.setPath( NBXdg::home() + "/.config/NewBreeze/plugins/" );
 	#endif
 
-	NBPreviewInterface *plugin = 0;
-	QObject *pObj = 0;
-	Q_FOREACH( QString pluginSo, pPath.entryList( QStringList() << "*.so", QDir::Files, QDir::Name | QDir::IgnoreCase ) ) {
-		QPluginLoader loader( pPath.filePath( pluginSo ) );
-		pObj = loader.instance();
-		if ( pObj ) {
-			plugin = qobject_cast<NBPreviewInterface*>( pObj );
-			Q_FOREACH( QString mime, plugin->mimeTypesHandled() )
-				mimePluginMap[ mime ] << pPath.filePath( pluginSo );
+	Q_FOREACH( QString pluginSo, pPathDir.entryList( QDir::Files ) ) {
+		QPluginLoader loader( pPathDir.absoluteFilePath( pluginSo ) );
+		QObject *plugin = loader.instance();
+		if ( plugin ) {
+			NBPreviewInterface *interface = qobject_cast<NBPreviewInterface*>( plugin );
+			if ( not interface )
+				continue;
+
+			Q_FOREACH( QString mime, interface->mimeTypesHandled() )
+				mimePluginMap[ mime ] << pPathDir.absoluteFilePath( pluginSo );
 		}
-		loader.unload();
 	}
 
 	QSettings pluginPriorities( "NewBreeze", "Plugins" );

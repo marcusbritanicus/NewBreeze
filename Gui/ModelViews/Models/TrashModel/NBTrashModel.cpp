@@ -5,6 +5,7 @@
 */
 
 #include <NBTrashModel.hpp>
+#include <NBXdg.hpp>
 
 NBTrashModel::NBTrashModel() : QAbstractItemModel() {
 

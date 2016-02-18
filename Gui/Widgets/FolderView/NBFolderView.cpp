@@ -5,6 +5,7 @@
 */
 
 #include <NBFolderView.hpp>
+#include <NBPluginManager.hpp>
 
 inline static void setXClipBoardData( QStringList paths ) {
 
@@ -610,7 +611,7 @@ void NBFolderView::doPeek() {
 	/* For directories we use the inbuild previewer */
 	if ( isDir( currentNode ) ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing folder: %s", qPrintable( currentNode ) );
-		NBFolderFlash *previewer = new NBFolderFlash( currentNode, this );
+		NBFolderFlash *previewer = new NBFolderFlash( currentNode );
 
 		connect( previewer, SIGNAL( loadFolder( QString ) ), this, SLOT( doOpen( QString ) ) );
 		previewer->show();
@@ -620,9 +621,9 @@ void NBFolderView::doPeek() {
 
 	/* Other mimetypes, we depend on the PluginManager */
 	/* If the PluginManager returns a valid path, we use it */
-	else if ( PluginManager->hasPluginForMimeType( mimeType ) ) {
+	else if ( NBPluginManager::instance()->hasPluginForMimeType( mimeType ) ) {
 
-		QPluginLoader loader( PluginManager->pluginForMimeType( mimeType ) );
+		QPluginLoader loader( NBPluginManager::instance()->pluginForMimeType( mimeType ) );
 		QObject *pObj = loader.instance();
 		NBPreviewInterface *plugin = 0;
 
@@ -639,7 +640,7 @@ void NBFolderView::doPeek() {
 
 	// Custom Peeking
 	NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", qPrintable( currentNode ) );
-	NBCustomPeek *previewer = new NBCustomPeek( currentNode, this );
+	NBCustomPeek *previewer = new NBCustomPeek( currentNode );
 	previewer->show();
 
 	currentWidget()->setFocus();
