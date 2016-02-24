@@ -5,26 +5,22 @@
 */
 
 #include <NBMarkDownPreviewWidget.hpp>
-#include <markdown.hpp>
+
+extern "C" {
+	#include "array.h"
+	#include "buffer.h"
+	#include "markdown.h"
+	#include "renderers.h"
+}
 
 NBWebWatch::NBWebWatch( QString pth ) : QDialog() {
 
 	path = QString( pth );
 
-	/* InFile */
-	std::ifstream ifile;
-	ifile.open( pth.toStdString().c_str() );
-	std::istream *in = &ifile;
-
-	markdown::Document doc;
-	doc.read( *in );
-
-	ifile.close();
-
 	createGUI();
 	setWindowProperties();
 
-	peekWidgetBase->setHtml( QString::fromStdString( doc.asHtml() ) );
+	QTimer::singleShot( 0, this, SLOT( loadDocument() ) );
 
 	peekWidgetBase->setFocus();
 };
@@ -49,8 +45,6 @@ void NBWebWatch::createGUI() {
 
 	peekWidgetBase = new QWebView();
 	peekWidgetBase->setRenderHints( QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing );
-
-	peekWidgetBase->load( QUrl::fromLocalFile( "/tmp/markdown.html" ) );
 
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
@@ -110,6 +104,40 @@ void NBWebWatch::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->end();
 	pEvent->accept();
+};
+
+void NBWebWatch::loadDocument() {
+
+	struct buf *ib, *ob;
+	size_t ret;
+
+	FILE *in = fopen( path.toLocal8Bit().data(), "r" );
+
+	const struct mkd_renderer *hrndr, **prndr;
+
+	hrndr = &mkd_html;
+	prndr = &hrndr;
+
+	/* reading everything */
+	ib = bufnew( BUFSIZ );
+	bufgrow( ib, BUFSIZ );
+	while ( ( ret = fread( ib->data + ib->size, 1, ib->asize - ib->size, in ) ) > 0 ) {
+		ib->size += ret;
+		bufgrow( ib, ib->size + BUFSIZ );
+	}
+
+	fclose( in );
+
+	/* performing markdown parsing */
+	ob = bufnew( BUFSIZ );
+	markdown( ob, ib, *prndr );
+
+	/* Load the document */
+	peekWidgetBase->setHtml( QString::fromLocal8Bit( ob->data, ob->size ), QUrl::fromLocalFile( path ) );
+
+	/* cleanup */
+	bufrelease( ib );
+	bufrelease( ob );
 };
 
 void NBWebWatch::openInExternal() {

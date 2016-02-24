@@ -306,7 +306,6 @@ QString NBDeviceAction::mountPoint() {
 	return mMountPoint;
 };
 
-
 void NBDeviceAction::paintEvent( QPaintEvent *pEvent ) {
 
 	QPainter painter( this );
@@ -314,7 +313,7 @@ void NBDeviceAction::paintEvent( QPaintEvent *pEvent ) {
 	painter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
 
 	// Selection Background
-	if ( select ) {
+	if ( select or hasFocus() ) {
 		painter.save();
 		QPalette pltt = palette();
 		painter.setPen( Qt::NoPen );
@@ -325,9 +324,7 @@ void NBDeviceAction::paintEvent( QPaintEvent *pEvent ) {
 
 	// Label
 	painter.save();
-
 	painter.drawText( QRect( 32, 0, width() - 32 - 10, 20 ), Qt::AlignLeft | Qt::AlignVCenter, mDeviceLabel );
-
 	painter.restore();
 
 	// Icon

@@ -36,11 +36,6 @@ else {
 	DEPENDPATH += $$NB_HEADER_PATH
 }
 
-# C++11/C11 Support
-# =================
-QMAKE_CFLAGS += -std=c++0x -w
-QMAKE_CXXFLAGS += -std=c++0x -w
-
 # Silent compilation
 # ==================
 CONFIG += silent
@@ -67,12 +62,12 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 # Input
 HEADERS += NBMarkDownPreviewWidget.hpp
-HEADERS += markdown-tokens.hpp
-HEADERS += markdown.hpp
 
 SOURCES += NBMarkDownPreviewWidget.cpp
-SOURCES += markdown-tokens.cpp
-SOURCES += markdown.cpp
+SOURCES += array.c
+SOURCES += buffer.c
+SOURCES += markdown.c
+SOURCES += renderers.c
 
 unix {
 	isEmpty(PREFIX) {

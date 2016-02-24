@@ -1,4 +1,5 @@
 # NewBreeze
+
 ## A fast and light-weight file manager based on Qt
 
 ### Qt5 builds are now supported

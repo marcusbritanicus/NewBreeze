@@ -6,6 +6,7 @@ Version 3.0.0 Alpha
 	- Feature: Added License dialog, shoing the complete GPL3 license
 	- Archive creation and extraction are performed using QtConcurrent::run
 	- Plugins are new part of the NewBreeze source tree
+	- MarkDownPreview plugin now uses libsoldout markdown library
 	- NewBreeze uses QtSingleApplication for one instance multiple windows
 	- Redesigned UI for better code maintenance
 	- Redesigned NBCrumbsBar (formerly, NBBreadCrumbsBar)

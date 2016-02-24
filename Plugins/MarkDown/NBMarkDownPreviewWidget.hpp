@@ -20,14 +20,16 @@ class NBWebWatch : public QDialog {
 
 	public :
 		NBWebWatch( QString path = QDir::homePath() );
-		QString path;
-		QWebView *peekWidgetBase;
 
 	private :
 		void createGUI();
 		void setWindowProperties();
 
+		QString path;
+		QWebView *peekWidgetBase;
+
 	private slots :
+		void loadDocument();
 		void openInExternal();
 
 	protected :
