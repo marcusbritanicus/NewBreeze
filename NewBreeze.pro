@@ -367,15 +367,7 @@ unix {
 	icons.files = icons/newbreeze.png
 
 	data.path = $$PREFIX/share/newbreeze/
-	data.files = Gui/Widgets/Terminal/data/color-schemes Gui/Widgets/Terminal/data/kb-layouts README.md freedesktop.org.xml README Changelog
+	data.files = README.md README Changelog ReleaseNotes
 }
 
 DEFINES += "HAVE_POSIX_OPENPT"
-DEFINES += "HAVE_SYS_TIME_H"
-DEFINES += "KB_LAYOUT_DIR=\\\""$$PREFIX/share/newbreeze/kb-layouts"\\\""
-DEFINES += "COLORSCHEMES_DIR=\\\""$$PREFIX/share/newbreeze/color-schemes"\\\""
-
-# Plugins
-plugins.commands = ./BuildPlugins.sh local
-QMAKE_EXTRA_TARGETS += plugins
-POST_TARGET_DEPS += plugins

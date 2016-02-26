@@ -29,9 +29,14 @@ class NBProcess : public QThread {
 			Trash
 		};
 
-		NBProcess( QObject *parent );
+		NBProcess( QObject *parent, NBProgress *progress );
 
-		virtual NBProgress progress();
+		virtual void setSources( QStringList ) = 0;
+		virtual void setTarget( QString ) = 0;
+		virtual QStringList errors() = 0;
+		virtual void cancel() = 0;
+		virtual void pause() = 0;
+		virtual void resume() = 0;
 };
 
 class NBIOProcess : public NBProcess {

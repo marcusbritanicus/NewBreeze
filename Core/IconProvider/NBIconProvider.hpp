@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBICONPROVIDER_HPP
-#define NBICONPROVIDER_HPP
 
 #include <Global.hpp>
 
@@ -25,6 +23,9 @@ class NBIconProvider {
 		/* Check if the theme has a icon named as the given parameter */
 		static bool hasIcon( QString );
 
+		/* Check if the theme has a icon named as the first parameter in theme second parameter */
+		static QString themeIcon( QString, QString theme = QString() );
+
 		/* Icon string from /usr/share/pixmaps */
 		static QString pixmapIcon( QString );
 
@@ -41,5 +42,3 @@ class NBIconProvider {
 		/* Save a image thumbnail */
 		static bool saveThumb( QString, QString );
 };
-
-#endif

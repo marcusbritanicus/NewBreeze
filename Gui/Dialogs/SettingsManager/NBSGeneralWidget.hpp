@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBSGENERALWIDGET_HPP
-#define NBSGENERALWIDGET_HPP
 
 #include <Global.hpp>
 
@@ -17,13 +15,16 @@ class NBSGeneralWidget : public QWidget {
 		NBSGeneralWidget( QWidget* );
 
 	private:
+		/* Grouping */
 		QGroupBox *perFolderEnabled;
 		QComboBox *defaultViewModeCB;		// Icon, Tiles or Details view
 		QSlider *defaultIconSizeS;			// 16 - 128
+		QLabel *iconSizeL;					// Show the current icon size
 		QCheckBox *defaultGroupingCB;		// Show in groups enabled?
 		QCheckBox *defaultSortCaseCB;		// Case sensitive sort?
 		QComboBox *defaultSortClmnCB;		// Sort column: Name, Size, Type or Date?
 
+		/* Others */
 		QCheckBox *filterFoldersCB;			// Should we filter folders while searching?
 		QCheckBox *nativeTitleBarCB;		// Use native titlebar?
 		QCheckBox *showTrayIconCB;			// Show tray icon?
@@ -45,5 +46,3 @@ class NBSGeneralWidget : public QWidget {
 		void handleOpenWithCatalogToggled( bool );
 		void handleCheckStateChanged( int );
 };
-
-#endif

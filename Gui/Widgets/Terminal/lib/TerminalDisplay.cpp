@@ -24,12 +24,38 @@
 #include "TerminalDisplay.h"
 
 // Qt
-#include <QtGui>
-#include <QtCore>
+#include <QApplication>
+#include <QBoxLayout>
+#include <QClipboard>
+#include <QKeyEvent>
+#include <QEvent>
+#include <QTime>
+#include <QFile>
+#include <QGridLayout>
+#include <QLabel>
+#include <QLayout>
+#include <QPainter>
+#include <QPixmap>
+#include <QScrollBar>
+#include <QStyle>
+#include <QTimer>
+#include <QToolTip>
 #include <QtDebug>
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#endif
+#include <QUrl>
+#include <QMimeData>
+#include <QDrag>
+
+// KDE
+//#include <kshell.h>
+//#include <KColorScheme>
+//#include <KCursor>
+//#include <kdebug.h>
+//#include <KLocale>
+//#include <KMenu>
+//#include <KNotification>
+//#include <KGlobalSettings>
+//#include <KShortcut>
+//#include <KIO/NetAccess>
 
 // Konsole
 //#include <config-apps.h>
@@ -115,6 +141,8 @@ void TerminalDisplay::setScreenWindow(ScreenWindow* window)
 //#warning "The order here is not specified - does it matter whether updateImage or updateLineProperties comes first?"
         connect( _screenWindow , SIGNAL(outputChanged()) , this , SLOT(updateLineProperties()) );
         connect( _screenWindow , SIGNAL(outputChanged()) , this , SLOT(updateImage()) );
+        connect( _screenWindow , SIGNAL(outputChanged()) , this , SLOT(updateFilters()) );
+        connect( _screenWindow , SIGNAL(scrolled(int)) , this , SLOT(updateFilters()) );
         window->setWindowLines(_lines);
     }
 }
@@ -123,7 +151,6 @@ const ColorEntry* TerminalDisplay::colorTable() const
 {
   return _colorTable;
 }
-
 void TerminalDisplay::setBackgroundColor(const QColor& color)
 {
     _colorTable[DEFAULT_BACK_COLOR].color = color;
@@ -222,15 +249,12 @@ void TerminalDisplay::setVTFont(const QFont& f)
 {
   QFont font = f;
 
-#ifdef Q_WS_MAC
-#if QT_VERSION >= 0x040700
-    // mac uses floats for font width specification.
-    // this ensures the same handling for all platforms
+    // This was originally set for OS X only:
+    //     mac uses floats for font width specification.
+    //     this ensures the same handling for all platforms
+    // but then there was revealed that various Linux distros
+    // have this problem too...
     font.setStyleStrategy(QFont::ForceIntegerMetrics);
-#else
-#warning "Correct handling of the QFont metrics requited Qt>=4.7"
-#endif
-#endif
 
   QFontMetrics metrics(font);
 
@@ -358,9 +382,8 @@ TerminalDisplay::TerminalDisplay(QWidget *parent)
   // enable input method support
   setAttribute(Qt::WA_InputMethodEnabled, true);
 
-  // this is an important optimization, it tells Qt
-  // that TerminalDisplay will handle repainting its entire area.
-  setAttribute(Qt::WA_OpaquePaintEvent);
+  // We want transparent background
+  setAttribute(Qt::WA_TranslucentBackground);
 
   _gridLayout = new QGridLayout(this);
   _gridLayout->setContentsMargins(0, 0, 0, 0);
@@ -558,11 +581,14 @@ void TerminalDisplay::setOpacity(qreal opacity)
 
     // enable automatic background filling to prevent the display
     // flickering if there is no transparency
-    if ( color.alpha() == 255 )
+    /*if ( color.alpha() == 255 )
+    {
         setAutoFillBackground(true);
-
+    }
     else
+    {
         setAutoFillBackground(false);
+    }*/
 
     _blendColor = color.rgba();
 }
@@ -577,26 +603,24 @@ void TerminalDisplay::drawBackground(QPainter& painter, const QRect& rect, const
         // being outside of the terminal display and visual consistency with other KDE
         // applications.
         //
-        QRect scrollBarArea = _scrollBar->isVisible() ?
-                                    rect.intersected(_scrollBar->geometry()) :
-                                    QRect();
-        QRegion contentsRegion = QRegion(rect).subtracted(scrollBarArea);
-        QRect contentsRect = contentsRegion.boundingRect();
 
-        if ( HAVE_TRANSPARENCY && qAlpha(_blendColor) < 0xff && useOpacitySetting )
-        {
+        QRect contentsRect = QRect( rect );
+
+        if ( HAVE_TRANSPARENCY && qAlpha(_blendColor) < 0xff && useOpacitySetting ) {
+
             QColor color(backgroundColor);
             color.setAlpha(qAlpha(_blendColor));
 
             painter.save();
-            painter.setCompositionMode(QPainter::CompositionMode_Source);
+            painter.setCompositionMode( QPainter::CompositionMode_Source );
             painter.fillRect(contentsRect, color);
             painter.restore();
         }
-        else
-            painter.fillRect(contentsRect, backgroundColor);
 
-        painter.fillRect(scrollBarArea,_scrollBar->palette().background());
+        else {
+
+            painter.fillRect(contentsRect, backgroundColor);
+		}
 }
 
 void TerminalDisplay::drawCursor(QPainter& painter,
@@ -1146,7 +1170,7 @@ void TerminalDisplay::setBlinkingCursor(bool blink)
   _hasBlinkingCursor=blink;
 
   if (blink && !_blinkCursorTimer->isActive())
-      _blinkCursorTimer->start(QApplication::cursorFlashTime() );
+      _blinkCursorTimer->start(QApplication::cursorFlashTime() / 2);
 
   if (!blink && _blinkCursorTimer->isActive())
   {
@@ -1552,6 +1576,7 @@ void TerminalDisplay::blinkCursorEvent()
 void TerminalDisplay::resizeEvent(QResizeEvent*)
 {
   updateImageSize();
+  processFilters();
 }
 
 void TerminalDisplay::propagateSize()
@@ -1747,6 +1772,10 @@ void TerminalDisplay::mousePressEvent(QMouseEvent* ev)
       {
         emit mouseSignal( 0, charColumn + 1, charLine + 1 +_scrollBar->value() -_scrollBar->maximum() , 0);
       }
+
+      Filter::HotSpot *spot = _filterChain->hotSpotAt(charLine, charColumn);
+      if (spot && spot->type() == Filter::HotSpot::Link)
+          spot->activate("open-action");
     }
   }
   else if ( ev->button() == Qt::MidButton )
@@ -2172,6 +2201,14 @@ void TerminalDisplay::getCharacterPosition(const QPoint& widgetPoint,int& line,i
         column = _usedColumns;
 }
 
+void TerminalDisplay::updateFilters()
+{
+    if ( !_screenWindow )
+        return;
+
+    processFilters();
+}
+
 void TerminalDisplay::updateLineProperties()
 {
     if ( !_screenWindow )
@@ -2410,8 +2447,11 @@ void TerminalDisplay::setWordCharacters(const QString& wc)
 
 void TerminalDisplay::setUsesMouse(bool on)
 {
-  _mouseMarks = on;
-  setCursor( _mouseMarks ? Qt::IBeamCursor : Qt::ArrowCursor );
+    if (_mouseMarks != on) {
+        _mouseMarks = on;
+        setCursor( _mouseMarks ? Qt::IBeamCursor : Qt::ArrowCursor );
+        emit usesMouseChanged();
+    }
 }
 bool TerminalDisplay::usesMouse() const
 {
@@ -2713,7 +2753,6 @@ void TerminalDisplay::enableBell()
 
 void TerminalDisplay::bell(const QString& message)
 {
-  Q_UNUSED( message );
   if (_bellMode==NoBell) return;
 
   //limit the rate at which bells can occur
@@ -2730,8 +2769,7 @@ void TerminalDisplay::bell(const QString& message)
     }
     else if (_bellMode==NotifyBell)
     {
-        //KNotification::event("BellVisible", message,QPixmap(),this);
-        // TODO/FIXME: qt4 notifications?
+        emit notifyBell(message);
     }
     else if (_bellMode==VisualBell)
     {
@@ -2875,6 +2913,8 @@ void TerminalDisplay::dragEnterEvent(QDragEnterEvent* event)
 {
   if (event->mimeData()->hasFormat("text/plain"))
       event->acceptProposedAction();
+  if (event->mimeData()->urls().count())
+      event->acceptProposedAction();
 }
 
 void TerminalDisplay::dropEvent(QDropEvent* event)
@@ -2891,13 +2931,13 @@ void TerminalDisplay::dropEvent(QDropEvent* event)
     {
         //KUrl url = KIO::NetAccess::mostLocalUrl( urls[i] , 0 );
         QUrl url = urls[i];
+
         QString urlText;
 
-//        if (url.isLocalFile())
-//            urlText = url.path();
-//        else
-//            urlText = url.url();
-        urlText = url.toString();
+        if (url.isLocalFile())
+            urlText = url.path();
+        else
+            urlText = url.toString();
 
         // in future it may be useful to be able to insert file names with drag-and-drop
         // without quoting them (this only affects paths with spaces in)
@@ -2914,10 +2954,7 @@ void TerminalDisplay::dropEvent(QDropEvent* event)
     dropText = event->mimeData()->text();
   }
 
-  if(event->mimeData()->hasFormat("text/plain"))
-  {
     emit sendStringToEmu(dropText.toLocal8Bit());
-  }
 }
 
 void TerminalDisplay::doDrag()

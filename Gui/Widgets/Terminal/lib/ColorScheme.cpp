@@ -557,7 +557,6 @@ ColorSchemeManager::~ColorSchemeManager()
 }
 void ColorSchemeManager::loadAllColorSchemes()
 {
-    // qDebug() << "loadAllColorSchemes";
     int success = 0;
     int failed = 0;
 
@@ -639,6 +638,17 @@ void ColorSchemeManager::addColorScheme(ColorScheme* scheme)
     scheme->write(config);
 }
 #endif
+
+bool ColorSchemeManager::loadCustomColorScheme(const QString& path)
+{
+    if (path.endsWith(QLatin1String(".colorscheme")))
+        return loadColorScheme(path);
+    else if (path.endsWith(QLatin1String(".schema")))
+        return loadKDE3ColorScheme(path);
+    else
+        return false;
+}
+
 bool ColorSchemeManager::loadColorScheme(const QString& filePath)
 {
     if ( !filePath.endsWith(QLatin1String(".colorscheme")) || !QFile::exists(filePath) )
@@ -646,8 +656,10 @@ bool ColorSchemeManager::loadColorScheme(const QString& filePath)
 
     QFileInfo info(filePath);
 
+    const QString& schemeName = info.baseName();
+
     ColorScheme* scheme = new ColorScheme();
-    scheme->setName(info.baseName());
+    scheme->setName(schemeName);
     scheme->read(filePath);
 
     if (scheme->name().isEmpty())
@@ -657,13 +669,13 @@ bool ColorSchemeManager::loadColorScheme(const QString& filePath)
         return false;
     }
 
-    if ( !_colorSchemes.contains(info.baseName()) )
+    if ( !_colorSchemes.contains(schemeName) )
     {
-        _colorSchemes.insert(scheme->name(),scheme);
+        _colorSchemes.insert(schemeName,scheme);
     }
     else
     {
-        qDebug() << "color scheme with name" << scheme->name() << "has already been" <<
+        qDebug() << "color scheme with name" << schemeName << "has already been" <<
             "found, ignoring.";
 
         delete scheme;
@@ -698,7 +710,8 @@ QList<QString> ColorSchemeManager::listColorSchemes()
     QStringList list = dir.entryList(filters);
     QStringList ret;
     foreach(QString i, list)
-        ret << dname + "/" + i;
+		if ( QFileInfo( dname + "/" + i ).isReadable() )
+			ret << dname + "/" + i;
     return ret;
 //    return KGlobal::dirs()->findAllResources("data",
 //                                             "konsole/*.colorscheme",

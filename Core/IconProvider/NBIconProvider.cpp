@@ -132,11 +132,17 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 		// If it is a image (save thumbnail) and image previews are set
 		if ( ( mimetype.name().startsWith( "image" ) or mimetype.name().startsWith( "video/mng" ) ) and ( Settings->General.ImagePreviews ) ) {
 			if ( mimetype.name().contains( "djvu" ) ) {
-				if ( hasIcon( "image-vnd.djvu" ) )
-					return "image-vnd.djvu";
-
-				else if ( hasIcon ( "application-x-office-document" ) )
+				if ( hasIcon ( "application-x-office-document" ) )
 					return "application-x-office-document";
+
+				else if ( hasIcon ( "x-office-document" ) )
+					return "x-office-document";
+
+				else if ( hasIcon( mimeIcon ) )
+					return mimeIcon;
+
+				else if ( hasIcon( genericIcon ) )
+					return genericIcon;
 
 				else
 					return "image-x-generic";
@@ -182,24 +188,20 @@ bool NBIconProvider::thumb( QString path, QString hashPath ) {
 
 bool NBIconProvider::hasIcon( QString icon ) {
 
-	/*
-		*
-		* List of themes
-		*
-		* First we input our stored theme.
-		* Then get its inherited themes.
-		* We check if our theme is system theme.
-		* If yes, end of story
-		* Else, add the system theme and
-		*
-	*/
-
+	/* Inbuilt icon */
 	if ( exists( icon ) )
 		return true;
 
+	/* Get system theme */
 	QStringList themes = QStringList() << NBSystemIconTheme();
+
+	/* Themes inherited by system theme */
 	themes << getInheritedThemes( themes.at( 0 ) );
+
+	/* We always include this: generic */
 	themes << "hicolor";
+
+	/* Clear duplicates */
 	themes.removeDuplicates();
 
 	// Folders
@@ -226,6 +228,54 @@ bool NBIconProvider::hasIcon( QString icon ) {
 	}
 
 	return false;
+};
+
+QString NBIconProvider::themeIcon( QString icon, QString theme ) {
+
+	/*
+		*
+		* List of themes
+		*
+		* First we input our stored theme.
+		* Then get its inherited themes.
+		* We check if our theme is system theme.
+		* If yes, end of story
+		* Else, add the system theme and
+		*
+	*/
+
+	if ( not theme.count() )
+		theme = NBSystemIconTheme();
+
+	QStringList themes = QStringList() << NBSystemIconTheme();
+	themes << getInheritedThemes( themes.at( 0 ) );
+	themes << "hicolor";
+	themes.removeDuplicates();
+
+	// Folders
+	QString iconDir = QString( "/usr/share/icons/" );
+	QStringList iconDirs;
+	foreach( QString theme, themes )
+		iconDirs << getThemeDirs( QDir( iconDir ).filePath( theme ) );
+
+	iconDirs << getFallbackThemeDirs( themes[ 0 ] );
+	iconDirs.removeDuplicates();
+
+	// Search in each of the directories if the icon is present
+	foreach( QString theme, themes ) {
+		foreach( QString str, iconDirs ) {
+			if ( exists( iconDir + theme + "/" + str + "/" + icon + ".png" ) )
+				return iconDir + theme + "/" + str + "/" + icon + ".png";
+
+			if ( exists( iconDir + theme + "/" + str + "/" + icon + ".svg" ) )
+				return iconDir + theme + "/" + str + "/" + icon + ".svg";
+
+			if ( exists( iconDir + theme + "/" + str + "/" + icon ) )
+				return iconDir + theme + "/" + str + "/" + icon;
+		}
+	}
+
+	return QString();
 };
 
 QString NBIconProvider::pixmapIcon( QString icon ) {
@@ -285,6 +335,9 @@ QString NBIconProvider::getCustomIcon( QString mime ) {
 };
 
 bool NBIconProvider::saveThumb( QString path, QString hashPath ) {
+
+	if ( not exists( path ) )
+		return false;
 
 	// Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/
 	QImage thumb = QImage( path ).scaled( 512, 512, Qt::KeepAspectRatio ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );

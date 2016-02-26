@@ -37,7 +37,7 @@
 #include <QRegExp>
 #include <QStringList>
 #include <QFile>
-#include <QtCore>
+#include <QtDebug>
 
 #include "Pty.h"
 //#include "kptyprocess.h"
@@ -49,7 +49,8 @@ using namespace Konsole;
 
 int Session::lastSessionId = 0;
 
-Session::Session() :
+Session::Session(QObject* parent) :
+    QObject(parent),
         _shellProcess(0)
         , _emulation(0)
         , _monitorActivity(false)
@@ -252,20 +253,21 @@ void Session::removeView(TerminalDisplay * widget)
 
 void Session::run()
 {
-    //check that everything is in place to run the session
-    if (_program.isEmpty()) {
+    //check that everything is in place to run the session -
+    // uncomment the below lines if you want info for debug
+    // if (_program.isEmpty()) {
         // qDebug() << "Session::run() - program to run not set.";
-    }
-    else {
+    // }
+    // else {
         // qDebug() << "Session::run() - program:" << _program;
-    }
+    // }
 
-    if (_arguments.isEmpty()) {
+    // if (_arguments.isEmpty()) {
         // qDebug() << "Session::run() - no command line arguments specified.";
-    }
-    else {
+    // }
+    // else {
         // qDebug() << "Session::run() - arguments:" << _arguments;
-    }
+    // }
 
     // Upon a KPty error, there is no description on what that error was...
     // Check to see if the given program is executable.
@@ -304,7 +306,7 @@ void Session::run()
     if (argsTmp.length())
         arguments << _arguments;
 
-    QString cwd = QDir::homePath();
+    QString cwd = QDir::currentPath();
     if (!_initialWorkingDir.isEmpty()) {
         _shellProcess->setWorkingDirectory(_initialWorkingDir);
     } else {
@@ -326,12 +328,12 @@ void Session::run()
      */
     int result = _shellProcess->start(exec,
                                       arguments,
-                                      _environment << "COLORFGBG=15;0",
+                                      _environment << backgroundColorHint,
                                       windowId(),
                                       _addToUtmp);
 
     if (result < 0) {
-        // qDebug() << "CRASHED! result: " << result;
+        qDebug() << "CRASHED! result: " << result;
         return;
     }
 
@@ -362,7 +364,7 @@ void Session::setUserTitle( int what, const QString & caption )
 
     if (what == 11) {
         QString colorString = caption.section(';',0,0);
-        // qDebug() << __FILE__ << __LINE__ << ": setting background colour to " << colorString;
+        qDebug() << __FILE__ << __LINE__ << ": setting background colour to " << colorString;
         QColor backColor = QColor(colorString);
         if (backColor.isValid()) { // change color via \033]11;Color\007
             if (backColor != _modifiedBackground) {
@@ -444,9 +446,7 @@ void Session::monitorTimerDone()
 
     //FIXME: Make message text for this notification and the activity notification more descriptive.
     if (_monitorSilence) {
-//    KNotification::event("Silence", ("Silence in session '%1'", _nameTitle), QPixmap(),
-//                    QApplication::activeWindow(),
-//                    KNotification::CloseWhenWidgetActivated);
+        emit silence();
         emit stateChanged(NOTIFYSILENCE);
     } else {
         emit stateChanged(NOTIFYNORMAL);
@@ -459,7 +459,7 @@ void Session::activityStateSet(int state)
 {
     if (state==NOTIFYBELL) {
         QString s;
-        s.sprintf("Bell in session '%s'",_nameTitle.toLocal8Bit().data());
+        s.sprintf("Bell in session '%s'",_nameTitle.toUtf8().data());
 
         emit bellRequest( s );
     } else if (state==NOTIFYACTIVITY) {
@@ -470,9 +470,7 @@ void Session::activityStateSet(int state)
         if ( _monitorActivity ) {
             //FIXME:  See comments in Session::monitorTimerDone()
             if (!_notifiedActivity) {
-//        KNotification::event("Activity", ("Activity in session '%1'", _nameTitle), QPixmap(),
-//                        QApplication::activeWindow(),
-//        KNotification::CloseWhenWidgetActivated);
+                emit activity();
                 _notifiedActivity=true;
             }
         }
@@ -607,16 +605,16 @@ void Session::done(int exitStatus)
 
         if (_shellProcess->exitStatus() == QProcess::NormalExit) {
             message.sprintf("Session '%s' exited with status %d.",
-                          _nameTitle.toLocal8Bit().data(), exitStatus);
+                          _nameTitle.toUtf8().data(), exitStatus);
         } else {
             message.sprintf("Session '%s' crashed.",
-                          _nameTitle.toLocal8Bit().data());
+                          _nameTitle.toUtf8().data());
         }
     }
 
     if ( !_wantedClose && _shellProcess->exitStatus() != QProcess::NormalExit )
         message.sprintf("Session '%s' exited unexpectedly.",
-                        _nameTitle.toLocal8Bit().data());
+                        _nameTitle.toUtf8().data());
     else
         emit finished();
 
@@ -1034,10 +1032,10 @@ void SessionGroup::setMasterStatus(Session * session, bool master)
 
 void SessionGroup::connectPair(Session * master , Session * other)
 {
-   // qDebug() << k_funcinfo;
+//    qDebug() << k_funcinfo;
 
     if ( _masterMode & CopyInputToAll ) {
-        // qDebug() << "Connection session " << master->nameTitle() << "to" << other->nameTitle();
+        qDebug() << "Connection session " << master->nameTitle() << "to" << other->nameTitle();
 
         connect( master->emulation() , SIGNAL(sendData(const char *,int)) , other->emulation() ,
                  SLOT(sendString(const char *,int)) );
@@ -1048,7 +1046,7 @@ void SessionGroup::disconnectPair(Session * master , Session * other)
 //    qDebug() << k_funcinfo;
 
     if ( _masterMode & CopyInputToAll ) {
-        // qDebug() << "Disconnecting session " << master->nameTitle() << "from" << other->nameTitle();
+        qDebug() << "Disconnecting session " << master->nameTitle() << "from" << other->nameTitle();
 
         disconnect( master->emulation() , SIGNAL(sendData(const char *,int)) , other->emulation() ,
                     SLOT(sendString(const char *,int)) );

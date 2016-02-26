@@ -126,7 +126,6 @@ void NewBreeze::createGUI() {
 	AddressBar->setFocusPolicy( Qt::NoFocus );
 	SidePanel->setFocusPolicy( Qt::NoFocus );
 	FolderView->setFocusPolicy( Qt::StrongFocus );
-	InfoBar->setFocusPolicy( Qt::NoFocus );
 
 	setFocusPolicy( Qt::NoFocus );
 };
@@ -385,7 +384,7 @@ void NewBreeze::showLicense() {
 void NewBreeze::showInfoDlg() {
 
 	NBDialog *infoDlg = new NBDialog( this );
-	infoDlg->setDialogTitle( "NewBreeze Info" );
+	infoDlg->setDialogTitle( "NewBreeze Readme" );
 	infoDlg->setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
 
 	QHBoxLayout *dlgLyt = new QHBoxLayout();

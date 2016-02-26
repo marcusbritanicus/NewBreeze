@@ -110,8 +110,27 @@ QList<NBDeviceInfo> NBDeviceManager::allDevices() {
 
 	QList<NBDeviceInfo> devices;
 
-	Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() )
-		devices << NBDeviceManager::deviceInfoForPath( sInfo.rootPath() );
+	Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() ) {
+		NBDeviceInfo devInfo;
+
+		if ( sInfo.fileSystemType().contains( "gvfs" ) )
+			continue;
+
+		devInfo.dN = sInfo.device();
+		devInfo.dL = getDevLabel( sInfo.name(), sInfo.displayName() );
+		devInfo.fS = sInfo.fileSystemType();
+		devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
+		devInfo.mP = sInfo.rootPath();
+		devInfo.fSz = sInfo.bytesFree();
+		devInfo.aSz = sInfo.bytesAvailable();
+		devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
+		devInfo.dSz = sInfo.bytesTotal();
+
+		if ( devInfo.mP == "/" )
+			devInfo.dT = "hdd";
+
+		devices << devInfo;
+	}
 
 	return devices;
 };

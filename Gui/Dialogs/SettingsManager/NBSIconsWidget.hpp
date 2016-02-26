@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBSICONSWIDGET_HPP
-#define NBSICONSWIDGET_HPP
 
 #include <Global.hpp>
 #include <NBButton.hpp>
@@ -27,9 +25,6 @@ class NBIconThemeWidget : public QWidget {
 
 		NBIconThemeChooserWidget *iconThemesWidget;
 		NBIconThemeViewerWidget *folderViewWidget;
-
-	private slots:
-		void setIconTheme();
 };
 
 class NBIconThemeChooserWidget : public QWidget {
@@ -54,14 +49,35 @@ class NBIconThemeChooserWidget : public QWidget {
 		void reloadIcons();
 };
 
-class NBIconThemeViewerWidget: public QListWidget {
+class NBIconThemeModel: public QAbstractListModel {
+	Q_OBJECT
+
+	public:
+		NBIconThemeModel( QObject * );
+
+		int rowCount( const QModelIndex &parent = QModelIndex() ) const;
+		QVariant data( const QModelIndex &index, int role ) const;
+
+		inline Qt::ItemFlags flags( const QModelIndex ) const {
+
+			return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
+		};
+
+	private:
+		QStringList mimeNameList;
+		QList<QIcon> mimeIconList;
+		QStringList mimeTypeList;
+
+	private slots:
+		void setupModel();
+};
+
+class NBIconThemeViewerWidget: public QListView {
 	Q_OBJECT
 
 	public:
 		NBIconThemeViewerWidget( QWidget * );
 
-	public slots:
-		void loadIcons();
+	Q_SIGNALS:
+		void setupModel();
 };
-
-#endif

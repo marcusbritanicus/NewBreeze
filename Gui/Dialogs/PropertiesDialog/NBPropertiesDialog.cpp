@@ -409,9 +409,9 @@ void NBPermissionsWidget::createGUI() {
 
 	delProtectCheck = new QCheckBox( "&Protect against accidental deletion" );
 	delProtectCheck->setToolTip(
-		"<p>Enabling this will generate a warning and a security check to make "
-		"sure you really want to delete the protected file/directory.</p>"
-		"<p><b>Note: Protection will be enabled only in NewBreeze FM. This is not "
+		"<p>Check this option to enable accidental delete protection. This ensures you cannot to "
+		"delete the protected file/directory until you maunally set the protection off here.</p>"
+		"<p><b>Note: Protection will be enabled only in NewBreeze FM. This is <u>not</u> "
 		"a universal linux filesystem property.</b></p>"
 	);
 

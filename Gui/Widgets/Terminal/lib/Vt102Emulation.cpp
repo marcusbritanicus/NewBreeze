@@ -958,6 +958,12 @@ void Vt102Emulation::sendKeyEvent( QKeyEvent* event )
         else if(event->key() == Qt::Key_Tab) {
             textToSend += 0x09;
         }
+        else if (event->key() == Qt::Key_PageUp) {
+            textToSend += "\033[5~";
+        }
+        else if (event->key() == Qt::Key_PageDown) {
+            textToSend += "\033[6~";
+        }
         else {
             textToSend += _codec->fromUnicode(event->text());
         }
@@ -973,7 +979,7 @@ void Vt102Emulation::sendKeyEvent( QKeyEvent* event )
                                          "into characters to send to the terminal "
                                          "is missing.");
         reset();
-        receiveData( translatorError.toLocal8Bit().constData() , translatorError.count() );
+        receiveData( translatorError.toUtf8().constData() , translatorError.count() );
     }
 }
 
@@ -1218,7 +1224,8 @@ static void hexdump(int* s, int len)
   }
 }
 
-void Vt102Emulation::reportDecodingError() {
+void Vt102Emulation::reportDecodingError()
+{
   if (tokenBufferPos == 0 || ( tokenBufferPos == 1 && (tokenBuffer[0] & 0xff) >= 32) )
     return;
   printf("Undecodable sequence: ");

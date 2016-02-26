@@ -4,7 +4,7 @@ Widgets
 		☒ Single click Open (point to select)
 		☑ Selections
 
-Undo-Redo Sequences > NBProcessManager
+Undo-Redo Sequences > NBProcessManager                                                                                               [ 0 of 1 ]
 	☐ Undo/Redo Rename, IO, Trash etc
 
 NBIconView                                                                                                                           [ 1 of 3 ]
@@ -12,13 +12,21 @@ NBIconView                                                                      
 	☐ Fix @aboveIndex @belowIndex
 	☐ Enable PageUp and PageDown navigation
 
-NewBreeze Theming and Styling                                                                                                        [ 3 of 3 ]
+NewBreeze Theming and Styling                                                                                                        [ 4 of 4 ]
 	☑ Remove all the redundant stylesheets
 	☒ Enable user defined theming
 	☑ Faster icon loading - images
+	☑ Qt supported styles
 
-Archives                                                                                                                             [ 3 of 4 ]
-	☐ Zip and tar preview: PeekPlugin using archivemount
+Archives                                                                                                                             [ 4 of 5 ]
+	☒ Zip and tar preview: PeekPlugin using archivemount
 	☒ Writing archives will be done in NBProcessManager, show the percentage of data compressed.
 	☒ Extraction of archives to be done in NBProcessManager, show the percentage of data processed
 	☑ Use an external library to do the work - libarchive
+	☐ Archive preview using Folder Flash
+
+
+Note:
+	☐ - Work in progress/to be started
+	☑ - Work Completed
+	☒ - Not working on this

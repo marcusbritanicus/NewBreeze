@@ -38,7 +38,7 @@ class KProcessPrivate;
 
 /**
  * \class KProcess kprocess.h <KProcess>
- *
+ * 
  * Child process invocation, monitoring and control.
  *
  * This class extends QProcess by some useful functionality, overrides
@@ -369,3 +369,4 @@ protected:
 };
 /* ------------------------------------------- */
 #endif
+

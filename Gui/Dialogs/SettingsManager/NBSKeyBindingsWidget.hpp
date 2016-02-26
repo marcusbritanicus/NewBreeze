@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBSKEYBINDINGSWIDGET_HPP
-#define NBSKEYBINDINGSWIDGET_HPP
 
 #include <Global.hpp>
 
@@ -64,5 +62,3 @@ class NBKeySequenceButton : public QPushButton {
 		void changeKeySequence();
 		void setKeySequence( QKeySequence );
 };
-
-#endif

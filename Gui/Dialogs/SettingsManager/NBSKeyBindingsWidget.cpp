@@ -139,7 +139,7 @@ NBKeyCaptureWidget::NBKeyCaptureWidget( QKeySequence old, QKeySequence defKey, Q
 	QLabel *lbl = new QLabel( "Press in the key combination of your choice, BackSpace clears the key combo." );
 	lbl->setWordWrap( true );
 
-	QPushButton *okBtn = new QPushButton( QIcon( ":/icons/ok.png" ), "Apply" );
+	QPushButton *okBtn = new QPushButton( QIcon::fromTheme( "dialog-ok-apply", QIcon( ":/icons/ok.png" ) ), "Apply" );
 	okBtn->setFocusPolicy( Qt::NoFocus );
 	connect( okBtn, SIGNAL( clicked() ), this, SLOT( apply() ) );
 
@@ -153,7 +153,7 @@ NBKeyCaptureWidget::NBKeyCaptureWidget( QKeySequence old, QKeySequence defKey, Q
 	clearBtn->setFocusPolicy( Qt::NoFocus );
 	connect( clearBtn, SIGNAL( clicked() ), this, SLOT( clear() ) );
 
-	QPushButton *resetBtn = new QPushButton( QIcon( ":/icons/reload.png" ), "Reset" );
+	QPushButton *resetBtn = new QPushButton( QIcon::fromTheme( "view-refresh", QIcon( ":/icons/reload.png" ) ), "Reset" );
 	resetBtn->setDefault( false );
 	resetBtn->setFocusPolicy( Qt::NoFocus );
 	connect( resetBtn, SIGNAL( clicked() ), this, SLOT( reset() ) );

@@ -48,7 +48,7 @@ void NBClickLabel::setClickable( bool canClick ) {
 NBInfoLabel::NBInfoLabel() : QLabel() {
 
 	setAlignment( Qt::AlignCenter );
-	setFont( QFont( "Envy Code R", 12 ) );
+	setFont( QFont( "Envy Code R", 9 ) );
 };
 
 void NBInfoLabel::setText( QString name, QString size, QString type, QString perm ) {

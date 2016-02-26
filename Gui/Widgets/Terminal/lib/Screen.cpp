@@ -34,6 +34,7 @@
 // Qt
 #include <QTextStream>
 #include <QDate>
+#include <QDebug>
 
 // KDE
 //#include <kdebug.h>
@@ -307,7 +308,7 @@ void Screen::resizeImage(int new_lines, int new_columns)
     // create new screen lines and copy from old to new
 
     ImageLine* newScreenLines = new ImageLine[new_lines+1];
-    for (int i=0; i < qMin(lines-1,new_lines+1) ;i++)
+    for (int i=0; i < qMin(lines,new_lines+1) ;i++)
         newScreenLines[i]=screenLines[i];
     for (int i=lines;(i > 0) && (i<new_lines+1);i++)
         newScreenLines[i].resize( new_columns );
@@ -933,7 +934,8 @@ void Screen::clearEntireScreen()
     // Add entire screen to history
     for (int i = 0; i < (lines-1); i++)
     {
-        addHistLine(); scrollUp(0,1);
+		addHistLine();
+        scrollUp(0,1);
     }
 
     clearImage(loc(0,0),loc(columns-1,lines-1),' ');

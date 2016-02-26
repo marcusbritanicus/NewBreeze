@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBSSIDEBAR_HPP
-#define NBSSIDEBAR_HPP
 
 #include <Global.hpp>
 
@@ -19,5 +17,3 @@ class NBSSideBar : public QWidget {
 	Q_SIGNALS:
 		void loadSettingsCategory( int );
 };
-
-#endif

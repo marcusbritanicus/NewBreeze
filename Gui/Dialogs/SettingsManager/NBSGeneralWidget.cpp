@@ -29,10 +29,14 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 	connect( defaultViewModeCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( handleViewModeChanged( int ) ) );
 
+	iconSizeL = new QLabel( this );
+	iconSizeL->setText( QString( "%1 px" ).arg( sett.value( "IconSize" ).toSize().width() ) );
+
 	defaultIconSizeS = new QSlider( Qt::Horizontal, this );
 	defaultIconSizeS->setTickPosition( QSlider::TicksBelow );
 	defaultIconSizeS->setRange( 16, 128 );
 	defaultIconSizeS->setTickInterval( 16 );
+	defaultIconSizeS->setSingleStep( 16 );
 	defaultIconSizeS->setValue( sett.value( "IconSize" ).toSize().width() );
 	connect( defaultIconSizeS, SIGNAL( valueChanged( int ) ), this, SLOT( handleIconSizeChanged( int ) ) );
 
@@ -59,11 +63,14 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	comboBoxLyt1->addWidget( defaultViewModeCB );
 
 	QHBoxLayout *comboBoxLyt2 = new QHBoxLayout();
+
 	QLabel *lbl2 = new QLabel( "Choose the default icon &size:" );
 	lbl2->setBuddy( defaultIconSizeS );
+
 	comboBoxLyt2->addWidget( lbl2 );
-	comboBoxLyt2->addWidget( lbl2 );
+	comboBoxLyt2->addStretch();
 	comboBoxLyt2->addWidget( defaultIconSizeS );
+	comboBoxLyt2->addWidget( iconSizeL );
 
 	QHBoxLayout *comboBoxLyt3 = new QHBoxLayout();
 	QLabel *lbl3 = new QLabel( "&Sort file and folders by:" );
@@ -130,6 +137,8 @@ void NBSGeneralWidget::handleIconSizeChanged( int ) {
 	int iconSize = defaultIconSizeS->value();
 	Settings->setValue( "IconSize", QSize( iconSize, iconSize ) );
 	Settings->General.IconSize = QSize( iconSize, iconSize );
+
+	iconSizeL->setText( QString( "%1 px" ).arg( iconSize ) );
 };
 
 void NBSGeneralWidget::handleGroupingChanged( bool grouping ) {

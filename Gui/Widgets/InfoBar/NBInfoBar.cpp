@@ -42,10 +42,12 @@ inline QString getPermissions( QString path ) {
 
 NBInfoBar::NBInfoBar( QWidget *parent ) : QWidget( parent ) {
 
+	/* Basic Settings */
 	setFixedHeight( 64 );
 	setContentsMargins( QMargins() );
+	setFocusPolicy( Qt::NoFocus );
 
-	// Widgets
+	/* Widgets */
 	iconLbl = new QLabel();
 	iconLbl->setFixedSize( QSize( 52, 52 ) );
 	iconLbl->setAlignment( Qt::AlignCenter );
@@ -53,14 +55,12 @@ NBInfoBar::NBInfoBar( QWidget *parent ) : QWidget( parent ) {
 	infoLbl = new NBInfoLabel();
 	infoLbl->setMinimumWidth( 700 );
 
-	// Layouts
+	/* Layouts */
 	QHBoxLayout *baseLyt = new QHBoxLayout();
 
 	baseLyt->addWidget( iconLbl );
 	baseLyt->addWidget( infoLbl );
 	baseLyt->addStretch( 0 );
-
-	setFont( QFont( font().family(), 11 ) );
 
 	setLayout( baseLyt );
 };

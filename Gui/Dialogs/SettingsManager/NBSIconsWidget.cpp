@@ -16,7 +16,7 @@ void NBIconThemeWidget::createGUI() {
 	iconThemesWidget = new NBIconThemeChooserWidget( this );
 	folderViewWidget = new NBIconThemeViewerWidget( this );
 
-	connect( iconThemesWidget, SIGNAL( reloadIcons() ), folderViewWidget, SLOT( loadIcons() ) );
+	connect( iconThemesWidget, SIGNAL( reloadIcons() ), folderViewWidget, SIGNAL( setupModel() ) );
 
 	QVBoxLayout *wLyt = new QVBoxLayout();
 	wLyt->addWidget( iconThemesWidget );
@@ -25,17 +25,20 @@ void NBIconThemeWidget::createGUI() {
 	setLayout( wLyt );
 };
 
-void NBIconThemeWidget::setIconTheme() {
-
-};
-
 NBIconThemeChooserWidget::NBIconThemeChooserWidget( QWidget *parent ) : QWidget( parent ) {
 
 	QHBoxLayout *wLyt = new QHBoxLayout();
 
-	prevBtn = new NBButton( QIcon(":/icons/arrow-left.png" ), this );
-	nextBtn = new NBButton( QIcon( ":/icons/arrow-right.png" ), this );
+	prevBtn = new NBButton( QIcon::fromTheme( "arrow-left", QIcon( ":/icons/arrow-left.png" ) ), this );
+	prevBtn->setFocusPolicy( Qt::NoFocus );
+	prevBtn->setShortcut( tr( "Ctrl+P" ) );
+
+	nextBtn = new NBButton( QIcon::fromTheme( "arrow-right", QIcon( ":/icons/arrow-right.png" ) ), this );
+	nextBtn->setFocusPolicy( Qt::NoFocus );
+	nextBtn->setShortcut( tr( "Ctrl+N" ) );
+
 	themeCB = new QComboBox();
+	themeCB->setFocusPolicy( Qt::NoFocus );
 
 	loadThemes();
 
@@ -53,6 +56,7 @@ NBIconThemeChooserWidget::NBIconThemeChooserWidget( QWidget *parent ) : QWidget(
 };
 
 void NBIconThemeChooserWidget::loadThemes() {
+
 	themesList.clear();
 
 	QDir iconDir( "/usr/share/icons" );
@@ -112,7 +116,80 @@ void NBIconThemeChooserWidget::previousTheme() {
 	emit reloadIcons();
 };
 
-NBIconThemeViewerWidget::NBIconThemeViewerWidget( QWidget *parent ) : QListWidget( parent ) {
+NBIconThemeModel::NBIconThemeModel( QObject *parent ) : QAbstractListModel( parent ) {
+
+	QTimer::singleShot( 10, this, SLOT( setupModel() ) );
+};
+
+int NBIconThemeModel::rowCount( const QModelIndex &parent ) const {
+
+	if ( parent == QModelIndex() )
+		return mimeTypeList.count();
+
+	else
+		return 0;
+};
+
+QVariant NBIconThemeModel::data( const QModelIndex &index, int role ) const {
+
+	int mimeIndex = index.row();
+
+	switch( role ) {
+		case Qt::DisplayRole:
+			return mimeNameList.at( mimeIndex );
+
+		case Qt::DecorationRole:
+			return mimeIconList.at( mimeIndex );
+
+		case Qt::ToolTipRole :
+			return mimeTypeList.at( mimeIndex );
+
+		default:
+			return QVariant();
+	}
+};
+
+void NBIconThemeModel::setupModel() {
+
+	mimeNameList.clear();
+	mimeIconList.clear();
+	mimeTypeList.clear();
+
+	beginResetModel();
+	Q_FOREACH( QMimeType mime, mimeDb.allMimeTypes() ) {
+		QIcon ico1 = QIcon::fromTheme( mime.iconName() );
+		QIcon ico2 = QIcon::fromTheme( mime.genericIconName() );
+
+		/* We will now show mimes with out icons */
+		if ( ico1.isNull() and ico2.isNull() ) {
+
+			continue;
+		}
+
+		/* These have mimes */
+		else {
+			if ( mime.preferredSuffix().count() )
+				mimeNameList << mime.preferredSuffix().toUpper();
+
+			else
+				mimeNameList << mime.comment();
+
+			if ( not ico1.isNull() )
+				mimeIconList << ico1;
+
+			else
+				mimeIconList << ico2;
+
+			mimeTypeList << mime.name();
+		}
+		qApp->processEvents();
+	}
+	endResetModel();
+
+	emit layoutChanged();
+};
+
+NBIconThemeViewerWidget::NBIconThemeViewerWidget( QWidget *parent ) : QListView( parent ) {
 
 	// View, Sizes and Resize Modes
 	setViewMode( QListView::IconMode );
@@ -138,62 +215,8 @@ NBIconThemeViewerWidget::NBIconThemeViewerWidget( QWidget *parent ) : QListWidge
 	// Uniform Item Sizes
 	setUniformItemSizes( true );
 
-	loadIcons();
-};
+	NBIconThemeModel *model = new NBIconThemeModel( this );
+	connect( this, SIGNAL( setupModel() ), model, SLOT( setupModel() ) );
 
-void NBIconThemeViewerWidget::loadIcons() {
-	/*
-		*
-		* Icons to be loaded
-		*
-
-		*
-		* inode/directory, text/plain, text/html, text/x-c++src, text/x-c++hdr,
-		* text/x-csrc, text/x-chdr, text/x-python
-		* application/x-gzip, application/zip, application/x-bzip2, application/x-7z-compressed
-		* application/msword, application/vnd.ms-powerpoint, application/vnd.ms-excel
-		* application/pdf, application/x-executable, application/x-font-ttf
-		* audio/mp3, audio/ogg, audio/flac
-		* video/mp4, video/avi, video/
-		* image/png, image/jpeg, image/gif
-		*
-	*/
-
-	QList<QMimeType> fileTypeList;
-	fileTypeList << mimeDb.mimeTypeForFile( "/" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.txt" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.html" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.cpp" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.hpp" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.c" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.h" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.py" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.gz" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.zip" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.bz2" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.7z" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.doc" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.ppt" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.xls" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.pdf" );
-	fileTypeList << mimeDb.mimeTypeForFile( "/bin/ls" );					// An executable which can surely be found in all linux based systems
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.ttf" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.mp3" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.mp4" );
-	fileTypeList << mimeDb.mimeTypeForFile( "filename.png" );
-
-	QStringList names;
-	names << "Folder" << "Text File" << "Html File" << "C++ Src" << "C++ Hdr" << "C Src" << "C Hdr" << "Python File" << "GZip Archive";
-	names << "Zip Archive" << "BZip2 Archive" << "7z Archive" << "MSWord" << "MS Powerpoint" << "MS Excel" << "PDF File";
-	names << "Executable" << "Font File" << "Audio File" << "Video File" << "Image File" << "JPG File" << "GIF File";
-
-	clear();
-
-	for( int i = 0; i < fileTypeList.count(); i++ ) {
-		QString icoStr = NBIconProvider::icon( QString( "filename" ), fileTypeList.at( i ) );
-		QIcon icon = QIcon::fromTheme( icoStr, QIcon( icoStr ) );
-		QListWidgetItem *item = new QListWidgetItem( icon, names.at( i ) );
-
-		addItem( item );
-	}
+	setModel( model );
 };
