@@ -69,7 +69,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 	QVariantList info;
 
 	struct stat statbuf;
-	if ( stat( qPrintable( path ), &statbuf ) != 0 )
+	if ( stat( path.toLocal8Bit().data(), &statbuf ) != 0 )
 		return QVariantList() << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
 
 	struct passwd *pwdinfo = getpwuid( statbuf.st_uid );

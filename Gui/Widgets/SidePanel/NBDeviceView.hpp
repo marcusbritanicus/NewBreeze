@@ -10,6 +10,7 @@
 #include <NBDeviceInfo.hpp>
 
 class NBDeviceAction;
+class NBDeviceMenu;
 
 class NBDevicesIcon : public QWidget {
 	Q_OBJECT
@@ -71,7 +72,7 @@ class NBDevicesIcon : public QWidget {
 		int flashesCompleted;
 		int maxFlashes;
 
-		QMenu *devView;
+		NBDeviceMenu *devView;
 
 	private slots:
 		void showDevices();
@@ -101,6 +102,8 @@ class NBDeviceAction : public QWidget {
 		NBDeviceAction( NBDeviceInfo, QWidget* );
 		QString mountPoint();
 
+		void highlight( bool );
+
 	private:
 		QString mMountPoint;
 		quint64 percentUsed;
@@ -113,4 +116,19 @@ class NBDeviceAction : public QWidget {
 		void paintEvent( QPaintEvent* );
 		void enterEvent( QEvent* );
 		void leaveEvent( QEvent* );
+};
+
+class NBDeviceMenu : public QMenu {
+	Q_OBJECT
+
+	public:
+		NBDeviceMenu( QWidget *parent );
+
+		void addAction( QWidgetAction *act );
+
+	private:
+		QList<QWidgetAction*> actionList;
+
+	private slots:
+		void highlightAction( QAction *act );
 };

@@ -22,7 +22,7 @@ inline QString dirName( QString path ) {
 	if ( path.endsWith( "/" ) )
 		path.chop( 1 );
 
-	return QString( dirname( strdup( qPrintable( path ) ) ) ) + "/";
+	return QString( dirname( strdup( path.toLocal8Bit().data() ) ) ) + "/";
 };
 
 inline QString baseName( QString path ) {
@@ -30,7 +30,7 @@ inline QString baseName( QString path ) {
 	if ( path.endsWith( "/" ) )
 		path.chop( 1 );
 
-	return QString( basename( strdup( qPrintable( path ) ) ) );
+	return QString( basename( strdup( path.toLocal8Bit().data() ) ) );
 };
 
 NBAppFile::NBAppFile() {
@@ -618,5 +618,5 @@ uint qHash( const NBAppFile &app ) {
 	hashString += app.value( NBAppFile::Comment ).toString();
 	hashString += app.value( NBAppFile::NoDisplay ).toString();
 
-	return qChecksum( qPrintable( hashString ), hashString.count() );
+	return qChecksum( hashString.toLocal8Bit().data(), hashString.count() );
 };

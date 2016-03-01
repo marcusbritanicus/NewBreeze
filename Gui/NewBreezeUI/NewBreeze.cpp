@@ -291,7 +291,7 @@ void NewBreeze::createAndSetupActions() {
 
 void NewBreeze::openFile( QString file ) {
 
-	NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", qPrintable( file ) );
+	NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", file.toLocal8Bit().data() );
 	NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( file ) );
 
 	/* Show Open with command  */

@@ -11,7 +11,7 @@ static inline QString baseName( QString path ) {
 	if ( path.endsWith( "/" ) )
 		path.chop( 1 );
 
-	char *dupPath = strdup( qPrintable( path ) );
+	char *dupPath = strdup( path.toLocal8Bit().data() );
 	QString basePth = QString( basename( dupPath ) );
 	free( dupPath );
 

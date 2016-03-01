@@ -25,7 +25,7 @@ inline QString getPermissions( QString path ) {
 
 	// Execute Permissions
 	if ( not isDir( path ) ) {
-		if ( access( qPrintable( path ), X_OK ) == 0 )
+		if ( access( path.toLocal8Bit().data(), X_OK ) == 0 )
 			text += " <font color='#008000'><b>X</b></font>";
 
 		else
@@ -33,7 +33,7 @@ inline QString getPermissions( QString path ) {
 	}
 
 	else {
-		if ( access( qPrintable( path ), X_OK ) != 0 )
+		if ( access( path.toLocal8Bit().data(), X_OK ) != 0 )
 			text = "<font color='#800000'><b>R W</b></font>";
 	}
 

@@ -392,12 +392,12 @@ void NBTrashModel::restore( QModelIndexList toBeRestored ) {
 			continue;
 		}
 
-		if( rename( qPrintable( node->trashPath() ), qPrintable( node->originalPath() ) ) ) {
+		if ( rename( node->trashPath().toLocal8Bit().data(), node->originalPath().toLocal8Bit().data() ) ) {
 			failed << idx;
 			continue;
 		}
 
-		remove( qPrintable( node->trashInfoPath() ) );
+		remove( node->trashInfoPath().toLocal8Bit().data() );
 		trashInfo.remove( QUrl::toPercentEncoding( node->name() ) );
 		trashInfo.sync();
 
@@ -417,12 +417,12 @@ void NBTrashModel::removeFromDisk( QModelIndexList toBeDeleted ) {
 		NBTrashNode *node = static_cast<NBTrashNode*>( idx.internalPointer() );
 		__childNames.removeOne( node->name() );
 
-		if( remove( qPrintable( node->trashPath() ) ) ) {
+		if( remove( node->trashPath().toLocal8Bit().data() ) ) {
 			failed << idx;
 			continue;
 		}
 
-		remove( qPrintable( node->trashInfoPath() ) );
+		remove( node->trashInfoPath().toLocal8Bit().data() );
 		trashInfo.remove( QUrl::toPercentEncoding( node->name() ) );
 		trashInfo.sync();
 

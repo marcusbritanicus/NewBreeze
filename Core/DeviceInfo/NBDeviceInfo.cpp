@@ -15,7 +15,7 @@
 inline QString readLink( QString path ) {
 
 	char linkTarget[ 1024 ] = { 0 };
-	readlink( qPrintable( path ), linkTarget, 1023 );
+	readlink( path.toLocal8Bit().data(), linkTarget, 1023 );
 
 	return QString( linkTarget );
 };
@@ -25,7 +25,7 @@ inline QString baseName( QString path ) {
 	if ( path.endsWith( "/" ) )
 		path.chop( 1 );
 
-	return QString( basename( strdup( qPrintable( path ) ) ) );
+	return QString( basename( strdup( path.toLocal8Bit().data() ) ) );
 };
 
 inline QString getDevType( QString dev, QString vfsType ) {

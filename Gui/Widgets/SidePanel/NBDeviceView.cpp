@@ -37,7 +37,7 @@ NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 	setFixedSize( 48, 48 );
 
 	// DeviceView
-	devView = new QMenu( this );
+	devView = new NBDeviceMenu( this );
 	devView->setObjectName( "NBDeviceMenu" );
 	connect( devView, SIGNAL( triggered( QAction* ) ), this, SLOT( clickDrive( QAction* ) ) );
 };
@@ -306,6 +306,12 @@ QString NBDeviceAction::mountPoint() {
 	return mMountPoint;
 };
 
+void NBDeviceAction::highlight( bool high ) {
+
+	select = high;
+	repaint();
+}
+
 void NBDeviceAction::paintEvent( QPaintEvent *pEvent ) {
 
 	QPainter painter( this );
@@ -379,4 +385,25 @@ void NBDeviceAction::leaveEvent( QEvent *lEvent ) {
 
 	select = false;
 	repaint();
+};
+
+NBDeviceMenu::NBDeviceMenu( QWidget *parent ) : QMenu( parent ) {
+
+	connect( this, SIGNAL( hovered( QAction* ) ), this, SLOT( highlightAction( QAction* ) ) );
+};
+
+void NBDeviceMenu::addAction( QWidgetAction *act ) {
+
+	actionList << act;
+	QMenu::addAction( act );
+};
+
+void NBDeviceMenu::highlightAction( QAction *act ) {
+
+	QWidgetAction *wAct = qobject_cast<QWidgetAction*>( act );
+	Q_FOREACH( QWidgetAction *wa, actionList ) {
+		NBDeviceAction *devAct = qobject_cast<NBDeviceAction*>( wa->defaultWidget() );
+		if ( devAct )
+			devAct->highlight( wAct == wa );
+	}
 };

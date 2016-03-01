@@ -57,14 +57,14 @@ NBGZip::NBGZip( QString archive, NBGZip::Mode openmode, QString file ) {
 				}
 			}
 
-			gzip = gzopen( qPrintable( gzFileName ), "rb" );
+			gzip = gzopen( gzFileName.toLocal8Bit().data(), "rb" );
 			break;
 		}
 
 		case NBGZip::WRITE : {
 			gzFileName = QString( archive );
 			fileName = QString( file );
-			gzip = gzopen( qPrintable( gzFileName ), "wb" );
+			gzip = gzopen( gzFileName.toLocal8Bit().data(), "wb" );
 			break;
 		}
 	}
@@ -75,7 +75,7 @@ void NBGZip::create() {
 	int error;
 
 	// Write to the @v gzip file created
-	std::ifstream ifile( qPrintable( fileName ), std::ifstream::binary );
+	std::ifstream ifile( fileName.toLocal8Bit().data(), std::ifstream::binary );
 	off_t fileSize = QFileInfo( fileName ).size();
 
 	if ( fileSize < MAX_READ_SIZE ) {
@@ -113,7 +113,7 @@ void NBGZip::extract() {
 		return;
 
 	// Reading from the bz2 file opened
-	std::ofstream ofile( qPrintable( fileName ), std::ofstream::binary );
+	std::ofstream ofile( fileName.toLocal8Bit().data(), std::ofstream::binary );
 
 	while ( true ) {
 		char buffer[ MAX_READ_SIZE ] = { "\x00" };

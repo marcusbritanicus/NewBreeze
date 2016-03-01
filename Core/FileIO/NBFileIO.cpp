@@ -127,14 +127,14 @@ void NBFileIO::performIO() {
 		QString srcPath = dirName( node );
 		QString srcBase = baseName( node );
 
-		chdir( qPrintable( srcPath ) );
+		chdir( srcPath.toLocal8Bit().data() );
 		if ( isDir( node ) )
 			copyDir( srcBase );
 
 		else
 			copyFile( srcBase );
 
-		chdir( qPrintable( curWD ) );
+		chdir( curWD.toLocal8Bit().data() );
 	}
 
 	emit IOComplete();
@@ -148,7 +148,7 @@ void NBFileIO::preIO() {
 		QString srcPath = dirName( node );
 		QString srcBase = baseName( node );
 
-		chdir( qPrintable( srcPath ) );
+		chdir( srcPath.toLocal8Bit().data() );
 		if ( isDir( node ) ) {
 			/*
 				*
@@ -159,8 +159,8 @@ void NBFileIO::preIO() {
 
 			/* If we are moving and its an intra-device move then mkpath won't be necessary */
 			struct stat iStat, oStat;
-			stat( qPrintable( node ), &iStat );
-			stat( qPrintable( targetDir ), &oStat );
+			stat( node.toLocal8Bit().data(), &iStat );
+			stat( targetDir.toLocal8Bit().data(), &oStat );
 
 			if ( ( iStat.st_dev == oStat.st_dev ) and ( NBIOMode::Move == mode ) )
 				continue;
@@ -176,7 +176,7 @@ void NBFileIO::preIO() {
 			totalSize += getSize( srcBase );
 		}
 
-		chdir( qPrintable( curWD ) );
+		chdir( curWD.toLocal8Bit().data() );
 	}
 };
 
@@ -186,7 +186,7 @@ void NBFileIO::getDirSize( QString path ) {
 	struct dirent* entry;
 	QString longest_name;
 
-	while( ( d_fh = opendir( qPrintable( path ) ) ) == NULL ) {
+	while( ( d_fh = opendir( path.toLocal8Bit().data() ) ) == NULL ) {
 		qWarning() << "Couldn't open directory:" << path;
 		return;
 	}
@@ -245,8 +245,8 @@ void NBFileIO::copyFile( QString srcFile ) {
 	}
 
 	struct stat iStat, oStat;
-	stat( qPrintable( srcFile ), &iStat );
-	stat( qPrintable( targetDir ), &oStat );
+	stat( srcFile.toLocal8Bit().data(), &iStat );
+	stat( targetDir.toLocal8Bit().data(), &oStat );
 
 	/* If the operation is intra-device operation and its a move, then we can simply rename the file */
 	if ( ( iStat.st_dev == oStat.st_dev ) and ( NBIOMode::Move == mode ) ) {
@@ -254,8 +254,8 @@ void NBFileIO::copyFile( QString srcFile ) {
 		return;
 	}
 
-	int iFileFD = open( qPrintable( srcFile ), O_RDONLY );
-	int oFileFD = open( qPrintable( ioTarget ), O_WRONLY | O_CREAT, iStat.st_mode );
+	int iFileFD = open( srcFile.toLocal8Bit().data(), O_RDONLY );
+	int oFileFD = open( ioTarget.toLocal8Bit().data(), O_WRONLY | O_CREAT, iStat.st_mode );
 
 	fTotalBytes = iStat.st_size;
 	fWritten = 0;
@@ -313,7 +313,7 @@ void NBFileIO::copyFile( QString srcFile ) {
 
 	if ( mode == NBIOMode::Move ) {
 		if ( not errorNodes.contains( srcFile ) )
-			unlink( qPrintable( srcFile) );
+			unlink( srcFile.toLocal8Bit().data() );
 	}
 };
 
@@ -321,8 +321,8 @@ void NBFileIO::copyDir( QString path ) {
 
 	/* If the operation is intra-device operation and its a move, then we can simply rename the file */
 	struct stat iStat, oStat;
-	stat( qPrintable( path ), &iStat );
-	stat( qPrintable( targetDir ), &oStat );
+	stat( path.toLocal8Bit().data(), &iStat );
+	stat( targetDir.toLocal8Bit().data(), &oStat );
 
 	if ( ( iStat.st_dev == oStat.st_dev ) and ( NBIOMode::Move == mode ) ) {
 		/*
@@ -331,7 +331,7 @@ void NBFileIO::copyDir( QString path ) {
 			* In such a case, we must perform a normal copy
 			*
 		*/
-		if ( not rename( qPrintable( path ), qPrintable( targetDir + baseName( path ) ) ) )
+		if ( not rename( path.toLocal8Bit().data(), ( targetDir + baseName( path ) ).toLocal8Bit().data() ) )
 			return;
 	}
 
@@ -342,7 +342,7 @@ void NBFileIO::copyDir( QString path ) {
 	if ( wasCanceled )
 		return;
 
-	while( ( d_fh = opendir( qPrintable( path ) ) ) == NULL ) {
+	while( ( d_fh = opendir( path.toLocal8Bit().data() ) ) == NULL ) {
 		qWarning() << "Couldn't open directory:" << path;
 		return;
 	}
@@ -373,21 +373,21 @@ void NBFileIO::copyDir( QString path ) {
 	closedir( d_fh );
 
 	if ( mode == NBIOMode::Move )
-		rmdir( qPrintable( path ) );
+		rmdir( path.toLocal8Bit().data() );
 };
 
 void NBFileIO::mkpath( QString path, QFile::Permissions dirPerms ) {
 
 	QString curWD( get_current_dir_name() );
 
-	chdir( qPrintable( targetDir ) );
+	chdir( targetDir.toLocal8Bit().data() );
 	QString __path;
 	Q_FOREACH( QString pathBit, path.split( "/", QString::SkipEmptyParts ) ) {
 		__path += pathBit + "/";
 		if ( not exists( __path ) ) {
-			mkdir( qPrintable( __path ), S_IRWXU );
+			mkdir( __path.toLocal8Bit().data(), S_IRWXU );
 			QFile::setPermissions( __path, dirPerms );
 		}
 	}
-	chdir( qPrintable( curWD ) );
+	chdir( curWD.toLocal8Bit().data() );
 };

@@ -836,7 +836,7 @@ void NBFileSystemModel::setupModelData() {
 
 	DIR *dir;
 	struct dirent *ent;
-	dir = opendir( qPrintable( __rootPath ) );
+	dir = opendir( __rootPath.toLocal8Bit().data() );
 
 	__childNames.clear();
 	rootNode->clearChildren();

@@ -6,16 +6,6 @@
 
 #include <NBTools.hpp>
 
-QDir NBDir( QString path ) {
-
-	QDir dir( path );
-	dir.makeAbsolute();
-	dir.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System );
-	dir.setSorting( QDir::DirsFirst | QDir::IgnoreCase );
-
-	return dir;
-};
-
 QString dirName( QString path ) {
 
 	while( path.contains( "//" ) )
@@ -136,6 +126,21 @@ QString readLink( QString path ) {
 	return QString( linkTarget );
 };
 
+int mkpath( QString path, mode_t mode ) {
+
+	/* Root always exists */
+	if ( path == "/" )
+		return 0;
+
+	/* If the directory exists, thats okay for us */
+	if ( exists( path ) )
+		return 0;
+
+	mkpath( dirName( path ), mode );
+
+	return mkdir( path.toLocal8Bit().data(), mode );
+};
+
 bool removeDir( QString dirName ) {
 
     bool result = true;
@@ -193,11 +198,63 @@ qint64 nChildren( QString path ) {
 qint64 getSize( QString path ) {
 
 	struct stat statbuf;
-	if ( stat( path.toLocal8Bit().data(), &statbuf ) == 0 )
-		return statbuf.st_size;
-
-	else
+	if ( stat( path.toLocal8Bit().data(), &statbuf ) != 0 )
 		return 0;
+
+	switch( statbuf.st_mode & S_IFMT ) {
+		case S_IFREG: {
+
+			return statbuf.st_size;
+		}
+
+		case S_IFDIR: {
+			DIR* d_fh;
+			struct dirent* entry;
+			QString longest_name;
+
+			while ( ( d_fh = opendir( path.toLocal8Bit().data() ) ) == NULL ) {
+				qWarning() << "Couldn't open directory:" << path;
+				return statbuf.st_size;
+			}
+
+			quint64 size = statbuf.st_size;
+
+			longest_name = QString( path );
+			if ( not longest_name.endsWith( "/" ) )
+				longest_name += "/";
+
+			while( ( entry = readdir( d_fh ) ) != NULL ) {
+
+				/* Don't descend up the tree or include the current directory */
+				if ( strcmp( entry->d_name, ".." ) != 0 && strcmp( entry->d_name, "." ) != 0 ) {
+
+					if ( entry->d_type == DT_DIR ) {
+
+						/* Recurse into that folder */
+						size += getSize( longest_name + entry->d_name );
+					}
+
+					else {
+
+						/* Get the size of the current file */
+						size += getSize( longest_name + entry->d_name );
+					}
+				}
+			}
+
+			closedir( d_fh );
+			return size;
+		}
+
+		default: {
+
+			/* Return 0 for all other nodes: chr, blk, lnk, symlink etc */
+			return 0;
+		}
+	}
+
+	/* Should never come till here */
+	return 0;
 };
 
 mode_t getMode( QString path ) {
@@ -386,24 +443,24 @@ QStringList getTerminal() {
 
 		switch ( type ) {
 			case QtDebugMsg: {
-				fprintf( stderr, "\033[01;30mNewBreeze::Debug# %s\n\033[00;00m", qPrintable( message ) );
+				fprintf( stderr, "\033[01;30mNewBreeze::Debug# %s\n\033[00;00m", message.toLocal8Bit().data() );
 				break;
 			}
 
 			case QtWarningMsg: {
 				if ( QString( message ).contains( "X Error" ) )
 					break;
-				fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", qPrintable( message ) );
+				fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", message.toLocal8Bit().data() );
 				break;
 			}
 
 			case QtCriticalMsg: {
-				fprintf( stderr, "\033[01;31mNewBreeze::CriticalError# %s\n\033[00;00m", qPrintable( message ) );
+				fprintf( stderr, "\033[01;31mNewBreeze::CriticalError# %s\n\033[00;00m", message.toLocal8Bit().data() );
 				break;
 			}
 
 			case QtFatalMsg: {
-				fprintf( stderr, "\033[01;41mNewBreeze::FatalError# %s\n\033[00;00m", qPrintable( message ) );
+				fprintf( stderr, "\033[01;41mNewBreeze::FatalError# %s\n\033[00;00m", message.toLocal8Bit().data() );
 				abort();
 			}
 		}

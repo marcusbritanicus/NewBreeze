@@ -108,7 +108,7 @@ void NBDjvuDisplay::loadDjvu() {
 	ddjvu_context_t *ctx = ddjvu_context_create( "newbreeze2" );
 
 	/* DjVu Document */
-	ddjvu_document_t *doc = ddjvu_document_create_by_filename( ctx, qPrintable( path ), 1 );
+	ddjvu_document_t *doc = ddjvu_document_create_by_filename( ctx, path.toLocal8Bit().data(), 1 );
 
 	/* Wait for decoding to be complete */
 	ddjvu_job_t *job = ddjvu_document_job( doc );

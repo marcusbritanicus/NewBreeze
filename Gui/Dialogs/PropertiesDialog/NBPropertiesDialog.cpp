@@ -188,7 +188,7 @@ void NBPropertiesWidget::createGUI() {
 
 		Q_FOREACH( QString path, pathsList ) {
 			struct stat timeSt;
-			if ( stat( qPrintable( path ), &timeSt ) == 0 ) {
+			if ( stat( path.toLocal8Bit().data(), &timeSt ) == 0 ) {
 
 				ctimeMin = qMin( QDateTime::fromTime_t( timeSt.st_ctim.tv_sec ), ctimeMin );
 				mtimeMin = qMin( QDateTime::fromTime_t( timeSt.st_mtim.tv_sec ), mtimeMin );

@@ -60,8 +60,8 @@ NBLzma::NBLzma( QString archive, NBLzma::Mode openmode, QString file ) {
 			strm = LZMA_STREAM_INIT;
 			ret_xz = lzma_stream_decoder( &strm, UINT64_MAX, LZMA_CONCATENATED );
 
-			fdin = fopen( qPrintable( xzFileName ), "rb" );
-			fdout = fopen( qPrintable( fileName ), "wb" );
+			fdin = fopen( xzFileName.toLocal8Bit().data(), "rb" );
+			fdout = fopen( fileName.toLocal8Bit().data(), "wb" );
 			break;
 		}
 
@@ -75,8 +75,8 @@ NBLzma::NBLzma( QString archive, NBLzma::Mode openmode, QString file ) {
 
 			ret_xz = lzma_easy_encoder( &strm, preset, check );
 
-			fdin = fopen( qPrintable( fileName ), "rb" );
-			fdout = fopen( qPrintable( xzFileName ), "wb" );
+			fdin = fopen( fileName.toLocal8Bit().data(), "rb" );
+			fdout = fopen( xzFileName.toLocal8Bit().data(), "wb" );
 			break;
 		}
 	}

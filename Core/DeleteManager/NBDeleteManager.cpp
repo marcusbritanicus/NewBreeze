@@ -104,13 +104,13 @@ void NBTrasher::trashFilesAndFolders( QStringList trashList ) {
 		QString delTime = QDateTime::currentDateTime().toString( "yyyyMMddThh:mm:ss" );
 
 		/* If it exists, add a date time to it to make it unique */
-		if ( access( qPrintable( newPath ), R_OK ) == 0 )
+		if ( access( newPath.toLocal8Bit().data(), R_OK ) == 0 )
 			newPath += delTime;
 
 		qDebug() << item << newPath;
 
 		/* Try trashing it. If it fails, intimate the user */
-		if ( rename( qPrintable( item ), qPrintable( newPath ) ) ) {
+		if ( rename( item.toLocal8Bit().data(), newPath.toLocal8Bit().data() ) ) {
 			qDebug() << "Error" << errno << ": Failed to trash " << item << ":" << strerror( errno );
 			failedFiles << item;
 		}

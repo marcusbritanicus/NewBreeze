@@ -63,7 +63,7 @@ NBBZip2::NBBZip2( QString archive, NBBZip2::Mode openmode, QString file ) {
 				fileName.chop( 4 );
 			}
 
-			bzFile = fopen( qPrintable( bz2FileName ), "r" );
+			bzFile = fopen( bz2FileName.toLocal8Bit().data(), "r" );
 			bz2 = BZ2_bzReadOpen( &error, bzFile, 0, 0, NULL, 0 );
 			break;
 		}
@@ -72,7 +72,7 @@ NBBZip2::NBBZip2( QString archive, NBBZip2::Mode openmode, QString file ) {
 			bz2FileName = QString( archive );
 			fileName = QString( file );
 
-			bzFile = fopen( qPrintable( bz2FileName ), "w" );
+			bzFile = fopen( bz2FileName.toLocal8Bit().data(), "w" );
 			bz2 = BZ2_bzWriteOpen( &error, bzFile, 9, 0, 30 );
 			break;
 		}
@@ -84,7 +84,7 @@ void NBBZip2::create() {
 	int error;
 	// Write to the bz2 file created above
 
-	std::ifstream ifile( qPrintable( fileName ), std::ifstream::binary );
+	std::ifstream ifile( fileName.toLocal8Bit().data(), std::ifstream::binary );
 	off_t fileSize = QFileInfo( fileName ).size();
 
 	if ( fileSize < MAX_READ_SIZE ) {
@@ -126,7 +126,7 @@ void NBBZip2::extract() {
 	int error;
 
 	// Reading from the bz2 file opened
-	std::ofstream ofile( qPrintable( fileName ), std::ofstream::binary );
+	std::ofstream ofile( fileName.toLocal8Bit().data(), std::ofstream::binary );
 
 	while ( true ) {
 		char buffer[ MAX_READ_SIZE ] = { "\x00" };

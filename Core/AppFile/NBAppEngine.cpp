@@ -116,7 +116,7 @@ QStringList NBAppEngine::listApplications( QString appsDir ) {
 
 	DIR *dir;
 	struct dirent *ent;
-	dir = opendir( qPrintable( appsDir ) );
+	dir = opendir( appsDir.toLocal8Bit().data() );
 
 	if ( dir != NULL ) {
 		while ( ( ent = readdir( dir ) ) != NULL) {

@@ -48,6 +48,10 @@ namespace NBProcess {
 		/* Current file bytes already copied */
 		quint64 fileBytesCopied;
 
+		/* Text to be displayed with the progress bar */
+		/* Mainly used for preIO stage */
+		QString progressText;
+
 		/* Type: Copy, Move, Delete, Trash */
 		Type type;
 
@@ -96,27 +100,18 @@ class NBIOProcess : public NBAbstractProcess {
 		// Things to be done before IO begins like computing sizes
 		void preIO();
 
-		// Compute the size of a directory
-		void getDirSize( QString );
-
 		// Copy a file
 		void copyFile( QString );
 
 		// Copy a folder
 		void copyDir( QString );
 
-		// Create a directory tree - A directory with sub-directory, sub-sub-directory, and so on
-		void mkpath( QString, QFile::Permissions );
-
 		QStringList errorNodes;
 		QStringList sourceList;
 		QString targetDir;
 
-		QString jobID;
-
 		bool mCanceled;
 		bool mPaused;
 
-		NBProcess::Type mode;
 		NBProcess::Progress *mProgress;
 };

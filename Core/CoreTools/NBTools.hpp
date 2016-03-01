@@ -19,9 +19,6 @@ namespace DbgMsgPart {
 	};
 };
 
-/* QDir with spe */
-QDir NBDir( QString path );
-
 /* Qt4 Equivalent of linux dirname and basename */
 QString dirName( QString path );
 QString baseName( QString path );
@@ -41,15 +38,25 @@ bool isFile( QString path );
 bool isDir( QString path );
 bool isLink( QString path );
 bool exists( QString path );
+
+/* Qt4 version of linux readlink(...) */
 QString readLink( QString path );
-bool removeDir( QString );
+
+/* Create a directory: mkdir -p */
+/* http://fossies.org/linux/inadyn/libite/makepath.c */
+int mkpath( QString );
+
+/* Remove a directory and its contents */
+bool removeDir( QString, mode_t mode );
 
 /* Is the path readable */
 bool isReadable( QString path );
 bool isWritable( QString path );
 
-/* Get the number of children of a dir and size of a file */
+/* Get the number of children of a dir */
 qint64 nChildren( QString );
+
+/* Get the size of a directory and file */
 qint64 getSize( QString path );
 
 /* Mode of a file/folder */

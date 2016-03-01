@@ -13,12 +13,12 @@ QString NBXdg::home() {
 
 	/* If the env variable HOME is set and its proper, good! */
 	QString __home = QString::fromLocal8Bit( qgetenv( "HOME" ) );
-	if ( access( qPrintable( __home ), R_OK | X_OK ) == 0 )
-		return __home;
+	if ( access( __home.toLocal8Bit().data(), R_OK | X_OK ) == 0 )
+		return __home + "/";
 
 	/* Otherwise, we divine it from the user ID */
 	struct passwd *pwd = getpwuid( getuid() );
-	return QString::fromLocal8Bit( pwd->pw_dir );
+	return QString::fromLocal8Bit( pwd->pw_dir ) + "/";
 };
 
 QString NBXdg::xdgDefaultApp( QString mimeType ) {
@@ -151,18 +151,18 @@ QString NBXdg::trashLocation( QString path ) {
 		QString mountPoint = trashDevInfo.mountPoint();
 
 		/* If the mount point does not exist, return a NULL string */
-		if ( access( qPrintable( mountPoint ), R_OK | W_OK | X_OK ) )
+		if ( access( mountPoint.toLocal8Bit().data(), R_OK | W_OK | X_OK ) )
 			return QString();
 
 		/* If $MNTPT/.Trash/$UID is present, and accessible with right permissions */
 		/* We blindly try to make $MTPT/.Trash/$uid/files, $MTPT/.Trash/$uid/info */
-		if( access( qPrintable( mountPoint + "/.Trash/" + QString::number( getuid() ) ), R_OK | W_OK | X_OK ) == 0 ) {
+		if( access( ( mountPoint + "/.Trash/" + QString::number( getuid() ) ).toLocal8Bit().data(), R_OK | W_OK | X_OK ) == 0 ) {
 			QDir( mountPoint ).mkpath( QString( ".Trash/%1/" ).arg( getuid() ) );
 			QDir( mountPoint ).mkpath( QString( ".Trash/%1/files/" ).arg( getuid() ) );
 			QDir( mountPoint ).mkpath( QString( ".Trash/%1/info/" ).arg( getuid() ) );
 
 			/* Check if the any one above folders exist, say $MTPT/.Trash-$uid/files */
-			if( access( qPrintable( mountPoint + "/.Trash/" + QString::number( getuid() ) + "/files/" ), R_OK | W_OK | X_OK ) == 0 )
+			if( access( ( mountPoint + "/.Trash/" + QString::number( getuid() ) + "/files/" ).toLocal8Bit().data(), R_OK | W_OK | X_OK ) == 0 )
 				return mountPoint + "/.Trash/" + QString::number( getuid() );
 
 			return QString();
@@ -175,7 +175,7 @@ QString NBXdg::trashLocation( QString path ) {
 		QFile::setPermissions( mountPoint + "/.Trash-" + QString::number( getuid() ), QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner );
 
 		/* Check if the any one above folders exist, say $MTPT/.Trash-$uid/files */
-		if( access( qPrintable( mountPoint + "/.Trash-" + QString::number( getuid() ) + "/files/" ), R_OK | W_OK | X_OK ) == 0 )
+		if( access( ( mountPoint + "/.Trash-" + QString::number( getuid() ) + "/files/" ).toLocal8Bit().data(), R_OK | W_OK | X_OK ) == 0 )
 			return mountPoint + "/.Trash-" + QString::number( getuid() );
 
 		return QString();
@@ -187,7 +187,7 @@ QString NBXdg::trashLocation( QString path ) {
 QString NBXdg::homeTrashLocation() {
 
 	/* If the permissions of Trash folder are right; we assume $trash/files and $trash/info exists */
-	if ( access( qPrintable( home() + "/.local/share/Trash/" ), R_OK | W_OK | X_OK ) == 0 )
+	if ( access( ( home() + "/.local/share/Trash/" ).toLocal8Bit().data(), R_OK | W_OK | X_OK ) == 0 )
 		return home() + "/.local/share/Trash/";
 
 	else {

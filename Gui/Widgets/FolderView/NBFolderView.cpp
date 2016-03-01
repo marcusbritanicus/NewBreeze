@@ -299,7 +299,7 @@ void NBFolderView::goForward() {
 
 void NBFolderView::doOpenHome() {
 
-	NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", qPrintable( NBXdg::home() ) );
+	NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", NBXdg::home().toLocal8Bit().data() );
 	if ( Settings->General.CombiHome )
 		fsModel->loadCombiView();
 
@@ -348,7 +348,7 @@ void NBFolderView::doOpen( QString loc ) {
 	}
 
 	if ( isDir( loc ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", qPrintable( loc ) );
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", loc.toLocal8Bit().data() );
 		fsModel->setRootPath( loc );
 	}
 
@@ -362,12 +362,12 @@ void NBFolderView::doOpen( QString loc ) {
 				* permissions
 				*
 			*/
-			NBDebugMsg( DbgMsgPart::HEAD, "Executing: %s... ", qPrintable( loc ) );
+			NBDebugMsg( DbgMsgPart::HEAD, "Executing: %s... ", loc.toLocal8Bit().data() );
 			NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( loc ) ? "[DONE]" : "[FAILED]" ) );
 		}
 
 		else {
-			NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", qPrintable( loc ) );
+			NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", loc.toLocal8Bit().data() );
 			NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
 			if ( not app.isValid() )
 				doOpenWithCmd();
@@ -430,7 +430,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 		}
 
 		if ( isDir( fileToBeOpened ) ) {
-			NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", qPrintable( fileToBeOpened ) );
+			NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", fileToBeOpened.toLocal8Bit().data() );
 			if ( index == idx )
 				fsModel->setRootPath( fileToBeOpened );
 
@@ -447,12 +447,12 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 					* or something of the sort and not a jpg file with exec perms
 					*
 				*/
-				NBDebugMsg( DbgMsgPart::HEAD, "Executing: %s... ", qPrintable( fileToBeOpened ) );
+				NBDebugMsg( DbgMsgPart::HEAD, "Executing: %s... ", fileToBeOpened.toLocal8Bit().data() );
 				NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( fileToBeOpened ) ? "[DONE]" : "[FAILED]" ) );
 			}
 
 			else {
-				NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", qPrintable( fileToBeOpened ) );
+				NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", fileToBeOpened.toLocal8Bit().data() );
 				NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( fileToBeOpened ) );
 				if ( not app.isValid() )
 					doOpenWithCmd();
@@ -610,7 +610,7 @@ void NBFolderView::doPeek() {
 
 	/* For directories we use the inbuild previewer */
 	if ( isDir( currentNode ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing folder: %s", qPrintable( currentNode ) );
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing folder: %s", currentNode.toLocal8Bit().data() );
 		NBFolderFlash *previewer = new NBFolderFlash( currentNode );
 
 		connect( previewer, SIGNAL( loadFolder( QString ) ), this, SLOT( doOpen( QString ) ) );
@@ -639,7 +639,7 @@ void NBFolderView::doPeek() {
 	}
 
 	// Custom Peeking
-	NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", qPrintable( currentNode ) );
+	NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", currentNode.toLocal8Bit().data() );
 	NBCustomPeek *previewer = new NBCustomPeek( currentNode );
 	previewer->show();
 
@@ -675,11 +675,15 @@ void NBFolderView::prepareCopy() {
 	moveItems = false;
 	QModelIndexList copyList = getSelection();
 
-	QStringList urlList;
+	QList<QUrl> urlList;
 	foreach( QModelIndex item, copyList )
-		urlList << fsModel->nodePath( item.data().toString() );
+		urlList << QUrl::fromLocalFile( fsModel->nodePath( item.data().toString() ) );
 
-	setXClipBoardData( urlList );
+	QMimeData *mData = new QMimeData();
+	mData->setUrls( urlList );
+
+	clipBoard->setMimeData( mData );
+	// setXClipBoardData( urlList );
 };
 
 void NBFolderView::prepareMove() {
@@ -690,11 +694,15 @@ void NBFolderView::prepareMove() {
 	moveItems = true;
 	QModelIndexList copyList = getSelection();
 
-	QStringList urlList;
+	QList<QUrl> urlList;
 	foreach( QModelIndex item, copyList )
-		urlList << fsModel->nodePath( item.data().toString() );
+		urlList << QUrl::fromLocalFile( fsModel->nodePath( item.data().toString() ) );
 
-	setXClipBoardData( urlList );
+	QMimeData *mData = new QMimeData();
+	mData->setUrls( urlList );
+
+	clipBoard->setMimeData( mData );
+	// setXClipBoardData( urlList );
 };
 
 void NBFolderView::acopy( QStringList srcList, QString tgt ) {
@@ -845,8 +853,8 @@ void NBFolderView::doRename() {
 	QString opath = QDir( fsModel->currentDir() ).filePath( curFile );
 	QString npath = QDir( fsModel->currentDir() ).filePath( renamer->newName() );
 
-	NBDebugMsg( DbgMsgPart::HEAD, "Renaming %s to %s... ", qPrintable( opath ), qPrintable( npath ) );
-	if ( rename( qPrintable( opath ), qPrintable( npath ) ) ) {
+	NBDebugMsg( DbgMsgPart::HEAD, "Renaming %s to %s... ", opath.toLocal8Bit().data(), npath.toLocal8Bit().data() );
+	if ( rename( opath.toLocal8Bit().data(), npath.toLocal8Bit().data() ) ) {
 
 		NBDebugMsg( DbgMsgPart::TAIL, "[Failed]" );
 	}
@@ -914,7 +922,7 @@ void NBFolderView::selectAll() {
 
 void NBFolderView::openTerminal() {
 
-	NBDebugMsg( DbgMsgPart::HEAD, "Opening the console at %s... ", qPrintable( fsModel->currentDir() ) );
+	NBDebugMsg( DbgMsgPart::HEAD, "Opening the console at %s... ", fsModel->currentDir().toLocal8Bit().data() );
 	QStringList commandList = getTerminal();
 	QString command = commandList.takeFirst();
 
