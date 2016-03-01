@@ -368,11 +368,14 @@ quint64 NBIOManagerMini::activeJobs() {
 void NBIOManagerMini::showAllIODialogs() {
 
 	if ( ioManager ) {
+
 		ioManager->showCritical();
 	}
 
 	else {
 		ioManager = new NBIOManager( jobList );
+		connect( ioManager, SIGNAL( closed() ), this, SLOT( uncheck() ) );
+
 		ioManager->showCritical();
 	}
 };

@@ -255,13 +255,16 @@ void NBFileIO::copyFile( QString srcFile ) {
 	}
 
 	int iFileFD = open( qPrintable( srcFile ), O_RDONLY );
-	int oFileFD = open( qPrintable( ioTarget ), O_WRONLY | O_CREAT, 0644 );
+	int oFileFD = open( qPrintable( ioTarget ), O_WRONLY | O_CREAT, iStat.st_mode );
 
 	fTotalBytes = iStat.st_size;
 	fWritten = 0;
-	int bytesWritten = 0;
 
-	while( fWritten != quint64( iStat.st_size ) ) {
+	ssize_t inBytes = 0;
+	ssize_t bytesWritten = 0;
+	char block[ COPY_BUF_SIZE ];
+
+	while ( ( inBytes = read( iFileFD, block, sizeof( block ) ) ) > 0 ) {
 		if ( wasCanceled ) {
 			close( iFileFD );
 			close( oFileFD );
@@ -281,9 +284,15 @@ void NBFileIO::copyFile( QString srcFile ) {
 			qApp->processEvents();
 		}
 
-		char block[ COPY_BUF_SIZE ];
-		qint64 inBytes = read( iFileFD, block, sizeof( block ) );
 		bytesWritten = write( oFileFD, block, inBytes );
+
+		if ( bytesWritten != inBytes ) {
+			qDebug() << "Error writing to file:" << ioTarget;
+			qDebug() << "[Error]:" << strerror( errno );
+			errorNodes << srcFile;
+			break;
+		}
+
 		fWritten += bytesWritten;
 		copiedSize += bytesWritten;
 		qApp->processEvents();
@@ -292,14 +301,19 @@ void NBFileIO::copyFile( QString srcFile ) {
 	close( iFileFD );
 	close( oFileFD );
 
-	QFile::setPermissions( ioTarget, QFile::permissions( srcFile ) );
+	/* If read(...) resulted in an error */
+	if ( inBytes == -1 ) {
+		qDebug() << "Error copying file:" << srcFile;
+		qDebug() << "[Error]:" << strerror( errno );
+		errorNodes << srcFile;
+	}
+
+	if ( fWritten != quint64( iStat.st_size ) )
+		errorNodes << srcFile;
 
 	if ( mode == NBIOMode::Move ) {
-		if ( fWritten == quint64( iStat.st_size ) )
+		if ( not errorNodes.contains( srcFile ) )
 			unlink( qPrintable( srcFile) );
-
-		else
-			errorNodes << srcFile;
 	}
 };
 
