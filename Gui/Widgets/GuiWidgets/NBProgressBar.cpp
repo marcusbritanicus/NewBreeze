@@ -24,22 +24,28 @@ NBProgressBar::NBProgressBar( QWidget *parent ) : QWidget( parent ) {
 
 void NBProgressBar::setValue( qreal value ) {
 
-	if ( 0 > value )
-		mFraction = 0;
+	/* All positive values will stop the swayTimer */
+	if ( value >= 0 ) {
+		if ( swayTimer.isActive() ) {
+			mSway = false;
+			swayTimer.stop();
+		}
 
-	else if ( value > 1 )
-		mFraction = 1;
+		/* If value is greater than 1, make it one, otherwise retain its value in mFraction */
+		mFraction = ( value > 1 ? 1 : value );
 
-	else
-		mFraction = value;
+		repaint();
+		qApp->processEvents();
 
-	if ( swayTimer.isActive() ) {
-		mSway = false;
-		swayTimer.stop();
+		return;
 	}
 
-	repaint();
-	qApp->processEvents();
+	/* All negative values will start the sway timer, if not already activated */
+	if ( not swayTimer.isActive() ) {
+
+		mSway = true;
+		swayTimer.start( 50, this );
+	}
 };
 
 void NBProgressBar::setSway( bool sway ) {

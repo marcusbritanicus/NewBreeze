@@ -36,7 +36,7 @@ void NBTrashManager::setupGui() {
 	connect( deleteButtons->segment( 0 ), SIGNAL( clicked() ), this, SLOT( deleteSelected() ) );
 	connect( deleteButtons->segment( 1 ), SIGNAL( clicked() ), this, SLOT( emptyTrash() ) );
 
-	deleteButtons->segment( 0 )->setObjectName( "cancelBtn" );
+	deleteButtons->segment( 0 )->setObjectName( "abortBtn" );
 	deleteButtons->segment( 1 )->setObjectName( "abortBtn" );
 
 	// Layouts

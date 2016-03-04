@@ -47,7 +47,7 @@ QString readLink( QString path );
 int mkpath( QString );
 
 /* Remove a directory and its contents */
-bool removeDir( QString, mode_t mode );
+bool removeDir( QString );
 
 /* Is the path readable */
 bool isReadable( QString path );

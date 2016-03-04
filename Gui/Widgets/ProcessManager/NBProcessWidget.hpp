@@ -14,13 +14,11 @@
 #include <NBMessageDialog.hpp>
 #include <NBStyleManager.hpp>
 
-class NBProcWidget : public QWidget {
+class NBProcessWidget : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBProcWidget( QWidget *parent );
-
-		void update( NBProgress progress );
+		NBProcessWidget( NBProcess::Progress *progress, QWidget *parent );
 
 	private:
 		/* Icon for the process */
@@ -47,6 +45,8 @@ class NBProcWidget : public QWidget {
 		/* Toggle details, pause */
 		bool detailsShown;
 		bool paused;
+
+		NBProcess::Progress *mProgress;
 
 	private slots:
 		void toggleDetails();

@@ -8,19 +8,19 @@
 
 /*
     *
-    * +-----------------------------------------------------------------------------------------------------------------------------+
-    * | +------+  Copying source directory name                                                                         [@] [=] [x] |
-    * | |@#@#@#|  Source: /home/cosmos/.....                                                                                        |
-    * | |#@#@#@|  Target: /home/cosmos/.....                                                                                        |
-    * | +------+  Speed:  31 MiB/s                ETA:  1 hr 24 min 36 sec                                                          |
-    * | [ ======================================================================================================================= ] |
-    * | Current File: /home/cosmos/......                                                                                           |
-    * | [ ======================================================================================================================= ] |
-    * +-----------------------------------------------------------------------------------------------------------------------------+
+    * ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    * │ ┌──────┐  Copying source directory name                                                                 [<] [>] [@] [-] [x] │
+    * │ │ ☒ ☐ │  Source: /home/cosmos/.....                                                                                        │
+    * │ │ ☐ ☒ │  Target: /home/cosmos/.....                                                                                        │
+    * │ └─────-┘  Speed:  31 MiB/s                ETA:  1 hr 24 min 36 sec                                                          │
+    * │ [ ═══════════════════════════════════════>                                                                                ] │
+    * │ Current File: /home/cosmos/......                                                                                           │
+    * │ [ ════════════════════════════════════════════════════════════════════════════════>                                       ] │
+    * └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
     *
 */
 
-NBProcWidget::NBProcWidget( QWidget *parent ) : QWidget( parent ) {
+NBProcessWidget::NBProcessWidget( QWidget *parent ) : QWidget( parent ) {
 
 	paused = false;
 	detailsShown = true;
@@ -101,12 +101,12 @@ NBProcWidget::NBProcWidget( QWidget *parent ) : QWidget( parent ) {
 	setLayout( baseLyt );
 };
 
-void NBProcWidget::update( NBProgress progress ) {
+void NBProcessWidget::update( NBProgress progress ) {
 
 	s
 };
 
-void NBProcWidget::toggleDetails() {
+void NBProcessWidget::toggleDetails() {
 
 	if ( detailsShown ) {
 		detailsBtn->setIcon( QIcon( ":/icons/arrow-down.png" ) );
@@ -138,7 +138,7 @@ void NBProcWidget::toggleDetails() {
 	}
 };
 
-void NBProcWidget::togglePauseResume() {
+void NBProcessWidget::togglePauseResume() {
 
 	if ( paused ) {
 		pauseBtn->setIcon( QIcon::fromTheme( "media-playback-pause" ) );
