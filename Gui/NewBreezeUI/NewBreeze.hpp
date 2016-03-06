@@ -31,9 +31,6 @@ class NewBreeze : public QMainWindow {
 	public :
 		NewBreeze( QString loc = QString() );
 
-		bool activeJobs();
-		void showActiveJobs();
-
 	private :
 		/* Create our UI */
 		void createGUI();

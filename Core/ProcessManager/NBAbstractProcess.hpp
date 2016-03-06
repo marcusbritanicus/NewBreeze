@@ -42,12 +42,12 @@ namespace NBProcess {
 	};
 
 	enum State  {
-		NotStarted = 0x7A242A			// We are yet to begin doing anything with this (for delayed start, etc)
+		NotStarted = 0x7A242A,			// We are yet to begin doing anything with this (for delayed start, etc)
 		Starting,						// Listing the sources
 		Started,						// Process is on going
 		Paused,							// Process is paused
 		Canceled,						// Process was cancelled
-		Complete						// Process is complete (with/without errors)
+		Completed						// Process is complete (with/without errors)
 	};
 
 	typedef struct NBProgress_t {
@@ -79,10 +79,10 @@ namespace NBProcess {
 		QString progressText;
 
 		/* Type: Copy, Move, Delete, Trash */
-		Type type;
+		NBProcess::Type type;
 
 		/* State: Starting, Started, Paused, Canceled, */
-		State state;
+		NBProcess::State state;
 	} Progress;
 };
 
@@ -98,12 +98,12 @@ class NBAbstractProcess : public QThread {
 		virtual bool canUndo() = 0;
 		virtual void undo() = 0;
 
-		virtual bool canRedo() = 0;
-		virtual void redo() = 0;
+		// virtual bool canRedo() = 0;
+		// virtual void redo() = 0;
 
 	protected:
 		/* Force the subclass to implement the function run */
-		virtual run() = 0;
+		virtual void run() = 0;
 
 	Q_SIGNALS:
 		/* Signals completion, with error list as the positional argument */

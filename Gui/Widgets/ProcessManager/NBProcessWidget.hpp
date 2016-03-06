@@ -9,18 +9,20 @@
 #include <Global.hpp>
 #include <NBTools.hpp>
 #include <NBIconProvider.hpp>
-#include <NBCoreProcess.hpp>
+#include <NBProcessManager.hpp>
 #include <NBProgressBar.hpp>
 #include <NBMessageDialog.hpp>
-#include <NBStyleManager.hpp>
 
 class NBProcessWidget : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBProcessWidget( NBProcess::Progress *progress, QWidget *parent );
+		NBProcessWidget( NBProcess::Progress *progress, NBAbstractProcess *proc, QWidget *parent );
 
 	private:
+		/* Create a GUI */
+		void createGUI();
+
 		/* Icon for the process */
 		QLabel *iconLbl;
 
@@ -40,16 +42,26 @@ class NBProcessWidget : public QWidget {
 		NBProgressBar *totalPB, *cfilePB;
 
 		/* Buttons */
-		QToolButton *pauseBtn, *detailsBtn, *closeBtn;
+		QToolButton *pauseBtn, *detailsBtn;
 
-		/* Toggle details, pause */
+		/* Refresh timer */
+		QBasicTimer updateTimer;
+
+		/* Time spend on puase */
+		QTime pauseTime;
+		quint64 pausedSecs;
+
+		/* Toggle details flag */
 		bool detailsShown;
-		bool paused;
 
 		NBProcess::Progress *mProgress;
+		NBAbstractProcess *mProcess;
 
 	private slots:
 		void toggleDetails();
 		void togglePauseResume();
-		// void close();
+
+	protected:
+		void timerEvent( QTimerEvent* );
+		void paintEvent( QPaintEvent* );
 };

@@ -67,16 +67,6 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	createAndSetupActions();
 };
 
-bool NewBreeze::activeJobs() {
-
-	return AddressBar->procWidget()->activeJobs();
-};
-
-void NewBreeze::showActiveJobs() {
-
-	AddressBar->procWidget()->showAllIODialogs();
-};
-
 void NewBreeze::createGUI() {
 
 	QWidget *BodyWidget = new QWidget( this );
@@ -639,7 +629,26 @@ void NewBreeze::clearFilters() {
 
 void NewBreeze::initiateIO( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {
 
-	AddressBar->procWidget()->addJob( sourceList, target, iomode );
+	NBProcess::Progress *progress = new NBProcess::Progress;
+	progress->sourceDir = dirName( sourceList.at( 0 ) ) + "/";
+	progress->targetDir = target;
+
+	QStringList srcList;
+	foreach( QString path, sourceList )
+		srcList << path.replace( progress->sourceDir, "" );
+
+	if ( iomode == NBIOMode::Move )
+		progress->type = NBProcess::Move;
+
+	else
+		progress->type = NBProcess::Copy;
+
+	NBIOProcess *proc = new NBIOProcess( srcList, progress );
+	NBProcessManager::instance()->addProcess( progress, proc );
+
+	progress->startTime = QTime::currentTime();
+
+	proc->start();
 };
 
 void NewBreeze::addBookMark() {
@@ -773,9 +782,9 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	// Close down recursive size checker in Properties
 	mTerminate = true;
 
-	// If there are background FileIO jobs, bring them to front
-	// if ( activeJobs() )
-		// showActiveJobs();
+	// If there are background processes, bring them to front
+	if ( NBProcessManager::instance()->activeProcessCount() )
+		NBProcessManagerUI::instance()->show();
 
 	// Store the previous session - geometry, and open directory.
 	Settings->setValue( "Session/Geometry", geometry() );

@@ -25,6 +25,7 @@
 */
 
 #include <NBIOProcess.hpp>
+#include <NBTools.hpp>
 
 NBIOProcess::NBIOProcess( QStringList sources, NBProcess::Progress *progress ) {
 
@@ -34,6 +35,10 @@ NBIOProcess::NBIOProcess( QStringList sources, NBProcess::Progress *progress ) {
 	sourceList.clear();
 
 	mProgress = progress;
+
+	mPaused = false;
+	mCanceled = false;
+	mUndo = false;
 
 	if ( not mProgress->sourceDir.endsWith( "/" ) )
 		mProgress->sourceDir+= "/";
@@ -85,7 +90,7 @@ void NBIOProcess::undo() {
 	if ( mProgress->type == NBProcess::Copy ) {
 		mUndo = true;
 		start();
-	};
+	}
 
 	/* We moved the files, move them back */
 	else {
@@ -94,12 +99,14 @@ void NBIOProcess::undo() {
 	}
 };
 
-void NBIOProcess::preIO() {
+bool NBIOProcess::preIO() {
 
 	mProgress->state = NBProcess::Starting;
 
 	if ( not isWritable( mProgress->targetDir ) ) {
 		emit noWriteAccess();
+		mProgress->state = NBProcess::Completed;
+
 		return false;
 	}
 
@@ -118,32 +125,30 @@ void NBIOProcess::preIO() {
 		/* Otherwise we proceed with the source processing */
 	}
 
-	/* Store the current working directory */
-	QString curWD = QString::fromLocal8Bit( get_current_dir_name() );
-
-	/* Switch to the source directory */
-	chdir( mProgress->sourceDir.toLocal8Bit().data() );
-
 	sourceList.clear();
 
 	/* Obtain the file sizes */
-	Q_FOREACH( QString src, sourceList ) {
+	Q_FOREACH( QString src, origSources ) {
 		mProgress->progressText = QString( "Processing %1..." ).arg( src );
-		if ( isDir( src ) )
+		if ( isDir( mProgress->sourceDir + src ) )
 			processDirectory( src );
 
-		else
-			sourceList << src;
-	}
+		else {
 
-	/* Change back to the current working directory */
-	chdir( curWD.toLocal8Bit().data() );
+			sourceList << src;
+			mProgress->totalBytes += getSize( mProgress->sourceDir + src );
+		}
+	}
 
 	/* Check if we have enough space to perform the IO */
 	mProgress->progressText = QString( "Checking space requirements..." );
 	NBDeviceInfo tgtInfo = NBDeviceManager::deviceInfoForPath( mProgress->targetDir );
+
 	if ( tgtInfo.availSpace() <= mProgress->totalBytes ) {
+
 		emit noSpace();
+
+		mProgress->state = NBProcess::Completed;
 		return false;
 	}
 
@@ -155,16 +160,20 @@ void NBIOProcess::processDirectory( QString path ) {
 	DIR* d_fh;
 	struct dirent* entry;
 
-	while ( ( d_fh = opendir( path.toLocal8Bit().data() ) ) == NULL ) {
+	while ( ( d_fh = opendir( ( mProgress->sourceDir + path ).toLocal8Bit().data() ) ) == NULL ) {
 		qWarning() << "Couldn't open directory:" << path;
 		return;
 	}
 
-	quint64 size = statbuf.st_size;
+	quint64 size = 0;
 
 	if ( not path.endsWith( "/" ) )
 		path += "/";
 
+	/* Create this path at the target */
+	mkpath( mProgress->targetDir + path );
+
+	/* Now, we can read what is inside this directory */
 	while( ( entry = readdir( d_fh ) ) != NULL ) {
 
 		/* Don't descend up the tree or include the current directory */
@@ -172,8 +181,12 @@ void NBIOProcess::processDirectory( QString path ) {
 
 			if ( entry->d_type == DT_DIR ) {
 
+				/* Stat the directory to get the mode */
+				struct stat st;
+				stat( ( mProgress->sourceDir + path + entry->d_name ).toLocal8Bit().data(), &st );
+
 				/* Create this directory at the target */
-				mkpath( mProgress->targetDir + path + entry->d_name );
+				mkpath( mProgress->targetDir + path + entry->d_name, st.st_mode );
 
 				/* Recurse into that folder */
 				processDirectory( path + entry->d_name );
@@ -182,7 +195,7 @@ void NBIOProcess::processDirectory( QString path ) {
 			else {
 
 				/* Get the size of the current file */
-				mProgress->totalBytes += getSize( path + entry->d_name );
+				mProgress->totalBytes += getSize( mProgress->sourceDir + path + entry->d_name );
 
 				/* Add this to the source file list */
 				sourceList << path + entry->d_name;
@@ -195,36 +208,38 @@ void NBIOProcess::processDirectory( QString path ) {
 
 void NBIOProcess::copyFile( QString srcFile ) {
 
+	QThread::setPriority( QThread::LowestPriority );
+
 	char buffer[ BUFSIZ ];
 
 	qint64 inBytes = 0;
 	qint64 bytesWritten = 0;
 
-	mProgress->currentFile = targetDir + srcFile;
+	QString currentFile = mProgress->targetDir + srcFile;
 
-	if ( not isReadable( srcFile ) ) {
+	if ( not isReadable( mProgress->sourceDir + srcFile ) ) {
 		qDebug() << "Unreadable file:" << srcFile;
 		errorNodes << srcFile;
 		return;
 	}
 
-	if ( not isWritable( dirName( mProgress->currentFile ) ) ) {
-		qDebug() << mProgress->currentFile << "not writable!!!";
+	if ( not isWritable( dirName( currentFile ) ) ) {
+		qDebug() << currentFile << "not writable!!!";
 		errorNodes << srcFile;
 		return;
 	}
 
 	/* If the file exists, add 'Copy - ' to the beginning of the file name */
-	if ( exists( mProgress->currentFile ) )
-		mProgress->currentFile = dirName( mProgress->currentFile ) + "/Copy - " + baseName( mProgress->currentFile );
+	if ( exists( currentFile ) )
+		currentFile = dirName( currentFile ) + "/Copy - " + baseName( currentFile );
 
 	struct stat iStat, oStat;
-	stat( srcFile.toLocal8Bit().data(), &iStat );
-	stat( targetDir.toLocal8Bit().data(), &oStat );
+	stat( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data(), &iStat );
+	stat( mProgress->targetDir.toLocal8Bit().data(), &oStat );
 
 	/* If the operation is intra-partition operation and its a move, then we can simply rename the file */
 	if ( ( iStat.st_dev == oStat.st_dev ) and ( mProgress->type == NBProcess::Move ) ) {
-		if ( rename( srcFile, mProgress->currentFile ) ) {
+		if ( rename( srcFile.toLocal8Bit().data(), currentFile.toLocal8Bit().data() ) ) {
 			qDebug() << "Error moving file:" << srcFile;
 			errorNodes << srcFile;
 		}
@@ -232,10 +247,10 @@ void NBIOProcess::copyFile( QString srcFile ) {
 	}
 
 	/* Open the input file descriptor fro reading */
-	int iFileFD = open( srcFile.toLocal8Bit().data(), O_RDONLY );
+	int iFileFD = open( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data(), O_RDONLY );
 
 	/* Open the output file descriptor for reading */
-	int oFileFD = open( targetDir.toLocal8Bit().data(), O_WRONLY | O_CREAT, iStat.st_mode );
+	int oFileFD = open( currentFile.toLocal8Bit().data(), O_WRONLY | O_CREAT, iStat.st_mode );
 
 	/* NBProcess::Progress::fileBytes */
 	mProgress->fileBytes = iStat.st_size;
@@ -268,10 +283,10 @@ void NBIOProcess::copyFile( QString srcFile ) {
 			qApp->processEvents();
 		}
 
-		bytesWritten = write( oFileFD, block, inBytes );
+		bytesWritten = write( oFileFD, buffer, inBytes );
 
 		if ( bytesWritten != inBytes ) {
-			qDebug() << "Error writing to file:" << mProgress->currentFile;
+			qDebug() << "Error writing to file:" << currentFile;
 			qDebug() << "[Error]:" << strerror( errno );
 			errorNodes << srcFile;
 			break;
@@ -279,8 +294,6 @@ void NBIOProcess::copyFile( QString srcFile ) {
 
 		mProgress->fileBytesCopied += bytesWritten;
 		mProgress->totalBytesCopied += bytesWritten;
-
-		qApp->processEvents();
 	}
 
 	close( iFileFD );
@@ -299,7 +312,7 @@ void NBIOProcess::copyFile( QString srcFile ) {
 	if ( mProgress->type == NBProcess::Move )
 		/* If there were no errors encountered, and its a move operation, delete the file */
 		if ( not errorNodes.contains( srcFile ) )
-			unlink( srcFile.toLocal8Bit().data() );
+			unlink( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data() );
 };
 
 void NBIOProcess::run() {
@@ -316,10 +329,9 @@ void NBIOProcess::run() {
 			return;
 		}
 
-		while ( isPaused ) {
-			if ( wasCanceled ){
-				close( iFileFD );
-				close( oFileFD );
+		while ( mPaused ) {
+			if ( mCanceled ) {
+				emit canceled( errorNodes );
 
 				return;
 			}
@@ -334,17 +346,17 @@ void NBIOProcess::run() {
 		mProgress->totalBytesCopied = -1;
 		mProgress->fileBytesCopied = -1;
 
-		mProgress->progressText( "Deleting files..." );
+		mProgress->progressText = "Deleting files...";
 		Q_FOREACH( QString path, sourceList )
-			unlink( mProgress->targetDir + path );
+			unlink( ( mProgress->targetDir + path ).toLocal8Bit().data() );
 
-		mProgress->progressText( "Deleting directory tree..." );
+		mProgress->progressText = "Deleting directory tree...";
 		Q_FOREACH( QString path, origSources )
 			removeDir( mProgress->targetDir + path );
 
 		mUndo = false;
 
-		mProgress->state = NBProcess::Complete;
+		mProgress->state = NBProcess::Completed;
 		emit completed( errorNodes );
 
 		quit();
@@ -359,10 +371,9 @@ void NBIOProcess::run() {
 		return;
 	}
 
-	while ( isPaused ) {
-		if ( wasCanceled ){
-			close( iFileFD );
-			close( oFileFD );
+	while ( mPaused ) {
+		if ( mCanceled ){
+			emit canceled( errorNodes );
 
 			return;
 		}
@@ -389,6 +400,10 @@ void NBIOProcess::run() {
 
 	/* Perform the IO */
 	Q_FOREACH( QString node, sourceList ) {
+
+		/* Update the current file */
+		mProgress->currentFile = node;
+
 		if ( mCanceled ) {
 			emit canceled( errorNodes );
 
@@ -396,8 +411,8 @@ void NBIOProcess::run() {
 			return;
 		}
 
-		while ( isPaused ) {
-			if ( wasCanceled ){
+		while ( mPaused ) {
+			if ( mCanceled ){
 				emit canceled( errorNodes );
 
 				quit();
@@ -415,7 +430,7 @@ void NBIOProcess::run() {
 		/* Various cases for various types of nodes */
 		switch( st.st_mode & S_IFMT ) {
 
-			case S_ISREG: {
+			case S_IFREG: {
 
 				/* Copy a regular file */
 				copyFile( node );
@@ -425,26 +440,26 @@ void NBIOProcess::run() {
 			case S_IFLNK: {
 
 				/* Create a symbolic link */
-				symlink( readLink( path + entry->d_name ), ( targetDir + path + entry->d_name ).toLocal8Bit().data() );
-				if ( not exists( targetDir + path + entry->d_name ) ) {
-					qDebug() << "Error creating symlink" << path + entry->d_name << "->" << readLink( path + entry->d_name );
-					errorNodes << path + entry->d_name;
+				symlink( readLink( node ).toLocal8Bit().data(), ( mProgress->targetDir + node ).toLocal8Bit().data() );
+				if ( not exists( ( mProgress->targetDir + node ) ) ) {
+					qDebug() << "Error creating symlink" << node << "->" << readLink( node );
+					errorNodes << node;
 				}
 			}
 
-			case S_ISBLK:
-			case S_ISCHR:
+			case S_IFBLK:
+			case S_IFCHR:
 			case S_IFIFO: {
-				/* Create a block device, character special, fifo */
 
-				mknod( targetDir + path + entry->d_name, st.st_mode, st.st_dev );
+				/* Create a block device, character special, fifo */
+				mknod( ( mProgress->targetDir + node ).toLocal8Bit().data(), st.st_mode, st.st_dev );
 				break;
 			}
 
 			case S_IFSOCK: {
 
-				qDebug() << "Cannot copy a socket:" << path + entry->d_name;
-				errorNodes << path + entry->d_name;
+				qDebug() << "Cannot copy a socket:" << node;
+				errorNodes << node;
 				break;
 			}
 		}

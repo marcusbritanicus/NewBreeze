@@ -220,7 +220,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	filterBtn->setFocusPolicy( Qt::NoFocus );
 
 	// Process Widget
-	mProcWidget = new NBIOManagerMini( this );
+	mProcWidget = new NBProcessManagerMini( this );
 
 	addressWidget->addressEdit->setFocusPolicy( Qt::ClickFocus );
 	addressWidget->crumbsBar->setFocusPolicy( Qt::NoFocus );
@@ -255,11 +255,6 @@ void NBAddressBar::updateNavigationButtons( bool bBtn, bool fBtn ) {
 
 	backBtn->setEnabled( bBtn );
 	forwardBtn->setEnabled( fBtn );
-};
-
-NBIOManagerMini *NBAddressBar::procWidget() {
-
-	return mProcWidget;
 };
 
 QString NBAddressBar::address() {

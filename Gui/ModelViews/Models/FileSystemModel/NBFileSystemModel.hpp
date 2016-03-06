@@ -182,6 +182,12 @@ class NBFileSystemModel : public QAbstractItemModel {
 		long curIndex;
 		mutable int updatedNodes;
 
+		/* To manage the rapidly changing nodes */
+		mutable QStringList lastUpdatedNodes;
+		mutable QList<QTime> lastUpdatedTimes;
+		mutable QStringList delayedUpdateList;
+		QBasicTimer updateTimer;
+
 		// Info Gatherer kill switch
 		bool __terminate;
 
@@ -198,9 +204,14 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void handleNodeRenamed( QString, QString );
 		void loadHome();
 
+		void updateDelayedNodes();
+
 		/* Perform the sorting again on a signal */
 		/* Just does sort( prevSort.column, prevSort.cs, prevSort.categorized ) */
 		void sort();
+
+	protected:
+		void timerEvent( QTimerEvent* );
 
 	Q_SIGNALS:
 		void loadFileInfo();

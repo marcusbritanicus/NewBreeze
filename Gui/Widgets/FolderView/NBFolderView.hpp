@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBFOLDERVIEW_HPP
-#define NBFOLDERVIEW_HPP
 
 #include <Global.hpp>
 #include <NBAppsView.hpp>
@@ -18,6 +16,7 @@
 #include <NBCustomActions.hpp>
 #include <NBCustomPeek.hpp>
 #include <NBDeleteManager.hpp>
+#include <NBDeleteProcess.hpp>
 #include <NBErrorsDialog.hpp>
 #include <NBFileDialog.hpp>
 #include <NBFileSystemModel.hpp>
@@ -25,9 +24,11 @@
 #include <NBGuiWidgets.hpp>
 #include <NBIconProvider.hpp>
 #include <NBIconView.hpp>
+#include <NBIOProcess.hpp>
 #include <NBMessageDialog.hpp>
 #include <NBNewNodeDialog.hpp>
 #include <NBPreviewInterface.hpp>
+#include <NBProcessManager.hpp>
 #include <NBPropertiesDialog.hpp>
 #include <NBRenameDialog.hpp>
 #include <NBRunCmdDialog.hpp>
@@ -64,6 +65,7 @@ class NBFolderView : public QStackedWidget {
 		bool moveItems;
 
 		QClipboard *clipBoard;
+		NBProcessManager *pMgr;
 
 	public slots :
 		void goUp();
@@ -90,7 +92,6 @@ class NBFolderView : public QStackedWidget {
 		void doReload();
 		void doToggleHidden();
 		void move( QStringList, QString );
-		void acopy( QStringList, QString );
 		void copy( QStringList, QString );
 		void link( QStringList, QString );
 		void doSendToTrash();
@@ -138,5 +139,3 @@ class NBFolderView : public QStackedWidget {
 		void hideStatusBar();
 		void showStatusBar();
 };
-
-#endif

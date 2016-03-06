@@ -6,6 +6,8 @@
 
 #include <NBFileSystemModel.hpp>
 
+static QMutex mutex;
+
 inline bool matchesFilter( QStringList filters, QString text ) {
 
 	Q_FOREACH( QString filter, filters )
@@ -303,6 +305,7 @@ bool NBFileSystemModel::insertNode( QString nodeName ) {
 
 void NBFileSystemModel::updateNode( QString nodeName ) {
 
+	QMutexLocker locker( &mutex );
 	if ( not exists( __rootPath + nodeName ) )
 		return;
 
@@ -328,8 +331,20 @@ void NBFileSystemModel::updateNode( QString nodeName ) {
 
 	ig->gatherInfo( QStringList() << nodeName, __rootPath );
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
+};
 
-	return;
+void NBFileSystemModel::updateDelayedNodes() {
+
+	/* Make a local copy */
+	QStringList nodeList;
+	nodeList << delayedUpdateList;
+
+	/* Clear the delayed nodes list */
+	delayedUpdateList.clear();
+
+	QMutexLocker locker( &mutex );
+	Q_FOREACH( QString node, nodeList )
+		updateNode( baseName( node ) );
 };
 
 bool NBFileSystemModel::removeNode( QString nodeName ) {
@@ -842,6 +857,12 @@ void NBFileSystemModel::setupModelData() {
 	rootNode->clearChildren();
 	currentLoadStatus.loading = true;
 
+	/* These are useful only when we do not refresh or change into some directory. */
+	lastUpdatedNodes.clear();
+	lastUpdatedTimes.clear();
+	delayedUpdateList.clear();
+	updateTimer.stop();
+
 	emit dirLoading( __rootPath );
 
 	beginResetModel();
@@ -1101,18 +1122,46 @@ void NBFileSystemModel::handleNodeCreated( QString node ) {
 
 	if ( dirName( node ) == currentDir() )
 		insertNode( baseName( node ) );
-
-	else
-		qDebug() << dirName( node ) << currentDir() << node;
 };
 
+/*
+	*
+	* We have updated the three function to ignore rapid inotify events triggered
+	* due to file copy. When a file is copied, it is rapidly changed. If an event is
+	* triggered for the same node in succession, then we quarantine it for a second.
+	*
+*/
 void NBFileSystemModel::handleNodeChanged( QString node ) {
 
 	if ( baseName( node ).startsWith( "." ) )
 		return;
 
-	if ( dirName( node ) == currentDir() )
-		updateNode( baseName( node ) );
+	if ( dirName( node ) == currentDir() ) {
+		qint64 idx = lastUpdatedNodes.indexOf( node );
+		if ( idx == -1 ) {
+			updateNode( baseName( node ) );
+			lastUpdatedNodes << node;
+			lastUpdatedTimes << QTime::currentTime();
+		}
+
+		else {
+			/* Past update was more than a second ago */
+			if ( lastUpdatedTimes.at( idx ).secsTo( QTime::currentTime() ) > 10000 ) {
+				lastUpdatedTimes.replace( idx, QTime::currentTime() );
+				updateNode( baseName( node ) );
+			}
+
+			else {
+				/* Add the node to the delayed update list */
+				if ( not delayedUpdateList.contains( node ) )
+					delayedUpdateList << node;
+
+				/* Start timer to perform the update two seconds later */
+				if ( not updateTimer.isActive() )
+					updateTimer.start( 10000, this );
+			}
+		}
+	}
 };
 
 void NBFileSystemModel::handleNodeDeleted( QString node ) {
@@ -1138,4 +1187,16 @@ void NBFileSystemModel::loadHome() {
 void NBFileSystemModel::sort() {
 
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
+};
+
+void NBFileSystemModel::timerEvent( QTimerEvent *tEvent ) {
+
+	if ( tEvent->timerId() == updateTimer.timerId() ) {
+		// QTimer::singleShot( 100, this, SLOT( updateDelayedNodes() ) );
+		// updateTimer.stop();
+
+		return;
+	}
+
+	QAbstractItemModel::timerEvent( tEvent );
 };

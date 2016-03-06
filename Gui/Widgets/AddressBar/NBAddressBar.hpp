@@ -15,6 +15,7 @@
 #include <NBButton.hpp>
 #include <NBButtons.hpp>
 #include <NBIOManager.hpp>
+#include <NBProcessManagerUI.hpp>
 
 class NBToggleButton : public QWidget {
 	Q_OBJECT
@@ -80,8 +81,6 @@ class NBAddressBar : public QFrame {
 
 		void updateNavigationButtons( bool, bool );
 
-		NBIOManagerMini *procWidget();
-
 		int checkedAction();
 
 	private:
@@ -89,7 +88,7 @@ class NBAddressBar : public QFrame {
 		NBButton *settingsBtn, *filterBtn;
 		NBSegmentButton *viewModes;
 		NBAddressWidget *addressWidget;
-		NBIOManagerMini *mProcWidget;
+		NBProcessManagerMini *mProcWidget;
 
 	public slots:
 		void focusAddressEdit();

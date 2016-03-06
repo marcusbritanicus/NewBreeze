@@ -51,6 +51,7 @@ Some of its features are
 
 ### Known Bugs
 * SegmentationFault in `NBIconView` `::aboveIndex(...)`, `::belowIndex(...)`
+* No update of nodes in NBIconView which are being copied.
 
 ### Upcoming
 * Application Editor ( Desktop file editor )

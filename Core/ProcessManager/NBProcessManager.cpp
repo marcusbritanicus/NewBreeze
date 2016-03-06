@@ -22,7 +22,7 @@ NBProcessManager *NBProcessManager::pMgr = NULL;
 NBProcessManager* NBProcessManager::instance() {
 
 	/* If the Processess Manager has already been init, then return the instance */
-	if ( pMgr and pMgr->init )
+	if ( pMgr != NULL and pMgr->init )
 		return pMgr;
 
 	/* Init our process manager. */
@@ -73,7 +73,10 @@ ProgressList NBProcessManager::activeProgresses() {
 	return active;
 };
 
-quint64 NBProcessManager::addProcess( NBAbstractProcess *proc, NBProcess::Progress *progress ) {
+quint64 NBProcessManager::addProcess( NBProcess::Progress *progress, NBAbstractProcess *proc ) {
+
+	emit processAdded( progress, proc );
+	emit activeProcessCountChanged( processList.count() - completedProcIDs.count() + 1 );
 
 	connect( proc, SIGNAL( completed( QStringList) ), this, SLOT( handleProcessComplete() ) );
 	connect( proc, SIGNAL( canceled( QStringList) ), this, SLOT( handleProcessComplete() ) );
@@ -94,6 +97,14 @@ NBProcess::Progress* NBProcessManager::progress( quint64 id ) {
 	return progressList.at( id );
 };
 
+NBAbstractProcess* NBProcessManager::process( quint64 id ) {
+
+	if ( id < 0 or id >= processList.count() )
+		return NULL;
+
+	return processList.at( id );
+};
+
 void NBProcessManager::handleProcessComplete() {
 
 	NBAbstractProcess *proc = qobject_cast<NBAbstractProcess*>( sender() );
@@ -104,4 +115,6 @@ void NBProcessManager::handleProcessComplete() {
 
 	/* Move this process to completedList */
 	completedProcIDs << id;
+
+	emit activeProcessCountChanged( processList.count() - completedProcIDs.count() );
 };

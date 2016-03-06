@@ -188,18 +188,19 @@ void NBFileSystemWatcher::processEvent( struct inotify_event *event ) {
 		if ( event->mask & IN_MOVED_TO ) {
 			/* If we have the same cookie, and last event was IN_MOVED_FROM */
 			if ( ( cookie == event->cookie ) and ( mask == IN_MOVED_FROM ) ) {
-				mask = -1;
+				mask = IN_MOVED_TO;
 				cookie = -1;
 				emit nodeRenamed( oldName, QString( monitor.path ) + event->name );
 			}
 
 			/* If the cookie is different or mask is not IN_MOVED_FROM */
 			else {
+				mask = IN_MOVED_TO;
+				cookie = -1;
 				emit nodeCreated( QString( monitor.path ) + event->name );
 			}
 		}
 
-		fflush( stdout );
 		return;
 	}
 };

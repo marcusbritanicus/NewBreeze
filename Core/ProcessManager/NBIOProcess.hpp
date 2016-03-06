@@ -14,7 +14,7 @@ class NBIOProcess : public NBAbstractProcess {
 	Q_OBJECT
 
 	public:
-		NBIOProcess( QStringList sources, QString target, NBProcess::Progress *progress )
+		NBIOProcess( QStringList sources, NBProcess::Progress *progress );
 
 		// The list of nodes which could not be copied/moved/archived
 		QStringList errors();

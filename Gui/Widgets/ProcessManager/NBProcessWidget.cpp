@@ -20,38 +20,69 @@
     *
 */
 
-NBProcessWidget::NBProcessWidget( QWidget *parent ) : QWidget( parent ) {
+NBProcessWidget::NBProcessWidget( NBProcess::Progress *progress, NBAbstractProcess *proc, QWidget *parent ) : QWidget( parent ) {
 
-	paused = false;
+	mProgress = progress;
+	mProcess = proc;
+
 	detailsShown = true;
 
+	pausedSecs = 0;
+
+	createGUI();
+};
+
+void NBProcessWidget::createGUI() {
+
 	iconLbl = new QLabel( this );
-	iconLbl->setPixmap( QIcon::fromTheme( NBIconProvider::icon( "abc.iso" ) ).pixmap( 48 ) );
+	iconLbl->setPixmap( QIcon( ":/icons/process.png" ).pixmap( 48 ) );
 	iconLbl->setFixedSize( QSize( 48, 48 ) );
 
-	titleLbl = new QLabel( "Initializing... ", this );
+	switch( mProgress->type ) {
+		case NBProcess::Copy: {
+			titleLbl = new QLabel( "Copying files", this );
+			break;
+		}
+		case NBProcess::Move: {
+			titleLbl = new QLabel( "Moving files", this );
+			break;
+		}
+		case NBProcess::Delete: {
+			titleLbl = new QLabel( "Deleting files", this );
+			break;
+		}
+		case NBProcess::Trash: {
+			titleLbl = new QLabel( "Sending files to trash", this );
+			break;
+		}
+		case NBProcess::Properties: {
+			titleLbl = new QLabel( "Settings file permissions", this );
+			break;
+		}
+	}
 	titleLbl->setFont( QFont( font().family(), font().pointSize() + 1, QFont::Bold, false ) );
 
 	srcLbl = new QLabel( this );
-	srcLbl->setText( "Source: /home/cosmos/Downloads/Others/Iso/" );
+	srcLbl->setText( "Source: " + mProgress->sourceDir );
 
 	tgtLbl = new QLabel( this );
-	tgtLbl->setText( "Target: /home/cosmos" );
+	tgtLbl->setText( "Target: " + mProgress->targetDir  );
 
 	speedLbl = new QLabel( this );
-	speedLbl->setText( "Speed: 54 MiB/s" );
+	speedLbl->setText( "Speed: 0 B/s" );
 
 	cFileLbl = new QLabel( this );
-	cFileLbl->setText( "Current File: /home/cosmos/Downloads/Others/Iso/Mac-SnowLeopard.iso" );
+	cFileLbl->setText( "Current File: " );
 
 	etcLbl = new QLabel( this );
-	etcLbl->setText( "ETC: 10 minutes, 36 seconds" );
+	etcLbl->setText( "ETC:" );
+	etcLbl->setToolTip( QString( "Estimated time of completion" ) );
 
 	totalPB = new NBProgressBar( this );
-	totalPB->setValue( 0.36 );
+	totalPB->setValue( -1 );
 
 	cfilePB = new NBProgressBar( this );
-	cfilePB->setValue( 0.72 );
+	cfilePB->setValue( -1 );
 
 	detailsBtn = new QToolButton( this );
 	detailsBtn->setIcon( QIcon( ":/icons/arrow-up.png" ) );
@@ -65,18 +96,11 @@ NBProcessWidget::NBProcessWidget( QWidget *parent ) : QWidget( parent ) {
 	pauseBtn->setFixedSize( QSize( 20, 20 ) );
 	connect( pauseBtn, SIGNAL( clicked() ), this, SLOT( togglePauseResume() ) );
 
-	closeBtn = new QToolButton( this );
-	closeBtn->setIcon( QIcon( ":/icons/delete.png" ) );
-	closeBtn->setIconSize( QSize( 16, 16 ) );
-	closeBtn->setFixedSize( QSize( 20, 20 ) );
-	connect( closeBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
-
 	QHBoxLayout *btnLyt = new QHBoxLayout();
 	btnLyt->addWidget( titleLbl );
 	btnLyt->addStretch();
 	btnLyt->addWidget( detailsBtn );
 	btnLyt->addWidget( pauseBtn );
-	btnLyt->addWidget( closeBtn );
 
 	QHBoxLayout *speedLyt = new QHBoxLayout();
 	speedLyt->addWidget( speedLbl );
@@ -99,11 +123,8 @@ NBProcessWidget::NBProcessWidget( QWidget *parent ) : QWidget( parent ) {
 	baseLyt->addWidget( cfilePB );
 
 	setLayout( baseLyt );
-};
 
-void NBProcessWidget::update( NBProgress progress ) {
-
-	s
+	updateTimer.start( 500, this );
 };
 
 void NBProcessWidget::toggleDetails() {
@@ -140,17 +161,135 @@ void NBProcessWidget::toggleDetails() {
 
 void NBProcessWidget::togglePauseResume() {
 
-	if ( paused ) {
+	if ( mProgress->state == NBProcess::Paused ) {
 		pauseBtn->setIcon( QIcon::fromTheme( "media-playback-pause" ) );
 		pauseBtn->setToolTip( "Pause" );
 
-		paused = false;
+		mProcess->resume();
+
+		pausedSecs += pauseTime.elapsed() / 1000;
 	}
 
 	else {
 		pauseBtn->setIcon( QIcon::fromTheme( "media-playback-start" ) );
 		pauseBtn->setToolTip( "Resume" );
 
-		paused = true;
+		mProcess->pause();
+
+		pauseTime.start();
 	}
+};
+
+void NBProcessWidget::timerEvent( QTimerEvent *tEvent ) {
+
+	if ( tEvent->timerId() == updateTimer.timerId() ) {
+		switch( mProgress->state ) {
+
+			case NBProcess::NotStarted: {
+
+				if ( not mProgress->progressText.isEmpty() )
+					totalPB->setProgressText( mProgress->progressText );
+
+				tEvent->accept();
+				return;
+			}
+
+			case NBProcess::Starting: {
+
+				totalPB->setSway( true );
+				cfilePB->setSway( true );
+
+				if ( not mProgress->progressText.isEmpty() )
+					totalPB->setProgressText( mProgress->progressText );
+
+				tEvent->accept();
+				return;
+			}
+
+			case NBProcess::Started: {
+
+				/* We need the update labels only if we are performing an IO */
+				if ( ( mProgress->type == NBProcess::Copy ) or ( mProgress->type == NBProcess::Move ) ) {
+					/* Total fraction */
+					qreal tFraction = 1.0 * mProgress->totalBytesCopied / mProgress->totalBytes;
+
+					/* Current File fraction */
+					qreal cFraction = 1.0 * mProgress->fileBytesCopied / mProgress->fileBytes;
+
+					/* Speed: totalBytesCopied / effective time spent on copying */
+					qreal speed = 1.0 * mProgress->totalBytesCopied / ( mProgress->startTime.secsTo( QTime::currentTime() ) - pausedSecs );
+
+					/* ETC = Remaining bytes / last chunk speed = Remaining bytes / ( last chunk size / 0.5 )  */
+					quint64 secs = ( mProgress->totalBytes - mProgress->totalBytesCopied ) / speed;
+
+					QString hrs = ( secs / 3600 ? QString( "%1 hours, " ).arg( secs / 3600 ) : QString() );
+					QString mns = ( ( secs % 3600 ) / 60 ? QString( "%1 minutes, " ).arg( ( secs % 3600 ) / 60 ) : QString() );
+					QString scs = ( ( secs % 3600 ) % 60 ? QString( "%1 seconds" ).arg( ( secs % 3600 ) % 60 ) : QString() );
+
+					cFileLbl->setText( mProgress->currentFile );
+
+					totalPB->setValue( tFraction );
+					cfilePB->setValue( cFraction );
+
+					speedLbl->setText( QString( "Speed: %1/s" ).arg( formatSize( speed ) ) );
+					etcLbl->setText( QString( "ETC: %1%2%3" ).arg( hrs ).arg( mns ).arg( scs ) );
+				}
+
+				else {
+
+					cFileLbl->setText( mProgress->currentFile );
+				}
+
+				return;
+			}
+
+			case NBProcess::Paused: {
+
+				etcLbl->setText( "ETC: -- hours, -- minutes, -- seconds" );
+				return;
+			}
+
+			case NBProcess::Canceled:
+			case NBProcess::Completed: {
+
+				cFileLbl->setText( QString() );
+
+				totalPB->setValue( 1 );
+				cfilePB->setValue( 1 );
+
+				speedLbl->setText( "Average " + speedLbl->text() );
+
+				/* ETC = Remaining bytes / last chunk speed = Remaining bytes / ( last chunk size / 0.5 )  */
+				quint64 secs = mProgress->startTime.secsTo( QTime::currentTime() );
+
+				QString hrs = ( secs / 3600 ? QString( "%1 hours, " ).arg( secs / 3600 ) : QString() );
+				QString mns = ( ( secs % 3600 ) / 60 ? QString( "%1 minutes, " ).arg( ( secs % 3600 ) / 60 ) : QString() );
+				QString scs = ( ( secs % 3600 ) % 60 ? QString( "%1 seconds" ).arg( ( secs % 3600 ) % 60 ) : QString() );
+				etcLbl->setText( QString( "Completed: %1%2%3" ).arg( hrs ).arg( mns ).arg( scs ) );
+
+				updateTimer.stop();
+
+				pauseBtn->setDisabled( true );
+
+				return;
+			}
+		}
+	}
+
+	else {
+
+		QWidget::timerEvent( tEvent );
+	}
+};
+
+void NBProcessWidget::paintEvent( QPaintEvent *pEvent ) {
+
+	QWidget::paintEvent( pEvent );
+
+	QPainter *painter = new QPainter( this );
+	painter->setPen( Qt::gray );
+	painter->drawRect( rect().adjusted( 0, 0, -1, -1 ) );
+	painter->end();
+
+	pEvent->accept();
 };

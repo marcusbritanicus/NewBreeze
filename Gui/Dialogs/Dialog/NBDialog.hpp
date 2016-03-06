@@ -24,4 +24,10 @@ class NBDialog : public QDialog {
 		void setupGUI();
 		void setupActions();
 		void setupDialogProperties();
+
+	protected:
+		void closeEvent( QCloseEvent* );
+
+	Q_SIGNALS:
+		void closed();
 };

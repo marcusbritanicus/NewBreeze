@@ -437,7 +437,7 @@ void NBIOManagerMini::paintEvent( QPaintEvent *pEvent ) {
 
 		painter->setPen( Qt::black );
 		painter->setFont( QFont( font().family(), 10, QFont::Bold ) );
-		painter->drawText( 0, 0, 32, 32, Qt::AlignCenter, QString( "i" ) );
+		painter->drawText( 0, 0, 32, 32, Qt::AlignCenter, QString::fromUtf8( "\u2139" ) );
 	}
 
 	painter->end();

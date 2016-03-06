@@ -4,6 +4,8 @@ Version 3.0.0 Alpha
 	- Feature: NBArchiveDialog helps to create an archive
 	- Feature: Improved AboutNB dialog
 	- Feature: Added License dialog, shoing the complete GPL3 license
+	- Feature: NBProcessManager replaces NBIOManager with better functionality
+	- Feature: Categories can be shown/hidden, selected/deselected with single click
 	- Archive creation and extraction are performed using QtConcurrent::run
 	- Plugins are new part of the NewBreeze source tree
 	- MarkDownPreview plugin now uses libsoldout markdown library
@@ -16,20 +18,17 @@ Version 3.0.0 Alpha
 	- Selections handling is better
 	- NBDialog polished for better appearance
 	- NBMessageDialog is a now a subclass of QMessageBox
-	- Categories can be hidden, selected/deselected with single click
 	- Removed default transparency, better integration with the native desktop
 	- QuickMenuBar removed, as its more of a hinderance
 	- UtilityBar (custom title bar) removed, uses native title bar
-	- The /proc/pid/cwd link points to the current directory
+	- The /proc/pid/cwd always points to the current directory
 	- PeekPlugins interface has been rewritten to enable support for dynamic loading of any plugin.
-	- NBProcessManager replaces NBIOManager with better functionality [To be done]
-	- File copy/move is now based on QtSolutions QtCopyDialog [To be done]
 	- BugFix: Unmounting a drive is possible when NB3 is open
 	- BugFix: Removed buggy tabs
 
 Version 2.4.0
     - Feature: Animated Catalog <-> FolderView <-> ApplicationView switching
-    - Feature: Tabs
+    - Feature: Tabs (experimental)
 
 Version 2.3.0
     - BugFix: Removed all the initializations from the headers

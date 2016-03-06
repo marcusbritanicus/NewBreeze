@@ -41,7 +41,7 @@ class NBProcessManager : public QObject {
 		ProgressList activeProgresses();
 
 		/* Add a process */
-		quint64 addProcess( NBAbstractProcess *, NBProcess::Progress *progress );
+		quint64 addProcess( NBProcess::Progress *progress, NBAbstractProcess * );
 
 		/* Get the process for a process ID */
 		NBAbstractProcess* process( quint64 );
@@ -69,5 +69,6 @@ class NBProcessManager : public QObject {
 		void handleProcessComplete();
 
 	Q_SIGNALS:
-		void processAdded( NBProcess::Progress* );
+		void processAdded( NBProcess::Progress*, NBAbstractProcess* );
+		void activeProcessCountChanged( quint64 );
 };

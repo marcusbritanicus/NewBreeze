@@ -33,6 +33,9 @@ NBFolderView::NBFolderView( QWidget *parent ) : QStackedWidget( parent ) {
 	ApplicationsView = new NBApplicationsView();
 	CatalogView = new NBCatalogView();
 
+	// Process Manager
+	pMgr = NBProcessManager::instance();
+
 	addWidget( IconView );
 	addWidget( ApplicationsView );
 	addWidget( CatalogView );
@@ -72,9 +75,6 @@ void NBFolderView::createAndSetupActions() {
 	);
 
 	connect( IconView, SIGNAL( link( QStringList, QString ) ), this, SLOT( link( QStringList, QString ) ) );
-
-	// DragDrop copy
-	connect( IconView, SIGNAL( acopy( QStringList, QString ) ), this, SLOT( acopy( QStringList, QString ) ) );
 
 	// DragDrop copy
 	connect( IconView, SIGNAL( copy( QStringList, QString ) ), this, SLOT( copy( QStringList, QString ) ) );
@@ -705,11 +705,6 @@ void NBFolderView::prepareMove() {
 	// setXClipBoardData( urlList );
 };
 
-void NBFolderView::acopy( QStringList srcList, QString tgt ) {
-
-	emit copy( srcList, tgt, NBIOMode::ACopy );
-};
-
 void NBFolderView::copy( QStringList srcList, QString tgt ) {
 
 	emit copy( srcList, tgt, NBIOMode::Copy );
@@ -731,22 +726,30 @@ void NBFolderView::prepareIO() {
 	const QMimeData *mimeData = clipBoard->mimeData();
 
 	if ( mimeData->hasUrls() ) {
+		NBProcess::Progress *progress = new NBProcess::Progress;
+		progress->sourceDir = dirName( mimeData->urls().at( 0 ).toLocalFile() );
+		progress->targetDir = fsModel->currentDir();
+
 		QStringList srcList;
 		foreach( QUrl url, mimeData->urls() )
-			srcList << url.toLocalFile();
+			srcList << url.toLocalFile().replace( progress->sourceDir, "" );
 
-		QString target = fsModel->currentDir();
+		if ( moveItems )
+			progress->type = NBProcess::Move;
 
-		if ( moveItems ) {
-			move( srcList, target );
-		}
+		else
+			progress->type = NBProcess::Copy;
 
-		else {
-			copy( srcList, target );
-		}
+		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		pMgr->addProcess( progress, proc );
+
+		progress->startTime = QTime::currentTime();
+
+		proc->start();
 	}
 
 	else {
+
 		NBNewNodeDialog *newFolder = new NBNewNodeDialog( "else", fsModel->currentDir(), mimeData->text() );
 		newFolder->exec();
 	}

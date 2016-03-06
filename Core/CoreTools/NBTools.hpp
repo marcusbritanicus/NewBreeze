@@ -44,7 +44,7 @@ QString readLink( QString path );
 
 /* Create a directory: mkdir -p */
 /* http://fossies.org/linux/inadyn/libite/makepath.c */
-int mkpath( QString );
+int mkpath( QString, mode_t mode = 0755 );
 
 /* Remove a directory and its contents */
 bool removeDir( QString );

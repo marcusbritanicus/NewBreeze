@@ -4,11 +4,11 @@ Widgets
 		✗ Single click Open (point to select)
 		✓ Selections
 
-NBProcessManager                                                                                                                     [ 0 of 4 ]
+NBProcessManager                                                                                                                     [ 1 of 4 ]
 	✓ NBIOProcess
-	✓ NBDeleteProcess
+	✓ NBDeleteProcess [Partial: Yet to be deployed]
 	⬜ NBPropertiesProcess
-	◐ Undo-Redo Sequences (Only for Copy and Move)
+	✍ Undo-Redo Sequences (Only for Copy and Move)
 
 NBIconView                                                                                                                           [ 1 of 3 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys

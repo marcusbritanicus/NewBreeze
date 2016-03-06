@@ -5,6 +5,7 @@
 */
 
 #include <NBDeleteProcess.hpp>
+#include <NBTools.hpp>
 #include <NBXdg.hpp>
 
 NBDeleteProcess::NBDeleteProcess( QStringList sources, bool removeFromDisk, NBProcess::Progress *progress ) {
@@ -65,7 +66,7 @@ void NBDeleteProcess::undo() {
 	}
 };
 
-bool NBDeleteProcess::deleteNode( QString path ) {
+void NBDeleteProcess::deleteNode( QString path ) {
 
 	if ( mCanceled ) {
 		emit canceled( errorNodes );
@@ -74,10 +75,9 @@ bool NBDeleteProcess::deleteNode( QString path ) {
 		return;
 	}
 
-	while ( isPaused ) {
-		if ( wasCanceled ){
-			close( iFileFD );
-			close( oFileFD );
+	while ( mPaused ) {
+		if ( mCanceled ){
+			emit canceled( errorNodes );
 
 			return;
 		}
@@ -105,8 +105,6 @@ bool NBDeleteProcess::deleteNode( QString path ) {
 				errorNodes << path;
 				return;
 			}
-
-			quint64 size = statbuf.st_size;
 
 			if ( not path.endsWith( "/" ) )
 				path += "/";
@@ -145,7 +143,7 @@ bool NBDeleteProcess::deleteNode( QString path ) {
 	}
 };
 
-bool NBDeleteProcess::trashNode( QString node ) {
+void NBDeleteProcess::trashNode( QString node ) {
 
 	if ( mCanceled ) {
 		emit canceled( errorNodes );
@@ -154,10 +152,9 @@ bool NBDeleteProcess::trashNode( QString node ) {
 		return;
 	}
 
-	while ( isPaused ) {
-		if ( wasCanceled ){
-			close( iFileFD );
-			close( oFileFD );
+	while ( mPaused ) {
+		if ( mCanceled ){
+			emit canceled( errorNodes );
 
 			return;
 		}
@@ -166,7 +163,7 @@ bool NBDeleteProcess::trashNode( QString node ) {
 		qApp->processEvents();
 	}
 
-	QString trashLoc = NBXdg::trashLocation( trashList.at( 0 ) );
+	QString trashLoc = NBXdg::trashLocation( mProgress->sourceDir );
 
 	QString newPath = trashLoc + "/files/" + baseName( node );
 	QString delTime = QDateTime::currentDateTime().toString( "yyyyMMddThh:mm:ss" );
@@ -200,6 +197,11 @@ bool NBDeleteProcess::trashNode( QString node ) {
 	}
 };
 
+void NBDeleteProcess::restoreNode( QString path ) {
+
+	Q_UNUSED( path );
+};
+
 void NBDeleteProcess::run() {
 
 	/* Undo for NBProcess::Copy */
@@ -214,10 +216,9 @@ void NBDeleteProcess::run() {
 			return;
 		}
 
-		while ( isPaused ) {
-			if ( wasCanceled ){
-				close( iFileFD );
-				close( oFileFD );
+		while ( mPaused ) {
+			if ( mCanceled ){
+				emit canceled( errorNodes );
 
 				return;
 			}
@@ -232,7 +233,7 @@ void NBDeleteProcess::run() {
 		mProgress->totalBytesCopied = -1;
 		mProgress->fileBytesCopied = -1;
 
-		QString trashLoc = NBXdg::trashLocation( trashList.at( 0 ) );
+		QString trashLoc = NBXdg::trashLocation( mProgress->sourceDir );
 
 		Q_FOREACH( QString path, sourceList ) {
 			if ( mCanceled ) {
@@ -242,10 +243,9 @@ void NBDeleteProcess::run() {
 				return;
 			}
 
-			while ( isPaused ) {
-				if ( wasCanceled ){
-					close( iFileFD );
-					close( oFileFD );
+			while ( mPaused ) {
+				if ( mCanceled ){
+					emit canceled( errorNodes );
 
 					return;
 				}
@@ -262,7 +262,7 @@ void NBDeleteProcess::run() {
 
 		mUndo = false;
 
-		mProgress->state = NBProcess::Complete;
+		mProgress->state = NBProcess::Completed;
 		emit completed( errorNodes );
 
 		quit();
@@ -277,10 +277,9 @@ void NBDeleteProcess::run() {
 		return;
 	}
 
-	while ( isPaused ) {
-		if ( wasCanceled ){
-			close( iFileFD );
-			close( oFileFD );
+	while ( mPaused ) {
+		if ( mCanceled ){
+			emit canceled( errorNodes );
 
 			return;
 		}

@@ -50,3 +50,10 @@ void NBDialog::setDialogIcon( QIcon icon ) {
 
 	setWindowIcon( icon );
 };
+
+void NBDialog::closeEvent( QCloseEvent *cEvent ) {
+
+	QDialog::closeEvent( cEvent );
+
+	emit closed();
+};

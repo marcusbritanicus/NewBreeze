@@ -42,6 +42,7 @@ Dependencies:
 
 Known Bugs
     - SegmentationFault in NBIconView ::aboveIndex(...), ::belowIndex(...)
+    - No update of nodes in NBIconView which are being copied.
 
 List of shortcuts
 +==============================================================+============================+
