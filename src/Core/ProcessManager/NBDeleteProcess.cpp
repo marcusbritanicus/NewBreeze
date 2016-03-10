@@ -86,6 +86,8 @@ void NBDeleteProcess::deleteNode( QString path ) {
 		qApp->processEvents();
 	}
 
+	path = mProgress->sourceDir + path;
+
 	struct stat st;
 	if ( stat( path.toLocal8Bit().data(), &st ) != 0 ) {
 		qDebug() << "Unable to stat:" << path;
@@ -173,7 +175,7 @@ void NBDeleteProcess::trashNode( QString node ) {
 		newPath += delTime;
 
 	/* Try trashing it. If it fails, intimate the user */
-	if ( rename( node.toLocal8Bit().data(), newPath.toLocal8Bit().data() ) ) {
+	if ( rename( ( mProgress->sourceDir + node ).toLocal8Bit().data(), newPath.toLocal8Bit().data() ) ) {
 		qDebug() << "Error" << errno << ": Failed to trash " << node << ":" << strerror( errno );
 		errorNodes << node;
 	}
@@ -291,12 +293,6 @@ void NBDeleteProcess::run() {
 	mProgress->progressText = QString();
 	mProgress->state = NBProcess::Started;
 
-	/* Store the current working directory */
-	QString curWD = QString::fromLocal8Bit( get_current_dir_name() );
-
-	/* Switch to the source directory */
-	chdir( mProgress->sourceDir.toLocal8Bit().data() );
-
 	Q_FOREACH( QString path, sourceList ) {
 		if ( mDeleteFromDisk )
 			deleteNode( path );
@@ -304,9 +300,6 @@ void NBDeleteProcess::run() {
 		else
 			trashNode( path );
 	}
-
-	/* Change back to the current working directory */
-	chdir( curWD.toLocal8Bit().data() );
 
 	emit completed( errorNodes );
 	mProgress->state = NBProcess::Completed;

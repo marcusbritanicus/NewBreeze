@@ -1,0 +1,31 @@
+newbreeze (3.0.0a) unstable; urgency=low
+
+  * Feature: Per-folder View options
+  * Feature: Scaling for NBIconView
+  * Feature: NBArchiveDialog helps to create an archive
+  * Feature: Improved AboutNB dialog
+  * Feature: Added License dialog, shoing the complete GPL3 license
+  * Feature: NBProcessManager replaces NBIOManager with better functionality
+  * Feature: Categories can be shown and hidden with a single click
+  * Feature: Categories can be selected and deselected with a single click
+  * Archive creation and extraction are performed using QtConcurrent::run
+  * Plugins are new part of the NewBreeze source tree
+  * MarkDownPreview plugin now uses libsoldout markdown library
+  * NewBreeze uses QtSingleApplication for one instance multiple windows
+  * Redesigned UI for better code maintenance
+  * Redesigned NBCrumbsBar (formerly, NBBreadCrumbsBar)
+  * Redesigned NBSidePanel
+  * View delegates are now view agnostic
+  * NBIconView mouseEvent handlers are rewritten
+  * Selections handling is better
+  * NBDialog polished for better appearance
+  * NBMessageDialog is a now a subclass of QMessageBox
+  * Removed default transparency, better integration with the native desktop
+  * QuickMenuBar removed, as its more of a hinderance
+  * UtilityBar (custom title bar) removed, uses native title bar
+  * The /proc/pid/cwd always points to the current directory
+  * PeekPlugins interface rewritten to support dynamic loading plugins.
+  * BugFix: Unmounting a drive is possible when NB3 is open
+  * BugFix: Removed buggy tabs
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Wed, 09 Mar 2016 17:04:14 +0530

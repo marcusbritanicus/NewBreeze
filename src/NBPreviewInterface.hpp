@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <QString>;
-#include <QStringList>;
-#include <QDialog>;
+#include <QString>
+#include <QStringList>
+#include <QDialog>
 
 class NBPreviewInterface {
 

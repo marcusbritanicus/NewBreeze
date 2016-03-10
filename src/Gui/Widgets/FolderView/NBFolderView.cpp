@@ -763,33 +763,38 @@ void NBFolderView::doSendToTrash() {
 
 	QList<QModelIndex> selectedList = getSelection();
 
-	QStringList toBeDeleted;
-	foreach( QModelIndex idx, selectedList )
-		toBeDeleted << QDir( fsModel->rootPath() ).filePath( idx.data().toString() );
-
 	/* Check if we have protection set */
 	QSettings nbSettings( "NewBreeze", "NewBreeze" );
 	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
 
-	Q_FOREACH( QString path, toBeDeleted ) {
-		if ( safeNodes.contains( path ) ) {
-			NBMessageDialog::error( NULL,
-				"Unable to delete files",
-				"You have enabled <b><tt>Accidental Delete Protection</tt></b> for some of the files or folders. "
-				"As a result I cannot send all the selected files to trash. Kindly, remove the protection, "
-				"or, deslect the protected files and retry."
-			);
-			return;
-		}
+	NBProcess::Progress *progress = new NBProcess::Progress;
+	progress->sourceDir = fsModel->currentDir();
+	progress->targetDir = QString();
+	progress->type = NBProcess::Move;
+
+	QStringList toBeDeleted;
+	Q_FOREACH( QModelIndex idx, selectedList ) {
+		QString path = QDir( fsModel->rootPath() ).filePath( idx.data().toString() );
+		if ( not safeNodes.contains( path ) )
+			toBeDeleted << path.replace( progress->sourceDir, "" );
 	}
 
-	NBDeleteManager *deleteManager = new NBDeleteManager( this, true );
-	connect(
-		deleteManager, SIGNAL( trashOperationComplete( QStringList, QStringList ) ),
-		this, SLOT( handleDeleteFailure( QStringList, QStringList ) )
-	);
+	/* If some files have protection inform the user */
+	if ( toBeDeleted.count() != selectedList.count() ) {
+		NBMessageDialog::warning( NULL,
+			"Error deleting protected files",
+			"You have enabled <b><tt>Accidental Delete Protection</tt></b> for some of the files or folders. "
+			"Only the files without accidental protection will be deleted. If you really want to delete protected "
+			"files, please remove the protection and try again."
+		);
+	}
 
-	deleteManager->sendToTrash( toBeDeleted );
+	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, false, progress );
+	pMgr->addProcess( progress, proc );
+
+	progress->startTime = QTime::currentTime();
+
+	proc->start();
 };
 
 void NBFolderView::doDelete() {
@@ -800,39 +805,38 @@ void NBFolderView::doDelete() {
 
 	QList<QModelIndex> selectedList = getSelection();
 
-	QStringList toBeDeleted;
-	foreach( QModelIndex idx, selectedList )
-		toBeDeleted << QDir( fsModel->rootPath() ).filePath( idx.data().toString() );
-
-	toBeDeleted.removeDuplicates();
-
 	/* Check if we have protection set */
 	QSettings nbSettings( "NewBreeze", "NewBreeze" );
 	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
 
-	Q_FOREACH( QString path, toBeDeleted ) {
-		if ( safeNodes.contains( path ) ) {
-			NBMessageDialog::error( this,
-				"Unable to delete files",
-				"You have enabled <b><tt>Accidental Delete Protection</tt></b> for some of the files and folders. "
-				"As a result I cannot delete all the selected files. Kindly, remove the protection, "
-				"or, deslect the protected files and retry."
-			);
-			return;
-		}
+	NBProcess::Progress *progress = new NBProcess::Progress;
+	progress->sourceDir = fsModel->currentDir();
+	progress->targetDir = QString();
+	progress->type = NBProcess::Move;
+
+	QStringList toBeDeleted;
+	Q_FOREACH( QModelIndex idx, selectedList ) {
+		QString path = QDir( fsModel->rootPath() ).filePath( idx.data().toString() );
+		if ( not safeNodes.contains( path ) )
+			toBeDeleted << path.replace( progress->sourceDir, "" );
 	}
 
-	NBConfirmDeleteDialog *deleteMsg = new NBConfirmDeleteDialog( toBeDeleted, true, this );
-	if ( not deleteMsg->exec() )
-		return;
+	/* If some files have protection inform the user */
+	if ( toBeDeleted.count() != selectedList.count() ) {
+		NBMessageDialog::warning( NULL,
+			"Error deleting protected files",
+			"You have enabled <b><tt>Accidental Delete Protection</tt></b> for some of the files or folders. "
+			"Only the files without accidental protection will be deleted. If you really want to delete protected "
+			"files, please remove the protection and try again."
+		);
+	}
 
-	NBDeleteManager *deleteManager = new NBDeleteManager( this, false );
-	connect(
-		deleteManager, SIGNAL( deleteOperationComplete( QStringList, QStringList ) ),
-		this, SLOT( handleDeleteFailure( QStringList, QStringList ) )
-	);
+	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, true, progress );
+	pMgr->addProcess( progress, proc );
 
-	deleteManager->deleteFromDisk( toBeDeleted );
+	progress->startTime = QTime::currentTime();
+
+	proc->start();
 };
 
 void NBFolderView::doRename() {

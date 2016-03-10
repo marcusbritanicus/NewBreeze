@@ -72,10 +72,8 @@ Session::Session(QObject* parent) :
 //   , _zmodemProgress(0)
         , _hasDarkBackground(false)
 {
-    //prepare DBus communication
 //    new SessionAdaptor(this);
     _sessionId = ++lastSessionId;
-//    QDBusConnection::sessionBus().registerObject(QLatin1String("/Sessions/")+QString::number(_sessionId), this);
 
     //create teletype for I/O with shell process
     _shellProcess = new Pty();

@@ -1,0 +1,28 @@
+Source: newbreeze
+Section: utils
+Priority: optional
+Maintainer: Marcus Britanicus <marcusbritanicus@gmail.com>
+Build-Depends: debhelper (>=9), libqt4-dev, qt4-qmake
+Standards-Version: 3.9.6
+Homepage: https://github.com/marcusbritanicus/NewBreeze/
+
+Package: newbreeze
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Qt based lightweight and fast file manager
+ Built on top of the Powerful Qt4/Qt5 GUI Toolkit, this file manager is sleek,
+ stylish and fast. Some of its features are
+  - Fast startup and browsing
+  - Folder, text, html, image, odt, and pdf quick preview
+  - File Association support
+  - Provides Categorized List, Icon and Details View
+  - Sleek side panel showing drives and boomarks
+  - Full drag and drop support (N/A)
+  - Applications and Catalog View
+  - Auto update devices list
+  - Custom Folder Icons and Thumbnail Preview
+  - Complete mime-icon support
+  - BreadCrumbs Navigation Bar
+  - Custom Actions
+  - Inline terminal
+  - SingleApplication Mode for resource sharing

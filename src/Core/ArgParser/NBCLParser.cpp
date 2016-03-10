@@ -34,8 +34,8 @@ const option::Descriptor usage[] = {
 		                                                        "FITNESS FOR A PARTICULAR PURPOSE.\n\n"
 
                                                                 "USAGE:\n"
-                                                                "    newbreeze2 [options]\n"
-                                                                "    newbreeze2 [-f|--force-new] [URL]\n\n"
+                                                                "    newbreeze [options]\n"
+                                                                "    newbreeze [-f|--force-new] [URL]\n\n"
                                                                 "Options:" },
 
     /* Print the help option */
@@ -43,6 +43,9 @@ const option::Descriptor usage[] = {
 
     /* Print the help option */
     { USAGE,      0,   "u",     "usage",      Arg::None,        "    -u, --usage      Print the usage and exit." },
+
+    /* Print the help option */
+    { MANPAGE,    0,   "m",     "manpage",    Arg::None,        "    -m, --manpage    Open the man page if it is installed" },
 
     /* Print the version option */
     { VERSION,    0,   "v",    "version",     Arg::None,        "    -v  --version    Print version information and exit." },
@@ -68,16 +71,16 @@ const option::Descriptor usage[] = {
 
     /* List the examples */
     { UNKNOWN,    0,   "", "",                Arg::None,        "\nExamples:\n"
-                                                                "    newbreeze2 -h                           # Prints this help message\n"
-                                                                "    newbreeze2                              # Opens the last opened directory\n"
-                                                                "    newbreeze2 -t                           # Opens an instance in tray\n"
-                                                                "    newbreeze2 -s                           # Opens the settings dialog\n"
-                                                                "    newbreeze2 --settings                   # Opens the settings dialog\n"
-                                                                "    newbreeze2 -a                           # Opens the about NB dialog\n"
-                                                                "    newbreeze2 --license                    # Opens the NB license dialog\n"
-                                                                "    newbreeze2 --force-new                  # Kills the existsing server and "
-                                                                                                             "opens window at the last opened location\n"
-                                                                "    newbreeze2 --force-new /home/cosmos     # Kills the existsing server and "
+                                                                "    newbreeze -h                           # Prints this help message\n"
+                                                                "    newbreeze                              # Opens the last opened directory\n"
+                                                                "    newbreeze -t                           # Opens an instance in tray\n"
+                                                                "    newbreeze -s                           # Opens the settings dialog\n"
+                                                                "    newbreeze --settings                   # Opens the settings dialog\n"
+                                                                "    newbreeze -a                           # Opens the about NB dialog\n"
+                                                                "    newbreeze --license                    # Opens the NB license dialog\n"
+                                                                "    newbreeze --force-new                  # Kills the existsing server and "
+                                                                                                            "opens window at the last opened location\n"
+                                                                "    newbreeze --force-new /home/cosmos     # Kills the existsing server and "
                                                                                                              "opens a window at /home/cosmos\n"
     },
 
@@ -121,6 +124,11 @@ int NBArgParser( int argc, char** argv ) {
 		);
 
 		return 0;
+	}
+
+	if ( options[ MANPAGE ] ) {
+
+		return system( "man newbreeze" );
 	}
 
 	if ( options[ VERSION ] ) {

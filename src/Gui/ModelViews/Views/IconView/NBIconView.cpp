@@ -738,12 +738,18 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 			QDrag *drag = new QDrag( this );
 
 			QList<QUrl> urlList;
+
+			/* Selection based on mSelectedIndexes */
 			Q_FOREACH( QModelIndex idx, mSelectedIndexes ) {
-
-				if ( not idx.column() ) {
-
+				if ( not idx.column() )
 					urlList << QUrl::fromLocalFile( cModel->nodePath( idx ) );
-				}
+			}
+
+			/* Selection based on selectedModel */
+			Q_FOREACH( QModelIndex idx, selectionModel()->selectedRows() ) {
+				QUrl url = QUrl::fromLocalFile( cModel->nodePath( idx ) );
+				if ( not urlList.contains( url ) )
+					urlList << url;
 			}
 
 			QMimeData *mimedata = new QMimeData();

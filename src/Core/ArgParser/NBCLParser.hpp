@@ -17,6 +17,7 @@ enum  optionIndex {
 	UNKNOWN,
 	HELP,
 	USAGE,
+	MANPAGE,
 	VERSION,
 	SYSTRAY,
 	SETTINGS,

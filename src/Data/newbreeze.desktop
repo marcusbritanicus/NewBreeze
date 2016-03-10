@@ -2,10 +2,11 @@
 Name=NewBreeze
 GenericName=NewBreeze File Manager
 Comment=Browse the file system and manage the files
-Exec=newbreeze3
+Exec=newbreeze3 %u
+TryExec=newbreeze3
 Icon=newbreeze
 Type=Application
 Categories=FileManager;Utility;Core;Qt;System;FileTools
 StartupNotify=true
 Terminal=false
-MimeType=inode/directory;application/x-encrypted-folder;
+MimeType=inode/directory;
