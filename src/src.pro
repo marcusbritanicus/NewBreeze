@@ -356,7 +356,7 @@ unix {
 	target.path = $$BINDIR
 
 	header.path = $$PREFIX/include/newbreeze
-	header.files = NBPreviewInterface.hpp
+	header.files = NBPreviewInterface.hpp NBPluginInterface.hpp
 
 	desktop.path = $$PREFIX/share/applications/
 	desktop.files = Data/newbreeze.desktop

@@ -7,9 +7,6 @@ INCLUDEPATH += .
 # Same as NewBreeze version
 VERSION = "3.0.0"
 
-# Boost Libs
-LIBS += -lboost_regex
-
 # Plugin Mode
 # ===========
 CONFIG += plugin
@@ -76,8 +73,8 @@ unix {
 
 	INSTALLS += target
 
-	target.path = $$PREFIX/share/newbreeze/plugins
+	target.path = $$PREFIX/lib/newbreeze/plugins
 	greaterThan(QT_MAJOR_VERSION, 4) {
-		target.path = $$PREFIX/share/newbreeze/plugins5
+		target.path = $$PREFIX/lib/newbreeze/plugins5
 	}
 }

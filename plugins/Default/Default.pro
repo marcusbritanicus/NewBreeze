@@ -143,8 +143,8 @@ unix {
 
 	INSTALLS += target
 
-	target.path = $$PREFIX/share/newbreeze/plugins
+	target.path = $$PREFIX/lib/newbreeze/plugins
 	greaterThan(QT_MAJOR_VERSION, 4) {
-		target.path = $$PREFIX/share/newbreeze/plugins5
+		target.path = $$PREFIX/lib/newbreeze/plugins5
 	}
 }
