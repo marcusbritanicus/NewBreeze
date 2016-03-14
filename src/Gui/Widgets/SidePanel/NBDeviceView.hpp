@@ -1,6 +1,6 @@
 /*
 	*
-	* NBDeviceView.hpp - NBDeviceView.cpp header file
+	* NBDeviceView.hpp - DeviceView class header file
 	*
 */
 

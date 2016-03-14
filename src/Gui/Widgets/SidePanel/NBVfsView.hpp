@@ -1,6 +1,6 @@
 /*
 	*
-	* NBDeviceView.hpp - NBDeviceView.cpp header file
+	* NBVfsView.hpp - NBVfsView.cpp header file
 	*
 */
 

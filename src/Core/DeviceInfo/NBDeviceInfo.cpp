@@ -1,4 +1,4 @@
- /*
+/*
 	*
 	* NBDeviceInfo.cpp - DeviceInfo class for NewBreeze
 	*

@@ -1,6 +1,6 @@
 /*
 	*
-	* NBDeviceView.cpp - A highly customized QWidget for NewBreeze
+	* NBDeviceView.cpp - Mounted Device View class for NewBreeze
 	*
 */
 

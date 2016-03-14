@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 
-SUBDIRS += Crypt Default MarkDown
+SUBDIRS += Default MarkDown

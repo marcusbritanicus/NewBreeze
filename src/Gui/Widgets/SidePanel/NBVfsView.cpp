@@ -1,6 +1,6 @@
 /*
 	*
-	* NBDeviceView.cpp - A highly customized QWidget for NewBreeze
+	* NBVfsView.cpp - Mounted VirtualFS View class for NewBreeze
 	*
 */
 

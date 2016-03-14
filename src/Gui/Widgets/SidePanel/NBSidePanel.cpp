@@ -46,7 +46,7 @@ void NBSidePanel::populateSidePanel() {
 	connect( showDevicesAct, SIGNAL( triggered() ), devIcon, SLOT( showDevices() ) );
 	addAction( showDevicesAct );
 
-	/* The 'Virtual Mounts' Label */
+	/* The 'VirtualFS Mounts' Label */
 	vfsIcon = new NBVfsIcon( this );
 	connect( vfsIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 	QAction *showVfsAct = new QAction( QIcon( ":/icons/encfs.png" ), "Show &VFS", vfsIcon );
