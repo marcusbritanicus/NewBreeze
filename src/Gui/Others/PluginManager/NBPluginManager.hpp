@@ -7,6 +7,7 @@
 #pragma once
 
 #include <QtCore>
+#include <NBPluginInterface.hpp>
 #include <NBPreviewInterface.hpp>
 #include <NBMimeDatabase.hpp>
 #include <NBXdg.hpp>

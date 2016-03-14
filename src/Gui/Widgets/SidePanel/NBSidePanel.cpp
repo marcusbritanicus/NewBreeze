@@ -46,6 +46,14 @@ void NBSidePanel::populateSidePanel() {
 	connect( showDevicesAct, SIGNAL( triggered() ), devIcon, SLOT( showDevices() ) );
 	addAction( showDevicesAct );
 
+	/* The 'Virtual Mounts' Label */
+	vfsIcon = new NBVfsIcon( this );
+	connect( vfsIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	QAction *showVfsAct = new QAction( QIcon( ":/icons/encfs.png" ), "Show &VFS", vfsIcon );
+	showVfsAct->setShortcut( tr( "Alt+V" ) );
+	connect( showVfsAct, SIGNAL( triggered() ), vfsIcon, SLOT( showDevices() ) );
+	addAction( showVfsAct );
+
 	/* The 'Bookmarks' Label */
 	bmkIcon = new NBBookmarksIcon( this );
 	connect( bmkIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
@@ -75,6 +83,7 @@ void NBSidePanel::populateSidePanel() {
 	lyt->addWidget( appLbl );
 	lyt->addWidget( ctlLbl );
 	lyt->addWidget( devIcon );
+	lyt->addWidget( vfsIcon );
 	lyt->addWidget( bmkIcon );
 	lyt->addStretch();
 	lyt->addWidget( trashLabel );
@@ -110,6 +119,11 @@ void NBSidePanel::flashFolders() {
 void NBSidePanel::flashDevices() {
 
 	devIcon->flashLabel();
+};
+
+void NBSidePanel::flashVfs() {
+
+	vfsIcon->flashLabel();
 };
 
 void NBSidePanel::flashBookmarks() {

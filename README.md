@@ -48,6 +48,7 @@ Some of its features are
 * liblzma
 * libbzip2
 * libarchive
+* libpoppler-qt4/qt5
 
 ### Known Bugs
 * SegmentationFault in `NBIconView` `::aboveIndex(...)`, `::belowIndex(...)`

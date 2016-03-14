@@ -420,7 +420,11 @@ QModelIndexList NBIconView::selectedIndexes() {
 
 QModelIndexList NBIconView::selection() {
 
-	return selectedIndexes();
+	QSet<QModelIndex> idxSet;
+	idxSet.unite( QSet<QModelIndex>::fromList( mSelectedIndexes ) );
+	idxSet.unite( QSet<QModelIndex>::fromList( selectionModel()->selectedIndexes() ) );
+
+	return idxSet.toList();
 };
 
 bool NBIconView::isIndexVisible( QModelIndex idx ) const {

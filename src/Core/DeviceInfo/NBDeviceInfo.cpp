@@ -47,8 +47,34 @@ inline QString getDevType( QString dev, QString vfsType ) {
 			if ( info.absoluteFilePath().contains( "usb" ) )
 				return QString( "usb" );
 
-			else
-				return QString( "hdd" );
+			else {
+				if ( vfsType.toLower().contains( "ntfs" ) )
+					return QString( "hdd-win" );
+
+				else if ( vfsType.toLower().contains( "fuseblk" ) )
+					return QString( "hdd-win" );
+
+				else if ( vfsType.toLower().contains( "ext" ) )
+					return QString( "hdd-linux" );
+
+				else if ( vfsType.toLower().contains( "jfs" ) )
+					return QString( "hdd-linux" );
+
+				else if ( vfsType.toLower().contains( "reiser" ) )
+					return QString( "hdd-linux" );
+
+				else if ( vfsType.toLower().contains( "zfs" ) )
+					return QString( "hdd-linux" );
+
+				else if ( vfsType.toLower().contains( "xfs" ) )
+					return QString( "hdd-linux" );
+
+				else if ( vfsType.toLower().contains( "btrfs" ) )
+					return QString( "hdd-linux" );
+
+				else
+					return QString( "hdd" );
+			}
 		}
 	}
 
@@ -106,7 +132,7 @@ NBDeviceManager::NBDeviceManager( QObject *parent ) : QObject( parent ) {
 
 };
 
-QList<NBDeviceInfo> NBDeviceManager::allDevices() {
+QList<NBDeviceInfo> NBDeviceManager::allMounts() {
 
 	QList<NBDeviceInfo> devices;
 
@@ -126,8 +152,60 @@ QList<NBDeviceInfo> NBDeviceManager::allDevices() {
 		devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
 		devInfo.dSz = sInfo.bytesTotal();
 
-		if ( devInfo.mP == "/" )
-			devInfo.dT = "hdd";
+		devices << devInfo;
+	}
+
+	return devices;
+};
+
+QList<NBDeviceInfo> NBDeviceManager::allDrives() {
+
+	QList<NBDeviceInfo> devices;
+
+	Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() ) {
+		NBDeviceInfo devInfo;
+
+		if ( not sInfo.device().startsWith( "/dev/" ) )
+			continue;
+
+		devInfo.dN = sInfo.device();
+		devInfo.dL = getDevLabel( sInfo.name(), sInfo.displayName() );
+		devInfo.fS = sInfo.fileSystemType();
+		devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
+		devInfo.mP = sInfo.rootPath();
+		devInfo.fSz = sInfo.bytesFree();
+		devInfo.aSz = sInfo.bytesAvailable();
+		devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
+		devInfo.dSz = sInfo.bytesTotal();
+
+		devices << devInfo;
+	}
+
+	return devices;
+};
+
+QList<NBDeviceInfo> NBDeviceManager::allVirtualMounts() {
+
+	QList<NBDeviceInfo> devices;
+
+	Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() ) {
+		NBDeviceInfo devInfo;
+
+		if ( sInfo.device().startsWith( "/dev/" ) )
+			continue;
+
+		if ( sInfo.rootPath().startsWith( "/run/" ) )
+			continue;
+
+		devInfo.dN = sInfo.device();
+		devInfo.dL = getDevLabel( sInfo.name(), sInfo.displayName() );
+		devInfo.fS = sInfo.fileSystemType();
+		devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
+		devInfo.mP = sInfo.rootPath();
+		devInfo.fSz = sInfo.bytesFree();
+		devInfo.aSz = sInfo.bytesAvailable();
+		devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
+		devInfo.dSz = sInfo.bytesTotal();
 
 		devices << devInfo;
 	}

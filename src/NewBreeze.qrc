@@ -42,6 +42,8 @@
 		<file>icons/folders.png</file>
 		<file>icons/groups.png</file>
 		<file>icons/hdd.png</file>
+		<file>icons/hdd-linux.png</file>
+		<file>icons/hdd-win.png</file>
 		<file>icons/hidden.png</file>
 		<file>icons/home.png</file>
 		<file>icons/iconthemes.png</file>

@@ -4,12 +4,12 @@
 	*
 */
 
-#include <NBDeviceView.hpp>
+#include <NBVfsView.hpp>
 
-NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
+NBVfsIcon::NBVfsIcon( QWidget *parent ) : QWidget( parent ) {
 
 	// Default Pixmap
-	mPixmap = QPixmap( ":/icons/comp.png" );
+	mPixmap = QPixmap( ":/icons/encfs.png" );
 
 	// Flash settings
 	alpha = 0;
@@ -37,18 +37,18 @@ NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 	setFixedSize( 48, 48 );
 
 	// DeviceView
-	devView = new NBDeviceMenu( this );
-	devView->setObjectName( "NBDeviceMenu" );
+	devView = new NBVfsMenu( this );
+	devView->setObjectName( "NBVfsMenu" );
 	connect( devView, SIGNAL( triggered( QAction* ) ), this, SLOT( clickDrive( QAction* ) ) );
 };
 
 /* Override the QLabel pixmap property handlers */
-QPixmap NBDevicesIcon::pixmap() {
+QPixmap NBVfsIcon::pixmap() {
 
 	return mPixmap;
 };
 
-void NBDevicesIcon::setPixmap( QPixmap newPixmap ) {
+void NBVfsIcon::setPixmap( QPixmap newPixmap ) {
 
 	mPixmap = newPixmap;
 
@@ -56,12 +56,12 @@ void NBDevicesIcon::setPixmap( QPixmap newPixmap ) {
 };
 
 /* Color property handlers */
-QColor NBDevicesIcon::flashColor() {
+QColor NBVfsIcon::flashColor() {
 
 	return color;
 };
 
-void NBDevicesIcon::setFlashColor( QColor newColor ) {
+void NBVfsIcon::setFlashColor( QColor newColor ) {
 
 	color = newColor;
 	color.setAlpha( alpha );
@@ -70,12 +70,12 @@ void NBDevicesIcon::setFlashColor( QColor newColor ) {
 };
 
 /* Alpha property handlers */
-qint64 NBDevicesIcon::alphaDelta() {
+qint64 NBVfsIcon::alphaDelta() {
 
 	return mAlphaDelta;
 };
 
-void NBDevicesIcon::setAlphaDelta( qint64 newAlphaDelta ) {
+void NBVfsIcon::setAlphaDelta( qint64 newAlphaDelta ) {
 
 	if ( ( newAlphaDelta * 10 ) > 255 )
 		mAlphaDelta = 25;
@@ -85,35 +85,35 @@ void NBDevicesIcon::setAlphaDelta( qint64 newAlphaDelta ) {
 };
 
 /* Flash duration property handlers */
-int NBDevicesIcon::flashDuration() {
+int NBVfsIcon::flashDuration() {
 
 	return mFlashDuration;
 };
 
-void NBDevicesIcon::setFlashDuration( int newFlashDuration ) {
+void NBVfsIcon::setFlashDuration( int newFlashDuration ) {
 
 	mFlashDuration = ( newFlashDuration >= 10 ? newFlashDuration : 10 );
 	timer.setInterval( mFlashDuration / flashSteps );
 };
 
 /* Number of Flashes property handlers */
-int NBDevicesIcon::numberOfFlashes() {
+int NBVfsIcon::numberOfFlashes() {
 
 	return maxFlashes;
 };
 
-void NBDevicesIcon::setNumberOfFlashes( int newNumOfFlashes ) {
+void NBVfsIcon::setNumberOfFlashes( int newNumOfFlashes ) {
 
 	maxFlashes = newNumOfFlashes;
 };
 
 /* flashFrames property handlers - Number of frames per flash */
-int NBDevicesIcon::flashFrames() {
+int NBVfsIcon::flashFrames() {
 
 	return flashSteps;
 };
 
-void NBDevicesIcon::setFlashFrames( int newFlashSteps ) {
+void NBVfsIcon::setFlashFrames( int newFlashSteps ) {
 
 	/* Persistence of vision is 62.5 (~63) ms */
 
@@ -122,7 +122,7 @@ void NBDevicesIcon::setFlashFrames( int newFlashSteps ) {
 };
 
 /* Overriding of paint event for showing flashes */
-void NBDevicesIcon::paintEvent( QPaintEvent *pEvent ) {
+void NBVfsIcon::paintEvent( QPaintEvent *pEvent ) {
 
 	QPainter *painter = new QPainter( this );
 	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform );
@@ -172,7 +172,7 @@ void NBDevicesIcon::paintEvent( QPaintEvent *pEvent ) {
 };
 
 /* Overriding QLabel::mousePressEvent to emit clicked signal */
-void NBDevicesIcon::mousePressEvent( QMouseEvent *mEvent ) {
+void NBVfsIcon::mousePressEvent( QMouseEvent *mEvent ) {
 
 	if ( devView->isVisible() )
 		devView->close();
@@ -181,12 +181,12 @@ void NBDevicesIcon::mousePressEvent( QMouseEvent *mEvent ) {
 };
 
 /* Overriding QLabel::mouseMoveEvent to expand the view */
-void NBDevicesIcon::mouseMoveEvent( QMouseEvent *mEvent ) {
+void NBVfsIcon::mouseMoveEvent( QMouseEvent *mEvent ) {
 
 	mEvent->accept();
 };
 
-void NBDevicesIcon::enterEvent( QEvent *eEvent ) {
+void NBVfsIcon::enterEvent( QEvent *eEvent ) {
 
 	/* Start the delay timer */
 	delayTimer.stop();
@@ -195,7 +195,7 @@ void NBDevicesIcon::enterEvent( QEvent *eEvent ) {
 	eEvent->accept();
 };
 
-void NBDevicesIcon::timerEvent( QTimerEvent *tEvent ) {
+void NBVfsIcon::timerEvent( QTimerEvent *tEvent ) {
 
 	if ( tEvent->timerId() == delayTimer.timerId() ) {
 
@@ -220,7 +220,7 @@ void NBDevicesIcon::timerEvent( QTimerEvent *tEvent ) {
 };
 
 /* Slot to access the flashing */
-void NBDevicesIcon::flashLabel() {
+void NBVfsIcon::flashLabel() {
 
 	color = palette().color( QPalette::Window ).darker();
 	color.setAlpha( alpha );
@@ -233,7 +233,7 @@ void NBDevicesIcon::flashLabel() {
 };
 
 /* Slot to access the flashing with a given color */
-void NBDevicesIcon::flashLabel( QColor newColor ) {
+void NBVfsIcon::flashLabel( QColor newColor ) {
 
 	setFlashColor( newColor );
 
@@ -244,12 +244,12 @@ void NBDevicesIcon::flashLabel( QColor newColor ) {
 	flash = true;
 };
 
-void NBDevicesIcon::showDevices() {
+void NBVfsIcon::showDevices() {
 
 	devView->clear();
 
 	// Spacer Label
-	QLabel *lbl = new QLabel( "<h4>&nbsp;&nbsp;&nbsp;&nbsp;Devices</h4>" );
+	QLabel *lbl = new QLabel( "<h4>&nbsp;&nbsp;&nbsp;&nbsp;VFS</h4>" );
 	lbl->setFixedHeight( 48 );
 	lbl->setMinimumWidth( 150 );
 
@@ -260,11 +260,12 @@ void NBDevicesIcon::showDevices() {
 
 	devView->addAction( lblAct );
 
-	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDrives() ) {
+	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allVirtualMounts() ) {
+
 		QWidgetAction *wa = new QWidgetAction( devView );
 		wa->setData( info.mountPoint() );
 
-		NBDeviceAction *actWdgt = new NBDeviceAction( info, devView );
+		NBVfsAction *actWdgt = new NBVfsAction( info, devView );
 		wa->setDefaultWidget( actWdgt );
 
 		devView->addAction( wa );
@@ -274,16 +275,16 @@ void NBDevicesIcon::showDevices() {
 	devView->exec( mapToGlobal( QPoint( 49, 0 ) ) );
 };
 
-void NBDevicesIcon::clickDrive( QAction *act ) {
+void NBVfsIcon::clickDrive( QAction *act ) {
 
 	QWidgetAction *wAct = qobject_cast<QWidgetAction*>( act );
-	NBDeviceAction *devAct = qobject_cast<NBDeviceAction*>( wAct->defaultWidget() );
+	NBVfsAction *devAct = qobject_cast<NBVfsAction*>( wAct->defaultWidget() );
 
 	if ( devAct )
 		emit driveClicked( devAct->mountPoint() );
 };
 
-NBDeviceAction::NBDeviceAction( NBDeviceInfo info, QWidget *parent ) : QWidget( parent ) {
+NBVfsAction::NBVfsAction( NBDeviceInfo info, QWidget *parent ) : QWidget( parent ) {
 
 	setMouseTracking( true );
 
@@ -301,18 +302,18 @@ NBDeviceAction::NBDeviceAction( NBDeviceInfo info, QWidget *parent ) : QWidget( 
 	percentUsed = ( int )( info.usedSpace() * 100.0 / info.driveSize() );
 };
 
-QString NBDeviceAction::mountPoint() {
+QString NBVfsAction::mountPoint() {
 
 	return mMountPoint;
 };
 
-void NBDeviceAction::highlight( bool high ) {
+void NBVfsAction::highlight( bool high ) {
 
 	select = high;
 	repaint();
 }
 
-void NBDeviceAction::paintEvent( QPaintEvent *pEvent ) {
+void NBVfsAction::paintEvent( QPaintEvent *pEvent ) {
 
 	QPainter painter( this );
 
@@ -374,35 +375,35 @@ void NBDeviceAction::paintEvent( QPaintEvent *pEvent ) {
 };
 
 /* Overriding QLabel::enterEvent to emit entered signal */
-void NBDeviceAction::enterEvent( QEvent *eEvent ) {
+void NBVfsAction::enterEvent( QEvent *eEvent ) {
 
 	select = true;
 	repaint();
 };
 
 /* Overriding QLabel::leaveEvent to emit exited signal */
-void NBDeviceAction::leaveEvent( QEvent *lEvent ) {
+void NBVfsAction::leaveEvent( QEvent *lEvent ) {
 
 	select = false;
 	repaint();
 };
 
-NBDeviceMenu::NBDeviceMenu( QWidget *parent ) : QMenu( parent ) {
+NBVfsMenu::NBVfsMenu( QWidget *parent ) : QMenu( parent ) {
 
 	connect( this, SIGNAL( hovered( QAction* ) ), this, SLOT( highlightAction( QAction* ) ) );
 };
 
-void NBDeviceMenu::addAction( QWidgetAction *act ) {
+void NBVfsMenu::addAction( QWidgetAction *act ) {
 
 	actionList << act;
 	QMenu::addAction( act );
 };
 
-void NBDeviceMenu::highlightAction( QAction *act ) {
+void NBVfsMenu::highlightAction( QAction *act ) {
 
 	QWidgetAction *wAct = qobject_cast<QWidgetAction*>( act );
 	Q_FOREACH( QWidgetAction *wa, actionList ) {
-		NBDeviceAction *devAct = qobject_cast<NBDeviceAction*>( wa->defaultWidget() );
+		NBVfsAction *devAct = qobject_cast<NBVfsAction*>( wa->defaultWidget() );
 		if ( devAct and wAct )
 			devAct->highlight( wAct == wa );
 	}

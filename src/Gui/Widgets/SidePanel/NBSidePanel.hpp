@@ -9,6 +9,7 @@
 #include <Global.hpp>
 #include <NBFlashLabel.hpp>
 #include <NBDeviceView.hpp>
+#include <NBVfsView.hpp>
 #include <NBBookmarkView.hpp>
 
 class NBSidePanel : public QWidget {
@@ -23,6 +24,7 @@ class NBSidePanel : public QWidget {
 		NBFlashLabel *dirLbl, *appLbl, *ctlLbl;
 		NBTrashLabel *trashLabel;
 		NBDevicesIcon *devIcon;
+		NBVfsIcon *vfsIcon;
 		NBBookmarksIcon *bmkIcon;
 
 	protected :
@@ -34,6 +36,7 @@ class NBSidePanel : public QWidget {
 		void flashCatalogs();
 		void flashFolders();
 		void flashDevices();
+		void flashVfs();
 		void flashBookmarks();
 
 	Q_SIGNALS:

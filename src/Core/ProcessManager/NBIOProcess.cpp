@@ -118,9 +118,13 @@ bool NBIOProcess::preIO() {
 		stat( mProgress->targetDir.toLocal8Bit().data(), &tgtStat );
 
 		/* If the source and the are the same */
-		if ( srcStat.st_dev == tgtStat.st_dev )
+		if ( srcStat.st_dev == tgtStat.st_dev ) {
+			/* Add the original sources to the list */
+			sourceList << origSources;
+
 			/* Move is just a trivial rename operation, we can get out of here */
 			return true;
+		}
 
 		/* Otherwise we proceed with the source processing */
 	}
@@ -239,7 +243,7 @@ void NBIOProcess::copyFile( QString srcFile ) {
 
 	/* If the operation is intra-partition operation and its a move, then we can simply rename the file */
 	if ( ( iStat.st_dev == oStat.st_dev ) and ( mProgress->type == NBProcess::Move ) ) {
-		if ( rename( srcFile.toLocal8Bit().data(), currentFile.toLocal8Bit().data() ) ) {
+		if ( rename( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data(), currentFile.toLocal8Bit().data() ) ) {
 			qDebug() << "Error moving file:" << srcFile;
 			errorNodes << srcFile;
 		}
@@ -392,12 +396,6 @@ void NBIOProcess::run() {
 	mProgress->progressText = QString();
 	mProgress->state = NBProcess::Started;
 
-	/* Store the current working directory */
-	QString curWD = QString::fromLocal8Bit( get_current_dir_name() );
-
-	/* Switch to the source directory */
-	chdir( mProgress->sourceDir.toLocal8Bit().data() );
-
 	/* Perform the IO */
 	Q_FOREACH( QString node, sourceList ) {
 
@@ -424,8 +422,10 @@ void NBIOProcess::run() {
 		}
 
 		struct stat st;
-		if ( stat( node.toLocal8Bit().data(), &st ) != 0 )
+		if ( stat( ( mProgress->sourceDir + node ).toLocal8Bit().data(), &st ) != 0 ) {
+			qDebug() << "Stat failed" << node;
 			errorNodes << node;
+		}
 
 		/* Various cases for various types of nodes */
 		switch( st.st_mode & S_IFMT ) {
@@ -464,9 +464,6 @@ void NBIOProcess::run() {
 			}
 		}
 	}
-
-	/* Change back to the current working directory */
-	chdir( curWD.toLocal8Bit().data() );
 
 	emit completed( errorNodes );
 	mProgress->state = NBProcess::Completed;

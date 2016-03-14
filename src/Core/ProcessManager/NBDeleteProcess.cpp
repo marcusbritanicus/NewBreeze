@@ -8,13 +8,18 @@
 #include <NBTools.hpp>
 #include <NBXdg.hpp>
 
-NBDeleteProcess::NBDeleteProcess( QStringList sources, bool removeFromDisk, NBProcess::Progress *progress ) {
+NBDeleteProcess::NBDeleteProcess( QStringList sources, NBProcess::Progress *progress ) {
 
+	/* Switch off flags */
+	mCanceled = false;
+	mPaused = false;
+	mUndo = false;
+
+	/* Set the source list */
 	sourceList.clear();
 	sourceList << sources;
 
-	mDeleteFromDisk = removeFromDisk;
-
+	/* Make a local copy of the progress pointer */
 	mProgress = progress;
 
 	if ( not mProgress->sourceDir.endsWith( "/" ) )
@@ -55,12 +60,12 @@ void NBDeleteProcess::resume() {
 
 bool NBDeleteProcess::canUndo() {
 
-	return not mDeleteFromDisk;
+	return ( mProgress->type != NBProcess::Delete );
 };
 
 void NBDeleteProcess::undo() {
 
-	if ( not mDeleteFromDisk ) {
+	if ( mProgress->type == NBProcess::Trash ) {
 		mUndo = true;
 		start();
 	}
@@ -294,7 +299,7 @@ void NBDeleteProcess::run() {
 	mProgress->state = NBProcess::Started;
 
 	Q_FOREACH( QString path, sourceList ) {
-		if ( mDeleteFromDisk )
+		if ( mProgress->type == NBProcess::Delete )
 			deleteNode( path );
 
 		else

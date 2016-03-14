@@ -60,7 +60,7 @@ void NBFolderView::updateViewMode() {
 
 bool NBFolderView::hasSelection() {
 
-	return IconView->selectionModel()->hasSelection();
+	return ( IconView->selection().count() > 0 );
 };
 
 void NBFolderView::createAndSetupActions() {
@@ -669,7 +669,7 @@ void NBFolderView::doToggleHidden() {
 
 void NBFolderView::prepareCopy() {
 
-	if ( not hasSelection() )
+	if ( not IconView->selection().count() )
 		return;
 
 	moveItems = false;
@@ -683,12 +683,11 @@ void NBFolderView::prepareCopy() {
 	mData->setUrls( urlList );
 
 	clipBoard->setMimeData( mData );
-	// setXClipBoardData( urlList );
 };
 
 void NBFolderView::prepareMove() {
 
-	if ( not hasSelection() )
+	if ( not IconView->selection().count() )
 		return;
 
 	moveItems = true;
@@ -702,17 +701,52 @@ void NBFolderView::prepareMove() {
 	mData->setUrls( urlList );
 
 	clipBoard->setMimeData( mData );
-	// setXClipBoardData( urlList );
 };
 
-void NBFolderView::copy( QStringList srcList, QString tgt ) {
+void NBFolderView::copy( QStringList sources, QString tgt ) {
 
-	emit copy( srcList, tgt, NBIOMode::Copy );
+	if ( not sources.count() )
+		return;
+
+	NBProcess::Progress *progress = new NBProcess::Progress;
+	progress->sourceDir = dirName( sources.value( 0, QDir::currentPath() ) );
+	progress->targetDir = fsModel->currentDir();
+
+	QStringList srcList;
+	foreach( QString path, sources )
+		srcList << path.replace( progress->sourceDir, "" );
+
+	progress->type = NBProcess::Copy;
+
+	NBIOProcess *proc = new NBIOProcess( srcList, progress );
+	pMgr->addProcess( progress, proc );
+
+	progress->startTime = QTime::currentTime();
+
+	proc->start();
 };
 
-void NBFolderView::move( QStringList srcList, QString tgt ) {
+void NBFolderView::move( QStringList sources, QString tgt ) {
 
-	emit copy( srcList, tgt, NBIOMode::Move );
+	if ( not sources.count() )
+		return;
+
+	NBProcess::Progress *progress = new NBProcess::Progress;
+	progress->sourceDir = dirName( sources.value( 0, QDir::currentPath() ) );
+	progress->targetDir = fsModel->currentDir();
+
+	QStringList srcList;
+	foreach( QString path, sources )
+		srcList << path.replace( progress->sourceDir, "" );
+
+	progress->type = NBProcess::Move;
+
+	NBIOProcess *proc = new NBIOProcess( srcList, progress );
+	pMgr->addProcess( progress, proc );
+
+	progress->startTime = QTime::currentTime();
+
+	proc->start();
 };
 
 void NBFolderView::link( QStringList linkList, QString path ) {
@@ -746,6 +780,7 @@ void NBFolderView::prepareIO() {
 		progress->startTime = QTime::currentTime();
 
 		proc->start();
+		qDebug() << progress->state;
 	}
 
 	else {
@@ -757,7 +792,7 @@ void NBFolderView::prepareIO() {
 
 void NBFolderView::doSendToTrash() {
 
-	if ( !hasSelection() ) {
+	if ( !IconView->selection().count() ) {
 		return;
 	}
 
@@ -770,7 +805,7 @@ void NBFolderView::doSendToTrash() {
 	NBProcess::Progress *progress = new NBProcess::Progress;
 	progress->sourceDir = fsModel->currentDir();
 	progress->targetDir = QString();
-	progress->type = NBProcess::Move;
+	progress->type = NBProcess::Trash;
 
 	QStringList toBeDeleted;
 	Q_FOREACH( QModelIndex idx, selectedList ) {
@@ -789,7 +824,7 @@ void NBFolderView::doSendToTrash() {
 		);
 	}
 
-	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, false, progress );
+	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
 	pMgr->addProcess( progress, proc );
 
 	progress->startTime = QTime::currentTime();
@@ -799,7 +834,7 @@ void NBFolderView::doSendToTrash() {
 
 void NBFolderView::doDelete() {
 
-	if ( !hasSelection() ) {
+	if ( not IconView->selection().count() ) {
 		return;
 	}
 
@@ -812,7 +847,7 @@ void NBFolderView::doDelete() {
 	NBProcess::Progress *progress = new NBProcess::Progress;
 	progress->sourceDir = fsModel->currentDir();
 	progress->targetDir = QString();
-	progress->type = NBProcess::Move;
+	progress->type = NBProcess::Delete;
 
 	QStringList toBeDeleted;
 	Q_FOREACH( QModelIndex idx, selectedList ) {
@@ -820,6 +855,11 @@ void NBFolderView::doDelete() {
 		if ( not safeNodes.contains( path ) )
 			toBeDeleted << path.replace( progress->sourceDir, "" );
 	}
+
+	NBConfirmDeleteDialog *delDlg = new NBConfirmDeleteDialog( toBeDeleted, this );
+
+	if ( not delDlg->exec() )
+		return;
 
 	/* If some files have protection inform the user */
 	if ( toBeDeleted.count() != selectedList.count() ) {
@@ -831,7 +871,7 @@ void NBFolderView::doDelete() {
 		);
 	}
 
-	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, true, progress );
+	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
 	pMgr->addProcess( progress, proc );
 
 	progress->startTime = QTime::currentTime();

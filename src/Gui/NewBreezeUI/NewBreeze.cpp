@@ -215,6 +215,7 @@ void NewBreeze::createAndSetupActions() {
 	int mountsFD = open( "/proc/self/mounts", O_RDONLY, 0 );
 	QSocketNotifier *devWatcher = new QSocketNotifier( mountsFD, QSocketNotifier::Write );
 	connect( devWatcher, SIGNAL( activated( int ) ), SidePanel, SLOT( flashDevices() ) );
+	connect( devWatcher, SIGNAL( activated( int ) ), SidePanel, SLOT( flashVfs() ) );
 
 	// Display terminal widget
 	QAction *termWidgetAct = new QAction( this );

@@ -6,6 +6,8 @@
 
 #include <NBPluginManager.hpp>
 
+static QList<NBPluginInterface::Interface> developedInterfaces;
+
 static inline QString baseName( QString path ) {
 
 	if ( path.endsWith( "/" ) )

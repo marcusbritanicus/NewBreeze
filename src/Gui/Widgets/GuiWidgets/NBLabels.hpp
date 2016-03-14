@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBLABELS_HPP
-#define NBLABELS_HPP
 
 #include <Global.hpp>
 #include <NBTools.hpp>
@@ -15,8 +13,9 @@ class NBClickLabel : public QLabel {
 	Q_OBJECT
 
 	public:
-		NBClickLabel( QPixmap icon = QPixmap() );
-		NBClickLabel( QString icon = QString() );
+		NBClickLabel( QPixmap icon = QPixmap(), QWidget *parent = NULL );
+		NBClickLabel( QString icon = QString(), QWidget *parent = NULL );
+
 		void setClickable( bool );
 
 	private :
@@ -39,5 +38,3 @@ class NBInfoLabel : public QLabel {
 		NBInfoLabel();
 		void setText( QString, QString, QString, QString );
 };
-
-#endif

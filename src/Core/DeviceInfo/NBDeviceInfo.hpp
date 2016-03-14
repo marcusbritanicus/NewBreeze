@@ -53,7 +53,15 @@ class NBDeviceManager : public QObject {
 	public :
 		NBDeviceManager( QObject *parent = 0  );
 
-		static QList<NBDeviceInfo> allDevices();
+		/* List of all mounted volumes: drives + vfs */
+		static QList<NBDeviceInfo> allMounts();
+
+		/* List of for all mounted drives */
+		static QList<NBDeviceInfo> allDrives();
+
+		/* List of all mounted vfs */
+		static QList<NBDeviceInfo> allVirtualMounts();
+
 		static NBDeviceInfo deviceInfoForPath( QString path );
 
 	Q_SIGNALS :

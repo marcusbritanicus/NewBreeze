@@ -6,7 +6,7 @@
 
 #include <NBLabels.hpp>
 
-NBClickLabel::NBClickLabel( QPixmap icon ) : QLabel() {
+NBClickLabel::NBClickLabel( QPixmap icon, QWidget *parent ) : QLabel( parent ) {
 
 	clickEnabled = true;
 
@@ -14,7 +14,7 @@ NBClickLabel::NBClickLabel( QPixmap icon ) : QLabel() {
 	setAlignment( Qt::AlignCenter );
 };
 
-NBClickLabel::NBClickLabel( QString text ) : QLabel() {
+NBClickLabel::NBClickLabel( QString text, QWidget *parent ) : QLabel( parent ) {
 
 	clickEnabled = true;
 
