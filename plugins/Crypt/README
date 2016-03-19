@@ -1,0 +1,29 @@
+NBCrypt Plugin
+==============
+
+A transparent files and folders encryption plugin for NewBreeze.
+
+This plugin consists of two parts
+  - NBEncFS
+      This provides Qt interface for the commandline program encfs. Currently only mounting and unmonting is possible.
+      Passowrd chaning cannot be done.
+      For more information on encfs visit their website: http://www.arg0.net/encfs
+
+  - NBSalsa20
+      This provides the Qt interface to Salsa20 Stream Cipher. Encryption and decryption are possible, however changing password is yet to be implemented
+      This is the implementation taken from https://github.com/everard/Salsa20, with some changes (removal of ucstk namespace, and reduction of indentation)
+      Note: Large files take long time to encode/decode, and will be blocking, no async operation available.
+      For more information on Salsa visit Salsa20 website: https://cr.yp.to/salsa20.html
+
+Note:
+    1. To compile this plugin -std=c++11 enabled compiler is required. This implementation pf Salsa20 refuses to compile without -std=c++11 option.
+    2. During file encryption/decryption, any existing file will be renamed to .orig without prompts.
+
+WARNING
+=======
+	I AM NOT RESPONSIBLE FOR ANY DATA LOSS THAT MAY BE A RESULT OF USING THIS PLUGIN.
+	PLEASE USE THIS AT YOUR OWN RISK. IT WOULD NOT BE ADVISABLE TO USE THIS PLUGIN
+	FOR SENSITIVE DATA WITHOUT FIRST CONSULTING A CRYPTANALYST.
+
+	BOTH ENCFS NAD FILE ENCRYPTION HAVE BEEN IMPLEMENTED TO MY SATISFACTION. IT IS SAFE
+	TO ASSUME THAT NO MAJOR CHANGES WILL BE DONE FOR BOTH ENCFS AND FILE ENCRYPTION.

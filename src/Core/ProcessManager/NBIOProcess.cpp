@@ -396,6 +396,32 @@ void NBIOProcess::run() {
 	mProgress->progressText = QString();
 	mProgress->state = NBProcess::Started;
 
+	if ( mProgress->type == NBProcess::Move ) {
+		struct stat srcStat, tgtStat;
+		stat( mProgress->sourceDir.toLocal8Bit().data(), &srcStat );
+		stat( mProgress->targetDir.toLocal8Bit().data(), &tgtStat );
+
+		/* If the source and the are the same */
+		if ( srcStat.st_dev == tgtStat.st_dev ) {
+			Q_FOREACH( QString node, sourceList ) {
+				QString srcNode = mProgress->sourceDir + node;
+				QString tgtNode = mProgress->targetDir + node;
+				if ( rename( srcNode.toLocal8Bit().data(), tgtNode.toLocal8Bit().data() ) != 0 ) {
+					qDebug() << "Error moving:" << node;
+					errorNodes << node;
+				}
+			}
+
+			emit completed( errorNodes );
+			mProgress->state = NBProcess::Completed;
+
+			quit();
+			return;
+		}
+
+		/* Otherwise, we let the copying take place, then delete the sources at the end. */
+	}
+
 	/* Perform the IO */
 	Q_FOREACH( QString node, sourceList ) {
 
@@ -433,6 +459,7 @@ void NBIOProcess::run() {
 			case S_IFREG: {
 
 				/* Copy a regular file */
+				qDebug() << "Copying:" << node;
 				copyFile( node );
 				break;
 			}
@@ -440,6 +467,7 @@ void NBIOProcess::run() {
 			case S_IFLNK: {
 
 				/* Create a symbolic link */
+				qDebug() << "Symlink:" << node << "->" << readLink( node );
 				symlink( readLink( node ).toLocal8Bit().data(), ( mProgress->targetDir + node ).toLocal8Bit().data() );
 				if ( not exists( ( mProgress->targetDir + node ) ) ) {
 					qDebug() << "Error creating symlink" << node << "->" << readLink( node );
@@ -461,6 +489,32 @@ void NBIOProcess::run() {
 				qDebug() << "Cannot copy a socket:" << node;
 				errorNodes << node;
 				break;
+			}
+		}
+	}
+
+	if ( mProgress->type == NBProcess::Move ) {
+		Q_FOREACH( QString node, sourceList ) {
+			/* sourceList will be just a list of files */
+			if ( unlink( ( mProgress->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
+				qDebug() << "Error removing original file:" << mProgress->sourceDir + node;
+				errorNodes << node;
+			}
+		}
+
+		Q_FOREACH( QString node, origSources ) {
+			if ( isDir( mProgress->sourceDir + node ) ) {
+				if ( not removeDir( mProgress->sourceDir + node ) ) {
+					qDebug() << "Error removing original directory:" << mProgress->sourceDir + node;
+					errorNodes << node;
+				}
+			}
+
+			else if ( exists( mProgress->sourceDir + node ) ) {
+				if ( unlink( ( mProgress->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
+					qDebug() << "Error removing original file:" << mProgress->sourceDir + node;
+					errorNodes << node;
+				}
 			}
 		}
 	}

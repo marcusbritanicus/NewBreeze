@@ -11,6 +11,7 @@
 #include <NBIconProvider.hpp>
 #include <NBProcessManager.hpp>
 #include <NBProgressBar.hpp>
+#include <NBErrorsDialog.hpp>
 #include <NBMessageDialog.hpp>
 
 class NBProcessWidget : public QWidget {

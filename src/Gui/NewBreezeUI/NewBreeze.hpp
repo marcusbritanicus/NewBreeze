@@ -15,7 +15,6 @@
 #include <NBFolderView.hpp>
 #include <NBGuiWidgets.hpp>
 #include <NBInfoBar.hpp>
-#include <NBIOManager.hpp>
 #include <NBMessageDialog.hpp>
 #include <NBPropertiesDialog.hpp>
 #include <NBSettingsManager.hpp>

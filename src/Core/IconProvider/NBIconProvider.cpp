@@ -8,6 +8,12 @@
 #include <NBSystemInfo.hpp>
 #include <NBTools.hpp>
 
+#if QT_VERSION >= 0x050000
+    #include <QStorageInfo>
+#else
+    #include <QVolumeInfo.hpp>
+#endif
+
 /*
 	*
 	* Convenience functions:
@@ -62,28 +68,58 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 	QString mimeIcon = mimetype.iconName();
 	QString genericIcon = mimetype.genericIconName();
 
-	// If the path is a directory
+	/*
+		*
+		* For directories, we will have to search multiple locations. One inside the directory for .directory. However this will not apply for
+		* folder encrypted using encfs. Their data will be stored in the parent directory's .dreictory file. The .directory inside the path
+		* always takes precedence. Thus we search the path first, then the parent.
+		*
+	*/
 	if ( mimetype.name() == QString( "inode/directory" ) ) {
-		QString icoStr = QSettings( QDir( path ).filePath( ".directory" ), QSettings::NativeFormat ).value( "Desktop Entry/Icon" ).toString();
+
+		/* Path Settings */
+		QSettings settPath( QDir( path ).filePath( ".directory" ), QSettings::NativeFormat );
+
+		/* Icon from the Path Settings */
+		QString icoStr = settPath.value( "Desktop Entry/Icon" ).toString();
 		if ( !icoStr.isNull() and ( hasIcon( icoStr ) or exists( icoStr ) ) ) {
 			/* This means we have a file named @v icoStr or a theme icon named @v icoStr */
 			return icoStr;
 		}
 
-		else {
-			if ( hasIcon( "folder" ) )
-				/* FIXME: getIconPath( "folder" ) */
-				return QString( "folder" );
+		/* Parent Settings object */
+		QSettings settPrnt( QDir( dirName( path ) ).filePath( ".directory" ), QSettings::NativeFormat );
 
-			else if ( hasIcon( mimeIcon ) )
-				return mimeIcon;
+		/* Check if the current directory is an EncFS source */
+		if ( settPrnt.allKeys().contains( "EncFS/" + baseName( path ) ) )
+			return QString( ":/icons/folder-locked.png" );
 
-			else if ( hasIcon( genericIcon ) )
-				return genericIcon;
+		/* Other wise it might be EncFS target */
+		Q_FOREACH( QString key, settPrnt.allKeys() ) {
+			if ( settPrnt.value( key ).toString() == baseName( path ) ) {
+				/* If it is mounted, we return folder-unlocked */
+				Q_FOREACH( QStorageInfo info, QStorageInfo::mountedVolumes() ) {
+					if ( info.rootPath() == path )
+						return QString( ":/icons/folder-unlocked.png" );
+				}
 
-			else
-				return QString( ":/icons/folder.png" );
+				/* Otherwise we return folder-locked */
+				return QString( ":/icons/folder-locked.png" );
+			}
 		}
+
+		if ( hasIcon( "folder" ) )
+			/* FIXME: getIconPath( "folder" ) */
+			return QString( "folder" );
+
+		else if ( hasIcon( mimeIcon ) )
+			return mimeIcon;
+
+		else if ( hasIcon( genericIcon ) )
+			return genericIcon;
+
+		else
+			return QString( ":/icons/folder.png" );
 	}
 
 	// If it is a desktop file

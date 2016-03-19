@@ -17,14 +17,15 @@ class NBErrorsDialog : public NBDialog {
 	Q_OBJECT
 
 	public:
-		NBErrorsDialog( QString title, QString text, QStringList, QStringList, QWidget *parent = 0 );
+		NBErrorsDialog( QString title, QString text, QStringList, QWidget *parent = 0 );
 
 	private:
 		QLabel *iconLbl, *textLbl;
 		NBSegmentButton *segBtns;
 		NBButton *okayBtn;
 		QTableWidget *table;
-		QStringList fileList, dirList;
+
+		QStringList nodeList;
 
 		QString mTitle, mText;
 

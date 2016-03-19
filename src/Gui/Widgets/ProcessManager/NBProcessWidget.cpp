@@ -271,6 +271,43 @@ void NBProcessWidget::timerEvent( QTimerEvent *tEvent ) {
 
 				pauseBtn->setDisabled( true );
 
+				if ( mProcess->errors().count() ) {
+					QString title;
+					QString message = QString( "Some errors were encountered while " );
+
+					switch( mProgress->type ) {
+						case NBProcess::Copy: {
+							title = "NewBreeze - Error copying files";
+							message += "copying";
+						}
+
+						case NBProcess::Move: {
+							title = "NewBreeze - Error copying files";
+							message += "moving";
+						}
+
+						case NBProcess::Trash: {
+							title = "NewBreeze - Error trashing files";
+							message += "trashing";
+						}
+
+						case NBProcess::Delete: {
+							title = "NewBreeze - Error deleting files";
+							message += "deleteing";
+						}
+
+						case NBProcess::Properties: {
+							title = "NewBreeze - Error setiings permissions";
+							message += "settings the permissions for";
+						}
+					}
+
+					message += "the nodes you requested. The list of nodes which were not processed are given below.";
+
+					NBErrorsDialog *errDlg = new NBErrorsDialog( title, message, mProcess->errors(), this );
+					errDlg->exec();
+				}
+
 				return;
 			}
 		}

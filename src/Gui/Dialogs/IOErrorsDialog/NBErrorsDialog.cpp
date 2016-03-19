@@ -6,13 +6,12 @@
 
 #include <NBErrorsDialog.hpp>
 
-NBErrorsDialog::NBErrorsDialog( QString title, QString text, QStringList files, QStringList dirs, QWidget *parent ) : NBDialog( parent ) {
+NBErrorsDialog::NBErrorsDialog( QString title, QString text, QStringList nodes, QWidget *parent ) : NBDialog( parent ) {
 
 	mTitle = QString( title );
 	mText = QString ( text );
 
-	fileList << files;
-	dirList << dirs;
+	nodeList << nodes;
 
 	setupGUI();
 	setupTable();
@@ -88,13 +87,8 @@ void NBErrorsDialog::setupTable() {
 		table->verticalHeader()->setResizeMode( QHeaderView::Fixed );
 	#endif
 
-	foreach( QString path, dirList ) {
+	Q_FOREACH( QString path, nodeList )
 		addEntry( path );
-	}
-
-	foreach( QString path, fileList ) {
-		addEntry( path );
-	}
 };
 
 void NBErrorsDialog::addEntry( QString path ) {

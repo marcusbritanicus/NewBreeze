@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+	<mime-type type="inode/x-encrypted-file">
+		<comment>Salsa20 Encrypted File</comment>
+		<comment xml:lang="en_GB">Salsa20 Encrypted File</comment>
+		<sub-class-of type="application/octet-stream"/>
+		<glob pattern="*.s20"/>
+		<generic-icon name="application-pgp-encrypted"/>
+	</mime-type>
+</mime-info>

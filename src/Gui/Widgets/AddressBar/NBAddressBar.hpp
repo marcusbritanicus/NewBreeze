@@ -14,7 +14,6 @@
 #include <NBTools.hpp>
 #include <NBButton.hpp>
 #include <NBButtons.hpp>
-#include <NBIOManager.hpp>
 #include <NBProcessManagerUI.hpp>
 
 class NBToggleButton : public QWidget {

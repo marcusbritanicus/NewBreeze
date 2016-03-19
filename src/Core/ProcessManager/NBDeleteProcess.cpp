@@ -91,23 +91,21 @@ void NBDeleteProcess::deleteNode( QString path ) {
 		qApp->processEvents();
 	}
 
-	path = mProgress->sourceDir + path;
-
 	struct stat st;
-	if ( stat( path.toLocal8Bit().data(), &st ) != 0 ) {
+	if ( stat( ( mProgress->sourceDir + path ).toLocal8Bit().data(), &st ) != 0 ) {
 		qDebug() << "Unable to stat:" << path;
 		errorNodes << path;
 
 		return;
 	}
 
-	switch( st.st_mode && S_IFMT ) {
+	switch( st.st_mode & S_IFMT ) {
 		case S_IFDIR: {
 
 			DIR* d_fh;
 			struct dirent* entry;
 
-			while ( ( d_fh = opendir( path.toLocal8Bit().data() ) ) == NULL ) {
+			while ( ( d_fh = opendir( ( mProgress->sourceDir + path ).toLocal8Bit().data() ) ) == NULL ) {
 				qWarning() << "Couldn't open directory:" << path;
 				errorNodes << path;
 				return;
@@ -125,16 +123,17 @@ void NBDeleteProcess::deleteNode( QString path ) {
 
 						/* Recurse into that folder */
 						deleteNode( path + entry->d_name );
+						rmdir( ( mProgress->sourceDir + path + entry->d_name ).toLocal8Bit().data() );
 					}
 
 					else {
-						if ( unlink( ( path + entry->d_name ).toLocal8Bit().data() ) != 0 )
+						if ( unlink( ( mProgress->sourceDir + path + entry->d_name ).toLocal8Bit().data() ) != 0 )
 							errorNodes << path + entry->d_name;
 					}
 				}
 			}
 
-			if ( unlink( path.toLocal8Bit().data() ) != 0 )
+			if ( rmdir( ( mProgress->sourceDir + path ).toLocal8Bit().data() ) != 0 )
 				errorNodes << path;
 
 			closedir( d_fh );
@@ -142,7 +141,7 @@ void NBDeleteProcess::deleteNode( QString path ) {
 		}
 
 		default: {
-			if ( unlink( path.toLocal8Bit().data() ) != 0 )
+			if ( unlink( ( mProgress->sourceDir + path ).toLocal8Bit().data() ) != 0 )
 				errorNodes << path;
 
 			break;

@@ -39,22 +39,24 @@ class NBPluginInterface {
 			RenameInterface,							// Alternative/Enhancement for Rename
 			MimeTypeInterface,							// Special handling ofspecific mimetypes
 			CreateInterface,							// Creation of new types of nodes
+			ContextInterface,							// Enhancement for ContextMenu
 		};
 
 		/* Plugin Type: How does the plugin work */
 		enum Type {
 			Alternative				= 0x65F8E4,			// Alternative for the existing widget. Ex: Mac sidebar instead of NBSidePanel
-			Enhancement,								// Enhancement for the existing widget. Ex: Encrypted Folder list for NBSidePanel
+			Enhancement,								// Enhancement for the existing widget. Ex: EncFS Support for NewBreeze
 		};
 
 		/* Plugin context: When will the plugin be activated */
 		enum Context {
-			Any						= 0xD50BE8,			// Any Selection
-			File,										// Single File Selection
+			File					= 0xD50BE8,			// Single File Selection
 			Dir,										// Single Folder Selection
-			Node,										// Single File/Folder Selection
+			Node					= File | Dir,		// Single File/Folder Selection
 			Files,										// Multiple File Selection
 			Dirs,    			 						// Multiple Folder Selection
+			Nodes					= Files | Dirs,		// File and Folder Selection
+			All,										// Any Node(s) Selection, including FIFO, CHR and others
 			None										// This is applicable for selections
 		};
 
@@ -66,8 +68,8 @@ class NBPluginInterface {
 		/* The plugin version */
 		virtual QString version() = 0;
 
-		/* The QAction hooks for menus/toolbars */
-		virtual QList<QAction*> actions() = 0;
+		/* The QAction */
+		virtual QList<QAction*> actions( QStringList ) = 0;
 
 		/* Plugin load context */
 		virtual Context context() = 0;
@@ -79,7 +81,13 @@ class NBPluginInterface {
 		virtual Type type() = 0;
 
 		/* Mimetypes handled by the plugin */
-		virtual QString mimetypes() = 0;
+		virtual QStringList mimetypes() = 0;
+
+		/* Store the called widget pointer */
+		virtual void setCaller( QWidget *caller ) = 0;
+
+	protected:
+		QWidget *mParent = NULL;
 };
 
 QT_BEGIN_NAMESPACE
