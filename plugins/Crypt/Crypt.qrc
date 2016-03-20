@@ -3,5 +3,6 @@
 		<file>icons/encrypt.png</file>
 		<file>icons/emblem-mounted.png</file>
 		<file>icons/emblem-unmounted.png</file>
+		<file>icons/key.png</file>
 	</qresource>
 </RCC>

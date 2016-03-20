@@ -100,18 +100,18 @@ QList<QAction*> NBCrypt::actions( QStringList nodes ) {
 		else if ( isFile( nodes.at( 0 ) ) ) {
 			/* If the extension is .s20, we decrypt it */
 			if ( nodes.at( 0 ).endsWith( ".s20" ) ) {
-				qDebug() << "Decrypting:" << nodes.at( 0 );
-				QAction *act = new QAction( QIcon::fromTheme( "document-decrypt" ), "&Decrypt File", this );
+				QAction *act1 = new QAction( QIcon::fromTheme( "document-decrypt" ), "&Decrypt File", this );
+				QAction *act2 = new QAction( QIcon( ":/icons/key.png" ), "Change &Password", this );
 
 				NBSalsa20 *s20 = new NBSalsa20( path, mParent );
-				connect( act, SIGNAL( triggered() ), s20, SLOT( decrypt() ) );
+				connect( act1, SIGNAL( triggered() ), s20, SLOT( decrypt() ) );
+				connect( act2, SIGNAL( triggered() ), s20, SLOT( changePass() ) );
 
-				return QList<QAction*>() << act;
+				return QList<QAction*>() << act1 << act2;
 			}
 
 			/* Otherwise, we encrypt */
 			else {
-				qDebug() << "Encrypting:" << nodes.at( 0 );
 				QAction *act = new QAction( QIcon::fromTheme( "document-encrypt" ), "&Encrypt File", this );
 
 				NBSalsa20 *s20 = new NBSalsa20( path, mParent );
@@ -127,7 +127,7 @@ QList<QAction*> NBCrypt::actions( QStringList nodes ) {
 		}
 	}
 
-	/* Otherwise we return mount action */
+	/* Otherwise we return create encfs action */
 	QAction *act = new QAction( QIcon( ":/icons/encrypt.png" ), "&Create EncFS Volume", this );
 
 	NBEncFS *encfs = new NBEncFS( QString(), QString(), mParent );
@@ -139,7 +139,7 @@ QList<QAction*> NBCrypt::actions( QStringList nodes ) {
 /* Interface type: preview, rename etc */
 NBPluginInterface::Interface NBCrypt::interface() {
 
-	return NBPluginInterface::ContextInterface;
+	return NBPluginInterface::ActionInterface;
 };
 
 /* Interface type: preview, rename etc */
@@ -148,10 +148,10 @@ NBPluginInterface::Type NBCrypt::type() {
 	return NBPluginInterface::Enhancement;
 };
 
-/* Plugin load context */
-NBPluginInterface::Context NBCrypt::context() {
+/* Plugin load contexts */
+NBPluginInterface::Contexts NBCrypt::contexts() {
 
-	return NBPluginInterface::All;
+	return Contexts() << NBPluginInterface::File << NBPluginInterface::Dir << NBPluginInterface::Files << NBPluginInterface::Dirs;
 };
 
 /* Mimetypes handled by the plugin */

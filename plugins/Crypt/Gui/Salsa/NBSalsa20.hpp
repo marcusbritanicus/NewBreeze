@@ -8,6 +8,7 @@
 
 #include <Global.hpp>
 #include <Salsa20.hpp>
+#include <NBPasswordDialog.hpp>
 #include <NBPasswordInput.hpp>
 #include <NBTools.hpp>
 
@@ -24,7 +25,14 @@ class NBSalsa20 : public QObject {
 		QWidget *mParent;
 		QString mFilePath;
 
-	private slots:
+	public slots:
 		void encrypt();
 		void decrypt();
+		void changePass();
+
+	private slots:
+		void validateOldPassword();
+
+	Q_SIGNALS:
+		void proceed( bool );
 };

@@ -43,8 +43,8 @@ class NBCrypt : public QObject, NBPluginInterface {
 		/* Interface type: preview, rename etc */
 		NBPluginInterface::Type type();
 
-		/* Plugin load context */
-		NBPluginInterface::Context context();
+		/* Plugin load contexts */
+		NBPluginInterface::Contexts contexts();
 
 		/* Mimetypes handled by the plugin */
 		QStringList mimetypes();

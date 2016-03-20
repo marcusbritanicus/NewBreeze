@@ -7,28 +7,9 @@
 #pragma once
 
 #include <Global.hpp>
+#include <NBPasswordEdit.hpp>
 #include <NBPasswordInput.hpp>
 #include <NBTools.hpp>
-
-class NBPasswordEdit : public QLabel {
-	Q_OBJECT
-
-	public:
-		NBPasswordEdit( QWidget *parent );
-
-		QString text();
-		void setText( QString );
-
-	private:
-		QString mText;
-
-	protected:
-		void mousePressEvent( QMouseEvent *mEvent );
-		void mouseReleaseEvent( QMouseEvent *mEvent );
-
-	Q_SIGNALS:
-		void textChanged( const QString& );
-};
 
 class NBNewEncFS : public QDialog {
 	Q_OBJECT

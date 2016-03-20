@@ -75,13 +75,13 @@ void NBSalsa20::makeKeyFromString( QString text, uint8_t *key ) {
 
 void NBSalsa20::encrypt() {
 
-	PasswordInput *pInput = new PasswordInput( qobject_cast<QWidget*>( parent() ) );
+	NBPasswordDialog *pDlg = new NBPasswordDialog( false, qobject_cast<QWidget*>( parent() ) );
 	Salsa20 s20;
-	if ( pInput->exec() == QDialog::Accepted ) {
+	if ( pDlg->exec() == QDialog::Accepted ) {
 
 		/* Get the password */
-		QString password = pInput->password();
-		pInput->clear();
+		QString password = pDlg->password();
+		pDlg->clear();
 
 		/* Initialization Vector: */
 		uint8_t iv[ 8 ] = { 0 };
@@ -218,4 +218,133 @@ void NBSalsa20::decrypt() {
 		ifile.close();
 		ofile.close();
 	}
+};
+
+void NBSalsa20::changePass() {
+
+	QMessageBox::warning(
+		mParent,
+		"NewBreeze - Warning",
+		"<p>Please note that I have <b>no way of validating the current password.</b> Due to the structure of this cipher, "
+		"it will just process the file irrespective of the password.</p>"
+		"<p>Inputting the <b>wrong password</b> as your current password could <b>destroy the contents</b> of your file "
+		"forever. Kindly proceed with <b>extreme caution</b>.</p>"
+		"<p><center><b><font color='red'>You are hereby warned.</font</b></center></p>"
+	);
+
+	NBPasswordDialog *pDlg = new NBPasswordDialog( true, qobject_cast<QWidget*>( parent() ) );
+
+	/* By pass the true password validation, as the password cannot be validated */
+	connect( pDlg, SIGNAL( oldPassword( QString ) ), this, SLOT( validateOldPassword() ) );
+	connect( this, SIGNAL( proceed( bool ) ), pDlg, SLOT( setValidated( bool ) ) );
+
+	if ( pDlg->exec() != QDialog::Accepted )
+		return;
+
+	/* Get the passwords */
+	QString oPassword = pDlg->oldPassword();
+	QString nPassword = pDlg->password();
+	pDlg->clear();
+
+	/* Create the Salsa Cipher objects */
+	Salsa20 decoder;
+	Salsa20 encoder;
+
+	/* Setup old Salsa20 Cipher */
+	uint8_t ivOld[ 8 ] = { 0 };
+	makeIVFromString( oPassword, ivOld );
+
+	/* Get the hashed password to be used */
+	#if QT_VERSION >= 0x050100
+		oPassword = QCryptographicHash::hash( oPassword.toUtf8(), QCryptographicHash5::Sha3_256 ).toHex();
+	#else
+		oPassword = QCryptographicHash5::hash( oPassword.toUtf8(), QCryptographicHash5::Sha3_256 ).toHex();
+	#endif
+
+	uint8_t passwdOld[ 32 ] = { 0 };
+	makeKeyFromString( oPassword, passwdOld );
+
+	decoder.setKey( passwdOld );
+	decoder.setIv( ivOld );
+	/* ------------------------ */
+
+	/* Setup New Salsa20 Cipher */
+	uint8_t ivNew[ 8 ] = { 0 };
+	makeIVFromString( nPassword, ivNew );
+
+	/* Get the hashed password to be used */
+	#if QT_VERSION >= 0x050100
+		nPassword = QCryptographicHash::hash( nPassword.toUtf8(), QCryptographicHash5::Sha3_256 ).toHex();
+	#else
+		nPassword = QCryptographicHash5::hash( nPassword.toUtf8(), QCryptographicHash5::Sha3_256 ).toHex();
+	#endif
+
+	uint8_t passwdNew[ 32 ] = { 0 };
+	makeKeyFromString( nPassword, passwdNew );
+
+	encoder.setKey( passwdNew );
+	encoder.setIv( ivNew );
+	/* ------------------------ */
+
+	QFile ifile( mFilePath );
+	if ( not ifile.open( QFile::ReadOnly ) ) {
+		QMessageBox::information(
+			mParent,
+			"NewBreeze - File Encryption Failed",
+			"I am unable to open the encrypted file for reading. This may be because you do not have read permission in this directory. "
+			"Please gain sufficient permissions and try again."
+		);
+
+		return;
+	}
+
+	/* Output filepath */
+	QString oFilePath = mFilePath + QDateTime::currentDateTime().toString( ".yyyyMMddThhmmss" );
+
+	QFile ofile( oFilePath );
+	if ( not ofile.open( QFile::WriteOnly ) ) {
+		QMessageBox::information(
+			mParent,
+			"NewBreeze - File Encryption Failed",
+			"I am unable to open the encrypted file for writing. This may be because you do not have write permission in this directory. "
+			"Please gain sufficient permissions and try again."
+		);
+
+		return;
+	}
+
+	uint8_t *block;
+	while ( not ifile.atEnd() ) {
+		QByteArray ba = ifile.read( 8192 );
+		block = reinterpret_cast<uint8_t*>( ba.data() );
+
+		/* If 8192 bytes were read, then process it as a block */
+		if ( ba.length() == 8192 ) {
+
+			decoder.processBlocks( block, block, 128 );
+			encoder.processBlocks( block, block, 128 );
+			ofile.write( reinterpret_cast<const char*>( block ), 8192 );
+		}
+
+		/* Otherwise process it as bytes */
+		else {
+
+			decoder.processBytes( block, block, ba.length() );
+			encoder.processBytes( block, block, ba.length() );
+			ofile.write( reinterpret_cast<const char*>( block ), ba.length() );
+		}
+	}
+
+	ifile.close();
+	ofile.close();
+
+	unlink( mFilePath.toLocal8Bit().data() );
+	rename( oFilePath.toLocal8Bit().data(), mFilePath.toLocal8Bit().data() );
+};
+
+void NBSalsa20::validateOldPassword() {
+
+	qDebug() << "Validating password:" << "[Done]";
+	qDebug() << "Firing proceed( true )";
+	emit proceed( true );
 };

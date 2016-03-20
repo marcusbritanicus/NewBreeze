@@ -34,12 +34,15 @@ class NBPluginInterface {
 		/* Plugin Interface: Where will the plugin be used */
 		enum Interface {
 			AnyInterface			= 0xC5F4A6,			// Show for all interfaces
-			SideBarInterface,							// Alternative/Enhancement for sidebar
-			InfoBarInterface,							// Alternative for infobar
-			RenameInterface,							// Alternative/Enhancement for Rename
-			MimeTypeInterface,							// Special handling ofspecific mimetypes
-			CreateInterface,							// Creation of new types of nodes
-			ContextInterface,							// Enhancement for ContextMenu
+			PreviewInterface,							// File Preview Enhancement (To be integrated from NBPreviewInterface)	> Peek (Ctrl+Return)
+			SideBarInterface,							// Alternative/Enhancement for sidebar									> No actions
+			InfoBarInterface,							// Alternative for infobar												> No actions
+			RenameInterface,							// Alternative/Enhancement for Rename									> Rename (F2)
+			MimeTypeInterface,							// Special handling of specific mimetypes								> 'Actions' Menu
+			CreateInterface,							// Creation of new types of nodes										> 'New' Menu
+			ActionInterface,							// Enhancement for ContextMenu											> 'Actions' Menu
+			PropertiesInterface,						// Alternative for Properties Dialog									> Properties (Alt+Return)
+			PermissionsInterface,						// Alternative for ContextMenu											> Permissions (Alt+Shift+Return)
 		};
 
 		/* Plugin Type: How does the plugin work */
@@ -60,6 +63,8 @@ class NBPluginInterface {
 			None										// This is applicable for selections
 		};
 
+		typedef QList<Context> Contexts;
+
 		virtual ~NBPluginInterface() {};
 
 		/* Name of the plugin */
@@ -71,14 +76,14 @@ class NBPluginInterface {
 		/* The QAction */
 		virtual QList<QAction*> actions( QStringList ) = 0;
 
-		/* Plugin load context */
-		virtual Context context() = 0;
-
 		/* Interface type: preview, rename etc */
 		virtual Interface interface() = 0;
 
 		/* Interface type: preview, rename etc */
 		virtual Type type() = 0;
+
+		/* Plugin load context */
+		virtual Contexts contexts() = 0;
 
 		/* Mimetypes handled by the plugin */
 		virtual QStringList mimetypes() = 0;

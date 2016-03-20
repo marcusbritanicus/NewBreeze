@@ -6,58 +6,6 @@
 
 #include <NBNewEncFS.hpp>
 
-NBPasswordEdit::NBPasswordEdit( QWidget *parent ) : QLabel( parent ) {
-
-	QLabel::setText( "<font color='gray'>Click to set the password</font>" );
-
-	setAlignment( Qt::AlignCenter );
-	setFixedHeight( 32 );
-
-	setStyleSheet( "border: 1px solid lightgray; border-radius: 2px; background-color: white;" );
-
-	setMouseTracking( true );
-};
-
-QString NBPasswordEdit::text() {
-
-	return mText;
-};
-
-void NBPasswordEdit::setText( QString txt ) {
-
-	if ( not txt.count() ) {
-
-		mText.clear();
-		QLabel::setText( "<font color='gray'>Click to set the password</font>" );
-		return;
-	}
-
-	mText = txt;
-
-	emit textChanged( txt );
-	QLabel::setText( QString::fromUtf8( "\u2219\u2219\u2219\u2219\u2219\u2219\u2219\u2219\u2219\u2219" ) );
-};
-
-void NBPasswordEdit::mousePressEvent( QMouseEvent *mEvent ) {
-
-	setStyleSheet( "border: 1px solid lightblue;" );
-	mEvent->accept();
-};
-
-void NBPasswordEdit::mouseReleaseEvent( QMouseEvent *mEvent ) {
-
-	PasswordInput *pInput = new PasswordInput( qobject_cast<QWidget*>( parent() ) );
-
-	if ( pInput->exec() == QDialog::Accepted ) {
-
-		setText( pInput->password() );
-		pInput->clear();
-	}
-
-	setStyleSheet( "border: 1px solid lightgray; border-radius: 2px; background-color: white;" );
-	mEvent->accept();
-};
-
 NBNewEncFS::NBNewEncFS( QString encPath, QString decPath, QWidget *parent ) : QDialog( parent ) {
 
 	/* Init the resources */

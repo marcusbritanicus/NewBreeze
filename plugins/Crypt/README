@@ -5,14 +5,14 @@ A transparent files and folders encryption plugin for NewBreeze.
 
 This plugin consists of two parts
   - NBEncFS
-      This provides Qt interface for the commandline program encfs. Currently only mounting and unmonting is possible.
-      Passowrd chaning cannot be done.
+      This provides Qt interface for the commandline program encfs. Currently only mounting and unmounting is possible.
+      Passowrd changing cannot be done.
       For more information on encfs visit their website: http://www.arg0.net/encfs
 
   - NBSalsa20
-      This provides the Qt interface to Salsa20 Stream Cipher. Encryption and decryption are possible, however changing password is yet to be implemented
+      This provides the Qt interface to Salsa20 Stream Cipher. Encryption, decryption and changing the password are possible.
       This is the implementation taken from https://github.com/everard/Salsa20, with some changes (removal of ucstk namespace, and reduction of indentation)
-      Note: Large files take long time to encode/decode, and will be blocking, no async operation available.
+      Note: Large files take long time to encode/decode, and will be blocking, no async operation available as of now.
       For more information on Salsa visit Salsa20 website: https://cr.yp.to/salsa20.html
 
 Note:

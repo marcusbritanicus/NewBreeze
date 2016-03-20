@@ -7,6 +7,7 @@
 #include <NBContextMenu.hpp>
 #include <NBFolderView.hpp>
 #include <NBPluginInterface.hpp>
+#include <NBPluginManager.hpp>
 
 NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QString dir, QWidget *parent ) : QMenu( parent ) {
 	/*
@@ -31,6 +32,7 @@ NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QS
 			connect( uncompressAct, SIGNAL( triggered() ), this, SLOT( extract() ) );
 			addAction( uncompressAct );
 		}
+
 		else {
 			QAction *compressAct = new QAction( QIcon( ":/icons/archive.png" ), tr( "&Create Archive" ), this );
 			connect( compressAct, SIGNAL( triggered() ), this, SLOT( compress() ) );
@@ -142,7 +144,30 @@ void NBCustomActionsMenu::buildCustomActionsMenu() {
 			}
 		}
 
+		addSeparator();
 		actionSettings.endGroup();
+	}
+
+	/* Plugins based actions */
+	NBPluginManager *pMgr = NBPluginManager::instance();
+	Q_FOREACH( QString pluginSo, pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::Files, QString() ) ) {
+		QPluginLoader loader( pluginSo );
+		QObject *plugin = loader.instance();
+		if ( plugin ) {
+			NBPluginInterface *interface = qobject_cast<NBPluginInterface*>( plugin );
+			if ( interface ) {
+				QStringList sources;
+				Q_FOREACH( QModelIndex idx, selection )
+					sources << QDir( workingDir ).filePath( idx.data().toString() );
+
+				QList<QAction*> actions = interface->actions( sources );
+				Q_FOREACH( QAction *act, actions )
+					addAction( act );
+
+				if ( actions.count() )
+					addSeparator();
+			}
+		}
 	}
 };
 
@@ -505,17 +530,6 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 		connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 
-		/* If we have an encrypted volume, add a mount action */
-		QPluginLoader loader( "/home/cosmos/.config/NewBreeze/plugins/libNBCrypt.so" );
-		QList<QAction*> actions;
-		QObject *plugin = loader.instance();
-		if ( plugin ) {
-			NBPluginInterface *interface = qobject_cast<NBPluginInterface*>( plugin );
-			if ( interface ) {
-				actions = interface->actions( QStringList() );
-			}
-		}
-
 		// File/directory sorting
 		QMenu *sortMenu = new QMenu( "&Sort by" );
 		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
@@ -531,8 +545,6 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		menu->addSeparator();
 
 		menu->addMenu( addToCatalogMenu );
-		if ( actions.count() )
-			menu->addAction( actions.at( 0 ) );
 		menu->addSeparator();
 
 		menu->addAction( pasteAct );
@@ -596,32 +608,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 			connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 			menu->addMenu( addToCatalogMenu );
 
-			/* If we have an encrypted volume, add a mount action */
-			QPluginLoader loader( "/home/cosmos/.config/NewBreeze/plugins/libNBCrypt.so" );
-			QObject *plugin = loader.instance();
-			if ( plugin ) {
-				NBPluginInterface *interface = qobject_cast<NBPluginInterface*>( plugin );
-				if ( interface ) {
-					QList<QAction*> actions = interface->actions( QStringList() << fsModel->nodePath( selectedList[ 0 ].data().toString() ) );
-					if ( actions.count() )
-						menu->addAction( actions.at( 0 ) );
-				}
-			}
 			menu->addSeparator();
-		}
-
-		/* If we have a file, add a encrypt/decrypt action */
-		QPluginLoader loader( "/home/cosmos/.config/NewBreeze/plugins/libNBCrypt.so" );
-		QObject *plugin = loader.instance();
-		if ( plugin ) {
-			NBPluginInterface *interface = qobject_cast<NBPluginInterface*>( plugin );
-			if ( interface ) {
-				QList<QAction*> actions = interface->actions( QStringList() << fsModel->nodePath( selectedList[ 0 ].data().toString() ) );
-				if ( actions.count() ) {
-					menu->addAction( actions.at( 0 ) );
-					menu->addSeparator();
-				}
-			}
 		}
 
 		menu->addMenu( customMenu );

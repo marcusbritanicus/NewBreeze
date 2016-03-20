@@ -58,12 +58,36 @@ QString NBPluginManager::pluginForMimeType( QString mimeName ) {
 	return bestPlugin;
 };
 
+QStringList NBPluginManager::plugins( NBPluginInterface::Interface iface, NBPluginInterface::Type type, NBPluginInterface::Context ctxt, QString mime ) {
+
+	QStringList plugins;
+	Q_FOREACH( PluginCapability *pCap, mPluginCapabilityList ) {
+		bool truth = true;
+		truth &= ( pCap->interface == iface );
+		truth &= ( pCap->type == type );
+		truth &= (bool)pCap->contexts.contains( ctxt );
+		if ( mime.count() )
+			truth &= (bool)pCap->mimeTypes.contains( mime );
+
+		if ( truth )
+			plugins << pCap->name;
+	}
+
+	return plugins;
+};
+
 NBPluginManager::NBPluginManager() {
 
 	reloadPlugins();
 };
 
 void NBPluginManager::reloadPlugins() {
+
+	reloadPeekPlugins();
+	reloadOtherPlugins();
+};
+
+void NBPluginManager::reloadPeekPlugins() {
 
 	/* For now we will be reading just the plugins folder of the home directory */
 	QStringList pluginPaths;
@@ -112,4 +136,53 @@ void NBPluginManager::reloadPlugins() {
 
 	pluginPriorities.endGroup();
 	pluginPriorities.sync();
+};
+
+void NBPluginManager::reloadOtherPlugins() {
+
+	/* For now we will be reading just the plugins folder of the home directory */
+	QStringList pluginPaths;
+	#if QT_VERSION >= 0x050000
+		pluginPaths << "/usr/share/newbreeze/plugins5/" << NBXdg::home() + "/.config/NewBreeze/plugins5/";
+	#else
+		pluginPaths << "/usr/share/newbreeze/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
+	#endif
+
+	QStringList pluginNames;
+	Q_FOREACH( QString path, pluginPaths ) {
+		QDir pPathDir( path );
+		Q_FOREACH( QString pluginSo, pPathDir.entryList( QStringList() << "*.so", QDir::Files, QDir::Name ) ) {
+			QPluginLoader loader( pPathDir.absoluteFilePath( pluginSo ) );
+			QObject *plugin = loader.instance();
+			if ( plugin ) {
+				NBPluginInterface *interface = qobject_cast<NBPluginInterface*>( plugin );
+				if ( not interface )
+					continue;
+
+				if ( pluginNames.contains( pluginSo ) ) {
+					PluginCapability *oldPCap = mPluginCapabilityList.at( pluginNames.indexOf( pluginSo ) );
+					/* If there is an newer version already registered, we skip this one */
+					if ( oldPCap->version > interface->version() ) {
+						continue;
+					}
+
+					/* We remove the existing instance and insert a new one */
+					else {
+						mPluginCapabilityList.removeAt( pluginNames.indexOf( pluginSo ) );
+						pluginNames.removeAll( pluginSo );
+					}
+				}
+
+				pluginNames << pluginSo;
+				PluginCapability *pcap = new PluginCapability;
+				pcap->name = pPathDir.absoluteFilePath( pluginSo );
+				pcap->interface = interface->interface();
+				pcap->type = interface->type();
+				pcap->contexts = interface->contexts();
+				pcap->mimeTypes = interface->mimetypes();
+
+				mPluginCapabilityList << pcap;
+			}
+		}
+	}
 };

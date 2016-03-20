@@ -60,6 +60,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 # Headers
 HEADERS += Core/Circle/NBCircle.hpp
 HEADERS += Core/Tools/NBTools.hpp
+HEADERS += Gui/Common/NBPasswordDialog.hpp
+HEADERS += Gui/Common/NBPasswordEdit.hpp
 HEADERS += Gui/Common/NBPasswordInput.hpp
 HEADERS += Gui/Common/NBPatternPad.hpp
 HEADERS += Gui/EncFS/NBEncFS.hpp
@@ -70,6 +72,8 @@ HEADERS += NBCrypt.hpp
 # Sources
 SOURCES += Core/Circle/NBCircle.cpp
 SOURCES += Core/Tools/NBTools.cpp
+SOURCES += Gui/Common/NBPasswordDialog.cpp
+SOURCES += Gui/Common/NBPasswordEdit.cpp
 SOURCES += Gui/Common/NBPasswordInput.cpp
 SOURCES += Gui/Common/NBPatternPad.cpp
 SOURCES += Gui/EncFS/NBEncFS.cpp
