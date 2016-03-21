@@ -195,7 +195,7 @@ void NBDevicesIcon::mouseMoveEvent( QMouseEvent *mEvent ) {
 void NBDevicesIcon::enterEvent( QEvent *eEvent ) {
 
 	if ( dndEntry ) {
-		eEvent->acceot();
+		eEvent->accept();
 		return;
 	}
 
@@ -206,9 +206,10 @@ void NBDevicesIcon::enterEvent( QEvent *eEvent ) {
 	eEvent->accept();
 };
 
-void NBDevicesIcon::enterEvent( QEvent *eEvent ) {
+void NBDevicesIcon::leaveEvent( QEvent *eEvent ) {
 
 	dndEntry = false;
+	eEvent->accept();
 };
 
 void NBDevicesIcon::dragEnterEvent( QDragEnterEvent *deEvent ) {
@@ -222,7 +223,7 @@ void NBDevicesIcon::dragEnterEvent( QDragEnterEvent *deEvent ) {
 	deEvent->accept();
 };
 
-void NBDevicesIcon::dragEnterEvent( QDragLeaveEvent *dlEvent ) {
+void NBDevicesIcon::dragLeaveEvent( QDragLeaveEvent *dlEvent ) {
 
 	dndEntry = false;
 	dlEvent->accept();
