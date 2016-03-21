@@ -7,7 +7,9 @@
 #pragma once
 
 #include <Global.hpp>
+#include <NBTools.hpp>
 #include <NBDeviceInfo.hpp>
+#include <NBProcessManager.hpp>
 
 class NBDeviceAction;
 class NBDeviceMenu;
@@ -74,6 +76,8 @@ class NBDevicesIcon : public QWidget {
 
 		NBDeviceMenu *devView;
 
+		bool dndEntry;
+
 	private slots:
 		void showDevices();
 		void clickDrive( QAction* );
@@ -84,6 +88,10 @@ class NBDevicesIcon : public QWidget {
 		void mouseMoveEvent( QMouseEvent* );
 
 		void enterEvent( QEvent* );
+		void leaveEvent( QEvent* );
+
+		void dragEnterEvent( QDragEnterEvent* );
+		void dragLeaveEvent( QDragLeaveEvent* );
 
 		void timerEvent( QTimerEvent * );
 
@@ -114,8 +122,13 @@ class NBDeviceAction : public QWidget {
 
 	protected :
 		void paintEvent( QPaintEvent* );
+
 		void enterEvent( QEvent* );
 		void leaveEvent( QEvent* );
+
+		void dragEnterEvent( QDragEnterEvent* );
+		void dragMoveEvent( QDragMoveEvent* );
+		void dropEvent( QDropEvent* );
 };
 
 class NBDeviceMenu : public QMenu {
@@ -124,6 +137,7 @@ class NBDeviceMenu : public QMenu {
 	public:
 		NBDeviceMenu( QWidget *parent );
 
+		void clear();
 		void addAction( QWidgetAction *act );
 
 	private:

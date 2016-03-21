@@ -40,6 +40,7 @@ class NBPluginInterface {
 			RenameInterface,							// Alternative/Enhancement for Rename									> Rename (F2)
 			MimeTypeInterface,							// Special handling of specific mimetypes								> 'Actions' Menu
 			CreateInterface,							// Creation of new types of nodes										> 'New' Menu
+			SendToInterface,							// Enhancement for Send to menu											> 'Send to' Menu
 			ActionInterface,							// Enhancement for ContextMenu											> 'Actions' Menu
 			PropertiesInterface,						// Alternative for Properties Dialog									> Properties (Alt+Return)
 			PermissionsInterface,						// Alternative for ContextMenu											> Permissions (Alt+Shift+Return)

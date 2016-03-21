@@ -780,7 +780,6 @@ void NBFolderView::prepareIO() {
 		progress->startTime = QTime::currentTime();
 
 		proc->start();
-		qDebug() << progress->state;
 	}
 
 	else {

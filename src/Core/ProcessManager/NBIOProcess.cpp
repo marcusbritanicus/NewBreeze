@@ -245,6 +245,7 @@ void NBIOProcess::copyFile( QString srcFile ) {
 	if ( ( iStat.st_dev == oStat.st_dev ) and ( mProgress->type == NBProcess::Move ) ) {
 		if ( rename( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data(), currentFile.toLocal8Bit().data() ) ) {
 			qDebug() << "Error moving file:" << srcFile;
+			qDebug() << "[Error]:" << strerror( errno );
 			errorNodes << srcFile;
 		}
 		return;
@@ -408,6 +409,8 @@ void NBIOProcess::run() {
 				QString tgtNode = mProgress->targetDir + node;
 				if ( rename( srcNode.toLocal8Bit().data(), tgtNode.toLocal8Bit().data() ) != 0 ) {
 					qDebug() << "Error moving:" << node;
+					qDebug() << "[Error]:" << strerror( errno );
+
 					errorNodes << node;
 				}
 			}
@@ -450,6 +453,7 @@ void NBIOProcess::run() {
 		struct stat st;
 		if ( stat( ( mProgress->sourceDir + node ).toLocal8Bit().data(), &st ) != 0 ) {
 			qDebug() << "Stat failed" << node;
+			qDebug() << "[Error]:" << strerror( errno );
 			errorNodes << node;
 		}
 
@@ -459,7 +463,6 @@ void NBIOProcess::run() {
 			case S_IFREG: {
 
 				/* Copy a regular file */
-				qDebug() << "Copying:" << node;
 				copyFile( node );
 				break;
 			}
@@ -467,10 +470,10 @@ void NBIOProcess::run() {
 			case S_IFLNK: {
 
 				/* Create a symbolic link */
-				qDebug() << "Symlink:" << node << "->" << readLink( node );
 				symlink( readLink( node ).toLocal8Bit().data(), ( mProgress->targetDir + node ).toLocal8Bit().data() );
 				if ( not exists( ( mProgress->targetDir + node ) ) ) {
 					qDebug() << "Error creating symlink" << node << "->" << readLink( node );
+					qDebug() << "[Error]:" << strerror( errno );
 					errorNodes << node;
 				}
 			}
@@ -498,6 +501,7 @@ void NBIOProcess::run() {
 			/* sourceList will be just a list of files */
 			if ( unlink( ( mProgress->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
 				qDebug() << "Error removing original file:" << mProgress->sourceDir + node;
+				qDebug() << "[Error]:" << strerror( errno );
 				errorNodes << node;
 			}
 		}
@@ -506,6 +510,7 @@ void NBIOProcess::run() {
 			if ( isDir( mProgress->sourceDir + node ) ) {
 				if ( not removeDir( mProgress->sourceDir + node ) ) {
 					qDebug() << "Error removing original directory:" << mProgress->sourceDir + node;
+					qDebug() << "[Error]:" << strerror( errno );
 					errorNodes << node;
 				}
 			}
@@ -513,6 +518,7 @@ void NBIOProcess::run() {
 			else if ( exists( mProgress->sourceDir + node ) ) {
 				if ( unlink( ( mProgress->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
 					qDebug() << "Error removing original file:" << mProgress->sourceDir + node;
+					qDebug() << "[Error]:" << strerror( errno );
 					errorNodes << node;
 				}
 			}

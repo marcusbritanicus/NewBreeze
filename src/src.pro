@@ -352,7 +352,7 @@ unix {
 	}
 	BINDIR = $$PREFIX/bin
 
-	INSTALLS += target header desktop icons data
+	INSTALLS += target header desktop icons data mime
 	target.path = $$BINDIR
 
 	header.path = $$PREFIX/include/newbreeze
@@ -366,6 +366,9 @@ unix {
 
 	data.path = $$PREFIX/share/newbreeze/
 	data.files = README Changelog ReleaseNotes
+
+	mime.path = $$PREFIX/share/mime/packages/
+	mime.files = Data/x-encrypted-file.xml
 }
 
 DEFINES += "HAVE_POSIX_OPENPT"

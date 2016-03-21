@@ -2082,19 +2082,70 @@ void NBIconView::emitCML() {
 	QStringList args = act->data().toStringList();
 	QString mtpt = args.takeLast();
 
+	if ( not mtpt.endsWith( "/" ) )
+		mtpt += "/";
+
 	if ( act->text().contains( "Copy" ) ) {
 
-		emit copy( args, mtpt );
+		NBProcess::Progress *progress = new NBProcess::Progress;
+		progress->sourceDir = dirName( args.at( 0 ) );
+		progress->targetDir = mtpt;
+
+		QStringList srcList;
+		foreach( QString path, args )
+			srcList << path.replace( progress->sourceDir, "" );
+
+		progress->type = NBProcess::Copy;
+
+		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBProcessManager::instance()->addProcess( progress, proc );
+
+		progress->startTime = QTime::currentTime();
+
+		proc->start();
 	}
 
 	else if ( act->text().contains( "Move" ) ) {
 
-		emit move( args, mtpt );
+		NBProcess::Progress *progress = new NBProcess::Progress;
+		progress->sourceDir = dirName( args.at( 0 ) );
+		progress->targetDir = mtpt;
+
+		QStringList srcList;
+		foreach( QString path, args )
+			srcList << path.replace( progress->sourceDir, "" );
+
+		progress->type = NBProcess::Move;
+
+		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBProcessManager::instance()->addProcess( progress, proc );
+
+		progress->startTime = QTime::currentTime();
+
+		proc->start();
 	}
 
 	else {
 
-		emit link( args, mtpt );
+		QStringList errorNodes;
+		Q_FOREACH( QString path, args ) {
+			if ( symlink( path.toLocal8Bit().data(), ( mtpt + baseName( path ) ).toLocal8Bit().data() ) != 0 ) {
+				errorNodes << path;
+				qDebug() << "Failed to create link for:" << baseName( path );
+				qDebug() << "   " << strerror( errno );
+			}
+		}
+
+		if ( errorNodes.count() ) {
+			QString title = "NewBreeze - Error Creating links";
+			QString text = QString(
+				"Some errors were encountered while creating the symlinks you requested. "
+				"They are listed in the table below. Please check the debug messages to determine the cause of the errors."
+			);
+
+			NBErrorsDialog *errDlg = new NBErrorsDialog( title, text, errorNodes, this );
+			errDlg->exec();
+		}
 	}
 };
 

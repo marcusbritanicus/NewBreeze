@@ -6,12 +6,14 @@
 
 #include <NBDeviceView.hpp>
 
+QMutex mutex;
+
 NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 
-	// Default Pixmap
+	/* Default Pixmap */
 	mPixmap = QPixmap( ":/icons/comp.png" );
 
-	// Flash settings
+	/* Flash settings */
 	alpha = 0;
 	mAlphaDelta = 30;
 	color = palette().color( QPalette::Window ).darker();
@@ -30,13 +32,17 @@ NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 
 	connect( &timer, SIGNAL( timeout() ), this, SLOT( repaint() ) );
 
-	// To track mouse movements
+	/* To track mouse movements */
 	setMouseTracking( true );
 
-	// Set the fixed size of 48 px
+	/* Set the fixed size of 48 px */
 	setFixedSize( 48, 48 );
 
-	// DeviceView
+	/* Drag and Drop */
+	setAcceptDrops( true );
+	dndEntry = true;
+
+	/* DeviceView */
 	devView = new NBDeviceMenu( this );
 	devView->setObjectName( "NBDeviceMenu" );
 	connect( devView, SIGNAL( triggered( QAction* ) ), this, SLOT( clickDrive( QAction* ) ) );
@@ -188,11 +194,38 @@ void NBDevicesIcon::mouseMoveEvent( QMouseEvent *mEvent ) {
 
 void NBDevicesIcon::enterEvent( QEvent *eEvent ) {
 
+	if ( dndEntry ) {
+		eEvent->acceot();
+		return;
+	}
+
 	/* Start the delay timer */
 	delayTimer.stop();
 	delayTimer.start( 250, this );
 
 	eEvent->accept();
+};
+
+void NBDevicesIcon::enterEvent( QEvent *eEvent ) {
+
+	dndEntry = false;
+};
+
+void NBDevicesIcon::dragEnterEvent( QDragEnterEvent *deEvent ) {
+
+	dndEntry = true;
+
+	/* Start the delay timer */
+	delayTimer.stop();
+	delayTimer.start( 250, this );
+
+	deEvent->accept();
+};
+
+void NBDevicesIcon::dragEnterEvent( QDragLeaveEvent *dlEvent ) {
+
+	dndEntry = false;
+	dlEvent->accept();
 };
 
 void NBDevicesIcon::timerEvent( QTimerEvent *tEvent ) {
@@ -285,20 +318,32 @@ void NBDevicesIcon::clickDrive( QAction *act ) {
 
 NBDeviceAction::NBDeviceAction( NBDeviceInfo info, QWidget *parent ) : QWidget( parent ) {
 
+	/* Mouse Tracking */
 	setMouseTracking( true );
 
+	/* Selection background */
 	select = false;
 
+	/* Fixed Item Heights */
 	setFixedHeight( 32 );
 
+	/* Width computation */
 	QFontMetrics fm( font() );
 	setMinimumWidth( qMax( 32 + fm.width( info.driveLabel() ) + 10, 150 ) );
 
+	/*Data for Display  */
 	mDeviceLabel = info.driveLabel();
 	icon = QIcon( ":/icons/" + info.driveType() + ".png" );
 	mMountPoint = info.mountPoint();
 
+	/* Disk Usage */
 	percentUsed = ( int )( info.usedSpace() * 100.0 / info.driveSize() );
+
+	/* Enable drag and drop */
+	setAcceptDrops( true );
+
+	/* Set tooltip */
+	setToolTip( mMountPoint );
 };
 
 QString NBDeviceAction::mountPoint() {
@@ -387,9 +432,64 @@ void NBDeviceAction::leaveEvent( QEvent *lEvent ) {
 	repaint();
 };
 
+void NBDeviceAction::dragEnterEvent( QDragEnterEvent *deEvent ) {
+
+	deEvent->acceptProposedAction();
+};
+
+void NBDeviceAction::dragMoveEvent( QDragMoveEvent *dmEvent ) {
+
+	const QMimeData *mData = dmEvent->mimeData();
+	if ( not mData->hasUrls() ) {
+		dmEvent->ignore();
+		return;
+	}
+
+	else {
+		dmEvent->setDropAction( Qt::CopyAction );
+		dmEvent->accept();
+	}
+};
+
+void NBDeviceAction::dropEvent( QDropEvent *dpEvent ) {
+
+	if ( not dpEvent->mimeData()->hasUrls() ) {
+		dpEvent->ignore();
+		return;
+	}
+
+	/* Get target gui */
+	/* === ====== === */
+
+	NBProcess::Progress *progress = new NBProcess::Progress;
+	progress->sourceDir = dirName( dpEvent->mimeData()->urls().at( 0 ).toLocalFile() );
+	progress->targetDir = mMountPoint;
+
+	QStringList srcList;
+	Q_FOREACH( QUrl url, dpEvent->mimeData()->urls() )
+		srcList << url.toLocalFile().replace( progress->sourceDir, "" );
+
+	progress->type = NBProcess::Copy;
+
+	NBIOProcess *proc = new NBIOProcess( srcList, progress );
+	NBProcessManager::instance()->addProcess( progress, proc );
+
+	progress->startTime = QTime::currentTime();
+
+	proc->start();
+
+	dpEvent->accept();
+};
+
 NBDeviceMenu::NBDeviceMenu( QWidget *parent ) : QMenu( parent ) {
 
 	connect( this, SIGNAL( hovered( QAction* ) ), this, SLOT( highlightAction( QAction* ) ) );
+};
+
+void NBDeviceMenu::clear() {
+
+	QMenu::clear();
+	actionList.clear();
 };
 
 void NBDeviceMenu::addAction( QWidgetAction *act ) {
@@ -400,10 +500,20 @@ void NBDeviceMenu::addAction( QWidgetAction *act ) {
 
 void NBDeviceMenu::highlightAction( QAction *act ) {
 
-	QWidgetAction *wAct = qobject_cast<QWidgetAction*>( act );
+	/* Remove highlighting from all QWidgetActions */
 	Q_FOREACH( QWidgetAction *wa, actionList ) {
 		NBDeviceAction *devAct = qobject_cast<NBDeviceAction*>( wa->defaultWidget() );
-		if ( devAct and wAct )
-			devAct->highlight( wAct == wa );
+			if ( devAct )
+				devAct->highlight( false );
 	}
+
+	/* Get the corresponding QWidgetAction */
+	QWidgetAction *wAct = qobject_cast<QWidgetAction*>( act );
+	if ( not wAct )
+		return;
+
+	/* Highlight only the one which is hovered */
+	NBDeviceAction *devAct = qobject_cast<NBDeviceAction*>( wAct->defaultWidget() );
+	if ( devAct )
+		devAct->highlight( true );
 };
