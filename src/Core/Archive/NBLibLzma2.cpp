@@ -26,20 +26,20 @@
 */
 
 // Local Headers
-#include <NBLibLzma.hpp>
+#include <NBLibLzma2.hpp>
 
 const int MAX_READ_SIZE = 40960;
 
-QString NBLzma::lzmaFileName = QString();
-QString NBLzma::fileName = QString();
+QString NBXz::xzFileName = QString();
+QString NBXz::fileName = QString();
 
-NBLzma::NBLzma( QString archive, NBLzma::Mode openmode, QString file ) {
+NBXz::NBXz( QString archive, NBXz::Mode openmode, QString file ) {
 
-	NBLzma::Mode mode = openmode;
+	NBXz::Mode mode = openmode;
 	lzma_ret ret_xz;
 	switch( mode ) {
-		case NBLzma::READ : {
-			lzmaFileName = QString( archive );
+		case NBXz::READ : {
+			xzFileName = QString( archive );
 			if ( not file.isEmpty() ) {
 				if ( QFileInfo( file ).isDir() ) {
 					fileName = QDir( file ).filePath( QString( archive ) );
@@ -56,17 +56,17 @@ NBLzma::NBLzma( QString archive, NBLzma::Mode openmode, QString file ) {
 				}
 			}
 
-			fdin = fopen( qPrintable( lzmaFileName ), "rb" );
+			fdin = fopen( qPrintable( xzFileName ), "rb" );
 			fdout = fopen( qPrintable( fileName ), "wb" );
 			break;
 		}
 
-		case NBLzma::WRITE : {
-			lzmaFileName = QString( archive );
+		case NBXz::WRITE : {
+			xzFileName = QString( archive );
 			fileName = QString( file );
 
 			fdin = fopen( qPrintable( fileName ), "rb" );
-			fdout = fopen( qPrintable( lzmaFileName ), "wb" );
+			fdout = fopen( qPrintable( xzFileName ), "wb" );
 			break;
 		}
 	}
@@ -74,7 +74,7 @@ NBLzma::NBLzma( QString archive, NBLzma::Mode openmode, QString file ) {
 	Q_UNUSED( ret_xz );
 };
 
-void NBLzma::create() {
+void NBXz::create() {
 
 	#define INTEGRITY_CHECK LZMA_CHECK_CRC64
 	#define IN_BUF_MAX      40960
@@ -100,17 +100,9 @@ void NBLzma::create() {
 	lzma_stream strm = LZMA_STREAM_INIT;
 	lzma_ret ret_xz;
 
-	lzma_options_lzma opts;
-	opts.dict_size = LZMA_DICT_SIZE_DEFAULT;
-	opts.preset_dict = NULL;
-	opts.lc = LZMA_LC_DEFAULT;
-	opts.lp = LZMA_LP_DEFAULT;
-	opts.pb = LZMA_PB_DEFAULT;
-	opts.mode = LZMA_MODE_NORMAL;
-	opts.nice_len = 128;
-	opts.mf = LZMA_MF_BT4;
-	opts.depth = 200;
-	ret_xz = lzma_alone_encoder( &strm, &opts );
+	uint32_t preset = 9 | 1;
+	lzma_check check = LZMA_CHECK_CRC64;
+	ret_xz = lzma_easy_encoder( &strm, preset, check );
 
 	while ( ( !in_finished ) and ( !out_finished ) ) {
 		in_len = fread( in_buf, 1, IN_BUF_MAX, fdin );
@@ -154,13 +146,13 @@ void NBLzma::create() {
 	fclose( fdout );
 }
 
-void NBLzma::extract() {
+void NBXz::extract() {
 
 	lzma_stream strm = LZMA_STREAM_INIT;
 	lzma_ret ret;
 
 	// Initialize the decoder
-	ret = lzma_alone_decoder( &strm, UINT64_MAX );
+	ret = lzma_stream_decoder( &strm, UINT64_MAX, LZMA_CONCATENATED );
 
 	if ( ret != LZMA_OK )
 		return;

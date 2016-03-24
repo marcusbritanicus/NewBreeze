@@ -56,12 +56,11 @@ class NBPluginInterface {
 		enum Context {
 			File					= 0xD50BE8,			// Single File Selection
 			Dir,										// Single Folder Selection
-			Node					= File | Dir,		// Single File/Folder Selection
+			Node,										// Single Selection ( File, Dir, FIFO, Socket, Chr, Block, etc... )
 			Files,										// Multiple File Selection
 			Dirs,    			 						// Multiple Folder Selection
-			Nodes					= Files | Dirs,		// File and Folder Selection
-			All,										// Any Node(s) Selection, including FIFO, CHR and others
-			None										// This is applicable for selections
+			Nodes,										// Single Selection ( File, Dir, FIFO, Socket, Chr, Block, etc... )
+			None										// There is no selection
 		};
 
 		typedef QList<Context> Contexts;

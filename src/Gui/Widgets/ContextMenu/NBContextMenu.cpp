@@ -9,7 +9,7 @@
 #include <NBPluginInterface.hpp>
 #include <NBPluginManager.hpp>
 
-NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QString dir, QWidget *parent ) : QMenu( parent ) {
+NBActionsMenu::NBActionsMenu( QList<QModelIndex> selectedIndexes, QString dir, QWidget *parent ) : QMenu( parent ) {
 	/*
 		*
 		* We set the custom actions based on the indexes
@@ -22,11 +22,23 @@ NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QS
 	workingDir = QString( dir );
 
 	setTitle( tr( "&Actions" ) );
-	setIcon( QIcon( ":/icons/archive.png" ) );
+	setIcon( QIcon( ":/icons/process.png" ) );
 
-	// Actions
-	if ( selectedIndexes.count() == 1 ) {
-		QFileInfo info( QDir( dir ).filePath( selectedIndexes.at( 0 ).data().toString() ) );
+	buildDefaultActions();
+	buildPluginsActions();
+	buildCustomActionsMenu();
+
+	QAction *addActionAct = new QAction( QIcon( ":/icons/list-add.png" ), tr( "Add custo&m action" ), this );
+	connect( addActionAct, SIGNAL( triggered() ), this, SLOT( showCustomActionsDialog() ) );
+
+	addSeparator();
+	addAction( addActionAct );
+};
+
+void NBActionsMenu::buildDefaultActions() {
+
+	if ( selection.count() == 1 ) {
+		QFileInfo info( QDir( workingDir ).filePath( selection.at( 0 ).data().toString() ) );
 		if ( isArchive( info.absoluteFilePath() ) ) {
 			QAction *uncompressAct = new QAction( QIcon( ":/icons/extract.png" ), tr( "E&xtract Archive" ), this );
 			connect( uncompressAct, SIGNAL( triggered() ), this, SLOT( extract() ) );
@@ -47,17 +59,88 @@ NBCustomActionsMenu::NBCustomActionsMenu( QList<QModelIndex> selectedIndexes, QS
 	}
 
 	addSeparator();
-	buildCustomActionsMenu();
-
-	QAction *addActionAct = new QAction( QIcon( ":/icons/list-add.png" ), tr( "Add custo&m action" ), this );
-	connect( addActionAct, SIGNAL( triggered() ), this, SLOT( showCustomActionsDialog() ) );
-	addSeparator();
-	addAction( addActionAct );
 };
 
-void NBCustomActionsMenu::buildCustomActionsMenu() {
+void NBActionsMenu::buildPluginsActions() {
 
-	foreach( QString group, actionSettings.childGroups() ) {
+	quint64 dirs = 0, files = 0, others = 0;
+	Q_FOREACH( QModelIndex idx, selection ) {
+		if ( isDir( QDir( workingDir ).filePath( idx.data().toString() ) ) )
+			dirs++;
+
+		else if ( isFile( QDir( workingDir ).filePath( idx.data().toString() ) ) )
+			files++;
+
+		else
+			others++;
+	}
+
+	QStringList pluginList;
+	NBPluginManager *pMgr = NBPluginManager::instance();
+
+	/* If there are sockets, fifos, etc */
+	if ( others ) {
+		if ( others > 1 )
+			pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::Nodes, QString() );
+
+		else
+			pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::Node, QString() );
+	}
+
+	/* If both files and dirs are selected */
+	else if ( dirs and files )
+		pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::Nodes, QString() );
+
+	/* If only dirs are selected */
+	else if ( dirs ) {
+		if ( dirs > 1 )
+			pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dirs, QString() );
+
+		else
+			pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, QString() );
+	}
+
+	/* If only files are selected */
+	else if ( files ) {
+		if ( files > 1 )
+			pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::Files, QString() );
+
+		else
+			pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::File, QString() );
+	}
+
+	/* If there is no selection */
+	else {
+		pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::Nodes, QString() );
+	}
+
+	/* Plugins based actions */
+	quint64 acts = 0;
+	Q_FOREACH( QString pluginSo, pluginList ) {
+		QPluginLoader loader( pluginSo );
+		QObject *plugin = loader.instance();
+		if ( plugin ) {
+			NBPluginInterface *interface = qobject_cast<NBPluginInterface*>( plugin );
+			if ( interface ) {
+				QStringList sources;
+				Q_FOREACH( QModelIndex idx, selection )
+					sources << QDir( workingDir ).filePath( idx.data().toString() );
+
+				QList<QAction*> actions = interface->actions( sources );
+				acts += actions.count();
+				Q_FOREACH( QAction *act, actions )
+					addAction( act );
+			}
+		}
+	}
+
+	if ( acts )
+		addSeparator();
+};
+
+void NBActionsMenu::buildCustomActionsMenu() {
+
+	Q_FOREACH( QString group, actionSettings.childGroups() ) {
 		actionSettings.beginGroup( group );
 
 		QString name = actionSettings.value( "Name" ).toString();
@@ -144,39 +227,16 @@ void NBCustomActionsMenu::buildCustomActionsMenu() {
 			}
 		}
 
-		addSeparator();
 		actionSettings.endGroup();
-	}
-
-	/* Plugins based actions */
-	NBPluginManager *pMgr = NBPluginManager::instance();
-	Q_FOREACH( QString pluginSo, pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::Files, QString() ) ) {
-		QPluginLoader loader( pluginSo );
-		QObject *plugin = loader.instance();
-		if ( plugin ) {
-			NBPluginInterface *interface = qobject_cast<NBPluginInterface*>( plugin );
-			if ( interface ) {
-				QStringList sources;
-				Q_FOREACH( QModelIndex idx, selection )
-					sources << QDir( workingDir ).filePath( idx.data().toString() );
-
-				QList<QAction*> actions = interface->actions( sources );
-				Q_FOREACH( QAction *act, actions )
-					addAction( act );
-
-				if ( actions.count() )
-					addSeparator();
-			}
-		}
 	}
 };
 
-void NBCustomActionsMenu::extract() {
+void NBActionsMenu::extract() {
 
 	emit extractArchive( QDir( workingDir ).filePath( selection.at( 0 ).data().toString() ) );
 };
 
-void NBCustomActionsMenu::compress() {
+void NBActionsMenu::compress() {
 
 	QStringList archiveList;
 	foreach( QModelIndex idx, selection )
@@ -185,13 +245,13 @@ void NBCustomActionsMenu::compress() {
 	emit addToArchive( archiveList );
 };
 
-void NBCustomActionsMenu::showCustomActionsDialog() {
+void NBActionsMenu::showCustomActionsDialog() {
 
 	NBCustomActions *customActions = new NBCustomActions();
 	customActions->exec();
 };
 
-void NBCustomActionsMenu::doCustomAction() {
+void NBActionsMenu::doCustomAction() {
 
 	QAction *customAct = qobject_cast<QAction*>( sender() );
 
@@ -583,7 +643,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		openWithMenu->setWorkingDirectory( fsModel->currentDir() );
 		openWithMenu->buildMenu( selectedList );
 
-		customMenu = new NBCustomActionsMenu( selectedList, fsModel->currentDir(), this );
+		customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
 		connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
 		connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
 
@@ -642,7 +702,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 		connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 
-		customMenu = new NBCustomActionsMenu( selectedList, fsModel->currentDir(), this );
+		customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
 		connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
 		connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
 

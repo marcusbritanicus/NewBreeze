@@ -8,10 +8,10 @@
 
 NBVfsIcon::NBVfsIcon( QWidget *parent ) : QWidget( parent ) {
 
-	// Default Pixmap
+	/* Default Pixmap */
 	mPixmap = QPixmap( ":/icons/encfs.png" );
 
-	// Flash settings
+	/* Flash settings */
 	alpha = 0;
 	mAlphaDelta = 30;
 	color = palette().color( QPalette::Window ).darker();
@@ -30,16 +30,23 @@ NBVfsIcon::NBVfsIcon( QWidget *parent ) : QWidget( parent ) {
 
 	connect( &timer, SIGNAL( timeout() ), this, SLOT( repaint() ) );
 
-	// To track mouse movements
+	/* To track mouse movements */
 	setMouseTracking( true );
 
-	// Set the fixed size of 48 px
+	/* Set the fixed size of 48 px */
 	setFixedSize( 48, 48 );
 
-	// DeviceView
+	/* Drag and Drop */
+	setAcceptDrops( true );
+	dndEntry = false;
+
+	/* DeviceView */
 	devView = new NBVfsMenu( this );
 	devView->setObjectName( "NBVfsMenu" );
 	connect( devView, SIGNAL( triggered( QAction* ) ), this, SLOT( clickDrive( QAction* ) ) );
+
+	/* ToolTip */
+	setToolTip( "Virtual FS" );
 };
 
 /* Override the QLabel pixmap property handlers */
@@ -188,11 +195,39 @@ void NBVfsIcon::mouseMoveEvent( QMouseEvent *mEvent ) {
 
 void NBVfsIcon::enterEvent( QEvent *eEvent ) {
 
+	if ( dndEntry ) {
+		eEvent->accept();
+		return;
+	}
+
 	/* Start the delay timer */
 	delayTimer.stop();
 	delayTimer.start( 250, this );
 
 	eEvent->accept();
+};
+
+void NBVfsIcon::leaveEvent( QEvent *eEvent ) {
+
+	dndEntry = false;
+	eEvent->accept();
+};
+
+void NBVfsIcon::dragEnterEvent( QDragEnterEvent *deEvent ) {
+
+	dndEntry = true;
+
+	/* Start the delay timer */
+	delayTimer.stop();
+	delayTimer.start( 250, this );
+
+	deEvent->accept();
+};
+
+void NBVfsIcon::dragLeaveEvent( QDragLeaveEvent *dlEvent ) {
+
+	dndEntry = false;
+	dlEvent->accept();
 };
 
 void NBVfsIcon::timerEvent( QTimerEvent *tEvent ) {
@@ -286,20 +321,34 @@ void NBVfsIcon::clickDrive( QAction *act ) {
 
 NBVfsAction::NBVfsAction( NBDeviceInfo info, QWidget *parent ) : QWidget( parent ) {
 
+	/* Mouse Tracking */
 	setMouseTracking( true );
 
+	/* Selection background */
 	select = false;
 
+	/* Fixed Item Heights */
 	setFixedHeight( 32 );
 
+	/* Width computation */
 	QFontMetrics fm( font() );
 	setMinimumWidth( qMax( 32 + fm.width( info.driveLabel() ) + 10, 150 ) );
 
+	/*Data for Display  */
 	mDeviceLabel = info.driveLabel();
 	icon = QIcon( ":/icons/" + info.driveType() + ".png" );
 	mMountPoint = info.mountPoint();
+	if ( not mMountPoint.endsWith( "/" ) )
+		mMountPoint += "/";
 
+	/* Disk Usage */
 	percentUsed = ( int )( info.usedSpace() * 100.0 / info.driveSize() );
+
+	/* Enable drag and drop */
+	setAcceptDrops( true );
+
+	/* Set tooltip */
+	setToolTip( mMountPoint );
 };
 
 QString NBVfsAction::mountPoint() {
@@ -388,9 +437,81 @@ void NBVfsAction::leaveEvent( QEvent *lEvent ) {
 	repaint();
 };
 
+void NBVfsAction::dragEnterEvent( QDragEnterEvent *deEvent ) {
+
+	deEvent->acceptProposedAction();
+};
+
+void NBVfsAction::dragMoveEvent( QDragMoveEvent *dmEvent ) {
+
+	const QMimeData *mData = dmEvent->mimeData();
+	if ( not mData->hasUrls() ) {
+		dmEvent->ignore();
+		return;
+	}
+
+	if ( not isWritable( mMountPoint ) ) {
+		dmEvent->ignore();
+		return;
+	}
+
+	else if ( dirName( dmEvent->mimeData()->urls().at( 0 ).toLocalFile() ) == mMountPoint ) {
+		dmEvent->ignore();
+		return;
+	}
+
+	else {
+		dmEvent->setDropAction( Qt::CopyAction );
+		dmEvent->accept();
+	}
+};
+
+void NBVfsAction::dropEvent( QDropEvent *dpEvent ) {
+
+	if ( not dpEvent->mimeData()->hasUrls() ) {
+		dpEvent->ignore();
+		return;
+	}
+
+	if ( not isWritable( mMountPoint ) ) {
+		dpEvent->ignore();
+		return;
+	}
+
+	if ( dirName( dpEvent->mimeData()->urls().at( 0 ).toLocalFile() ) == mMountPoint ) {
+		dpEvent->ignore();
+		return;
+	}
+
+	NBProcess::Progress *progress = new NBProcess::Progress;
+	progress->sourceDir = dirName( dpEvent->mimeData()->urls().at( 0 ).toLocalFile() );
+	progress->targetDir = mMountPoint;
+
+	QStringList srcList;
+	Q_FOREACH( QUrl url, dpEvent->mimeData()->urls() )
+		srcList << url.toLocalFile().replace( progress->sourceDir, "" );
+
+	progress->type = NBProcess::Copy;
+
+	NBIOProcess *proc = new NBIOProcess( srcList, progress );
+	NBProcessManager::instance()->addProcess( progress, proc );
+
+	progress->startTime = QTime::currentTime();
+
+	proc->start();
+
+	dpEvent->accept();
+};
+
 NBVfsMenu::NBVfsMenu( QWidget *parent ) : QMenu( parent ) {
 
 	connect( this, SIGNAL( hovered( QAction* ) ), this, SLOT( highlightAction( QAction* ) ) );
+};
+
+void NBVfsMenu::clear() {
+
+	QMenu::clear();
+	actionList.clear();
 };
 
 void NBVfsMenu::addAction( QWidgetAction *act ) {
@@ -401,10 +522,20 @@ void NBVfsMenu::addAction( QWidgetAction *act ) {
 
 void NBVfsMenu::highlightAction( QAction *act ) {
 
-	QWidgetAction *wAct = qobject_cast<QWidgetAction*>( act );
+	/* Remove highlighting from all QWidgetActions */
 	Q_FOREACH( QWidgetAction *wa, actionList ) {
 		NBVfsAction *devAct = qobject_cast<NBVfsAction*>( wa->defaultWidget() );
-		if ( devAct and wAct )
-			devAct->highlight( wAct == wa );
+			if ( devAct )
+				devAct->highlight( false );
 	}
+
+	/* Get the corresponding QWidgetAction */
+	QWidgetAction *wAct = qobject_cast<QWidgetAction*>( act );
+	if ( not wAct )
+		return;
+
+	/* Highlight only the one which is hovered */
+	NBVfsAction *devAct = qobject_cast<NBVfsAction*>( wAct->defaultWidget() );
+	if ( devAct )
+		devAct->highlight( true );
 };

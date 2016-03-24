@@ -1,6 +1,6 @@
 /*
 	*
-	* NBLibLzma.hpp - Legacy Lmza header
+	* NBLibLzma2.hpp - The new XZ class header
 	*
 */
 
@@ -10,7 +10,7 @@
 #include <assert.h>
 #include <lzma.h>
 
-class NBLzma {
+class NBXz {
 
 	public:
 		enum LzmaError {
@@ -23,15 +23,15 @@ class NBLzma {
 			WRITE,			// Write a zip file
 		};
 
-		NBLzma( QString, NBLzma::Mode mode, QString file = QString() );
+		NBXz( QString, NBXz::Mode mode, QString file = QString() );
 		void create();
 		void extract();
 
 		static QString fileName;
-		static QString lzmaFileName;
-		static NBLzma::Mode mode;
+		static QString xzFileName;
+		static NBXz::Mode mode;
 
 	private:
 		FILE *fdin, *fdout;
-		int NBLzmaError;
+		int NBXzError;
 };

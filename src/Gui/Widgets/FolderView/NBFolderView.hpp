@@ -56,7 +56,7 @@ class NBFolderView : public QStackedWidget {
 		NBCatalogView *CatalogView;
 
 		NBFileSystemModel *fsModel;
-		NBCustomActionsMenu *customMenu;
+		NBActionsMenu *customMenu;
 
 	private :
 		QModelIndex indexAt( QPoint );

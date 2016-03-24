@@ -12,6 +12,7 @@
 #include <NBLibBZip2.hpp>
 #include <NBLibGZip.hpp>
 #include <NBLibLzma.hpp>
+#include <NBLibLzma2.hpp>
 
 class NBArchive {
 

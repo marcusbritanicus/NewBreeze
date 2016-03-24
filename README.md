@@ -14,7 +14,7 @@ Some of its features are
 * File Association support
 * Provides Categorized List, Icon and Details View
 * Sleek side panel showing drives and boomarks
-* Full drag and drop support (N/A)
+* Full drag and drop support
 * Applications and Catalog View
 * Auto update devices list
 * Custom Folder Icons and Thumbnail Preview

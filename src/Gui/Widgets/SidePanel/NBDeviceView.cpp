@@ -40,12 +40,15 @@ NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 
 	/* Drag and Drop */
 	setAcceptDrops( true );
-	dndEntry = true;
+	dndEntry = false;
 
 	/* DeviceView */
 	devView = new NBDeviceMenu( this );
 	devView->setObjectName( "NBDeviceMenu" );
 	connect( devView, SIGNAL( triggered( QAction* ) ), this, SLOT( clickDrive( QAction* ) ) );
+
+	/* ToolTip */
+	setToolTip( "Devices" );
 };
 
 /* Override the QLabel pixmap property handlers */
@@ -336,6 +339,8 @@ NBDeviceAction::NBDeviceAction( NBDeviceInfo info, QWidget *parent ) : QWidget( 
 	mDeviceLabel = info.driveLabel();
 	icon = QIcon( ":/icons/" + info.driveType() + ".png" );
 	mMountPoint = info.mountPoint();
+	if ( not mMountPoint.endsWith( "/" ) )
+		mMountPoint += "/";
 
 	/* Disk Usage */
 	percentUsed = ( int )( info.usedSpace() * 100.0 / info.driveSize() );
@@ -446,6 +451,16 @@ void NBDeviceAction::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 		return;
 	}
 
+	if ( not isWritable( mMountPoint ) ) {
+		dmEvent->ignore();
+		return;
+	}
+
+	else if ( dirName( dmEvent->mimeData()->urls().at( 0 ).toLocalFile() ) == mMountPoint ) {
+		dmEvent->ignore();
+		return;
+	}
+
 	else {
 		dmEvent->setDropAction( Qt::CopyAction );
 		dmEvent->accept();
@@ -459,8 +474,15 @@ void NBDeviceAction::dropEvent( QDropEvent *dpEvent ) {
 		return;
 	}
 
-	/* Get target gui */
-	/* === ====== === */
+	if ( not isWritable( mMountPoint ) ) {
+		dpEvent->ignore();
+		return;
+	}
+
+	if ( dirName( dpEvent->mimeData()->urls().at( 0 ).toLocalFile() ) == mMountPoint ) {
+		dpEvent->ignore();
+		return;
+	}
 
 	NBProcess::Progress *progress = new NBProcess::Progress;
 	progress->sourceDir = dirName( dpEvent->mimeData()->urls().at( 0 ).toLocalFile() );

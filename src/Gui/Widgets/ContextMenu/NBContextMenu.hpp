@@ -14,15 +14,18 @@
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
 
-class NBCustomActionsMenu : public QMenu {
+class NBActionsMenu : public QMenu {
 	Q_OBJECT
 
 	public:
-		NBCustomActionsMenu( QList<QModelIndex>, QString, QWidget * );
+		NBActionsMenu( QList<QModelIndex>, QString, QWidget * );
 		QStringList command();
 
 	private:
+		void buildDefaultActions();
+		void buildPluginsActions();
 		void buildCustomActionsMenu();
+
 		QList<QModelIndex> selection;
 		QString workingDir;
 

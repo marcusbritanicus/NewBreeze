@@ -22,7 +22,8 @@ QString NBCrypt::version() {
 QList<QAction*> NBCrypt::actions( QStringList nodes ) {
 
 	if ( nodes.count() > 1 ) {
-		/* Create a encrypted folder */
+		/* Create a encrypted folder with multiple input folders */
+		return QList<QAction*>(  );
 	}
 
 	else if ( nodes.count() == 1 ) {
@@ -124,6 +125,7 @@ QList<QAction*> NBCrypt::actions( QStringList nodes ) {
 		else {
 			/* Cannot encrypt this type of node */
 			qDebug() << "Unable to encrypt/decrypt this node:" << path;
+			return QList<QAction*>();
 		}
 	}
 
@@ -151,7 +153,7 @@ NBPluginInterface::Type NBCrypt::type() {
 /* Plugin load contexts */
 NBPluginInterface::Contexts NBCrypt::contexts() {
 
-	return Contexts() << NBPluginInterface::File << NBPluginInterface::Dir << NBPluginInterface::Files << NBPluginInterface::Dirs;
+	return Contexts() << NBPluginInterface::File << NBPluginInterface::Dir << NBPluginInterface::Files << NBPluginInterface::Dirs << NBPluginInterface::None;
 };
 
 /* Mimetypes handled by the plugin */
