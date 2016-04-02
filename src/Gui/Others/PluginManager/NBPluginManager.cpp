@@ -58,9 +58,9 @@ QString NBPluginManager::pluginForMimeType( QString mimeName ) {
 	return bestPlugin;
 };
 
-QStringList NBPluginManager::plugins( NBPluginInterface::Interface iface, NBPluginInterface::Type type, NBPluginInterface::Context ctxt, QString mime ) {
+PluginList NBPluginManager::plugins( NBPluginInterface::Interface iface, NBPluginInterface::Type type, NBPluginInterface::Context ctxt, QString mime ) {
 
-	QStringList plugins;
+	PluginList plugins;
 	Q_FOREACH( PluginCapability *pCap, mPluginCapabilityList ) {
 		bool truth = true;
 		truth &= ( pCap->interface == iface );
@@ -70,7 +70,7 @@ QStringList NBPluginManager::plugins( NBPluginInterface::Interface iface, NBPlug
 			truth &= (bool)pCap->mimeTypes.contains( mime );
 
 		if ( truth )
-			plugins << pCap->name;
+			plugins << pCap->plugin;
 	}
 
 	return plugins;
@@ -180,6 +180,7 @@ void NBPluginManager::reloadOtherPlugins() {
 				pcap->type = interface->type();
 				pcap->contexts = interface->contexts();
 				pcap->mimeTypes = interface->mimetypes();
+				pcap->plugin = interface;
 
 				mPluginCapabilityList << pcap;
 			}

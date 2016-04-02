@@ -18,6 +18,7 @@
 #include <NBMessageDialog.hpp>
 #include <NBPropertiesDialog.hpp>
 #include <NBSettingsManager.hpp>
+#include <NBSideBar.hpp>
 #include <NBSidePanel.hpp>
 #include <NBSystemInfo.hpp>
 #include <NBTerminal.hpp>
@@ -34,6 +35,9 @@ class NewBreeze : public QMainWindow {
 		/* Create our UI */
 		void createGUI();
 
+		/* Setup the SidePanel */
+		void setupSidePanel();
+
 		/* Set window title, icon, size etc */
 		void setWindowProperties();
 
@@ -44,6 +48,7 @@ class NewBreeze : public QMainWindow {
 		void openFile( QString );
 
 		NBAddressBar *AddressBar;
+		NBSideBar *SideBar;
 		NBSidePanel *SidePanel;
 		NBFolderView *FolderView;
 		NBTerminal *Terminal;
@@ -97,9 +102,10 @@ class NewBreeze : public QMainWindow {
 		void toggleSideBarVisible();
 		void showHideTermWidget();
 
+		void quit();
+
 	protected:
 		void closeEvent( QCloseEvent *cEvent );
-		void paintEvent( QPaintEvent *pEvent );
 };
 
 // The code for @f NBStartup() and ReadSettings() is in NBStartup.cpp

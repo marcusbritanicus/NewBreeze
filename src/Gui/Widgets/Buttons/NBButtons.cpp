@@ -8,6 +8,12 @@
 
 NBSegmentButton::NBSegmentButton( QWidget *parent ) : QWidget( parent ) {
 
+	btnGrp = new QButtonGroup();
+
+	myButtonHeight = 28;
+	myWidgetWidth = 28;
+	btnGrp = new QButtonGroup();
+
 	myButtonHeight = 28;
 	myWidgetWidth = 28;
 	setContentsMargins( QMargins() );
@@ -17,7 +23,7 @@ NBSegmentButton::NBSegmentButton( QWidget *parent ) : QWidget( parent ) {
 	btnsLyt->setSpacing( 0 );
 
 	QWidget *btnsBase = new QWidget( this );
-	btnsBase->setObjectName( "btnsBase" );
+	btnsBase->setObjectName( "base" );
 	btnsBase->setLayout( btnsLyt );
 
 	QHBoxLayout *baseLyt = new QHBoxLayout();
@@ -29,11 +35,15 @@ NBSegmentButton::NBSegmentButton( QWidget *parent ) : QWidget( parent ) {
 	setLayout( baseLyt );
 
 	/* Internal styling hack: until we learn to draw smooth rounded rects */
-	setStyleSheet( "QWidget#btnsBase { border: 1px solid lightgray; border-radius: 4px; }" );
+	setStyleSheet( "QWidget#base { border: 1px solid lightgray; border-radius: 4px; }" );
 };
 
 NBSegmentButton::NBSegmentButton( QList<QIcon> icons, QWidget *parent ) : QWidget( parent ) {
 
+	btnGrp = new QButtonGroup();
+
+	myButtonHeight = 28;
+	myWidgetWidth = 28;
 	setContentsMargins( QMargins() );
 
 	btnsLyt = new QHBoxLayout();
@@ -47,13 +57,12 @@ NBSegmentButton::NBSegmentButton( QList<QIcon> icons, QWidget *parent ) : QWidge
 		connect( btn, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
 
 		segments << btn;
+		btnGrp->addButton( btn );
 		btnsLyt->addWidget( btn );
-		if ( i < max - 1 )
-			btnsLyt->addWidget( Separator::vertical() );
 	}
 
 	QWidget *btnsBase = new QWidget( this );
-	btnsBase->setObjectName( "btnsBase" );
+	btnsBase->setObjectName( "base" );
 	btnsBase->setLayout( btnsLyt );
 
 	QHBoxLayout *baseLyt = new QHBoxLayout();
@@ -66,7 +75,7 @@ NBSegmentButton::NBSegmentButton( QList<QIcon> icons, QWidget *parent ) : QWidge
 	setLayout( baseLyt );
 
 	/* Internal styling hack: until we learn to draw smooth rounded rects */
-	setStyleSheet( "QWidget#btnsBase { border: 1px solid lightgray; border-radius: 4px; }" );
+	setStyleSheet( "QWidget#base { border: 1px solid lightgray; border-radius: 4px; }" );
 
 	/* AutoResize */
 	autoResize();
@@ -74,6 +83,10 @@ NBSegmentButton::NBSegmentButton( QList<QIcon> icons, QWidget *parent ) : QWidge
 
 NBSegmentButton::NBSegmentButton( QStringList labels, QWidget *parent ) : QWidget( parent ) {
 
+	btnGrp = new QButtonGroup();
+
+	myButtonHeight = 28;
+	myWidgetWidth = 28;
 	setContentsMargins( QMargins() );
 
 	btnsLyt = new QHBoxLayout();
@@ -87,13 +100,12 @@ NBSegmentButton::NBSegmentButton( QStringList labels, QWidget *parent ) : QWidge
 		connect( btn, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
 
 		segments << btn;
+		btnGrp->addButton( btn );
 		btnsLyt->addWidget( btn );
-		if ( i < max - 1 )
-			btnsLyt->addWidget( Separator::vertical() );
 	}
 
 	QWidget *btnsBase = new QWidget( this );
-	btnsBase->setObjectName( "btnsBase" );
+	btnsBase->setObjectName( "base" );
 	btnsBase->setLayout( btnsLyt );
 
 	QHBoxLayout *baseLyt = new QHBoxLayout();
@@ -105,7 +117,7 @@ NBSegmentButton::NBSegmentButton( QStringList labels, QWidget *parent ) : QWidge
 	setLayout( baseLyt );
 
 	/* Internal styling hack: until we learn to draw smooth rounded rects */
-	setStyleSheet( "QWidget#btnsBase { border: 1px solid lightgray; border-radius: 4px; }" );
+	setStyleSheet( "QWidget#base { border: 1px solid lightgray; border-radius: 4px; }" );
 
 	/* AutoResize */
 	autoResize();
@@ -113,6 +125,10 @@ NBSegmentButton::NBSegmentButton( QStringList labels, QWidget *parent ) : QWidge
 
 NBSegmentButton::NBSegmentButton( QStringList labels, QList<QIcon> icons, QWidget *parent ) : QWidget( parent ) {
 
+	btnGrp = new QButtonGroup();
+
+	myButtonHeight = 28;
+	myWidgetWidth = 28;
 	setContentsMargins( QMargins() );
 
 	btnsLyt = new QHBoxLayout();
@@ -126,13 +142,12 @@ NBSegmentButton::NBSegmentButton( QStringList labels, QList<QIcon> icons, QWidge
 		connect( btn, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
 
 		segments << btn;
+		btnGrp->addButton( btn );
 		btnsLyt->addWidget( btn );
-		if ( i < max - 1 )
-			btnsLyt->addWidget( Separator::vertical() );
 	}
 
 	QWidget *btnsBase = new QWidget( this );
-	btnsBase->setObjectName( "btnsBase" );
+	btnsBase->setObjectName( "base" );
 	btnsBase->setLayout( btnsLyt );
 
 	QHBoxLayout *baseLyt = new QHBoxLayout();
@@ -144,7 +159,7 @@ NBSegmentButton::NBSegmentButton( QStringList labels, QList<QIcon> icons, QWidge
 	setLayout( baseLyt );
 
 	/* Internal styling hack: until we learn to draw smooth rounded rects */
-	setStyleSheet( "QWidget#btnsBase { border: 1px solid lightgray; border-radius: 4px; }" );
+	setStyleSheet( "QWidget#base { border: 1px solid lightgray; border-radius: 4px; }" );
 
 	/* AutoResize */
 	autoResize();
@@ -230,14 +245,12 @@ void NBSegmentButton::insertSegment( NBButton *button, int logicalPos ) {
 
 	if ( logicalPos >= segments.count() ) {
 		segments << button;
-		btnsLyt->addWidget( Separator::vertical() );
 		btnsLyt->addWidget( button );
 	}
 
 	else {
 		segments.insert( logicalPos, button );
 		btnsLyt->insertWidget( logicalPos * 2, button );
-		btnsLyt->insertWidget( logicalPos * 2 + 1, Separator::vertical() );
 	}
 
 	resetStyleSheets();
@@ -250,13 +263,11 @@ void NBSegmentButton::addSegment( NBButton *button ) {
 
 	button->setParent( this );
 
-	if ( segments.count() )
-		btnsLyt->addWidget( Separator::vertical() );
-
 	connect( button, SIGNAL( clicked() ), this, SLOT( handleSegmentClick() ) );
 
 	btnsLyt->addWidget( button );
 	segments << button;
+	btnGrp->addButton( button );
 
 	resetStyleSheets();
 
@@ -267,6 +278,42 @@ void NBSegmentButton::addSegment( NBButton *button ) {
 QSize NBSegmentButton::size() {
 
 	return QSize( myWidgetWidth, myButtonHeight );
+};
+
+int NBSegmentButton::selectionBehavior() {
+
+	return mSelectionBehavior;
+};
+
+void NBSegmentButton::setSelectionBehavior( SelectionBehavior behavior ) {
+
+	mSelectionBehavior = behavior;
+
+	switch( behavior ) {
+		case NBSegmentButton::SelectOne: {
+			btnGrp->setExclusive( true );
+			Q_FOREACH( NBButton *btn, segments )
+				btn->setCheckable( true );
+
+			break;
+		}
+
+		case NBSegmentButton::SelectAll: {
+			btnGrp->setExclusive( false );
+			Q_FOREACH( NBButton *btn, segments )
+				btn->setCheckable( true );
+
+			break;
+		}
+
+		case NBSegmentButton::SelectNone: {
+			btnGrp->setExclusive( false );
+			Q_FOREACH( NBButton *btn, segments )
+				btn->setCheckable( false );
+
+			break;
+		}
+	}
 };
 
 QSize NBSegmentButton::sizeHint() {
@@ -296,11 +343,10 @@ void NBSegmentButton::resetStyleSheets() {
 void NBSegmentButton::autoResize() {
 
 	myWidgetWidth = 0;
-	/* Sum of the width of all the segments + sum of the width of the separators; */
+	/* Sum of the width of all the segments */
 	Q_FOREACH( NBButton *btn, segments )
 		myWidgetWidth += btn->width();
 
-	myWidgetWidth += ( segments.count() - 1 ) * 2;
 	resize( myWidgetWidth, myButtonHeight );
 
 	setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ) );

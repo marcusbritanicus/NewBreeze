@@ -7,18 +7,6 @@
 #include <NBFolderView.hpp>
 #include <NBPluginManager.hpp>
 
-inline static void setXClipBoardData( QStringList paths ) {
-
-	FILE *xclip = popen( "xclip -selection clipboard -t text/uri-list", "w" );
-	Q_FOREACH( QString path, paths ) {
-		QByteArray name = QUrl::fromLocalFile( path + "\n" ).toString().toLocal8Bit();
-		fwrite( name.data(), name.count(), 1, xclip );
-	}
-
-	fflush( xclip );
-	pclose( xclip );
-};
-
 NBFolderView::NBFolderView( QWidget *parent ) : QStackedWidget( parent ) {
 
 	// ClipBoard

@@ -72,22 +72,32 @@ void NBSidePanel::populateSidePanel() {
 	setContentsMargins( QMargins() );
 
 	/* Layout */
-	QVBoxLayout *lyt = new QVBoxLayout();
+	QVBoxLayout *baseLyt = new QVBoxLayout();
 
 	/* No margins or widget spacing */
-	lyt->setContentsMargins( QMargins() );
-	lyt->setSpacing( 0 );
+	baseLyt->setContentsMargins( QMargins() );
+	baseLyt->setSpacing( 0 );
 
 	/* Add the various icons */
-	lyt->addWidget( dirLbl );
-	lyt->addWidget( appLbl );
-	lyt->addWidget( ctlLbl );
-	lyt->addWidget( devIcon );
-	lyt->addWidget( vfsIcon );
-	lyt->addWidget( bmkIcon );
-	lyt->addStretch();
-	lyt->addWidget( trashLabel );
+	baseLyt->addWidget( dirLbl );
+	baseLyt->addWidget( appLbl );
+	baseLyt->addWidget( ctlLbl );
+	baseLyt->addWidget( devIcon );
+	baseLyt->addWidget( vfsIcon );
+	baseLyt->addWidget( bmkIcon );
+	baseLyt->addStretch();
+	baseLyt->addWidget( trashLabel );
 
+	QWidget *base = new QWidget( this );
+	base->setObjectName( "base" );
+	base->setLayout( baseLyt );
+
+	QHBoxLayout *lyt = new QHBoxLayout();
+	lyt->setContentsMargins( QMargins() );
+	lyt->setSpacing( 0 );
+	lyt->addWidget( base );
+
+	setLayout( lyt );
 	setLayout( lyt );
 };
 

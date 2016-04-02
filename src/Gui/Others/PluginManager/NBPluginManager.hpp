@@ -12,6 +12,8 @@
 #include <NBMimeDatabase.hpp>
 #include <NBXdg.hpp>
 
+typedef QList<NBPluginInterface*> PluginList;
+
 typedef struct {
 	/* Name of the plugin with full path */
 	QString name;
@@ -30,6 +32,9 @@ typedef struct {
 
 	/* List of mimetypes handled */
 	QStringList mimeTypes;
+
+	/* The actual plugin */
+	NBPluginInterface* plugin;
 } PluginCapability;
 
 class NBPluginManager {
@@ -45,7 +50,7 @@ class NBPluginManager {
 		QString pluginForMimeType( QString );
 
 		/* Return the plugin path for the given setup */
-		QStringList plugins( NBPluginInterface::Interface, NBPluginInterface::Type, NBPluginInterface::Context, QString );
+		PluginList plugins( NBPluginInterface::Interface, NBPluginInterface::Type, NBPluginInterface::Context, QString );
 
 	public Q_SLOTS:
 		/* Reload the plugins map */

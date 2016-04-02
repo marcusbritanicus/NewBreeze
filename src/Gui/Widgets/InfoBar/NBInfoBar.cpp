@@ -57,12 +57,23 @@ NBInfoBar::NBInfoBar( QWidget *parent ) : QWidget( parent ) {
 
 	/* Layouts */
 	QHBoxLayout *baseLyt = new QHBoxLayout();
+	baseLyt->setContentsMargins( QMargins() );
+	baseLyt->setSpacing( 0 );
 
 	baseLyt->addWidget( iconLbl );
 	baseLyt->addWidget( infoLbl );
 	baseLyt->addStretch( 0 );
 
-	setLayout( baseLyt );
+	QWidget *base = new QWidget( this );
+	base->setObjectName( "base" );
+	base->setLayout( baseLyt );
+
+	QHBoxLayout *lyt = new QHBoxLayout();
+	lyt->setContentsMargins( QMargins() );
+	lyt->setSpacing( 0 );
+	lyt->addWidget( base );
+
+	setLayout( lyt );
 };
 
 void NBInfoBar::updateInfoBarCF( QString folderPath ) {

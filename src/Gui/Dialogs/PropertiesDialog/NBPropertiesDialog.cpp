@@ -493,15 +493,15 @@ void NBPermissionsWidget::readPermissions() {
 	short UR = 0, UW = 0, UE = 0, GR = 0, GW = 0, GE = 0, OR = 0, OW = 0, OE = 0;
 	Q_FOREACH( QString path, pathsList ) {
 		QFile::Permissions perms = QFile::permissions( path );
-		UR += ( perms & QFile::ReadOwner ? 1 : -1 );
-		UW += ( perms & QFile::WriteOwner ? 1 : -1 );
-		UE += ( perms & QFile::ExeOwner ? 1 : -1 );
-		GR += ( perms & QFile::ReadGroup ? 1 : -1 );
-		GW += ( perms & QFile::WriteGroup ? 1 : -1 );
-		GE += ( perms & QFile::ExeGroup ? 1 : -1 );
-		OR += ( perms & QFile::ReadOther ? 1 : -1 );
-		OW += ( perms & QFile::WriteOther ? 1 : -1 );
-		OE += ( perms & QFile::ExeOther ? 1 : -1 );
+		UR += ( ( perms & QFile::ReadOwner ) ? 1 : -1 );
+		UW += ( ( perms & QFile::WriteOwner ) ? 1 : -1 );
+		UE += ( ( perms & QFile::ExeOwner ) ? 1 : -1 );
+		GR += ( ( perms & QFile::ReadGroup ) ? 1 : -1 );
+		GW += ( ( perms & QFile::WriteGroup ) ? 1 : -1 );
+		GE += ( ( perms & QFile::ExeGroup ) ? 1 : -1 );
+		OR += ( ( perms & QFile::ReadOther ) ? 1 : -1 );
+		OW += ( ( perms & QFile::WriteOther ) ? 1 : -1 );
+		OE += ( ( perms & QFile::ExeOther ) ? 1 : -1 );
 	}
 
 	if ( -UR == pathsList.count() )

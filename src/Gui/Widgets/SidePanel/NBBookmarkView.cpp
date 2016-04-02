@@ -6,27 +6,6 @@
 
 #include <NBBookmarkView.hpp>
 
-QList<NBBookmarkInfo> allBookmarks() {
-
-	QList<NBBookmarkInfo> bookmarkInfoList;
-
-	foreach( QString bookmark, bookmarkSettings.value( "Order" ).toStringList() ) {
-		if ( not exists( bookmark ) )
-			continue;
-
-		QString label = bookmarkSettings.value( QUrl::toPercentEncoding( bookmark ) ).toString();
-
-		NBBookmarkInfo bmkInfo;
-		bmkInfo.displayLabel = label;
-		bmkInfo.displayIcon = "bookmarks";
-		bmkInfo.mountPoint = bookmark;
-
-		bookmarkInfoList << bmkInfo;
-	}
-
-	return bookmarkInfoList;
-};
-
 NBBookmarksIcon::NBBookmarksIcon( QWidget *parent ) : QWidget( parent ) {
 
 	// Default Pixmap
@@ -290,6 +269,8 @@ void NBBookmarksIcon::flashLabel( QColor newColor ) {
 
 void NBBookmarksIcon::showBookmarks() {
 
+	return;
+
 	bmkView->clear();
 
 	// Spacer Label
@@ -304,7 +285,7 @@ void NBBookmarksIcon::showBookmarks() {
 
 	bmkView->addAction( lblAct );
 
-	Q_FOREACH( NBBookmarkInfo info, allBookmarks() ) {
+	Q_FOREACH( NBBookmarkInfo info, NBBookmarkInfo::allBookmarks() ) {
 		QAction *act = new QAction( QIcon::fromTheme( info.displayIcon , QIcon( ":/icons/bookmark.png" ) ), info.displayLabel, bmkView );
 		act->setData( info.mountPoint );
 

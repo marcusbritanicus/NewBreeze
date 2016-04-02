@@ -75,7 +75,7 @@ void NBActionsMenu::buildPluginsActions() {
 			others++;
 	}
 
-	QStringList pluginList;
+	PluginList pluginList;
 	NBPluginManager *pMgr = NBPluginManager::instance();
 
 	/* If there are sockets, fifos, etc */
@@ -116,21 +116,16 @@ void NBActionsMenu::buildPluginsActions() {
 
 	/* Plugins based actions */
 	quint64 acts = 0;
-	Q_FOREACH( QString pluginSo, pluginList ) {
-		QPluginLoader loader( pluginSo );
-		QObject *plugin = loader.instance();
+	Q_FOREACH( NBPluginInterface* plugin, pluginList ) {
 		if ( plugin ) {
-			NBPluginInterface *interface = qobject_cast<NBPluginInterface*>( plugin );
-			if ( interface ) {
-				QStringList sources;
-				Q_FOREACH( QModelIndex idx, selection )
-					sources << QDir( workingDir ).filePath( idx.data().toString() );
+			QStringList sources;
+			Q_FOREACH( QModelIndex idx, selection )
+				sources << QDir( workingDir ).filePath( idx.data().toString() );
 
-				QList<QAction*> actions = interface->actions( sources );
-				acts += actions.count();
-				Q_FOREACH( QAction *act, actions )
-					addAction( act );
-			}
+			QList<QAction*> actions = plugin->actions( sources );
+			acts += actions.count();
+			Q_FOREACH( QAction *act, actions )
+				addAction( act );
 		}
 	}
 

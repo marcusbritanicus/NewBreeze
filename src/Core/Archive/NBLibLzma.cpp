@@ -90,9 +90,6 @@ void NBLzma::create() {
 	uint8_t in_buf [IN_BUF_MAX];
 	uint8_t out_buf [OUT_BUF_MAX];
 
-	size_t in_len;  /* length of useful data in in_buf */
-	size_t out_len; /* length of useful data in out_buf */
-
 	int in_finished = 0;
 	int out_finished = 0;
 
@@ -113,6 +110,9 @@ void NBLzma::create() {
 	ret_xz = lzma_alone_encoder( &strm, &opts );
 
 	while ( ( !in_finished ) and ( !out_finished ) ) {
+		size_t in_len;  /* length of useful data in in_buf */
+		size_t out_len; /* length of useful data in out_buf */
+
 		in_len = fread( in_buf, 1, IN_BUF_MAX, fdin );
 
 		if ( feof( fdin ) )

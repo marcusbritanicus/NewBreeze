@@ -127,9 +127,6 @@ class NBFolderView : public QStackedWidget {
 		void newTab( QString );
 		void selectionChanged( const QItemSelection&, const QItemSelection& );
 
-		void move( QStringList, QString, NBIOMode::Mode );
-		void copy( QStringList, QString, NBIOMode::Mode );
-
 		void showProperties();
 		void showPermissions();
 

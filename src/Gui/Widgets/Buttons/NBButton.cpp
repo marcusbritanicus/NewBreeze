@@ -168,18 +168,22 @@ void NBButton::setSegment( NBButton::Segment seg ) {
 	switch( seg ) {
 		case NBButton::FirstSegment: {
 			radius << "4px" << "4px" << "0px" << "0px";
+			leftBorderSize = "0px";
 			break;
 		}
 		case NBButton::MiddleSegment: {
 			radius << "0px" << "0px" << "0px" << "0px";
+			leftBorderSize = "1px";
 			break;
 		}
 		case NBButton::LastSegment: {
 			radius << "0px" << "0px" << "4px" << "4px";
+			leftBorderSize = "1px";
 			break;
 		}
 		case NBButton::SingleButton: {
 			radius << "4px" << "4px" << "4px" << "4px";
+			leftBorderSize = "0px";
 			break;
 		}
 	}
@@ -203,6 +207,7 @@ void NBButton::setButtonStyle() {
 
 	QString styleSkel = QString( "QPushButton {"
 		"    border: none;"
+		"    border-left: <LBS> solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop:0 transparent, stop:0.4 lightgray, stop:0.6 lightgray, stop:1 transparent);"
 		"    border-top-left-radius: <TLR>;"
 		"    border-bottom-left-radius: <BLR>;"
 		"    border-top-right-radius: <TRR>;"
@@ -219,6 +224,9 @@ void NBButton::setButtonStyle() {
 		"QPushButton:pressed {"
 		"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop:0 <Edge>, stop:0.4 <Middle>, stop:0.6 <Middle>, stop:1 <Edge>);"
 		"}"
+		"QPushButton:checked {"
+		"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop:0 <Gray>, stop:0.4 <Gray>, stop:0.6 <Gray>, stop:1 <Gray>);"
+		"}"
 	);
 
 	/* Border color */
@@ -231,6 +239,8 @@ void NBButton::setButtonStyle() {
 	QString colorSkelH = QString( "rgba(%1, %2, %3, 100)" ).arg( mButtonColor.red() ).arg( mButtonColor.green() ).arg( mButtonColor.blue() );
 	/* Button text */
 	QString colorSkelT = QString( "rgba(%1, %2, %3, 255)" ).arg( mButtonColor.red() ).arg( mButtonColor.green() ).arg( mButtonColor.blue() );
+	/* Checked button */
+	QString colorSkelG = QString( "rgba(%1, %1, %1, 255)" ).arg( 0.21 * mButtonColor.red() + 0.72 * mButtonColor.green() + 0.07 * mButtonColor.blue() );
 
 	styleSkel = styleSkel.replace( "<TLR>", radius.at( 0 ) ).replace( "<BLR>", radius.at( 1 ) ).replace( "<TRR>", radius.at( 2 ) ).replace( "<BRR>", radius.at( 3 ) );
 	styleSkel = styleSkel.replace( "<Border>", colorSkelB );
@@ -238,6 +248,8 @@ void NBButton::setButtonStyle() {
 	styleSkel = styleSkel.replace( "<Edge>", colorSkelE );
 	styleSkel = styleSkel.replace( "<Middle>", colorSkelM );
 	styleSkel = styleSkel.replace( "<Hover>", colorSkelH );
+	styleSkel = styleSkel.replace( "<Gray>", colorSkelG );
+	styleSkel = styleSkel.replace( "<LBS>", leftBorderSize );
 
 	QPushButton::setStyleSheet( styleSkel );
 };

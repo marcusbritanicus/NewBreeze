@@ -11,7 +11,10 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	/* No terminate signal until close */
 	mTerminate = false;
 
+	/* Create the UI */
 	createGUI();
+
+	/* Load the a folder */
 	if ( not loc.isEmpty() ) {
 		if ( isFile( loc ) ) {
 
@@ -23,6 +26,7 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 
 			/* This is a folder open it */
 			FolderView->doOpen( loc );
+			SideBar->highlight( loc );
 		}
 
 		else if ( exists( loc ) ) {
@@ -42,11 +46,15 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	}
 
 	else {
-		if ( exists( Settings->Session.LastDir ) )
+		if ( exists( Settings->Session.LastDir ) ) {
 			FolderView->doOpen( QString( Settings->Session.LastDir ) );
+			SideBar->highlight( QString( Settings->Session.LastDir ) );
+		}
 
-		else
+		else {
 			FolderView->doOpen( QString( QDir::homePath() ) );
+			SideBar->highlight( QString( QDir::homePath() ) );
+		}
 	}
 
 	/* Open with catalog */
@@ -69,43 +77,43 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 
 void NewBreeze::createGUI() {
 
-	QWidget *BodyWidget = new QWidget( this );
-	QWidget *MainWidget = new QWidget( this );
-
-	QVBoxLayout *MainLayout = new QVBoxLayout();
-	QHBoxLayout *BodyLayout = new QHBoxLayout();
-	QVBoxLayout *ViewLayout = new QVBoxLayout();
-
-	MainLayout->setContentsMargins( QMargins() );
-	ViewLayout->setContentsMargins( QMargins( 0, 0, 3, 0 ) );
-	ViewLayout->setSpacing( 3 );
-	BodyLayout->setContentsMargins( QMargins() );
-	BodyLayout->setSpacing( 0 );
+	QWidget *BaseWidget = new QWidget( this );
+	BaseWidget->setObjectName( "base" );
 
 	AddressBar = new NBAddressBar( this );
-	SidePanel = new NBSidePanel( this );
+	setupSidePanel();
 	FolderView = new NBFolderView( this );
-	InfoBar = new NBInfoBar( this );
 	Terminal = new NBTerminal( QString(), this );
+	InfoBar = new NBInfoBar( this );
 	FilterWidget = new NBFilterWidget( FolderView );
 
-	// Widgets layout
-	ViewLayout->addWidget( AddressBar );
+	QWidget *Spacer = new QWidget();
+	Spacer->setFixedHeight( 3 );
+
+	QHBoxLayout *ViewLayout = new QHBoxLayout();
+	ViewLayout->setContentsMargins( QMargins() );
+	ViewLayout->setSpacing( 0 );
+
+	if ( Settings->General.SidePanelType == 0 )
+		ViewLayout->addWidget( SidePanel );
+
+	else
+		ViewLayout->addWidget( SideBar );
+
 	ViewLayout->addWidget( FolderView );
 
-	BodyLayout->addWidget( SidePanel );
-	BodyLayout->addLayout( ViewLayout );
+	QVBoxLayout *BaseLayout = new QVBoxLayout();
+	BaseLayout->setContentsMargins( QMargins( 0, 3, 0, 0 ) );
+	BaseLayout->setSpacing( 0 );
 
-	BodyWidget->setLayout( BodyLayout );
-	MainLayout->setContentsMargins( QMargins( 0, 5, 0, 0 ) );
+	BaseLayout->addWidget( AddressBar );
+	BaseLayout->addWidget( Spacer );
+	BaseLayout->addLayout( ViewLayout );
+	BaseLayout->addWidget( Terminal );
+	BaseLayout->addWidget( InfoBar );
 
-	MainLayout->addWidget( BodyWidget );
-	MainLayout->addWidget( Terminal );
-	MainLayout->addWidget( Separator::horizontal() );
-	MainLayout->addWidget( InfoBar );
-
-	MainWidget->setLayout( MainLayout );
-	setCentralWidget( MainWidget );
+	BaseWidget->setLayout( BaseLayout );
+	setCentralWidget( BaseWidget );
 
 	// Widget Properties
 	AddressBar->setFixedHeight( 32 );
@@ -115,9 +123,35 @@ void NewBreeze::createGUI() {
 
 	AddressBar->setFocusPolicy( Qt::NoFocus );
 	SidePanel->setFocusPolicy( Qt::NoFocus );
+	SideBar->setFocusPolicy( Qt::NoFocus );
 	FolderView->setFocusPolicy( Qt::StrongFocus );
 
 	setFocusPolicy( Qt::NoFocus );
+	qDebug() << "Init complete";
+};
+
+void NewBreeze::setupSidePanel() {
+
+	SidePanel = new NBSidePanel( this );
+	SideBar = new NBSideBar( this );
+
+	connect( SidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
+	connect( SidePanel, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
+	connect( SidePanel, SIGNAL( showApplications() ), this, SLOT( showApplications() ) );
+	connect( SidePanel, SIGNAL( showCatalogs() ), this, SLOT( showCatalogs() ) );
+	connect( SidePanel, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
+
+	connect( SideBar, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
+	connect( SideBar, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
+	connect( SideBar, SIGNAL( showApplications() ), this, SLOT( showApplications() ) );
+	connect( SideBar, SIGNAL( showCatalogs() ), this, SLOT( showCatalogs() ) );
+	connect( SideBar, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
+
+	if ( Settings->General.SidePanelType == 0 )
+		SideBar->hide();
+
+	else
+		SidePanel->hide();
 };
 
 void NewBreeze::setWindowProperties() {
@@ -127,7 +161,8 @@ void NewBreeze::setWindowProperties() {
 
 	setMinimumSize( 900, 600 );
 
-	setGeometry( Settings->Session.Geometry );
+	if ( not Settings->Session.Maximized )
+		setGeometry( Settings->Session.Geometry );
 };
 
 void NewBreeze::createAndSetupActions() {
@@ -144,18 +179,6 @@ void NewBreeze::createAndSetupActions() {
 	connect( AddressBar, SIGNAL( goBack() ), FolderView, SLOT( goBack() ) );
 	connect( AddressBar, SIGNAL( goForward() ), FolderView, SLOT( goForward() ) );
 
-	connect( SidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
-	connect( SidePanel, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
-	connect( SidePanel, SIGNAL( showApplications() ), this, SLOT( showApplications() ) );
-	connect( SidePanel, SIGNAL( showCatalogs() ), this, SLOT( showCatalogs() ) );
-	connect( SidePanel, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
-
-	connect( SidePanel, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ), this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
-	connect( SidePanel, SIGNAL( move( QStringList, QString, NBIOMode::Mode ) ), this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
-
-	connect( FolderView, SIGNAL( copy( QStringList, QString, NBIOMode::Mode ) ), this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
-	connect( FolderView, SIGNAL( move( QStringList, QString, NBIOMode::Mode ) ), this, SLOT( initiateIO( QStringList, QString, NBIOMode::Mode ) ) );
-
 	connect( FolderView, SIGNAL( showProperties() ), this, SLOT( showProperties() ) );
 	connect( FolderView, SIGNAL( showPermissions() ), this, SLOT( showPermissions() ) );
 
@@ -170,6 +193,8 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateInfoBar() ) );
 	connect( FolderView->widget( 2 ), SIGNAL( openLocation( QString ) ), FolderView, SLOT( doOpen( QString ) ) );
+
+	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), SideBar, SLOT( highlight( QString ) ) );
 
 	// About NB
 	QAction *aboutNBAct = new QAction( this );
@@ -210,12 +235,6 @@ void NewBreeze::createAndSetupActions() {
 	QAction *addBookMarkAct = new QAction( this );
 	addBookMarkAct->setShortcuts( Settings->Shortcuts.AddBookmark );
 	connect( addBookMarkAct, SIGNAL( triggered() ), this, SLOT( addBookMark() ) );
-
-	// Update devices list
-	int mountsFD = open( "/proc/self/mounts", O_RDONLY, 0 );
-	QSocketNotifier *devWatcher = new QSocketNotifier( mountsFD, QSocketNotifier::Write );
-	connect( devWatcher, SIGNAL( activated( int ) ), SidePanel, SLOT( flashDevices() ) );
-	connect( devWatcher, SIGNAL( activated( int ) ), SidePanel, SLOT( flashVfs() ) );
 
 	// Display terminal widget
 	QAction *termWidgetAct = new QAction( this );
@@ -258,6 +277,11 @@ void NewBreeze::createAndSetupActions() {
 	clearSearchAct->setShortcuts( Settings->Shortcuts.ClearSearchBar );
 	connect( clearSearchAct, SIGNAL( triggered() ), this, SLOT( clearFilters() ) );
 
+	// Quit NewBreeze
+	QAction *quitNBAct = new QAction( "Quit NewBreeze", this );
+	quitNBAct->setShortcuts( Settings->Shortcuts.QuitNewBreeze );
+	connect( quitNBAct, SIGNAL( triggered() ), this, SLOT( quit() ) );
+
 	addAction( focusAddressBarAct );
 	addAction( newWindowAct );
 	addAction( addBookMarkAct );
@@ -274,6 +298,7 @@ void NewBreeze::createAndSetupActions() {
 	addAction( licenseAct );
 	addAction( showInfoAct );
 	addAction( showSettingsAct );
+	addAction( quitNBAct );
 
 	/* Update Widgets */
 	updateVarious();
@@ -586,8 +611,10 @@ void NewBreeze::handleDriveUrl( QString url ){
 
 void NewBreeze::showApplications() {
 
-	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
+	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel ) {
 		SidePanel->flashApplications();
+		SideBar->highlight( "NB://Applications" );
+	}
 
 	FolderView->doOpen( "NB://Applications" );
 	AddressBar->setAddress( "NB://Applications" );
@@ -595,8 +622,10 @@ void NewBreeze::showApplications() {
 
 void NewBreeze::showCatalogs() {
 
-	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
+	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel ) {
 		SidePanel->flashCatalogs();
+		SideBar->highlight( "NB://Catalogs" );
+	}
 
 	FolderView->doOpen( "NB://Catalogs" );
 	AddressBar->setAddress( "NB://Catalogs" );
@@ -604,10 +633,13 @@ void NewBreeze::showCatalogs() {
 
 void NewBreeze::showFolders() {
 
-	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
+	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel ) {
 		SidePanel->flashFolders();
+		SideBar->highlight( "NB://Folders" );
+	}
 
-	FolderView->doOpen( FolderView->fsModel->currentDir() );
+	FolderView->setCurrentIndex( 0 );
+	FolderView->setFocus();
 };
 
 void NewBreeze::showTrash() {
@@ -670,6 +702,7 @@ void NewBreeze::addBookMark() {
 	bookmarkSettings.sync();
 
 	SidePanel->flashBookmarks();
+	SideBar->reloadBookmarks();
 };
 
 void NewBreeze::openAddressBar() {
@@ -751,11 +784,17 @@ void NewBreeze::toggleGrouping() {
 
 void NewBreeze::toggleSideBarVisible() {
 
-	if ( SidePanel->isVisible() )
-		SidePanel->hide();
+	// if ( SidePanel->isVisible() )
+		// SidePanel->hide();
+
+	// else
+		// SidePanel->show();
+
+	if ( SideBar->isVisible() )
+		SideBar->hide();
 
 	else
-		SidePanel->show();
+		SideBar->show();
 
 	Settings->setValue( "Session/SidePanel", SidePanel->isVisible() );
 };
@@ -769,9 +808,20 @@ void NewBreeze::showHideTermWidget() {
 
 	else {
 		Terminal->show();
-		// Terminal->setFocus();
+		Terminal->setFocus();
 		return;
 	}
+};
+
+void NewBreeze::quit() {
+
+	/* Close all top level widgets */
+	Q_FOREACH( QWidget *w, qApp->topLevelWidgets() )
+		w->close();
+
+	fclose( nblog );
+
+	qApp->quit();
 };
 
 void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
@@ -801,18 +851,4 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 
 	cEvent->accept();
 	qDebug( "Good Bye!" );
-};
-
-void NewBreeze::paintEvent( QPaintEvent *pEvent ) {
-
-	QMainWindow::paintEvent( pEvent );
-
-	QPainter *painter = new QPainter( this );
-
-	painter->setPen( QPen( palette().color( QPalette::Window ).darker(), 1.0 ) );
-	painter->drawLine( rect().topLeft(), rect().topRight() );
-
-	painter->end();
-
-	pEvent->accept();
 };

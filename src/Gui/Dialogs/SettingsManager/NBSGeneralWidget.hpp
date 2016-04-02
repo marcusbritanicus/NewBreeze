@@ -24,25 +24,35 @@ class NBSGeneralWidget : public QWidget {
 		QCheckBox *defaultSortCaseCB;		// Case sensitive sort?
 		QComboBox *defaultSortClmnCB;		// Sort column: Name, Size, Type or Date?
 
+		/* SidePanel */
+		QGroupBox *showSidePanelGB;			// Show the SidePanel/SideBar?
+		QRadioButton *sidePanelRB;			// Show the Modern Side Panel
+		QRadioButton *sideBarRB;			// Show the Classic SideBar
+
 		/* Others */
 		QCheckBox *filterFoldersCB;			// Should we filter folders while searching?
 		QCheckBox *nativeTitleBarCB;		// Use native titlebar?
 		QCheckBox *showTrayIconCB;			// Show tray icon?
-		QCheckBox *sidePanelOpenCB;			// Keep side panel fully stretched always?
 		QCheckBox *openWithCatalogCB;		// Show home folder or catalogs?
 		QCheckBox *imagePreviewCB;			// Show image previews?
 
 	private slots:
+		/*  */
 		void handlePerFolderChanged( bool );
 		void handleViewModeChanged( int );
 		void handleIconSizeChanged( int );
 		void handleGroupingChanged( bool );
 		void handleSortCaseChanged( bool );
 		void handleSortColumnChanged( int );
+
+		/* SidePanel */
+		void handleShowSidePanelToggled( bool );
+		void handleSidePanelChoice();
+
+		/*  */
 		void handleFilterDirsChanged( bool );
 		void handleNativeTitleBarToggle( bool );
 		void handleTrayIconChanged( bool );
-		void handleSidePanelOpenToggled( bool );
 		void handleOpenWithCatalogToggled( bool );
 		void handleCheckStateChanged( int );
 };

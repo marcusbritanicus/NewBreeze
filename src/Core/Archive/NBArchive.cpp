@@ -98,11 +98,8 @@ void NBArchive::create() {
 
 	else {
 		struct archive *a;
-		struct archive_entry *entry;
 		struct stat st;
 		char buff[ 8192 ];
-		int len;
-		int fd;
 		int r;
 
 		a = archive_write_new();
@@ -124,7 +121,7 @@ void NBArchive::create() {
 			// qDebug() << file.toLocal8Bit().data() << exists( file );
 
 			stat( filename, &st );
-			entry = archive_entry_new();
+			struct archive_entry *entry = archive_entry_new();
 			archive_entry_set_pathname( entry, filename );
 			archive_entry_set_size( entry, st.st_size );
 			archive_entry_set_filetype( entry, st.st_mode );
@@ -136,8 +133,8 @@ void NBArchive::create() {
 			archive_write_header( a, entry );
 
 			// Perform the write
-			fd = open( filename, O_RDONLY );
-			len = read( fd, buff, sizeof( buff ) );
+			int fd = open( filename, O_RDONLY );
+			int len = read( fd, buff, sizeof( buff ) );
 			while ( len > 0 ) {
 				archive_write_data( a, buff, len );
 				len = read( fd, buff, sizeof( buff ) );
@@ -277,13 +274,12 @@ int NBArchive::extract() {
 
 int NBArchive::copyData( struct archive *ar, struct archive *aw ) {
 
-	int r;
 	const void *buff;
 	size_t size;
 	off_t offset;
 
 	while ( true ) {
-		r = archive_read_data_block( ar, &buff, &size, &offset );
+		int r = archive_read_data_block( ar, &buff, &size, &offset );
 		if ( r == ARCHIVE_EOF )
 			return ( ARCHIVE_OK );
 

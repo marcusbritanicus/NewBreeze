@@ -10,33 +10,27 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 LIBS += -lmagic -larchive -lbz2 -llzma -lz
 
 # Source Paths
-INCLUDEPATH += Core Core/AppFile Core/Archive Core/ArgParser Core/ClipBoard Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/DeviceInfo/QVolumeInfo Core/FileIO
-INCLUDEPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/ProcessManager Core/StandardPaths Core/SystemInfo Core/XDG Data Data/color-schemes
-INCLUDEPATH += Data/color-schemes/historic Data/kb-layouts Data/kb-layouts/historic Gui Gui/Dialogs Gui/Dialogs/Archive Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
-INCLUDEPATH += Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/qtcopydialog
-INCLUDEPATH += Gui/Dialogs/qtcopydialog/buildlib Gui/Dialogs/qtcopydialog/doc Gui/Dialogs/qtcopydialog/doc/html Gui/Dialogs/qtcopydialog/doc/html/images
-INCLUDEPATH += Gui/Dialogs/qtcopydialog/doc/images Gui/Dialogs/qtcopydialog/examples Gui/Dialogs/qtcopydialog/examples/simple Gui/Dialogs/qtcopydialog/src
-INCLUDEPATH += Gui/Dialogs/RenameDialog Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel
-INCLUDEPATH += Gui/ModelViews/Models/CatalogModel Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
-INCLUDEPATH += Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/CombiView Gui/ModelViews/Views/IconView
+INCLUDEPATH += Core Core/AppFile Core/Archive Core/ArgParser Core/BookmarkInfo Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/DeviceInfo/QVolumeInfo
+INCLUDEPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/ProcessManager Core/StandardPaths Core/SystemInfo Core/XDG Gui Gui/Dialogs Gui/Dialogs/Archive
+INCLUDEPATH += Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog
+INCLUDEPATH += Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/ModelViews Gui/ModelViews/Models
+INCLUDEPATH += Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/TrashModel
+INCLUDEPATH += Gui/ModelViews/Views Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/CombiView Gui/ModelViews/Views/IconView
 INCLUDEPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others Gui/Others/GuiFunctions
 INCLUDEPATH += Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu
 INCLUDEPATH += Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
-INCLUDEPATH += Gui/Widgets/ProcessManager Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager icons
+INCLUDEPATH += Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager icons
 
-DEPENDPATH += Core Core/AppFile Core/Archive Core/ArgParser Core/ClipBoard Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/DeviceInfo/QVolumeInfo Core/FileIO
-DEPENDPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/ProcessManager Core/StandardPaths Core/SystemInfo Core/XDG Data Data/color-schemes
-DEPENDPATH += Data/color-schemes/historic Data/kb-layouts Data/kb-layouts/historic Gui Gui/Dialogs Gui/Dialogs/Archive Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
-DEPENDPATH += Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/qtcopydialog
-DEPENDPATH += Gui/Dialogs/qtcopydialog/buildlib Gui/Dialogs/qtcopydialog/doc Gui/Dialogs/qtcopydialog/doc/html Gui/Dialogs/qtcopydialog/doc/html/images
-DEPENDPATH += Gui/Dialogs/qtcopydialog/doc/images Gui/Dialogs/qtcopydialog/examples Gui/Dialogs/qtcopydialog/examples/simple Gui/Dialogs/qtcopydialog/src
-DEPENDPATH += Gui/Dialogs/RenameDialog Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/ApplicationsModel
-DEPENDPATH += Gui/ModelViews/Models/CatalogModel Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
-DEPENDPATH += Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/CombiView Gui/ModelViews/Views/IconView
+DEPENDPATH += Core Core/AppFile Core/Archive Core/ArgParser Core/BookmarkInfo Core/CoreTools Core/DeleteManager Core/DeviceInfo Core/DeviceInfo/QVolumeInfo
+DEPENDPATH += Core/FSWatcher Core/IconProvider Core/MimeHandler Core/ProcessManager Core/StandardPaths Core/SystemInfo Core/XDG Gui Gui/Dialogs Gui/Dialogs/Archive
+DEPENDPATH += Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog
+DEPENDPATH += Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/ModelViews Gui/ModelViews/Models
+DEPENDPATH += Gui/ModelViews/Models/ApplicationsModel Gui/ModelViews/Models/CatalogModel Gui/ModelViews/Models/FileSystemModel Gui/ModelViews/Models/TrashModel
+DEPENDPATH += Gui/ModelViews/Views Gui/ModelViews/Views/AppsView Gui/ModelViews/Views/CatalogView Gui/ModelViews/Views/CombiView Gui/ModelViews/Views/IconView
 DEPENDPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others Gui/Others/GuiFunctions
 DEPENDPATH += Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu
 DEPENDPATH += Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
-DEPENDPATH += Gui/Widgets/ProcessManager Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager icons
+DEPENDPATH += Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager icons
 
 # Headers
 HEADERS += Core/AppFile/NBAppEngine.hpp
@@ -47,11 +41,10 @@ HEADERS += Core/Archive/NBLibGZip.hpp
 HEADERS += Core/Archive/NBLibLzma.hpp
 HEADERS += Core/Archive/NBLibLzma2.hpp
 HEADERS += Core/ArgParser/NBCLParser.hpp
+HEADERS += Core/BookmarkInfo/NBBookmarkInfo.hpp
 HEADERS += Core/CoreTools/NBTools.hpp
 HEADERS += Core/DeleteManager/NBDeleteManager.hpp
 HEADERS += Core/DeviceInfo/NBDeviceInfo.hpp
-HEADERS += Core/DeviceInfo/QVolumeInfo/QVolumeInfo.hpp
-HEADERS += Core/DeviceInfo/QVolumeInfo/QVolumeInfoP.hpp
 HEADERS += Core/FileIO/NBFileIO.hpp
 HEADERS += Core/FSWatcher/NBFileSystemWatcher.hpp
 HEADERS += Core/IconProvider/NBIconProvider.hpp
@@ -130,6 +123,9 @@ HEADERS += Gui/Widgets/GuiWidgets/NBProgressBar.hpp
 HEADERS += Gui/Widgets/InfoBar/NBInfoBar.hpp
 HEADERS += Gui/Widgets/ProcessManager/NBProcessManagerUI.hpp
 HEADERS += Gui/Widgets/ProcessManager/NBProcessWidget.hpp
+HEADERS += Gui/Widgets/SideBar/NBSideBar.hpp
+HEADERS += Gui/Widgets/SideBar/NBSideBarGroup.hpp
+HEADERS += Gui/Widgets/SideBar/NBSideBarItem.hpp
 HEADERS += Gui/Widgets/SidePanel/NBBookmarkView.hpp
 HEADERS += Gui/Widgets/SidePanel/NBDeviceView.hpp
 HEADERS += Gui/Widgets/SidePanel/NBSidePanel.hpp
@@ -178,11 +174,10 @@ SOURCES += Core/Archive/NBLibGZip.cpp
 SOURCES += Core/Archive/NBLibLzma.cpp
 SOURCES += Core/Archive/NBLibLzma2.cpp
 SOURCES += Core/ArgParser/NBCLParser.cpp
+SOURCES += Core/BookmarkInfo/NBBookmarkInfo.cpp
 SOURCES += Core/CoreTools/NBTools.cpp
 SOURCES += Core/DeleteManager/NBDeleteManager.cpp
 SOURCES += Core/DeviceInfo/NBDeviceInfo.cpp
-SOURCES += Core/DeviceInfo/QVolumeInfo/QVolumeInfo.cpp
-SOURCES += Core/DeviceInfo/QVolumeInfo/QVolumeInfoUnix.cpp
 SOURCES += Core/FileIO/NBFileIO.cpp
 SOURCES += Core/FSWatcher/NBFileSystemWatcher.cpp
 SOURCES += Core/IconProvider/NBIconProvider.cpp
@@ -261,6 +256,9 @@ SOURCES += Gui/Widgets/GuiWidgets/NBProgressBar.cpp
 SOURCES += Gui/Widgets/InfoBar/NBInfoBar.cpp
 SOURCES += Gui/Widgets/ProcessManager/NBProcessManagerUI.cpp
 SOURCES += Gui/Widgets/ProcessManager/NBProcessWidget.cpp
+SOURCES += Gui/Widgets/SideBar/NBSideBar.cpp
+SOURCES += Gui/Widgets/SideBar/NBSideBarGroup.cpp
+SOURCES += Gui/Widgets/SideBar/NBSideBarItem.cpp
 SOURCES += Gui/Widgets/SidePanel/NBBookmarkView.cpp
 SOURCES += Gui/Widgets/SidePanel/NBDeviceView.cpp
 SOURCES += Gui/Widgets/SidePanel/NBSidePanel.cpp
@@ -313,6 +311,28 @@ lessThan(QT_MAJOR_VERSION, 5) {
 	SOURCES += Core/MimeHandler/NBMimeTypeParser.cpp
 	SOURCES += Core/StandardPaths/NBStandardPaths.cpp
 	SOURCES += Core/StandardPaths/NBStandardPaths_unix.cpp
+}
+
+lessThan(QT_MAJOR_VERSION, 5) {
+
+	# QStorageInfo from Qt5 v5.4
+	HEADERS += Core/QVolumeInfo/QVolumeInfo.hpp
+	HEADERS += Core/QVolumeInfo/QVolumeInfoP.hpp
+
+	SOURCES += Core/QVolumeInfo/QVolumeInfo.cpp
+	SOURCES += Core/QVolumeInfo/QVolumeInfoUnix.cpp
+}
+
+isEqual(QT_MAJOR_VERSION, 5) {
+
+	# QStorageInfo from Qt5 v5.4
+	lessThan(QT_MINOR_VERSION, 4) {
+		HEADERS += Core/QVolumeInfo/QVolumeInfo.hpp
+		HEADERS += Core/QVolumeInfo/QVolumeInfoP.hpp
+
+		SOURCES += Core/QVolumeInfo/QVolumeInfo.cpp
+		SOURCES += Core/QVolumeInfo/QVolumeInfoUnix.cpp
+	}
 }
 
 # Icon and stylesheet resources

@@ -47,7 +47,4 @@ class NBSidePanel : public QWidget {
 		void showTrash();
 
 		void driveClicked( QString );
-
-		void copy( QStringList, QString, NBIOMode::Mode );
-		void move( QStringList, QString, NBIOMode::Mode );
 };

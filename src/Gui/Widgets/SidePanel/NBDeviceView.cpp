@@ -6,8 +6,6 @@
 
 #include <NBDeviceView.hpp>
 
-QMutex mutex;
-
 NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 
 	/* Default Pixmap */

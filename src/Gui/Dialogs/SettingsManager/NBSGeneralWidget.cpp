@@ -11,9 +11,11 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 	QSettings sett( "NewBreeze", "NewBreeze" );
 
+	/* Grouping */
+
 	perFolderEnabled = new QGroupBox( "&Enabled per-folder view", this );
 	perFolderEnabled->setCheckable( true );
-	perFolderEnabled->setChecked( sett.value( "PerFolderViews").toBool() );
+	perFolderEnabled->setChecked( sett.value( "PerFolderViews" ).toBool() );
 	connect( perFolderEnabled, SIGNAL( toggled( bool ) ), this, SLOT( handlePerFolderChanged( bool ) ) );
 
 	defaultViewModeCB = new QComboBox( this );
@@ -51,6 +53,28 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	defaultSortClmnCB->addItems( QStringList() << "Name" << "Size" << "Type" << "Date" );
 	defaultSortClmnCB->setCurrentIndex( sett.value( "SortColumn" ).toInt() == 3 ? 4 : sett.value( "SortColumn" ).toInt() );
 	connect( defaultSortClmnCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( handleSortColumnChanged( int ) ) );
+
+	/* Side Panel */
+	showSidePanelGB = new QGroupBox( "Show SidePanel", this );
+	showSidePanelGB->setCheckable( true );
+	showSidePanelGB->setChecked( sett.value( "SidePanel" ).toBool() );
+	connect( showSidePanelGB, SIGNAL( toggled( bool ) ), this, SLOT( handleShowSidePanelToggled( bool ) ) );
+
+	sidePanelRB = new QRadioButton( "Use the modern side &panel" );
+	connect( sidePanelRB, SIGNAL( clicked() ), this, SLOT( handleSidePanelChoice() ) );
+	sidePanelRB->setChecked( sett.value( "SidePanelType" ).toInt() == 0 );
+
+	sideBarRB = new QRadioButton( "Use the classic side &bar" );
+	connect( sideBarRB, SIGNAL( clicked() ), this, SLOT( handleSidePanelChoice() ) );
+	sideBarRB->setChecked( sett.value( "SidePanelType" ).toInt() == 1 );
+
+	QVBoxLayout *sidePanelLyt = new QVBoxLayout();
+	sidePanelLyt->addWidget( sidePanelRB );
+	sidePanelLyt->addWidget( sideBarRB );
+
+	showSidePanelGB->setLayout( sidePanelLyt );
+
+	/* Others */
 
 	filterFoldersCB = new QCheckBox( "&Filter folder and files", this );
 	filterFoldersCB->setChecked( sett.value( "FilterFolders" ).toBool() );
@@ -90,10 +114,6 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	openWithCatalogCB->setChecked( sett.value( "OpenWithCatalog" ).toBool() );
 	connect( openWithCatalogCB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithCatalogToggled( bool ) ) );
 
-	sidePanelOpenCB = new QCheckBox( "&Keep the SidePanel always open (requires restart)");
-	sidePanelOpenCB->setChecked( sett.value( "SidePanel" ).toBool() );
-	connect( sidePanelOpenCB, SIGNAL( toggled( bool ) ), this, SLOT( handleSidePanelOpenToggled( bool ) ) );
-
 	imagePreviewCB = new QCheckBox( "&Show Image Previews" );
 	imagePreviewCB->setChecked( Settings->General.ImagePreviews );
 	connect( imagePreviewCB, SIGNAL( stateChanged( int ) ), this, SLOT( handleCheckStateChanged( int ) ) );
@@ -109,11 +129,11 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 	QVBoxLayout *lyt = new QVBoxLayout();
 	lyt->addWidget( perFolderEnabled );
+	lyt->addWidget( showSidePanelGB );
 	lyt->addWidget( filterFoldersCB );
 	lyt->addWidget( nativeTitleBarCB );
 	lyt->addWidget( showTrayIconCB );
 	lyt->addWidget( openWithCatalogCB );
-	lyt->addWidget( sidePanelOpenCB );
 	lyt->addWidget( imagePreviewCB );
 	lyt->addStretch();
 
@@ -196,6 +216,23 @@ void NBSGeneralWidget::handleSortColumnChanged( int sortColumn ) {
 
 };
 
+void NBSGeneralWidget::handleShowSidePanelToggled( bool showPanel ) {
+
+	Settings->setValue( "SidePanel", showPanel );
+	Settings->General.SidePanel = showPanel;
+};
+
+void NBSGeneralWidget::handleSidePanelChoice() {
+	/* Modern: 0 */
+	/* Classic: 0 */
+
+	if ( qobject_cast<QRadioButton*>( sender() ) == sidePanelRB )
+		Settings->setValue( "SidePanelType", 0 );
+
+	else
+		Settings->setValue( "SidePanelType", 1 );
+};
+
 void NBSGeneralWidget::handleFilterDirsChanged( bool filterFolders ) {
 
 	Settings->setValue( "FilterFolders", filterFolders );
@@ -218,12 +255,6 @@ void NBSGeneralWidget::handleTrayIconChanged( bool value ) {
 
 	Settings->setValue( "TrayIcon", value );
 	Settings->General.TrayIcon = value;
-};
-
-void NBSGeneralWidget::handleSidePanelOpenToggled( bool keepOpen ) {
-
-	Settings->setValue( "SidePanel", keepOpen );
-	Settings->General.SidePanel = keepOpen;
 };
 
 void NBSGeneralWidget::handleCheckStateChanged( int state ) {

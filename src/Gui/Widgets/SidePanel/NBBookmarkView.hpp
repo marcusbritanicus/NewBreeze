@@ -8,18 +8,7 @@
 
 #include <Global.hpp>
 #include <NBTools.hpp>
-
-class NBBookmarkInfo {
-
-	public:
-		QString displayLabel;
-		QString displayIcon;
-		QString mountPoint;
-};
-
-Q_DECLARE_METATYPE(NBBookmarkInfo);
-
-QList<NBBookmarkInfo> allBookmarks();
+#include <NBBookmarkInfo.hpp>
 
 class NBBookmarksIcon : public QWidget {
 	Q_OBJECT

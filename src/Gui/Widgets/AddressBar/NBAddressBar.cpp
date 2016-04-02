@@ -9,7 +9,7 @@
 NBToggleButton::NBToggleButton( QWidget *parent ) : QWidget( parent ) {
 
 	checked = false;
-	setFixedSize( 24, 24 );
+	setFixedSize( 28, 28 );
 };
 
 bool NBToggleButton::isChecked() {
@@ -74,7 +74,7 @@ void NBToggleButton::paintEvent( QPaintEvent *pEvent ) {
 			painter.setPen( Qt::lightGray );
 	}
 
-	painter.drawText( QRectF( 0, 0, 24, 24 ), Qt::AlignCenter, QString::fromUtf8( "\u270D " ) );
+	painter.drawText( QRectF( 0, 0, 28, 28 ), Qt::AlignCenter, QString::fromUtf8( "\u270D " ) );
 
 	painter.end();
 	pEvent->accept();
@@ -84,7 +84,6 @@ NBAddressWidget::NBAddressWidget( QWidget *parent ) : QWidget( parent ) {
 
 	addressEdit = new NBLineEdit( this );
 	addressEdit->setFont( QFont( "Envy Code R", 11 ) );
-	addressEdit->setStyleSheet( "border: none; background: transparent;" );
 	addressEdit->setFocusPolicy( Qt::NoFocus );
 
 	connect( addressEdit, SIGNAL( returnPressed() ), this, SLOT( revertToCrumbsBar() ) );
@@ -93,16 +92,27 @@ NBAddressWidget::NBAddressWidget( QWidget *parent ) : QWidget( parent ) {
 	connect( crumbsBar, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
 
 	toggleBtn = new NBToggleButton( this );
+
+	QHBoxLayout *bLyt = new QHBoxLayout();
+	bLyt->setContentsMargins( QMargins() );
+	bLyt->setSpacing( 0 );
+
+	bLyt->addWidget( crumbsBar );
+	bLyt->addWidget( addressEdit );
+	bLyt->addWidget( toggleBtn );
+
+	QWidget *base = new QWidget( this );
+	base->setObjectName( "base" );
+	base->setLayout( bLyt );
+
 	QHBoxLayout *lyt = new QHBoxLayout();
 	lyt->setContentsMargins( QMargins() );
+	lyt->setSpacing( 0 );
 
-	lyt->addWidget( crumbsBar );
-	lyt->addWidget( addressEdit );
-	lyt->addWidget( toggleBtn );
+	lyt->addWidget( base );
+	setLayout( lyt );
 
 	addressEdit->hide();
-
-	setLayout( lyt );
 
 	dModel = new QDirModel();
 	dModel->setFilter( QDir::Dirs | QDir::NoDotAndDotDot );
@@ -138,11 +148,11 @@ void NBAddressWidget::setWidgetProperties() {
 	setContentsMargins( QMargins() );
 	setFont( QFont( "Envy Code R", 10 ) );
 
-	setFixedHeight( 24 );
+	setFixedHeight( 28 );
 
 	toggleBtn->setChecked( false );
 	toggleBtn->setFocusPolicy( Qt::NoFocus );
-	toggleBtn->setShortcut( Settings->Shortcuts.ToggleCrumbLE.at( 0 ).toString() );
+	toggleBtn->setShortcut( Settings->Shortcuts.ToggleCrumbLE.at( 0 ) );
 
 	connect( toggleBtn, SIGNAL( clicked() ), this, SLOT( toggleCrumbsBarAndEdit() ) );
 };
@@ -179,7 +189,7 @@ void NBAddressWidget::revertToCrumbsBar() {
 NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 
 	setFrameStyle( NoFrame );
-	setFixedHeight( 32 );
+	setFixedHeight( 28 );
 
 	QHBoxLayout *fLyt = new QHBoxLayout();
 	fLyt->setContentsMargins( QMargins() );
@@ -194,14 +204,20 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	forwardBtn->setFocusPolicy( Qt::NoFocus );
 	forwardBtn->setFlat( true );
 
+	NBSegmentButton *navBtns = new NBSegmentButton( this );
+	navBtns->addSegment( backBtn );
+	navBtns->addSegment( forwardBtn );
+
 	// AddressWidget
 	addressWidget = new NBAddressWidget( this );
 
 	// View Modes
 	viewModes = new NBSegmentButton( this );
+	viewModes->setObjectName( "base" );
+
 	viewModes->setFocusPolicy( Qt::NoFocus );
 	viewModes->setCount( 3 );
-	// viewModes->setSelectionBehavior( NBSegmentControl::SelectOne );
+	viewModes->setSelectionBehavior( NBSegmentButton::SelectOne );
 
 	// Tiles
 	viewModes->setSegmentIcon( 0, QIcon::fromTheme( "view-list-details" ) );
@@ -215,18 +231,28 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	viewModes->setSegmentIcon( 2, QIcon::fromTheme( "view-list-text" ) );
 	viewModes->segment( 2 )->setFocusPolicy( Qt::NoFocus );
 
+	if ( Settings->General.ViewMode == "Tiles" )
+		viewModes->segment( 0 )->setChecked( true );
+
+	else if ( Settings->General.ViewMode == "Tiles" )
+		viewModes->segment( 1 )->setChecked( true );
+
+	else
+		viewModes->segment( 1 )->setChecked( true );
+
 	// FilterButton
 	filterBtn = new NBButton( QIcon::fromTheme( "edit-find", QIcon( ":/icons/search.png" ) ) );
+	filterBtn->setObjectName( "base" );
 	filterBtn->setFocusPolicy( Qt::NoFocus );
 
 	// Process Widget
 	mProcWidget = new NBProcessManagerMini( this );
+	mProcWidget->setObjectName( "base" );
 
 	addressWidget->addressEdit->setFocusPolicy( Qt::ClickFocus );
 	addressWidget->crumbsBar->setFocusPolicy( Qt::NoFocus );
 
-	fLyt->addWidget( backBtn );
-	fLyt->addWidget( forwardBtn );
+	fLyt->addWidget( navBtns );
 	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( addressWidget );
 	fLyt->addWidget( Separator::vertical() );

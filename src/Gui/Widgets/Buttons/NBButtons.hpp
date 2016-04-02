@@ -14,9 +14,9 @@
 class NBSegmentButton : public QWidget {
 	Q_OBJECT
 
-	enum SelectionBehavior { SelectOne, SelectAll, SelectNone };
-
 	public:
+		enum SelectionBehavior { SelectOne, SelectAll, SelectNone };
+
 		NBSegmentButton( QWidget* );
 		NBSegmentButton( QList<QIcon>, QWidget* );
 		NBSegmentButton( QStringList, QWidget* );
@@ -42,8 +42,8 @@ class NBSegmentButton : public QWidget {
 		void insertSegment( NBButton *button, int logicalPos );
 		void addSegment( NBButton *button );
 
+		int selectionBehavior();
 		void setSelectionBehavior(SelectionBehavior behavior);
-		SelectionBehavior selectionBehavior() const;
 
 		QSize size();
 		QSize sizeHint();
@@ -58,6 +58,8 @@ class NBSegmentButton : public QWidget {
 		int myButtonHeight;
 		int myWidgetWidth;
 		int mSelectionBehavior;
+
+		QButtonGroup *btnGrp;
 
 	private slots:
 		void handleSegmentClick();

@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBADDRESSBAR_HPP
-#define NBADDRESSBAR_HPP
 
 #include <Global.hpp>
 #include <NBGuiWidgets.hpp>
@@ -103,5 +101,3 @@ class NBAddressBar : public QFrame {
 		void goBack();
 		void goForward();
 };
-
-#endif

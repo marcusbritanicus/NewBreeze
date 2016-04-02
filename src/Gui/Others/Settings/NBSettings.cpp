@@ -36,6 +36,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.TrayIcon = true;
 	defaultSettings->General.OpenWithCatalog = true;
 	defaultSettings->General.SidePanel = true;
+	defaultSettings->General.SidePanelType = 1;
 	defaultSettings->General.ShowHidden = false;
 	defaultSettings->General.IconSize = QSize( 48, 48 );
 	defaultSettings->General.SortColumn = 2;
@@ -85,6 +86,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->Shortcuts.AddBookmark = QList<QKeySequence>() << QKeySequence( "Ctrl+D" );
 	defaultSettings->Shortcuts.FocusSearchBar = QList<QKeySequence>() << QKeySequence( "Ctrl+F" );
 	defaultSettings->Shortcuts.ClearSearchBar = QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+F" );
+	defaultSettings->Shortcuts.QuitNewBreeze = QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+Q" );
 
 	return defaultSettings;
 };
@@ -125,6 +127,9 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "SidePanel" ) ) )
 		settings->General.SidePanel = gSettings.value( "SidePanel" ).toBool();
+
+	if ( gaKeys.contains( QString( "SidePanelType" ) ) )
+		settings->General.SidePanelType = gSettings.value( "SidePanelType" ).toInt();
 
 	if ( gaKeys.contains( QString( "ShowHidden" ) ) )
 		settings->General.ShowHidden = gSettings.value( "ShowHidden" ).toBool();
@@ -261,6 +266,9 @@ NBSettings* NBSettings::instance() {
 	if ( saKeys.contains( QString( "ClearSearchBar" ) ) )
 		settings->Shortcuts.ClearSearchBar = getShortcuts( "ClearSearchBar" );
 
+	if ( saKeys.contains( QString( "QuitNewBreeze" ) ) )
+		settings->Shortcuts.QuitNewBreeze = getShortcuts( "QuitNewBreeze" );
+
 	return settings;
 };
 
@@ -310,6 +318,9 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "General/SidePanel" ) ) )
 		General.SidePanel = gSettings.value( "General/SidePanel" ).toBool();
+
+	if ( gaKeys.contains( QString( "General/SidePanelType" ) ) )
+		General.SidePanel = gSettings.value( "General/SidePanelType" ).toInt();
 
 	if ( gaKeys.contains( QString( "General/ShowHidden" ) ) )
 		General.ShowHidden = gSettings.value( "General/ShowHidden" ).toBool();
@@ -436,6 +447,9 @@ void NBSettings::reload() {
 
 	if ( saKeys.contains( QString( "ClearSearchBar" ) ) )
 		Shortcuts.ClearSearchBar = getShortcuts( "ClearSearchBar" );
+
+	if ( saKeys.contains( QString( "QuitNewBreeze" ) ) )
+		Shortcuts.QuitNewBreeze = getShortcuts( "QuitNewBreeze" );
 };
 
 void NBSettings::setValue( QString key, QVariant value ) {

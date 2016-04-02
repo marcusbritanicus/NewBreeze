@@ -41,7 +41,7 @@ void NBEncFS::mountDir() {
 
 		/* Get our Password Keypad */
 		PasswordInput *pKeyPad = new PasswordInput( mParent );
-		if ( pKeyPad->exec() == QDialog::Accepted ) {
+		if ( pKeyPad->exec() != QDialog::Accepted ) {
 			proc.terminate();
 			return;
 		}
@@ -49,9 +49,11 @@ void NBEncFS::mountDir() {
 		QString password = pKeyPad->password();
 		pKeyPad->clear();
 
+		qDebug() << "Entered password";
 		proc.write( password.toLocal8Bit().data() );
 		proc.write( "\n" );
 		password.clear();
+		qDebug() << "Waiting for mount";
 		proc.waitForFinished();
 
 		if ( proc.exitCode() )

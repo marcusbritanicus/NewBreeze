@@ -83,4 +83,5 @@ class NBButton : public QPushButton {
 		/* Button StyleSheet info */
 		QColor mButtonColor;
 		QStringList radius;
+		QString leftBorderSize;
 };

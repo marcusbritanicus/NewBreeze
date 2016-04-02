@@ -30,6 +30,7 @@ class NBSettings {
 				bool TrayIcon;									// Minimize to tray?
 				bool OpenWithCatalog;							// Show catalog on NB Open?
 				bool SidePanel;									// Show sidepanel?
+				int SidePanelType;								// Show classic or modern?
 				bool ShowHidden;								// Show Hidden files and folders?
 				QSize IconSize;									// Default Icon Size
 				int SortColumn;									// Default Sort Column
@@ -91,6 +92,7 @@ class NBSettings {
 				QList<QKeySequence> AddBookmark;
 				QList<QKeySequence> FocusSearchBar;
 				QList<QKeySequence> ClearSearchBar;
+				QList<QKeySequence> QuitNewBreeze;
 		} Shortcuts;
 
 		static NBSettings* defaultInstance();
