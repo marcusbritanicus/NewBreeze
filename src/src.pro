@@ -316,22 +316,22 @@ lessThan(QT_MAJOR_VERSION, 5) {
 lessThan(QT_MAJOR_VERSION, 5) {
 
 	# QStorageInfo from Qt5 v5.4
-	HEADERS += Core/QVolumeInfo/QVolumeInfo.hpp
-	HEADERS += Core/QVolumeInfo/QVolumeInfoP.hpp
+	HEADERS += Core/DeviceInfo/QVolumeInfo/QVolumeInfo.hpp
+	HEADERS += Core/DeviceInfo/QVolumeInfo/QVolumeInfoP.hpp
 
-	SOURCES += Core/QVolumeInfo/QVolumeInfo.cpp
-	SOURCES += Core/QVolumeInfo/QVolumeInfoUnix.cpp
+	SOURCES += Core/DeviceInfo/QVolumeInfo/QVolumeInfo.cpp
+	SOURCES += Core/DeviceInfo/QVolumeInfo/QVolumeInfoUnix.cpp
 }
 
 isEqual(QT_MAJOR_VERSION, 5) {
 
 	# QStorageInfo from Qt5 v5.4
 	lessThan(QT_MINOR_VERSION, 4) {
-		HEADERS += Core/QVolumeInfo/QVolumeInfo.hpp
-		HEADERS += Core/QVolumeInfo/QVolumeInfoP.hpp
+		HEADERS += Core/DeviceInfo/QVolumeInfo/QVolumeInfo.hpp
+		HEADERS += Core/DeviceInfo/QVolumeInfo/QVolumeInfoP.hpp
 
-		SOURCES += Core/QVolumeInfo/QVolumeInfo.cpp
-		SOURCES += Core/QVolumeInfo/QVolumeInfoUnix.cpp
+		SOURCES += Core/DeviceInfo/QVolumeInfo/QVolumeInfo.cpp
+		SOURCES += Core/DeviceInfo/QVolumeInfo/QVolumeInfoUnix.cpp
 	}
 }
 
