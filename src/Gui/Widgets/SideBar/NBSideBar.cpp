@@ -58,7 +58,17 @@ void NBSideBar::populateSideBar() {
 	baseLayout->addStretch();
 	baseLayout->addWidget( trash );
 
-	setLayout( baseLayout );
+	QWidget *base = new QWidget( this );
+	base->setObjectName( "base" );
+	base->setLayout( baseLayout );
+
+	QVBoxLayout *lyt = new QVBoxLayout();
+	lyt->setContentsMargins( QMargins( 1, 1, 1, 1 ) );
+	lyt->setSpacing( 0 );
+
+	lyt->addWidget( base );
+
+	setLayout( lyt );
 
 	setFixedWidth( 150 );
 };
@@ -160,4 +170,16 @@ void NBSideBar::highlight( QString tgt ) {
 	}
 
 	dirs->setHighlighted( true );
+};
+
+void NBSideBar::paintEvent( QPaintEvent *pEvent ) {
+
+	QPainter painter( this );
+	painter.setRenderHint( QPainter::HighQualityAntialiasing );
+	painter.setPen( Qt::gray );
+
+	painter.drawRoundedRect( QRectF( rect().adjusted( 0, 0, -1, -1 ) ), 2.0, 2.0 );
+	painter.end();
+
+	pEvent->accept();
 };

@@ -39,6 +39,9 @@ class NBSideBar : public QWidget {
 		void reloadBookmarks();
 		void highlight( QString );
 
+	protected:
+		void paintEvent( QPaintEvent* );
+
 	Q_SIGNALS:
 		void showFolders();
 		void showApplications();
