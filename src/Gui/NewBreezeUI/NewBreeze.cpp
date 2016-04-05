@@ -127,7 +127,6 @@ void NewBreeze::createGUI() {
 	FolderView->setFocusPolicy( Qt::StrongFocus );
 
 	setFocusPolicy( Qt::NoFocus );
-	qDebug() << "Init complete";
 };
 
 void NewBreeze::setupSidePanel() {

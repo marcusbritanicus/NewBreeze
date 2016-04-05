@@ -148,7 +148,7 @@ void NBWebWatch::openInExternal() {
 
 QStringList NBMarkDownPreview::mimeTypesHandled() const {
 
-	return QStringList() << "text/x-markdown";
+	return QStringList() << "text/x-markdown" << "text/markdown";
 };
 
 QDialog* NBMarkDownPreview::getPreviewWidget( const QString &path ) {
