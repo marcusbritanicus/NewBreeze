@@ -8,9 +8,29 @@
 
 #include <Global.hpp>
 #include <NBTools.hpp>
+#include <NBIconProvider.hpp>
 #include <NBFileSystemNode.hpp>
 #include <NBFileInfoGatherer.hpp>
 #include <NBFileSystemWatcher.hpp>
+
+class NBIconUpdater : public QThread {
+	Q_OBJECT
+
+		public:
+		NBIconUpdater( QString, QStringList, bool *term );
+		~NBIconUpdater();
+
+	private:
+		void run();
+
+		QStringList entryList;
+		QString rootPath;
+
+		bool *__terminate;
+
+	signals:
+		void updated( QString, QString, QStringList );
+};
 
 class NBFileSystemModel : public QAbstractItemModel {
     Q_OBJECT
@@ -73,6 +93,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 		QString category( const QModelIndex &index = QModelIndex() ) const;
 		int categoryIndex( const QModelIndex &index = QModelIndex() ) const;
 		QStringList categories() const;
+		QPixmap pixmapForCategory( QString ) const;
 
 		int indexListCountForCategory( QString ) const;
 		QModelIndexList indexListForCategory( QString ) const;
@@ -180,7 +201,6 @@ class NBFileSystemModel : public QAbstractItemModel {
 		// History
 		QStringList oldRoots;
 		long curIndex;
-		mutable int updatedNodes;
 
 		/* To manage the rapidly changing nodes */
 		mutable QStringList lastUpdatedNodes;
@@ -195,7 +215,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 		NBFileSystemWatcher *watcher;
 
 	private slots:
-		void gatherFileInfo();
+		void updateAllNodes( QString root = QString() );
 		void saveInfo( QString, QString, QStringList );
 
 		void handleNodeCreated( QString );
@@ -206,19 +226,17 @@ class NBFileSystemModel : public QAbstractItemModel {
 
 		void updateDelayedNodes();
 
-		/* Perform the sorting again on a signal */
-		/* Just does sort( prevSort.column, prevSort.cs, prevSort.categorized ) */
-		void sort();
-
 	protected:
 		void timerEvent( QTimerEvent* );
 
 	Q_SIGNALS:
+		// Update Node
+		void nodeUpdated( QString );
+
 		void loadFileInfo();
 		void dirLoading( QString );
 		void directoryLoaded( QString );
 		void runningHome( QString );
-		void updatedAllNodes();
 
 		// Experimental
 		void loadApplications();

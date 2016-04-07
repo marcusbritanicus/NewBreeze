@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBICONVIEW_HPP
-#define NBICONVIEW_HPP
 
 #include <Global.hpp>
 #include <NBFileSystemModel.hpp>
@@ -203,7 +201,6 @@ class NBIconView : public QAbstractItemView {
 		mutable QStringList hiddenCategories;
 
 		QPoint dragStartPosition;
-		QRubberBand *rBand;
 
 	private slots:
 		void zoomIn();
@@ -220,5 +217,3 @@ class NBIconView : public QAbstractItemView {
 		void link( QStringList, QString );
 		void selectionChanged();
 };
-
-#endif

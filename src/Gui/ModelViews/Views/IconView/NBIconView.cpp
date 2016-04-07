@@ -1336,19 +1336,19 @@ QModelIndex NBIconView::belowIndex() {
 		return cIdxList.at( cIdxList.indexOf( idx ) + itemsPerRow );
 	}
 
-	// We have another row, just not an index below this
+	/* We have another row, just not an index below this */
 	else if ( ( cRow < cRows ) and ( ( cRow * itemsPerRow + persistentVCol ) >= cIdxList.count() - 1 ) ) {
 
 		return cIdxList.last();
 	}
 
-	// There is an index below this one in the next category
+	/* There is an index below this one in the next category */
 	else if ( nIdxList.count() > persistentVCol ) {
 
 		return nIdxList.at( persistentVCol );
 	}
 
-	// Last one in the next category
+	/* Last one in the next category */
 	else {
 
 		return nIdxList.last();
@@ -1415,16 +1415,22 @@ QModelIndex NBIconView::aboveIndex() {
 	int nLast = pIdxList.count() - ( pRows - 1 ) * itemsPerRow;
 
 	/* If we have a row above us in the current category, return the persistent index above */
-	if ( cRow > 1 )
+	if ( cRow > 1 ) {
+
 		return cIdxList.at( ( cIdxList.indexOf( idx ) / itemsPerRow - 1 ) * itemsPerRow + persistentVCol );
+	}
 
 	/* We have to return from the previous category */
-	else if ( persistentVCol < nLast )
+	else if ( persistentVCol < nLast ) {
+
 		return pIdxList.at( ( pRows - 1 ) * itemsPerRow + persistentVCol );
+	}
 
 	/* The last index of the previous category */
-	else
+	else {
+
 		return pIdxList.last();
+	}
 };
 
 QModelIndex NBIconView::firstIndex() {
@@ -1438,6 +1444,8 @@ QModelIndex NBIconView::firstIndex() {
 			break;
 		}
 	}
+
+	verticalScrollBar()->setValue( 0 );
 
 	if ( firstVisibleCatIdx >= 0 )
 		return cModel->indexListForCategory( categoryList.at( firstVisibleCatIdx ) ).first();
@@ -1455,6 +1463,8 @@ QModelIndex NBIconView::lastIndex() {
 			break;
 		}
 	}
+
+	verticalScrollBar()->setValue( verticalScrollBar()->maximum() );
 
 	persistentVCol = ( cModel->indexListCountForCategory( categoryList.at( lastVisibleCatIdx ) ) - 1 ) % itemsPerRow;
 
@@ -1721,6 +1731,8 @@ void NBIconView::calculateRectsIfNecessary() const {
 		calculateNonCategorizedRects();
 
 	if ( idealHeight <= viewport()->height() ) {
+
+		verticalScrollBar()->setRange( 0, 0 );
 		verticalScrollBar()->hide();
 	}
 

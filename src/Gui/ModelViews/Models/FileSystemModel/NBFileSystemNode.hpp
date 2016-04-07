@@ -46,7 +46,6 @@ class NBFileSystemNode {
 		void sort( int column = 0, bool cs = false, bool categorized = false );
 
 		void updateCategories();
-		QStringList mCategoryList;
 
 		QIcon icon();
 
@@ -55,6 +54,7 @@ class NBFileSystemNode {
 		QVariantList nodeData;
 		NBFileSystemNode *parentNode;
 
+		QStringList mCategoryList;
 		QString myCategory;
 		QIcon mIcon;
 

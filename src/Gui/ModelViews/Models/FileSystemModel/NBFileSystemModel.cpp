@@ -17,6 +17,37 @@ inline bool matchesFilter( QStringList filters, QString text ) {
 	return false;
 };
 
+NBIconUpdater::NBIconUpdater( QString root, QStringList entries, bool *term ) : QThread() {
+
+	__terminate = term;
+
+	entryList.clear();
+	entryList << entries;
+
+	rootPath.clear();
+	rootPath = root;
+	if ( not root.endsWith( "/" ) )
+		rootPath += "/";
+};
+
+NBIconUpdater::~NBIconUpdater() {
+
+	wait();
+};
+
+void NBIconUpdater::run() {
+
+	if ( rootPath != "/dev/" ) {
+		foreach( QString entry, entryList ) {
+			if ( *__terminate )
+				break;
+
+			QMimeType mimeType = mimeDb.mimeTypeForFile( rootPath + entry );
+			emit updated( rootPath, entry, QStringList() << NBIconProvider::icon( rootPath + entry, mimeType ) );
+		}
+	}
+};
+
 NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 
 	/* By default we don't show hidden files */
@@ -24,9 +55,6 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 
 	/* Filter both files and folders? */
 	__filterFolders = Settings->General.FilterFolders;
-
-	/* Number of updated files */
-	updatedNodes = 0;
 
 	/* Switch for temination of data gathering */
 	__terminate = false;
@@ -61,9 +89,7 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 	connect( watcher, SIGNAL( nodeRenamed( QString, QString ) ), this, SLOT( handleNodeRenamed( QString, QString ) ) );
 	connect( watcher, SIGNAL( watchPathDeleted() ), this, SLOT( loadHome() ) );
 
-	/* File info gathering and sorting */
-	connect( this, SIGNAL( loadFileInfo() ), this, SLOT( gatherFileInfo() ) );
-	connect( this, SIGNAL( updatedAllNodes() ), this, SLOT( sort() ) );
+	// connect( this, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateAllNodes( QString ) ) );
 };
 
 NBFileSystemModel::~NBFileSystemModel() {
@@ -719,7 +745,7 @@ void NBFileSystemModel::setRootPath( QString path ) {
 		currentLoadStatus.stopLoading = true;
 
 	/* If the root path is /dev/, then stop the watcher */
-	if ( __rootPath == "/dev/" )
+	if ( __rootPath.startsWith( "/dev/" ) )
 		newWatch( QString() );
 
 	/* For all the other folders, we can happily start the watcher */
@@ -940,6 +966,8 @@ void NBFileSystemModel::setupModelData() {
 
 	emit loadFileInfo();
 	emit directoryLoaded( __rootPath );
+
+	updateAllNodes( __rootPath );
 };
 
 void NBFileSystemModel::newWatch( QString path ) {
@@ -1067,22 +1095,17 @@ void NBFileSystemModel::recategorize() {
 	rootNode->updateCategories();
 };
 
-void NBFileSystemModel::gatherFileInfo() {
-
-	updatedNodes = 0;
-
-	NBFileInfoGatherer *ig = new NBFileInfoGatherer( &__terminate );
-	connect(
-		ig, SIGNAL( done( QString, QString, QStringList ) ),
-		this, SLOT( saveInfo( QString, QString, QStringList ) )
-	);
-
-	ig->gatherInfo( __childNames, __rootPath );
-};
-
 void NBFileSystemModel::terminateInfoGathering() {
 
 	__terminate = true;
+};
+
+void NBFileSystemModel::updateAllNodes( QString root ) {
+
+	NBIconUpdater *iconUpdater = new NBIconUpdater( root, __childNames, &__terminate );
+	connect( iconUpdater, SIGNAL( updated( QString, QString, QStringList ) ), this, SLOT( saveInfo( QString, QString, QStringList ) ) );
+
+	iconUpdater->start();
 };
 
 void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info ) {
@@ -1103,14 +1126,18 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 	QModelIndex idx = index( entry );
 	NBFileSystemNode *node = rootNode->child( entry );
 
-	node->setData( 2, info.at( 0 ), true );
-	node->setData( 2, info.at( 1 ), false );
-	node->setData( 3, info.at( 2 ), false );
+	/* Updating the icon */
+	if (  info.count() == 1 ) {
 
-	updatedNodes++;
+		node->setData( 2, info.at( 0 ), true );
+	}
 
-	if ( updatedNodes == rowCount() )
-		emit updatedAllNodes();
+	/* Updating the icons, mime and category */
+	else if (  info.count() == 3 ) {
+		node->setData( 2, info.at( 0 ), true );
+		node->setData( 2, info.at( 1 ), false );
+		node->setData( 3, info.at( 2 ), false );
+	}
 
 	emit dataChanged( idx, idx );
 };
@@ -1182,11 +1209,6 @@ void NBFileSystemModel::loadHome() {
 
 	emit runningHome( currentDir() );
 	goHome();
-};
-
-void NBFileSystemModel::sort() {
-
-	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 };
 
 void NBFileSystemModel::timerEvent( QTimerEvent *tEvent ) {

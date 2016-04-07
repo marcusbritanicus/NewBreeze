@@ -3,12 +3,14 @@ Version 3.0.0 Alpha
 	- Feature: Scaling for NBIconView
 	- Feature: NBArchiveDialog helps to create an archive
 	- Feature: Improved AboutNB dialog
-	- Feature: Added License dialog, shoing the complete GPL3 license
+	- Feature: Added License dialog, showing the complete GPL3 license
 	- Feature: NBProcessManager replaces NBIOManager with better functionality
 	- Feature: Categories can be shown/hidden, selected/deselected with single click
+	- Feature: MarkDownPreview plugin, using libsoldout markdown library
+	- Feature: NBCrypt plugin for file and folder encryption
+	- Feature: TextEditor plugin for quick editing of text
 	- Archive creation and extraction are performed using QtConcurrent::run
-	- Plugins are new part of the NewBreeze source tree
-	- MarkDownPreview plugin now uses libsoldout markdown library
+	- Plugins are now part of the NewBreeze source tree
 	- NewBreeze uses QtSingleApplication for one instance multiple windows
 	- Redesigned UI for better code maintenance
 	- Redesigned NBCrumbsBar (formerly, NBBreadCrumbsBar)

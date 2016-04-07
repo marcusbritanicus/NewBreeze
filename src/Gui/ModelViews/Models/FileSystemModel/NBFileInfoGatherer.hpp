@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBFILEINFOGATHERER_HPP
-#define NBFILEINFOGATHERER_HPP
 
 #include <Global.hpp>
 #include <NBTools.hpp>
@@ -44,5 +42,3 @@ class NBFileInfoGatherer : public QThread {
 	signals:
 		void done( QString, QString, QStringList );
 };
-
-#endif

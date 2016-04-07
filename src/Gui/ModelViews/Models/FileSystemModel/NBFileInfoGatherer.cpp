@@ -107,20 +107,15 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 	}
 
 	else if ( S_ISREG( statbuf.st_mode ) ) {
-		QStringList baseExtInfo;
-		if ( statbuf.st_mode & S_IXUSR )
-			baseExtInfo = QStringList() << "Executable" << "application/octet-stream" << "application-octet-stream";
-		else
-			baseExtInfo = QStringList() << "Regular File" << "application/octet-stream" << "application-octet-stream";
-		QStringList extInfo = fileTypes->value( name.section( ".", 1 ), baseExtInfo ).toStringList();
+		QMimeType mType = mimeDb.mimeTypeForFile( path );
 
 		info << "file";
 		info << quint64( statbuf.st_size );
-		info << extInfo.value( 2 );
+		info << mType.iconName();
 		info << ( name.isEmpty() ? "/" : name );
 		info << formatSize( statbuf.st_size );
-		info << extInfo.value( 0 );
-		info << extInfo.value( 1 );
+		info << mType.comment();
+		info << mType.name();
 	}
 
 	else if ( S_ISCHR( statbuf.st_mode ) ) {

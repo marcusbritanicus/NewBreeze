@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBICONDELEGATE_HPP
-#define NBICONDELEGATE_HPP
 
 #include <Global.hpp>
 
@@ -26,5 +24,3 @@ class NBIconDelegate : public QItemDelegate {
 		mutable int maxLines;		// Max number of lines that can be written
 		mutable int textLines;		// Number of lines the filename occupies
 };
-
-#endif

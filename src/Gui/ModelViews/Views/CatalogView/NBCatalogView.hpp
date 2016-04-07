@@ -5,8 +5,6 @@
 */
 
 #pragma once
-#ifndef NBCATALOGVIEW_HPP
-#define NBCATALOGVIEW_HPP
 
 #include <Global.hpp>
 #include <NBCatalogModel.hpp>
@@ -25,14 +23,12 @@ class NBCatalogView : public QAbstractItemView {
 		// Set the item model
 		void setModel( QAbstractItemModel *model );
 
+		// Update the view mode
+		void updateViewMode();
+
 		// Category drawing height : myCategoryHeight
 		int categoryHeight() const;
 		void setCategoryHeight( int );
-
-		// Grid size for the indexes: myGridSizeMin, myGridSize
-		QSize gridSize() const;
-		void setGridSize( QSize );
-		void setGridSize( int, int );
 
 		// Icon Size for the indexes: myIconSize
 		QSize iconSize() const;
@@ -53,7 +49,7 @@ class NBCatalogView : public QAbstractItemView {
 		int categorySpacing() const;
 		void setCategorySpacing( int );
 
-		// Given the index, return the visual index
+		// Given the index, return the visual rect
 		QRect visualRect( const QModelIndex &index ) const;
 
 		// Given the category index get the rectangle for it
@@ -68,14 +64,18 @@ class NBCatalogView : public QAbstractItemView {
 		// Get the category at a given point
 		QString categoryAt( const QPoint &position ) const;
 
-	public slots:
-		void reload();
+		// Return the selected indexes
+		QModelIndexList selection();
+
+		// Is the index visible in the viewport?
+		bool isIndexVisible( QModelIndex ) const;
 
 	protected slots:
 		void dataChanged( const QModelIndex &topLeft, const QModelIndex &bottomRight );
 		void rowsInserted( const QModelIndex &parent, int start, int end );
 		void rowsAboutToBeRemoved( const QModelIndex &parent, int start, int end );
 		void updateGeometries();
+		void reload();
 
 	protected:
 		QModelIndex moveCursor( QAbstractItemView::CursorAction cursorAction, Qt::KeyboardModifiers modifiers );
@@ -86,22 +86,64 @@ class NBCatalogView : public QAbstractItemView {
 		void setSelection( const QRect &rect, QFlags<QItemSelectionModel::SelectionFlag> flags );
 		QRegion visualRegionForSelection( const QItemSelection &selection ) const;
 
+		QModelIndexList selectedIndexes();
+
 		void paintEvent( QPaintEvent* );
 		void resizeEvent( QResizeEvent* );
-		void mousePressEvent( QMouseEvent *event );
-		void mouseDoubleClickEvent( QMouseEvent *event );
+
+		void mousePressEvent( QMouseEvent * );
+		void mouseDoubleClickEvent( QMouseEvent * );
+
+		void keyPressEvent( QKeyEvent* );
 
 	private:
+		// Grid size for the indexes: myGridSizeMin, myGridSize
+		void computeGridSize( QSize );
+
+		QModelIndex moveCursorCategorized( QAbstractItemView::CursorAction cursorAction );
+		QModelIndex moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction );
+
+		void toggleCategorySelection( QString );
+		void setCategorySelected( QString, bool );
+
+		// Cursor Movement Helpers
+		QModelIndex nextIndex();
+		QModelIndex prevIndex();
+		QModelIndex aboveIndex();
+		QModelIndex belowIndex();
+
+		QModelIndex firstIndex();
+		QModelIndex lastIndex();
+
+		QModelIndex indexPageBelow();
+		QModelIndex indexPageAbove();
+
 		void calculateRectsIfNecessary() const;
+
+		void calculateCategorizedRects() const;
 		void computeRowsAndColumns() const;
 
 		QRect viewportRectForRow( int row ) const;
 
 		void paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const;
+		void paintSelection( QPainter *painter, const QModelIndexList ) const;
 		QPixmap pixmapForCategory( QString ) const;
 
-		NBCatalogModel *catalogModel;
+		void showHideCategory( QString );
+		bool canShowIndex( QModelIndex );
 
+		// Applications Model
+		NBCatalogModel *cModel;
+
+		// ViewMode
+		mutable QString currentViewMode;
+
+		// Selection
+		mutable QModelIndexList mSelectedIndexes;
+		mutable QStringList mSelectedCategories;
+		mutable QModelIndex mSelStartIdx;
+
+		// Icon rects
 		mutable int idealHeight;
 		mutable QHash<int, QPoint> rectForRow;
 		mutable QHash<int, QRect> rectForCategory;
@@ -133,8 +175,18 @@ class NBCatalogView : public QAbstractItemView {
 		// Items per visual row
 		mutable int itemsPerRow;
 		mutable int numberOfRows;
+		mutable int padding;
+
+		// Category List
+		mutable QStringList categoryList;
+
+		// Hidden Categories
+		mutable QStringList hiddenCategories;
 
 	private slots:
+		void zoomIn();
+		void zoomOut();
+
 		void openCatalogItem();
 		void deleteCatalogItem();
 		void openCatalogItem( const QModelIndex &index );
@@ -143,5 +195,3 @@ class NBCatalogView : public QAbstractItemView {
 	Q_SIGNALS:
 		void openLocation( QString );
 };
-
-#endif
