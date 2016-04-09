@@ -100,7 +100,7 @@ void NBSideBar::highlight( QString tgt ) {
 	apps->setHighlighted( false );
 	ctlg->setHighlighted( false );
 
-	if ( tgt.startsWith( "NB://Aplications" ) ) {
+	if ( tgt.startsWith( "NB://Applications" ) ) {
 
 		dirs->setHighlighted( false );
 		apps->setHighlighted( true );

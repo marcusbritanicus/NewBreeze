@@ -540,6 +540,45 @@ QPixmap NBItemViewModel::pixmapForCategory( QString categoryName ) const {
 
 	switch ( __mModelDataType ) {
 
+		case NBItemViewModel::Applications: {
+
+			if ( categoryName == "Accessories" )
+				return QIcon::fromTheme( "applications-accessories" ).pixmap( 24, 24 );
+
+			else if ( categoryName == "Development" )
+				return QIcon::fromTheme( "applications-development" ).pixmap( 24, 24 );
+
+			else if ( categoryName == "Education" )
+				return QIcon::fromTheme( "applications-education" ).pixmap( 24, 24 );
+
+			else if ( categoryName == "Games" )
+				return QIcon::fromTheme( "applications-games" ).pixmap( 24, 24 );
+
+			else if ( categoryName == "Graphics" )
+				return QIcon::fromTheme( "applications-graphics" ).pixmap( 24, 24 );
+
+			else if ( categoryName == "Internet" )
+				return QIcon::fromTheme( "applications-internet" ).pixmap( 24, 24 );
+
+			else if ( categoryName == "Multimedia" )
+				return QIcon::fromTheme( "applications-multimedia" ).pixmap( 24, 24 );
+
+			else if ( categoryName == "Office" )
+				return QIcon::fromTheme( "applications-office" ).pixmap( 24, 24 );
+
+			else if ( categoryName == "Science and Math" )
+				return QIcon::fromTheme( "applications-science" ).pixmap( 24, 24 );
+
+			else if ( categoryName == "Settings" )
+				return QIcon::fromTheme( "preferences-system" ).pixmap( 24, 24 );
+
+			else if ( categoryName == "System" )
+				return QIcon::fromTheme( "applications-system" ).pixmap( 24, 24 );
+
+			else
+				return QIcon::fromTheme( "preferences-other" ).pixmap( 24, 24 );
+		}
+
 		case NBItemViewModel::Catalogs: {
 
 			if ( categoryName == "Documents" )
@@ -797,17 +836,19 @@ QString NBItemViewModel::rootPath() const {
 
 void NBItemViewModel::setRootPath( QString path ) {
 
-	if ( path == QString( "NB://SuperStart" ) ) {
+	__rootPath = path;
+
+	if ( path.startsWith( "NB://SuperStart" ) ) {
 		__mVirtualData = true;
 		__mModelDataType = (quint64)NBItemViewModel::SuperStart;
 	}
 
-	else if ( path == QString( "NB://Applications" ) ) {
+	else if ( path.startsWith( "NB://Applications" ) ) {
 		__mVirtualData = true;
 		__mModelDataType = (quint64)NBItemViewModel::Applications;
 	}
 
-	else if ( path == QString( "NB://Catalogs" ) ) {
+	else if ( path.startsWith( "NB://Catalogs" ) ) {
 		__mVirtualData = true;
 		__mModelDataType = (quint64)NBItemViewModel::Catalogs;
 	}
@@ -815,12 +856,9 @@ void NBItemViewModel::setRootPath( QString path ) {
 	else {
 		__mVirtualData = false;
 		__mModelDataType = (quint64)NBItemViewModel::FileSystem;
-	}
 
-
-	/* Add a trailing / only if we have a real location */
-	if ( not __rootPath.startsWith( "NB://" ) )
 		__rootPath = ( path.endsWith( "/" ) ? path : path + "/" );
+	}
 
 	/* Navigation: If we are in the middle, remove all 'forawrd' roots */
 	if ( oldRoots.count() )
@@ -995,7 +1033,7 @@ void NBItemViewModel::setupFileSystemData() {
 	delayedUpdateList.clear();
 	updateTimer.stop();
 
-	emit dirLoading( __rootPath );
+	emit directoryLoading( __rootPath );
 
 	beginResetModel();
 	if ( dir != NULL ) {
@@ -1084,7 +1122,7 @@ void NBItemViewModel::setupApplicationsData() {
 	rootNode->clearChildren();
 	currentLoadStatus.loading = true;
 
-	emit dirLoading( __rootPath );
+	emit directoryLoading( __rootPath );
 
 	beginResetModel();
 	NBAppEngine *appEngine = NBAppEngine::instance();
@@ -1129,7 +1167,7 @@ void NBItemViewModel::setupCatalogData() {
 	rootNode->clearChildren();
 	currentLoadStatus.loading = true;
 
-	emit dirLoading( __rootPath );
+	emit directoryLoading( __rootPath );
 
 	QSettings catalogsSettings( "NewBreeze", "Catalogs" );
 	/* Default Catalogs */

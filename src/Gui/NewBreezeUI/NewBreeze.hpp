@@ -102,6 +102,10 @@ class NewBreeze : public QMainWindow {
 		void toggleSideBarVisible();
 		void showHideTermWidget();
 
+		/* Busy cursor during loading of models */
+		void setBusyCursor();
+		void setNormalCursor();
+
 		void quit();
 
 	protected:

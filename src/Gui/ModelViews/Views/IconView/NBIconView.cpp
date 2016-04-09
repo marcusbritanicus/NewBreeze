@@ -94,7 +94,7 @@ NBIconView::NBIconView( NBItemViewModel *fsModel ) : QAbstractItemView() {
 	// Context Menu
 	setContextMenuPolicy( Qt::CustomContextMenu );
 
-	connect( cModel, SIGNAL( dirLoading( QString ) ), this, SLOT( reload() ) );
+	connect( cModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( reload() ) );
 	connect( cModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( reload() ) );
 	connect( cModel, SIGNAL( layoutChanged() ), this, SLOT( reload() ) );
 	connect( this, SIGNAL( customContextMenuRequested( QPoint ) ), this, SIGNAL( contextMenuRequested( QPoint ) ) );

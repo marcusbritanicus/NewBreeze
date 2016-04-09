@@ -186,10 +186,13 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( hideStatusBar() ), InfoBar, SLOT( hide() ) );
 	connect( FolderView, SIGNAL( showStatusBar() ), InfoBar, SLOT( show() ) );
 
-	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
-	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateInfoBar() ) );
+	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
+	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateInfoBar() ) );
 
-	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), SideBar, SLOT( highlight( QString ) ) );
+	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), SideBar, SLOT( highlight( QString ) ) );
+
+	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( setBusyCursor() ) );
+	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( setNormalCursor() ) );
 
 	// About NB
 	QAction *aboutNBAct = new QAction( this );
@@ -606,10 +609,8 @@ void NewBreeze::handleDriveUrl( QString url ){
 
 void NewBreeze::showApplications() {
 
-	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel ) {
+	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
 		SidePanel->flashApplications();
-		SideBar->highlight( "NB://Applications" );
-	}
 
 	FolderView->doOpen( "NB://Applications" );
 	AddressBar->setAddress( "NB://Applications" );
@@ -617,10 +618,8 @@ void NewBreeze::showApplications() {
 
 void NewBreeze::showCatalogs() {
 
-	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel ) {
+	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
 		SidePanel->flashCatalogs();
-		SideBar->highlight( "NB://Catalogs" );
-	}
 
 	FolderView->doOpen( "NB://Catalogs" );
 	AddressBar->setAddress( "NB://Catalogs" );
@@ -806,6 +805,16 @@ void NewBreeze::showHideTermWidget() {
 		Terminal->setFocus();
 		return;
 	}
+};
+
+void NewBreeze::setBusyCursor() {
+
+	setCursor( Qt::WaitCursor );
+};
+
+void NewBreeze::setNormalCursor() {
+
+	setCursor( Qt::ArrowCursor );
 };
 
 void NewBreeze::quit() {

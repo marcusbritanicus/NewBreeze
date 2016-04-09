@@ -244,7 +244,7 @@ class NBItemViewModel : public QAbstractItemModel {
 		/* Updated Node */
 		void nodeUpdated( QString );
 
-		void dirLoading( QString );
+		void directoryLoading( QString );
 		void directoryLoaded( QString );
 		void runningHome( QString );
 };
