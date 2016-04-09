@@ -44,9 +44,6 @@ class NBSideBar : public QWidget {
 
 	Q_SIGNALS:
 		void showFolders();
-		void showApplications();
-		void showCatalogs();
-
 		void showTrash();
 
 		void driveClicked( QString );

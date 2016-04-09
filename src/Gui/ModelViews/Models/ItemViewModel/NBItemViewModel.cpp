@@ -1,10 +1,11 @@
 /*
 	*
-	* NBFileSystemModel.cpp - NewBreeze NBFileSystemModel Class
+	* NBItemViewModel.cpp - NewBreeze NBItemViewModel Class
 	*
 */
 
-#include <NBFileSystemModel.hpp>
+#include <NBItemViewModel.hpp>
+#include <NBAppEngine.hpp>
 
 static QMutex mutex;
 
@@ -32,6 +33,7 @@ NBIconUpdater::NBIconUpdater( QString root, QStringList entries, bool *term ) : 
 
 NBIconUpdater::~NBIconUpdater() {
 
+	terminate();
 	wait();
 };
 
@@ -48,7 +50,7 @@ void NBIconUpdater::run() {
 	}
 };
 
-NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
+NBItemViewModel::NBItemViewModel() : QAbstractItemModel() {
 
 	/* By default we don't show hidden files */
 	__showHidden = false;
@@ -59,11 +61,12 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 	/* Switch for temination of data gathering */
 	__terminate = false;
 
-	/* Do we show the CombiView */
-	__mCombiShown = false;
+	/* Do we show the special directories */
+	__mModelDataType = NBItemViewModel::FileSystem;
+	__mVirtualData = false;
 
 	/* Categrorization enabled by default */
-	mCategorizationEnabled = true;
+	mCategorizationEnabled = Settings->General.Grouping;
 
 	/* Useless swtiches */
 	currentLoadStatus.loading = false;
@@ -77,7 +80,7 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 	curIndex = 0;
 
 	/* Root node */
-	rootNode = new NBFileSystemNode();
+	rootNode = new NBItemViewNode();
 
 	quickDataGatherer = new NBQuickFileInfoGatherer();
 
@@ -92,22 +95,22 @@ NBFileSystemModel::NBFileSystemModel() : QAbstractItemModel() {
 	// connect( this, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateAllNodes( QString ) ) );
 };
 
-NBFileSystemModel::~NBFileSystemModel() {
+NBItemViewModel::~NBItemViewModel() {
 
 };
 
-bool NBFileSystemModel::isCategorizationEnabled() {
+bool NBItemViewModel::isCategorizationEnabled() {
 
 	return mCategorizationEnabled;
 };
 
-void NBFileSystemModel::setCategorizationEnabled( bool enabled ) {
+void NBItemViewModel::setCategorizationEnabled( bool enabled ) {
 
 	mCategorizationEnabled = enabled;
 	sort( prevSort.column, prevSort.cs, enabled );
 };
 
-int NBFileSystemModel::rowCount( const QModelIndex & parent ) const {
+int NBItemViewModel::rowCount( const QModelIndex & parent ) const {
 
 	if ( parent.column() > 0 )
 		return 0;
@@ -116,10 +119,10 @@ int NBFileSystemModel::rowCount( const QModelIndex & parent ) const {
 		return rootNode->childCount();
 
 	else
-		return static_cast<NBFileSystemNode*>( parent.internalPointer() )->childCount();
+		return static_cast<NBItemViewNode*>( parent.internalPointer() )->childCount();
 };
 
-int NBFileSystemModel::rowCount( QString mCategory ) const {
+int NBItemViewModel::rowCount( QString mCategory ) const {
 
 	if ( not rootNode->categoryList().contains( mCategory ) or mCategory.isEmpty() or mCategory.isNull() )
 		return 0;
@@ -127,18 +130,18 @@ int NBFileSystemModel::rowCount( QString mCategory ) const {
 	return categoryRowMap[ mCategory ].count();
 };
 
-int NBFileSystemModel::categoryCount() const {
+int NBItemViewModel::categoryCount() const {
 
 	return rootNode->categoryCount();
 };
 
-int NBFileSystemModel::columnCount( const QModelIndex & parent ) const {
+int NBItemViewModel::columnCount( const QModelIndex & parent ) const {
 
 	Q_UNUSED( parent );
 	return 7;
 };
 
-Qt::ItemFlags NBFileSystemModel::flags( const QModelIndex & index ) const {
+Qt::ItemFlags NBItemViewModel::flags( const QModelIndex & index ) const {
 
 	if ( not index.isValid() )
 		return Qt::NoItemFlags;
@@ -150,17 +153,17 @@ Qt::ItemFlags NBFileSystemModel::flags( const QModelIndex & index ) const {
 		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
 };
 
-QVariant NBFileSystemModel::data( const QModelIndex &index, int role ) const {
+QVariant NBItemViewModel::data( const QModelIndex &index, int role ) const {
 
 	if ( not index.isValid() )
 		return QVariant();
 
-	NBFileSystemNode *node = static_cast<NBFileSystemNode*>( index.internalPointer() );
+	NBItemViewNode *node = static_cast<NBItemViewNode*>( index.internalPointer() );
 	switch( role ) {
 
 		case Qt::DisplayRole: {
-			if (  ( index.column() >= 0 ) and ( index.column() <= 6  ) )
-				return QVariant( node->data( index.column() ) );
+			if (  ( index.column() >= 0 ) and ( index.column() <= 9  ) )
+				return node->data( index.column() );
 
 			else
 				return QVariant();
@@ -168,17 +171,36 @@ QVariant NBFileSystemModel::data( const QModelIndex &index, int role ) const {
 
 		case Qt::DecorationRole: {
 			if ( index.column() == 0 ) {
-				// Icon String
-				QString icoStr( node->data( 2, true ).toString() );
+				switch( __mModelDataType ) {
+					case NBItemViewModel::Applications: {
+						QString icoStr( node->data( 2, true ).toString() );
+						QIcon icon = QIcon::fromTheme( icoStr );
 
-				// Icon we got from the theme
-				QIcon themeIcon = QIcon::fromTheme( icoStr, QIcon( icoStr ) );
+						if ( icon.isNull() )
+							icon = QIcon( NBIconProvider::pixmapIcon( icoStr ) );
 
-				if ( not themeIcon.isNull() )
-					return themeIcon;
+						if ( icon.isNull() )
+							icon = QIcon::fromTheme( "application-x-desktop", QIcon::fromTheme( "application-x-executable", QIcon( ":/icons/exec.png" ) ) );
 
-				else
-					return QIcon::fromTheme( "unknown", QIcon( ":/icons/unknown.png" ) );
+						return icon;
+					}
+
+					case NBItemViewModel::SuperStart:
+					case NBItemViewModel::Catalogs:
+					case NBItemViewModel::FileSystem: {
+						// Icon String
+						QString icoStr( node->data( 2, true ).toString() );
+
+						// Icon we got from the theme
+						QIcon themeIcon = QIcon::fromTheme( icoStr, QIcon( icoStr ) );
+
+						if ( not themeIcon.isNull() )
+							return themeIcon;
+
+						else
+							return QIcon::fromTheme( "unknown", QIcon( ":/icons/unknown.png" ) );
+					}
+				}
 			}
 
 			return QVariant();
@@ -205,9 +227,23 @@ QVariant NBFileSystemModel::data( const QModelIndex &index, int role ) const {
 
 		case Qt::ToolTipRole: {
 			switch( index.column() ) {
-				case 0:	return QString( "<center>%1<br>%2</center>" ).arg( node->data( 0 ).toString() ).arg( node->data( 1 ).toString() );
-				default: return QString( "<b>%1</b>" ).arg( node->data( index.column() ).toString() );
+				case 0:	{
+					if ( __mModelDataType == NBItemViewModel::Applications )
+						return QString( "<center>%1<br>%2</center>" ).arg( node->data( 0 ).toString() ).arg( node->data( 2 ).toString() );
+
+					else
+						return QString( "<center>%1<br>%2</center>" ).arg( node->data( 0 ).toString() ).arg( node->data( 1 ).toString() );
+
+				}
+				default: {
+
+					return QString( "<b>%1</b>" ).arg( node->data( index.column() ).toString() );
+				}
 			}
+		}
+
+		case Qt::UserRole + 0: {
+			return node->data( 0 );
 		}
 
 		case Qt::UserRole + 1: {
@@ -234,13 +270,25 @@ QVariant NBFileSystemModel::data( const QModelIndex &index, int role ) const {
 			return node->data( 6 );
 		}
 
+		case Qt::UserRole + 7: {
+			return node->data( 7 );
+		}
+
+		case Qt::UserRole + 8: {
+			return node->data( 8 );
+		}
+
+		case Qt::UserRole + 9: {
+			return node->data( 9 );
+		}
+
 		default: {
 			return QVariant();
 		}
 	}
 };
 
-QVariant NBFileSystemModel::headerData( int section, Qt::Orientation orientation, int role ) const {
+QVariant NBItemViewModel::headerData( int section, Qt::Orientation orientation, int role ) const {
 
 	QVariantList headerList = QVariantList() << "Name" << "Size" << "Type" << "MimeType" << "Modified" << "Permissions" << "Owner";
 
@@ -261,7 +309,7 @@ QVariant NBFileSystemModel::headerData( int section, Qt::Orientation orientation
 		return QVariant();
 };
 
-bool NBFileSystemModel::setData( const QModelIndex &index, QVariant value, int role ) {
+bool NBItemViewModel::setData( const QModelIndex &index, QVariant value, int role ) {
 
 	bool ok = rootNode->child( index.row() )->setData( role, value );
 	if ( ok )
@@ -270,7 +318,17 @@ bool NBFileSystemModel::setData( const QModelIndex &index, QVariant value, int r
 	return ok;
 };
 
-bool NBFileSystemModel::insertNode( QString nodeName ) {
+bool NBItemViewModel::isRealLocation() const {
+
+	return not __mVirtualData;
+};
+
+quint64 NBItemViewModel::modelDataType() const {
+
+	return __mModelDataType;
+};
+
+bool NBItemViewModel::insertNode( QString nodeName ) {
 
 	/*
 		*
@@ -290,12 +348,12 @@ bool NBFileSystemModel::insertNode( QString nodeName ) {
 	if ( __showHidden ) {
 		if ( __nameFilters.count() ) {
 			if ( matchesFilter( __nameFilters, nodeName ) ) {
-				rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
+				rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 				__childNames << nodeName;
 			}
 		}
 		else {
-			rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
+			rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 			__childNames << nodeName;
 		}
 	}
@@ -303,12 +361,12 @@ bool NBFileSystemModel::insertNode( QString nodeName ) {
 		if ( not nodeName.startsWith( "." ) ) {
 			if ( __nameFilters.count() ) {
 				if ( matchesFilter( __nameFilters, nodeName ) ) {
-					rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
+					rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 					__childNames << nodeName;
 				}
 			}
 			else {
-				rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
+				rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 				__childNames << nodeName;
 			}
 		}
@@ -329,7 +387,7 @@ bool NBFileSystemModel::insertNode( QString nodeName ) {
 	return true;
 };
 
-void NBFileSystemModel::updateNode( QString nodeName ) {
+void NBItemViewModel::updateNode( QString nodeName ) {
 
 	QMutexLocker locker( &mutex );
 	if ( not exists( __rootPath + nodeName ) )
@@ -338,7 +396,7 @@ void NBFileSystemModel::updateNode( QString nodeName ) {
 	if ( not __childNames.contains( nodeName ) )
 		return;
 
-	NBFileSystemNode *node = rootNode->child( nodeName );
+	NBItemViewNode *node = rootNode->child( nodeName );
 	if ( isDir( __rootPath + nodeName ) ) {
 		node->setData( 1, nChildren( __rootPath + nodeName ), true );
 		node->setData( 1, QString( "%1 items" ).arg( node->data( 1, true ).toLongLong() ), false );
@@ -359,7 +417,7 @@ void NBFileSystemModel::updateNode( QString nodeName ) {
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 };
 
-void NBFileSystemModel::updateDelayedNodes() {
+void NBItemViewModel::updateDelayedNodes() {
 
 	/* Make a local copy */
 	QStringList nodeList;
@@ -373,13 +431,13 @@ void NBFileSystemModel::updateDelayedNodes() {
 		updateNode( baseName( node ) );
 };
 
-bool NBFileSystemModel::removeNode( QString nodeName ) {
+bool NBItemViewModel::removeNode( QString nodeName ) {
 
 	if ( not __childNames.contains( nodeName ) )
 		return false;
 
 	__childNames.removeAll( nodeName );
-	NBFileSystemNode *removedNode = rootNode->child( nodeName );
+	NBItemViewNode *removedNode = rootNode->child( nodeName );
 
 	beginResetModel();
 	beginRemoveRows( parent(), removedNode->row(), removedNode->row() );
@@ -397,7 +455,7 @@ bool NBFileSystemModel::removeNode( QString nodeName ) {
 	return false;
 };
 
-QModelIndex NBFileSystemModel::index( int row, int column, const QModelIndex &parent ) const {
+QModelIndex NBItemViewModel::index( int row, int column, const QModelIndex &parent ) const {
 
     if (row < 0 || column < 0)
         return QModelIndex();
@@ -405,14 +463,14 @@ QModelIndex NBFileSystemModel::index( int row, int column, const QModelIndex &pa
     if ( not ( ( row < rowCount( parent ) ) and ( column < columnCount( parent ) ) ) )
 		return QModelIndex();
 
-	NBFileSystemNode *parentNode;
+	NBItemViewNode *parentNode;
 	if ( not parent.isValid() )
 		parentNode = rootNode;
 
 	else
-		parentNode = (NBFileSystemNode *)parent.internalPointer();
+		parentNode = (NBItemViewNode *)parent.internalPointer();
 
-	NBFileSystemNode *childNode = parentNode->child( row );
+	NBItemViewNode *childNode = parentNode->child( row );
 	if ( childNode )
 		return createIndex( row, column, childNode );
 
@@ -420,20 +478,20 @@ QModelIndex NBFileSystemModel::index( int row, int column, const QModelIndex &pa
 		return QModelIndex();
 };
 
-QModelIndex NBFileSystemModel::index( QString name, const QModelIndex &parent ) const {
+QModelIndex NBItemViewModel::index( QString name, const QModelIndex &parent ) const {
 
 	if ( not __childNames.contains( name ) )
 		return QModelIndex();
 
-	NBFileSystemNode *parentNode;
+	NBItemViewNode *parentNode;
 	if ( not parent.isValid() )
 		parentNode = rootNode;
 
 	else
-		parentNode = (NBFileSystemNode *)parent.internalPointer();
+		parentNode = (NBItemViewNode *)parent.internalPointer();
 
 	int row = parentNode->child( name )->row();
-	NBFileSystemNode *childNode = parentNode->child( name );
+	NBItemViewNode *childNode = parentNode->child( name );
 
 	if ( childNode )
 		return createIndex( row, 0, childNode );
@@ -441,13 +499,13 @@ QModelIndex NBFileSystemModel::index( QString name, const QModelIndex &parent ) 
 	return QModelIndex();
 };
 
-QModelIndex NBFileSystemModel::parent( const QModelIndex &index ) const {
+QModelIndex NBItemViewModel::parent( const QModelIndex &index ) const {
 
 	if ( not index.isValid() )
 		return QModelIndex();
 
-	NBFileSystemNode *childNode = ( NBFileSystemNode * )index.internalPointer();
-	NBFileSystemNode *parentNode = childNode->parent();
+	NBItemViewNode *childNode = ( NBItemViewNode * )index.internalPointer();
+	NBItemViewNode *parentNode = childNode->parent();
 
 	if ( parentNode == rootNode )
 		return QModelIndex();
@@ -455,30 +513,77 @@ QModelIndex NBFileSystemModel::parent( const QModelIndex &index ) const {
 	return createIndex( parentNode->row(), 0, parentNode );
 };
 
-QString NBFileSystemModel::category( const QModelIndex &index ) const {
+QString NBItemViewModel::category( const QModelIndex &index ) const {
 
 	if ( not index.isValid() )
 		return QString( "" );
 
-	NBFileSystemNode *childItem = ( NBFileSystemNode * )index.internalPointer();
+	NBItemViewNode *childItem = ( NBItemViewNode * )index.internalPointer();
 	return childItem->category();
 };
 
-int NBFileSystemModel::categoryIndex( const QModelIndex &index ) const {
+int NBItemViewModel::categoryIndex( const QModelIndex &index ) const {
 
 	if ( not index.isValid() )
 		return -1;
 
-	NBFileSystemNode *childItem = ( NBFileSystemNode * )index.internalPointer();
+	NBItemViewNode *childItem = ( NBItemViewNode * )index.internalPointer();
 	return childItem->categoryIndex();
 };
 
-QStringList NBFileSystemModel::categories() const {
+QStringList NBItemViewModel::categories() const {
 
 	return rootNode->categoryList();
 };
 
-int NBFileSystemModel::indexListCountForCategory( QString mCategory ) const {
+QPixmap NBItemViewModel::pixmapForCategory( QString categoryName ) const {
+
+	switch ( __mModelDataType ) {
+
+		case NBItemViewModel::Catalogs: {
+
+			if ( categoryName == "Documents" )
+				return QIcon( ":/icons/documents.png" ).pixmap( 16, 16 );
+
+			else if ( categoryName == "Music" )
+				return QIcon::fromTheme( "folder-sound" ).pixmap( 16, 16 );
+
+			else if ( categoryName == "Pictures" )
+				return QIcon::fromTheme( "folder-image" ).pixmap( 16, 16 );
+
+			else if ( categoryName == "Videos" )
+				return QIcon::fromTheme( "folder-video" ).pixmap( 16, 16 );
+
+			else
+				return QIcon( ":/icons/catalogs-alt.png" ).pixmap( 16, 16 );
+		}
+
+		default: {
+			if ( categoryVisibilityMap[ categoryName ] == false )
+				return QIcon::fromTheme( "arrow-right" ).pixmap( 16, 16 );
+
+			else
+				return QIcon::fromTheme( "arrow-down" ).pixmap( 16, 16 );
+		}
+	}
+};
+
+void NBItemViewModel::foldCategory( QString categoryName ) {
+
+	categoryVisibilityMap[ categoryName ] = false;
+};
+
+void NBItemViewModel::openCategory( QString categoryName ) {
+
+	categoryVisibilityMap[ categoryName ] = true;
+};
+
+bool NBItemViewModel::isCategoryOpen( QString categoryName ) const {
+
+	return categoryVisibilityMap[ categoryName ];
+};
+
+int NBItemViewModel::indexListCountForCategory( QString mCategory ) const {
 
 	if ( not rootNode->categoryList().contains( mCategory ) or mCategory.isEmpty() or mCategory.isNull() )
 		return 0;
@@ -486,7 +591,7 @@ int NBFileSystemModel::indexListCountForCategory( QString mCategory ) const {
 	return categoryRowMap[ mCategory ].count();
 };
 
-QModelIndexList NBFileSystemModel::indexListForCategory( QString mCategory ) const {
+QModelIndexList NBItemViewModel::indexListForCategory( QString mCategory ) const {
 
 	QModelIndexList mList;
 
@@ -500,7 +605,7 @@ QModelIndexList NBFileSystemModel::indexListForCategory( QString mCategory ) con
 	return mList;
 };
 
-QModelIndexList NBFileSystemModel::categorySiblings( QModelIndex idx ) const {
+QModelIndexList NBItemViewModel::categorySiblings( QModelIndex idx ) const {
 
 	if ( not idx.isValid() )
 		return QModelIndexList();
@@ -511,12 +616,12 @@ QModelIndexList NBFileSystemModel::categorySiblings( QModelIndex idx ) const {
 	return mList;
 };
 
-bool NBFileSystemModel::showHidden() const {
+bool NBItemViewModel::showHidden() const {
 
 	return __showHidden;
 };
 
-void NBFileSystemModel::setShowHidden( bool shown ) {
+void NBItemViewModel::setShowHidden( bool shown ) {
 
 	__showHidden = shown;
 
@@ -524,17 +629,17 @@ void NBFileSystemModel::setShowHidden( bool shown ) {
 		setupModelData();
 };
 
-Qt::DropActions NBFileSystemModel::supportedDragActions() const {
+Qt::DropActions NBItemViewModel::supportedDragActions() const {
 
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 };
 
-Qt::DropActions NBFileSystemModel::supportedDropActions() const {
+Qt::DropActions NBItemViewModel::supportedDropActions() const {
 
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 };
 
-Qt::ItemFlags NBFileSystemModel::flags( const QModelIndex index ) const {
+Qt::ItemFlags NBItemViewModel::flags( const QModelIndex index ) const {
 
 	if ( isReadable( nodePath( index ) ) )
 		return Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEnabled;
@@ -543,21 +648,21 @@ Qt::ItemFlags NBFileSystemModel::flags( const QModelIndex index ) const {
 		return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 };
 
-QStringList NBFileSystemModel::mimeTypes() const {
+QStringList NBItemViewModel::mimeTypes() const {
 
 	QStringList types;
 	types << "text/uri-list";
 	return types;
 };
 
-bool NBFileSystemModel::filter( Filters filter ) {
+bool NBItemViewModel::filter( Filters filter ) {
 
 	Q_UNUSED( filter );
 
 	return false;
 };
 
-void NBFileSystemModel::setFilter( Filters filter, bool on ) {
+void NBItemViewModel::setFilter( Filters filter, bool on ) {
 
 	Q_UNUSED( filter );
 	Q_UNUSED( on );
@@ -565,12 +670,12 @@ void NBFileSystemModel::setFilter( Filters filter, bool on ) {
 	return;
 };
 
-QStringList NBFileSystemModel::nameFilters() {
+QStringList NBItemViewModel::nameFilters() {
 
 	return __nameFilters;
 };
 
-void NBFileSystemModel::setNameFilters( QStringList filters ) {
+void NBItemViewModel::setNameFilters( QStringList filters ) {
 
 	__nameFilters.clear();
 	__nameFilters << filters;
@@ -578,24 +683,24 @@ void NBFileSystemModel::setNameFilters( QStringList filters ) {
 	setupModelData();
 };
 
-void NBFileSystemModel::clearNameFilters() {
+void NBItemViewModel::clearNameFilters() {
 
 	__nameFilters.clear();
 	setupModelData();
 };
 
-bool NBFileSystemModel::filterFolders() const {
+bool NBItemViewModel::filterFolders() const {
 
 	return __filterFolders;
 };
 
-void NBFileSystemModel::setFilterFolders( bool filter) {
+void NBItemViewModel::setFilterFolders( bool filter) {
 
 	__filterFolders = filter;
 	setupModelData();
 };
 
-void NBFileSystemModel::sort( int column, bool cs, bool categorized ) {
+void NBItemViewModel::sort( int column, bool cs, bool categorized ) {
 
 	prevSort.column = column;
 	prevSort.cs = cs;
@@ -606,21 +711,21 @@ void NBFileSystemModel::sort( int column, bool cs, bool categorized ) {
 
 	// Create a map of categoryIndex versus rows
 	categoryRowMap.clear();
-	foreach( NBFileSystemNode *item, rootNode->children() )
+	foreach( NBItemViewNode *item, rootNode->children() )
 		categoryRowMap[ item->category() ] << item->row();
 
 	emit layoutChanged();
 };
 
-void NBFileSystemModel::reload() {
+void NBItemViewModel::reload() {
 
 	setupModelData();
 };
 
-bool NBFileSystemModel::rename( QString oldName, QString newName ) {
+bool NBItemViewModel::rename( QString oldName, QString newName ) {
 
 	// Do nothing: This should never happen
-	if ( __mCombiShown )
+	if ( __mVirtualData )
 		return true;
 
 	/* If the file @oldName is not from the current directory */
@@ -637,7 +742,7 @@ bool NBFileSystemModel::rename( QString oldName, QString newName ) {
 
 	else {
 		/* Same folder */
-		NBFileSystemNode *node = rootNode->child( baseName( oldName ) );
+		NBItemViewNode *node = rootNode->child( baseName( oldName ) );
 		node->setData( 0, baseName( newName ) );
 		updateNode( baseName( newName ) );
 
@@ -648,66 +753,74 @@ bool NBFileSystemModel::rename( QString oldName, QString newName ) {
 	return false;
 };
 
-QString NBFileSystemModel::nodeName( const QModelIndex index ) const {
+QString NBItemViewModel::nodeName( const QModelIndex idx ) const {
 
-	return index.data( 0 ).toString();
+	return idx.data( 0 ).toString();
 };
 
-QString NBFileSystemModel::nodePath( const QModelIndex index ) const {
+QString NBItemViewModel::nodePath( const QModelIndex idx ) const {
 
-	if ( __mCombiShown ) {
-		NBFileSystemNode *node = static_cast<NBFileSystemNode*>( index.internalPointer() );
-		return node->data( 7 ).toString();
-	}
-
-	else
-		return __rootPath + index.data( 0 ).toString();
+	return idx.data( Qt::UserRole + 7 ).toString();
 };
 
-QString NBFileSystemModel::nodePath( const QString path ) const {
+QString NBItemViewModel::nodePath( const QString path ) const {
 
-	if ( __mCombiShown ) {
+	if ( __mVirtualData ) {
 		QModelIndex idx = index( path );
-		return idx.data( 7 ).toString();
+		return idx.data( Qt::UserRole + 7 ).toString();
 	}
 
 	else
 		return __rootPath + path;
 };
 
-QFileInfo NBFileSystemModel::nodeInfo( const QModelIndex index ) const {
+QFileInfo NBItemViewModel::nodeInfo( const QModelIndex idx ) const {
 
-	if ( __mCombiShown ) {
-		return QFileInfo( nodePath( index ) );
+	switch ( __mModelDataType ) {
+
+		case NBItemViewModel::Applications: {
+
+			return QFileInfo( idx.data( Qt::UserRole + 9 ).toString() );
+		}
+
+		case NBItemViewModel::SuperStart:
+		case NBItemViewModel::Catalogs:
+		case NBItemViewModel::FileSystem:
+			return QFileInfo( idx.data( Qt::UserRole + 7 ).toString() );
 	}
-
-	else
-		return QFileInfo( __rootPath + index.data( 0 ).toString() );
 };
 
-QString NBFileSystemModel::rootPath() const {
+QString NBItemViewModel::rootPath() const {
 
 	return __rootPath;
 };
 
-void NBFileSystemModel::setRootPath( QString path ) {
+void NBItemViewModel::setRootPath( QString path ) {
 
-	if ( path == QString( "NB://Applications" ) ) {
-		oldRoots << path;
-		curIndex = oldRoots.count() - 1;
-		emit loadApplications();
-		return;
+	if ( path == QString( "NB://SuperStart" ) ) {
+		__mVirtualData = true;
+		__mModelDataType = (quint64)NBItemViewModel::SuperStart;
 	}
 
-	if ( path == QString( "NB://Catalogs" ) ) {
-		oldRoots << path;
-		curIndex = oldRoots.count() - 1;
-		emit loadCatalogs();
-		return;
+	else if ( path == QString( "NB://Applications" ) ) {
+		__mVirtualData = true;
+		__mModelDataType = (quint64)NBItemViewModel::Applications;
 	}
 
-	__rootPath = ( path.endsWith( "/" ) ? path : path + "/" );
-	__mCombiShown = false;
+	else if ( path == QString( "NB://Catalogs" ) ) {
+		__mVirtualData = true;
+		__mModelDataType = (quint64)NBItemViewModel::Catalogs;
+	}
+
+	else {
+		__mVirtualData = false;
+		__mModelDataType = (quint64)NBItemViewModel::FileSystem;
+	}
+
+
+	/* Add a trailing / only if we have a real location */
+	if ( not __rootPath.startsWith( "NB://" ) )
+		__rootPath = ( path.endsWith( "/" ) ? path : path + "/" );
 
 	/* Navigation: If we are in the middle, remove all 'forawrd' roots */
 	if ( oldRoots.count() )
@@ -731,14 +844,11 @@ void NBFileSystemModel::setRootPath( QString path ) {
 	prevSort.categorized = sett.value( "NewBreeze/Grouping", Settings->General.Grouping ).toBool();
 	mCategorizationEnabled = prevSort.categorized;
 
-	/* If we are in NB://Applications or NB://Catalogs mode, come to FolderView mode */
-	emit loadFolders();
-
 	/* Delete the old node */
 	delete rootNode;
 
 	/* Create a fresh root node */
-	rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( path ), "" );
+	rootNode = new NBItemViewNode( quickDataGatherer->getQuickFileInfo( path ), "" );
 
 	/* Stop loading thumbs, or even nodes */
 	if ( currentLoadStatus.loading )
@@ -755,64 +865,35 @@ void NBFileSystemModel::setRootPath( QString path ) {
 	setupModelData();
 };
 
-void NBFileSystemModel::goBack() {
+void NBItemViewModel::goBack() {
 
 	if ( canGoBack() ) {
 		curIndex--;
 
-		if ( oldRoots.at( curIndex ) == QString( "NB://Applications" ) ) {
-			emit loadApplications();
-			return;
-		}
-
-		if ( oldRoots.at( curIndex ) == QString( "NB://Catalogs" ) ) {
-			emit loadCatalogs();
-			return;
-		}
-
-		emit loadFolders();
-
 		__rootPath = oldRoots.at( curIndex );
 
 		delete rootNode;
-		rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath ), "" );
+		rootNode = new NBItemViewNode( quickDataGatherer->getQuickFileInfo( __rootPath ), "" );
 
 		setupModelData();
 	}
 };
 
-void NBFileSystemModel::goForward() {
+void NBItemViewModel::goForward() {
 
 	if ( canGoForward() ) {
 		curIndex++;
 
-		if ( oldRoots.at( curIndex ) == QString( "NB://Applications" ) ) {
-			emit loadApplications();
-			return;
-		}
-
-		if ( oldRoots.at( curIndex ) == QString( "NB://Catalogs" ) ) {
-			emit loadCatalogs();
-			return;
-		}
-
-		emit loadFolders();
-
 		__rootPath = oldRoots.at( curIndex );
 
 		delete rootNode;
-		rootNode = new NBFileSystemNode( quickDataGatherer->getQuickFileInfo( __rootPath ), "" );
+		rootNode = new NBItemViewNode( quickDataGatherer->getQuickFileInfo( __rootPath ), "" );
 
 		setupModelData();
 	}
 };
 
-void NBFileSystemModel::loadCombiView() {
-
-	goHome();
-};
-
-void NBFileSystemModel::goUp() {
+void NBItemViewModel::goUp() {
 
 	if ( canGoUp() ) {
 		QString newRoot = __rootPath.section( "/", 0, -3 );
@@ -821,22 +902,22 @@ void NBFileSystemModel::goUp() {
 	}
 };
 
-void NBFileSystemModel::goHome() {
+void NBItemViewModel::goHome() {
 
 	setRootPath( QDir::homePath() );
 };
 
-bool NBFileSystemModel::canGoBack() const {
+bool NBItemViewModel::canGoBack() const {
 
 	return ( curIndex > 0 );
 };
 
-bool NBFileSystemModel::canGoForward() const {
+bool NBItemViewModel::canGoForward() const {
 
 	return ( curIndex < ( oldRoots.count() - 1 ) ? true : false);
 };
 
-bool NBFileSystemModel::canGoUp() const {
+bool NBItemViewModel::canGoUp() const {
 
 	if ( oldRoots.at( curIndex ).startsWith( "NB://" ) )
 		return false;
@@ -844,7 +925,7 @@ bool NBFileSystemModel::canGoUp() const {
 	return ( __rootPath != "/" );
 };
 
-QString NBFileSystemModel::previousDir() const {
+QString NBItemViewModel::previousDir() const {
 
 	if ( canGoBack() )
 		return oldRoots.at( curIndex - 1 );
@@ -853,7 +934,7 @@ QString NBFileSystemModel::previousDir() const {
 		return QString( "" );
 };
 
-QString NBFileSystemModel::nextDir() const {
+QString NBItemViewModel::nextDir() const {
 
 	if ( canGoForward() )
 		return oldRoots.at( curIndex + 1 );
@@ -862,18 +943,43 @@ QString NBFileSystemModel::nextDir() const {
 		return QString( "" );
 };
 
-QString NBFileSystemModel::currentDir() const {
+QString NBItemViewModel::currentDir() const {
 
 	return __rootPath;
 };
 
-QString NBFileSystemModel::parentDir() const {
+QString NBItemViewModel::parentDir() const {
 
 	QString path = __rootPath.section( "/", 0, -3 );
 	return ( path.endsWith( "/" ) ? path : path + "/" );
 };
 
-void NBFileSystemModel::setupModelData() {
+void NBItemViewModel::setupModelData() {
+
+	switch( __mModelDataType ) {
+		case NBItemViewModel::SuperStart: {
+			goHome();
+			break;
+		}
+
+		case NBItemViewModel::Applications: {
+			setupApplicationsData();
+			break;
+		}
+
+		case NBItemViewModel::Catalogs: {
+			setupCatalogData();
+			break;
+		}
+
+		case NBItemViewModel::FileSystem: {
+			setupFileSystemData();
+			break;
+		}
+	}
+};
+
+void NBItemViewModel::setupFileSystemData() {
 
 	DIR *dir;
 	struct dirent *ent;
@@ -917,17 +1023,17 @@ void NBFileSystemModel::setupModelData() {
 				if ( __nameFilters.count() ) {
 					/* If filter folders is false, don't bother about filtering folders */
 					if ( not __filterFolders and ent->d_type == DT_DIR ) {
-						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
+						rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 						__childNames << nodeName;
 					}
 
 					else if ( matchesFilter( __nameFilters, nodeName ) ) {
-						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
+						rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 						__childNames << nodeName;
 					}
 				}
 				else {
-					rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
+					rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 					__childNames << nodeName;
 				}
 			}
@@ -938,18 +1044,18 @@ void NBFileSystemModel::setupModelData() {
 					/* We want to filter folders too */
 					if ( __nameFilters.count() ) {
 						if ( not __filterFolders and ent->d_type == DT_DIR ) {
-							rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
+							rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 							__childNames << nodeName;
 						}
 
 						else if ( matchesFilter( __nameFilters, nodeName ) ) {
-							rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
+							rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 							__childNames << nodeName;
 						}
 					}
 
 					else {
-						rootNode->addChild( new NBFileSystemNode( data, getCategory( data ), rootNode ) );
+						rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 						__childNames << nodeName;
 					}
 				}
@@ -960,17 +1066,111 @@ void NBFileSystemModel::setupModelData() {
 	}
 	endResetModel();
 
+	foreach( QString mCategoryName, rootNode->categoryList() )
+		categoryVisibilityMap[ mCategoryName ] = true;
+
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
 	currentLoadStatus.loading = false;
 
-	emit loadFileInfo();
 	emit directoryLoaded( __rootPath );
 
 	updateAllNodes( __rootPath );
 };
 
-void NBFileSystemModel::newWatch( QString path ) {
+void NBItemViewModel::setupApplicationsData() {
+
+	__childNames.clear();
+	rootNode->clearChildren();
+	currentLoadStatus.loading = true;
+
+	emit dirLoading( __rootPath );
+
+	beginResetModel();
+	NBAppEngine *appEngine = NBAppEngine::instance();
+	foreach( NBAppFile app, appEngine->allDesktops().toQList() ) {
+		if ( ( app.value( NBAppFile::Type ) != "Application" ) or ( app.value( NBAppFile::NoDisplay ).toBool() ) )
+			continue;
+
+		QVariantList data;
+
+		/* Special Data */
+		data << "System" << 0 << app.value( NBAppFile::Icon );
+
+		/* Normal Data */
+		data << app.value( NBAppFile::Name );												/* Qt::UserRole + 0 */
+		data << app.value( NBAppFile::Exec );												/* Qt::UserRole + 1 */
+		data << app.value( NBAppFile::Comment );											/* Qt::UserRole + 2 */
+		data << app.execArgs();																/* Qt::UserRole + 3 */
+		data << app.value( NBAppFile::Icon );												/* Qt::UserRole + 4 */
+		data << app.value( NBAppFile::WorkPath );											/* Qt::UserRole + 5 */
+		data << app.value( NBAppFile::MimeTypes );											/* Qt::UserRole + 6 */
+		data << app.value( NBAppFile::TerminalMode );										/* Qt::UserRole + 7 */
+		data << app.value( NBAppFile::Categories );											/* Qt::UserRole + 8 */
+		data << app.filePath();																/* Qt::UserRole + 9 */
+
+		rootNode->addChild( new NBItemViewNode( data, app.category(), rootNode ) );
+	}
+	endResetModel();
+
+	foreach( QString mCategoryName, rootNode->categoryList() )
+		categoryVisibilityMap[ mCategoryName ] = true;
+
+	sort( prevSort.column, prevSort.cs, prevSort.categorized );
+
+	currentLoadStatus.loading = false;
+
+	emit directoryLoaded( __rootPath );
+};
+
+void NBItemViewModel::setupCatalogData() {
+
+	__childNames.clear();
+	rootNode->clearChildren();
+	currentLoadStatus.loading = true;
+
+	emit dirLoading( __rootPath );
+
+	QSettings catalogsSettings( "NewBreeze", "Catalogs" );
+	/* Default Catalogs */
+	beginResetModel();
+	foreach( QString ctlg, catalogsSettings.childKeys() ) {
+		QStringList locations = catalogsSettings.value( ctlg ).toStringList();
+		foreach( QString location, locations ) {
+			if ( not exists( location ) )
+				continue;
+
+			QVariantList data = quickDataGatherer->getQuickFileInfo( location );
+			rootNode->addChild( new NBItemViewNode( data, ctlg, rootNode ) );
+		}
+	}
+
+	/* Custom Catalogs */
+	catalogsSettings.beginGroup( "Custom" );
+	foreach( QString ctlg, catalogsSettings.childKeys() ) {
+		QStringList locations = catalogsSettings.value( ctlg ).toStringList();
+		foreach( QString location, locations ) {
+			if ( not exists( location ) )
+				continue;
+
+			QVariantList data = quickDataGatherer->getQuickFileInfo( location );
+			rootNode->addChild( new NBItemViewNode( data, ctlg, rootNode ) );
+		}
+	}
+	catalogsSettings.endGroup();
+	endResetModel();
+
+	foreach( QString mCategoryName, rootNode->categoryList() )
+		categoryVisibilityMap[ mCategoryName ] = true;
+
+	sort( prevSort.column, prevSort.cs, prevSort.categorized );
+
+	currentLoadStatus.loading = false;
+
+	emit directoryLoaded( __rootPath );
+};
+
+void NBItemViewModel::newWatch( QString path ) {
 
 	/* If there is a watch running: delete it and create a new watcher object */
 	if ( watcher->isRunning() ) {
@@ -1000,7 +1200,7 @@ void NBFileSystemModel::newWatch( QString path ) {
 	}
 };
 
-QString NBFileSystemModel::getCategory( QVariantList data ) {
+QString NBItemViewModel::getCategory( QVariantList data ) {
 
 	switch( prevSort.column ) {
 		/* Name Sorting */
@@ -1083,24 +1283,21 @@ QString NBFileSystemModel::getCategory( QVariantList data ) {
 	return QString( "Uncategorized" );
 };
 
-void NBFileSystemModel::recategorize() {
+void NBItemViewModel::recategorize() {
 
-	foreach( NBFileSystemNode *node, rootNode->children() )
-		if ( __mCombiShown )
-			node->setCategory( "My Computer" );
-
-		else
+	foreach( NBItemViewNode *node, rootNode->children() )
+		if ( not __mVirtualData )
 			node->setCategory( getCategory( node->allData() ) );
 
 	rootNode->updateCategories();
 };
 
-void NBFileSystemModel::terminateInfoGathering() {
+void NBItemViewModel::terminateInfoGathering() {
 
 	__terminate = true;
 };
 
-void NBFileSystemModel::updateAllNodes( QString root ) {
+void NBItemViewModel::updateAllNodes( QString root ) {
 
 	NBIconUpdater *iconUpdater = new NBIconUpdater( root, __childNames, &__terminate );
 	connect( iconUpdater, SIGNAL( updated( QString, QString, QStringList ) ), this, SLOT( saveInfo( QString, QString, QStringList ) ) );
@@ -1108,7 +1305,7 @@ void NBFileSystemModel::updateAllNodes( QString root ) {
 	iconUpdater->start();
 };
 
-void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info ) {
+void NBItemViewModel::saveInfo( QString root, QString entry, QStringList info ) {
 
 	/*
 		 *
@@ -1124,7 +1321,7 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 		return;
 
 	QModelIndex idx = index( entry );
-	NBFileSystemNode *node = rootNode->child( entry );
+	NBItemViewNode *node = rootNode->child( entry );
 
 	/* Updating the icon */
 	if (  info.count() == 1 ) {
@@ -1142,7 +1339,7 @@ void NBFileSystemModel::saveInfo( QString root, QString entry, QStringList info 
 	emit dataChanged( idx, idx );
 };
 
-void NBFileSystemModel::handleNodeCreated( QString node ) {
+void NBItemViewModel::handleNodeCreated( QString node ) {
 
 	if ( baseName( node ).startsWith( "." ) and not __showHidden )
 		return;
@@ -1158,7 +1355,7 @@ void NBFileSystemModel::handleNodeCreated( QString node ) {
 	* triggered for the same node in succession, then we quarantine it for a second.
 	*
 */
-void NBFileSystemModel::handleNodeChanged( QString node ) {
+void NBItemViewModel::handleNodeChanged( QString node ) {
 
 	if ( baseName( node ).startsWith( "." ) )
 		return;
@@ -1191,7 +1388,7 @@ void NBFileSystemModel::handleNodeChanged( QString node ) {
 	}
 };
 
-void NBFileSystemModel::handleNodeDeleted( QString node ) {
+void NBItemViewModel::handleNodeDeleted( QString node ) {
 
 	if ( baseName( node ).startsWith( "." ) and not __showHidden )
 		return;
@@ -1200,18 +1397,18 @@ void NBFileSystemModel::handleNodeDeleted( QString node ) {
 		removeNode( baseName( node ) );
 };
 
-void NBFileSystemModel::handleNodeRenamed( QString oldNode, QString newNode ) {
+void NBItemViewModel::handleNodeRenamed( QString oldNode, QString newNode ) {
 
 	rename( oldNode, newNode );
 };
 
-void NBFileSystemModel::loadHome() {
+void NBItemViewModel::loadHome() {
 
 	emit runningHome( currentDir() );
 	goHome();
 };
 
-void NBFileSystemModel::timerEvent( QTimerEvent *tEvent ) {
+void NBItemViewModel::timerEvent( QTimerEvent *tEvent ) {
 
 	if ( tEvent->timerId() == updateTimer.timerId() ) {
 		// QTimer::singleShot( 100, this, SLOT( updateDelayedNodes() ) );

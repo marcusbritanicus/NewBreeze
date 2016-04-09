@@ -5,11 +5,9 @@
 */
 
 #pragma once
-#ifndef NBOPENWITHVIEW_HPP
-#define NBOPENWITHVIEW_HPP
 
 #include <Global.hpp>
-#include <NBApplicationsModel.hpp>
+#include <NBItemViewModel.hpp>
 #include <NBOpenWithDelegate.hpp>
 #include <NBGuiFunctions.hpp>
 #include <NBTools.hpp>
@@ -93,7 +91,7 @@ class NBOpenWithView : public QAbstractItemView {
 		void paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const;
 		QPixmap pixmapForCategory( QString ) const;
 
-		NBApplicationsModel *appModel;
+		NBItemViewModel *appModel;
 
 		mutable int idealHeight;
 		mutable int viewWidth;
@@ -119,5 +117,3 @@ class NBOpenWithView : public QAbstractItemView {
 		// Icon Size
 		mutable QSize myIconSize;
 };
-
-#endif

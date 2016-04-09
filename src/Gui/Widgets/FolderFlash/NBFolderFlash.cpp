@@ -32,9 +32,9 @@ void NBFolderFlash::createGUI() {
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( loadFolder() ) );
 
-	peekWidgetBase = new NBIconViewRestricted( new NBFileSystemModel() );
+	peekWidgetBase = new NBIconViewRestricted( new NBItemViewModel() );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
-	qobject_cast<NBFileSystemModel*>( peekWidgetBase->model() )->setRootPath( path );
+	qobject_cast<NBItemViewModel*>( peekWidgetBase->model() )->setRootPath( path );
 
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );

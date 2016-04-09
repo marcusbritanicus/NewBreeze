@@ -7,7 +7,7 @@
 #pragma once
 
 #include <Global.hpp>
-#include <NBFileSystemModel.hpp>
+#include <NBItemViewModel.hpp>
 #include <NBIconDelegate.hpp>
 #include <NBTools.hpp>
 #include <NBGuiWidgets.hpp>
@@ -20,7 +20,7 @@ class NBIconView : public QAbstractItemView {
 	Q_OBJECT
 
 	public:
-		NBIconView( NBFileSystemModel* );
+		NBIconView( NBItemViewModel* );
 
 		// Set the item model
 		void setModel( QAbstractItemModel *model );
@@ -144,13 +144,12 @@ class NBIconView : public QAbstractItemView {
 
 		void paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const;
 		void paintSelection( QPainter *painter, const QModelIndexList ) const;
-		QPixmap pixmapForCategory( QString ) const;
 
 		void showHideCategory( QString );
 		bool canShowIndex( QModelIndex );
 
 		// FileSystem Model
-		NBFileSystemModel *cModel;
+		NBItemViewModel *cModel;
 
 		// ViewMode
 		mutable QString currentViewMode;
@@ -210,10 +209,13 @@ class NBIconView : public QAbstractItemView {
 
 	Q_SIGNALS :
 		void open( QModelIndex );
+		void open( QString );
+
 		void contextMenuRequested( QPoint );
-		void acopy( QStringList, QString );
+
 		void copy( QStringList, QString );
 		void move( QStringList, QString );
 		void link( QStringList, QString );
+
 		void selectionChanged();
 };

@@ -16,7 +16,7 @@ static inline bool isExecutable( QString path ) {
 		return false;
 };
 
-NBIconView::NBIconView( NBFileSystemModel *fsModel ) : QAbstractItemView() {
+NBIconView::NBIconView( NBItemViewModel *fsModel ) : QAbstractItemView() {
 
 	// Current folder viewMode
 	currentViewMode = Settings->General.ViewMode;
@@ -429,8 +429,8 @@ QModelIndexList NBIconView::selection() {
 
 bool NBIconView::isIndexVisible( QModelIndex idx ) const {
 
-	// /* See if the index is in the hidden categories list */
-	// if
+	if ( hiddenCategories.contains( cModel->category( idx ) ) )
+		return false;
 
 	QRect rect = viewportRectForRow( idx.row() );
 	if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
@@ -793,8 +793,45 @@ void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 
 	if ( mEvent->button() == Qt::LeftButton ) {
 		QModelIndex idx = indexAt( mEvent->pos() );
-		if ( idx.isValid() )
-			emit open( idx );
+		if ( idx.isValid() ) {
+			switch( cModel->modelDataType() ) {
+				case NBItemViewModel::SuperStart: {
+					mEvent->accept();
+					break;
+				}
+
+				case NBItemViewModel::Applications: {
+
+					QStringList execList = idx.data( Qt::UserRole + 7 ).toStringList();
+					bool runInTerminal = idx.data( Qt::UserRole + 3 ).toBool();
+
+					if ( not runInTerminal ) {
+
+						// Try to run this program
+						QProcess::startDetached( execList.at( 0 ) );
+					}
+
+					else {
+						QStringList terminalList = getTerminal().join( " " ).arg( QDir::homePath() ).arg( execList.at( 0 ) ).split( " " );
+						QProcess::startDetached( terminalList.takeFirst(), terminalList );
+					}
+
+					break;
+				}
+
+				case NBItemViewModel::Catalogs: {
+
+					emit open( idx.data( Qt::UserRole + 7 ).toString() );
+					break;
+				}
+
+				case NBItemViewModel::FileSystem: {
+
+					emit open( idx );
+					break;
+				}
+			}
+		}
 
 		else if ( not categoryAt( mEvent->pos() ).isEmpty() ) {
 			showHideCategory( categoryAt( mEvent->pos() ) );
@@ -916,12 +953,6 @@ void NBIconView::dropEvent( QDropEvent *dpEvent ) {
 			emit link( args, mtpt );
 		}
 
-		else if ( dpEvent->keyboardModifiers() == ( Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier ) ) {
-
-			QProcess::startDetached( "sh", QStringList() << "find -type f -print0 | sort -z | cpio -0 -pd " + mtpt );
-			emit acopy( args, mtpt );
-		}
-
 		else {
 
 			dpEvent->ignore();
@@ -934,8 +965,48 @@ void NBIconView::dropEvent( QDropEvent *dpEvent ) {
 
 void NBIconView::keyPressEvent( QKeyEvent *kEvent ) {
 
-	if ( ( kEvent->key() == Qt::Key_Return ) and ( selectionModel()->isSelected( currentIndex() ) ) )
-		emit open( currentIndex() );
+	if ( ( kEvent->key() == Qt::Key_Return ) and ( selectionModel()->isSelected( currentIndex() ) ) ) {
+
+		QModelIndex idx = currentIndex();
+		switch( cModel->modelDataType() ) {
+
+			case NBItemViewModel::SuperStart: {
+				kEvent->accept();
+				break;
+			}
+
+			case NBItemViewModel::Applications: {
+
+				QStringList execList = idx.data( Qt::UserRole + 3 ).toStringList();
+				bool runInTerminal = idx.data( Qt::UserRole + 7 ).toBool();
+
+				if ( not runInTerminal ) {
+
+					// Try to run this program
+					QProcess::startDetached( execList.at( 0 ) );
+				}
+
+				else {
+					QStringList terminalList = getTerminal().join( " " ).arg( QDir::homePath() ).arg( execList.at( 0 ) ).split( " " );
+					QProcess::startDetached( terminalList.takeFirst(), terminalList );
+				}
+
+				break;
+			}
+
+			case NBItemViewModel::Catalogs: {
+
+				emit open( idx.data( Qt::UserRole + 7 ).toString() );
+				break;
+			}
+
+			case NBItemViewModel::FileSystem: {
+
+				emit open( idx );
+				break;
+			}
+		}
+	}
 
 	QAbstractItemView::keyPressEvent( kEvent );
 };
@@ -2032,7 +2103,7 @@ void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const
 
 	painter->setPen( QPen( textColor ) );
 
-	QPixmap pix = pixmapForCategory( text );
+	QPixmap pix = cModel->pixmapForCategory( text );
 	QPoint topLeft = rectangle.topLeft();
 
 	painter->drawPixmap( topLeft.x() + 4, topLeft.y() + 4, 16, 16, pix );
@@ -2042,15 +2113,6 @@ void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const
 	painter->drawText( topLeft.x() + 24, topLeft.y(), rectangle.width() - 48, rectangle.height(), Qt::AlignVCenter, text );
 
 	painter->restore();
-};
-
-QPixmap NBIconView::pixmapForCategory( QString categoryText ) const {
-
-	if ( hiddenCategories.contains( categoryText ) )
-		return QIcon::fromTheme( "arrow-right" ).pixmap( 16, 16 );
-
-	else
-		return QIcon::fromTheme( "arrow-down" ).pixmap( 16, 16 );
 };
 
 void NBIconView::zoomIn() {
@@ -2071,8 +2133,11 @@ void NBIconView::zoomIn() {
 			setIconSize( myIconSize + QSize( 4, 4 ) );
 	}
 
-	QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-	sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+	if ( cModel->isRealLocation() ) {
+
+		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+	}
 };
 
 void NBIconView::zoomOut() {
@@ -2083,8 +2148,11 @@ void NBIconView::zoomOut() {
 	else
 		setIconSize( myIconSize - QSize( 4, 4 ) );
 
-	QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-	sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+	if ( cModel->isRealLocation() ) {
+
+		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+	}
 };
 
 void NBIconView::emitCML() {
@@ -2163,11 +2231,15 @@ void NBIconView::emitCML() {
 
 void NBIconView::showHideCategory( QString category ) {
 
-	if ( hiddenCategories.contains( category ) )
+	if ( hiddenCategories.contains( category ) ) {
 		hiddenCategories.removeAll( category );
+		cModel->openCategory( category );
+	}
 
-	else
+	else{
 		hiddenCategories.append( category );
+		cModel->foldCategory( category );
+	}
 
 	hashIsDirty = true;
 	calculateRectsIfNecessary();

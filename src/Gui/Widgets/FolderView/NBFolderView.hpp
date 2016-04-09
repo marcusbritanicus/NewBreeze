@@ -7,10 +7,8 @@
 #pragma once
 
 #include <Global.hpp>
-#include <NBAppsView.hpp>
 #include <NBArchiveDialog.hpp>
 #include <NBArchive.hpp>
-#include <NBCatalogView.hpp>
 #include <NBConfirmDeleteDialog.hpp>
 #include <NBContextMenu.hpp>
 #include <NBCustomActions.hpp>
@@ -19,7 +17,7 @@
 #include <NBDeleteProcess.hpp>
 #include <NBErrorsDialog.hpp>
 #include <NBFileDialog.hpp>
-#include <NBFileSystemModel.hpp>
+#include <NBItemViewModel.hpp>
 #include <NBFolderFlash.hpp>
 #include <NBGuiWidgets.hpp>
 #include <NBIconProvider.hpp>
@@ -52,10 +50,8 @@ class NBFolderView : public QStackedWidget {
 		QAction *groupsAct;
 
 		NBIconView *IconView;
-		NBApplicationsView *ApplicationsView;
-		NBCatalogView *CatalogView;
 
-		NBFileSystemModel *fsModel;
+		NBItemViewModel *fsModel;
 		NBActionsMenu *customMenu;
 
 	private :
@@ -83,8 +79,6 @@ class NBFolderView : public QStackedWidget {
 		void doOpenInNewTab();
 		void doOpenWithCmd();
 
-		void showApplications();
-		void showCatalogs();
 		void showFolders();
 
 		void doRename();

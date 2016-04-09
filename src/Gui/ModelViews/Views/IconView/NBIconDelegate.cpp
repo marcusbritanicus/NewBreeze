@@ -5,7 +5,7 @@
 */
 
 #include <NBIconDelegate.hpp>
-#include <NBFileSystemModel.hpp>
+#include <NBItemViewModel.hpp>
 
 void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
 
@@ -16,7 +16,7 @@ void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &
 		QItemDelegate::paint( painter, option, index );
 
 	else {
-		// const NBFileSystemModel *model = static_cast<const NBFileSystemModel*>( index.model() );
+		// const NBItemViewModel *model = static_cast<const NBItemViewModel*>( index.model() );
 
 		QRect optionRect( option.rect );
 
@@ -171,7 +171,7 @@ void NBIconDelegate::paintTiles( QPainter *painter, const QStyleOptionViewItem &
 		QItemDelegate::paint( painter, option, index );
 
 	else {
-		const NBFileSystemModel *model = static_cast<const NBFileSystemModel*>( index.model() );
+		const NBItemViewModel *model = static_cast<const NBItemViewModel*>( index.model() );
 		QFileInfo ftype = model->nodeInfo( index );
 
 		QRect optionRect( option.rect );
@@ -325,7 +325,7 @@ void NBIconDelegate::paintDetails( QPainter *painter, const QStyleOptionViewItem
 		QItemDelegate::paint( painter, option, index );
 
 	else {
-		const NBFileSystemModel *model = static_cast<const NBFileSystemModel*>( index.model() );
+		const NBItemViewModel *model = static_cast<const NBItemViewModel*>( index.model() );
 		QFileInfo ftype = model->nodeInfo( index );
 
 		QRect optionRect( option.rect );

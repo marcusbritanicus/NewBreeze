@@ -13,13 +13,15 @@ few changes in NewBreeze 3.
 => NBFileSystemWatcher
     NBFileSystemWatcher has been rewritten with a cleaner code based on the inotify-example.c from http://www.lanedo.com/users/amorgado/fanotify/inotify-example.c
 
-=> NBFileSystemModel( QAbsractItemModel )
-   - NBFileSystemModel provides upto 50% faster thumbnails for images
+=> NBItemViewModel( QAbsractItemModel )
+   - Formerly NBFileSystemModel, now it models Applications, Catalogs, and the FileSystem
+   - Buffed up for better performance.
+   - NBFileSystemModel provides upto 50% faster thumbnails for images.
 
 => NBIconView( QAbstractItemModel )
    - Per-folder views are now enabled. Each folder remembers its previous state ( size, grouping, list view, etc )
    - Fixed the small issue of mouse/cursor selection conflict.
-   - Fixed the SegFault with cursor up and down movements.
+   - Partially fixed the SegFault with cursor up and down movements.
 
 => NBAddressBar redesigned
    - NBBreadCrumbsBar is now called NBCrumbsBar.

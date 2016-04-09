@@ -34,7 +34,7 @@ NBOpenWithView::NBOpenWithView() : QAbstractItemView() {
 	setItemDelegate( new NBOpenWithDelegate() );
 
 	// Applications Model
-	appModel = new NBApplicationsModel();
+	appModel = new NBItemViewModel();
 	setModel( appModel );
 
 	// Selection
@@ -64,6 +64,8 @@ NBOpenWithView::NBOpenWithView() : QAbstractItemView() {
 	setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	verticalScrollBar()->show();
 	verticalScrollBar()->setRange( 0, 0 );
+
+	appModel->setRootPath( "NB://Applications" );
 };
 
 void NBOpenWithView::setModel( QAbstractItemModel *model ) {
@@ -183,7 +185,7 @@ void NBOpenWithView::calculateRectsIfNecessary() const {
 
 		yOffsetForCategory[ catIdx ] = minY;
 
-		if ( not appModel->isCategoryVisible( appModel->category( mList.value( 0 ) ) ) )
+		if ( not appModel->isCategoryOpen( appModel->category( mList.value( 0 ) ) ) )
 			continue;
 
 		// Mimimum X and Y for indexes
@@ -320,13 +322,13 @@ QModelIndex NBOpenWithView::moveCursor( QAbstractItemView::CursorAction cursorAc
 			case QAbstractItemView::MoveRight: {
 				if ( index.row() >= 0 and index.row() < appModel->rowCount() ) {
 					QModelIndex mIdx = appModel->index( index.row() + 1, 0, rootIndex() );
-					if ( appModel->isCategoryVisible( appModel->category( mIdx ) ) )
+					if ( appModel->isCategoryOpen( appModel->category( mIdx ) ) )
 						return mIdx;
 
 					else {
 						// We need to return the next visible index
 						for ( int i = appModel->categoryIndex( index ) + 1; i < categoryList.count(); i++ ) {
-							if ( appModel->isCategoryVisible( categoryList.value( i ) ) )
+							if ( appModel->isCategoryOpen( categoryList.value( i ) ) )
 								return appModel->indexListForCategory( categoryList.value( i ) ).first();
 						}
 						return index;
@@ -341,13 +343,13 @@ QModelIndex NBOpenWithView::moveCursor( QAbstractItemView::CursorAction cursorAc
 			case QAbstractItemView::MoveLeft: {
 				if ( index.row() >= 0 and index.row() < appModel->rowCount() ) {
 					QModelIndex mIdx = appModel->index( index.row() - 1, 0, rootIndex() );
-					if ( appModel->isCategoryVisible( appModel->category( mIdx ) ) )
+					if ( appModel->isCategoryOpen( appModel->category( mIdx ) ) )
 						return mIdx;
 
 					else {
 						// We need to return the previous visible index
 						for ( int i = appModel->categoryIndex( index ) - 1; i < categoryList.count(); i-- ) {
-							if ( appModel->isCategoryVisible( categoryList.value( i ) ) )
+							if ( appModel->isCategoryOpen( categoryList.value( i ) ) )
 								return appModel->indexListForCategory( categoryList.value( i ) ).last();
 						}
 						return index;
@@ -365,7 +367,7 @@ QModelIndex NBOpenWithView::moveCursor( QAbstractItemView::CursorAction cursorAc
 				QString nextCategory;
 
 				for ( int i = categoryList.indexOf( thisCategory ) + 1; i < categoryList.count(); i++ ) {
-					if ( appModel->isCategoryVisible( categoryList.at( i ) ) ) {
+					if ( appModel->isCategoryOpen( categoryList.at( i ) ) ) {
 						nextCategory = categoryList.value( i );
 						break;
 					}
@@ -414,7 +416,7 @@ QModelIndex NBOpenWithView::moveCursor( QAbstractItemView::CursorAction cursorAc
 				QString prevCategory;
 
 				for( int i = categoryList.indexOf( thisCategory ) - 1; i >= 0; i-- ) {
-					if ( appModel->isCategoryVisible( categoryList.at( i ) ) ) {
+					if ( appModel->isCategoryOpen( categoryList.at( i ) ) ) {
 						prevCategory = categoryList.value( i );
 						break;
 					}
@@ -466,13 +468,13 @@ QModelIndex NBOpenWithView::moveCursor( QAbstractItemView::CursorAction cursorAc
 			case QAbstractItemView::MoveNext: {
 				if ( index.row() >= 0 and index.row() < appModel->rowCount() ) {
 					QModelIndex mIdx = appModel->index( index.row() + 1, 0, rootIndex() );
-					if ( appModel->isCategoryVisible( appModel->category( mIdx ) ) )
+					if ( appModel->isCategoryOpen( appModel->category( mIdx ) ) )
 						return mIdx;
 
 					else {
 						// We need to return the next visible index
 						for ( int i = appModel->categoryIndex( index ) + 1; i < categoryList.count(); i++ ) {
-							if ( appModel->isCategoryVisible( categoryList.value( i ) ) )
+							if ( appModel->isCategoryOpen( categoryList.value( i ) ) )
 								return appModel->indexListForCategory( categoryList.value( i ) ).first();
 						}
 						return index;
@@ -487,13 +489,13 @@ QModelIndex NBOpenWithView::moveCursor( QAbstractItemView::CursorAction cursorAc
 			case QAbstractItemView::MovePrevious: {
 				if ( index.row() >= 0 and index.row() < appModel->rowCount() ) {
 					QModelIndex mIdx = appModel->index( index.row() - 1, 0, rootIndex() );
-					if ( appModel->isCategoryVisible( appModel->category( mIdx ) ) )
+					if ( appModel->isCategoryOpen( appModel->category( mIdx ) ) )
 						return mIdx;
 
 					else {
 						// We need to return the previous visible index
 						for ( int i = appModel->categoryIndex( index ) - 1; i < categoryList.count(); i-- ) {
-							if ( appModel->isCategoryVisible( categoryList.value( i ) ) )
+							if ( appModel->isCategoryOpen( categoryList.value( i ) ) )
 								return appModel->indexListForCategory( categoryList.value( i ) ).last();
 						}
 						return index;
@@ -594,7 +596,7 @@ void NBOpenWithView::paintEvent( QPaintEvent* event ) {
 	for ( int row = 0; row < appModel->rowCount( rootIndex() ); row++ ) {
 		QModelIndex index = appModel->index( row, 0, rootIndex() );
 
-		if ( not appModel->isCategoryVisible( appModel->category( index ) ) )
+		if ( not appModel->isCategoryOpen( appModel->category( index ) ) )
 			continue;
 
 		QRect rect = viewportRectForRow( row );
@@ -763,8 +765,8 @@ void NBOpenWithView::mouseDoubleClickEvent( QMouseEvent *event ) {
 
 	QModelIndex index = indexAt( event->pos() );
 	if ( index.isValid() ) {
-		QStringList execList = index.data( NBApplicationsModel::ExecList ).toStringList();
-		bool runInTerminal = index.data( NBApplicationsModel::Terminal ).toBool();
+		QStringList execList = index.data( Qt::UserRole + 3 ).toStringList();
+		bool runInTerminal = index.data( Qt::UserRole + 7 ).toBool();
 
 		if ( not runInTerminal ) {
 

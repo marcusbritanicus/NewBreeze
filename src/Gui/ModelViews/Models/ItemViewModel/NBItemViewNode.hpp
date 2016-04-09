@@ -1,6 +1,6 @@
 /*
 	*
-	* NBFileSystemNode.hpp - NewBreeze NBFileSystemNode Class Header
+	* NBItemViewNode.hpp - NewBreeze NBItemViewNode Class Header
 	*
 */
 
@@ -8,11 +8,11 @@
 
 #include <Global.hpp>
 
-class NBFileSystemNode {
+class NBItemViewNode {
 
 	public:
-		NBFileSystemNode();
-		NBFileSystemNode( QVariantList, QString, NBFileSystemNode *parent = 0 );
+		NBItemViewNode();
+		NBItemViewNode( QVariantList, QString, NBItemViewNode *parent = 0 );
 
 		bool combi() const;
 		void setCombi( bool );
@@ -22,12 +22,12 @@ class NBFileSystemNode {
 
 		void clearChildren();
 
-		void addChild( NBFileSystemNode* );
-		void removeChild( NBFileSystemNode* );
+		void addChild( NBItemViewNode* );
+		void removeChild( NBItemViewNode* );
 
-		NBFileSystemNode* child( int );
-		NBFileSystemNode* child( QString );
-		QList<NBFileSystemNode*> children();
+		NBItemViewNode* child( int );
+		NBItemViewNode* child( QString );
+		QList<NBItemViewNode*> children();
 
 		QVariant data( int column, bool special = false ) const;
 		QVariantList allData();
@@ -40,7 +40,7 @@ class NBFileSystemNode {
 
 		QStringList categoryList();
 
-		NBFileSystemNode *parent();
+		NBItemViewNode *parent();
 		int row();
 
 		void sort( int column = 0, bool cs = false, bool categorized = false );
@@ -50,9 +50,9 @@ class NBFileSystemNode {
 		QIcon icon();
 
 	private:
-		QList<NBFileSystemNode*> childNodes;
+		QList<NBItemViewNode*> childNodes;
 		QVariantList nodeData;
-		NBFileSystemNode *parentNode;
+		NBItemViewNode *parentNode;
 
 		QStringList mCategoryList;
 		QString myCategory;
@@ -61,5 +61,5 @@ class NBFileSystemNode {
 		bool m_Combi;
 };
 
-bool columnSort2( NBFileSystemNode *first, NBFileSystemNode *second );
+bool columnSort2( NBItemViewNode *first, NBItemViewNode *second );
 QStringList sortCategoryList( QStringList& );

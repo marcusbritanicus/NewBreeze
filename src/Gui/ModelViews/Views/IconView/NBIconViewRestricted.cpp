@@ -6,7 +6,7 @@
 
 #include <NBIconViewRestricted.hpp>
 
-NBIconViewRestricted::NBIconViewRestricted( NBFileSystemModel *fsModel ) : NBIconView( fsModel ) {
+NBIconViewRestricted::NBIconViewRestricted( NBItemViewModel *fsModel ) : NBIconView( fsModel ) {
 
 	mdl = fsModel;
 

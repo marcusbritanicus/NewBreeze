@@ -24,11 +24,8 @@ NBAppsList NBAppEngine::appsForMimeType( QMimeType mimeType ) {
 	NBAppsList appsForMimeList;
 	QStringList mimeList = QStringList() << mimeType.name() << mimeType.allAncestors();
 
-	foreach( NBAppFile app, appsList.toQList() ) {
-		foreach( QString mime, mimeList ) {
-			// if ( app.value( NBAppFile::Name ).toString().toLower().contains( "libre" ) )
-				// qDebug() << app.value( NBAppFile::MimeTypes ).toStringList();
-
+	Q_FOREACH( NBAppFile app, appsList.toQList() ) {
+		Q_FOREACH( QString mime, mimeList ) {
 			if ( app.value( NBAppFile::MimeTypes ).toStringList().contains( mime ) ) {
 				if ( ( app.value( NBAppFile::Type ).toString() == "Application" ) and ( not app.value( NBAppFile::NoDisplay ).toBool() ) ) {
 					if ( not appsForMimeList.contains( app ) ) {
@@ -76,6 +73,7 @@ void NBAppEngine::parseDesktops() {
 
 	foreach( QString appDir, appsDirs ) {
 		foreach( QString application, listApplications( appDir ) ) {
+
 			appsList << NBAppFile( appDir + application );
 		}
 	}

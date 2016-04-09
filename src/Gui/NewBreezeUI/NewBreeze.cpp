@@ -142,8 +142,6 @@ void NewBreeze::setupSidePanel() {
 
 	connect( SideBar, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
 	connect( SideBar, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
-	connect( SideBar, SIGNAL( showApplications() ), this, SLOT( showApplications() ) );
-	connect( SideBar, SIGNAL( showCatalogs() ), this, SLOT( showCatalogs() ) );
 	connect( SideBar, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
 
 	if ( Settings->General.SidePanelType == 0 )
@@ -183,7 +181,6 @@ void NewBreeze::createAndSetupActions() {
 
 	connect( FolderView, SIGNAL( newWindow( QString ) ), this, SLOT( newWindow( QString ) ) );
 	connect( FolderView, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ), this, SLOT( updateInfoBar() ) );
-	connect( FolderView, SIGNAL( reloadCatalogs() ), FolderView->widget( 2 ), SLOT( reload() ) );
 	connect( FolderView, SIGNAL( toggleGroups() ), this, SLOT( toggleGrouping() ) );
 
 	connect( FolderView, SIGNAL( hideStatusBar() ), InfoBar, SLOT( hide() ) );
@@ -191,7 +188,6 @@ void NewBreeze::createAndSetupActions() {
 
 	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), this, SLOT( updateInfoBar() ) );
-	connect( FolderView->widget( 2 ), SIGNAL( openLocation( QString ) ), FolderView, SLOT( doOpen( QString ) ) );
 
 	connect( FolderView->fsModel, SIGNAL( dirLoading( QString ) ), SideBar, SLOT( highlight( QString ) ) );
 
@@ -546,7 +542,7 @@ void NewBreeze::updateInfoBar() {
 
 	InfoBar->clear();
 
-	if ( qobject_cast<NBFileSystemModel*>( sender() ) == FolderView->fsModel ) {
+	if ( qobject_cast<NBItemViewModel*>( sender() ) == FolderView->fsModel ) {
 
 		InfoBar->updateInfoBarCF( FolderView->fsModel->currentDir() );
 	}

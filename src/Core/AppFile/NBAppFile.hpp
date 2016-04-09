@@ -59,6 +59,9 @@ class NBAppFile {
 		// Name of the desktop file
 		QString desktopFileName() const;
 
+		// Name of the desktop file
+		QString filePath() const;
+
 		// Compare this and other
 		// this.grade() - other.grade()
 		int compare( NBAppFile ) const;

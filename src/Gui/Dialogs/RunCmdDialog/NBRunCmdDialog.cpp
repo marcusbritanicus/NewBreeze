@@ -127,8 +127,8 @@ void NBRunCmdDialog::handleTextChanged( QString newText ) {
 
 void NBRunCmdDialog::appSelected( QModelIndex index ) {
 
-	le->setText( index.data( NBApplicationsModel::ExecStr ).toString() );
-	execCmd = index.data( NBApplicationsModel::ExecList ).toStringList().join( " " );
+	le->setText( index.data( Qt::UserRole + 1 ).toString() );
+	execCmd = index.data( Qt::UserRole + 3 ).toStringList().join( " " );
 	okBtn->setEnabled( true );
 	defaultAndRunBtn->setEnabled( true );
 };
@@ -141,7 +141,7 @@ void NBRunCmdDialog::runCommand() {
 
 void NBRunCmdDialog::runCommand( QModelIndex index ) {
 
-	execCmd = index.data( NBApplicationsModel::ExecList ).toStringList().join( " " );
+	execCmd = index.data( Qt::UserRole + 3 ).toStringList().join( " " );
 	runOk = true;
 	close();
 };
@@ -156,8 +156,8 @@ void NBRunCmdDialog::makeDefaultAndRunCommand() {
 
 	QModelIndex idx = appList->currentIndex();
 
-	NBAppEngine::setApplicationAsDefault( idx.data( NBApplicationsModel::DesktopFile ).toString(), getMimeType( fileName ) );
-	execCmd = idx.data( NBApplicationsModel::ExecList ).toStringList().join( " " );
+	NBAppEngine::setApplicationAsDefault( idx.data( Qt::UserRole + 9 ).toString(), getMimeType( fileName ) );
+	execCmd = idx.data( Qt::UserRole + 3 ).toStringList().join( " " );
 	runOk = true;
 	close();
 };

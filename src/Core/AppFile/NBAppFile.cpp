@@ -127,6 +127,11 @@ QString NBAppFile::desktopFileName() const {
 	return baseName( fileUrl );
 };
 
+QString NBAppFile::filePath() const {
+
+	return fileUrl;
+};
+
 int NBAppFile::compare( NBAppFile other ) const {
 
 	if ( __execArgs.at( 0 ) == other.execArgs().at( 0 ) )
@@ -214,9 +219,9 @@ NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
 	bool firstDisplay = ( not first.value( NBAppFile::NoDisplay ).toBool() );
 	bool secondDisplay = ( not second.value( NBAppFile::NoDisplay ).toBool() );
 
-	QString desktopName = ( firstDisplay ? first.desktopFileName() : ( secondDisplay ? second.desktopFileName() : QString() ) );
+	QString desktopName = ( firstDisplay ? first.filePath() : ( secondDisplay ? second.filePath() : QString() ) );
 	if ( not( firstDisplay or secondDisplay ) )
-		desktopName = first.value( NBAppFile::Name ).toString().replace( QRegExp( "" ), QString() ).toLower() + ".desktop";
+		desktopName = first.filePath();
 
 	data << desktopName;
 	data << first.value( NBAppFile::Name );

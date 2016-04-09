@@ -62,6 +62,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 		*   time = 4
 		*   perm = 5
 		*   ownr = 6
+		*   mtpt = 7
 		* ]
 		*
 	*/
@@ -85,6 +86,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 		info << QDateTime::fromTime_t( statbuf.st_mtime ).toString( "ddd, dd MMM, yyyy" );
 		info << permStr( statbuf.st_mode );
 		info << "root";
+		info << "/";
 
 		return info;
 	};
@@ -175,6 +177,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 	info << QDateTime::fromTime_t( statbuf.st_mtime ).toString( "ddd, dd MMM, yyyy" );
 	info << permStr( statbuf.st_mode );
 	info << ( ( pwdinfo == NULL ) ? QString::number( statbuf.st_uid ) : pwdinfo->pw_name );
+	info << path;
 
 	return info;
 };

@@ -1,6 +1,6 @@
 /*
 	*
-	* NBNBFileSystemModel.hpp - NewBreeze NBFileSystemModel Class Header
+	* NBNBItemViewModel.hpp - NewBreeze NBItemViewModel Class Header
 	*
 */
 
@@ -9,7 +9,7 @@
 #include <Global.hpp>
 #include <NBTools.hpp>
 #include <NBIconProvider.hpp>
-#include <NBFileSystemNode.hpp>
+#include <NBItemViewNode.hpp>
 #include <NBFileInfoGatherer.hpp>
 #include <NBFileSystemWatcher.hpp>
 
@@ -32,18 +32,15 @@ class NBIconUpdater : public QThread {
 		void updated( QString, QString, QStringList );
 };
 
-class NBFileSystemModel : public QAbstractItemModel {
+class NBItemViewModel : public QAbstractItemModel {
     Q_OBJECT
 
 	public:
-		enum Sections {
-			NAME = 3,
-			SIZE = 4,
-			TYPE = 5,
-			MIME = 6,
-			TIME = 7,
-			PERM = 8,
-			OWNR = 9
+		enum LocationType {
+			SuperStart				= 0x6AF97E,			/* Real locations */
+			Applications,								/* Applications */
+			Catalogs,
+			FileSystem
 		};
 
 		enum Filters {
@@ -59,14 +56,14 @@ class NBFileSystemModel : public QAbstractItemModel {
 			System,
 		};
 
-		NBFileSystemModel();
-		~NBFileSystemModel();
+		NBItemViewModel();
+		~NBItemViewModel();
 
-		// Categorization Info
+		/* Categorization Info */
 		bool isCategorizationEnabled();
 		void setCategorizationEnabled( bool );
 
-		// Children Info
+		/* Children Info */
 		int rowCount( const QModelIndex &parent = QModelIndex() ) const;
 		int rowCount( const QString category ) const;
 		int categoryCount() const;
@@ -75,17 +72,21 @@ class NBFileSystemModel : public QAbstractItemModel {
 
 		Qt::ItemFlags flags( const QModelIndex &) const;
 
-		// Display Info
+		/* Display Info */
 		QVariant data( const QModelIndex &index, int role = Qt::DisplayRole ) const;
 		QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 		bool setData( const QModelIndex &index, QVariant value, int role );
 
-		// Data editing
+		/* Are we showing real or virtual data */
+		bool isRealLocation() const;
+		quint64 modelDataType() const;
+
+		/* Data editing */
 		bool insertNode( QString name );
 		bool removeNode( QString name );
 		void updateNode( QString name );
 
-		// Node Info
+		/* Node Info */
 		QModelIndex index( int row = 0, int column = 0, const QModelIndex &parent = QModelIndex() ) const;
 		QModelIndex index( QString, const QModelIndex &parent = QModelIndex() ) const;
 		QModelIndex parent( const QModelIndex &index = QModelIndex() ) const;
@@ -95,6 +96,10 @@ class NBFileSystemModel : public QAbstractItemModel {
 		QStringList categories() const;
 		QPixmap pixmapForCategory( QString ) const;
 
+		void foldCategory( QString );
+		void openCategory( QString );
+		bool isCategoryOpen( QString ) const;
+
 		int indexListCountForCategory( QString ) const;
 		QModelIndexList indexListForCategory( QString ) const;
 		QModelIndexList categorySiblings( QModelIndex ) const;
@@ -102,13 +107,13 @@ class NBFileSystemModel : public QAbstractItemModel {
 		bool showHidden() const;
 		void setShowHidden( bool );
 
-		// Drag and Drop
+		/* Drag and Drop */
 		Qt::DropActions supportedDropActions() const;
 		Qt::DropActions supportedDragActions() const;
 		Qt::ItemFlags flags( const QModelIndex index ) const;
 		QStringList mimeTypes() const;
 
-		// Filters
+		/* Filters */
 		bool filter( Filters filter );
 		void setFilter( Filters filter, bool );
 		QStringList nameFilters();
@@ -121,10 +126,10 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void sort( int column, bool cs, bool categorized );
 		void reload();
 
-		// FS Modification
+		/* FS Modification */
 		bool rename( QString, QString );
 
-		// FS Navigation
+		/* FS Navigation */
 		QString nodeName( const QModelIndex ) const;
 		QString nodePath( const QModelIndex ) const;
 		QString nodePath( QString ) const;
@@ -132,9 +137,6 @@ class NBFileSystemModel : public QAbstractItemModel {
 
 		QString rootPath() const;
 		void setRootPath( QString );
-
-		// Load CombiView
-		void loadCombiView();
 
 		void goUp();
 		void goBack();
@@ -150,18 +152,24 @@ class NBFileSystemModel : public QAbstractItemModel {
 		QString nextDir() const;
 		QString parentDir() const;
 
-		// To halt the Info Gathering
+		/* To halt the Info Gathering */
 		void terminateInfoGathering();
 
 	private:
-		// CombiData
-		QVariant combiData( const QModelIndex &index, int role = Qt::DisplayRole ) const;
-
-		// Model Data for normal filesystem
+		/* Initiate setting up of model */
 		void setupModelData();
 
-		// Model Data for combi view
-		void setupCombiViewData();
+		/* Model Data for SuperStart * /
+		void setupSuperStartData(); */
+
+		/* Model Data for applications */
+		void setupApplicationsData();
+
+		/* Model Data for catalogs */
+		void setupCatalogData();
+
+		/* Model Data for real locations */
+		void setupFileSystemData();
 
 		/* New watch */
 		void newWatch( QString );
@@ -169,7 +177,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 		QString getCategory( QVariantList );
 		void recategorize();
 
-		NBFileSystemNode *rootNode;
+		NBItemViewNode *rootNode;
 
 		QString __rootPath;
 		QStringList __childNames;
@@ -195,10 +203,13 @@ class NBFileSystemModel : public QAbstractItemModel {
 		QStringList __nameFilters;
 		bool __filterFolders;
 
-		// CombiView
-		bool __mCombiShown;
+		/* Showing virtual data */
+		bool __mVirtualData;
 
-		// History
+		/* Showing which data type */
+		quint64 __mModelDataType;
+
+		/* History */
 		QStringList oldRoots;
 		long curIndex;
 
@@ -208,7 +219,7 @@ class NBFileSystemModel : public QAbstractItemModel {
 		mutable QStringList delayedUpdateList;
 		QBasicTimer updateTimer;
 
-		// Info Gatherer kill switch
+		/* Info Gatherer kill switch */
 		bool __terminate;
 
 		NBQuickFileInfoGatherer *quickDataGatherer;
@@ -230,16 +241,10 @@ class NBFileSystemModel : public QAbstractItemModel {
 		void timerEvent( QTimerEvent* );
 
 	Q_SIGNALS:
-		// Update Node
+		/* Updated Node */
 		void nodeUpdated( QString );
 
-		void loadFileInfo();
 		void dirLoading( QString );
 		void directoryLoaded( QString );
 		void runningHome( QString );
-
-		// Experimental
-		void loadApplications();
-		void loadCatalogs();
-		void loadFolders();
 };

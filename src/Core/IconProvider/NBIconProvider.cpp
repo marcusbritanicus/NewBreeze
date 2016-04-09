@@ -325,6 +325,9 @@ QString NBIconProvider::pixmapIcon( QString icon ) {
 	else if ( exists( QString( "/usr/share/pixmaps/%1" ).arg( icon ) ) )
 		return QString( "/usr/share/pixmaps/%1" ).arg( icon );
 
+	else if ( exists( icon ) )
+		return icon;
+
 	else
 		return QString();
 };

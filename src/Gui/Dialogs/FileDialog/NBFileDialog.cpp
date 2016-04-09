@@ -13,7 +13,7 @@ NBFileDialog::NBFileDialog( QString wIcon, QString wTitle, QString fLocation, Fi
 	location = fLocation;
 	type = dType;
 
-	fsModel = new NBFileSystemModel();
+	fsModel = new NBItemViewModel();
 	fsModel->setShowHidden( Settings->General.ShowHidden );
 	fsModel->setCategorizationEnabled( Settings->General.Grouping );
 	fsModel->setFilterFolders( false );

@@ -23,15 +23,12 @@ void NBSideBar::populateSideBar() {
 
 	dirs = new NBSideBarItem( "Folders", ":/icons/show-folders.png", "NB://Folders", this );
 	connect( dirs, SIGNAL( clicked() ), this, SIGNAL( showFolders() ) );
-	connect( dirs, SIGNAL( clicked( QString ) ), this, SLOT( highlight( QString ) ) );
 
 	apps = new NBSideBarItem( "Applications", ":/icons/applications.png", "NB://Applications", this );
-	connect( apps, SIGNAL( clicked() ), this, SIGNAL( showApplications() ) );
-	connect( apps, SIGNAL( clicked( QString ) ), this, SLOT( highlight( QString ) ) );
+	connect( apps, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 
 	ctlg = new NBSideBarItem( "Catalogs", ":/icons/catalogs.png", "NB://Catalogs", this );
-	connect( ctlg, SIGNAL( clicked() ), this, SIGNAL( showCatalogs() ) );
-	connect( ctlg, SIGNAL( clicked( QString ) ), this, SLOT( highlight( QString ) ) );
+	connect( ctlg, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 
 	drives = new NBSideBarGroup( "Devices", ":/icons/comp.png", this );
 	connect( drives, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
@@ -99,16 +96,11 @@ void NBSideBar::highlight( QString tgt ) {
 	vfs->clearHighlights();
 	bookmarks->clearHighlights();
 
-	if ( dirs->target() == tgt ) {
+	dirs->setHighlighted( false );
+	apps->setHighlighted( false );
+	ctlg->setHighlighted( false );
 
-		dirs->setHighlighted( true );
-		apps->setHighlighted( false );
-		ctlg->setHighlighted( false );
-
-		return;
-	}
-
-	if ( apps->target() == tgt ) {
+	if ( tgt.startsWith( "NB://Aplications" ) ) {
 
 		dirs->setHighlighted( false );
 		apps->setHighlighted( true );
@@ -117,20 +109,13 @@ void NBSideBar::highlight( QString tgt ) {
 		return;
 	}
 
-	if ( ctlg->target() == tgt ) {
+	if ( tgt.startsWith( "NB://Catalogs" ) ) {
 
 		dirs->setHighlighted( false );
 		apps->setHighlighted( false );
 		ctlg->setHighlighted( true );
 
 		return;
-	}
-
-	else {
-
-		dirs->setHighlighted( false );
-		apps->setHighlighted( false );
-		ctlg->setHighlighted( false );
 	}
 
 	for( int i = 0; i < drives->itemCount(); i++ ) {

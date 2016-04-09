@@ -5,7 +5,6 @@
 */
 
 #include <NBOpenWithDelegate.hpp>
-// #include <NBApplicationsModel.hpp>
 
 void NBOpenWithDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
 

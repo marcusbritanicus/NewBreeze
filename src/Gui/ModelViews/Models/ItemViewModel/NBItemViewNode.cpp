@@ -1,16 +1,16 @@
 /*
 	*
-	* NBFileSystemNode.cpp - NewBreeze NBFileSystemNode Class
+	* NBItemViewNode.cpp - NewBreeze NBItemViewNode Class
 	*
 */
 
-#include <NBFileSystemNode.hpp>
+#include <NBItemViewNode.hpp>
 
 static int __sortColumn = Settings->General.SortColumn;
 static bool __sortCase = Settings->General.SortCase;
 static bool __sortCategory = Settings->General.Grouping;
 
-NBFileSystemNode::NBFileSystemNode() {
+NBItemViewNode::NBItemViewNode() {
 
 	for( int i = 0; i < 10; i++ )
 		nodeData << "";
@@ -22,7 +22,7 @@ NBFileSystemNode::NBFileSystemNode() {
 	m_Combi = false;
 };
 
-NBFileSystemNode::NBFileSystemNode( QVariantList data, QString category, NBFileSystemNode *parent ) {
+NBItemViewNode::NBItemViewNode( QVariantList data, QString category, NBItemViewNode *parent ) {
 
 	nodeData << data;
 	myCategory = category;
@@ -30,17 +30,17 @@ NBFileSystemNode::NBFileSystemNode( QVariantList data, QString category, NBFileS
 	parentNode = parent;
 };
 
-bool NBFileSystemNode::combi() const {
+bool NBItemViewNode::combi() const {
 
 	return m_Combi;
 };
 
-void NBFileSystemNode::setCombi( bool truth ) {
+void NBItemViewNode::setCombi( bool truth ) {
 
 	m_Combi = truth;
 };
 
-void NBFileSystemNode::addChild( NBFileSystemNode *node ) {
+void NBItemViewNode::addChild( NBItemViewNode *node ) {
 
 	if ( not mCategoryList.contains( node->category() ) )
 		mCategoryList << node->category();
@@ -48,41 +48,41 @@ void NBFileSystemNode::addChild( NBFileSystemNode *node ) {
 	childNodes << node;
 };
 
-void NBFileSystemNode::removeChild( NBFileSystemNode *node ) {
+void NBItemViewNode::removeChild( NBItemViewNode *node ) {
 
 	delete childNodes.takeAt( node->row() );
 };
 
-NBFileSystemNode* NBFileSystemNode::child( int row ) {
+NBItemViewNode* NBItemViewNode::child( int row ) {
 
 	return childNodes.at( row );
 };
 
-NBFileSystemNode* NBFileSystemNode::child( QString name ) {
+NBItemViewNode* NBItemViewNode::child( QString name ) {
 
-	foreach( NBFileSystemNode* node, childNodes )
+	foreach( NBItemViewNode* node, childNodes )
 		if ( node->data( 0 ) == name )
 			return node;
 
-	return new NBFileSystemNode();
+	return new NBItemViewNode();
 };
 
-QList<NBFileSystemNode*> NBFileSystemNode::children() {
+QList<NBItemViewNode*> NBItemViewNode::children() {
 
 	return childNodes;
 };
 
-int NBFileSystemNode::childCount() {
+int NBItemViewNode::childCount() {
 
 	return childNodes.count();
 };
 
-int NBFileSystemNode::categoryCount() {
+int NBItemViewNode::categoryCount() {
 
 	return mCategoryList.count();
 };
 
-void NBFileSystemNode::clearChildren() {
+void NBItemViewNode::clearChildren() {
 
 	m_Combi = false;
 
@@ -90,27 +90,27 @@ void NBFileSystemNode::clearChildren() {
 	mCategoryList.clear();
 };
 
-QString NBFileSystemNode::category() {
+QString NBItemViewNode::category() {
 
 	return myCategory;
 };
 
-void NBFileSystemNode::setCategory( QString newCategory ) {
+void NBItemViewNode::setCategory( QString newCategory ) {
 
 	myCategory = newCategory;
 };
 
-int NBFileSystemNode::categoryIndex() {
+int NBItemViewNode::categoryIndex() {
 
 	return parentNode->mCategoryList.indexOf( myCategory );
 };
 
-QStringList NBFileSystemNode::categoryList() {
+QStringList NBItemViewNode::categoryList() {
 
 	return mCategoryList;
 };
 
-QVariant NBFileSystemNode::data( int column, bool special ) const {
+QVariant NBItemViewNode::data( int column, bool special ) const {
 
 	/*
 		*
@@ -133,27 +133,19 @@ QVariant NBFileSystemNode::data( int column, bool special ) const {
 		*
 	*/
 
-	if ( special ) {
-		if ( ( column < 0 ) or ( column > 2 ) )
-			return QVariant();
-
+	if ( special )
 		return nodeData.at( column );
-	}
 
-	else {
-		if ( ( column < 0 ) or ( column > 8 ) )
-			return QVariant();
-
+	else
 		return nodeData.value( 3 + column, QString() );
-	}
 };
 
-QVariantList NBFileSystemNode::allData() {
+QVariantList NBItemViewNode::allData() {
 
 	return nodeData;
 }
 
-bool NBFileSystemNode::setData( int column, QVariant data, bool special ) {
+bool NBItemViewNode::setData( int column, QVariant data, bool special ) {
 
 	/*
 		*
@@ -179,12 +171,12 @@ bool NBFileSystemNode::setData( int column, QVariant data, bool special ) {
 	return true;
 };
 
-NBFileSystemNode* NBFileSystemNode::parent() {
+NBItemViewNode* NBItemViewNode::parent() {
 
 	return parentNode;
 };
 
-int NBFileSystemNode::row() {
+int NBItemViewNode::row() {
 
 	if ( parentNode )
 		return parentNode->childNodes.indexOf( this );
@@ -192,7 +184,7 @@ int NBFileSystemNode::row() {
 	return 0;
 };
 
-void NBFileSystemNode::sort( int column, bool cs, bool categorized ) {
+void NBItemViewNode::sort( int column, bool cs, bool categorized ) {
 
 	__sortColumn = column;
 	__sortCase = cs;
@@ -204,10 +196,10 @@ void NBFileSystemNode::sort( int column, bool cs, bool categorized ) {
 	qSort( childNodes.begin(), childNodes.end(), columnSort2 );
 };
 
-void NBFileSystemNode::updateCategories() {
+void NBItemViewNode::updateCategories() {
 
-	NBFileSystemNode::mCategoryList.clear();
-	foreach( NBFileSystemNode *cNode, childNodes ) {
+	NBItemViewNode::mCategoryList.clear();
+	foreach( NBItemViewNode *cNode, childNodes ) {
 		QString newCategory = cNode->category();
 		if ( not mCategoryList.contains( newCategory ) )
 			mCategoryList << newCategory;
@@ -217,7 +209,7 @@ void NBFileSystemNode::updateCategories() {
 		mCategoryList = sortCategoryList( mCategoryList );
 };
 
-bool columnSort2( NBFileSystemNode *first, NBFileSystemNode *second )  {
+bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 
 	int firstIdx = first->categoryIndex();
 	int secondIdx = second->categoryIndex();

@@ -9,7 +9,7 @@
 #define NBICONVIEWRESTRICTED_HPP
 
 #include <Global.hpp>
-#include <NBFileSystemModel.hpp>
+#include <NBItemViewModel.hpp>
 #include <NBIconDelegate.hpp>
 #include <NBTools.hpp>
 #include <NBIconView.hpp>
@@ -18,9 +18,9 @@ class NBIconViewRestricted : public NBIconView {
 	Q_OBJECT
 
 	public:
-		NBIconViewRestricted( NBFileSystemModel* );
+		NBIconViewRestricted( NBItemViewModel* );
 
-		NBFileSystemModel* mdl;
+		NBItemViewModel* mdl;
 
 	protected:
 		void mousePressEvent( QMouseEvent * );

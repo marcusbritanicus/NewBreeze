@@ -45,7 +45,7 @@ class NBFileDialog : public NBDialog {
 		void createAndSetupActions();
 		void setWindowProperties();
 
-		NBFileSystemModel *fsModel;
+		NBItemViewModel *fsModel;
 
 		NBAddressWidget *addressWidget;
 		NBIconViewRestricted *mainView;

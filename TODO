@@ -10,6 +10,10 @@ NBProcessManager                                                                
 	⬜ NBPropertiesProcess
 	✍ Undo-Redo Sequences (Only for Copy and Move)
 
+NBItemViewModel                                                                                                                      [ 1 of 2 ]
+	✓ Unify ApplicationsModel, CatalogModel and FileSystemModel
+	⬜ SuperStart
+
 NBIconView                                                                                                                           [ 1 of 3 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
 	⬜ Fix @aboveIndex @belowIndex

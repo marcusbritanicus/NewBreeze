@@ -13,20 +13,16 @@ NBFolderView::NBFolderView( QWidget *parent ) : QStackedWidget( parent ) {
 	clipBoard = QApplication::clipboard();
 
 	// Set Data Model
-	fsModel = new NBFileSystemModel();
+	fsModel = new NBItemViewModel();
 	fsModel->setCategorizationEnabled( Settings->General.Grouping );
 
 	// Setup the views
 	IconView = new NBIconView( fsModel );
-	ApplicationsView = new NBApplicationsView();
-	CatalogView = new NBCatalogView();
 
 	// Process Manager
 	pMgr = NBProcessManager::instance();
 
 	addWidget( IconView );
-	addWidget( ApplicationsView );
-	addWidget( CatalogView );
 
 	// Minimum Width - 700px
 	setMinimumWidth( 700 );
@@ -54,6 +50,7 @@ bool NBFolderView::hasSelection() {
 void NBFolderView::createAndSetupActions() {
 
 	connect( IconView, SIGNAL( open( QModelIndex ) ), this, SLOT( doOpen( QModelIndex ) ) );
+	connect( IconView, SIGNAL( open( QString ) ), this, SLOT( doOpen( QString ) ) );
 
 	connect( IconView, SIGNAL( contextMenuRequested( QPoint ) ), this, SLOT( showContextMenu( QPoint ) ) );
 
@@ -69,10 +66,6 @@ void NBFolderView::createAndSetupActions() {
 
 	// DragDrop move
 	connect( IconView, SIGNAL( move( QStringList, QString ) ), this, SLOT( move( QStringList, QString ) ) );
-
-	connect( fsModel, SIGNAL( loadFolders() ), this, SLOT( showFolders() ) );
-	connect( fsModel, SIGNAL( loadApplications() ), this, SLOT( showApplications() ) );
-	connect( fsModel, SIGNAL( loadCatalogs() ), this, SLOT( showCatalogs() ) );
 
 	// Home
 	actHomeDir = new QAction( QIcon( ":/icons/home.png" ), "&Home", this );
@@ -289,7 +282,7 @@ void NBFolderView::doOpenHome() {
 
 	NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", NBXdg::home().toLocal8Bit().data() );
 	if ( Settings->General.CombiHome )
-		fsModel->loadCombiView();
+		fsModel->goHome();
 
 	else
 		fsModel->goHome();
@@ -539,22 +532,6 @@ void NBFolderView::doOpenWithCmd() {
 		QString cmd = exec.takeFirst();
 		QProcess::startDetached( cmd, exec );
 	}
-};
-
-void NBFolderView::showApplications() {
-
-	setCurrentIndex( 1 );
-	currentWidget()->setFocus();
-
-	emit hideStatusBar();
-};
-
-void NBFolderView::showCatalogs() {
-
-	setCurrentIndex( 2 );
-	currentWidget()->setFocus();
-
-	emit hideStatusBar();
 };
 
 void NBFolderView::showFolders() {
