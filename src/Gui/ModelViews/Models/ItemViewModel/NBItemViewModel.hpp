@@ -151,6 +151,7 @@ class NBItemViewModel : public QAbstractItemModel {
 		QString previousDir() const;
 		QString nextDir() const;
 		QString parentDir() const;
+		QString lastOpenedFolder() const;
 
 		/* To halt the Info Gathering */
 		void terminateInfoGathering();
@@ -159,8 +160,8 @@ class NBItemViewModel : public QAbstractItemModel {
 		/* Initiate setting up of model */
 		void setupModelData();
 
-		/* Model Data for SuperStart * /
-		void setupSuperStartData(); */
+		/* Model Data for SuperStart */
+		void setupSuperStartData();
 
 		/* Model Data for applications */
 		void setupApplicationsData();
@@ -212,6 +213,7 @@ class NBItemViewModel : public QAbstractItemModel {
 		/* History */
 		QStringList oldRoots;
 		long curIndex;
+		QString prevFolder;
 
 		/* To manage the rapidly changing nodes */
 		mutable QStringList lastUpdatedNodes;

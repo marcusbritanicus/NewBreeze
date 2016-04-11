@@ -266,26 +266,23 @@ void NBFolderView::goUp() {
 
 void NBFolderView::goBack() {
 
-	if ( fsModel->canGoBack() ) {
-		fsModel->goBack();
-	}
+	fsModel->goBack();
 };
 
 void NBFolderView::goForward() {
 
-	if ( fsModel->canGoForward() ) {
-		fsModel->goForward();
-	}
+	fsModel->goForward();
 };
 
 void NBFolderView::doOpenHome() {
 
-	NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", NBXdg::home().toLocal8Bit().data() );
-	if ( Settings->General.CombiHome )
-		fsModel->goHome();
+	if ( Settings->General.SuperStart )
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening SuperStart" );
 
 	else
-		fsModel->goHome();
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", NBXdg::home().toLocal8Bit().data() );
+
+	fsModel->goHome();
 };
 
 void NBFolderView::newFile() {
@@ -536,8 +533,8 @@ void NBFolderView::doOpenWithCmd() {
 
 void NBFolderView::showFolders() {
 
-	setCurrentIndex( 0 );
-	currentWidget()->setFocus();
+	qDebug() << "NBFolderView::showFolders()";
+	fsModel->setRootPath( "NB://Folders" );
 
 	emit showStatusBar();
 };

@@ -259,14 +259,8 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	fLyt->addWidget( filterBtn );
 	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( viewModes );
-
-	if ( Settings->General.NativeTitleBar ) {
-		fLyt->addWidget( Separator::vertical() );
-		fLyt->addWidget( mProcWidget );
-	}
-
-	else
-		mProcWidget->hide();
+	fLyt->addWidget( Separator::vertical() );
+	fLyt->addWidget( mProcWidget );
 
 	setLayout( fLyt );
 

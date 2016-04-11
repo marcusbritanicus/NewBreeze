@@ -14,8 +14,12 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	/* Create the UI */
 	createGUI();
 
+	/* Open with catalog */
+	if ( Settings->General.SuperStart and loc.isEmpty() )
+		FolderView->doOpen( "NB://SuperStart" );
+
 	/* Load the a folder */
-	if ( not loc.isEmpty() ) {
+	else if ( not loc.isEmpty() ) {
 		if ( isFile( loc ) ) {
 
 			/* This is a file, just open the file */
@@ -26,7 +30,6 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 
 			/* This is a folder open it */
 			FolderView->doOpen( loc );
-			SideBar->highlight( loc );
 		}
 
 		else if ( exists( loc ) ) {
@@ -48,18 +51,12 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	else {
 		if ( exists( Settings->Session.LastDir ) ) {
 			FolderView->doOpen( QString( Settings->Session.LastDir ) );
-			SideBar->highlight( QString( Settings->Session.LastDir ) );
 		}
 
 		else {
 			FolderView->doOpen( QString( QDir::homePath() ) );
-			SideBar->highlight( QString( QDir::homePath() ) );
 		}
 	}
-
-	/* Open with catalog */
-	if ( Settings->General.OpenWithCatalog and loc.isEmpty() )
-		FolderView->setCurrentIndex( 2 );
 
 	/* Show/hide hidden files */
 	if ( Settings->General.ShowHidden )
@@ -141,7 +138,6 @@ void NewBreeze::setupSidePanel() {
 	connect( SidePanel, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
 
 	connect( SideBar, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
-	connect( SideBar, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
 	connect( SideBar, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
 
 	if ( Settings->General.SidePanelType == 0 )
@@ -369,8 +365,6 @@ void NewBreeze::openFile( QString file ) {
 
 void NewBreeze::show() {
 
-	qDebug() << mTerminate;
-
 	if ( mTerminate )
 		return;
 
@@ -597,11 +591,17 @@ void NewBreeze::showPermissions() {
 
 void NewBreeze::handleDriveUrl( QString url ){
 
-	if ( url.startsWith( "NB://A" ) )
+	if ( url.startsWith( "NB://SuperStart" ) )
+		FolderView->fsModel->goHome();
+
+	if ( url.startsWith( "NB://Applications" ) )
 		showApplications();
 
-	else if ( url.startsWith( "NB://C" ) )
+	else if ( url.startsWith( "NB://Catalogs" ) )
 		showCatalogs();
+
+	else if ( url.startsWith( "NB://Folders" ) )
+		showFolders();
 
 	else
 		FolderView->doOpen( url );
@@ -627,13 +627,10 @@ void NewBreeze::showCatalogs() {
 
 void NewBreeze::showFolders() {
 
-	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel ) {
+	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
 		SidePanel->flashFolders();
-		SideBar->highlight( "NB://Folders" );
-	}
 
-	FolderView->setCurrentIndex( 0 );
-	FolderView->setFocus();
+	FolderView->showFolders();
 };
 
 void NewBreeze::showTrash() {
@@ -843,8 +840,9 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 
 	// Store the previous session - geometry, and open directory.
 	Settings->setValue( "Session/Geometry", geometry() );
-	Settings->setValue( "Session/LastDir", FolderView->fsModel->currentDir() );
 	Settings->setValue( "Session/Maximized", isMaximized() );
+
+	Settings->setValue( "Session/LastDir", FolderView->fsModel->lastOpenedFolder() );
 
 	// Come to home dir
 	chdir( NBXdg::home().toLocal8Bit().constData() );

@@ -78,6 +78,7 @@ NBItemViewModel::NBItemViewModel() : QAbstractItemModel() {
 
 	oldRoots.clear();
 	curIndex = 0;
+	prevFolder = Settings->Session.LastDir;
 
 	/* Root node */
 	rootNode = new NBItemViewNode();
@@ -185,7 +186,30 @@ QVariant NBItemViewModel::data( const QModelIndex &index, int role ) const {
 						return icon;
 					}
 
-					case NBItemViewModel::SuperStart:
+					case NBItemViewModel::SuperStart: {
+						QString icoStr( node->data( 2, true ).toString() );
+
+						if ( node->data( 0, true ).toString() == "System" ) {
+							QIcon icon = QIcon::fromTheme( icoStr );
+
+							if ( icon.isNull() )
+								icon = QIcon( NBIconProvider::pixmapIcon( icoStr ) );
+
+							if ( icon.isNull() )
+								icon = QIcon::fromTheme( "application-x-desktop", QIcon::fromTheme( "application-x-executable", QIcon( ":/icons/exec.png" ) ) );
+
+							return icon;
+						}
+
+						// Icon we got from the theme
+						QIcon themeIcon = QIcon::fromTheme( icoStr, QIcon( icoStr ) );
+
+						if ( not themeIcon.isNull() )
+							return themeIcon;
+
+						else
+							return QIcon::fromTheme( "unknown", QIcon( ":/icons/unknown.png" ) );
+					}
 					case NBItemViewModel::Catalogs:
 					case NBItemViewModel::FileSystem: {
 						// Icon String
@@ -822,7 +846,16 @@ QFileInfo NBItemViewModel::nodeInfo( const QModelIndex idx ) const {
 			return QFileInfo( idx.data( Qt::UserRole + 9 ).toString() );
 		}
 
-		case NBItemViewModel::SuperStart:
+		case NBItemViewModel::SuperStart: {
+
+			QString path = idx.data( Qt::UserRole + 9 ).toString();
+			if ( exists( path ) )
+				return QFileInfo( path );
+
+			else
+				return QFileInfo( idx.data( Qt::UserRole + 7 ).toString() );
+		}
+
 		case NBItemViewModel::Catalogs:
 		case NBItemViewModel::FileSystem:
 			return QFileInfo( idx.data( Qt::UserRole + 7 ).toString() );
@@ -835,6 +868,9 @@ QString NBItemViewModel::rootPath() const {
 };
 
 void NBItemViewModel::setRootPath( QString path ) {
+
+	if ( path.startsWith( "/" ) )
+		prevFolder = path;
 
 	__rootPath = path;
 
@@ -851,6 +887,12 @@ void NBItemViewModel::setRootPath( QString path ) {
 	else if ( path.startsWith( "NB://Catalogs" ) ) {
 		__mVirtualData = true;
 		__mModelDataType = (quint64)NBItemViewModel::Catalogs;
+	}
+
+	else if ( path.startsWith( "NB://Folders" ) ) {
+		__mVirtualData = false;
+		__mModelDataType = (quint64)NBItemViewModel::FileSystem;
+		__rootPath = prevFolder;
 	}
 
 	else {
@@ -910,6 +952,26 @@ void NBItemViewModel::goBack() {
 
 		__rootPath = oldRoots.at( curIndex );
 
+		if ( __rootPath.startsWith( "NB://SuperStart" ) ) {
+			__mVirtualData = true;
+			__mModelDataType = (quint64)NBItemViewModel::SuperStart;
+		}
+
+		else if ( __rootPath.startsWith( "NB://Applications" ) ) {
+			__mVirtualData = true;
+			__mModelDataType = (quint64)NBItemViewModel::Applications;
+		}
+
+		else if ( __rootPath.startsWith( "NB://Catalogs" ) ) {
+			__mVirtualData = true;
+			__mModelDataType = (quint64)NBItemViewModel::Catalogs;
+		}
+
+		else {
+			__mVirtualData = false;
+			__mModelDataType = (quint64)NBItemViewModel::FileSystem;
+		}
+
 		delete rootNode;
 		rootNode = new NBItemViewNode( quickDataGatherer->getQuickFileInfo( __rootPath ), "" );
 
@@ -923,6 +985,26 @@ void NBItemViewModel::goForward() {
 		curIndex++;
 
 		__rootPath = oldRoots.at( curIndex );
+
+		if ( __rootPath.startsWith( "NB://SuperStart" ) ) {
+			__mVirtualData = true;
+			__mModelDataType = (quint64)NBItemViewModel::SuperStart;
+		}
+
+		else if ( __rootPath.startsWith( "NB://Applications" ) ) {
+			__mVirtualData = true;
+			__mModelDataType = (quint64)NBItemViewModel::Applications;
+		}
+
+		else if ( __rootPath.startsWith( "NB://Catalogs" ) ) {
+			__mVirtualData = true;
+			__mModelDataType = (quint64)NBItemViewModel::Catalogs;
+		}
+
+		else {
+			__mVirtualData = false;
+			__mModelDataType = (quint64)NBItemViewModel::FileSystem;
+		}
 
 		delete rootNode;
 		rootNode = new NBItemViewNode( quickDataGatherer->getQuickFileInfo( __rootPath ), "" );
@@ -942,7 +1024,11 @@ void NBItemViewModel::goUp() {
 
 void NBItemViewModel::goHome() {
 
-	setRootPath( QDir::homePath() );
+	if ( Settings->General.SuperStart )
+		setRootPath( "NB://SuperStart" );
+
+	else
+		setRootPath( QDir::homePath() );
 };
 
 bool NBItemViewModel::canGoBack() const {
@@ -992,11 +1078,16 @@ QString NBItemViewModel::parentDir() const {
 	return ( path.endsWith( "/" ) ? path : path + "/" );
 };
 
+QString NBItemViewModel::lastOpenedFolder() const {
+
+	return prevFolder;
+};
+
 void NBItemViewModel::setupModelData() {
 
 	switch( __mModelDataType ) {
 		case NBItemViewModel::SuperStart: {
-			goHome();
+			setupSuperStartData();
 			break;
 		}
 
@@ -1114,6 +1205,64 @@ void NBItemViewModel::setupFileSystemData() {
 	emit directoryLoaded( __rootPath );
 
 	updateAllNodes( __rootPath );
+};
+
+void NBItemViewModel::setupSuperStartData() {
+
+	__childNames.clear();
+	rootNode->clearChildren();
+	currentLoadStatus.loading = true;
+
+	emit directoryLoading( __rootPath );
+
+	QSettings superStart( "NewBreeze", "SuperStart" );
+	superStart.beginGroup( "Applications" );
+
+	beginResetModel();
+	foreach( QString appName, superStart.childKeys() ) {
+		NBAppFile app( superStart.value( appName ).toString() );
+		QVariantList data;
+
+		/* Special Data */
+		data << "System" << 0 << app.value( NBAppFile::Icon );
+
+		/* Normal Data */
+		data << app.value( NBAppFile::Name );												/* Qt::UserRole + 0 */
+		data << app.value( NBAppFile::Exec );												/* Qt::UserRole + 1 */
+		data << app.value( NBAppFile::Comment );											/* Qt::UserRole + 2 */
+		data << app.execArgs();																/* Qt::UserRole + 3 */
+		data << app.value( NBAppFile::Icon );												/* Qt::UserRole + 4 */
+		data << app.value( NBAppFile::WorkPath );											/* Qt::UserRole + 5 */
+		data << app.value( NBAppFile::MimeTypes );											/* Qt::UserRole + 6 */
+		data << app.value( NBAppFile::TerminalMode );										/* Qt::UserRole + 7 */
+		data << app.value( NBAppFile::Categories );											/* Qt::UserRole + 8 */
+		data << app.filePath();																/* Qt::UserRole + 9 */
+
+		rootNode->addChild( new NBItemViewNode( data, "Applications", rootNode ) );
+	}
+	superStart.endGroup();
+
+	/* Custom Catalogs */
+	superStart.beginGroup( "Places" );
+	foreach( QString key, superStart.childKeys() ) {
+		QString location = superStart.value( key ).toString();
+		if ( not exists( location ) )
+			continue;
+
+		QVariantList data = quickDataGatherer->getQuickFileInfo( location );
+		rootNode->addChild( new NBItemViewNode( data, "Places", rootNode ) );
+	}
+	superStart.endGroup();
+	endResetModel();
+
+	foreach( QString mCategoryName, rootNode->categoryList() )
+		categoryVisibilityMap[ mCategoryName ] = true;
+
+	sort( prevSort.column, prevSort.cs, prevSort.categorized );
+
+	currentLoadStatus.loading = false;
+
+	emit directoryLoaded( __rootPath );
 };
 
 void NBItemViewModel::setupApplicationsData() {

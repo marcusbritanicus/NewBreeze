@@ -26,7 +26,6 @@ class NBSettings {
 				QString ViewMode;								// Icons, Tiles or Details
 				QString IconTheme;								// Icon Theme
 				bool ImagePreviews;								// Show image previews?
-				bool NativeTitleBar;							// Use native title bar?
 				bool TrayIcon;									// Minimize to tray?
 				bool OpenWithCatalog;							// Show catalog on NB Open?
 				bool SidePanel;									// Show sidepanel?
@@ -38,7 +37,8 @@ class NBSettings {
 				bool Grouping;									// Enable grouping?
 				bool PerFolderViews;							// Enable per folder views?
 				bool FilterFolders;								// Filter folders while searching?
-				bool CombiHome;									// Use CombiView as Home
+				bool SuperStart;								// Use CombiView as Home
+				bool SpecialOpen;								// Use CombiView as Home
 		} General;
 
 		// Special Settings

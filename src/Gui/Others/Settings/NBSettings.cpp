@@ -32,9 +32,8 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.ViewMode = QString( "IconsView" );
 	defaultSettings->General.IconTheme = NBSystemIconTheme();
 	defaultSettings->General.ImagePreviews = true;
-	defaultSettings->General.NativeTitleBar = false;
 	defaultSettings->General.TrayIcon = true;
-	defaultSettings->General.OpenWithCatalog = true;
+	defaultSettings->General.OpenWithCatalog = false;
 	defaultSettings->General.SidePanel = true;
 	defaultSettings->General.SidePanelType = 1;
 	defaultSettings->General.ShowHidden = false;
@@ -44,7 +43,8 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.Grouping = true;
 	defaultSettings->General.PerFolderViews = true;
 	defaultSettings->General.FilterFolders = true;
-	defaultSettings->General.CombiHome = false;
+	defaultSettings->General.SuperStart = true;
+	defaultSettings->General.SpecialOpen = true;
 
 	defaultSettings->Special.ClosingDown = false;
 
@@ -116,9 +116,6 @@ NBSettings* NBSettings::instance() {
 	if ( gaKeys.contains( QString( "ImagePreviews" ) ) )
 		settings->General.ImagePreviews = gSettings.value( "ImagePreviews" ).toBool();
 
-	if ( gaKeys.contains( QString( "NativeTitleBar" ) ) )
-		settings->General.NativeTitleBar = gSettings.value( "NativeTitleBar" ).toBool();
-
 	if ( gaKeys.contains( QString( "TrayIcon" ) ) )
 		settings->General.TrayIcon = gSettings.value( "TrayIcon" ).toBool();
 
@@ -152,8 +149,16 @@ NBSettings* NBSettings::instance() {
 	if ( gaKeys.contains( QString( "FilterFolders" ) ) )
 		settings->General.FilterFolders = gSettings.value( "FilterFolders" ).toBool();
 
-	if ( gaKeys.contains( QString( "CombiHome" ) ) )
-		settings->General.CombiHome = gSettings.value( "CombiHome" ).toBool();
+	if ( gaKeys.contains( QString( "SuperStart" ) ) )
+		settings->General.SuperStart = gSettings.value( "SuperStart" ).toBool();
+
+	if ( gaKeys.contains( QString( "SpecialOpen" ) ) )
+		settings->General.SpecialOpen = gSettings.value( "SpecialOpen" ).toBool();
+
+	if ( not settings->General.SpecialOpen ) {
+		settings->General.SuperStart = false;
+		settings->General.OpenWithCatalog = false;
+	}
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		settings->Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
@@ -298,9 +303,6 @@ void NBSettings::reload() {
 	if ( gaKeys.contains( QString( "ImagePreviews" ) ) )
 		General.ImagePreviews = gSettings.value( "ImagePreviews" ).toBool();
 
-	if ( gaKeys.contains( QString( "NativeTitleBar" ) ) )
-		General.NativeTitleBar = gSettings.value( "NativeTitleBar" ).toBool();
-
 	if ( gaKeys.contains( QString( "TrayIcon" ) ) )
 		General.TrayIcon = gSettings.value( "TrayIcon" ).toBool();
 
@@ -343,8 +345,8 @@ void NBSettings::reload() {
 	if ( gaKeys.contains( QString( "General/FilterFolders" ) ) )
 		General.FilterFolders = gSettings.value( "General/FilterFolders" ).toBool();
 
-	if ( gaKeys.contains( QString( "General/CombiHome" ) ) )
-		General.CombiHome = gSettings.value( "General/CombiHome" ).toBool();
+	if ( gaKeys.contains( QString( "General/SuperStart" ) ) )
+		General.SuperStart = gSettings.value( "General/SuperStart" ).toBool();
 
 	if ( saKeys.contains( QString( "AboutNB" ) ) )
 		Shortcuts.AboutNB = getShortcuts( "AboutNB" );

@@ -796,14 +796,35 @@ void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 		if ( idx.isValid() ) {
 			switch( cModel->modelDataType() ) {
 				case NBItemViewModel::SuperStart: {
-					mEvent->accept();
+
+					if ( idx.data( Qt::UserRole + 9 ).toString().count() ) {
+						QStringList execList = idx.data( Qt::UserRole + 3 ).toStringList();
+						bool runInTerminal = idx.data( Qt::UserRole + 7 ).toBool();
+
+						if ( not runInTerminal ) {
+
+							// Try to run this program
+							QProcess::startDetached( execList.at( 0 ) );
+						}
+
+						else {
+							QStringList terminalList = getTerminal().join( " " ).arg( QDir::homePath() ).arg( execList.at( 0 ) ).split( " " );
+							QProcess::startDetached( terminalList.takeFirst(), terminalList );
+						}
+					}
+
+					else {
+
+						emit open( idx );
+					}
+
 					break;
 				}
 
 				case NBItemViewModel::Applications: {
 
-					QStringList execList = idx.data( Qt::UserRole + 7 ).toStringList();
-					bool runInTerminal = idx.data( Qt::UserRole + 3 ).toBool();
+					QStringList execList = idx.data( Qt::UserRole + 3 ).toStringList();
+					bool runInTerminal = idx.data( Qt::UserRole + 7 ).toBool();
 
 					if ( not runInTerminal ) {
 
@@ -971,7 +992,27 @@ void NBIconView::keyPressEvent( QKeyEvent *kEvent ) {
 		switch( cModel->modelDataType() ) {
 
 			case NBItemViewModel::SuperStart: {
-				kEvent->accept();
+				if ( idx.data( Qt::UserRole + 9 ).toString().count() ) {
+					QStringList execList = idx.data( Qt::UserRole + 3 ).toStringList();
+					bool runInTerminal = idx.data( Qt::UserRole + 7 ).toBool();
+
+					if ( not runInTerminal ) {
+
+						// Try to run this program
+						QProcess::startDetached( execList.at( 0 ) );
+					}
+
+					else {
+						QStringList terminalList = getTerminal().join( " " ).arg( QDir::homePath() ).arg( execList.at( 0 ) ).split( " " );
+						QProcess::startDetached( terminalList.takeFirst(), terminalList );
+					}
+				}
+
+				else {
+
+					emit open( idx );
+				}
+
 				break;
 			}
 
@@ -1838,6 +1879,9 @@ void NBIconView::calculateCategorizedIconsRects() const {
 		// Minimum X and Y for Category Rectangle
 		int minX = myContentsMargins.left();
 		int minY = myContentsMargins.top() + catIdx * myCategoryHeight + catIdx * myCategorySpacing + totalRows * myGridSize.height();
+
+		if ( cModel->modelDataType() == NBItemViewModel::SuperStart )
+			minY += ( catIdx ? myGridSize.height() : 0 );
 
 		int categoryWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
 		rectForCategory[ catIdx ] = QRect( minX, minY, categoryWidth, 24 );

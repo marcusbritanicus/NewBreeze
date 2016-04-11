@@ -102,17 +102,26 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	comboBoxLyt3->addWidget( lbl3 );
 	comboBoxLyt3->addWidget( defaultSortClmnCB );
 
-	nativeTitleBarCB = new QCheckBox( "&Use native title bar" );
-	nativeTitleBarCB->setChecked( Settings->General.NativeTitleBar );
-	connect( nativeTitleBarCB, SIGNAL( toggled( bool ) ), this, SLOT( handleNativeTitleBarToggle( bool ) ) );
-
 	showTrayIconCB = new QCheckBox( "&Minimize to tray" );
 	showTrayIconCB->setChecked( Settings->General.TrayIcon );
 	connect( showTrayIconCB, SIGNAL( toggled( bool ) ), this, SLOT( handleTrayIconChanged( bool ) ) );
 
-	openWithCatalogCB = new QCheckBox( "Open Catalog &View every time NewBreeze starts" );
-	openWithCatalogCB->setChecked( sett.value( "OpenWithCatalog" ).toBool() );
-	connect( openWithCatalogCB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithCatalogToggled( bool ) ) );
+	openWithCB = new QCheckBox( "Open with special location when NewBreeze starts?", this );
+	openWithCB->setChecked( sett.value( "SpecialOpen" ).toBool() );
+	connect( openWithCB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithToggled() ) );
+
+	openWithCatalogRB = new QRadioButton( "Open with Catalog &View", this );
+	openWithCatalogRB->setChecked( sett.value( "OpenWithCatalog" ).toBool() );
+	connect( openWithCatalogRB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithToggled() ) );
+
+	openWithSuperStartRB = new QRadioButton( "Open with S&uperStart", this );
+	openWithSuperStartRB->setChecked( sett.value( "SuperStart" ).toBool() );
+	connect( openWithSuperStartRB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithToggled() ) );
+
+	if ( not openWithCB->isChecked() ) {
+		openWithCatalogRB->setDisabled( true );
+		openWithSuperStartRB->setDisabled( true );
+	}
 
 	imagePreviewCB = new QCheckBox( "&Show Image Previews" );
 	imagePreviewCB->setChecked( Settings->General.ImagePreviews );
@@ -127,14 +136,25 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 	perFolderEnabled->setLayout( grpLyt );
 
+	QHBoxLayout *rbLyt = new QHBoxLayout();
+	rbLyt->setContentsMargins( QMargins( 20, 0, 0, 0 ) );
+	rbLyt->addWidget( openWithCatalogRB );
+	rbLyt->addWidget( openWithSuperStartRB );
+
+	QVBoxLayout *otherGBLyt = new QVBoxLayout();
+	otherGBLyt->addWidget( filterFoldersCB );
+	otherGBLyt->addWidget( showTrayIconCB );
+	otherGBLyt->addWidget( openWithCB );
+	otherGBLyt->addLayout( rbLyt );
+	otherGBLyt->addWidget( imagePreviewCB );
+
+	QGroupBox *otherOptionsGB = new QGroupBox( "Other Options", this );
+	otherOptionsGB->setLayout( otherGBLyt );
+
 	QVBoxLayout *lyt = new QVBoxLayout();
 	lyt->addWidget( perFolderEnabled );
 	lyt->addWidget( showSidePanelGB );
-	lyt->addWidget( filterFoldersCB );
-	lyt->addWidget( nativeTitleBarCB );
-	lyt->addWidget( showTrayIconCB );
-	lyt->addWidget( openWithCatalogCB );
-	lyt->addWidget( imagePreviewCB );
+	lyt->addWidget( otherOptionsGB );
 	lyt->addStretch();
 
 	setLayout( lyt );
@@ -239,16 +259,49 @@ void NBSGeneralWidget::handleFilterDirsChanged( bool filterFolders ) {
 	Settings->General.FilterFolders = filterFolders;
 };
 
-void NBSGeneralWidget::handleNativeTitleBarToggle( bool useNative ) {
+void NBSGeneralWidget::handleOpenWithToggled() {
 
-	Settings->setValue( "NativeTitleBar", useNative );
-	Settings->General.NativeTitleBar = useNative;
-};
+	if ( qobject_cast<QCheckBox*>( sender() ) == openWithCB ) {
+		if ( openWithCB->isChecked() ) {
+			Settings->setValue( "SpecialOpen", true );
+			Settings->General.SpecialOpen = true;
 
-void NBSGeneralWidget::handleOpenWithCatalogToggled( bool open ) {
+			QSettings gSettings( "NewBreeze", "NewBreeze" );
 
-	Settings->setValue( "OpenWithCatalog", open );
-	Settings->General.OpenWithCatalog = open;
+			Settings->General.OpenWithCatalog = gSettings.value( "OpenWithCatalog", false ).toBool();
+			Settings->General.SuperStart = gSettings.value( "SuperStart", false ).toBool();
+
+			openWithCatalogRB->setEnabled( true );
+			openWithSuperStartRB->setEnabled( true );
+		}
+
+		else {
+			Settings->setValue( "SpecialOpen", false );
+			Settings->General.SpecialOpen = false;
+
+			Settings->General.OpenWithCatalog = false;
+			Settings->General.SuperStart = false;
+
+			openWithCatalogRB->setDisabled( true );
+			openWithSuperStartRB->setDisabled( true );
+		}
+	}
+
+	else if ( qobject_cast<QRadioButton*>( sender() ) == openWithCatalogRB ) {
+		Settings->setValue( "OpenWithCatalog", true );
+		Settings->setValue( "SuperStart", false );
+
+		Settings->General.OpenWithCatalog = true;
+		Settings->General.SuperStart = false;
+	}
+
+	else if ( qobject_cast<QRadioButton*>( sender() ) == openWithSuperStartRB ) {
+		Settings->setValue( "OpenWithCatalog", false );
+		Settings->setValue( "SuperStart", true );
+
+		Settings->General.OpenWithCatalog = false;
+		Settings->General.SuperStart = true;
+	}
 };
 
 void NBSGeneralWidget::handleTrayIconChanged( bool value ) {

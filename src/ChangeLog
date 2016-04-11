@@ -9,6 +9,7 @@ Version 3.0.0 Alpha
 	- Feature: MarkDownPreview plugin, using libsoldout markdown library
 	- Feature: NBCrypt plugin for file and folder encryption
 	- Feature: TextEditor plugin for quick editing of text
+	- Feature: SuperStart, listing out your most used apps and favorite folders
 	- Cursor shapre chages to WaitCursor during model loading
 	- NBItemViewModel now models, Applications, Catalogs and FileSystem
 	- Archive creation and extraction are performed using QtConcurrent::run

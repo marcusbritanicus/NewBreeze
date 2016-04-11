@@ -22,7 +22,7 @@ NBSideBar::NBSideBar( QWidget *parent ) : QWidget( parent ) {
 void NBSideBar::populateSideBar() {
 
 	dirs = new NBSideBarItem( "Folders", ":/icons/show-folders.png", "NB://Folders", this );
-	connect( dirs, SIGNAL( clicked() ), this, SIGNAL( showFolders() ) );
+	connect( dirs, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 
 	apps = new NBSideBarItem( "Applications", ":/icons/applications.png", "NB://Applications", this );
 	connect( apps, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
