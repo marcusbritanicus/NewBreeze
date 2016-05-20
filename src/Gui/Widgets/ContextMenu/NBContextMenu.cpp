@@ -569,6 +569,11 @@ void NBAddToCatalogMenu::addToNewCatalog() {
 
 void NBFolderView::showContextMenu( QPoint position ) {
 
+	if ( not fsModel->isRealLocation() ) {
+		/* We should fix this later */
+		return;
+	}
+
 	QList<QModelIndex> selectedList = getSelection();
 
 	QMenu *menu = new QMenu( this );

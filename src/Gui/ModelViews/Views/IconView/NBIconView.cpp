@@ -1914,6 +1914,9 @@ void NBIconView::calculateCategorizedIconsRects() const {
 	idealHeight = myContentsMargins.top() + myContentsMargins.bottom() + categoryList.count() * ( myCategoryHeight + myCategorySpacing );
 	idealHeight += totalRows * myGridSize.height();
 
+	if ( cModel->modelDataType() == NBItemViewModel::SuperStart )
+		idealHeight += categoryList.count() * myGridSize.height();
+
 	hashIsDirty = false;
 	viewport()->update();
 };

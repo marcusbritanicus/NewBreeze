@@ -1027,6 +1027,9 @@ void NBItemViewModel::goHome() {
 	if ( Settings->General.SuperStart )
 		setRootPath( "NB://SuperStart" );
 
+	else if ( Settings->General.SuperStart )
+		setRootPath( "NB://SuperStart" );
+
 	else
 		setRootPath( QDir::homePath() );
 };

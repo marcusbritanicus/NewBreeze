@@ -132,6 +132,8 @@ void NBPdfPeep::loadPdf() {
 
 			lbl->setText( "<tt><b>" + QFileInfo( path ).fileName() + QString( "</b></tt> (Loading... %1/%2)" ).arg( i + 1 ).arg( doc->numPages() ) );
 		}
+
+		lbl->setText( "<tt><b>" + QFileInfo( path ).fileName() + "</tt></b>" );
 	}
 };
 

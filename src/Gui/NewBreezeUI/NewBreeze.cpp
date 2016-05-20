@@ -14,9 +14,13 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	/* Create the UI */
 	createGUI();
 
-	/* Open with catalog */
+	/* Open with SuperStart */
 	if ( Settings->General.SuperStart and loc.isEmpty() )
 		FolderView->doOpen( "NB://SuperStart" );
+
+	/* Open with Catalogs */
+	else if ( Settings->General.OpenWithCatalog and loc.isEmpty() )
+		FolderView->doOpen( "NB://Catalogs" );
 
 	/* Load the a folder */
 	else if ( not loc.isEmpty() ) {

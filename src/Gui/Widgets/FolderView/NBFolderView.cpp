@@ -870,7 +870,9 @@ void NBFolderView::doRename() {
 	else {
 
 		NBDebugMsg( DbgMsgPart::TAIL, "[Done]" );
-		// To spare the trouble with NBFileSystemWatcher
+		/* To spare the trouble with NBFileSystemWatcher */
+		/* This is only an internal fix, external renames */
+		/* still need NBFileSystemWatcher trigger. */
 		fsModel->rename( opath, npath );
 	}
 };
