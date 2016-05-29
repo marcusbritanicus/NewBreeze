@@ -6,8 +6,21 @@
 
 #include <Global.hpp>
 #include <FileProps.hpp>
-#include <Tools.hpp>
+#include <NBTools.hpp>
 #include <Editor.hpp>
+
+QPixmap getPixmap( QString path ) {
+
+	QString mimeIconName = mimeDb.mimeTypeForFile( path ).iconName();
+	QString genericMimeIconName = mimeDb.mimeTypeForFile( path ).genericIconName();
+
+	QIcon icon = QIcon::fromTheme( mimeIconName, QIcon::fromTheme( genericMimeIconName ) );
+
+	if ( icon.isNull() )
+		return QPixmap( ":/icons/text.png" );
+
+	return icon.pixmap( 128, 128 );
+};
 
 wFileProps::wFileProps( Editor *editor ) : QDialog( editor ) {
 

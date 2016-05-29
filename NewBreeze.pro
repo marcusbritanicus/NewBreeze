@@ -1,4 +1,6 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS += src plugins
+SUBDIRS += app common plugins
+
+app.depends = common

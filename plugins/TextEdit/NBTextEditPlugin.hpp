@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <TextEditor.hpp>
+#include "common.hpp"
+#include "TextEditor.hpp"
 
 #include <QtPlugin>
-#include <NBPluginInterface.hpp>
+#include "NBPluginInterface.hpp"
 
 class TextEditorPlugin : public QObject, NBPluginInterface {
 	Q_OBJECT

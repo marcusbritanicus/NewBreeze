@@ -26,4 +26,3 @@
 #endif
 
 static QSettings settings( "TextEditor", "TextEditor" );
-static QMimeDatabase mimeDb;

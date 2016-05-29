@@ -15,7 +15,5 @@
 
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>
-	#include <QMimeDatabase>
-	#include <QMimeType>
 	#include <QtWebKitWidgets>
 #endif

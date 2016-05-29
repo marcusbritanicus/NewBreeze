@@ -8,41 +8,7 @@
 #include <Global.hpp>
 #include <TextEditor.hpp>
 #include <FileProps.hpp>
-#include <Tools.hpp>
-
-static QString editorSS = QString(
-	"QScrollBar:vertical {\n"
-	"	background-color: white;\n"
-	"	max-width: 10px;\n"
-	"	padding: 1px;\n"
-	"}\n"
-	"QScrollBar::handle:vertical {\n"
-	"	background-color: #736A66;\n"
-	"	max-width: 8px;\n"
-	"	border-radius: 4px;\n"
-	"}\n"
-	"QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {\n"
-	"	border: 0;\n"
-	"	width: 0;\n"
-	"	height: 0;\n"
-	"}\n"
-	"QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
-	"	background-color: transparent;\n"
-	"}\n"
-	"QAbstractScrollArea {\n"
-	"	background: white;\n"
-	"	border: none;\n"
-	"}\n"
-	"QScrollBar:hover {\n"
-	"	max-width: 10px;\n"
-	"}\n"
-	"QScrollBar::handle:vertical:hover {\n"
-	"	background-color: #ADD8E6;\n"
-	"}\n"
-	"QScrollBar::handle:vertical:pressed {\n"
-	"	background-color: #90B4C0;\n"
-	"}\n"
-);
+#include <NBTools.hpp>
 
 TextEditor::TextEditor( QString fn, QWidget *parent ) : QMainWindow( parent ) {
 

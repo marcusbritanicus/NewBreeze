@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 
-SUBDIRS += Crypt Default MarkDown
+SUBDIRS += Crypt Default MarkDown TextEdit

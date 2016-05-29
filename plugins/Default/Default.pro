@@ -1,8 +1,20 @@
 TEMPLATE = lib
 TARGET = DefaultPeekPlugins
 
-DEPENDPATH += . MimeHandler DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch WordView
-INCLUDEPATH += . MimeHandler DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch WordView
+# Common Sources
+INCLUDEPATH += ../../common/ ../../common/MimeHandler/ ../../common/StandardPaths/
+DEPENDPATH += ../../common/ ../../common/MimeHandler/ ../../common/StandardPaths/
+
+DEPENDPATH += . DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch WordView
+INCLUDEPATH += . DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch WordView
+
+isEqual( QT_MAJOR_VERSION, 4 ) {
+	LIBS += -L../../common/ -lnewbreeze-common
+}
+
+isEqual( QT_MAJOR_VERSION, 5 ) {
+	LIBS += -L../../common/ -lnewbreeze-common5
+}
 
 # Same as NewBreeze version
 VERSION = "3.0.0"
@@ -17,17 +29,18 @@ QT += xml
 # ===========
 greaterThan(QT_MAJOR_VERSION, 4) {
 	QT += widgets
-	QT += webkitwidgets
 }
 
 # Plugin Mode
 # ===========
 CONFIG += plugin
 
-
 # Webkit Support for WebWatch
 # ===========================
 QT += webkit
+greaterThan(QT_MAJOR_VERSION, 4) {
+	QT += webkitwidgets
+}
 
 # NBPreviewInterface.hpp
 # ====================
@@ -35,6 +48,7 @@ NB_HEADER_PATH = $$(NB_INCLUDES)
 isEmpty( NB_HEADER_PATH ) {
 	error( NewBreeze plugin interface header file not detected. Please set the envronmental variable NB_INCLUDES. )
 }
+
 else {
 	INCLUDEPATH += $$NB_HEADER_PATH
 	DEPENDPATH += $$NB_HEADER_PATH
@@ -92,18 +106,6 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 HEADERS += NBPreviewWidget.hpp
 SOURCES += NBPreviewWidget.cpp
 
-# MimeTypes - Only for Qt4
-# ========================
-lessThan( QT_MAJOR_VERSION, 5 ) {
-	HEADERS += MimeHandler/NBMimeDatabase.hpp MimeHandler/NBMimeDatabase_p.hpp MimeHandler/NBMimeGlobPattern_p.hpp MimeHandler/NBMimeMagicRuleMatcher_p.hpp
-	HEADERS += MimeHandler/NBMimeMagicRule_p.hpp MimeHandler/NBMimeProvider_p.hpp MimeHandler/NBMimeType.hpp MimeHandler/NBMimeTypeParser_p.hpp
-	HEADERS +=  MimeHandler/NBMimeType_p.hpp MimeHandler/NBStandardPaths.hpp
-
-	SOURCES += MimeHandler/NBMimeDatabase.cpp MimeHandler/NBMimeGlobPattern.cpp MimeHandler/NBMimeMagicRule.cpp MimeHandler/NBMimeMagicRuleMatcher.cpp
-	SOURCES += MimeHandler/NBMimeProvider.cpp MimeHandler/NBMimeType.cpp MimeHandler/NBMimeTypeParser.cpp MimeHandler/NBStandardPaths.cpp
-	SOURCES += MimeHandler/NBStandardPaths_unix.cpp
-}
-
 ## DjvuDisplay
 ## ===========
 HEADERS += DjvuDisplay/NBDjvuDisplay.hpp
@@ -142,6 +144,8 @@ unix {
 	}
 
 	INSTALLS += target
+
+	QMAKE_RPATHDIR += $$PREFIX/lib/newbreeze/
 
 	target.path = $$PREFIX/lib/newbreeze/plugins
 	greaterThan(QT_MAJOR_VERSION, 4) {

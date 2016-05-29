@@ -90,6 +90,8 @@ void NBWordView::keyPressEvent( QKeyEvent *keyEvent ) {
 
 void NBWordView::changeEvent( QEvent *event ) {
 
+	qDebug() << event->type();
+
 	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
 		hide();
 		event->accept();

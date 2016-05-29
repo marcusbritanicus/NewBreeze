@@ -28,6 +28,7 @@ NB_HEADER_PATH = $$(NB_INCLUDES)
 isEmpty( NB_HEADER_PATH ) {
 	error( NewBreeze plugin interface header file not detected. Please set the envronmental variable NB_INCLUDES. )
 }
+
 else {
 	INCLUDEPATH += $$NB_HEADER_PATH
 	DEPENDPATH += $$NB_HEADER_PATH
