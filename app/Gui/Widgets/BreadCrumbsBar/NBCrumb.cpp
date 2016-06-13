@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBCrumb.hpp>
+#include "NBCrumb.hpp"
 
 NBCrumb::NBCrumb( QString text, bool currentPath, QWidget *parent ) : QWidget( parent ) {
 

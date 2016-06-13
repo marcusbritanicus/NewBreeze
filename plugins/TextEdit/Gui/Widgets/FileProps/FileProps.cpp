@@ -4,10 +4,10 @@
     *
 */
 
-#include <Global.hpp>
-#include <FileProps.hpp>
-#include <NBTools.hpp>
-#include <Editor.hpp>
+#include "Global.hpp"
+#include "FileProps.hpp"
+#include "NBTools.hpp"
+#include "Editor.hpp"
 
 QPixmap getPixmap( QString path ) {
 

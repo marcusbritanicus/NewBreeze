@@ -6,14 +6,13 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBAddressBar.hpp>
-#include <NBIconViewRestricted.hpp>
-#include <NBSidePanel.hpp>
-#include <NBDialog.hpp>
-#include <NBMessageDialog.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
+#include "NBAddressBar.hpp"
+#include "NBIconViewRestricted.hpp"
+#include "NBSidePanel.hpp"
+#include "NBDialog.hpp"
+#include "NBMessageDialog.hpp"
+#include "NBGuiWidgets.hpp"
 
 class NBFileDialog : public NBDialog {
 	Q_OBJECT

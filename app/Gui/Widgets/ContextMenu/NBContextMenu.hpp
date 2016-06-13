@@ -5,14 +5,9 @@
 */
 
 #pragma once
-#ifndef NBCONTEXTMENU_HPP
-#define NBCONTEXTMENU_HPP
 
-#include <Global.hpp>
-#include <NBAppEngine.hpp>
-#include <NBAppFile.hpp>
-#include <NBTools.hpp>
-#include <NBGuiWidgets.hpp>
+#include "Global.hpp"
+#include "NBGuiWidgets.hpp"
 
 class NBActionsMenu : public QMenu {
 	Q_OBJECT
@@ -69,5 +64,3 @@ class NBAddToCatalogMenu : public QMenu {
 	Q_SIGNALS:
 		void reloadCatalogs();
 };
-
-#endif

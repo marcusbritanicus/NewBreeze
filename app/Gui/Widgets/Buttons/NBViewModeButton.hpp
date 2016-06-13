@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBButton.hpp>
+#include "Global.hpp"
+#include "NBButton.hpp"
 
 class NBViewModeButton: public NBButton {
 	Q_OBJECT

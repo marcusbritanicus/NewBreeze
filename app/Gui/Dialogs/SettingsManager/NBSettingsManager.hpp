@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBDialog.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBSGeneralWidget.hpp>
-#include <NBSIconsWidget.hpp>
-#include <NBSKeyBindingsWidget.hpp>
-#include <NBSStyleWidget.hpp>
-#include <NBSSideBar.hpp>
+#include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBGuiWidgets.hpp"
+#include "NBSGeneralWidget.hpp"
+#include "NBSIconsWidget.hpp"
+#include "NBSKeyBindingsWidget.hpp"
+#include "NBSStyleWidget.hpp"
+#include "NBSSideBar.hpp"
 
 class NBSettingsManager : public NBDialog {
 	Q_OBJECT

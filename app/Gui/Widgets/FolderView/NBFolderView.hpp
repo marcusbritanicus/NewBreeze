@@ -6,32 +6,30 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBArchiveDialog.hpp>
-#include <NBArchive.hpp>
-#include <NBConfirmDeleteDialog.hpp>
-#include <NBContextMenu.hpp>
-#include <NBCustomActions.hpp>
-#include <NBCustomPeek.hpp>
-#include <NBDeleteManager.hpp>
-#include <NBDeleteProcess.hpp>
-#include <NBErrorsDialog.hpp>
-#include <NBFileDialog.hpp>
-#include <NBItemViewModel.hpp>
-#include <NBFolderFlash.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBIconProvider.hpp>
-#include <NBIconView.hpp>
-#include <NBIOProcess.hpp>
-#include <NBLogger.hpp>
-#include <NBMessageDialog.hpp>
-#include <NBNewNodeDialog.hpp>
-#include <NBPreviewInterface.hpp>
-#include <NBProcessManager.hpp>
-#include <NBPropertiesDialog.hpp>
-#include <NBRenameDialog.hpp>
-#include <NBRunCmdDialog.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
+#include "NBArchiveDialog.hpp"
+#include "NBConfirmDeleteDialog.hpp"
+#include "NBContextMenu.hpp"
+#include "NBCustomActions.hpp"
+#include "NBCustomPeek.hpp"
+#include "NBDeleteManager.hpp"
+#include "NBDeleteProcess.hpp"
+#include "NBErrorsDialog.hpp"
+#include "NBFileDialog.hpp"
+#include "NBItemViewModel.hpp"
+#include "NBFolderFlash.hpp"
+#include "NBGuiWidgets.hpp"
+#include "NBIconProvider.hpp"
+#include "NBIconView.hpp"
+#include "NBIOProcess.hpp"
+#include "NBLogger.hpp"
+#include "NBMessageDialog.hpp"
+#include "NBNewNodeDialog.hpp"
+#include "NBPreviewInterface.hpp"
+#include "NBProcessManager.hpp"
+#include "NBPropertiesDialog.hpp"
+#include "NBRenameDialog.hpp"
+#include "NBRunCmdDialog.hpp"
 
 class NBFolderView : public QStackedWidget {
 	Q_OBJECT
@@ -106,6 +104,8 @@ class NBFolderView : public QStackedWidget {
 		void setFocus();
 
 	private slots :
+		void updatePeekAct();
+
 		void prepareCopy();
 		void prepareMove();
 		void prepareIO();

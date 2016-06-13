@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBVfsView.hpp>
+#include "NBVfsView.hpp"
 
 NBVfsIcon::NBVfsIcon( QWidget *parent ) : QWidget( parent ) {
 

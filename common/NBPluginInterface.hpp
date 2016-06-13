@@ -28,7 +28,13 @@
 #include <QStringList>
 #include <QWidget>
 
-class NBPluginInterface {
+#if defined NBPLUGIN
+	#define PLUGIN_DLLSPEC Q_DECL_EXPORT
+#else
+	#define PLUGIN_DLLSPEC Q_DECL_IMPORT
+#endif
+
+class PLUGIN_DLLSPEC NBPluginInterface {
 
 	public:
 		/* Plugin Interface: Where will the plugin be used */
@@ -96,5 +102,5 @@ class NBPluginInterface {
 };
 
 QT_BEGIN_NAMESPACE
-Q_DECLARE_INTERFACE( NBPluginInterface, "com.NewBreeze.NBPluginInterface")
+	Q_DECLARE_INTERFACE( NBPluginInterface, "com.NewBreeze.NBPluginInterface")
 QT_END_NAMESPACE

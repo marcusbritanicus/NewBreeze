@@ -26,8 +26,8 @@
 */
 
 // Local Headers
-#include <NBLibBZip2.hpp>
-#include <NBTools.hpp>
+#include "NBLibBZip2.hpp"
+#include "NBTools.hpp"
 
 const int MAX_READ_SIZE = 40960;
 

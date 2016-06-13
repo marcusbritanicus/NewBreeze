@@ -4,10 +4,9 @@
 	*
 */
 
-#ifndef NBWEBWATCH_HPP
-#define NBWEBWATCH_HPP
+#pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 #include <QtWebKit>
 
 #if QT_VERSION >= 0x050000
@@ -35,5 +34,3 @@ class NBWebWatch : public QDialog {
 
 		void paintEvent( QPaintEvent *pEvent );
 };
-
-#endif

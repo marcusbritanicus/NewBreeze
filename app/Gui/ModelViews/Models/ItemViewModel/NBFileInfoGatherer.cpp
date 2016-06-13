@@ -4,8 +4,8 @@
 	*
 */
 
-#include <NBIconProvider.hpp>
-#include <NBFileInfoGatherer.hpp>
+#include "NBIconProvider.hpp"
+#include "NBFileInfoGatherer.hpp"
 
 NBQuickFileInfoGatherer::NBQuickFileInfoGatherer() {
 

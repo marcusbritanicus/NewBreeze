@@ -4,4 +4,4 @@
 	*
 */
 
-#include <NBSPluginsWidget.hpp>
+#include "NBSPluginsWidget.hpp"

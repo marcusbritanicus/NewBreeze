@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBGuiWidgets.hpp>
+#include "Global.hpp"
+#include "NBGuiWidgets.hpp"
 
 class NBCrumb : public QWidget {
 	Q_OBJECT

@@ -6,10 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBDeviceInfo.hpp>
-#include <NBProcessManager.hpp>
+#include "Global.hpp"
+#include "NBProcessManager.hpp"
 
 class NBDeviceAction;
 class NBDeviceMenu;

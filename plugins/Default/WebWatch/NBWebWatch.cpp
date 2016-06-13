@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBWebWatch.hpp>
+#include "NBWebWatch.hpp"
 
 NBWebWatch::NBWebWatch( QString pth ) : QDialog() {
 

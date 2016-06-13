@@ -6,10 +6,9 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBDialog.hpp>
-#include <NBButtons.hpp>
-#include <NBArchive.hpp>
+#include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBButtons.hpp"
 
 class NBArchiveDialog : public NBDialog {
 	Q_OBJECT

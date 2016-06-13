@@ -6,30 +6,47 @@
 
 #pragma once
 
-#include <NBPreviewInterface.hpp>
+#include "NBPluginInterface.hpp"
 
-#include <NBDjvuDisplay.hpp>
-#include <NBImagePeek.hpp>
-#include <NBOdfOgle.hpp>
-#include <NBPdfPeep.hpp>
-#include <NBWebWatch.hpp>
-#include <NBWordView.hpp>
+#include "NBDjvuDisplay.hpp"
+#include "NBImagePeek.hpp"
+#include "NBOdfOgle.hpp"
+#include "NBPdfPeep.hpp"
+#include "NBWebWatch.hpp"
+#include "NBWordView.hpp"
 
 #include <QtPlugin>
-#include <Global.hpp>
+#include "Global.hpp"
 
-#if QT_VERSION < 0x050000
-	#define Q_DECL_OVERRIDE
-#endif
-
-class NBPreviewWidget : public QObject, NBPreviewInterface {
+class NBPreviewWidget : public QObject, NBPluginInterface {
 	Q_OBJECT
 	#if QT_VERSION >= 0x050000
-		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPreviewInterface" FILE "DefaultPeekPlugins5.json" )
+		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "DefaultPeekPlugins5.json" )
 	#endif
-	Q_INTERFACES( NBPreviewInterface )
+	Q_INTERFACES( NBPluginInterface )
 
 	public:
-		QStringList mimeTypesHandled() const Q_DECL_OVERRIDE;
-		QDialog* getPreviewWidget( const QString & ) Q_DECL_OVERRIDE;
+		/* Name of the plugin */
+		 QString name();
+
+		/* The plugin version */
+		 QString version();
+
+		/* The QAction */
+		 QList<QAction*> actions( QStringList );
+
+		/* Interface type: preview, rename etc */
+		 Interface interface();
+
+		/* Interface type: preview, rename etc */
+		 Type type();
+
+		/* Plugin load context */
+		 Contexts contexts();
+
+		/* Mimetypes handled by the plugin */
+		 QStringList mimetypes();
+
+		/* Store the called widget pointer */
+		 void setCaller( QWidget *caller );
 };

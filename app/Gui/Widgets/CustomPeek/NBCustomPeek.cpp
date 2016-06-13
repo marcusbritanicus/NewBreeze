@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBCustomPeek.hpp>
+#include "NBCustomPeek.hpp"
 
 NBCustomPeek::NBCustomPeek( QString pth, QWidget *parent ) : QWidget( parent ) {
 

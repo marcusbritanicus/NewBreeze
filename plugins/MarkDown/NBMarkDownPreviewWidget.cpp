@@ -13,7 +13,7 @@ extern "C" {
 	#include "renderers.h"
 }
 
-NBWebWatch::NBWebWatch( QString pth ) : QDialog() {
+NBWebWatch::NBWebWatch( QString pth, QWidget *parent ) : QDialog( parent ) {
 
 	path = QString( pth );
 
@@ -146,14 +146,61 @@ void NBWebWatch::openInExternal() {
 	close();
 };
 
-QStringList NBMarkDownPreview::mimeTypesHandled() const {
+/* Name of the plugin */
+QString NBMarkDownPreview::name() {
 
-	return QStringList() << "text/x-markdown" << "text/markdown";
+	return "MarkdownPreview";
 };
 
-QDialog* NBMarkDownPreview::getPreviewWidget( const QString &path ) {
+/* The plugin version */
+QString NBMarkDownPreview::version() {
 
-	return new NBWebWatch( path );
+	return "3.0.0";
+};
+
+/* The QAction hooks for menus/toolbars */
+QList<QAction*> NBMarkDownPreview::actions( QStringList nodes ) {
+
+	if ( ( nodes.count() == 1 ) and isFile( nodes.at( 0 ) ) ) {
+		QAction *act = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), "&Peek", this );
+
+		NBWebWatch *mdview = new NBWebWatch( nodes.at( 0 ) );
+		mdview->setWindowFlags( mdview->windowFlags() | Qt::FramelessWindowHint );
+		connect( act, SIGNAL( triggered() ), mdview, SLOT( exec() ) );
+
+		return QList<QAction*>() << act;
+	}
+
+	return QList<QAction*>();
+};
+
+/* Interface type: preview, rename etc */
+NBPluginInterface::Interface NBMarkDownPreview::interface() {
+
+	return NBPluginInterface::PreviewInterface;
+};
+
+/* Interface type: preview, rename etc */
+NBPluginInterface::Type NBMarkDownPreview::type() {
+
+	return NBPluginInterface::Enhancement;
+};
+
+/* Plugin load contexts */
+NBPluginInterface::Contexts NBMarkDownPreview::contexts() {
+
+	return Contexts() << NBPluginInterface::File;
+};
+
+/* Mimetypes handled by the plugin */
+QStringList NBMarkDownPreview::mimetypes() {
+
+	return QStringList() << "text/markdown" << "text/x-markdown";
+};
+
+void NBMarkDownPreview::setCaller( QWidget *caller ) {
+
+	mParent = caller;
 };
 
 #if QT_VERSION < 0x050000

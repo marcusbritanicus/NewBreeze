@@ -6,7 +6,7 @@
 	*
 */
 
-#include <NBExtraCrumb.hpp>
+#include "NBExtraCrumb.hpp"
 
 NBExtraCrumb::NBExtraCrumb( QWidget *parent ) : QWidget( parent ) {
 

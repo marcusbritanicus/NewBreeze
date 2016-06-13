@@ -6,12 +6,11 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBDialog.hpp>
-#include <NBButton.hpp>
-#include <NBButtons.hpp>
-#include <NBMessageDialog.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBButton.hpp"
+#include "NBButtons.hpp"
+#include "NBMessageDialog.hpp"
 
 class NBNewNodeDialog : public NBDialog {
 	Q_OBJECT

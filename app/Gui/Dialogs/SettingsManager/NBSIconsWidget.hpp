@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBButton.hpp>
-#include <NBIconProvider.hpp>
+#include "Global.hpp"
+#include "NBButton.hpp"
+#include "NBIconProvider.hpp"
 
 class NBIconThemeChooserWidget;
 class NBIconThemeViewerWidget;

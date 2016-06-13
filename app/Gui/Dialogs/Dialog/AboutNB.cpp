@@ -4,7 +4,7 @@
 	*
 */
 
-#include <AboutNB.hpp>
+#include "AboutNB.hpp"
 
 AboutNB::AboutNB( QWidget *parent ) : QDialog( parent ) {
 
@@ -72,7 +72,7 @@ QWidget* AboutNB::createAboutNB() {
 		"	<li>File Association support</li>"									\
 		"	<li>Multiple Views - Tiles, Icons and Details</li>"					\
 		"	<li>Sleek side panel showing drives and boomarks</li>"				\
-		"	<li><s>Full drag and drop support</s></li>"				\
+		"	<li>Full drag and drop support</li>"								\
 		"	<li>Applications and Catalog View</li>"								\
 		"   <li>Custom Folder Icons and Thumbnail Preview</li>"					\
 		"   <li>Mime-Icon Support</li>"											\

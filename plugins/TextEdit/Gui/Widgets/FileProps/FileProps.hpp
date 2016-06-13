@@ -4,11 +4,10 @@
 	*
 */
 
-#ifndef WFILEPROPS_HPP
-#define WFILEPROPS_HPP
+#pragma once
 
-#include <Global.hpp>
-#include <Editor.hpp>
+#include "Global.hpp"
+#include "Editor.hpp"
 
 class wFileProps: public QDialog {
     Q_OBJECT
@@ -27,5 +26,3 @@ class wFileProps: public QDialog {
 		QString lines, words, chars;
 		bool noFileProps;
 };
-
-#endif

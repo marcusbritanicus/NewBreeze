@@ -712,6 +712,7 @@ QList<QString> ColorSchemeManager::listColorSchemes()
     foreach(QString i, list)
 		if ( QFileInfo( dname + "/" + i ).isReadable() )
 			ret << dname + "/" + i;
+
     return ret;
 //    return KGlobal::dirs()->findAllResources("data",
 //                                             "konsole/*.colorscheme",

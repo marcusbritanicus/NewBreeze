@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBCrypt.hpp>
+#include "NBCrypt.hpp"
 
 /* Name of the plugin */
 QString NBCrypt::name() {

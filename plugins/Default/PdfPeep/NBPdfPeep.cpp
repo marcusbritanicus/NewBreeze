@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBPdfPeep.hpp>
+#include "NBPdfPeep.hpp"
 
 NBPdfPeep::NBPdfPeep( QString pth ) : QDialog() {
 
@@ -47,8 +47,6 @@ void NBPdfPeep::createGUI() {
 	peekWidgetBase->setWidget( pdfBase );
 	peekWidgetBase->setWidgetResizable( true );
 
-	QTimer::singleShot( 100, this, SLOT( loadPdf() ) );
-
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
 	lblBtnLyt->addWidget( openBtn );
@@ -78,26 +76,16 @@ void NBPdfPeep::setWindowProperties() {
 	setAttribute( Qt::WA_DeleteOnClose );
 };
 
-void NBPdfPeep::keyPressEvent( QKeyEvent *keyEvent ) {
+int NBPdfPeep::exec() {
 
-	if ( keyEvent->key() == Qt::Key_Escape )
-		close();
-
-	else
-		QWidget::keyPressEvent( keyEvent );
+	QTimer::singleShot( 0, this, SLOT( loadPdf() ) );
+	return QDialog::exec();
 };
 
-void NBPdfPeep::changeEvent( QEvent *event ) {
+void NBPdfPeep::openInExternal() {
 
-	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
-		close();
-		event->accept();
-	}
-
-	else {
-		QWidget::changeEvent( event );
-		event->accept();
-	}
+	QProcess::startDetached( "xdg-open " + path );
+	close();
 };
 
 void NBPdfPeep::loadPdf() {
@@ -120,20 +108,39 @@ void NBPdfPeep::loadPdf() {
 		doc->setRenderHint( Poppler::Document::TextAntialiasing, true );
 
 		for ( int i = 0; i < doc->numPages(); i++ ) {
-			if ( not isVisible() )
-				return;
 
 			QLabel *pdfPage = new QLabel();
-			QImage image = doc->page( i )->renderToImage( 72, 72 );
+			QImage image = doc->page( i )->renderToImage( 96, 96 );
 			pdfPage->setPixmap( QPixmap::fromImage( image ).scaledToWidth( pageWidth, Qt::SmoothTransformation ) );
 			pdfLyt->addWidget( pdfPage );
 
 			qApp->processEvents();
-
 			lbl->setText( "<tt><b>" + QFileInfo( path ).fileName() + QString( "</b></tt> (Loading... %1/%2)" ).arg( i + 1 ).arg( doc->numPages() ) );
 		}
 
 		lbl->setText( "<tt><b>" + QFileInfo( path ).fileName() + "</tt></b>" );
+	}
+};
+
+void NBPdfPeep::keyPressEvent( QKeyEvent *keyEvent ) {
+
+	if ( keyEvent->key() == Qt::Key_Escape )
+		close();
+
+	else
+		QWidget::keyPressEvent( keyEvent );
+};
+
+void NBPdfPeep::changeEvent( QEvent *event ) {
+
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
+		close();
+		event->accept();
+	}
+
+	else {
+		QWidget::changeEvent( event );
+		event->accept();
 	}
 };
 
@@ -147,10 +154,4 @@ void NBPdfPeep::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->end();
 	pEvent->accept();
-};
-
-void NBPdfPeep::openInExternal() {
-
-	QProcess::startDetached( "xdg-open " + path );
-	close();
 };

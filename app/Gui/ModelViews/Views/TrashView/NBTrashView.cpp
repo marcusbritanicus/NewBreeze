@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBTrashView.hpp>
+#include "NBTrashView.hpp"
 
 NBTrashView::NBTrashView( NBTrashModel *model ) : QAbstractItemView() {
 

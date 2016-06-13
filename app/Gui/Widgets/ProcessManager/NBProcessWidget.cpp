@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBProcessWidget.hpp>
+#include "NBProcessWidget.hpp"
 
 /*
     *

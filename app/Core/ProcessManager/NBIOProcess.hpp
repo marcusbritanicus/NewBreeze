@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBDeviceInfo.hpp>
-#include <NBAbstractProcess.hpp>
+#include "Global.hpp"
+#include "NBAbstractProcess.hpp"
 
 class NBIOProcess : public NBAbstractProcess {
 	Q_OBJECT

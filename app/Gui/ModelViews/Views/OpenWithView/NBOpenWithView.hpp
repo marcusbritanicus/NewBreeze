@@ -6,11 +6,10 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBItemViewModel.hpp>
-#include <NBOpenWithDelegate.hpp>
-#include <NBGuiFunctions.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
+#include "NBItemViewModel.hpp"
+#include "NBOpenWithDelegate.hpp"
+#include "NBGuiFunctions.hpp"
 
 class NBOpenWithView : public QAbstractItemView {
 	Q_OBJECT

@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBAppFile.hpp>
+#include "NBAppFile.hpp"
 
 inline QString findIn( QString what, QString where ) {
 

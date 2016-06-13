@@ -9,8 +9,8 @@ VERSION = "3.0.0"
 CONFIG += plugin
 
 # Common Sources
-INCLUDEPATH += ../../common/ ../../common/QCryptographicHash5 ../../common/DeviceInfo/QVolumeInfo ../../common/Tools/ ../../common/MimeHandler/ ../../common/StandardPaths/
-DEPENDPATH += ../../common/ ../../common/QCryptographicHash5 ../../common/DeviceInfo/QVolumeInfo ../../common/Tools/ ../../common/MimeHandler/ ../../common/StandardPaths/
+INCLUDEPATH += ../../common/ ../../common/include
+DEPENDPATH += ../../common/ ../../common/include
 
 INCLUDEPATH += . Gui/Editor Gui/Editor/Syntaxer Gui/Application Gui/Widgets Gui/Widgets/Buttons Gui/Widgets/FileProps Gui/Widgets/Misc Gui/Widgets/SearchReplace
 INCLUDEPATH += Gui/UI Resources Resources/icons

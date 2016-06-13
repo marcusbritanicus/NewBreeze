@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBRunCmdDialog.hpp>
+#include "NBRunCmdDialog.hpp"
 
 NBRunCmdDialog::NBRunCmdDialog( QString origName, QWidget *parent ) : NBDialog( parent ) {
 

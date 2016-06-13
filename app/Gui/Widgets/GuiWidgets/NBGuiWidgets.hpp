@@ -6,18 +6,14 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBLabels.hpp>
+#include "Global.hpp"
+#include "NBLabels.hpp"
 
 class NBLineEdit : public QLineEdit {
 	Q_OBJECT
 
 	public:
 		NBLineEdit( QWidget* );
-
-	protected:
-		void paintEvent( QPaintEvent* );
 };
 
 class NBDriveLabel : public QWidget {

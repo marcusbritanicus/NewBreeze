@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 
 class NBIconDelegate : public QItemDelegate {
     Q_OBJECT

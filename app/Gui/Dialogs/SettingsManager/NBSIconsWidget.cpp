@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBSIconsWidget.hpp>
+#include "NBSIconsWidget.hpp"
 
 NBIconThemeWidget::NBIconThemeWidget( QWidget *parent ) :QWidget( parent ) {
 

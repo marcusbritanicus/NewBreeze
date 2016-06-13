@@ -6,19 +6,13 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBEncFS.hpp>
-#include <NBSalsa20.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
+#include "NBEncFS.hpp"
+#include "NBSalsa20.hpp"
+#include "NBTools.hpp"
 
 #include <QtPlugin>
-#include <NBPluginInterface.hpp>
-
-#if QT_VERSION >= 0x050000
-    #include <QStorageInfo>
-#else
-    #include <QVolumeInfo.hpp>
-#endif
+#include "NBPluginInterface.hpp"
 
 class NBCrypt : public QObject, NBPluginInterface {
 	Q_OBJECT

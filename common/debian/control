@@ -1,0 +1,29 @@
+Source: newbreeze-common
+Priority: optional
+Maintainer: Marcus Britanicus <marcusbritanicus@gmail.com>
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.8
+Section: libs
+Homepage: https://marcusbritanicus.github.io/NewBreeze
+#Vcs-Git: git://anonscm.debian.org/collab-maint/newbreeze-common.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/newbreeze-common.git
+
+Package: newbreeze-dev
+Section: libdevel
+Architecture: any
+Depends: newbreeze-common (= ${binary:Version}), ${misc:Depends}
+Description: Qt based lightweight and fast file manager
+ Built on top of the Powerful Qt4/Qt5 GUI Toolkit, NewBreeze is sleek,
+ stylish and fast with some amazing features.
+ .
+ This package provides the files required to build new plugins for
+ NewBreeze.
+
+Package: newbreeze-common
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Qt based lightweight and fast file manager
+ Built on top of the Powerful Qt4/Qt5 GUI Toolkit, NewBreeze is sleek,
+ stylish and fast with some amazing features.
+ .
+ This package provides the files common to NewBreeze and its plugins.

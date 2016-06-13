@@ -4,10 +4,9 @@
 	*
 */
 
-#ifndef NBDJVUDISPLAY_HPP
-#define NBDJVUDISPLAY_HPP
+#pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 #include <libdjvu/ddjvuapi.h>
 
 class NBDjvuDisplay : public QDialog {
@@ -24,6 +23,9 @@ class NBDjvuDisplay : public QDialog {
 
 		QVBoxLayout *djvuLyt;
 
+	public slots:
+		int exec();
+
 	private slots :
 		void openInExternal();
 		void loadDjvu();
@@ -34,5 +36,3 @@ class NBDjvuDisplay : public QDialog {
 
 		void paintEvent( QPaintEvent *pEvent );
 };
-
-#endif

@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBSideBarItem.hpp>
+#include "Global.hpp"
+#include "NBSideBarItem.hpp"
 
 class NBGroupHeader : public QLabel {
 	Q_OBJECT

@@ -6,15 +6,12 @@
 
 #pragma once
 
-#include <QtGui>
-#include <NBDialog.hpp>
-#include <NBButton.hpp>
-#include <NBButtons.hpp>
-#include <NBAppEngine.hpp>
-#include <NBAppFile.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBTools.hpp>
-#include <NBOpenWithView.hpp>
+#include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBButton.hpp"
+#include "NBButtons.hpp"
+#include "NBGuiWidgets.hpp"
+#include "NBOpenWithView.hpp"
 
 class NBRunCmdDialog : public NBDialog {
 	Q_OBJECT

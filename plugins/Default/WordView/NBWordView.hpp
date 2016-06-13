@@ -4,26 +4,29 @@
 	*
 */
 
-#ifndef NBWORDVIEW_HPP
-#define NBWORDVIEW_HPP
+#pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 
 class NBWordView : public QDialog {
 	Q_OBJECT
 
 	public :
 		NBWordView( QString path = QDir::homePath() );
-		QString path;
-		QTextEdit *peekWidgetBase;
 
 	private :
 		void createGUI();
 		void setWindowProperties();
-		QString loadFile();
+
+		QString path;
+		QTextEdit *peekWidgetBase;
+
+	public slots:
+		int exec();
 
 	private slots :
 		void openInExternal();
+		void loadFile();
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
@@ -31,5 +34,3 @@ class NBWordView : public QDialog {
 
 		void paintEvent( QPaintEvent *pEvent );
 };
-
-#endif

@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBProcessManagerUI.hpp>
+#include "NBProcessManagerUI.hpp"
 
 NBProcessManagerUI* NBProcessManagerUI::procMgrUI = NULL;
 

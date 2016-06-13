@@ -4,8 +4,7 @@
 	*
 */
 
-#include <NBTools.hpp>
-#include <NBSGeneralWidget.hpp>
+#include "NBSGeneralWidget.hpp"
 
 NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 

@@ -4,15 +4,7 @@
 	*
 */
 
-#include <NBIconProvider.hpp>
-#include <NBSystemInfo.hpp>
-#include <NBTools.hpp>
-
-#if QT_VERSION >= 0x050000
-    #include <QStorageInfo>
-#else
-    #include <QVolumeInfo.hpp>
-#endif
+#include "NBIconProvider.hpp"
 
 /*
 	*

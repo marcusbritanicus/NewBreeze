@@ -6,10 +6,9 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBButton.hpp>
-#include <NBGuiWidgets.hpp>
+#include "Global.hpp"
+#include "NBButton.hpp"
+#include "NBGuiWidgets.hpp"
 
 class NBSegmentButton : public QWidget {
 	Q_OBJECT

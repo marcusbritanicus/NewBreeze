@@ -6,13 +6,12 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBCrumbsBar.hpp>
-#include <NBTools.hpp>
-#include <NBButton.hpp>
-#include <NBButtons.hpp>
-#include <NBProcessManagerUI.hpp>
+#include "Global.hpp"
+#include "NBGuiWidgets.hpp"
+#include "NBCrumbsBar.hpp"
+#include "NBButton.hpp"
+#include "NBButtons.hpp"
+#include "NBProcessManagerUI.hpp"
 
 class NBToggleButton : public QWidget {
 	Q_OBJECT

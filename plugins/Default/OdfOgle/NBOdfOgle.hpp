@@ -4,27 +4,30 @@
 	*
 */
 
-#ifndef NBODFOGLE_HPP
-#define NBODFOGLE_HPP
+#pragma once
 
-#include <Global.hpp>
-#include <converter.h>
+#include "Global.hpp"
+#include "converter.h"
 
 class NBOdfOgle : public QDialog {
 	Q_OBJECT
 
 	public :
 		NBOdfOgle( QString path = QDir::homePath() );
-		QString path;
-		QTextBrowser *peekWidgetBase;
 
 	private :
 		void createGUI();
 		void setWindowProperties();
-		QTextDocument* loadFile();
+
+		QString path;
+		QTextBrowser *peekWidgetBase;
+
+	public slots:
+		int exec();
 
 	private slots :
 		void openInExternal();
+		void loadFile();
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
@@ -32,5 +35,3 @@ class NBOdfOgle : public QDialog {
 
 		void paintEvent( QPaintEvent *pEvent );
 };
-
-#endif

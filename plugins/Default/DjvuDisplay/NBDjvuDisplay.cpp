@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBDjvuDisplay.hpp>
+#include "NBDjvuDisplay.hpp"
 
 NBDjvuDisplay::NBDjvuDisplay( QString pth ) : QDialog() {
 
@@ -47,8 +47,6 @@ void NBDjvuDisplay::createGUI() {
 	peekWidgetBase->setWidget( djvuBase );
 	peekWidgetBase->setWidgetResizable( true );
 
-	QTimer::singleShot( 100, this, SLOT( loadDjvu() ) );
-
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
 	lblBtnLyt->addWidget( openBtn );
@@ -78,26 +76,17 @@ void NBDjvuDisplay::setWindowProperties() {
 	setAttribute( Qt::WA_DeleteOnClose );
 };
 
-void NBDjvuDisplay::keyPressEvent( QKeyEvent *keyEvent ) {
+int NBDjvuDisplay::exec() {
 
-	if ( keyEvent->key() == Qt::Key_Escape )
-		close();
+	QTimer::singleShot( 0, this, SLOT( loadDjvu() ) );
 
-	else
-		QWidget::keyPressEvent( keyEvent );
+	return QDialog::exec();
 };
 
-void NBDjvuDisplay::changeEvent( QEvent *event ) {
+void NBDjvuDisplay::openInExternal() {
 
-	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
-		close();
-		event->accept();
-	}
-
-	else {
-		QWidget::changeEvent( event );
-		event->accept();
-	}
+	QProcess::startDetached( "xdg-open " + path );
+	close();
 };
 
 void NBDjvuDisplay::loadDjvu() {
@@ -105,7 +94,7 @@ void NBDjvuDisplay::loadDjvu() {
 	int pageWidth = 700 - peekWidgetBase->verticalScrollBar()->width() - 4;
 
 	/* DjVu Context */
-	ddjvu_context_t *ctx = ddjvu_context_create( "newbreeze2" );
+	ddjvu_context_t *ctx = ddjvu_context_create( "newbreeze3" );
 
 	/* DjVu Document */
 	ddjvu_document_t *doc = ddjvu_document_create_by_filename( ctx, path.toLocal8Bit().data(), 1 );
@@ -154,9 +143,6 @@ void NBDjvuDisplay::loadDjvu() {
 	pages = ddjvu_document_get_pagenum( doc );
 
 	for ( int i = 0; i < pages; i++ ) {
-		if ( not isVisible() )
-			return;
-
 		/* Create and decode page */
 		pg = ddjvu_page_create_by_pageno( doc, i );
 		pgjob = ddjvu_page_job( pg );
@@ -187,6 +173,28 @@ void NBDjvuDisplay::loadDjvu() {
 	}
 };
 
+void NBDjvuDisplay::keyPressEvent( QKeyEvent *keyEvent ) {
+
+	if ( keyEvent->key() == Qt::Key_Escape )
+		close();
+
+	else
+		QWidget::keyPressEvent( keyEvent );
+};
+
+void NBDjvuDisplay::changeEvent( QEvent *event ) {
+
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
+		close();
+		event->accept();
+	}
+
+	else {
+		QWidget::changeEvent( event );
+		event->accept();
+	}
+};
+
 void NBDjvuDisplay::paintEvent( QPaintEvent *pEvent ) {
 
 	QWidget::paintEvent( pEvent );
@@ -197,10 +205,4 @@ void NBDjvuDisplay::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->end();
 	pEvent->accept();
-};
-
-void NBDjvuDisplay::openInExternal() {
-
-	QProcess::startDetached( "xdg-open " + path );
-	close();
 };

@@ -1,0 +1,4 @@
+usr/include/*
+libnewbreeze-common.a usr/lib/newbreeze/
+#usr/lib/*/pkgconfig/*
+#usr/share/pkgconfig/*

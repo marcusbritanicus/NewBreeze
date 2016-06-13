@@ -2,8 +2,8 @@ TEMPLATE = lib
 TARGET = DefaultPeekPlugins
 
 # Common Sources
-INCLUDEPATH += ../../common/ ../../common/MimeHandler/ ../../common/StandardPaths/
-DEPENDPATH += ../../common/ ../../common/MimeHandler/ ../../common/StandardPaths/
+INCLUDEPATH += ../../common/ ../../common/include
+DEPENDPATH += ../../common/ ../../common/include
 
 DEPENDPATH += . DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch WordView
 INCLUDEPATH += . DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch WordView

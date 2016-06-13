@@ -6,12 +6,11 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBDialog.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBTools.hpp>
-#include <NBIconProvider.hpp>
-#include <NBButtons.hpp>
+#include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBGuiWidgets.hpp"
+#include "NBIconProvider.hpp"
+#include "NBButtons.hpp"
 
 class NBConfirmDeleteDialog : public NBDialog {
 	Q_OBJECT

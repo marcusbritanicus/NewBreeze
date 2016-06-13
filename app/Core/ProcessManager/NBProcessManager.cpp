@@ -15,7 +15,7 @@
 	*
 */
 
-#include <NBProcessManager.hpp>
+#include "NBProcessManager.hpp"
 
 NBProcessManager *NBProcessManager::pMgr = NULL;
 

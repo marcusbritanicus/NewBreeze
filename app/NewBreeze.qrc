@@ -105,46 +105,43 @@
 
 		<file>README</file>
 
-		<file>Data/NBFSExtData.conf</file>
-		<file>Data/GPL3.html</file>
-		<file>Data/Credits.html</file>
+		<file>../data/NBFSExtData.conf</file>
+		<file>../data/GPL3.html</file>
+		<file>../data/Credits.html</file>
 
-		<file>Data/freedesktop.org.xml</file>
+		<file>../data/kb-layouts/default.keytab</file>
+		<file>../data/kb-layouts/linux.keytab</file>
+		<file>../data/kb-layouts/macbook.keytab</file>
+		<file>../data/kb-layouts/solaris.keytab</file>
+		<file>../data/kb-layouts/vt420pc.keytab</file>
+		<file>../data/kb-layouts/historic/vt100.keytab</file>
+		<file>../data/kb-layouts/historic/x11r5.keytab</file>
 
-		<file>Data/kb-layouts/default.keytab</file>
-		<file>Data/kb-layouts/linux.keytab</file>
-		<file>Data/kb-layouts/macbook.keytab</file>
-		<file>Data/kb-layouts/solaris.keytab</file>
-		<file>Data/kb-layouts/vt420pc.keytab</file>
-		<file>Data/kb-layouts/historic/vt100.keytab</file>
-		<file>Data/kb-layouts/historic/x11r5.keytab</file>
-
-		<file>Data/color-schemes/BlackOnLightYellow.schema</file>
-		<file>Data/color-schemes/BlackOnRandomLight.colorscheme</file>
-		<file>Data/color-schemes/BlackOnWhite.schema</file>
-		<file>Data/color-schemes/CMakeLists.txt</file>
-		<file>Data/color-schemes/DarkPastels.colorscheme</file>
-		<file>Data/color-schemes/GreenOnBlack.colorscheme</file>
-		<file>Data/color-schemes/historic/BlackOnLightColor.schema</file>
-		<file>Data/color-schemes/historic/DarkPicture.schema</file>
-		<file>Data/color-schemes/historic/Example.Schema</file>
-		<file>Data/color-schemes/historic/GreenOnBlack.schema</file>
-		<file>Data/color-schemes/historic/GreenTint_MC.schema</file>
-		<file>Data/color-schemes/historic/GreenTint.schema</file>
-		<file>Data/color-schemes/historic/LightPicture.schema</file>
-		<file>Data/color-schemes/historic/Linux.schema</file>
-		<file>Data/color-schemes/historic/README.default.Schema</file>
-		<file>Data/color-schemes/historic/README.Schema</file>
-		<file>Data/color-schemes/historic/syscolor.schema</file>
-		<file>Data/color-schemes/historic/Transparent_darkbg.schema</file>
-		<file>Data/color-schemes/historic/Transparent_lightbg.schema</file>
-		<file>Data/color-schemes/historic/Transparent_MC.schema</file>
-		<file>Data/color-schemes/historic/Transparent.schema</file>
-		<file>Data/color-schemes/historic/vim.schema</file>
-		<file>Data/color-schemes/historic/XTerm.schema</file>
-		<file>Data/color-schemes/Linux.colorscheme</file>
-		<file>Data/color-schemes/Transparent.colorscheme</file>
-		<file>Data/color-schemes/WhiteOnBlack.schema</file>
+		<file>../data/color-schemes/BlackOnLightYellow.schema</file>
+		<file>../data/color-schemes/BlackOnRandomLight.colorscheme</file>
+		<file>../data/color-schemes/BlackOnWhite.schema</file>
+		<file>../data/color-schemes/DarkPastels.colorscheme</file>
+		<file>../data/color-schemes/GreenOnBlack.colorscheme</file>
+		<file>../data/color-schemes/historic/BlackOnLightColor.schema</file>
+		<file>../data/color-schemes/historic/DarkPicture.schema</file>
+		<file>../data/color-schemes/historic/Example.Schema</file>
+		<file>../data/color-schemes/historic/GreenOnBlack.schema</file>
+		<file>../data/color-schemes/historic/GreenTint_MC.schema</file>
+		<file>../data/color-schemes/historic/GreenTint.schema</file>
+		<file>../data/color-schemes/historic/LightPicture.schema</file>
+		<file>../data/color-schemes/historic/Linux.schema</file>
+		<file>../data/color-schemes/historic/README.default.Schema</file>
+		<file>../data/color-schemes/historic/README.Schema</file>
+		<file>../data/color-schemes/historic/syscolor.schema</file>
+		<file>../data/color-schemes/historic/Transparent_darkbg.schema</file>
+		<file>../data/color-schemes/historic/Transparent_lightbg.schema</file>
+		<file>../data/color-schemes/historic/Transparent_MC.schema</file>
+		<file>../data/color-schemes/historic/Transparent.schema</file>
+		<file>../data/color-schemes/historic/vim.schema</file>
+		<file>../data/color-schemes/historic/XTerm.schema</file>
+		<file>../data/color-schemes/Linux.colorscheme</file>
+		<file>../data/color-schemes/Transparent.colorscheme</file>
+		<file>../data/color-schemes/WhiteOnBlack.schema</file>
 
 	</qresource>
 </RCC>

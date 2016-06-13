@@ -8,8 +8,10 @@
 
 // Qt Headers
 #include <QtGui>
-#include <QtCore>
 #include <QtWebKit>
+
+#include "newbreeze.hpp"
+#include "NBPluginInterface.hpp"
 
 #include <fstream>
 

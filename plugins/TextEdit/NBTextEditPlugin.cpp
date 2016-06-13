@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBTextEditPlugin.hpp>
+#include "NBTextEditPlugin.hpp"
 
 /* Name of the plugin */
 QString TextEditorPlugin::name() {

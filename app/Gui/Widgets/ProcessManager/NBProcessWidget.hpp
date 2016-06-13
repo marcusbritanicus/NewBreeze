@@ -6,13 +6,12 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBIconProvider.hpp>
-#include <NBProcessManager.hpp>
-#include <NBProgressBar.hpp>
-#include <NBErrorsDialog.hpp>
-#include <NBMessageDialog.hpp>
+#include "Global.hpp"
+#include "NBIconProvider.hpp"
+#include "NBProcessManager.hpp"
+#include "NBProgressBar.hpp"
+#include "NBErrorsDialog.hpp"
+#include "NBMessageDialog.hpp"
 
 class NBProcessWidget : public QWidget {
 	Q_OBJECT

@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBBookmarkView.hpp>
+#include "NBBookmarkView.hpp"
 
 NBBookmarksIcon::NBBookmarksIcon( QWidget *parent ) : QWidget( parent ) {
 

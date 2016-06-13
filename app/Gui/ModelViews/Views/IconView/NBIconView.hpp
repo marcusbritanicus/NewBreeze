@@ -6,15 +6,14 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBItemViewModel.hpp>
-#include <NBIconDelegate.hpp>
-#include <NBTools.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBGuiFunctions.hpp>
-#include <NBIOProcess.hpp>
-#include <NBProcessManager.hpp>
-#include <NBErrorsDialog.hpp>
+#include "Global.hpp"
+#include "NBItemViewModel.hpp"
+#include "NBIconDelegate.hpp"
+#include "NBGuiWidgets.hpp"
+#include "NBGuiFunctions.hpp"
+#include "NBIOProcess.hpp"
+#include "NBProcessManager.hpp"
+#include "NBErrorsDialog.hpp"
 
 class NBIconView : public QAbstractItemView {
 	Q_OBJECT

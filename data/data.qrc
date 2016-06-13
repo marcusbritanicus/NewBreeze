@@ -1,0 +1,41 @@
+<!DOCTYPE RCC><RCC version="1.0">
+	<qresource prefix="Data/">
+		<file>NBFSExtData.conf</file>
+		<file>GPL3.html</file>
+		<file>Credits.html</file>
+
+		<file>kb-layouts/default.keytab</file>
+		<file>kb-layouts/linux.keytab</file>
+		<file>kb-layouts/macbook.keytab</file>
+		<file>kb-layouts/solaris.keytab</file>
+		<file>kb-layouts/vt420pc.keytab</file>
+		<file>kb-layouts/historic/vt100.keytab</file>
+		<file>kb-layouts/historic/x11r5.keytab</file>
+
+		<file>color-schemes/BlackOnLightYellow.schema</file>
+		<file>color-schemes/BlackOnRandomLight.colorscheme</file>
+		<file>color-schemes/BlackOnWhite.schema</file>
+		<file>color-schemes/DarkPastels.colorscheme</file>
+		<file>color-schemes/GreenOnBlack.colorscheme</file>
+		<file>color-schemes/historic/BlackOnLightColor.schema</file>
+		<file>color-schemes/historic/DarkPicture.schema</file>
+		<file>color-schemes/historic/Example.Schema</file>
+		<file>color-schemes/historic/GreenOnBlack.schema</file>
+		<file>color-schemes/historic/GreenTint_MC.schema</file>
+		<file>color-schemes/historic/GreenTint.schema</file>
+		<file>color-schemes/historic/LightPicture.schema</file>
+		<file>color-schemes/historic/Linux.schema</file>
+		<file>color-schemes/historic/README.default.Schema</file>
+		<file>color-schemes/historic/README.Schema</file>
+		<file>color-schemes/historic/syscolor.schema</file>
+		<file>color-schemes/historic/Transparent_darkbg.schema</file>
+		<file>color-schemes/historic/Transparent_lightbg.schema</file>
+		<file>color-schemes/historic/Transparent_MC.schema</file>
+		<file>color-schemes/historic/Transparent.schema</file>
+		<file>color-schemes/historic/vim.schema</file>
+		<file>color-schemes/historic/XTerm.schema</file>
+		<file>color-schemes/Linux.colorscheme</file>
+		<file>color-schemes/Transparent.colorscheme</file>
+		<file>color-schemes/WhiteOnBlack.schema</file>
+	</qresource>
+</RCC>

@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBAddressBar.hpp>
+#include "NBAddressBar.hpp"
 
 NBToggleButton::NBToggleButton( QWidget *parent ) : QWidget( parent ) {
 
@@ -192,7 +192,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	setFixedHeight( 28 );
 
 	QHBoxLayout *fLyt = new QHBoxLayout();
-	fLyt->setContentsMargins( QMargins() );
+	fLyt->setContentsMargins( QMargins( 3, 0, 0, 0 ) );
 
 	// Previous button
 	backBtn = new NBButton( QIcon::fromTheme( "go-previous" ), this );
@@ -252,6 +252,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	addressWidget->addressEdit->setFocusPolicy( Qt::ClickFocus );
 	addressWidget->crumbsBar->setFocusPolicy( Qt::NoFocus );
 
+	/* Layouts */
 	fLyt->addWidget( navBtns );
 	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( addressWidget );
@@ -262,8 +263,18 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( mProcWidget );
 
-	setLayout( fLyt );
+	QWidget *base = new QWidget( this );
+	base->setObjectName( "baseWidget" );
+	base->setLayout( fLyt );
 
+	QHBoxLayout *bLyt = new QHBoxLayout();
+	bLyt->setContentsMargins( QMargins() );
+	bLyt->setSpacing( 0 );
+	bLyt->addWidget( base );
+
+	setLayout( bLyt );
+
+	/* Connections */
 	connect( backBtn, SIGNAL( clicked() ), this, SIGNAL( goBack() ) );
 	connect( forwardBtn, SIGNAL( clicked() ), this, SIGNAL( goForward() ) );
 	connect( addressWidget, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );

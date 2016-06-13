@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBSystemInfo.hpp>
+#include "NBSystemInfo.hpp"
 
 DesktopSession::Session DesktopSession::activeSession() {
 

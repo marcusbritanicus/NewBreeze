@@ -4,8 +4,7 @@
 	*
 */
 
-#include <NBSettingsManager.hpp>
-#include <NBTools.hpp>
+#include "NBSettingsManager.hpp"
 
 NBSettingsManager::NBSettingsManager( QWidget *parent ) : NBDialog( parent ) {
 

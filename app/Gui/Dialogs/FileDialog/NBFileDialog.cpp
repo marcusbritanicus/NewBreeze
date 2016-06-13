@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBFileDialog.hpp>
+#include "NBFileDialog.hpp"
 
 NBFileDialog::NBFileDialog( QString wIcon, QString wTitle, QString fLocation, FileType dType, QWidget *parent ) : NBDialog( parent ) {
 

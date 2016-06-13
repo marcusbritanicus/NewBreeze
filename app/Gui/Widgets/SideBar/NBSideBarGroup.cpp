@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBSideBarGroup.hpp>
+#include "NBSideBarGroup.hpp"
 
 NBGroupHeader::NBGroupHeader( QString name, QString icon, QWidget *parent ) : QLabel( parent ) {
 

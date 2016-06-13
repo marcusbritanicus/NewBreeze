@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBNewNodeDialog.hpp>
+#include "NBNewNodeDialog.hpp"
 
 NBNewNodeDialog::NBNewNodeDialog( QString type, QDir curDir, QString text, QWidget *parent ) : NBDialog( parent ) {
 

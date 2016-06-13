@@ -26,7 +26,7 @@
 */
 
 // Local Headers
-#include <NBLibLzma.hpp>
+#include "NBLibLzma.hpp"
 
 const int MAX_READ_SIZE = 40960;
 

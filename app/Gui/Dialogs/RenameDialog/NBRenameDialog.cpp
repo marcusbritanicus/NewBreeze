@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBRenameDialog.hpp>
+#include "NBRenameDialog.hpp"
 
 NBRenameDialog::NBRenameDialog( QString origName, QDir curDir, QWidget *parent ) : NBDialog( parent ) {
 

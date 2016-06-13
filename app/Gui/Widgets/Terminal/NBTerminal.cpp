@@ -4,8 +4,8 @@
     *
 */
 
-#include <NBTerminal.hpp>
-#include <NBGuiWidgets.hpp>
+#include "NBTerminal.hpp"
+#include "NBGuiWidgets.hpp"
 
 NBTerminal::NBTerminal( QString wDir, QWidget *parent ) : QWidget( parent ) {
 

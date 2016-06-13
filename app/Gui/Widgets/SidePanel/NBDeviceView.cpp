@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBDeviceView.hpp>
+#include "NBDeviceView.hpp"
 
 NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 

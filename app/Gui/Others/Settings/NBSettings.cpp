@@ -4,8 +4,8 @@
 	*
 */
 
-#include <NBSettings.hpp>
-#include <NBSystemInfo.hpp>
+#include "newbreeze.hpp"
+#include "NBSettings.hpp"
 
 inline QList<QKeySequence> getShortcuts( QString actionName ) {
 

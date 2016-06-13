@@ -5,10 +5,8 @@
 */
 
 #pragma once
-#ifndef NBTRASHDELEGATE_HPP
-#define NBTRASHDELEGATE_HPP
 
-#include <Global.hpp>
+#include "Global.hpp"
 
 class NBTrashDelegate : public QItemDelegate {
     Q_OBJECT
@@ -19,5 +17,3 @@ class NBTrashDelegate : public QItemDelegate {
 	private:
 		void paintExtraDetails( QPainter *painter, QList<QRect> &textRectList, const QModelIndex &index ) const;
 };
-
-#endif

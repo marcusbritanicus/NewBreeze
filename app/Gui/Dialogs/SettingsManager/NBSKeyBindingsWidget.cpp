@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBSKeyBindingsWidget.hpp>
+#include "NBSKeyBindingsWidget.hpp"
 
 NBKeyBindingsWidget::NBKeyBindingsWidget( QWidget *parent ) : QWidget( parent ) {
 

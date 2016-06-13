@@ -1,16 +1,16 @@
 Source: newbreeze-plugins
-Section: utils
+Section: devel
 Priority: optional
 Maintainer: Marcus Britanicus <marcusbritanicus@gmail.com>
-Build-Depends: debhelper (>=9), newbreeze (= 3.0.0a)
-Standards-Version: 3.9.6
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.8
 Homepage: https://github.com/marcusbritanicus/NewBreeze/
 
 Package: newbreeze-plugins
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, newbreeze (= 3.0.0a)
-Description: Plugins for NewBreeze v3.0.0a
- NewBreeze is a Qt based lightweight and fast file manager built
- on top of the Powerful Qt4/Qt5 GUI Toolkit.
+Depends: ${shlibs:Depends}, ${misc:Depends}, libnewbreeze-common (= 3.0.0)
+Description: Qt based lightweight and fast file manager
+ Built on top of the Powerful Qt4/Qt5 GUI Toolkit, NewBreeze is sleek,
+ stylish and fast with some amazing features.
  .
- This package provides peek plugins for NewBreeze 3.0.0a
+ This package provides the default set of plugins for NewBreeze

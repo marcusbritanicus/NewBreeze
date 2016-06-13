@@ -1,4 +1,4 @@
-#include <NBSegmentControl.hpp>
+#include "NBSegmentControl.hpp"
 
 class NBStyleOptionSegmentControlSegment : public QStyleOption {
 

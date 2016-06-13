@@ -1,29 +1,29 @@
 TEMPLATE = lib
 TARGET = newbreeze-common
 
-INCLUDEPATH += . AppFile Archive DeviceInfo DeviceInfo/QVolumeInfo MimeHandler QCryptographicHash5 QCryptographicHash5/md4 QCryptographicHash5/md5
-INCLUDEPATH += QCryptographicHash5/rfc6234 QCryptographicHash5/sha1 QCryptographicHash5/sha3 StandardPaths SystemInfo Tools XDG
+VERSION = 3.0.0
 
-DEPENDPATH += . AppFile Archive DeviceInfo DeviceInfo/QVolumeInfo MimeHandler QCryptographicHash5 QCryptographicHash5/md4 QCryptographicHash5/md5
-DEPENDPATH += QCryptographicHash5/rfc6234 QCryptographicHash5/sha1 QCryptographicHash5/sha3 StandardPaths SystemInfo Tools XDG
+INCLUDEPATH += . include AppFile Archive DeviceInfo QStorageInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
+DEPENDPATH += . include AppFile Archive DeviceInfo QStorageInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
 
 LIBS += -lmagic -larchive -lbz2 -llzma -lz
+DEFINES += COMMON
 
 # Headers
 # =======
-HEADERS += common.hpp
+HEADERS += include/common.hpp
 HEADERS += NBPluginInterface.hpp
-HEADERS += AppFile/NBAppEngine.hpp
-HEADERS += AppFile/NBAppFile.hpp
-HEADERS += Archive/NBArchive.hpp
-HEADERS += Archive/NBLibBZip2.hpp
-HEADERS += Archive/NBLibGZip.hpp
-HEADERS += Archive/NBLibLzma.hpp
-HEADERS += Archive/NBLibLzma2.hpp
-HEADERS += DeviceInfo/NBDeviceInfo.hpp
-HEADERS += SystemInfo/NBSystemInfo.hpp
-HEADERS += Tools/NBTools.hpp
-HEADERS += XDG/NBXdg.hpp
+HEADERS += include/NBAppEngine.hpp
+HEADERS += include/NBAppFile.hpp
+HEADERS += include/NBArchive.hpp
+HEADERS += include/NBLibBZip2.hpp
+HEADERS += include/NBLibGZip.hpp
+HEADERS += include/NBLibLzma.hpp
+HEADERS += include/NBLibLzma2.hpp
+HEADERS += include/NBDeviceInfo.hpp
+HEADERS += include/NBSystemInfo.hpp
+HEADERS += include/NBTools.hpp
+HEADERS += include/NBXdg.hpp
 
 # Sources
 # =======
@@ -43,55 +43,49 @@ SOURCES += XDG/NBXdg.cpp
 # ==============
 lessThan(QT_MAJOR_VERSION, 5) {
 	# CryptographicHash Sha3 from Qt5 v5.1
-	HEADERS += QCryptographicHash5/QCryptographicHash5.hpp
+	HEADERS += include/QCryptographicHash5.hpp
 	SOURCES += QCryptographicHash5/QCryptographicHash5.cpp
 
 	# QStorageInfo from Qt5 v5.4
-	HEADERS += DeviceInfo/QVolumeInfo/QVolumeInfo.hpp
-	HEADERS += DeviceInfo/QVolumeInfo/QVolumeInfoP.hpp
+	HEADERS += include/QStorageInfo.hpp
 
-	SOURCES += DeviceInfo/QVolumeInfo/QVolumeInfo.cpp
-	SOURCES += DeviceInfo/QVolumeInfo/QVolumeInfoUnix.cpp
+	SOURCES += QStorageInfo/QStorageInfo.cpp
+	SOURCES += QStorageInfo/QStorageInfo_unix.cpp
 
 	# QMimeType from Qt5 v5.0+
-	HEADERS += MimeHandler/NBMimeDatabase.hpp
-	HEADERS += MimeHandler/NBMimeDatabase_p.hpp
-	HEADERS += MimeHandler/NBMimeGlobPattern_p.hpp
-	HEADERS += MimeHandler/NBMimeMagicRuleMatcher_p.hpp
-	HEADERS += MimeHandler/NBMimeMagicRule_p.hpp
-	HEADERS += MimeHandler/NBMimeProvider_p.hpp
-	HEADERS += MimeHandler/NBMimeType.hpp
-	HEADERS += MimeHandler/NBMimeTypeParser_p.hpp
-	HEADERS += MimeHandler/NBMimeType_p.hpp
-	HEADERS += StandardPaths/NBStandardPaths.hpp
+	HEADERS += include/QMimeDatabase.hpp
+	HEADERS += include/QMimeType.hpp
+	HEADERS += include/QStandardPaths.hpp
 
-	SOURCES += MimeHandler/NBMimeDatabase.cpp
-	SOURCES += MimeHandler/NBMimeGlobPattern.cpp
-	SOURCES += MimeHandler/NBMimeMagicRule.cpp
-	SOURCES += MimeHandler/NBMimeMagicRuleMatcher.cpp
-	SOURCES += MimeHandler/NBMimeProvider.cpp
-	SOURCES += MimeHandler/NBMimeType.cpp
-	SOURCES += MimeHandler/NBMimeTypeParser.cpp
-	SOURCES += StandardPaths/NBStandardPaths.cpp
-	SOURCES += StandardPaths/NBStandardPaths_unix.cpp
+	SOURCES += MimeTypes/QMimeDatabase.cpp
+	SOURCES += MimeTypes/QMimeGlobPattern.cpp
+	SOURCES += MimeTypes/QMimeMagicRule.cpp
+	SOURCES += MimeTypes/QMimeMagicRuleMatcher.cpp
+	SOURCES += MimeTypes/QMimeProvider.cpp
+	SOURCES += MimeTypes/QMimeType.cpp
+	SOURCES += MimeTypes/QMimeTypeParser.cpp
+	SOURCES += StandardPaths/QStandardPaths.cpp
+	SOURCES += StandardPaths/QStandardPaths_unix.cpp
 }
 
 isEqual(QT_MAJOR_VERSION, 5) {
 	lessThan(QT_MINOR_VERSION, 1) {
 		# CryptographicHash Sha3 from Qt5 v5.1
-		HEADERS += QCryptographicHash5/QCryptographicHash5.hpp
+		HEADERS += include/QCryptographicHash5.hpp
 		SOURCES += QCryptographicHash5/QCryptographicHash5.cpp
 	}
 
 	lessThan(QT_MINOR_VERSION, 4) {
 		# QStorageInfo from Qt5 v5.4
-		HEADERS += DeviceInfo/QVolumeInfo/QVolumeInfo.hpp
-		HEADERS += DeviceInfo/QVolumeInfo/QVolumeInfoP.hpp
+		HEADERS += include/QStorageInfo.hpp
 
-		SOURCES += DeviceInfo/QVolumeInfo/QVolumeInfo.cpp
-		SOURCES += DeviceInfo/QVolumeInfo/QVolumeInfoUnix.cpp
+		SOURCES += QStorageInfo/QStorageInfo.cpp
+		SOURCES += QStorageInfo/QStorageInfo_unix.cpp
 	}
 }
+
+# Resources
+RESOURCES += MimeTypes/mimetypes.qrc
 
 # Silent compilation
 # ==================
@@ -115,4 +109,23 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 	OBJECTS_DIR = $$BUILD_PREFIX/obj-common5
 	RCC_DIR		= $$BUILD_PREFIX/qrc-common5
 	UI_DIR      = $$BUILD_PREFIX/uic-common5
+}
+
+# Build Shared and Static
+# =======================
+CONFIG += shared_and_static build_all
+
+unix {
+	isEmpty(PREFIX) {
+		PREFIX = /usr
+	}
+
+	INSTALLS += target static header
+	target.path = $$PREFIX/lib/newbreeze
+
+	header.path = $$PREFIX/include/newbreeze
+	header.files = $$HEADERS include/newbreeze.hpp NBPluginInterface.hpp
+
+	static.path = $$PREFIX/lib/newbreeze
+	static.files = libnewbreeze-common.a
 }

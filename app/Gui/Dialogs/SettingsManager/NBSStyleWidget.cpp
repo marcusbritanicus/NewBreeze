@@ -4,8 +4,7 @@
 	*
 */
 
-#include <NBTools.hpp>
-#include <NBSStyleWidget.hpp>
+#include "NBSStyleWidget.hpp"
 
 NBSStyleWidget::NBSStyleWidget( QWidget * parent ) : QWidget( parent ) {
 

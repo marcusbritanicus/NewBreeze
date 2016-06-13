@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <NBArchiveDialog.hpp>
+#include "NBArchiveDialog.hpp"
 
 NBArchive* NBArchiveDialog::newArchive( QWidget *parent ) {
 

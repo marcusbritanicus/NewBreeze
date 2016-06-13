@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 
 class NBOpenWithDelegate : public QItemDelegate {
     Q_OBJECT

@@ -4,9 +4,8 @@
 	*
 */
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBSystemInfo.hpp>
+#include "Global.hpp"
+#include "NBPluginManager.hpp"
 
 void NBStartup() {
 	/*
@@ -143,4 +142,12 @@ void NBStartup() {
 	*/
 
 	QFont::insertSubstitutions( "Envy Code R", QStringList() << "DejaVu Sans Mono" << "mono" << "Courier" );
+
+	/*
+		*
+		* init the plugins
+		*
+	*/
+
+	QTimer::singleShot( 0, NBPluginManager::instance(), SLOT( reloadPlugins() ) );
 };

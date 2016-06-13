@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBSSideBar.hpp>
+#include "NBSSideBar.hpp"
 
 NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 

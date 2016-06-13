@@ -6,14 +6,12 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBSideBarGroup.hpp>
-#include <NBSideBarItem.hpp>
+#include "Global.hpp"
+#include "NBSideBarGroup.hpp"
+#include "NBSideBarItem.hpp"
 
-#include <NBDeviceInfo.hpp>
-#include <NBBookmarkInfo.hpp>
-
-#include <NBIconProvider.hpp>
+#include "NBBookmarkInfo.hpp"
+#include "NBIconProvider.hpp"
 
 class NBSideBar : public QWidget {
 	Q_OBJECT

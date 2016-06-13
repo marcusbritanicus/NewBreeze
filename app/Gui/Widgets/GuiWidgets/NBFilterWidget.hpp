@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include <Global.hpp>
-// #include <GuiWidgets.hpp>
+#include "Global.hpp"
 
 class NBFilterWidget : public QWidget {
 	Q_OBJECT

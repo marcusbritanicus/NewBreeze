@@ -5,18 +5,15 @@
 */
 
 #pragma once
-#ifndef NBTRASHMANAGER_HPP
-#define NBTRASHMANAGER_HPP
 
-#include <Global.hpp>
-#include <NBButtons.hpp>
-#include <NBTrashView.hpp>
-#include <NBTrashModel.hpp>
-#include <NBTrashNode.hpp>
-#include <NBDialog.hpp>
-#include <NBMessageDialog.hpp>
-#include <NBTools.hpp>
-#include <NBGuiWidgets.hpp>
+#include "Global.hpp"
+#include "NBButtons.hpp"
+#include "NBTrashView.hpp"
+#include "NBTrashModel.hpp"
+#include "NBTrashNode.hpp"
+#include "NBDialog.hpp"
+#include "NBMessageDialog.hpp"
+#include "NBGuiWidgets.hpp"
 
 class NBTrashManager : public NBDialog {
 	Q_OBJECT
@@ -55,5 +52,3 @@ class NBTrashManager : public NBDialog {
 		void deleteSelected();
 		void emptyTrash();
 };
-
-#endif

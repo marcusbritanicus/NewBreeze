@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBAppEngine.hpp>
+#include "NBAppEngine.hpp"
 
 inline QString findIn( QString what, QString where ) {
 
@@ -93,7 +93,7 @@ NBAppEngine* NBAppEngine::instance() {
 void NBAppEngine::setApplicationAsDefault( QString appFileName, QString mimetype ) {
 
 	if ( QProcess::execute( "xdg-mime", QStringList() << "default" << appFileName << mimetype ) )
-		qDebug() << "Error while settings" << appFileName << "as the default handler for" << mimetype;
+		qDebug() << "Error while setting" << appFileName << "as the default handler for" << mimetype;
 };
 
 NBAppEngine::NBAppEngine() {

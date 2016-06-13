@@ -6,11 +6,9 @@
 
 #pragma once
 
-#include <QtCore>
-#include <NBPluginInterface.hpp>
-#include <NBPreviewInterface.hpp>
-#include <NBMimeDatabase.hpp>
-#include <NBXdg.hpp>
+#include "Global.hpp"
+#include "NBPluginInterface.hpp"
+#include "NBPreviewInterface.hpp"
 
 typedef QList<NBPluginInterface*> PluginList;
 
@@ -37,7 +35,8 @@ typedef struct {
 	NBPluginInterface* plugin;
 } PluginCapability;
 
-class NBPluginManager {
+class NBPluginManager : public QObject {
+	Q_OBJECT
 
 	public:
 		/* Create a global instance of NBPluginManager */

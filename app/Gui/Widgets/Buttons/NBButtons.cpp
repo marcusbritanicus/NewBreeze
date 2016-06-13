@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBButtons.hpp>
+#include "NBButtons.hpp"
 
 NBSegmentButton::NBSegmentButton( QWidget *parent ) : QWidget( parent ) {
 

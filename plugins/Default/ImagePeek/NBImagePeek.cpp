@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBImagePeek.hpp>
+#include "NBImagePeek.hpp"
 
 NBImagePeek::NBImagePeek( QString pth ) : QDialog() {
 
@@ -66,26 +66,17 @@ void NBImagePeek::setWindowProperties() {
 	setGeometry( hpos, vpos, 720, 540 );
 };
 
-void NBImagePeek::keyPressEvent( QKeyEvent *keyEvent ) {
+int NBImagePeek::exec() {
 
-	if ( keyEvent->key() == Qt::Key_Escape )
-		close();
+	QTimer::singleShot( 0, this, SLOT( loadImage() ) );
 
-	else
-		QWidget::keyPressEvent( keyEvent );
+	return QDialog::exec();
 };
 
-void NBImagePeek::changeEvent( QEvent *event ) {
+void NBImagePeek::openInExternal() {
 
-	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
-		hide();
-		event->accept();
-	}
-
-	else {
-		QWidget::changeEvent( event );
-		event->accept();
-	}
+	QProcess::startDetached( "xdg-open " + path );
+	close();
 };
 
 void NBImagePeek::loadImage() {
@@ -118,6 +109,28 @@ void NBImagePeek::loadImage() {
 	peekWidgetBase->setPixmap( QPixmap::fromImage( image ).scaled( isize, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 };
 
+void NBImagePeek::keyPressEvent( QKeyEvent *keyEvent ) {
+
+	if ( keyEvent->key() == Qt::Key_Escape )
+		close();
+
+	else
+		QWidget::keyPressEvent( keyEvent );
+};
+
+void NBImagePeek::changeEvent( QEvent *event ) {
+
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
+		hide();
+		event->accept();
+	}
+
+	else {
+		QWidget::changeEvent( event );
+		event->accept();
+	}
+};
+
 void NBImagePeek::paintEvent( QPaintEvent *pEvent ) {
 
 	QWidget::paintEvent( pEvent );
@@ -128,10 +141,4 @@ void NBImagePeek::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->end();
 	pEvent->accept();
-};
-
-void NBImagePeek::openInExternal() {
-
-	QProcess::startDetached( "xdg-open " + path );
-	close();
 };

@@ -4,7 +4,9 @@
 	*
 */
 
-#include <NBArchive.hpp>
+#include "NBArchive.hpp"
+
+static QMimeDatabase mimeDb;
 
 NBArchive::NBArchive( QString archive ) {
 

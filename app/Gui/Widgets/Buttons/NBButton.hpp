@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBGuiWidgets.hpp>
+#include "Global.hpp"
+#include "NBGuiWidgets.hpp"
 
 class NBButton : public QPushButton {
 	Q_OBJECT

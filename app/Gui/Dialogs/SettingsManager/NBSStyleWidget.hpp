@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBButtons.hpp>
+#include "Global.hpp"
+#include "NBButtons.hpp"
 
 class NBSSPreviewWidget;
 

@@ -1,0 +1,37 @@
+Installation Instructions for NewBreeze v3.0.0
+==============================================
+
+1. Preparation
+==============
+  a] Dependencies
+     The list of dependencies are given below. Please install them in your system as appropriate.
+     The below methods assume you have a debian based system.
+
+      1. Qt4/Qt5 libraries (Qt4: libqt4-dev, libqtwebkit-dev. Qt5: qtbase5-dev, libqt5webkit5-dev )
+      2. xdg-utils
+      3. libmagic-dev
+      4. libarchive-dev
+      5. libbz2-dev
+      6. zlib1g-dev
+      7. liblzma-dev
+      8. libsource-highlight-dev (optional)
+      9. libpoppler-qt4-dev/libpoppler-qt5-dev (optional)
+     10. libdjvulibre-dev (optional)
+
+     The the following command (on Debian and Debian based systems) to install the above dependencies (with root previleges)
+
+        Qt4:
+		    apt-get install libqt4-dev libqtwebkit-dev xdg-utils libmagic-dev libarchive-dev libbz2-dev zlib1g-dev liblzma-dev \
+					libsource-highlight-dev libpoppler-qt4-dev libdjvulibre-dev
+
+        Qt5:
+		    apt-get install qtbase5-dev-dev libqt5webkit5-dev xdg-utils libmagic-dev libarchive-dev libbz2-dev zlib1g-dev liblzma-dev \
+					libsource-highlight-dev libpoppler-qt5-dev libdjvulibre-dev
+
+  b] Installation locations
+     You need to set the locations where you want to install newbreeze, and its plugins. By default, the prefix is /usr.
+     The newbreeze app is installed at /usr/bin/, libnewbreeze-common.so at /usr/lib/newbreeze, plugins at /usr/lib/newbreeze/plugins.
+     These are set in the respective .pro files. You'll have to edit the individual .pro files.
+
+     NOTE: Please make note that we use RPATH to locate libnewbreeze-common.so. Setting improper values to $PREFIX, or in QMAKE_RPATHDIR
+     will result in newbreeze crashing out with error.

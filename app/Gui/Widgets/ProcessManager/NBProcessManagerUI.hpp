@@ -6,14 +6,13 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBDialog.hpp>
-#include <NBAbstractProcess.hpp>
-#include <NBProcessWidget.hpp>
-#include <NBIconProvider.hpp>
-#include <NBMessageDialog.hpp>
-#include <NBProcessManager.hpp>
+#include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBAbstractProcess.hpp"
+#include "NBProcessWidget.hpp"
+#include "NBIconProvider.hpp"
+#include "NBMessageDialog.hpp"
+#include "NBProcessManager.hpp"
 
 class NBProcessManagerUI : public NBDialog {
 	Q_OBJECT

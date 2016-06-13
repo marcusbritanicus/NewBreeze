@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBFlashLabel.hpp>
+#include "NBFlashLabel.hpp"
 
 NBFlashLabel::NBFlashLabel( QWidget *parent ) : QWidget( parent ) {
 

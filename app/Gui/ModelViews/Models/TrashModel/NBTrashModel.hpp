@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBTrashNode.hpp>
+#include "Global.hpp"
+#include "NBTrashNode.hpp"
 
 class NBTrashModel : public QAbstractItemModel {
     Q_OBJECT

@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBDialog.hpp>
+#include "NBDialog.hpp"
 
 NBDialog::NBDialog( QWidget *parent ) : QDialog( parent ) {
 

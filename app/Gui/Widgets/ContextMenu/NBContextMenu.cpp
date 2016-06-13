@@ -4,10 +4,10 @@
 	*
 */
 
-#include <NBContextMenu.hpp>
-#include <NBFolderView.hpp>
-#include <NBPluginInterface.hpp>
-#include <NBPluginManager.hpp>
+#include "NBContextMenu.hpp"
+#include "NBFolderView.hpp"
+#include "NBPluginInterface.hpp"
+#include "NBPluginManager.hpp"
 
 NBActionsMenu::NBActionsMenu( QList<QModelIndex> selectedIndexes, QString dir, QWidget *parent ) : QMenu( parent ) {
 	/*

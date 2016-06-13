@@ -15,7 +15,7 @@
 class TextEditorPlugin : public QObject, NBPluginInterface {
 	Q_OBJECT
 	#if QT_VERSION >= 0x050000
-		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "Crypt5.json" )
+		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "TextEdit5.json" )
 	#endif
 	Q_INTERFACES( NBPluginInterface )
 

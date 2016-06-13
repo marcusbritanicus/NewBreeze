@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBPropertiesDialog.hpp>
+#include "NBPropertiesDialog.hpp"
 
 NBPropertiesBase::NBPropertiesBase( QStringList paths, QWidget *parent ) : QWidget( parent ) {
 

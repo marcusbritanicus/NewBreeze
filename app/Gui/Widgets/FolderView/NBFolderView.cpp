@@ -4,8 +4,8 @@
 	*
 */
 
-#include <NBFolderView.hpp>
-#include <NBPluginManager.hpp>
+#include "NBFolderView.hpp"
+#include "NBPluginManager.hpp"
 
 NBFolderView::NBFolderView( QWidget *parent ) : QStackedWidget( parent ) {
 
@@ -59,6 +59,8 @@ void NBFolderView::createAndSetupActions() {
 		this, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) )
 	);
 
+	connect( IconView->selectionModel(), SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ), this, SLOT( updatePeekAct() ) );
+
 	connect( IconView, SIGNAL( link( QStringList, QString ) ), this, SLOT( link( QStringList, QString ) ) );
 
 	// DragDrop copy
@@ -108,13 +110,6 @@ void NBFolderView::createAndSetupActions() {
 
 	connect( actNewFile, SIGNAL( triggered() ), this, SLOT( newFile() ) );
 	addAction( actNewFile );
-
-	// Peek
-	peekAct = new QAction( QIcon( ":/icons/peek.png" ), "Pee&k", this );
-	peekAct->setShortcuts( Settings->Shortcuts.Peek );
-
-	connect( peekAct, SIGNAL( triggered() ), this, SLOT( doPeek() ) );
-	addAction( peekAct );
 
 	// Copy
 	copyAct = new QAction( QIcon( ":/icons/copy.png" ), "&Copy", this );
@@ -627,6 +622,44 @@ void NBFolderView::doToggleHidden() {
 	}
 
 	Settings->General.ShowHidden = fsModel->showHidden();
+};
+
+void NBFolderView::updatePeekAct() {
+
+	if ( actions().contains( peekAct ) ) {
+		removeAction( peekAct );
+		delete peekAct;
+	}
+
+	NBPluginManager *pMgr = NBPluginManager::instance();
+	QModelIndexList selection = getSelection();
+
+	if ( selection.count() == 1 ) {
+
+		QString node = fsModel->nodePath( selection.at( 0 ) );
+		PluginList pList;
+
+		if ( isFile( node ) ) {
+			QString mType = getMimeType( node );
+			pList << pMgr->plugins( NBPluginInterface::PreviewInterface, NBPluginInterface::Enhancement, NBPluginInterface::File, mType );
+
+			if ( pList.count() ) {
+				NBPluginInterface *iface = pList.at( 0 );
+				peekAct =  iface->actions( QStringList() << node ).at( 0 );
+				peekAct->setShortcuts( Settings->Shortcuts.Peek );
+				addAction( peekAct );
+
+				return;
+			}
+		}
+	}
+
+	// Peek
+	peekAct = new QAction( QIcon( ":/icons/peek.png" ), "Pee&k", this );
+	peekAct->setShortcuts( Settings->Shortcuts.Peek );
+
+	connect( peekAct, SIGNAL( triggered() ), this, SLOT( doPeek() ) );
+	addAction( peekAct );
 };
 
 void NBFolderView::prepareCopy() {

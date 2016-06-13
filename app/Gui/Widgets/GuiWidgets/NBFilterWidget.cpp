@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBFilterWidget.hpp>
+#include "NBFilterWidget.hpp"
 
 NBFilterWidget::NBFilterWidget( QWidget *parent ) : QWidget( parent ) {
 

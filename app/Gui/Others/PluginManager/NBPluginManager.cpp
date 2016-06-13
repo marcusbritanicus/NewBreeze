@@ -4,21 +4,9 @@
 	*
 */
 
-#include <NBPluginManager.hpp>
+#include "NBPluginManager.hpp"
 
 static QList<NBPluginInterface::Interface> developedInterfaces;
-
-static inline QString baseName( QString path ) {
-
-	if ( path.endsWith( "/" ) )
-		path.chop( 1 );
-
-	char *dupPath = strdup( path.toLocal8Bit().data() );
-	QString basePth = QString( basename( dupPath ) );
-	free( dupPath );
-
-	return basePth;
-};
 
 NBPluginManager *NBPluginManager::pMgr = NULL;
 

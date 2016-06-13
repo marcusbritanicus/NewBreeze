@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBButton.hpp>
+#include "NBButton.hpp"
 
 NBButton::NBButton( QWidget *parent ) : QPushButton( parent ) {
 

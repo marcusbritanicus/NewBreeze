@@ -5,11 +5,9 @@
 */
 
 #pragma once
-#ifndef NBTerminal_HPP
-#define NBTerminal_HPP
 
-#include <Global.hpp>
-#include <qtermwidget.h>
+#include "Global.hpp"
+#include "qtermwidget.h"
 
 class NBTerminalWidget : public QTermWidget {
 	Q_OBJECT
@@ -40,5 +38,3 @@ class NBTerminal : public QWidget {
 	Q_SIGNALS:
 		void shown( bool );
 };
-
-#endif

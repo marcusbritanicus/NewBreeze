@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBLabels.hpp>
+#include "NBLabels.hpp"
 
 NBClickLabel::NBClickLabel( QPixmap icon, QWidget *parent ) : QLabel( parent ) {
 

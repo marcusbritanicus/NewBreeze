@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBProcessManager.hpp>
+#include "Global.hpp"
+#include "NBProcessManager.hpp"
 
 class NBSideBarItem : public QLabel {
 	Q_OBJECT

@@ -4,10 +4,9 @@
 	*
 */
 
-#ifndef NBPDFPEEP_HPP
-#define NBPDFPEEP_HPP
+#pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 #if QT_VERSION >= 0x050000
 	#include <poppler-qt5.h>
 #else
@@ -29,6 +28,9 @@ class NBPdfPeep : public QDialog {
 		QVBoxLayout *pdfLyt;
 		QLabel *lbl;
 
+	public slots:
+		int exec();
+
 	private slots :
 		void openInExternal();
 		void loadPdf();
@@ -39,5 +41,3 @@ class NBPdfPeep : public QDialog {
 
 		void paintEvent( QPaintEvent *pEvent );
 };
-
-#endif

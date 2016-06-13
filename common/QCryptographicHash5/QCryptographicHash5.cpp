@@ -40,7 +40,7 @@
 **
 ****************************************************************************/
 
-#include <QCryptographicHash5.hpp>
+#include "QCryptographicHash5.hpp"
 #include <qiodevice.h>
 
 #include "sha1/sha1.cpp"

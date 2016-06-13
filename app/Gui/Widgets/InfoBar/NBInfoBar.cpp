@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBInfoBar.hpp>
+#include "NBInfoBar.hpp"
 
 inline QString getPermissions( QString path ) {
 
@@ -74,6 +74,9 @@ NBInfoBar::NBInfoBar( QWidget *parent ) : QWidget( parent ) {
 	lyt->addWidget( base );
 
 	setLayout( lyt );
+
+	/* Styling */
+	setStyleSheet( "QWidget#base { border-top: 1px solid gray; }" );
 };
 
 void NBInfoBar::updateInfoBarCF( QString folderPath ) {

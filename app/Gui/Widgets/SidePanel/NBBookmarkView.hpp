@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBBookmarkInfo.hpp>
+#include "Global.hpp"
+#include "NBBookmarkInfo.hpp"
 
 class NBBookmarksIcon : public QWidget {
 	Q_OBJECT

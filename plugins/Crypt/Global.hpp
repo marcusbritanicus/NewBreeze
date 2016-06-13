@@ -8,7 +8,7 @@
 
 // Qt Headers
 #include <QtGui>
-#include <QtCore>
+#include "newbreeze.hpp"
 
 #include <unistd.h>
 #include <sys/stat.h>

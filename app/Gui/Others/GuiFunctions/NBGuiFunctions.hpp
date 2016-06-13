@@ -6,6 +6,6 @@
 
 #pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 
 bool isBrightColor( QColor, QColor );

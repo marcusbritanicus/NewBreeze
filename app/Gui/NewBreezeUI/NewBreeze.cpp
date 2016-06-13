@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NewBreeze.hpp>
+#include "NewBreeze.hpp"
 
 NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 
@@ -90,6 +90,8 @@ void NewBreeze::createGUI() {
 
 	QWidget *Spacer = new QWidget();
 	Spacer->setFixedHeight( 3 );
+	Spacer->setStyleSheet( "border-bottom: 1px solid darkgray;" );
+
 
 	QHBoxLayout *ViewLayout = new QHBoxLayout();
 	ViewLayout->setContentsMargins( QMargins() );

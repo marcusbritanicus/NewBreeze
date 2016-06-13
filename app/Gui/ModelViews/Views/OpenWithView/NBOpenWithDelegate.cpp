@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBOpenWithDelegate.hpp>
+#include "NBOpenWithDelegate.hpp"
 
 void NBOpenWithDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
 

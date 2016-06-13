@@ -6,25 +6,23 @@
 
 #pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 
-#include <AboutNB.hpp>
-#include <NBAddressBar.hpp>
-#include <NBCustomActions.hpp>
-#include <NBFilterWidget.hpp>
-#include <NBFolderView.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBInfoBar.hpp>
-#include <NBLogger.hpp>
-#include <NBMessageDialog.hpp>
-#include <NBPropertiesDialog.hpp>
-#include <NBSettingsManager.hpp>
-#include <NBSideBar.hpp>
-#include <NBSidePanel.hpp>
-#include <NBSystemInfo.hpp>
-#include <NBTerminal.hpp>
-#include <NBTools.hpp>
-#include <NBTrashManager.hpp>
+#include "AboutNB.hpp"
+#include "NBAddressBar.hpp"
+#include "NBCustomActions.hpp"
+#include "NBFilterWidget.hpp"
+#include "NBFolderView.hpp"
+#include "NBGuiWidgets.hpp"
+#include "NBInfoBar.hpp"
+#include "NBLogger.hpp"
+#include "NBMessageDialog.hpp"
+#include "NBPropertiesDialog.hpp"
+#include "NBSettingsManager.hpp"
+#include "NBSideBar.hpp"
+#include "NBSidePanel.hpp"
+#include "NBTerminal.hpp"
+#include "NBTrashManager.hpp"
 
 class NewBreeze : public QMainWindow {
 	Q_OBJECT

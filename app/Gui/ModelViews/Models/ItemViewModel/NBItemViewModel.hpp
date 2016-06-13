@@ -6,12 +6,11 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBIconProvider.hpp>
-#include <NBItemViewNode.hpp>
-#include <NBFileInfoGatherer.hpp>
-#include <NBFileSystemWatcher.hpp>
+#include "Global.hpp"
+#include "NBIconProvider.hpp"
+#include "NBItemViewNode.hpp"
+#include "NBFileInfoGatherer.hpp"
+#include "NBFileSystemWatcher.hpp"
 
 class NBIconUpdater : public QThread {
 	Q_OBJECT

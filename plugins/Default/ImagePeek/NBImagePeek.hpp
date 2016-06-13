@@ -4,10 +4,9 @@
 	*
 */
 
-#ifndef NBIMAGEPEEK_HPP
-#define NBIMAGEPEEK_HPP
+#pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 
 class NBImagePeek : public QDialog {
 	Q_OBJECT
@@ -20,10 +19,13 @@ class NBImagePeek : public QDialog {
 	private :
 		void createGUI();
 		void setWindowProperties();
-		void loadImage();
+
+	public slots:
+		int exec();
 
 	private slots :
 		void openInExternal();
+		void loadImage();
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
@@ -31,5 +33,3 @@ class NBImagePeek : public QDialog {
 
 		void paintEvent( QPaintEvent *pEvent );
 };
-
-#endif

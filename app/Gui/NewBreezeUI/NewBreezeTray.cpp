@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NewBreezeTray.hpp>
+#include "NewBreezeTray.hpp"
 
 NBTrayIcon::NBTrayIcon() : QSystemTrayIcon() {
 

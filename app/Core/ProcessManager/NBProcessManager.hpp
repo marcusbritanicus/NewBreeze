@@ -6,10 +6,9 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBDeviceInfo.hpp>
-#include <NBAbstractProcess.hpp>
-#include <NBIOProcess.hpp>
+#include "Global.hpp"
+#include "NBAbstractProcess.hpp"
+#include "NBIOProcess.hpp"
 
 typedef QList<quint64> ProcessIDList;
 typedef QList<NBAbstractProcess*> ProcessList;

@@ -24,8 +24,7 @@
 	*
 */
 
-#include <NBIOProcess.hpp>
-#include <NBTools.hpp>
+#include "NBIOProcess.hpp"
 
 NBIOProcess::NBIOProcess( QStringList sources, NBProcess::Progress *progress ) {
 

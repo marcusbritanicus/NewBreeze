@@ -5,13 +5,11 @@
 */
 
 #pragma once
-#ifndef NBFLASHLABEL_HPP
-#define NBFLASHLABEL_HPP
 
-#include <Global.hpp>
-#include <NBDeleteManager.hpp>
-#include <NBMessageDialog.hpp>
-#include <NBConfirmDeleteDialog.hpp>
+#include "Global.hpp"
+#include "NBDeleteManager.hpp"
+#include "NBMessageDialog.hpp"
+#include "NBConfirmDeleteDialog.hpp"
 
 class NBFlashLabel : public QWidget {
 	Q_OBJECT
@@ -126,5 +124,3 @@ class NBTrashLabel : public QWidget {
 		void showTrash();
 		void clicked();
 };
-
-#endif

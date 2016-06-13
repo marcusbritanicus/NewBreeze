@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBFileSystemWatcher.hpp>
+#include "NBFileSystemWatcher.hpp"
 #include <poll.h>
 
 NBFileSystemWatcher::NBFileSystemWatcher() : QThread() {

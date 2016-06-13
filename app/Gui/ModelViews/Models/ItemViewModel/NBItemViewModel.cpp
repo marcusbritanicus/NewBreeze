@@ -4,8 +4,7 @@
 	*
 */
 
-#include <NBItemViewModel.hpp>
-#include <NBAppEngine.hpp>
+#include "NBItemViewModel.hpp"
 
 static QMutex mutex;
 

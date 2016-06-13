@@ -5,13 +5,10 @@
 */
 
 #pragma once
-#ifndef NBINFOBAR_HPP
-#define NBINFOBAR_HPP
 
-#include <Global.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBIconProvider.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
+#include "NBGuiWidgets.hpp"
+#include "NBIconProvider.hpp"
 
 class NBInfoBar : public QWidget {
 	Q_OBJECT
@@ -39,5 +36,3 @@ class NBInfoBar : public QWidget {
 
 		void setWidgetProperties();
 };
-
-#endif

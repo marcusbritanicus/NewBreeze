@@ -5,15 +5,12 @@
 */
 
 #pragma once
-#ifndef NBTRASHVIEW_HPP
-#define NBTRASHVIEW_HPP
 
-#include <Global.hpp>
-#include <NBTrashModel.hpp>
-#include <NBTrashDelegate.hpp>
-#include <NBTools.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBGuiFunctions.hpp>
+#include "Global.hpp"
+#include "NBTrashModel.hpp"
+#include "NBTrashDelegate.hpp"
+#include "NBGuiWidgets.hpp"
+#include "NBGuiFunctions.hpp"
 
 class NBTrashView : public QAbstractItemView {
 	Q_OBJECT
@@ -154,5 +151,3 @@ class NBTrashView : public QAbstractItemView {
 		void link( QStringList, QString );
 		void contextMenuRequested( QPoint );
 };
-
-#endif

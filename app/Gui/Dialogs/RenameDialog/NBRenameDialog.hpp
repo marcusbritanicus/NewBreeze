@@ -6,10 +6,9 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBDialog.hpp>
-#include <NBButtons.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBButtons.hpp"
 
 class NBRenameDialog : public NBDialog {
 	Q_OBJECT

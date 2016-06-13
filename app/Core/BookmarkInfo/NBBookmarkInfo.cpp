@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBBookmarkInfo.hpp>
+#include "NBBookmarkInfo.hpp"
 
 QList<NBBookmarkInfo> NBBookmarkInfo::allBookmarks() {
 

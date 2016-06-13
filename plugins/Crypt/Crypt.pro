@@ -2,8 +2,8 @@ TEMPLATE = lib
 TARGET = NBCrypt
 
 # Common Sources
-INCLUDEPATH += ../../common/ ../../common/QCryptographicHash5 ../../common/DeviceInfo/QVolumeInfo ../../common/Tools/ ../../common/MimeHandler/ ../../common/StandardPaths/
-DEPENDPATH += ../../common/ ../../common/QCryptographicHash5 ../../common/DeviceInfo/QVolumeInfo ../../common/Tools/ ../../common/MimeHandler/ ../../common/StandardPaths/
+INCLUDEPATH += ../../common/ ../../common/include
+DEPENDPATH += ../../common/ ../../common/include
 
 INCLUDEPATH += . Core/Circle Core/Salsa20 Gui/Common Gui/EncFS Gui/Salsa icons
 DEPENDPATH += . Core/Circle Core/Salsa20 Gui/Common Gui/EncFS Gui/Salsa icons

@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBSideBar.hpp>
+#include "NBSideBar.hpp"
 
 NBSideBar::NBSideBar( QWidget *parent ) : QWidget( parent ) {
 
@@ -80,6 +80,18 @@ void NBSideBar::reloadDevices() {
 
 	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allVirtualMounts() )
 		vfs->addItem( info.driveLabel(), ":/icons/" + info.driveType() + ".png", info.mountPoint() );
+
+	if ( drives->itemCount() )
+		drives->show();
+
+	else
+		drives->hide();
+
+	if ( vfs->itemCount() )
+		vfs->show();
+
+	else
+		vfs->hide();
 };
 
 void NBSideBar::reloadBookmarks() {
@@ -88,6 +100,12 @@ void NBSideBar::reloadBookmarks() {
 
 	Q_FOREACH( NBBookmarkInfo info, NBBookmarkInfo::allBookmarks() )
 		bookmarks->addItem( info.displayLabel, NBIconProvider::themeIcon( "bookmarks" ), info.mountPoint );
+
+	if ( bookmarks->itemCount() )
+		bookmarks->show();
+
+	else
+		bookmarks->hide();
 };
 
 void NBSideBar::highlight( QString tgt ) {
@@ -163,7 +181,8 @@ void NBSideBar::paintEvent( QPaintEvent *pEvent ) {
 	painter.setRenderHint( QPainter::HighQualityAntialiasing );
 	painter.setPen( Qt::gray );
 
-	painter.drawRoundedRect( QRectF( rect().adjusted( 0, 0, -1, -1 ) ), 2.0, 2.0 );
+	// painter.drawRoundedRect( QRectF( rect().adjusted( 0, 0, -1, -1 ) ), 2.0, 2.0 );
+	painter.drawLine( rect().topRight(), rect().bottomRight() );
 	painter.end();
 
 	pEvent->accept();

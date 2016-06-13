@@ -6,13 +6,14 @@
 
 #pragma once
 
+#include <QtGui>
 #include <QtNetwork>
 
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>
 #endif
 
-#include "common.hpp"
+#include "newbreeze.hpp"
 #include "NBSettings.hpp"
 
 namespace NBIOMode {
@@ -30,6 +31,8 @@ namespace NBInfoMode {
 		Catalog
 	};
 };
+
+static QMimeDatabase mimeDb;
 
 // Thumbnails Storage Directory
 const QString thumbsDir( QDir( QStandardPaths::writableLocation( QStandardPaths::GenericCacheLocation ) ).filePath( "NewBreeze/Thumbs/" ) );

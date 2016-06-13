@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBItemViewNode.hpp>
+#include "NBItemViewNode.hpp"
 
 static int __sortColumn = Settings->General.SortColumn;
 static bool __sortCase = Settings->General.SortCase;

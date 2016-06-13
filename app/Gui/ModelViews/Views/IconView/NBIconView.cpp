@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBIconView.hpp>
+#include "NBIconView.hpp"
 
 static inline bool isExecutable( QString path ) {
 
@@ -68,6 +68,9 @@ NBIconView::NBIconView( NBItemViewModel *fsModel ) : QAbstractItemView() {
 	// Internal Object Name
 	setObjectName( "mainList" );
 
+	/* Styling */
+	setStyleSheet( "#mainList{ border:none; }" );
+
 	// Minimum Size
 	setMinimumWidth( 640 );
 
@@ -82,7 +85,6 @@ NBIconView::NBIconView( NBItemViewModel *fsModel ) : QAbstractItemView() {
 
 	// No Horizontal ScrollBar
 	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	horizontalScrollBar()->hide();
 
 	// DragAndDrop
 	viewport()->setAcceptDrops( true );

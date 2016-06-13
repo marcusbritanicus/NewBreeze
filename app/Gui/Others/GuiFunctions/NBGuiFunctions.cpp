@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBGuiFunctions.hpp>
+#include "NBGuiFunctions.hpp"
 
 bool isBrightColor( QColor dst, QColor src ) {
 

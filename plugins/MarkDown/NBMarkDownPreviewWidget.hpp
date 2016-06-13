@@ -6,10 +6,7 @@
 
 #pragma once
 
-#include <NBPreviewInterface.hpp>
-
-#include <Global.hpp>
-#include <QtWebKit>
+#include "Global.hpp"
 
 #if QT_VERSION >= 0x050000
 	#include <QtWebKitWidgets>
@@ -19,7 +16,7 @@ class NBWebWatch : public QDialog {
 	Q_OBJECT
 
 	public :
-		NBWebWatch( QString path = QDir::homePath() );
+		NBWebWatch( QString path = QDir::homePath(), QWidget *parent = 0 );
 
 	private :
 		void createGUI();
@@ -39,14 +36,35 @@ class NBWebWatch : public QDialog {
 		void paintEvent( QPaintEvent *pEvent );
 };
 
-class NBMarkDownPreview : public QObject, NBPreviewInterface {
+class NBMarkDownPreview : public QObject, NBPluginInterface {
 	Q_OBJECT
 	#if QT_VERSION >= 0x050000
-		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPreviewInterface" FILE "MarkDownPreview5.json" )
+		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "MarkDownPreview5.json" )
 	#endif
-	Q_INTERFACES( NBPreviewInterface )
+	Q_INTERFACES( NBPluginInterface )
 
 	public:
-		QStringList mimeTypesHandled() const;
-		QDialog* getPreviewWidget( const QString & );
+		/* Name of the plugin */
+		 QString name();
+
+		/* The plugin version */
+		 QString version();
+
+		/* The QAction */
+		 QList<QAction*> actions( QStringList );
+
+		/* Interface type: preview, rename etc */
+		 Interface interface();
+
+		/* Interface type: preview, rename etc */
+		 Type type();
+
+		/* Plugin load context */
+		 Contexts contexts();
+
+		/* Mimetypes handled by the plugin */
+		 QStringList mimetypes();
+
+		/* Store the called widget pointer */
+		 void setCaller( QWidget *caller );
 };

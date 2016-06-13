@@ -5,13 +5,10 @@
 */
 
 #pragma once
-#ifndef NBCUSTOMACTIONS_HPP
-#define NBCUSTOMACTIONS_HPP
 
-#include <Global.hpp>
-#include <NBDialog.hpp>
-#include <NBButton.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBButton.hpp"
 
 class NBCustomActions : public NBDialog {
 	Q_OBJECT
@@ -57,5 +54,3 @@ class NBNewAction : public NBDialog {
 		NBButton *addBtn, *cancelBtn;
 		bool addAction;
 };
-
-#endif

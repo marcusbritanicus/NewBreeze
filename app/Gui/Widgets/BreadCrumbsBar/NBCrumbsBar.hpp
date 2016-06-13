@@ -6,12 +6,11 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBCrumb.hpp>
-#include <FlowLayout.hpp>
-#include <NBExtraCrumb.hpp>
-#include <NBGuiWidgets.hpp>
+#include "Global.hpp"
+#include "NBCrumb.hpp"
+#include "FlowLayout.hpp"
+#include "NBExtraCrumb.hpp"
+#include "NBGuiWidgets.hpp"
 
 /* Menu Popup to show the full path */
 class NBCrumbsBarX : public QWidget {

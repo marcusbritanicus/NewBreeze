@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBCustomActions.hpp>
+#include "NBCustomActions.hpp"
 
 NBCustomActions::NBCustomActions( QWidget *parent ) : NBDialog( parent ) {
 

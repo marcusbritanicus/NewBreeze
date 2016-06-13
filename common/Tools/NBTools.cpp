@@ -4,7 +4,9 @@
 	*
 */
 
-#include <NBTools.hpp>
+#include "NBTools.hpp"
+
+static QMimeDatabase mimeDb;
 
 QString dirName( QString path ) {
 

@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBIconViewRestricted.hpp>
+#include "NBIconViewRestricted.hpp"
 
 NBIconViewRestricted::NBIconViewRestricted( NBItemViewModel *fsModel ) : NBIconView( fsModel ) {
 

@@ -10,14 +10,6 @@
 #include <QtCore>
 #include <QtWebKit>
 
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-	#include <QMimeDatabase>
-	#include <QMimeType>
-	#include <QtWebKitWidgets>
-#else
-	#include <NBMimeDatabase.hpp>
-	#include <NBMimeType.hpp>
-#endif
+#include "newbreeze.hpp"
 
 static QMimeDatabase mimeDb;

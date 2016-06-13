@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NewBreeze.hpp>
+#include "Global.hpp"
+#include "NewBreeze.hpp"
 
 class NBTrayIcon : public QSystemTrayIcon {
 	Q_OBJECT

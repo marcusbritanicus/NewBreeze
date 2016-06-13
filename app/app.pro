@@ -7,24 +7,17 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 	QT += concurrent
 }
 
-LIBS += -lmagic -larchive -lbz2 -llzma -lz
-
 isEqual( QT_MAJOR_VERSION, 4 ) {
 	 LIBS += -L../common/ -lnewbreeze-common
 }
 
 isEqual( QT_MAJOR_VERSION, 5 ) {
-	LIBS +=  -L../common -lnewbreeze-common5
+	LIBS +=  -L../common/ -lnewbreeze-common5
 }
 
 # Common Sources
-INCLUDEPATH += ../common ../common/AppFile ../common/Archive ../common/DeviceInfo ../common/DeviceInfo/QVolumeInfo ../common/MimeHandler ../common/QCryptographicHash5
-INCLUDEPATH += ../common/QCryptographicHash5/md4 ../common/QCryptographicHash5/md5 ../common/QCryptographicHash5/rfc6234 ../common/QCryptographicHash5/sha1
-INCLUDEPATH += ../common/QCryptographicHash5/sha3 ../common/StandardPaths ../common/SystemInfo ../common/Tools ../common/XDG
-
-DEPENDPATH += ../common ../common/AppFile ../common/Archive ../common/DeviceInfo ../common/DeviceInfo/QVolumeInfo ../common/MimeHandler ../common/QCryptographicHash5
-DEPENDPATH += ../common/QCryptographicHash5/md4 ../common/QCryptographicHash5/md5 ../common/QCryptographicHash5/rfc6234 ../common/QCryptographicHash5/sha1
-DEPENDPATH += ../common/QCryptographicHash5/sha3 ../common/StandardPaths ../common/SystemInfo ../common/Tools ../common/XDG
+INCLUDEPATH += ../common/ ../common/include
+DEPENDPATH += ../common/ ../common/include
 
 # Source Paths
 INCLUDEPATH += Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs Gui/Dialogs/Archive
@@ -263,7 +256,7 @@ SOURCES += Gui/Widgets/TrashManager/NBTrashManager.cpp
 SOURCES += Main.cpp
 
 # Icon and stylesheet resources
-RESOURCES += NewBreeze.qrc
+RESOURCES += NewBreeze.qrc ../data/data.qrc
 
 # C++11 Support
 #QMAKE_CFLAGS += -std=c++11
@@ -301,16 +294,13 @@ unix {
 	}
 	BINDIR = $$PREFIX/bin
 
-	INSTALLS += target header desktop icons data mime
+	INSTALLS += target desktop icons data mime
 	target.path = $$BINDIR
 
 	QMAKE_RPATHDIR += $$PREFIX/lib/newbreeze/
 
-	header.path = $$PREFIX/include/newbreeze
-	header.files = NBPreviewInterface.hpp NBPluginInterface.hpp
-
 	desktop.path = $$PREFIX/share/applications/
-	desktop.files = Data/newbreeze.desktop
+	desktop.files = ../data/newbreeze.desktop
 
 	icons.path = $$PREFIX/share/icons/hicolor/256x256/apps/
 	icons.files = icons/newbreeze.png
@@ -319,7 +309,7 @@ unix {
 	data.files = README Changelog ReleaseNotes
 
 	mime.path = $$PREFIX/share/mime/packages/
-	mime.files = Data/x-encrypted-file.xml
+	mime.files = ../data/x-encrypted-file.xml
 }
 
 DEFINES += "HAVE_POSIX_OPENPT"

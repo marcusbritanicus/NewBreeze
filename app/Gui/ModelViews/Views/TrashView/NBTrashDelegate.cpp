@@ -4,8 +4,8 @@
 	*
 */
 
-#include <NBTrashDelegate.hpp>
-#include <NBTrashModel.hpp>
+#include "NBTrashDelegate.hpp"
+#include "NBTrashModel.hpp"
 
 void NBTrashDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
 

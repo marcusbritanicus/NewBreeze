@@ -4,9 +4,7 @@
 	*
 */
 
-#include <NBDeleteManager.hpp>
-#include <NBTools.hpp>
-#include <NBXdg.hpp>
+#include "NBDeleteManager.hpp"
 
 NBDeleteManager::NBDeleteManager( QObject *parent, bool trash ) : QObject( parent ) {
 

@@ -5,14 +5,11 @@
 */
 
 #pragma once
-#ifndef NBICONVIEWRESTRICTED_HPP
-#define NBICONVIEWRESTRICTED_HPP
 
-#include <Global.hpp>
-#include <NBItemViewModel.hpp>
-#include <NBIconDelegate.hpp>
-#include <NBTools.hpp>
-#include <NBIconView.hpp>
+#include "Global.hpp"
+#include "NBItemViewModel.hpp"
+#include "NBIconDelegate.hpp"
+#include "NBIconView.hpp"
 
 class NBIconViewRestricted : public NBIconView {
 	Q_OBJECT
@@ -32,5 +29,3 @@ class NBIconViewRestricted : public NBIconView {
 		void dragMoveEvent( QDragMoveEvent* );
 		void dropEvent( QDropEvent* );
 };
-
-#endif

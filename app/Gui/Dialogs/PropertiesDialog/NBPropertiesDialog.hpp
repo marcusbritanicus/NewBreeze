@@ -5,17 +5,14 @@
 */
 
 #pragma once
-#ifndef NBPROPERTIES_HPP
-#define NBPROPERTIES_HPP
 
-#include <Global.hpp>
-#include <NBDialog.hpp>
-#include <NBGuiWidgets.hpp>
-#include <NBLabels.hpp>
-#include <NBIconProvider.hpp>
-#include <NBDeviceInfo.hpp>
-#include <NBTools.hpp>
-#include <NBFileDialog.hpp>
+#include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBGuiWidgets.hpp"
+#include "NBLabels.hpp"
+#include "NBIconProvider.hpp"
+#include "NBFileDialog.hpp"
+
 #if QT_VERSION >= 0x050000
 	#include <QtConcurrent>
 #endif
@@ -145,5 +142,3 @@ class NBPropertiesDialog: public NBDialog {
 		void switchToTab( int  );
 		void setDirIcon();
 };
-
-#endif

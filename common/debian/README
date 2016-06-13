@@ -1,0 +1,7 @@
+The Debian Package newbreeze-common
+-----------------------------------
+
+NewBreeze Common contains files common to both NewBreeze and its plugins.
+Some are ease-of-use functions and classes and few are backported from Qt5.
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Mon, 13 Jun 2016 18:23:42 +0530

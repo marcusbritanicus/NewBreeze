@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBCrumbsBar.hpp>
+#include "NBCrumbsBar.hpp"
 
 typedef QList<NBCrumb*> NBCrumbsList;
 

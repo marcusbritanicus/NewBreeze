@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBOdfOgle.hpp>
+#include "NBOdfOgle.hpp"
 
 NBOdfOgle::NBOdfOgle( QString pth ) : QDialog() {
 
@@ -51,8 +51,6 @@ void NBOdfOgle::createGUI() {
 	peekWidgetBase->setWordWrapMode( QTextOption::WrapAtWordBoundaryOrAnywhere );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
 
-	peekWidgetBase->setDocument( loadFile() );
-
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
 	lblBtnLyt->addWidget( openBtn );
@@ -79,6 +77,25 @@ void NBOdfOgle::setWindowProperties() {
 	setGeometry( hpos, vpos, 720, 540 );
 };
 
+int NBOdfOgle::exec() {
+
+	QTimer::singleShot( 0, this, SLOT( loadFile() ) );
+
+	return QDialog::exec();
+};
+
+void NBOdfOgle::openInExternal() {
+
+	QProcess::startDetached( "xdg-open " + path );
+	close();
+};
+
+void NBOdfOgle::loadFile() {
+
+	OOO::Converter *odtConverter = new OOO::Converter();
+	peekWidgetBase->setDocument( odtConverter->convert( path ) );
+};
+
 void NBOdfOgle::keyPressEvent( QKeyEvent *keyEvent ) {
 
 	if ( keyEvent->key() == Qt::Key_Escape )
@@ -101,13 +118,6 @@ void NBOdfOgle::changeEvent( QEvent *event ) {
 	}
 };
 
-QTextDocument* NBOdfOgle::loadFile() {
-
-	OOO::Converter *odtConverter = new OOO::Converter();
-
-	return odtConverter->convert( path );
-};
-
 void NBOdfOgle::paintEvent( QPaintEvent *pEvent ) {
 
 	QWidget::paintEvent( pEvent );
@@ -118,10 +128,4 @@ void NBOdfOgle::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->end();
 	pEvent->accept();
-};
-
-void NBOdfOgle::openInExternal() {
-
-	QProcess::startDetached( "xdg-open " + path );
-	close();
 };

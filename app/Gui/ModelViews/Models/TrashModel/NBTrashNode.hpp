@@ -5,12 +5,9 @@
 */
 
 #pragma once
-#ifndef NBTRASHNODE_HPP
-#define NBTRASHNODE_HPP
 
-#include <Global.hpp>
-#include <NBTools.hpp>
-#include <NBIconProvider.hpp>
+#include "Global.hpp"
+#include "NBIconProvider.hpp"
 
 class NBTrashNode {
 
@@ -73,5 +70,3 @@ class NBTrashNode {
 
 bool columnSort( NBTrashNode *first, NBTrashNode *second );
 QStringList sortDateList( QStringList& );
-
-#endif

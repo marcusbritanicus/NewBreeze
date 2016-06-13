@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBOpenWithView.hpp>
+#include "NBOpenWithView.hpp"
 
 NBOpenWithView::NBOpenWithView() : QAbstractItemView() {
 

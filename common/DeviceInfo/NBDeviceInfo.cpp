@@ -4,13 +4,7 @@
 	*
 */
 
-#include <NBDeviceInfo.hpp>
-#include <sys/statvfs.h>
-#include <sys/stat.h>
-
-#if QT_VERSION >= 0x050000
-    #include <QStorageInfo>
-#endif
+#include "NBDeviceInfo.hpp"
 
 inline QString readLink( QString path ) {
 
@@ -191,10 +185,10 @@ QList<NBDeviceInfo> NBDeviceManager::allVirtualMounts() {
 	Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() ) {
 		NBDeviceInfo devInfo;
 
-		if ( sInfo.device().startsWith( "/dev/" ) )
+		if ( sInfo.device().startsWith( "/dev" ) )
 			continue;
 
-		if ( sInfo.rootPath().startsWith( "/run/" ) )
+		if ( sInfo.rootPath().startsWith( "/run" ) )
 			continue;
 
 		devInfo.dN = sInfo.device();

@@ -4,8 +4,8 @@
 	*
 */
 
-#include <NBIconDelegate.hpp>
-#include <NBItemViewModel.hpp>
+#include "NBIconDelegate.hpp"
+#include "NBItemViewModel.hpp"
 
 void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
 

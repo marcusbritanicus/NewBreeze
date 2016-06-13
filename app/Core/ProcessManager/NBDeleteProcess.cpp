@@ -4,9 +4,7 @@
 	*
 */
 
-#include <NBDeleteProcess.hpp>
-#include <NBTools.hpp>
-#include <NBXdg.hpp>
+#include "NBDeleteProcess.hpp"
 
 NBDeleteProcess::NBDeleteProcess( QStringList sources, NBProcess::Progress *progress ) {
 

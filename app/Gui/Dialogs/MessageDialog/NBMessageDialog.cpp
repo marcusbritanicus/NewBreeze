@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBMessageDialog.hpp>
+#include "NBMessageDialog.hpp"
 
 int NBMessageDialog::information( QWidget *parent, QString title, QString text ) {
 

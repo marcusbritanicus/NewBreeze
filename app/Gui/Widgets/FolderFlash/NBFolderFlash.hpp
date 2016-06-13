@@ -5,12 +5,9 @@
 */
 
 #pragma once
-#ifndef NBFOLDERFLASH_HPP
-#define NBFOLDERFLASH_HPP
 
-#include <Global.hpp>
-#include <NBIconViewRestricted.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
+#include "NBIconViewRestricted.hpp"
 
 class NBFolderFlash : public QWidget {
 	Q_OBJECT
@@ -36,5 +33,3 @@ class NBFolderFlash : public QWidget {
 	Q_SIGNALS:
 		void loadFolder( QString );
 };
-
-#endif

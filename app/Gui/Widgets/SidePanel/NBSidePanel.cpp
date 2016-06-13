@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBSidePanel.hpp>
+#include "NBSidePanel.hpp"
 
 /* Side Panel init */
 NBSidePanel::NBSidePanel( QWidget *parent ) : QWidget( parent ) {

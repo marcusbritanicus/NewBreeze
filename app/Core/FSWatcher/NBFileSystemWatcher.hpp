@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 
 /* Size of buffer to use when reading inotify events */
 #define MAX_EVENTS				1024

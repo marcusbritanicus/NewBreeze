@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBConfirmDeleteDialog.hpp>
+#include "NBConfirmDeleteDialog.hpp"
 
 NBConfirmDeleteDialog::NBConfirmDeleteDialog( QString src, QStringList paths, bool permanent, QWidget *parent ) : NBDialog( parent ) {
 

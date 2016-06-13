@@ -4,21 +4,11 @@
 	*
 */
 
-#include <NBGuiWidgets.hpp>
+#include "NBGuiWidgets.hpp"
 
 NBLineEdit::NBLineEdit( QWidget *parent ) : QLineEdit( parent ) {
-	;
-};
 
-void NBLineEdit::paintEvent( QPaintEvent *pEvent ) {
-
-	QLineEdit::paintEvent( pEvent );
-	QPainter painter( this );
-
-	painter.setPen( palette().color( QPalette::Base ).darker() );
-	painter.drawRect( rect().adjusted( 0, 0, -1, -1 ) );
-
-	painter.end();
+	setStyleSheet( "background: transparent; border: none;" );
 };
 
 NBDriveLabel::NBDriveLabel( const QString path, QWidget *parent ) : QWidget( parent ) {

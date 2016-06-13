@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBTrashNode.hpp>
+#include "NBTrashNode.hpp"
 
 NBTrashNode::NBTrashNode() {
 

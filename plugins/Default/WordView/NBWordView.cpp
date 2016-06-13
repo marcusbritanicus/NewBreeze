@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBWordView.hpp>
+#include "NBWordView.hpp"
 
 NBWordView::NBWordView( QString pth ) : QDialog() {
 
@@ -51,8 +51,6 @@ void NBWordView::createGUI() {
 	peekWidgetBase->setWordWrapMode( QTextOption::WrapAtWordBoundaryOrAnywhere );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
 
-	peekWidgetBase->setPlainText( loadFile() );
-
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
 	lblBtnLyt->addWidget( openBtn );
@@ -79,6 +77,28 @@ void NBWordView::setWindowProperties() {
 	setGeometry( hpos, vpos, 720, 540 );
 };
 
+int NBWordView::exec() {
+
+	QTimer::singleShot( 0, this, SLOT( loadFile() ) );
+
+	return QDialog::exec();
+};
+
+void NBWordView::openInExternal() {
+
+	QProcess::startDetached( "xdg-open " + path );
+	close();
+};
+
+void NBWordView::loadFile() {
+
+	QFile file( path );
+	file.open( QFile::ReadOnly | QFile::Text );
+
+	peekWidgetBase->setPlainText( QString::fromLocal8Bit( file.readAll() ) );
+	file.close();
+};
+
 void NBWordView::keyPressEvent( QKeyEvent *keyEvent ) {
 
 	if ( keyEvent->key() == Qt::Key_Escape )
@@ -89,8 +109,6 @@ void NBWordView::keyPressEvent( QKeyEvent *keyEvent ) {
 };
 
 void NBWordView::changeEvent( QEvent *event ) {
-
-	qDebug() << event->type();
 
 	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
 		hide();
@@ -103,17 +121,6 @@ void NBWordView::changeEvent( QEvent *event ) {
 	}
 };
 
-QString NBWordView::loadFile() {
-
-	QFile file( path );
-	file.open( QFile::ReadOnly | QFile::Text );
-
-	QByteArray ba = file.readAll();
-	file.close();
-
-	return QString::fromLocal8Bit( ba );
-};
-
 void NBWordView::paintEvent( QPaintEvent *pEvent ) {
 
 	QWidget::paintEvent( pEvent );
@@ -124,10 +131,4 @@ void NBWordView::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->end();
 	pEvent->accept();
-};
-
-void NBWordView::openInExternal() {
-
-	QProcess::startDetached( "xdg-open " + path );
-	close();
 };

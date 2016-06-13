@@ -1,8 +1,12 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: newbreeze-plugins
-Source: https://github.com/marcusbritanicus/NewBreeze/
+Source: http://github.com/marcusbritanicus/NewBreeze
 
 Files: *
+Copyright: 2016 Marcus Britanicus <marcusbritanicus@gmail.com>
+License: GPL-3.0+
+
+Files: debian/*
 Copyright: 2016 Marcus Britanicus <marcusbritanicus@gmail.com>
 License: GPL-3.0+
 

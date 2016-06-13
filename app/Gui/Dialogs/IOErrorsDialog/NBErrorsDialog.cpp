@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBErrorsDialog.hpp>
+#include "NBErrorsDialog.hpp"
 
 NBErrorsDialog::NBErrorsDialog( QString title, QString text, QStringList nodes, QWidget *parent ) : NBDialog( parent ) {
 

@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBSideBarItem.hpp>
+#include "NBSideBarItem.hpp"
 
 NBSideBarItem::NBSideBarItem( QWidget *parent ) : QLabel( parent ) {
 
@@ -43,6 +43,8 @@ NBSideBarItem::NBSideBarItem( QString name, QString icon, QString target, QWidge
 
 	setFixedHeight( 20 );
 	setCursor( Qt::PointingHandCursor );
+
+	setAcceptDrops( true );
 };
 
 QString NBSideBarItem::name() {

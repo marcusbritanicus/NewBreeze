@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBDialog.hpp>
-#include <NBButton.hpp>
-#include <NBGuiWidgets.hpp>
+#include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBButton.hpp"
+#include "NBGuiWidgets.hpp"
 
 class AboutNB : public QDialog {
 	Q_OBJECT

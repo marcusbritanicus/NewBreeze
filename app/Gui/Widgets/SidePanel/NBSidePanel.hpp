@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBFlashLabel.hpp>
-#include <NBDeviceView.hpp>
-#include <NBVfsView.hpp>
-#include <NBBookmarkView.hpp>
+#include "Global.hpp"
+#include "NBFlashLabel.hpp"
+#include "NBDeviceView.hpp"
+#include "NBVfsView.hpp"
+#include "NBBookmarkView.hpp"
 
 class NBSidePanel : public QWidget {
 	Q_OBJECT

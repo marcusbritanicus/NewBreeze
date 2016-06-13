@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
 
 class NBClickLabel : public QLabel {
 	Q_OBJECT

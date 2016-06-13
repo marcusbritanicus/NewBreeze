@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBProgressBar.hpp>
+#include "NBProgressBar.hpp"
 
 NBProgressBar::NBProgressBar( QWidget *parent ) : QWidget( parent ) {
 

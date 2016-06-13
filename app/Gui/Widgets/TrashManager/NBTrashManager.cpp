@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBTrashManager.hpp>
+#include "NBTrashManager.hpp"
 
 NBTrashManager::NBTrashManager( QWidget *parent ) : NBDialog( parent ) {
 

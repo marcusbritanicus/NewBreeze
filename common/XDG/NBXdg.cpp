@@ -4,10 +4,7 @@
 	*
 */
 
-#include <NBXdg.hpp>
-#include <sys/types.h>
-#include <unistd.h>
-#include <pwd.h>
+#include "NBXdg.hpp"
 
 QString NBXdg::home() {
 

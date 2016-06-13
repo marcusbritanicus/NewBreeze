@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <Global.hpp>
+#include "Global.hpp"
 
 class NBSSideBar : public QWidget {
 	Q_OBJECT

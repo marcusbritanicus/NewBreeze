@@ -1,6 +1,10 @@
 TEMPLATE = lib
 TARGET = MarkDownPreview
 
+# Common Sources
+INCLUDEPATH += ../../common/ ../../common/include
+DEPENDPATH += ../../common/ ../../common/include
+
 DEPENDPATH += .
 INCLUDEPATH += .
 
