@@ -80,9 +80,14 @@ void NBToggleButton::paintEvent( QPaintEvent *pEvent ) {
 	pEvent->accept();
 };
 
+NBAddressEdit::NBAddressEdit( QWidget *parent ) : QLineEdit( parent ) {
+
+	setStyleSheet( "background: transparent; border: none;" );
+};
+
 NBAddressWidget::NBAddressWidget( QWidget *parent ) : QWidget( parent ) {
 
-	addressEdit = new NBLineEdit( this );
+	addressEdit = new NBAddressEdit( this );
 	addressEdit->setFont( QFont( "Envy Code R", 11 ) );
 	addressEdit->setFocusPolicy( Qt::NoFocus );
 

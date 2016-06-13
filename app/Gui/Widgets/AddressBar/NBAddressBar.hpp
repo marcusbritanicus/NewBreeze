@@ -39,6 +39,13 @@ class NBToggleButton : public QWidget {
 		void clicked();
 };
 
+class NBAddressEdit : public QLineEdit {
+	Q_OBJECT
+
+	public:
+		NBAddressEdit( QWidget* );
+};
+
 class NBAddressWidget : public QWidget {
 	Q_OBJECT
 
@@ -46,7 +53,7 @@ class NBAddressWidget : public QWidget {
 		NBAddressWidget( QWidget *parent = NULL );
 		void setShowHidden( bool );
 
-		NBLineEdit *addressEdit;
+		NBAddressEdit *addressEdit;
 		NBCrumbsBar *crumbsBar;
 
 	public slots:

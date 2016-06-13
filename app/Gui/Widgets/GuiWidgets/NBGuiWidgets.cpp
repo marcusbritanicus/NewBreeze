@@ -8,7 +8,13 @@
 
 NBLineEdit::NBLineEdit( QWidget *parent ) : QLineEdit( parent ) {
 
-	setStyleSheet( "background: transparent; border: none;" );
+	setMinimumHeight( 32 );
+};
+
+void NBLineEdit::paintEvent( QPaintEvent *pEvent ) {
+
+	QLineEdit::paintEvent( pEvent );
+	pEvent->accept();
 };
 
 NBDriveLabel::NBDriveLabel( const QString path, QWidget *parent ) : QWidget( parent ) {

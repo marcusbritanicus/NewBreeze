@@ -35,7 +35,6 @@ void NBRunCmdDialog::createGUI() {
 	QLabel *lbl1 = new QLabel( tr( "Open '<tt><b>%1</b></tt>' with: " ).arg( fileName ) );
 	QLabel *lbl2 = new QLabel( tr( "Custom command:" ) );
 	le = new NBLineEdit( this );
-	le->setFixedHeight( 24 );
 
 	appList = new NBOpenWithView();
 

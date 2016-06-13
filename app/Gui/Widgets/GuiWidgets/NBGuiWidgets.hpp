@@ -14,6 +14,9 @@ class NBLineEdit : public QLineEdit {
 
 	public:
 		NBLineEdit( QWidget* );
+
+	protected:
+		void paintEvent( QPaintEvent * );
 };
 
 class NBDriveLabel : public QWidget {

@@ -30,7 +30,6 @@ void NBRenameDialog::createGUI() {
 
 	lbl->setText( tr( "Rename the item '%1' to:" ).arg( name ) );
 
-	le->setFixedHeight( 24 );
 	le->setText( name );
 	le->selectAll();
 

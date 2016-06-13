@@ -28,7 +28,6 @@ NBNewNodeDialog::NBNewNodeDialog( QString type, QDir curDir, QString text, QWidg
 
 	QLabel *lbl = new QLabel();
 	le = new NBLineEdit( this );
-	le->setFixedHeight( 24 );
 
 	okBtn = new NBButton( QIcon( ":/icons/ok.png" ), "&Ok", this );
 	okBtn->setObjectName( tr( "okBtn" ) );
