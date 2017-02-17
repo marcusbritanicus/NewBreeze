@@ -7,5 +7,4 @@
 #pragma once
 
 #include "Global.hpp"
-#include "NBPreviewInterface.hpp"
 #include "NBPluginManager.hpp"

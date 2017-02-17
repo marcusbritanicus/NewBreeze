@@ -98,7 +98,9 @@ void NBSidePanel::populateSidePanel() {
 	lyt->addWidget( base );
 
 	setLayout( lyt );
-	setLayout( lyt );
+
+	/* Styling */
+	setStyleSheet( "#base{ border-right: 1px solid darkgray; }" );
 };
 
 void NBSidePanel::mousePressEvent( QMouseEvent *mEvent ) {

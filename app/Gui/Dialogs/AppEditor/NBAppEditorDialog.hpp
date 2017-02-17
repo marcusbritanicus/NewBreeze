@@ -4,6 +4,8 @@
 	*
 */
 
+#include "Global.hpp"
+
 class NBAppEditorDialog : public QWidget {
 	Q_OBJECT
 

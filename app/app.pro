@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = newbreeze3
 
-QT += network
+QT += network sql
 greaterThan(QT_MAJOR_VERSION, 4) {
 	QT += widgets
 	QT += concurrent
@@ -20,37 +20,43 @@ INCLUDEPATH += ../common/ ../common/include
 DEPENDPATH += ../common/ ../common/include
 
 # Source Paths
-INCLUDEPATH += Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs Gui/Dialogs/Archive
-INCLUDEPATH += Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog
-INCLUDEPATH += Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/ModelViews Gui/ModelViews/Models
-INCLUDEPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views Gui/ModelViews/Views/CombiView Gui/ModelViews/Views/IconView
-INCLUDEPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others Gui/Others/GuiFunctions
-INCLUDEPATH += Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu
-INCLUDEPATH += Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
-INCLUDEPATH += Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager icons
+INCLUDEPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs
+INCLUDEPATH += Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BugCatcher Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
+INCLUDEPATH += Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
+INCLUDEPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
+INCLUDEPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTypeModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views Gui/ModelViews/Views/IconView
+INCLUDEPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/ModelViews/Views/DirectoryView Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others
+INCLUDEPATH += Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
+INCLUDEPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets
+INCLUDEPATH += Gui/Widgets/InfoBar Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
+INCLUDEPATH += Gui/Widgets/TrashManager
 
-DEPENDPATH += Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs Gui/Dialogs/Archive
-DEPENDPATH += Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog
-DEPENDPATH += Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/ModelViews Gui/ModelViews/Models
-DEPENDPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views Gui/ModelViews/Views/CombiView Gui/ModelViews/Views/IconView
-DEPENDPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others Gui/Others/GuiFunctions
-DEPENDPATH += Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons Gui/Widgets/ContextMenu
-DEPENDPATH += Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar
-DEPENDPATH += Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager icons
+DEPENDPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs
+DEPENDPATH += Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BugCatcher Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
+DEPENDPATH += Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
+DEPENDPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
+DEPENDPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTypeModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views Gui/ModelViews/Views/IconView
+DEPENDPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/ModelViews/Views/DirectoryView Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others
+DEPENDPATH += Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
+DEPENDPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets
+DEPENDPATH += Gui/Widgets/InfoBar Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
+DEPENDPATH += Gui/Widgets/TrashManager
 
 # Headers
 HEADERS += Core/ArgParser/NBCLParser.hpp
 HEADERS += Core/BookmarkInfo/NBBookmarkInfo.hpp
 HEADERS += Core/DeleteManager/NBDeleteManager.hpp
 HEADERS += Core/FSWatcher/NBFileSystemWatcher.hpp
-HEADERS += Core/IconProvider/NBIconProvider.hpp
+HEADERS += Core/IconProvider/NBIconManager.hpp
 HEADERS += Core/Logger/NBLogger.hpp
 HEADERS += Core/ProcessManager/NBAbstractProcess.hpp
 HEADERS += Core/ProcessManager/NBDeleteProcess.hpp
 HEADERS += Core/ProcessManager/NBIOProcess.hpp
 HEADERS += Core/ProcessManager/NBProcessManager.hpp
 HEADERS += Global.hpp
+HEADERS += Gui/Dialogs/AppEditor/NBAppEditorDialog.hpp
 HEADERS += Gui/Dialogs/Archive/NBArchiveDialog.hpp
+HEADERS += Gui/Dialogs/BugCatcher/NBBugReporter.hpp
 HEADERS += Gui/Dialogs/ConfirmDeleteDialog/NBConfirmDeleteDialog.hpp
 HEADERS += Gui/Dialogs/Dialog/AboutNB.hpp
 HEADERS += Gui/Dialogs/Dialog/NBDialog.hpp
@@ -70,9 +76,14 @@ HEADERS += Gui/Dialogs/SettingsManager/NBSSideBar.hpp
 HEADERS += Gui/Dialogs/SettingsManager/NBSStyleWidget.hpp
 HEADERS += Gui/Dialogs/SettingsManager/qkeysequencewidget.h
 HEADERS += Gui/Dialogs/SettingsManager/qkeysequencewidget_p.h
+HEADERS += Gui/Dialogs/StartupWizard/NBStartupWizard.hpp
+HEADERS += Gui/ModelViews/Models/DirTreeModel/NBDirTreeModel.hpp
+HEADERS += Gui/ModelViews/Models/DirTreeModel/NBTreeBranch.hpp
 HEADERS += Gui/ModelViews/Models/ItemViewModel/NBFileInfoGatherer.hpp
 HEADERS += Gui/ModelViews/Models/ItemViewModel/NBItemViewModel.hpp
 HEADERS += Gui/ModelViews/Models/ItemViewModel/NBItemViewNode.hpp
+HEADERS += Gui/ModelViews/Models/MimeTypeModel/NBMimeTypeModel.hpp
+HEADERS += Gui/ModelViews/Models/MimeTypeModel/NBMimeTypeNode.hpp
 HEADERS += Gui/ModelViews/Models/TrashModel/NBTrashModel.hpp
 HEADERS += Gui/ModelViews/Models/TrashModel/NBTrashNode.hpp
 HEADERS += Gui/ModelViews/Views/IconView/NBIconDelegate.hpp
@@ -82,6 +93,7 @@ HEADERS += Gui/ModelViews/Views/OpenWithView/NBOpenWithDelegate.hpp
 HEADERS += Gui/ModelViews/Views/OpenWithView/NBOpenWithView.hpp
 HEADERS += Gui/ModelViews/Views/TrashView/NBTrashDelegate.hpp
 HEADERS += Gui/ModelViews/Views/TrashView/NBTrashView.hpp
+HEADERS += Gui/ModelViews/Views/DirectoryView/NBDirectoryView.hpp
 HEADERS += Gui/NewBreezeUI/Application/NBApplication.hpp
 HEADERS += Gui/NewBreezeUI/Application/qtlocalpeer.hpp
 HEADERS += Gui/NewBreezeUI/Application/qtlockedfile.hpp
@@ -97,6 +109,8 @@ HEADERS += Gui/Widgets/BreadCrumbsBar/NBCrumbsBar.hpp
 HEADERS += Gui/Widgets/BreadCrumbsBar/NBExtraCrumb.hpp
 HEADERS += Gui/Widgets/Buttons/NBButton.hpp
 HEADERS += Gui/Widgets/Buttons/NBButtons.hpp
+HEADERS += Gui/Widgets/Buttons/NBPushButton.hpp
+HEADERS += Gui/Widgets/Buttons/NBSegmentControl.hpp
 HEADERS += Gui/Widgets/ContextMenu/NBContextMenu.hpp
 HEADERS += Gui/Widgets/CustomActions/NBCustomActions.hpp
 HEADERS += Gui/Widgets/CustomPeek/NBCustomPeek.hpp
@@ -110,8 +124,8 @@ HEADERS += Gui/Widgets/GuiWidgets/NBProgressBar.hpp
 HEADERS += Gui/Widgets/InfoBar/NBInfoBar.hpp
 HEADERS += Gui/Widgets/ProcessManager/NBProcessManagerUI.hpp
 HEADERS += Gui/Widgets/ProcessManager/NBProcessWidget.hpp
-HEADERS += Gui/Widgets/SideBar/NBSideBar.hpp
 HEADERS += Gui/Widgets/SideBar/NBSideBarGroup.hpp
+HEADERS += Gui/Widgets/SideBar/NBSideBar.hpp
 HEADERS += Gui/Widgets/SideBar/NBSideBarItem.hpp
 HEADERS += Gui/Widgets/SidePanel/NBBookmarkView.hpp
 HEADERS += Gui/Widgets/SidePanel/NBDeviceView.hpp
@@ -156,12 +170,15 @@ SOURCES += Core/ArgParser/NBCLParser.cpp
 SOURCES += Core/BookmarkInfo/NBBookmarkInfo.cpp
 SOURCES += Core/DeleteManager/NBDeleteManager.cpp
 SOURCES += Core/FSWatcher/NBFileSystemWatcher.cpp
-SOURCES += Core/IconProvider/NBIconProvider.cpp
+SOURCES += Core/IconProvider/NBIconManager.cpp
+SOURCES += Core/IconProvider/NBIconProvider.cc
 SOURCES += Core/Logger/NBLogger.cpp
 SOURCES += Core/ProcessManager/NBDeleteProcess.cpp
 SOURCES += Core/ProcessManager/NBIOProcess.cpp
 SOURCES += Core/ProcessManager/NBProcessManager.cpp
+SOURCES += Gui/Dialogs/AppEditor/NBAppEditorDialog.cpp
 SOURCES += Gui/Dialogs/Archive/NBArchiveDialog.cpp
+SOURCES += Gui/Dialogs/BugCatcher/NBBugReporter.cpp
 SOURCES += Gui/Dialogs/ConfirmDeleteDialog/NBConfirmDeleteDialog.cpp
 SOURCES += Gui/Dialogs/Dialog/AboutNB.cpp
 SOURCES += Gui/Dialogs/Dialog/NBDialog.cpp
@@ -180,9 +197,14 @@ SOURCES += Gui/Dialogs/SettingsManager/NBSPluginsWidget.cpp
 SOURCES += Gui/Dialogs/SettingsManager/NBSSideBar.cpp
 SOURCES += Gui/Dialogs/SettingsManager/NBSStyleWidget.cpp
 SOURCES += Gui/Dialogs/SettingsManager/qkeysequencewidget.cpp
+SOURCES += Gui/Dialogs/StartupWizard/NBStartupWizard.cpp
+SOURCES += Gui/ModelViews/Models/DirTreeModel/NBDirTreeModel.cpp
+SOURCES += Gui/ModelViews/Models/DirTreeModel/NBTreeBranch.cpp
 SOURCES += Gui/ModelViews/Models/ItemViewModel/NBFileInfoGatherer.cpp
 SOURCES += Gui/ModelViews/Models/ItemViewModel/NBItemViewModel.cpp
 SOURCES += Gui/ModelViews/Models/ItemViewModel/NBItemViewNode.cpp
+SOURCES += Gui/ModelViews/Models/MimeTypeModel/NBMimeTypeModel.cpp
+SOURCES += Gui/ModelViews/Models/MimeTypeModel/NBMimeTypeNode.cpp
 SOURCES += Gui/ModelViews/Models/TrashModel/NBTrashModel.cpp
 SOURCES += Gui/ModelViews/Models/TrashModel/NBTrashNode.cpp
 SOURCES += Gui/ModelViews/Views/IconView/NBIconDelegate.cpp
@@ -192,6 +214,7 @@ SOURCES += Gui/ModelViews/Views/OpenWithView/NBOpenWithDelegate.cpp
 SOURCES += Gui/ModelViews/Views/OpenWithView/NBOpenWithView.cpp
 SOURCES += Gui/ModelViews/Views/TrashView/NBTrashDelegate.cpp
 SOURCES += Gui/ModelViews/Views/TrashView/NBTrashView.cpp
+SOURCES += Gui/ModelViews/Views/DirectoryView/NBDirectoryView.cpp
 SOURCES += Gui/NewBreezeUI/Application/NBApplication.cpp
 SOURCES += Gui/NewBreezeUI/Application/qtlocalpeer.cpp
 SOURCES += Gui/NewBreezeUI/Application/qtlockedfile.cpp
@@ -209,6 +232,8 @@ SOURCES += Gui/Widgets/BreadCrumbsBar/NBCrumbsBar.cpp
 SOURCES += Gui/Widgets/BreadCrumbsBar/NBExtraCrumb.cpp
 SOURCES += Gui/Widgets/Buttons/NBButton.cpp
 SOURCES += Gui/Widgets/Buttons/NBButtons.cpp
+SOURCES += Gui/Widgets/Buttons/NBPushButton.cpp
+SOURCES += Gui/Widgets/Buttons/NBSegmentControl.cpp
 SOURCES += Gui/Widgets/ContextMenu/NBContextMenu.cpp
 SOURCES += Gui/Widgets/CustomActions/NBCustomActions.cpp
 SOURCES += Gui/Widgets/CustomPeek/NBCustomPeek.cpp
@@ -258,8 +283,8 @@ SOURCES += Main.cpp
 # Icon and stylesheet resources
 RESOURCES += NewBreeze.qrc ../data/data.qrc
 
-# C++11 Support
-#QMAKE_CFLAGS += -std=c++11
+# C99/C++11 Support
+#QMAKE_CFLAGS += -std=c99
 #QMAKE_CXXFLAGS += -std=c++11
 
 # Enable warnings and threading support

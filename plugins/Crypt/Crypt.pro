@@ -61,7 +61,7 @@ RCC_DIR		= $$BUILD_PREFIX/qrc-plugins
 UI_DIR      = $$BUILD_PREFIX/uic-plugins
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-	TARGET = MarkDownPreview5
+	TARGET = NBCrypt5
 	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5
 	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5
 	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5

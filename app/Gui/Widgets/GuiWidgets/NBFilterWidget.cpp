@@ -1,6 +1,6 @@
 /*
 	*
-	* NBNBFilterWidget.hpp - NBFilterWidget for NewBreeze
+	* NBFilterWidget.hpp - NBFilterWidget for NewBreeze
 	*
 */
 

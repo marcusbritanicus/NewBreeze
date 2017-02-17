@@ -29,7 +29,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->init = true;
 
 	defaultSettings->General.Style = QString( "Default" );
-	defaultSettings->General.ViewMode = QString( "IconsView" );
+	defaultSettings->General.ViewMode = QString( "Icons" );
 	defaultSettings->General.IconTheme = NBSystemIconTheme();
 	defaultSettings->General.ImagePreviews = true;
 	defaultSettings->General.TrayIcon = true;
@@ -108,7 +108,7 @@ NBSettings* NBSettings::instance() {
 		settings->General.Style = gSettings.value( "Style" ).toString();
 
 	if ( gaKeys.contains( QString( "ViewMode" ) ) )
-		settings->General.ViewMode = gSettings.value( "ViewMode" ).toString() + "View";
+		settings->General.ViewMode = gSettings.value( "ViewMode" ).toString();
 
 	if ( gaKeys.contains( QString( "IconTheme" ) ) )
 		settings->General.IconTheme = gSettings.value( "IconTheme" ).toString();
@@ -118,9 +118,6 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "TrayIcon" ) ) )
 		settings->General.TrayIcon = gSettings.value( "TrayIcon" ).toBool();
-
-	if ( gaKeys.contains( QString( "OpenWithCatalog" ) ) )
-		settings->General.OpenWithCatalog = gSettings.value( "OpenWithCatalog" ).toBool();
 
 	if ( gaKeys.contains( QString( "SidePanel" ) ) )
 		settings->General.SidePanel = gSettings.value( "SidePanel" ).toBool();
@@ -149,16 +146,14 @@ NBSettings* NBSettings::instance() {
 	if ( gaKeys.contains( QString( "FilterFolders" ) ) )
 		settings->General.FilterFolders = gSettings.value( "FilterFolders" ).toBool();
 
+	if ( gaKeys.contains( QString( "OpenWithCatalog" ) ) )
+		settings->General.OpenWithCatalog = gSettings.value( "OpenWithCatalog" ).toBool();
+
 	if ( gaKeys.contains( QString( "SuperStart" ) ) )
 		settings->General.SuperStart = gSettings.value( "SuperStart" ).toBool();
 
 	if ( gaKeys.contains( QString( "SpecialOpen" ) ) )
 		settings->General.SpecialOpen = gSettings.value( "SpecialOpen" ).toBool();
-
-	if ( not settings->General.SpecialOpen ) {
-		settings->General.SuperStart = false;
-		settings->General.OpenWithCatalog = false;
-	}
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		settings->Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
@@ -295,7 +290,7 @@ void NBSettings::reload() {
 		General.Style = gSettings.value( "Style" ).toString();
 
 	if ( gaKeys.contains( QString( "FolderView" ) ) )
-		General.ViewMode = gSettings.value( "ViewMode" ).toString() + "View";
+		General.ViewMode = gSettings.value( "ViewMode" ).toString();
 
 	if ( gaKeys.contains( QString( "IconTheme" ) ) )
 		General.IconTheme = gSettings.value( "IconTheme" ).toString();
@@ -318,35 +313,35 @@ void NBSettings::reload() {
 	if ( gaKeys.contains( QString( "Session/Maximized" ) ) )
 		Session.Maximized = gSettings.value( "Session/Maximized" ).toBool();
 
-	if ( gaKeys.contains( QString( "General/SidePanel" ) ) )
-		General.SidePanel = gSettings.value( "General/SidePanel" ).toBool();
+	if ( gaKeys.contains( QString( "SidePanel" ) ) )
+		General.SidePanel = gSettings.value( "SidePanel" ).toBool();
 
-	if ( gaKeys.contains( QString( "General/SidePanelType" ) ) )
-		General.SidePanel = gSettings.value( "General/SidePanelType" ).toInt();
+	if ( gaKeys.contains( QString( "SidePanelType" ) ) )
+		General.SidePanelType = gSettings.value( "SidePanelType" ).toInt();
 
-	if ( gaKeys.contains( QString( "General/ShowHidden" ) ) )
-		General.ShowHidden = gSettings.value( "General/ShowHidden" ).toBool();
+	if ( gaKeys.contains( QString( "ShowHidden" ) ) )
+		General.ShowHidden = gSettings.value( "ShowHidden" ).toBool();
 
-	if ( gaKeys.contains( QString( "General/IconSize" ) ) )
-		General.IconSize = gSettings.value( "General/IconSize" ).toSize();
+	if ( gaKeys.contains( QString( "IconSize" ) ) )
+		General.IconSize = gSettings.value( "IconSize" ).toSize();
 
-	if ( gaKeys.contains( QString( "General/SortColumn" ) ) )
-		General.SortColumn = gSettings.value( "General/SortColumn" ).toInt();
+	if ( gaKeys.contains( QString( "SortColumn" ) ) )
+		General.SortColumn = gSettings.value( "SortColumn" ).toInt();
 
-	if ( gaKeys.contains( QString( "General/SortCase" ) ) )
-		General.SortCase = gSettings.value( "General/SortCase" ).toBool();
+	if ( gaKeys.contains( QString( "SortCase" ) ) )
+		General.SortCase = gSettings.value( "SortCase" ).toBool();
 
-	if ( gaKeys.contains( QString( "General/Grouping" ) ) )
-		General.Grouping = gSettings.value( "General/Grouping" ).toBool();
+	if ( gaKeys.contains( QString( "Grouping" ) ) )
+		General.Grouping = gSettings.value( "Grouping" ).toBool();
 
-	if ( gaKeys.contains( QString( "General/PerFolderViews" ) ) )
-		General.PerFolderViews = gSettings.value( "General/PerFolderViews" ).toBool();
+	if ( gaKeys.contains( QString( "PerFolderViews" ) ) )
+		General.PerFolderViews = gSettings.value( "PerFolderViews" ).toBool();
 
-	if ( gaKeys.contains( QString( "General/FilterFolders" ) ) )
-		General.FilterFolders = gSettings.value( "General/FilterFolders" ).toBool();
+	if ( gaKeys.contains( QString( "FilterFolders" ) ) )
+		General.FilterFolders = gSettings.value( "FilterFolders" ).toBool();
 
-	if ( gaKeys.contains( QString( "General/SuperStart" ) ) )
-		General.SuperStart = gSettings.value( "General/SuperStart" ).toBool();
+	if ( gaKeys.contains( QString( "SuperStart" ) ) )
+		General.SuperStart = gSettings.value( "SuperStart" ).toBool();
 
 	if ( saKeys.contains( QString( "AboutNB" ) ) )
 		Shortcuts.AboutNB = getShortcuts( "AboutNB" );

@@ -30,6 +30,8 @@ class NewBreeze : public QMainWindow {
 	public :
 		NewBreeze( QString loc = QString() );
 
+		bool isClosed();
+
 	private :
 		/* Create our UI */
 		void createGUI();
@@ -55,6 +57,7 @@ class NewBreeze : public QMainWindow {
 		NBFilterWidget *FilterWidget;
 
 		bool mTerminate;
+		bool mClosed;
 
 	public Q_SLOTS:
 		void show();
@@ -86,8 +89,6 @@ class NewBreeze : public QMainWindow {
 
 		void filterFiles( QString );
 		void clearFilters();
-
-		void initiateIO( QStringList, QString, NBIOMode::Mode );
 
 		void addBookMark();
 

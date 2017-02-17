@@ -8,14 +8,14 @@
 
 #include "Global.hpp"
 #include "NBGuiWidgets.hpp"
+#include "NBIconManager.hpp"
 
 class NBCrumb : public QWidget {
 	Q_OBJECT
 
 	public:
-		/* A button */
 		/* @p1 Full Path until the current crumb */
-		NBCrumb( QString, bool currentPath, QWidget *parent );
+		NBCrumb( QString, bool currentPath );
 
 		/* Size hint */
 		QSize sizeHint() const;
@@ -25,9 +25,7 @@ class NBCrumb : public QWidget {
 	public slots:
 		void showMenu();
 
-	private:
-		void initPrivateVariables();
-
+	protected:
 		/* Path */
 		QString mPath;
 		QString mCrumbText;
@@ -38,9 +36,6 @@ class NBCrumb : public QWidget {
 
 		/* Button Size */
 		int mWidth;
-
-		/* Menu */
-		QMenu *mMenu;
 
 		/* The crumb was pressed */
 		bool m_Pressed;

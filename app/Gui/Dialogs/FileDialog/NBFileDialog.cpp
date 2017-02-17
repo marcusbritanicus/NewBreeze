@@ -6,131 +6,153 @@
 
 #include "NBFileDialog.hpp"
 
-NBFileDialog::NBFileDialog( QString wIcon, QString wTitle, QString fLocation, FileType dType, QWidget *parent ) : NBDialog( parent ) {
+NBFileDialog::NBFileDialog( QWidget *parent, QString wTitle, QString fLocation, DialogType dType ) : NBDialog( parent ) {
 
-	icon = wIcon;
-	title = wTitle;
+	setWindowTitle( wTitle );
+
 	location = fLocation;
 	type = dType;
-
-	fsModel = new NBItemViewModel();
-	fsModel->setShowHidden( Settings->General.ShowHidden );
-	fsModel->setCategorizationEnabled( Settings->General.Grouping );
-	fsModel->setFilterFolders( false );
 
 	createGUI();
 	createAndSetupActions();
 	setWindowProperties();
-
-	mainView->setFocus();
-	fsModel->setRootPath( fLocation );
 };
 
 void NBFileDialog::createGUI() {
 
-	QVBoxLayout *lyt = new QVBoxLayout();
-	QVBoxLayout *viewLyt = new QVBoxLayout();
-	QHBoxLayout *bodyLyt = new QHBoxLayout();
-	QHBoxLayout *inputLyt = new QHBoxLayout();
-	QHBoxLayout *filterLyt = new QHBoxLayout();
-	QHBoxLayout *btnLyt = new QHBoxLayout();
+	sidePanel = new NBSideBar( this );
 
-	addressWidget = new NBAddressWidget();
-	sidePanel = new NBSidePanel( this );
+	NBSegmentButton *dlgBtns = new NBSegmentButton( this );
+	dlgBtns->setCount( 2 );
 
-	mainView = new NBIconViewRestricted( fsModel );
-	switch( type ) {
-		case ExistingFile :
-		case SaveFile :
-		case ExistingDirectory :
-		case SaveDirectory : {
-			mainView->setSelectionMode( QListView::SingleSelection );
-			break;
-		};
-		case ExistingFiles :
-		case ExistingDirectories : {
-			mainView->setSelectionMode( QListView::ExtendedSelection );
-			break;
-		};
-	};
+	dlgBtns->setSegmentIcon( 0, QIcon::fromTheme( "dialog-ok-apply", QIcon( ":/icons/ok.png" ) ) );
+	dlgBtns->setSegmentText( 0, "&Okay" );
+	dlgBtns->segment( 0 )->setObjectName( "okBtn" );
+	connect( dlgBtns->segment( 0 ), SIGNAL( clicked() ), this, SLOT( accept() ) );
 
-	QLabel *nameLbl = new QLabel( "File&name:" );
-	nameLE = new NBLineEdit( this );
-	nameLE->setDisabled( true );
-	nameLE->hide();
-	nameLbl->setBuddy( nameLE );
-
-	QLabel *filtersLbl = new QLabel( "&Filters:" );
-	filtersCB = new QComboBox();
-
-	filtersLbl->setBuddy( filtersCB );
-
-	QPushButton *okBtn = new QPushButton( QIcon::fromTheme( "dialog-ok" ), "&Open" );
-	okBtn->setObjectName( "okBtn" );
-	okBtn->setFocusPolicy( Qt::NoFocus );
-
-	QPushButton *cancelBtn = new QPushButton( QIcon::fromTheme( "dialog-close" ), "&Cancel" );
-	cancelBtn->setObjectName( "cancelBtn" );
-	cancelBtn->setFocusPolicy( Qt::NoFocus );
-
-	connect( okBtn, SIGNAL( clicked() ), this, SLOT( accept() ) );
-	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( reject() ) );
-
-	viewLyt->addWidget( addressWidget );
-	viewLyt->addWidget( Separator::horizontal() );
-	viewLyt->addWidget( mainView );
-
-	bodyLyt->addWidget( sidePanel );
-	bodyLyt->addWidget( Separator::vertical() );
-	bodyLyt->addLayout( viewLyt );
+	dlgBtns->setSegmentIcon( 1, QIcon( ":/icons/delete.png" ) );
+	dlgBtns->setSegmentText( 1, "&Cancel" );
+	dlgBtns->segment( 0 )->setObjectName( "cancelkBtn" );
+	connect( dlgBtns->segment( 1 ), SIGNAL( clicked() ), this, SLOT( reject() ) );
 
 	switch( type ) {
-		case SaveFile :
-		case SaveDirectory : {
-			inputLyt->addWidget( nameLbl );
-			inputLyt->addWidget( nameLE );
+		case Icon: {
+
 			break;
-		};
-		case ExistingFile :
-		case ExistingDirectory :
-		case ExistingFiles :
-		case ExistingDirectories :
+		}
+
+		case File: {
+
+			addressBar = new NBAddressWidget( this );
+			connect( addressBar->crumbsBar, SIGNAL( openLocation( QString ) ), this, SLOT( open( QString ) ) );
+			connect( addressBar->addressEdit, SIGNAL( returnPressed() ), this, SLOT( openAddressBar() ) );
+
+			fsModel = new NBItemViewModel( this );
+			fsModel->setShowHidden( Settings->General.ShowHidden );
+			fsModel->setCategorizationEnabled( Settings->General.Grouping );
+			fsModel->setFilterFolders( false );
+			connect( fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateToolBar() ) );
+			fsModel->setRootPath( location );
+
+			mainView = new NBIconView( fsModel, this );
+			connect( mainView, SIGNAL( open( QModelIndex ) ), this, SLOT( open( QModelIndex ) ) );
+			connect( mainView, SIGNAL( open( QString ) ), this, SLOT( doOpen( QString ) ) );
+
+			nameLE = new NBLineEdit( this );
+
+			filtersCB = new QComboBox( this );
+			connect( filtersCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( resetFilters() ) );
+
+			NBSegmentButton *naviBtn = new NBSegmentButton( this );
+			naviBtn->setCount( 3 );
+
+			/* Back */
+			naviBtn->setSegmentIcon( 0, QIcon::fromTheme( "arrow-left", QIcon( ":/icons/arrow-left.png" ) ) );
+			connect( naviBtn->segment( 0 ), SIGNAL( clicked() ), fsModel, SLOT( goBack() ) );
+
+			/* Home */
+			naviBtn->setSegmentIcon( 1, QIcon::fromTheme( "go-home", QIcon( ":/icons/home.png" ) ) );
+			connect( naviBtn->segment( 1 ), SIGNAL( clicked() ), fsModel, SLOT( goHome() ) );
+
+			/* Next */
+			naviBtn->setSegmentIcon( 2, QIcon::fromTheme( "arrow-right", QIcon( ":/icons/arrow-right.png" ) ) );
+			connect( naviBtn->segment( 2 ), SIGNAL( clicked() ), fsModel, SLOT( goForward() ) );
+
+			QHBoxLayout *addrLyt = new QHBoxLayout();
+			addrLyt->addWidget( naviBtn );
+			addrLyt->addWidget( addressBar );
+
+			QHBoxLayout *bodyLyt = new QHBoxLayout();
+			bodyLyt->addWidget( sidePanel );
+			bodyLyt->addWidget( mainView );
+
+			QHBoxLayout *nameLyt = new QHBoxLayout();
+			nameLyt->addWidget( new QLabel( "Name:" ) );
+			nameLyt->addWidget( nameLE );
+
+			QHBoxLayout *fltrLyt = new QHBoxLayout();
+			fltrLyt->addWidget( new QLabel( "Filters:" ) );
+			fltrLyt->addWidget( filtersCB );
+
+			QHBoxLayout *btnLyt = new QHBoxLayout();
+			btnLyt->addStretch( 0 );
+			btnLyt->addWidget( dlgBtns );
+
+			QVBoxLayout *baseLyt = new QVBoxLayout();
+			baseLyt->setContentsMargins( QMargins() );
+			baseLyt->setSpacing( 0 );
+			baseLyt->addLayout( addrLyt );
+			baseLyt->addWidget( Separator::horizontal( this ) );
+			baseLyt->addLayout( bodyLyt );
+			baseLyt->addWidget( Separator::horizontal( this ) );
+			baseLyt->addLayout( nameLyt );
+			baseLyt->addLayout( fltrLyt );
+			baseLyt->addLayout( btnLyt );
+
+			setLayout( baseLyt );
+
+			mainView->setFocus();
+
 			break;
-	};
+		}
 
+		case Directory: {
 
-	filterLyt->addWidget( filtersLbl );
-	filterLyt->addWidget( filtersCB );
+			dirView = new NBDirectoryView( this );
+			nameLE = new NBLineEdit( this );
 
-	btnLyt->addStretch( 0 );
-	btnLyt->addWidget( okBtn );
-	btnLyt->addWidget( cancelBtn );
+			QHBoxLayout *bodyLyt = new QHBoxLayout();
+			bodyLyt->addWidget( sidePanel );
+			bodyLyt->addWidget( dirView );
 
-	lyt->addLayout( bodyLyt );
-	lyt->addWidget( Separator::horizontal() );
-	if( ( type == SaveFile ) or ( type == SaveDirectory ) )
-		lyt->addLayout( inputLyt );
-	lyt->addLayout( filterLyt );
-	lyt->addLayout( btnLyt );
+			QHBoxLayout *nameLyt = new QHBoxLayout();
+			nameLyt->addWidget( new QLabel( "Name:" ) );
+			nameLyt->addWidget( nameLE );
 
-	setLayout( lyt );
+			QHBoxLayout *btnsLyt = new QHBoxLayout();
+			btnsLyt->addWidget( dlgBtns );
 
-	// Update the toolbar
-	updateToolBar();
+			QVBoxLayout *baseLyt = new QVBoxLayout();
+			baseLyt->setContentsMargins( QMargins() );
+			baseLyt->setSpacing( 0 );
+			baseLyt->addLayout( bodyLyt );
+			baseLyt->addLayout( nameLyt );
+			baseLyt->addLayout( btnsLyt );
+
+			setLayout( baseLyt );
+
+			dirView->setCurrentBranch( location );
+			dirView->setFocus();
+
+			break;
+		}
+	}
 };
 
 void NBFileDialog::createAndSetupActions() {
 
 	connect( sidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( open( QString ) ) );
 
-	connect( addressWidget->crumbsBar, SIGNAL( openLocation( QString ) ), this, SLOT( open( QString ) ) );
-	connect( addressWidget->addressEdit, SIGNAL( returnPressed() ), this, SLOT( openAddressBar() ) );
-
-	connect( fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateToolBar() ) );
-
-	connect( mainView, SIGNAL( open( QModelIndex ) ), this, SLOT( open( QModelIndex ) ) );
-
-	connect( filtersCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( resetFilters() ) );
 };
 
 void NBFileDialog::setNameFilters( QStringList filters, QString filter ) {
@@ -147,24 +169,15 @@ void NBFileDialog::setNameFilters( QStringList filters, QString filter ) {
 
 QString NBFileDialog::selectedItem() {
 
-	QString ext = selectedFilter();
+	switch( type ) {
+		case File:
+			return fsModel->nodePath( mainView->selectionModel()->selectedRows().at( 0 ).data().toString() );
 
-	if ( nameLE->text().isEmpty() ) {
-		QString item = fsModel->nodePath( mainView->selectionModel()->selectedRows().at( 0 ).data().toString() );
-		if ( not item.endsWith( ext ) )
-			return item += ext;
+		case Directory:
+			return dirView->currentBranch();
 
-		else
-			return item;
-	}
-
-	else {
-		QString item = fsModel->nodePath( nameLE->text() );
-		if ( not item.endsWith( ext ) )
-			return item += ext;
-
-		else
-			return item;
+		case Icon:
+			return QString();
 	}
 };
 
@@ -172,27 +185,24 @@ QStringList NBFileDialog::selectedItems() {
 
 	QString ext = selectedFilter();
 
-	if ( nameLE->text().isEmpty() ) {
-		QStringList selected;
-		foreach( QModelIndex idx, mainView->selectionModel()->selectedRows() ) {
-			QString item = fsModel->nodePath( idx.data().toString() );
-			if ( not item.endsWith( ext ) )
-				selected << item += ext;
+	switch( type ) {
+		case File: {
+			QStringList selected;
+			foreach( QModelIndex idx, mainView->selectionModel()->selectedRows() )
+				selected << fsModel->nodePath( idx.data().toString() );
 
-			else
-				selected << item;
+			return selected;
 		}
 
-		return selected;
-	}
+		case Directory: {
 
-	else {
-		QString item = fsModel->nodePath( nameLE->text() );
-		if ( not item.endsWith( ext ) )
-			return QStringList() << item += ext;
+			return QStringList() << dirView->currentBranch();
+		}
 
-		else
-			return QStringList() << item;
+		case Icon: {
+
+			return QStringList();
+		}
 	}
 };
 
@@ -208,9 +218,6 @@ QString NBFileDialog::selectedFilter() {
 
 void NBFileDialog::setWindowProperties() {
 
-	setDialogTitle( title );
-	setDialogIcon( QIcon::fromTheme( icon, QIcon( icon ) ) );
-
 	setMinimumSize( 800, 600 );
 
 	QDesktopWidget dw;
@@ -221,9 +228,9 @@ void NBFileDialog::setWindowProperties() {
 	resize( 800, 600 );
 };
 
-QString NBFileDialog::getSaveFileName( QString icon, QString title, QString location, QStringList filters, QString selectedFilter ) {
+QString NBFileDialog::getFileName( QWidget *parent, QString title, QString location, QStringList filters, QString selectedFilter ) {
 
-	NBFileDialog *fDlg = new NBFileDialog( icon, title, location, NBFileDialog::SaveFile );
+	NBFileDialog *fDlg = new NBFileDialog( parent, title, location, NBFileDialog::File );
 	fDlg->setNameFilters( filters, selectedFilter );
 
 	fDlg->exec();
@@ -235,11 +242,23 @@ QString NBFileDialog::getSaveFileName( QString icon, QString title, QString loca
 		return QString();
 };
 
-QString NBFileDialog::getExistingFileName( QString icon, QString title, QString location, QStringList filters, QString selectedFilter ) {
+// QString NBFileDialog::getSaveFileName( QWidget *parent, QString title, QString location, QStringList filters, QString selectedFilter ) {
 
-	NBFileDialog *fDlg = new NBFileDialog( icon, title, location, NBFileDialog::ExistingFile );
-	fDlg->setNameFilters( filters, selectedFilter );
+	// NBFileDialog *fDlg = new NBFileDialog( icon, title, location, NBFileDialog::SaveFile, parent );
+	// fDlg->setNameFilters( filters, selectedFilter );
 
+	// fDlg->exec();
+
+	// if ( fDlg->result() )
+		// return fDlg->selectedItem();
+
+	// else
+		// return QString();
+// };
+
+QString NBFileDialog::getDirectoryName( QWidget *parent, QString title, QString location ) {
+
+	NBFileDialog *fDlg = new NBFileDialog( parent, title, location, NBFileDialog::Directory );
 	fDlg->exec();
 
 	if ( fDlg->result() )
@@ -251,17 +270,17 @@ QString NBFileDialog::getExistingFileName( QString icon, QString title, QString 
 
 void NBFileDialog::openAddressBar() {
 
-	if ( !QFileInfo( addressWidget->addressEdit->text() ).exists() ) {
+	if ( !QFileInfo( addressBar->addressEdit->text() ).exists() ) {
 		QString title = QString( "Invalid Location" );
 		QString text = QString( "There is no file or directory named: "		\
 			"<tt><b>%1</b></tt>. Please check the path entered."
-		).arg(  addressWidget->addressEdit->text() );
+		).arg(  addressBar->addressEdit->text() );
 
 		NBMessageDialog::error( this, title, text );
 		return;
 	}
 
-	fsModel->setRootPath( addressWidget->addressEdit->text() );
+	fsModel->setRootPath( addressBar->addressEdit->text() );
 	mainView->setFocus();
 };
 
@@ -292,6 +311,6 @@ void NBFileDialog::updateToolBar() {
 
 	QString url = fsModel->currentDir();
 
-	addressWidget->addressEdit->setText( url );
-	addressWidget->crumbsBar->setCurrentDirectory( url );
+	addressBar->addressEdit->setText( url );
+	addressBar->crumbsBar->setCurrentDirectory( url );
 };

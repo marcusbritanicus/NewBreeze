@@ -6,8 +6,52 @@
 
 #include "Global.hpp"
 #include "NBPluginManager.hpp"
+#include "NBMessageDialog.hpp"
+#include "NBBugReporter.hpp"
+
+void detectCrash() {
+
+	/* We check for an ending good by in the last 12 chars. */
+	// QFile nblogf( logPath );
+	// if ( nblogf.open( QFile::ReadOnly ) ) {
+		// nblogf.seek( nblogf.size() - 12 );
+
+		// QString goodbye = QString::fromLocal8Bit( nblogf.read( 12 ) );
+		// if ( not goodbye.contains( "Good Bye!" ) ) {
+			// int reply = NBMessageDialog::question(
+				// 0,		/* Not a child of anything */
+				// "NewBreeze - Bug Report",
+				// "It seems to me that NewBreeze did not close properly the last time. If you were working on something very important at the time, "
+				// "I'm extremely sorry. I hope no data was lost. Would you like to report this on GitHub?"
+			// );
+
+			// if ( reply == QMessageBox::Yes ) {
+				// NBBugReporter *bugreport = NBBugReporter( this );
+				// bugreport->exec();
+			// }
+
+			// /*
+				// *
+				// * Creating an issue
+				// *
+				// * curl -i -u "user:passphrase" -d '{ "title": "Title", "body": "Body", "label": "Label" }' https://api.github.com/repos/marcusbritanicus/NewBreeze/issues
+				// * https://curl.haxx.se/libcurl/c/http-post.html
+				// *
+			// */
+		// }
+	// }
+	// nblogf.close();
+};
 
 void NBStartup() {
+
+	/*
+		*
+		* Crash Detector?
+		*
+	*/
+	detectCrash();
+
 	/*
 		*
 		* Check if thumbDir exists. Otherwise try to create it.
@@ -137,17 +181,17 @@ void NBStartup() {
 
 	/*
 		*
-		* QFont Substitutions
+		* QFont Substitutions - DejaVu Sans Mono is used for addressbar, if not found use courier, or mono
 		*
 	*/
 
-	QFont::insertSubstitutions( "Envy Code R", QStringList() << "DejaVu Sans Mono" << "mono" << "Courier" );
+	QFont::insertSubstitutions( "DejaVu Sans Mono", QStringList() << "Courier" << "Courier New" << "Courier 10 Pitch" << "mono" );
 
 	/*
 		*
-		* init the plugins
+		* Init the plugins - only if we are not the root user
 		*
 	*/
-
-	QTimer::singleShot( 0, NBPluginManager::instance(), SLOT( reloadPlugins() ) );
+	if ( getuid() )
+		QTimer::singleShot( 0, NBPluginManager::instance(), SLOT( reloadPlugins() ) );
 };

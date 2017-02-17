@@ -39,6 +39,8 @@ class TextEditor : public QMainWindow {
 		QString filename;
 		Editor *ed;
 
+		bool preview;
+
 		QToolButton *saveBtn;
 		QToolButton *printBtn;
 		QToolButton *propsBtn;
@@ -48,7 +50,13 @@ class TextEditor : public QMainWindow {
 		QToolButton *selectBtn;
 		QToolButton *undoBtn;
 		QToolButton *redoBtn;
+		QToolButton *editBtn;
+		QToolButton *openBtn;
 		QWidget *toolBar;
+
+	public slots:
+		void setPreviewMode();
+		void switchToEditMode();
 
 	private slots :
 		// File Menu Actions
@@ -67,9 +75,12 @@ class TextEditor : public QMainWindow {
 
 		void handleAutoSaved();
 
-		void toggleNormal();
+		void openInExternal();
 
 	protected :
+		void keyPressEvent( QKeyEvent * );
+
 		void resizeEvent( QResizeEvent * );
+		void paintEvent( QPaintEvent * );
 		void closeEvent( QCloseEvent * );
 };

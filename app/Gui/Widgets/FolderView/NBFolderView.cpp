@@ -5,7 +5,7 @@
 */
 
 #include "NBFolderView.hpp"
-#include "NBPluginManager.hpp"
+#include "NBFileDialog.hpp"
 
 NBFolderView::NBFolderView( QWidget *parent ) : QStackedWidget( parent ) {
 
@@ -17,7 +17,7 @@ NBFolderView::NBFolderView( QWidget *parent ) : QStackedWidget( parent ) {
 	fsModel->setCategorizationEnabled( Settings->General.Grouping );
 
 	// Setup the views
-	IconView = new NBIconView( fsModel );
+	IconView = new NBIconView( fsModel, this );
 
 	// Process Manager
 	pMgr = NBProcessManager::instance();
@@ -59,8 +59,6 @@ void NBFolderView::createAndSetupActions() {
 		this, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) )
 	);
 
-	connect( IconView->selectionModel(), SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ), this, SLOT( updatePeekAct() ) );
-
 	connect( IconView, SIGNAL( link( QStringList, QString ) ), this, SLOT( link( QStringList, QString ) ) );
 
 	// DragDrop copy
@@ -69,32 +67,46 @@ void NBFolderView::createAndSetupActions() {
 	// DragDrop move
 	connect( IconView, SIGNAL( move( QStringList, QString ) ), this, SLOT( move( QStringList, QString ) ) );
 
-	// Home
+	// Peek
+	peekAct = new QAction( QIcon( ":/icons/peek.png" ), "Pee&k", this );
+	peekAct->setShortcuts( Settings->Shortcuts.Peek );
+
+	connect( peekAct, SIGNAL( triggered() ), this, SLOT( doPeek() ) );
+	addAction( peekAct );
+
+	// Home Dir
 	actHomeDir = new QAction( QIcon( ":/icons/home.png" ), "&Home", this );
 	actHomeDir->setShortcuts( Settings->Shortcuts.GoHome );
 
-	connect( actHomeDir, SIGNAL( triggered() ), this, SLOT( doOpenHome() ) );
+	connect( actHomeDir, SIGNAL( triggered() ), this, SLOT( loadHomeDir() ) );
 	addAction( actHomeDir );
+
+	// Home
+	actGoHome = new QAction( QIcon( ":/icons/home.png" ), "&Home", this );
+	actGoHome->setShortcut( tr( "Alt+Shift+Home" ) );
+
+	connect( actGoHome, SIGNAL( triggered() ), this, SLOT( doOpenHome() ) );
+	addAction( actGoHome );
 
 	// Up
 	actParDir = new QAction( QIcon( ":/icons/up.png" ), "&Up", this );
 	actParDir->setShortcuts( Settings->Shortcuts.GoUp );
 
-	connect( actParDir, SIGNAL( triggered() ), this, SLOT( goUp() ) );
+	connect( actParDir, SIGNAL( triggered() ), fsModel, SLOT( goUp() ) );
 	addAction( actParDir );
 
 	// Back
 	actPrevDir = new QAction( QIcon( ":/icons/prev.png" ), "&Back", this );
 	actPrevDir->setShortcuts( Settings->Shortcuts.GoLeft );
 
-	connect( actPrevDir, SIGNAL( triggered() ), this, SLOT( goBack() ) );
+	connect( actPrevDir, SIGNAL( triggered() ), fsModel, SLOT( goBack() ) );
 	addAction( actPrevDir );
 
 	// Forward
 	actNextDir = new QAction( QIcon( ":/icons/next.png" ), "&Forward", this );
 	actNextDir->setShortcuts( Settings->Shortcuts.GoRight );
 
-	connect( actNextDir, SIGNAL( triggered() ), this, SLOT( goForward() ) );
+	connect( actNextDir, SIGNAL( triggered() ), fsModel, SLOT( goForward() ) );
 	addAction( actNextDir );
 
 	// New Folder
@@ -271,13 +283,23 @@ void NBFolderView::goForward() {
 
 void NBFolderView::doOpenHome() {
 
-	if ( Settings->General.SuperStart )
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening SuperStart" );
+	// if ( Settings->General.SpecialOpen and Settings->General.SuperStart )
+		// NBDebugMsg( DbgMsgPart::ONESHOT, "Opening SuperStart" );
 
-	else
+	/*else*/ if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog )
+		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening Catalogs" );
+
+	// else
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", NBXdg::home().toLocal8Bit().data() );
 
 	fsModel->goHome();
+};
+
+void NBFolderView::loadHomeDir() {
+
+	setCursor( QCursor( Qt::WaitCursor ) );
+	fsModel->setRootPath( NBXdg::home() );
+	setCursor( QCursor( Qt::ArrowCursor ) );
 };
 
 void NBFolderView::newFile() {
@@ -295,7 +317,9 @@ void NBFolderView::newFolder() {
 void NBFolderView::doOpen( QString loc ) {
 
 	if ( loc.startsWith( "NB://" ) ) {
+		setCursor( QCursor( Qt::WaitCursor ) );
 		fsModel->setRootPath( loc );
+		setCursor( QCursor( Qt::ArrowCursor ) );
 		return;
 	}
 
@@ -315,14 +339,19 @@ void NBFolderView::doOpen( QString loc ) {
 
 		NBMessageDialog::error( this, title, text );
 
+		setCursor( QCursor( Qt::WaitCursor ) );
 		fsModel->setRootPath( NBXdg::home() );
+		setCursor( QCursor( Qt::ArrowCursor ) );
 
 		return;
 	}
 
 	if ( isDir( loc ) ) {
 		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", loc.toLocal8Bit().data() );
+
+		setCursor( QCursor( Qt::WaitCursor ) );
 		fsModel->setRootPath( loc );
+		setCursor( QCursor( Qt::ArrowCursor ) );
 	}
 
 	else if ( isFile( loc ) ) {
@@ -404,11 +433,16 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 
 		if ( isDir( fileToBeOpened ) ) {
 			NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", fileToBeOpened.toLocal8Bit().data() );
-			if ( index == idx )
+			if ( index == idx ) {
+				setCursor( QCursor( Qt::WaitCursor ) );
 				fsModel->setRootPath( fileToBeOpened );
+				setCursor( QCursor( Qt::ArrowCursor ) );
+			}
 
-			else
+			else {
+
 				emit newTab( fileToBeOpened );
+			}
 		}
 
 		else if ( isFile( fileToBeOpened ) ) {
@@ -529,7 +563,9 @@ void NBFolderView::doOpenWithCmd() {
 void NBFolderView::showFolders() {
 
 	qDebug() << "NBFolderView::showFolders()";
+	setCursor( QCursor( Qt::WaitCursor ) );
 	fsModel->setRootPath( "NB://Folders" );
+	setCursor( QCursor( Qt::ArrowCursor ) );
 
 	emit showStatusBar();
 };
@@ -578,18 +614,23 @@ void NBFolderView::doPeek() {
 
 	/* Other mimetypes, we depend on the PluginManager */
 	/* If the PluginManager returns a valid path, we use it */
-	else if ( NBPluginManager::instance()->hasPluginForMimeType( mimeType ) ) {
+	else {
 
-		QPluginLoader loader( NBPluginManager::instance()->pluginForMimeType( mimeType ) );
-		QObject *pObj = loader.instance();
-		NBPreviewInterface *plugin = 0;
+		NBPluginManager *plMgr = NBPluginManager::instance();
 
-		if ( pObj ) {
-			plugin = qobject_cast<NBPreviewInterface*>( pObj );
+		QString node = fsModel->nodePath( curIndex );
+		PluginList pList;
 
-			QDialog *previewer = plugin->getPreviewWidget( currentNode );
-			previewer->setWindowFlags( previewer->windowFlags() | Qt::FramelessWindowHint );
-			previewer->exec();
+		QString mType = getMimeType( node );
+		pList << plMgr->plugins( NBPluginInterface::PreviewInterface, NBPluginInterface::Enhancement, NBPluginInterface::File, mimeType );
+
+		if ( pList.count() ) {
+			NBPluginInterface *iface = pList.at( 0 );
+			// qDebug() << "Load plugin... [DONE]";
+			QAction *act = iface->actions( NBPluginInterface::PreviewInterface, QStringList() << node ).at( 0 );
+			// qDebug() << "Get action... [DONE]";
+			iface->actionTrigger( NBPluginInterface::PreviewInterface, act->text(), QStringList() << node );
+			// qDebug() << "Showing... [DONE]";
 
 			return;
 		}
@@ -624,44 +665,6 @@ void NBFolderView::doToggleHidden() {
 	Settings->General.ShowHidden = fsModel->showHidden();
 };
 
-void NBFolderView::updatePeekAct() {
-
-	if ( actions().contains( peekAct ) ) {
-		removeAction( peekAct );
-		delete peekAct;
-	}
-
-	NBPluginManager *pMgr = NBPluginManager::instance();
-	QModelIndexList selection = getSelection();
-
-	if ( selection.count() == 1 ) {
-
-		QString node = fsModel->nodePath( selection.at( 0 ) );
-		PluginList pList;
-
-		if ( isFile( node ) ) {
-			QString mType = getMimeType( node );
-			pList << pMgr->plugins( NBPluginInterface::PreviewInterface, NBPluginInterface::Enhancement, NBPluginInterface::File, mType );
-
-			if ( pList.count() ) {
-				NBPluginInterface *iface = pList.at( 0 );
-				peekAct =  iface->actions( QStringList() << node ).at( 0 );
-				peekAct->setShortcuts( Settings->Shortcuts.Peek );
-				addAction( peekAct );
-
-				return;
-			}
-		}
-	}
-
-	// Peek
-	peekAct = new QAction( QIcon( ":/icons/peek.png" ), "Pee&k", this );
-	peekAct->setShortcuts( Settings->Shortcuts.Peek );
-
-	connect( peekAct, SIGNAL( triggered() ), this, SLOT( doPeek() ) );
-	addAction( peekAct );
-};
-
 void NBFolderView::prepareCopy() {
 
 	if ( not IconView->selection().count() )
@@ -670,14 +673,33 @@ void NBFolderView::prepareCopy() {
 	moveItems = false;
 	QModelIndexList copyList = getSelection();
 
+	QStringList srcList;
 	QList<QUrl> urlList;
-	foreach( QModelIndex item, copyList )
-		urlList << QUrl::fromLocalFile( fsModel->nodePath( item.data().toString() ) );
+	foreach( QModelIndex item, copyList ) {
+		srcList << item.data().toString();
+		urlList << QUrl::fromLocalFile( fsModel->nodePath( srcList.last() ) );
+	}
 
 	QMimeData *mData = new QMimeData();
 	mData->setUrls( urlList );
 
 	clipBoard->setMimeData( mData );
+
+	NBProcess::Progress *progress = new NBProcess::Progress;
+	progress->sourceDir = fsModel->currentDir();
+	progress->targetDir = NBFileDialog::getDirectoryName( this, "NewBreeze - Choose target directory", fsModel->currentDir() );
+
+	if ( not progress->targetDir.count() )
+		return;
+
+	progress->type = NBProcess::Copy;
+
+	NBIOProcess *proc = new NBIOProcess( srcList, progress );
+	pMgr->addProcess( progress, proc );
+
+	progress->startTime = QTime::currentTime();
+
+	proc->start();
 };
 
 void NBFolderView::prepareMove() {
@@ -688,14 +710,33 @@ void NBFolderView::prepareMove() {
 	moveItems = true;
 	QModelIndexList copyList = getSelection();
 
+	QStringList srcList;
 	QList<QUrl> urlList;
-	foreach( QModelIndex item, copyList )
-		urlList << QUrl::fromLocalFile( fsModel->nodePath( item.data().toString() ) );
+	foreach( QModelIndex item, copyList ) {
+		srcList << item.data().toString();
+		urlList << QUrl::fromLocalFile( fsModel->nodePath( srcList.last() ) );
+	}
 
 	QMimeData *mData = new QMimeData();
 	mData->setUrls( urlList );
 
 	clipBoard->setMimeData( mData );
+
+	NBProcess::Progress *progress = new NBProcess::Progress;
+	progress->sourceDir = fsModel->currentDir();
+	progress->targetDir = NBFileDialog::getDirectoryName( this,"NewBreeze - Choose target directory", fsModel->currentDir() );
+
+	if ( not progress->targetDir.count() )
+		return;
+
+	progress->type = NBProcess::Move;
+
+	NBIOProcess *proc = new NBIOProcess( srcList, progress );
+	pMgr->addProcess( progress, proc );
+
+	progress->startTime = QTime::currentTime();
+
+	proc->start();
 };
 
 void NBFolderView::copy( QStringList sources, QString tgt ) {
@@ -790,6 +831,19 @@ void NBFolderView::doSendToTrash() {
 		return;
 	}
 
+	QString srcDir = fsModel->currentDir();
+
+	/* If we are deleting system files, wake up the user */
+	if ( ( not srcDir.startsWith( NBXdg::home() ) ) and ( not srcDir.startsWith( "/media" ) ) and not srcDir.startsWith( "/tmp" ) ) {
+		NBMessageDialog::critical( this,
+			"NewBreeze - Trashing system files",
+			"You are attempting to send system files to trash. This operation is potentially dangerous and hence, has been disabled. "
+			"If you wish to trash system files, you'll have to open a terminal and perform the operation."
+		);
+
+		return;
+	}
+
 	QList<QModelIndex> selectedList = getSelection();
 
 	/* Check if we have protection set */
@@ -797,7 +851,7 @@ void NBFolderView::doSendToTrash() {
 	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
 
 	NBProcess::Progress *progress = new NBProcess::Progress;
-	progress->sourceDir = fsModel->currentDir();
+	progress->sourceDir = srcDir;
 	progress->targetDir = QString();
 	progress->type = NBProcess::Trash;
 
@@ -832,6 +886,19 @@ void NBFolderView::doDelete() {
 		return;
 	}
 
+	QString srcDir = fsModel->currentDir();
+
+	/* If we are deleting system files, wake up the user */
+	if ( ( not srcDir.startsWith( NBXdg::home() ) ) and ( not srcDir.startsWith( "/media" ) ) and not srcDir.startsWith( "/tmp" ) ) {
+		NBMessageDialog::critical( this,
+			"NewBreeze - Deleting system files",
+			"You are attempting to delete send system files. This operation is potentially dangerous and hence, has been disabled. "
+			"If you wish to delete system files, you'll have to open a terminal and perform the operation."
+		);
+
+		return;
+	}
+
 	QList<QModelIndex> selectedList = getSelection();
 
 	/* Check if we have protection set */
@@ -839,7 +906,7 @@ void NBFolderView::doDelete() {
 	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
 
 	NBProcess::Progress *progress = new NBProcess::Progress;
-	progress->sourceDir = fsModel->currentDir();
+	progress->sourceDir = srcDir;
 	progress->targetDir = QString();
 	progress->type = NBProcess::Delete;
 
@@ -1024,20 +1091,33 @@ void NBFolderView::extract( QString archive ) {
 	QtConcurrent::run( arc, &NBArchive::extract );
 };
 
-void NBFolderView::updateProgress( QString nodePath, float fileCopied, float totalCopied ) {
+void NBFolderView::updateActions() {
 
-	Q_UNUSED( fileCopied );
-	Q_UNUSED( totalCopied );
+	// QAction *peekAct, *moveAct, *copyAct, *pasteAct, *renameAct, *reloadAct, *trashAct, *delAct, *propertiesAct, *permissionsAct;
+	// QAction *actPrevDir, *actNextDir, *actParDir, *actHomeDir, *actGoHome, *showHideDotFiles, *openVTE;
+	// QAction *actNewDir, *actNewFile;
+	// QAction *sortByNameAct, *sortByTypeAct, *sortBySizeAct, *sortByDateAct;
+	// QAction *groupsAct;
 
-	if ( dirName( nodePath ) == fsModel->currentDir() ) {
-		fsModel->updateNode( baseName( nodePath ) );
+	if ( not isWritable( fsModel->currentDir() ) ) {
+
+		moveAct->setDisabled( true );
+		pasteAct->setDisabled( true );
+		renameAct->setDisabled( true );
+		trashAct->setDisabled( true );
+		delAct->setDisabled( true );
+		actNewDir->setDisabled( true );
+		actNewFile->setDisabled( true );
 	}
-};
 
-void NBFolderView::handleDeleteFailure( QStringList files, QStringList dirs ) {
+	else {
 
-	if ( ( files.count() ) or ( dirs.count() ) ) {
-		NBDeleteErrorsDialog *delErrDlg = new NBDeleteErrorsDialog( files, dirs, this );
-		delErrDlg->exec();
+		moveAct->setEnabled( true );
+		pasteAct->setEnabled( true );
+		renameAct->setEnabled( true );
+		trashAct->setEnabled( true );
+		delAct->setEnabled( true );
+		actNewDir->setEnabled( true );
+		actNewFile->setEnabled( true );
 	}
 };

@@ -14,9 +14,6 @@ class NBItemViewNode {
 		NBItemViewNode();
 		NBItemViewNode( QVariantList, QString, NBItemViewNode *parent = 0 );
 
-		bool combi() const;
-		void setCombi( bool );
-
 		int childCount();
 		int categoryCount();
 
@@ -57,8 +54,6 @@ class NBItemViewNode {
 		QStringList mCategoryList;
 		QString myCategory;
 		QIcon mIcon;
-
-		bool m_Combi;
 };
 
 bool columnSort2( NBItemViewNode *first, NBItemViewNode *second );

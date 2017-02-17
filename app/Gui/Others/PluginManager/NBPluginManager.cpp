@@ -27,10 +27,17 @@ NBPluginManager* NBPluginManager::instance() {
 
 bool NBPluginManager::hasPluginForMimeType( QString mimeName ) {
 
-	return mimePluginMap.value( mimeName ).count() ? true : false;
+	if ( getuid() )
+		return mimePluginMap.value( mimeName ).count() ? true : false;
+
+	else
+		return false;
 };
 
 QString NBPluginManager::pluginForMimeType( QString mimeName ) {
+
+	if ( not getuid() )
+		return QString();
 
 	QStringList plugins = mimePluginMap.value( mimeName );
 
@@ -48,20 +55,24 @@ QString NBPluginManager::pluginForMimeType( QString mimeName ) {
 
 PluginList NBPluginManager::plugins( NBPluginInterface::Interface iface, NBPluginInterface::Type type, NBPluginInterface::Context ctxt, QString mime ) {
 
-	PluginList plugins;
-	Q_FOREACH( PluginCapability *pCap, mPluginCapabilityList ) {
-		bool truth = true;
-		truth &= ( pCap->interface == iface );
-		truth &= ( pCap->type == type );
-		truth &= (bool)pCap->contexts.contains( ctxt );
-		if ( mime.count() )
-			truth &= (bool)pCap->mimeTypes.contains( mime );
+	PluginList plugList;
+	if ( not getuid() )
+		return plugList;
 
-		if ( truth )
-			plugins << pCap->plugin;
+	Q_UNUSED( type );
+
+	NBContextPluginHash cph = mPluginsHash.value( iface );
+	Q_FOREACH( NBPluginInterface *plugin, cph.value( ctxt ) ) {
+		if ( plugin->mimetypes().contains( mime ) or plugin->mimetypes().contains( "*" ) )
+			plugList << plugin;
 	}
 
-	return plugins;
+	return plugList;
+};
+
+PluginList NBPluginManager::allPlugins() {
+
+	return mPluginList;
 };
 
 NBPluginManager::NBPluginManager() {
@@ -70,6 +81,9 @@ NBPluginManager::NBPluginManager() {
 };
 
 void NBPluginManager::reloadPlugins() {
+
+	if ( not getuid() )
+		return;
 
 	reloadPeekPlugins();
 	reloadOtherPlugins();
@@ -80,9 +94,9 @@ void NBPluginManager::reloadPeekPlugins() {
 	/* For now we will be reading just the plugins folder of the home directory */
 	QStringList pluginPaths;
 	#if QT_VERSION >= 0x050000
-		pluginPaths << "/usr/share/newbreeze/plugins5/" << NBXdg::home() + "/.config/NewBreeze/plugins5/";
+		pluginPaths << "/usr/lib/newbreeze/plugins5/" << NBXdg::home() + "/.config/NewBreeze/plugins5/";
 	#else
-		pluginPaths << "/usr/share/newbreeze/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
+		pluginPaths << "/usr/lib/newbreeze/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
 	#endif
 
 	/* Our MimeDatabase object */
@@ -128,49 +142,37 @@ void NBPluginManager::reloadPeekPlugins() {
 
 void NBPluginManager::reloadOtherPlugins() {
 
-	/* For now we will be reading just the plugins folder of the home directory */
 	QStringList pluginPaths;
 	#if QT_VERSION >= 0x050000
-		pluginPaths << "/usr/share/newbreeze/plugins5/" << NBXdg::home() + "/.config/NewBreeze/plugins5/";
+		pluginPaths << "/usr/lib/newbreeze/plugins5/" << NBXdg::home() + "/.config/NewBreeze/plugins5/";
 	#else
-		pluginPaths << "/usr/share/newbreeze/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
+		pluginPaths << "/usr/lib/newbreeze/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
 	#endif
 
-	QStringList pluginNames;
+	mPluginsHash.clear();
 	Q_FOREACH( QString path, pluginPaths ) {
 		QDir pPathDir( path );
 		Q_FOREACH( QString pluginSo, pPathDir.entryList( QStringList() << "*.so", QDir::Files, QDir::Name ) ) {
 			QPluginLoader loader( pPathDir.absoluteFilePath( pluginSo ) );
-			QObject *plugin = loader.instance();
-			if ( plugin ) {
-				NBPluginInterface *interface = qobject_cast<NBPluginInterface*>( plugin );
-				if ( not interface )
+			QObject *pObject = loader.instance();
+			if ( pObject ) {
+				NBPluginInterface *plugin = qobject_cast<NBPluginInterface*>( pObject );
+				if ( not plugin )
 					continue;
 
-				if ( pluginNames.contains( pluginSo ) ) {
-					PluginCapability *oldPCap = mPluginCapabilityList.at( pluginNames.indexOf( pluginSo ) );
-					/* If there is an newer version already registered, we skip this one */
-					if ( oldPCap->version > interface->version() ) {
-						continue;
+				mPluginList << plugin;
+				Q_FOREACH( NBPluginInterface::Interface iface, plugin->interfaces() ) {
+					NBContextPluginHash cph = mPluginsHash.value( iface );
+					Q_FOREACH( NBPluginInterface::Context ctxt, plugin->contexts( iface ) ) {
+						PluginList pl = cph.value( ctxt );
+						if ( not pl.contains( plugin ) )
+							pl << plugin;
+
+						cph[ ctxt ] = pl;
 					}
 
-					/* We remove the existing instance and insert a new one */
-					else {
-						mPluginCapabilityList.removeAt( pluginNames.indexOf( pluginSo ) );
-						pluginNames.removeAll( pluginSo );
-					}
+					mPluginsHash[ iface ] = cph;
 				}
-
-				pluginNames << pluginSo;
-				PluginCapability *pcap = new PluginCapability;
-				pcap->name = pPathDir.absoluteFilePath( pluginSo );
-				pcap->interface = interface->interface();
-				pcap->type = interface->type();
-				pcap->contexts = interface->contexts();
-				pcap->mimeTypes = interface->mimetypes();
-				pcap->plugin = interface;
-
-				mPluginCapabilityList << pcap;
 			}
 		}
 	}

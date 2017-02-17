@@ -8,23 +8,45 @@
 
 NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 
+	/* If we have root privileges */
+	if ( not getuid() ) {
+		NBMessageDialog::critical(
+			this,
+			"NewBreeze - Attention!!",
+			"You are running NewBreeze as superuser privileges. This is generally a bad idea and it is advised to perform actions as root, on a teminal or a tty. "
+			"To minimize the potential damage that can be caused, NewBreeze will be started in safe mode with all the plugins disabled."
+		);
+	}
+
 	/* No terminate signal until close */
 	mTerminate = false;
+
+	/* Closed flag */
+	mClosed = false;
 
 	/* Create the UI */
 	createGUI();
 
 	/* Open with SuperStart */
-	if ( Settings->General.SuperStart and loc.isEmpty() )
-		FolderView->doOpen( "NB://SuperStart" );
+	// if ( Settings->General.SpecialOpen and Settings->General.SuperStart and loc.isEmpty() )
+		// FolderView->doOpen( "NB://SuperStart" );
 
 	/* Open with Catalogs */
-	else if ( Settings->General.OpenWithCatalog and loc.isEmpty() )
+	/*else*/ if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog and loc.isEmpty() )
 		FolderView->doOpen( "NB://Catalogs" );
 
 	/* Load the a folder */
 	else if ( not loc.isEmpty() ) {
-		if ( isFile( loc ) ) {
+		// if ( loc.startsWith( "NB://SuperStart" ) )
+			// FolderView->doOpen( "NB://SuperStart" );
+
+		// else if ( loc.startsWith( "NB://Applications" ) )
+			// FolderView->doOpen( "NB://Applications" );
+
+		// else if ( loc.startsWith( "NB://Catalogs" ) )
+			// FolderView->doOpen( "NB://Catalogs" );
+
+		/*else*/ if ( isFile( loc ) ) {
 
 			/* This is a file, just open the file */
 			openFile( loc );
@@ -76,6 +98,11 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	createAndSetupActions();
 };
 
+bool NewBreeze::isClosed() {
+
+	return mClosed;
+};
+
 void NewBreeze::createGUI() {
 
 	QWidget *BaseWidget = new QWidget( this );
@@ -92,16 +119,13 @@ void NewBreeze::createGUI() {
 	Spacer->setFixedHeight( 3 );
 	Spacer->setStyleSheet( "border-bottom: 1px solid darkgray;" );
 
-
 	QHBoxLayout *ViewLayout = new QHBoxLayout();
 	ViewLayout->setContentsMargins( QMargins() );
 	ViewLayout->setSpacing( 0 );
 
-	if ( Settings->General.SidePanelType == 0 )
-		ViewLayout->addWidget( SidePanel );
-
-	else
-		ViewLayout->addWidget( SideBar );
+	/* One of the SidePanel's will be hidden automatically */
+	ViewLayout->addWidget( SidePanel );
+	ViewLayout->addWidget( SideBar );
 
 	ViewLayout->addWidget( FolderView );
 
@@ -170,13 +194,14 @@ void NewBreeze::createAndSetupActions() {
 	connect( AddressBar, SIGNAL( openLocation( QString ) ), FolderView, SLOT( doOpen( QString ) ) );
 	connect( AddressBar, SIGNAL( openSearch() ), FilterWidget, SLOT( show() ) );
 
+	connect( AddressBar, SIGNAL( goBack() ), FolderView, SLOT( goBack() ) );
+	connect( AddressBar, SIGNAL( goHome() ), FolderView, SLOT( doOpenHome() ) );
+	connect( AddressBar, SIGNAL( goForward() ), FolderView, SLOT( goForward() ) );
+
 	connect( FilterWidget, SIGNAL( search( QString ) ), this, SLOT( filterFiles( QString ) ) );
 	connect( FilterWidget, SIGNAL( shown() ), AddressBar, SLOT( hideSearchButton() ) );
 	connect( FilterWidget, SIGNAL( hidden() ), AddressBar, SLOT( showSearchButton() ) );
 	connect( FilterWidget, SIGNAL( hidden() ), this, SLOT( clearFilters() ) );
-
-	connect( AddressBar, SIGNAL( goBack() ), FolderView, SLOT( goBack() ) );
-	connect( AddressBar, SIGNAL( goForward() ), FolderView, SLOT( goForward() ) );
 
 	connect( FolderView, SIGNAL( showProperties() ), this, SLOT( showProperties() ) );
 	connect( FolderView, SIGNAL( showPermissions() ), this, SLOT( showPermissions() ) );
@@ -190,6 +215,7 @@ void NewBreeze::createAndSetupActions() {
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateInfoBar() ) );
+	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), FolderView, SLOT( updateActions() ) );
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), SideBar, SLOT( highlight( QString ) ) );
 
@@ -449,12 +475,21 @@ void NewBreeze::showInfoDlg() {
 
 void NewBreeze::showSettingsDialog() {
 
-	hide();
-
 	NBSettingsManager *settingsMgr = new NBSettingsManager( this );
 	settingsMgr->exec();
 
-	show();
+	/* Hack */
+	if ( Settings->General.SidePanelType == 0 ) {
+		SideBar->hide();			// Classic SideBar
+		SidePanel->show();			// Modern SideBar
+	}
+
+	else {
+		SideBar->show();			// Classic SideBar
+		SidePanel->hide();			// Modern SideBar
+	}
+
+	qApp->processEvents();
 };
 
 void NewBreeze::showCustomActionsDialog() {
@@ -465,8 +500,9 @@ void NewBreeze::showCustomActionsDialog() {
 
 void NewBreeze::newWindow( QString location ) {
 
-	if ( location.isEmpty() and qobject_cast<QAction*>( sender() ) )
+	if ( location.isEmpty() and qobject_cast<QAction*>( sender() ) ) {
 		location = FolderView->fsModel->currentDir();
+	}
 
 	NewBreeze *newbreeze = new NewBreeze( location );
 	if ( Settings->Session.Maximized )
@@ -657,30 +693,6 @@ void NewBreeze::clearFilters() {
 	FolderView->setFocus();
 };
 
-void NewBreeze::initiateIO( QStringList sourceList, QString target, NBIOMode::Mode iomode ) {
-
-	NBProcess::Progress *progress = new NBProcess::Progress;
-	progress->sourceDir = dirName( sourceList.at( 0 ) ) + "/";
-	progress->targetDir = target;
-
-	QStringList srcList;
-	foreach( QString path, sourceList )
-		srcList << path.replace( progress->sourceDir, "" );
-
-	if ( iomode == NBIOMode::Move )
-		progress->type = NBProcess::Move;
-
-	else
-		progress->type = NBProcess::Copy;
-
-	NBIOProcess *proc = new NBIOProcess( srcList, progress );
-	NBProcessManager::instance()->addProcess( progress, proc );
-
-	progress->startTime = QTime::currentTime();
-
-	proc->start();
-};
-
 void NewBreeze::addBookMark() {
 
 	QStringList order = bookmarkSettings.value( "Order" ).toStringList();
@@ -738,7 +750,7 @@ void NewBreeze::openWithList() {
 
 void NewBreeze::changeViewMode( int mode ) {
 
-	QStringList viewModes = QStringList() << "TilesView" << "IconsView" << "DetailsView";
+	QStringList viewModes = QStringList() << "Tiles" << "Icons" << "Details";
 	Settings->General.ViewMode = viewModes.at( mode );
 
 	QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
@@ -749,14 +761,14 @@ void NewBreeze::changeViewMode( int mode ) {
 
 void NewBreeze::switchToNextView() {
 
-	if ( Settings->General.ViewMode == QString( "TilesView" ) )
-		Settings->General.ViewMode = QString( "IconsView" );
+	if ( Settings->General.ViewMode == QString( "Tiles" ) )
+		Settings->General.ViewMode = QString( "Icons" );
 
-	else if ( Settings->General.ViewMode == QString( "IconsView" ) )
-		Settings->General.ViewMode = QString( "DetailsView" );
+	else if ( Settings->General.ViewMode == QString( "Icons" ) )
+		Settings->General.ViewMode = QString( "Details" );
 
 	else
-		Settings->General.ViewMode = QString( "TilesView" );
+		Settings->General.ViewMode = QString( "Tiles" );
 
 	FolderView->updateViewMode();
 
@@ -856,6 +868,7 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 
 	// Now hide this window, other processes may take a while longer to close down
 	QMainWindow::close();
+	mClosed = true;
 
 	cEvent->accept();
 	qDebug( "Good Bye!" );

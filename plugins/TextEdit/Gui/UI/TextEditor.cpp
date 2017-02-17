@@ -13,6 +13,7 @@
 TextEditor::TextEditor( QString fn, QWidget *parent ) : QMainWindow( parent ) {
 
 	filename = QString( fn );
+	preview = false;
 
 	// Setup base gui
 	setupGui();
@@ -27,7 +28,7 @@ void TextEditor::setupGui()  {
 	QMimeType mime = mimeDb.mimeTypeForFile( filename );
 	ed = new Editor( this );
 
-	QLabel *iconLbl = new QLabel();
+	QLabel *iconLbl = new QLabel( this );
 	iconLbl->setStyleSheet( "background-color: darkgray; border-top-left-radius: 2px; border-bottom-left-radius: 2px;" );
 	iconLbl->setFixedSize( QSize( 24, 24 ) );
 	iconLbl->setPixmap( QIcon::fromTheme( mime.iconName() ).pixmap( 16 ) );
@@ -39,6 +40,26 @@ void TextEditor::setupGui()  {
 
 	buildToolBar();
 
+	editBtn = new QToolButton( this );
+	editBtn->setIcon( QIcon::fromTheme( "document-edit" ) );
+	editBtn->setText( "Edit" );
+	editBtn->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+	editBtn->setAutoRaise( false );
+	editBtn->setFixedSize( QSize( 52, 24 ) );
+	editBtn->setFocusPolicy( Qt::NoFocus );
+	editBtn->setStyleSheet( "QToolButton{ background-color: lightgray; border-radius: 2px; }" );
+	connect( editBtn, SIGNAL( clicked() ), this, SLOT( switchToEditMode() ) );
+	editBtn->hide();
+
+	openBtn = new QToolButton( this );
+	openBtn->setIcon( QIcon( ":/icons/maximize.png" ) );
+	openBtn->setAutoRaise( false );
+	openBtn->setFixedSize( QSize( 24, 24 ) );
+	openBtn->setFocusPolicy( Qt::NoFocus );
+	openBtn->setStyleSheet( "QToolButton{ background-color: lightgray; border-radius: 2px; }" );
+	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
+	openBtn->hide();
+
 	QHBoxLayout *ToolLyt = new QHBoxLayout();
 	ToolLyt->setContentsMargins( QMargins( 5, 4, 7, 7 ) );
 	ToolLyt->setSpacing( 0 );
@@ -47,6 +68,9 @@ void TextEditor::setupGui()  {
 	ToolLyt->addWidget( nameLbl );
 	ToolLyt->addStretch( 0 );
 	ToolLyt->addWidget( toolBar );
+	ToolLyt->addWidget( editBtn );
+	ToolLyt->addWidget( Spacer::horizontal( 5, this ) );
+	ToolLyt->addWidget( openBtn );
 
 	BaseLayout = new QVBoxLayout();
 	BaseLayout->setContentsMargins( QMargins( 0, 3, 0, 0 ) );
@@ -221,6 +245,33 @@ void TextEditor::setWindowProperties() {
 	move( hpos, vpos );
 };
 
+void TextEditor::setPreviewMode() {
+
+	preview = true;
+
+	toolBar->hide();
+	openBtn->show();
+	editBtn->show();
+
+	ed->setReadOnly( true );
+
+	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
+}
+
+void TextEditor::switchToEditMode() {
+
+	preview = false;
+
+	toolBar->show();
+	openBtn->hide();
+	editBtn->hide();
+
+	ed->setReadOnly( false );
+	setWindowFlags( Qt::Window );
+
+	showMaximized();
+}
+
 void TextEditor::loadFile() {
 
 	ed->open( filename );
@@ -296,13 +347,21 @@ void TextEditor::handleAutoSaved() {
 	statusBar()->showMessage( "The file was automatically saved.", 1000 );
 };
 
-void TextEditor::toggleNormal() {
+void TextEditor::openInExternal() {
 
-	if ( isMaximized() )
-		showNormal();
+	QProcess::startDetached( "xdg-open " + filename );
+	close();
+};
 
-	else
-		showMaximized();
+void TextEditor::keyPressEvent( QKeyEvent *kEvent ) {
+
+	if ( preview and kEvent->key() == Qt::Key_Escape ) {
+
+		close();
+	}
+
+	QMainWindow::keyPressEvent( kEvent );
+	kEvent->accept();
 };
 
 void TextEditor::resizeEvent( QResizeEvent *rEvent ) {
@@ -317,6 +376,22 @@ void TextEditor::resizeEvent( QResizeEvent *rEvent ) {
 	else {
 		BaseLayout->setContentsMargins( QMargins( 1, 3, 1, 1 ) );
 	}
+};
+
+void TextEditor::paintEvent( QPaintEvent *pEvent ) {
+
+	QMainWindow::paintEvent( pEvent );
+
+	if ( preview ) {
+		QPainter *painter = new QPainter( this );
+
+		painter->setPen( QPen( palette().color( QPalette::Window ).darker(), 2.0 ) );
+		painter->drawRect( rect().adjusted( +1, +1, -1, -1 ) );
+
+		painter->end();
+	}
+
+	pEvent->accept();
 };
 
 void TextEditor::closeEvent( QCloseEvent *cEvent ) {

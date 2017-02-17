@@ -6,7 +6,7 @@
 
 #include "NBIconViewRestricted.hpp"
 
-NBIconViewRestricted::NBIconViewRestricted( NBItemViewModel *fsModel ) : NBIconView( fsModel ) {
+NBIconViewRestricted::NBIconViewRestricted( NBItemViewModel *fsModel, QWidget *parent ) : NBIconView( fsModel, parent ) {
 
 	mdl = fsModel;
 
@@ -28,17 +28,33 @@ void NBIconViewRestricted::mousePressEvent( QMouseEvent *mpEvent ) {
 
 void NBIconViewRestricted::mouseMoveEvent( QMouseEvent *mmEvent ) {
 
-	/* Disable all the mouse move events */
 	mmEvent->accept();
 };
 
 void NBIconViewRestricted::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 
-	/* Disable all the mouse release events */
 	mrEvent->accept();
 };
 
 void NBIconViewRestricted::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
+
+	if ( mEvent->button() == Qt::LeftButton ) {
+		QModelIndex idx = indexAt( mEvent->pos() );
+		if ( idx.isValid() ) {
+			switch( mdl->modelDataType() ) {
+				case NBItemViewModel::SuperStart:
+				case NBItemViewModel::Applications:
+				case NBItemViewModel::Catalogs:
+					break;
+
+				case NBItemViewModel::FileSystem: {
+
+					emit open( idx );
+					break;
+				}
+			}
+		}
+	}
 
 	mEvent->accept();
 };

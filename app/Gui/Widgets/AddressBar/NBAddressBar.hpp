@@ -87,7 +87,7 @@ class NBAddressBar : public QFrame {
 		int checkedAction();
 
 	private:
-		NBButton *backBtn, *forwardBtn;
+		NBButton *backBtn, *forwardBtn, *homeBtn;
 		NBButton *settingsBtn, *filterBtn;
 		NBSegmentButton *viewModes;
 		NBAddressWidget *addressWidget;
@@ -105,5 +105,6 @@ class NBAddressBar : public QFrame {
 		void changeViewMode( int );
 
 		void goBack();
+		void goHome();
 		void goForward();
 };

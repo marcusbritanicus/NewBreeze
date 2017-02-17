@@ -27,19 +27,22 @@ class TextEditorPlugin : public QObject, NBPluginInterface {
 		QString version();
 
 		/* The QAction hooks for menus/toolbars */
-		QList<QAction*> actions( QStringList );
+		QList<QAction*> actions( Interface, QStringList );
 
 		/* Interface type: preview, rename etc */
-		NBPluginInterface::Interface interface();
+		NBPluginInterface::Interfaces interfaces();
 
 		/* Interface type: preview, rename etc */
-		NBPluginInterface::Type type();
+		NBPluginInterface::Type type( Interface );
 
 		/* Plugin load contexts */
-		NBPluginInterface::Contexts contexts();
+		NBPluginInterface::Contexts contexts( Interface );
 
 		/* Mimetypes handled by the plugin */
 		QStringList mimetypes();
+
+		/* Invoke slots called called by triggering the actions */
+		void actionTrigger( Interface, QString, QStringList );
 
 		/* Store the called widget pointer */
 		void setCaller( QWidget* );

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Global.hpp"
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
 #include "NBProcessManager.hpp"
 #include "NBProgressBar.hpp"
 #include "NBErrorsDialog.hpp"

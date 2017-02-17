@@ -8,6 +8,7 @@
 
 #include "Global.hpp"
 #include "NBDialog.hpp"
+#include "NBFileDialog.hpp"
 #include "NBButtons.hpp"
 
 class NBArchiveDialog : public NBDialog {

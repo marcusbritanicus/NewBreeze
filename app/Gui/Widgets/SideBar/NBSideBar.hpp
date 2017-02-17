@@ -11,7 +11,9 @@
 #include "NBSideBarItem.hpp"
 
 #include "NBBookmarkInfo.hpp"
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
+
+#include "NBTrashModel.hpp"
 
 class NBSideBar : public QWidget {
 	Q_OBJECT

@@ -51,5 +51,5 @@ class NBPasswordDialog : public QDialog {
 		void validatePassword();
 
 	Q_SIGNALS:
-		void oldPassword( QString );
+		void oldPasswordValidated( bool );
 };

@@ -8,7 +8,7 @@
 
 #include "Global.hpp"
 #include "NBButton.hpp"
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
 
 class NBIconThemeChooserWidget;
 class NBIconThemeViewerWidget;

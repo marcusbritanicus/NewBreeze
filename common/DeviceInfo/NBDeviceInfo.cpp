@@ -33,6 +33,9 @@ inline QString getDevType( QString dev, QString vfsType ) {
 	if ( vfsType.contains( "encfs" ) )
 		return "encfs";
 
+	if ( vfsType.contains( "archivemount" ) )
+		return "archive";
+
 	QDir disks = QDir( "/dev/disk/by-path" );
 	disks.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System );
 	foreach( QString disk, disks.entryList() ) {

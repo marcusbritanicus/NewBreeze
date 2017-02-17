@@ -19,11 +19,11 @@ QString NBCrypt::version() {
 };
 
 /* The QAction hooks for menus/toolbars */
-QList<QAction*> NBCrypt::actions( QStringList nodes ) {
+QList<QAction*> NBCrypt::actions( Interface, QStringList nodes ) {
 
 	if ( nodes.count() > 1 ) {
 		/* Create a encrypted folder with multiple input folders */
-		return QList<QAction*>(  );
+		return QList<QAction*>();
 	}
 
 	else if ( nodes.count() == 1 ) {
@@ -53,12 +53,14 @@ QList<QAction*> NBCrypt::actions( QStringList nodes ) {
 				}
 
 				/* Mount Action */
-				QAction *act = new QAction( QIcon( ":/icons/emblem-mounted.png" ), "&Mount EncFS Volume", this );
+				QAction *act1 = new QAction( QIcon( ":/icons/emblem-mounted.png" ), "&Mount EncFS Volume", this );
+				QAction *act2 = new QAction( QIcon( ":/icons/key.png" ), "&Change EncFS Password", this );
 
 				NBEncFS *encfs = new NBEncFS( path, dirName( path ) + sett.value( baseName( path ) ).toString(), mParent );
-				connect( act, SIGNAL( triggered() ), encfs, SLOT( mountDir() ) );
+				connect( act1, SIGNAL( triggered() ), encfs, SLOT( mountDir() ) );
+				connect( act2, SIGNAL( triggered() ), encfs, SLOT( changePass() ) );
 
-				return QList<QAction*>() << act;
+				return QList<QAction*>() << act1 << act2;
 			}
 
 			/* Otherwise it might be EncFS target */
@@ -79,12 +81,14 @@ QList<QAction*> NBCrypt::actions( QStringList nodes ) {
 					}
 
 					/* Otherwise we return mount action */
-					QAction *act = new QAction( QIcon( ":/icons/emblem-mounted.png" ), "&Mount EncFS Volume", this );
+					QAction *act1 = new QAction( QIcon( ":/icons/emblem-mounted.png" ), "&Mount EncFS Volume", this );
+					QAction *act2 = new QAction( QIcon( ":/icons/key.png" ), "&Change EncFS Password", this );
 
-					NBEncFS *encfs = new NBEncFS( dirName( path ) +  key, path, mParent );
-					connect( act, SIGNAL( triggered() ), encfs, SLOT( mountDir() ) );
+					NBEncFS *encfs = new NBEncFS( dirName( path ) + key, path, mParent );
+					connect( act1, SIGNAL( triggered() ), encfs, SLOT( mountDir() ) );
+					connect( act2, SIGNAL( triggered() ), encfs, SLOT( changePass() ) );
 
-					return QList<QAction*>() << act;
+					return QList<QAction*>() << act1 << act2;
 				}
 			}
 
@@ -139,27 +143,33 @@ QList<QAction*> NBCrypt::actions( QStringList nodes ) {
 };
 
 /* Interface type: preview, rename etc */
-NBPluginInterface::Interface NBCrypt::interface() {
+NBPluginInterface::Interfaces NBCrypt::interfaces() {
 
-	return NBPluginInterface::ActionInterface;
+	return NBPluginInterface::Interfaces() << NBPluginInterface::ActionInterface;
 };
 
 /* Interface type: preview, rename etc */
-NBPluginInterface::Type NBCrypt::type() {
+NBPluginInterface::Type NBCrypt::type( NBPluginInterface::Interface ) {
 
 	return NBPluginInterface::Enhancement;
 };
 
 /* Plugin load contexts */
-NBPluginInterface::Contexts NBCrypt::contexts() {
+NBPluginInterface::Contexts NBCrypt::contexts( NBPluginInterface::Interface ) {
 
-	return Contexts() << NBPluginInterface::File << NBPluginInterface::Dir << NBPluginInterface::Files << NBPluginInterface::Dirs << NBPluginInterface::None;
+	return Contexts() << NBPluginInterface::File << NBPluginInterface::Dir << NBPluginInterface::None;
 };
 
 /* Mimetypes handled by the plugin */
 QStringList NBCrypt::mimetypes() {
 
 	return QStringList() << "*";
+};
+
+/* Invoke slots called called by triggering the actions */
+void NBCrypt::actionTrigger( Interface, QString, QStringList nodes ) {
+
+	#warning "Fix this..!!!"
 };
 
 void NBCrypt::setCaller( QWidget *caller ) {

@@ -10,7 +10,7 @@
 #include "NBDialog.hpp"
 #include "NBGuiWidgets.hpp"
 #include "NBLabels.hpp"
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
 #include "NBFileDialog.hpp"
 
 #if QT_VERSION >= 0x050000

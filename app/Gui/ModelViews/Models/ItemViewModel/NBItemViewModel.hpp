@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Global.hpp"
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
 #include "NBItemViewNode.hpp"
 #include "NBFileInfoGatherer.hpp"
 #include "NBFileSystemWatcher.hpp"
@@ -36,10 +36,10 @@ class NBItemViewModel : public QAbstractItemModel {
 
 	public:
 		enum LocationType {
-			SuperStart				= 0x6AF97E,			/* Real locations */
+			SuperStart				= 0x6AF97E,			/* SuperStart */
 			Applications,								/* Applications */
-			Catalogs,
-			FileSystem
+			Catalogs,									/* Catalogs */
+			FileSystem									/* Real Locations */
 		};
 
 		enum Filters {
@@ -55,7 +55,7 @@ class NBItemViewModel : public QAbstractItemModel {
 			System,
 		};
 
-		NBItemViewModel();
+		NBItemViewModel( QObject *parent = 0 );
 		~NBItemViewModel();
 
 		/* Categorization Info */
@@ -137,11 +137,6 @@ class NBItemViewModel : public QAbstractItemModel {
 		QString rootPath() const;
 		void setRootPath( QString );
 
-		void goUp();
-		void goBack();
-		void goForward();
-		void goHome();
-
 		bool canGoUp() const;
 		bool canGoBack() const;
 		bool canGoForward() const;
@@ -154,6 +149,12 @@ class NBItemViewModel : public QAbstractItemModel {
 
 		/* To halt the Info Gathering */
 		void terminateInfoGathering();
+
+	public Q_SLOTS:
+		void goUp();
+		void goBack();
+		void goForward();
+		void goHome();
 
 	private:
 		/* Initiate setting up of model */
@@ -174,8 +175,12 @@ class NBItemViewModel : public QAbstractItemModel {
 		/* New watch */
 		void newWatch( QString );
 
+		/* Category tools */
 		QString getCategory( QVariantList );
 		void recategorize();
+
+		/* Filtering */
+		static int nameFilter( const struct dirent * );
 
 		NBItemViewNode *rootNode;
 
@@ -198,10 +203,10 @@ class NBItemViewModel : public QAbstractItemModel {
 			bool stopLoading;
 		} currentLoadStatus;
 
-		bool __showHidden;
+		static bool __showHidden;
 
-		QStringList __nameFilters;
-		bool __filterFolders;
+		static QStringList __nameFilters;
+		static bool __filterFolders;
 
 		/* Showing virtual data */
 		bool __mVirtualData;

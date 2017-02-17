@@ -20,24 +20,3 @@ class NBQuickFileInfoGatherer {
 
 		QSettings *fileTypes;
 };
-
-class NBFileInfoGatherer : public QThread {
-	Q_OBJECT
-
-	public:
-		NBFileInfoGatherer( bool *term );
-		~NBFileInfoGatherer();
-
-		void gatherInfo( QStringList, QString );
-
-	private:
-		void run();
-
-		QStringList entryList;
-		QString rootPath;
-
-		bool *__terminate;
-
-	signals:
-		void done( QString, QString, QStringList );
-};

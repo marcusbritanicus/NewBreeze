@@ -269,8 +269,6 @@ void NBBookmarksIcon::flashLabel( QColor newColor ) {
 
 void NBBookmarksIcon::showBookmarks() {
 
-	return;
-
 	bmkView->clear();
 
 	// Spacer Label
@@ -286,7 +284,7 @@ void NBBookmarksIcon::showBookmarks() {
 	bmkView->addAction( lblAct );
 
 	Q_FOREACH( NBBookmarkInfo info, NBBookmarkInfo::allBookmarks() ) {
-		QAction *act = new QAction( QIcon::fromTheme( info.displayIcon , QIcon( ":/icons/bookmark.png" ) ), info.displayLabel, bmkView );
+		QAction *act = new QAction( QIcon::fromTheme( info.displayIcon , QIcon( NBIconProvider::themeIcon( "bookmarks", ":/icons/bookmark.png" ) ) ), info.displayLabel, bmkView );
 		act->setData( info.mountPoint );
 
 		bmkView->addAction( act );

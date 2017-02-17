@@ -76,6 +76,7 @@ NBSegmentButton::NBSegmentButton( QList<QIcon> icons, QWidget *parent ) : QWidge
 
 	/* Internal styling hack: until we learn to draw smooth rounded rects */
 	setStyleSheet( "QWidget#base { border: 1px solid lightgray; border-radius: 4px; }" );
+	resetStyleSheets();
 
 	/* AutoResize */
 	autoResize();
@@ -118,6 +119,7 @@ NBSegmentButton::NBSegmentButton( QStringList labels, QWidget *parent ) : QWidge
 
 	/* Internal styling hack: until we learn to draw smooth rounded rects */
 	setStyleSheet( "QWidget#base { border: 1px solid lightgray; border-radius: 4px; }" );
+	resetStyleSheets();
 
 	/* AutoResize */
 	autoResize();
@@ -160,6 +162,7 @@ NBSegmentButton::NBSegmentButton( QStringList labels, QList<QIcon> icons, QWidge
 
 	/* Internal styling hack: until we learn to draw smooth rounded rects */
 	setStyleSheet( "QWidget#base { border: 1px solid lightgray; border-radius: 4px; }" );
+	resetStyleSheets();
 
 	/* AutoResize */
 	autoResize();

@@ -106,7 +106,7 @@ void NBActionsMenu::buildPluginsActions() {
 			pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::Files, QString() );
 
 		else
-			pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::File, QString() );
+			pluginList = pMgr->plugins( NBPluginInterface::ActionInterface, NBPluginInterface::Enhancement, NBPluginInterface::File, getMimeType( QDir( workingDir ).filePath( selection.at( 0 ).data().toString() ) ) );
 	}
 
 	/* If there is no selection */
@@ -122,7 +122,7 @@ void NBActionsMenu::buildPluginsActions() {
 			Q_FOREACH( QModelIndex idx, selection )
 				sources << QDir( workingDir ).filePath( idx.data().toString() );
 
-			QList<QAction*> actions = plugin->actions( sources );
+			QList<QAction*> actions = plugin->actions( NBPluginInterface::ActionInterface, sources );
 			acts += actions.count();
 			Q_FOREACH( QAction *act, actions )
 				addAction( act );

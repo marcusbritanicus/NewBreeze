@@ -10,30 +10,11 @@
 #include "NBPluginInterface.hpp"
 #include "NBPreviewInterface.hpp"
 
+/* PluginList */
 typedef QList<NBPluginInterface*> PluginList;
 
-typedef struct {
-	/* Name of the plugin with full path */
-	QString name;
-
-	/* Version of the plugin with full path */
-	QString version;
-
-	/* Interface this plugin provides */
-	NBPluginInterface::Interface interface;
-
-	/* Type of plugin */
-	NBPluginInterface::Type type;
-
-	/* Plugin Context */
-	NBPluginInterface::Contexts contexts;
-
-	/* List of mimetypes handled */
-	QStringList mimeTypes;
-
-	/* The actual plugin */
-	NBPluginInterface* plugin;
-} PluginCapability;
+/* PluginList of Context <int> */
+typedef QHash<int, PluginList> NBContextPluginHash;
 
 class NBPluginManager : public QObject {
 	Q_OBJECT
@@ -51,6 +32,9 @@ class NBPluginManager : public QObject {
 		/* Return the plugin path for the given setup */
 		PluginList plugins( NBPluginInterface::Interface, NBPluginInterface::Type, NBPluginInterface::Context, QString );
 
+		/* Return all the unique plugins */
+		PluginList allPlugins();
+
 	public Q_SLOTS:
 		/* Reload the plugins map */
 		void reloadPlugins();
@@ -67,9 +51,13 @@ class NBPluginManager : public QObject {
 		/* Init flag */
 		bool init;
 
+		/* PluginList */
+		PluginList mPluginList;
+
 		/* MimeType-PluginPath map */
 		QMap<QString, QStringList> mimePluginMap;
 		QMap<QString, int> pluginPriorityMap;
 
-		QList<PluginCapability*> mPluginCapabilityList;
+		/* Interface-Context-PluginList Hash */
+		QHash<int, NBContextPluginHash> mPluginsHash;
 };

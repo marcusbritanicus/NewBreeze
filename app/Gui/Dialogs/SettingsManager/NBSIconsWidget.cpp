@@ -5,6 +5,7 @@
 */
 
 #include "NBSIconsWidget.hpp"
+#include "NBMimeTypeModel.hpp"
 
 NBIconThemeWidget::NBIconThemeWidget( QWidget *parent ) :QWidget( parent ) {
 
@@ -157,11 +158,10 @@ void NBIconThemeModel::setupModel() {
 
 	beginResetModel();
 	Q_FOREACH( QMimeType mime, mimeDb.allMimeTypes() ) {
-		QIcon ico1 = QIcon::fromTheme( mime.iconName() );
-		QIcon ico2 = QIcon::fromTheme( mime.genericIconName() );
+		QString ico = NBIconProvider::themeIcon( mime.iconName(), mime.genericIconName() );
 
 		/* We will now show mimes with out icons */
-		if ( ico1.isNull() and ico2.isNull() ) {
+		if ( ico.isEmpty() ) {
 
 			continue;
 		}
@@ -174,12 +174,7 @@ void NBIconThemeModel::setupModel() {
 			else
 				mimeNameList << mime.comment();
 
-			if ( not ico1.isNull() )
-				mimeIconList << ico1;
-
-			else
-				mimeIconList << ico2;
-
+			mimeIconList << QIcon( ico );
 			mimeTypeList << mime.name();
 		}
 		qApp->processEvents();

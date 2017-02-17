@@ -66,9 +66,11 @@ void NBArchiveDialog::createGUI() {
 	QLabel *formatsLbl = new QLabel( "&Format:", this );
 	formatsLbl->setBuddy( formatsCB );
 
+	/* WHAT IS ADVACNED? WHY DID I ADD THIS? */
 	QCheckBox *advanced = new QCheckBox( "Ad&vanced", this );
 	advanced->setDisabled( true );
 	advanced->setStyleSheet( "color:gray;");
+	advanced->hide();
 
 	QHBoxLayout *fLyt = new QHBoxLayout();
 	fLyt->addWidget( advanced );
@@ -124,7 +126,7 @@ void NBArchiveDialog::updateFileName( QString fn ) {
 
 void NBArchiveDialog::updateDirName() {
 
-	QString loc = QFileDialog::getExistingDirectory( this, "NewBreeze - Choose Directory", QDir::currentPath() );
+	QString loc = NBFileDialog::getDirectoryName( this, "NewBreeze - Choose Directory", QDir::currentPath() );
 	if ( not loc.isEmpty() ) {
 		locationLE->setText( loc );
 		location = loc;

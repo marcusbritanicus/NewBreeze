@@ -5,6 +5,7 @@
 */
 
 #include "NBItemViewNode.hpp"
+#include "NBIconManager.hpp"
 
 static int __sortColumn = Settings->General.SortColumn;
 static bool __sortCase = Settings->General.SortCase;
@@ -18,8 +19,6 @@ NBItemViewNode::NBItemViewNode() {
 	mCategoryList.clear();
 	myCategory = "Uncategorized";
 	parentNode = 0;
-
-	m_Combi = false;
 };
 
 NBItemViewNode::NBItemViewNode( QVariantList data, QString category, NBItemViewNode *parent ) {
@@ -28,16 +27,6 @@ NBItemViewNode::NBItemViewNode( QVariantList data, QString category, NBItemViewN
 	myCategory = category;
 
 	parentNode = parent;
-};
-
-bool NBItemViewNode::combi() const {
-
-	return m_Combi;
-};
-
-void NBItemViewNode::setCombi( bool truth ) {
-
-	m_Combi = truth;
 };
 
 void NBItemViewNode::addChild( NBItemViewNode *node ) {
@@ -84,10 +73,13 @@ int NBItemViewNode::categoryCount() {
 
 void NBItemViewNode::clearChildren() {
 
-	m_Combi = false;
-
 	childNodes.clear();
 	mCategoryList.clear();
+};
+
+QIcon NBItemViewNode::icon() {
+
+	return mIcon;
 };
 
 QString NBItemViewNode::category() {
@@ -115,12 +107,12 @@ QVariant NBItemViewNode::data( int column, bool special ) const {
 	/*
 		*
 		* If we want special data, i.e., we can choose column 0, 1, or 2
-		* If we want normal data, then we can choose columns 0 to 6, internally 3 to 9
+		* If we want normal data, then we can choose columns 0 to 6, internally 3 onwards
 		*
 		* [
 		* 	dir/file/system
 		*   rawsize
-		*   icon ( string used with QIcon::fromTheme )
+		*   iconstr
 		*   name = 0
 		*   size = 1
 		*   type = 2
@@ -159,6 +151,13 @@ bool NBItemViewNode::setData( int column, QVariant data, bool special ) {
 			return false;
 
 		nodeData.replace( column, data );
+		if ( column == 2 ) {
+			// Icon String
+			mIcon = QIcon::fromTheme( data.toString(), QIcon( data.toString() ) );
+
+			if ( mIcon.isNull() )
+				mIcon = QIcon( ":/icons/unknown.png" );
+		}
 	}
 
 	else {

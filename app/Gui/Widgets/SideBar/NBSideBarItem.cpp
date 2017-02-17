@@ -258,7 +258,7 @@ void NBSideBarItem::paintEvent( QPaintEvent *pEvent ) {
 		painter.drawRect( QRect( 0, 0, width(), height() ) );
 	}
 
-	/* Hiver and no highlight */
+	/* Hover and no highlight */
 	else if ( not mHighlight and mHover ) {
 
 		painter.setBrush( palette().color( QPalette::Highlight ).lighter() );

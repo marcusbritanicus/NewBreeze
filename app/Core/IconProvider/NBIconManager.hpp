@@ -1,12 +1,54 @@
-/*
+ /*
 	*
-	* NBIcon.hpp - NBIcon.cpp header
+	* NBIconManager.hpp - Icon Manager for NewBreeze
 	*
 */
 
 #pragma once
 
 #include "Global.hpp"
+
+class NBIconManager {
+
+	public:
+		/* Unique single instance */
+		NBIconManager *instance();
+
+		/* Icon string for file */
+		QString iconStringForFile( QString, QMimeType mType = QMimeType() );
+
+		/* Icon string for file */
+		QByteArray imageThumbnail( QString, QMimeType mType = QMimeType() );
+
+	private:
+		/* Private init function */
+		NBIconManager();
+
+		/* Function to populate themeDirsHash */
+		void readThemeDirectories();
+
+		/* Function to populate themeFallbackHash */
+		void readThemeInheritance();
+
+		/* Global Instance */
+		static NBIconManager *iMgr;
+		bool init;
+
+		/* We store the themes and their directories here */
+		QHash<QString, QStringList> themeDirsHash;
+
+		/* Store the fallbacks per theme, non-recursive */
+		QHash<QString, QStringList> themeFallbackHash;
+
+		/* Default theme location */
+		QString iconThemePath;
+
+		/* Create a thumbnail database object */
+		QSqlDatabase thumbsDb;
+
+		/* Create an icon database object */
+		QSqlDatabase iconsDb;
+};
 
 class NBIconProvider {
 

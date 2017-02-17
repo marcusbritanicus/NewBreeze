@@ -8,17 +8,23 @@
 	* provided for all widgets, NBFolderView, NBAddressBar, NBProcessManager to name
 	* a few.
 	*
-	* Note:
+	* Note1:
 	* This PluginInterface can be used to enhance the NBFolderView class by providing
 	* a suitable context. For the context to be applicable, the plugin must return
 	* on of the FolderView interfaces for interface() and 'Enhancement' for type().
 	* Otherwise 'context()' will be ignored and the plugin may not work.
 	*
-	* Note:
+	* Note2:
 	* At the present moment, I have not enabled plugin interfaces for all the widgets
 	* and hence your plugins may not work. If you have developed a plugin for some
 	* interface, and if you know how to develop the interface for the widget, please
 	* feel free to contribute them both to NewBreeze via github.
+	*
+	* Note3:
+	* actions(...) and actionsTrigger(...) are meant to be equivalent functions. If
+	* provided the same conditions, will behave similarly. Instead of triggering an
+	* action named 'act', for an interface names 'iface' for listed 'nodes', then
+	* calling actionsTrigger( iface, act, nodes ) should give the same result.
 	*
 */
 
@@ -54,7 +60,7 @@ class PLUGIN_DLLSPEC NBPluginInterface {
 
 		/* Plugin Type: How does the plugin work */
 		enum Type {
-			Alternative				= 0x65F8E4,			// Alternative for the existing widget. Ex: Mac sidebar instead of NBSidePanel
+			Alternative				= 0x65F8E4,			// Alternative for the existing widget. Ex: Classic sidebar instead of NBSidePanel
 			Enhancement,								// Enhancement for the existing widget. Ex: EncFS Support for NewBreeze
 		};
 
@@ -65,10 +71,11 @@ class PLUGIN_DLLSPEC NBPluginInterface {
 			Node,										// Single Selection ( File, Dir, FIFO, Socket, Chr, Block, etc... )
 			Files,										// Multiple File Selection
 			Dirs,    			 						// Multiple Folder Selection
-			Nodes,										// Single Selection ( File, Dir, FIFO, Socket, Chr, Block, etc... )
+			Nodes,										// Multiple Selection ( File, Dir, FIFO, Socket, Chr, Block, etc... )
 			None										// There is no selection
 		};
 
+		typedef QList<Interface> Interfaces;
 		typedef QList<Context> Contexts;
 
 		virtual ~NBPluginInterface() {};
@@ -80,19 +87,22 @@ class PLUGIN_DLLSPEC NBPluginInterface {
 		virtual QString version() = 0;
 
 		/* The QAction */
-		virtual QList<QAction*> actions( QStringList ) = 0;
+		virtual QList<QAction*> actions( Interface, QStringList ) = 0;
+
+		/* Interface: preview, rename etc */
+		virtual Interfaces interfaces() = 0;
 
 		/* Interface type: preview, rename etc */
-		virtual Interface interface() = 0;
-
-		/* Interface type: preview, rename etc */
-		virtual Type type() = 0;
+		virtual Type type( Interface ) = 0;
 
 		/* Plugin load context */
-		virtual Contexts contexts() = 0;
+		virtual Contexts contexts( Interface ) = 0;
 
 		/* Mimetypes handled by the plugin */
 		virtual QStringList mimetypes() = 0;
+
+		/* Invoke slots called called by triggering the actions */
+		virtual void actionTrigger( Interface, QString, QStringList ) = 0;
 
 		/* Store the called widget pointer */
 		virtual void setCaller( QWidget *caller ) = 0;

@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <Qt4SyntaxHighlighter.h>
-#include <SR.hpp>
+#include "Global.hpp"
+#include "Qt4SyntaxHighlighter.h"
+#include "SR.hpp"
 
 class LineNumberWidget;
 

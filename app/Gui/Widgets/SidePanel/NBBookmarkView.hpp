@@ -8,6 +8,7 @@
 
 #include "Global.hpp"
 #include "NBBookmarkInfo.hpp"
+#include "NBIconManager.hpp"
 
 class NBBookmarksIcon : public QWidget {
 	Q_OBJECT

@@ -8,8 +8,10 @@
 
 #include "Global.hpp"
 #include "NBAddressBar.hpp"
+#include "NBButtons.hpp"
 #include "NBIconViewRestricted.hpp"
-#include "NBSidePanel.hpp"
+#include "NBDirectoryView.hpp"
+#include "NBSideBar.hpp"
 #include "NBDialog.hpp"
 #include "NBMessageDialog.hpp"
 #include "NBGuiWidgets.hpp"
@@ -18,47 +20,46 @@ class NBFileDialog : public NBDialog {
 	Q_OBJECT
 
 	public:
-		enum FileType {
-			ExistingFile,
-			SaveFile,
-			ExistingDirectory,
-			SaveDirectory,
-			ExistingFiles,
-			ExistingDirectories
+		enum DialogType {
+			Icon					= 0xA01B73,
+			File,
+			Directory
 		};
 
-		NBFileDialog( QString icon, QString title, QString location = QDir::homePath(), FileType type = NBFileDialog::ExistingFile, QWidget *parent = 0 );
 		void setNameFilters( QStringList, QString );
+		void clearNameFilter();
 
 		QString selectedItem();
 		QStringList selectedItems();
 
 		QString selectedFilter();
 
-		static QString getExistingFileName( QString, QString, QString, QStringList, QString );
-		static QString getSaveFileName( QString, QString, QString, QStringList, QString );
-		static QString getExistingDirectory( QString, QString, QString );
+		static QString getFileName( QWidget*, QString, QString, QStringList, QString );
+		static QString getDirectoryName( QWidget*, QString, QString );
 
 	private:
+		NBFileDialog( QWidget *parent, QString title, QString location, DialogType type );
+
 		void createGUI();
 		void createAndSetupActions();
 		void setWindowProperties();
 
 		NBItemViewModel *fsModel;
 
-		NBAddressWidget *addressWidget;
-		NBIconViewRestricted *mainView;
-		NBSidePanel *sidePanel;
+		NBAddressWidget *addressBar;
+		NBSideBar *sidePanel;
+
+		NBIconView *mainView;
+		NBDirectoryView *dirView;
 
 		NBLineEdit *nameLE;
 		QComboBox *filtersCB;
 
 		QStringList filters;
 
-		QString icon;
 		QString title;
 		QString location;
-		FileType type;
+		DialogType type;
 
 	private slots:
 		void openAddressBar();

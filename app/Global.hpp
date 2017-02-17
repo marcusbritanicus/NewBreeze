@@ -8,6 +8,7 @@
 
 #include <QtGui>
 #include <QtNetwork>
+#include <QtSql>
 
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>
@@ -15,22 +16,6 @@
 
 #include "newbreeze.hpp"
 #include "NBSettings.hpp"
-
-namespace NBIOMode {
-	enum Mode {
-		ACopy,
-		Copy,
-		Move
-	};
-};
-
-namespace NBInfoMode {
-	enum Mode {
-		Application,
-		FileSystem,
-		Catalog
-	};
-};
 
 static QMimeDatabase mimeDb;
 

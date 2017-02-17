@@ -95,7 +95,12 @@ void NBPasswordDialog::createGUI() {
 
 void NBPasswordDialog::setWindowProperties() {
 
-	setWindowTitle( "NewBreeze - Input Password" );
+	if ( mChangePassword )
+		setWindowTitle( "NewBreeze - Change Password" );
+
+	else
+		setWindowTitle( "NewBreeze - Input Password" );
+
 	setWindowIcon( QIcon( ":/icons/appearance.png" ) );
 
 	QRect scrnSize = QDesktopWidget().screenGeometry();
@@ -136,7 +141,7 @@ void NBPasswordDialog::setValidated( bool truth ) {
 void NBPasswordDialog::validateOldPassword() {
 
 	setDisabled( true  );
-	emit oldPassword( oldPasswdLE->text() );
+	emit oldPasswordValidated( true );
 };
 
 void NBPasswordDialog::validatePassword() {

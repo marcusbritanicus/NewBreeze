@@ -14,7 +14,7 @@ NBTrayIcon::NBTrayIcon() : QSystemTrayIcon() {
 	QMenu *menu = new QMenu( "TrayMenu" );
 	menu->addAction( QIcon( ":/icons/newbreeze.png" ), "New &Window", this, SIGNAL( newWindow() ) );
 	menu->addAction( "&Toggle Visible Windows", this, SLOT( toggleVisible() ) );
-	menu->addAction( QIcon::fromTheme( "application-exit", QIcon( ":/icons/delete.png" ) ), "&Quit NewBreeze", this, SLOT( quit() ) );
+	menu->addAction( QIcon( NBIconProvider::themeIcon( "application-exit", ":/icons/delete.png" ) ), "&Quit NewBreeze", this, SLOT( quit() ) );
 	setContextMenu( menu );
 };
 
@@ -51,10 +51,11 @@ void NBTrayIcon::toggleVisible() {
 	bool visible = true;
 	Q_FOREACH( QWidget *nb, qApp->topLevelWidgets() ) {
 		if ( qobject_cast<NewBreeze*>( nb ) ) {
-			if ( not nb->isHidden() ) {
-				visible = false;
-				break;
-			}
+			if ( nb->isVisible() )
+				visible &= true;
+
+			else
+				visible &= false;
 		}
 	}
 
@@ -67,9 +68,11 @@ void NBTrayIcon::toggleVisible() {
 
 	/* Some are hidden, show them all */
 	else {
-		Q_FOREACH( QWidget *nb, qApp->topLevelWidgets() )
-			if ( qobject_cast<NewBreeze*>( nb ) )
+		Q_FOREACH( QWidget *w, qApp->topLevelWidgets() ) {
+			NewBreeze *nb = qobject_cast<NewBreeze*>( w );
+			if ( nb and not nb->isClosed() )
 				nb->show();
+		}
 	}
 };
 

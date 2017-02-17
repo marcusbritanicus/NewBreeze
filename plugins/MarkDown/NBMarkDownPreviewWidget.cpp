@@ -159,7 +159,7 @@ QString NBMarkDownPreview::version() {
 };
 
 /* The QAction hooks for menus/toolbars */
-QList<QAction*> NBMarkDownPreview::actions( QStringList nodes ) {
+QList<QAction*> NBMarkDownPreview::actions( Interface, QStringList nodes ) {
 
 	if ( ( nodes.count() == 1 ) and isFile( nodes.at( 0 ) ) ) {
 		QAction *act = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), "&Peek", this );
@@ -175,19 +175,19 @@ QList<QAction*> NBMarkDownPreview::actions( QStringList nodes ) {
 };
 
 /* Interface type: preview, rename etc */
-NBPluginInterface::Interface NBMarkDownPreview::interface() {
+NBPluginInterface::Interfaces NBMarkDownPreview::interfaces() {
 
-	return NBPluginInterface::PreviewInterface;
+	return  NBPluginInterface::Interfaces() << NBPluginInterface::PreviewInterface;
 };
 
 /* Interface type: preview, rename etc */
-NBPluginInterface::Type NBMarkDownPreview::type() {
+NBPluginInterface::Type NBMarkDownPreview::type( Interface ) {
 
 	return NBPluginInterface::Enhancement;
 };
 
 /* Plugin load contexts */
-NBPluginInterface::Contexts NBMarkDownPreview::contexts() {
+NBPluginInterface::Contexts NBMarkDownPreview::contexts( Interface ) {
 
 	return Contexts() << NBPluginInterface::File;
 };
@@ -196,6 +196,16 @@ NBPluginInterface::Contexts NBMarkDownPreview::contexts() {
 QStringList NBMarkDownPreview::mimetypes() {
 
 	return QStringList() << "text/markdown" << "text/x-markdown";
+};
+
+/* Invoke slots called called by triggering the actions */
+void NBMarkDownPreview::actionTrigger( Interface, QString, QStringList nodes ) {
+
+	if ( ( nodes.count() == 1 ) and isFile( nodes.at( 0 ) ) ) {
+		NBWebWatch *mdview = new NBWebWatch( nodes.at( 0 ) );
+		mdview->setWindowFlags( mdview->windowFlags() | Qt::FramelessWindowHint );
+		mdview->exec();
+	}
 };
 
 void NBMarkDownPreview::setCaller( QWidget *caller ) {

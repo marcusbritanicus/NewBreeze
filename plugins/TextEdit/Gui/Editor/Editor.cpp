@@ -99,11 +99,6 @@ void Editor::save() {
 
 	QFile *file = new QFile( filename );
 
-	#ifdef HAVE_GNU_SYNTAX_HILITE
-		syntaxer->setDocument( document() );
-		syntaxer->initFromFileName( filename );
-	#endif
-
 	if ( file->open( QIODevice::WriteOnly ) ) {
 		file->write( text().toLocal8Bit() );
 		file->close();
@@ -702,8 +697,8 @@ void Editor::timerEvent( QTimerEvent *tEvent ) {
 		}
 
 		else {
-			/* If we have no name for the file, return */
-			if ( filename.isEmpty() )
+			/* If we have no name for the file or if its not modified, return */
+			if ( filename.isEmpty() or not isModified() )
 				return;
 
 			save();

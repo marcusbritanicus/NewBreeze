@@ -233,32 +233,13 @@ void NBPropertiesWidget::createGUI() {
 	fileLyt->addWidget( Separator::horizontal() );
 	fileLyt->addWidget( timeLabel );
 
-	NBDriveLabel *driveIcon;
-	QLabel *driveName = new QLabel( this );
-	NBDriveInfo *driveInfo;
-
-	NBDeviceInfo deviceInfo = NBDeviceManager::deviceInfoForPath( pathsList.at( 0 ) );
-
-	driveIcon = new NBDriveLabel( deviceInfo.driveLabel(), this );
-	driveName->setText( deviceInfo.driveName() );
-	driveInfo = new NBDriveInfo( deviceInfo.usedSpace(), deviceInfo.driveSize(), this );
-
-	QVBoxLayout *driveLyt = new QVBoxLayout();
-	QGridLayout *subLytDrive1 = new QGridLayout();
-	QHBoxLayout *subLytDrive2 = new QHBoxLayout();
-
-	subLytDrive1->addWidget( driveIcon, 0, 0, Qt::AlignLeft );
-	subLytDrive1->addWidget( driveName, 0, 1, Qt::AlignRight );
-	subLytDrive2->addWidget( driveInfo );
-
-	driveLyt->addLayout( subLytDrive1 );
-	driveLyt->addLayout( subLytDrive2 );
+	NBDriveInfo *driveInfo = new NBDriveInfo( NBDeviceManager::deviceInfoForPath( pathsList.at( 0 ) ), this );
 
 	QVBoxLayout *baseLyt = new QVBoxLayout();
 	baseLyt->setContentsMargins( QMargins() );
 	baseLyt->addLayout( fileLyt );
 	baseLyt->addWidget( Separator::horizontal() );
-	baseLyt->addLayout( driveLyt );
+	baseLyt->addWidget( driveInfo );
 	setLayout( baseLyt );
 
 	connect( this, SIGNAL( updateSignal() ), this, SLOT( update() ) );
@@ -802,15 +783,22 @@ void NBPropertiesDialog::switchToTab( int newTab ) {
 
 void NBPropertiesDialog::setDirIcon() {
 
-	QString iconName = NBFileDialog::getExistingFileName(
-			QString( ":/icons/newbreeze.png" ),
+	QString iconName = NBFileDialog::getFileName(
+			this,
 			tr( "NewBreeze - Select Icon" ),
-			QDir::homePath(),
+			"/usr/share/icons/",
 			QStringList(
 				QStringList() << "Images ( *.png *.bmp *.jpg *.svg *.gif *.ppm )"
 			),
 			QString( "PNG (*.png)" )
 	);
+
+	// QString iconName = QFileDialog::getOpenFileName(
+			// this,
+			// tr( "NewBreeze - Select Icon" ),
+			// "/usr/share/icons/" + NBSystemIconTheme(),
+			// "Images ( *.png *.bmp *.jpg *.svg *.gif *.ppm )"
+	// );
 
 	if ( not iconName.isEmpty() ) {
 		propsB->setNewIcon( iconName );

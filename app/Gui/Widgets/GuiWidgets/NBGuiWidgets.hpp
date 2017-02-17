@@ -19,31 +19,17 @@ class NBLineEdit : public QLineEdit {
 		void paintEvent( QPaintEvent * );
 };
 
-class NBDriveLabel : public QWidget {
+class NBDriveInfo : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBDriveLabel( const QString path, QWidget * );
-		~NBDriveLabel();
+		NBDriveInfo( NBDeviceInfo, QWidget * );
 
 	private:
-		QPainter *painter;
-		QString label;
-
-	protected:
-		void paintEvent( QPaintEvent * );
-};
-
-class NBDriveInfo : public QFrame {
-	Q_OBJECT
-
-	public:
-		NBDriveInfo( qint64 used, qint64 total, QWidget * );
-		~NBDriveInfo();
-
-	private:
-		QPainter *painter;
-		QString label;
+		QString name;
+		QString disk;
+		QString info;
+		QString icon;
 		float percent;
 
 	protected:

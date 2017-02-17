@@ -19,7 +19,7 @@ class NBIconView : public QAbstractItemView {
 	Q_OBJECT
 
 	public:
-		NBIconView( NBItemViewModel* );
+		NBIconView( NBItemViewModel*, QWidget *parent );
 
 		// Set the item model
 		void setModel( QAbstractItemModel *model );

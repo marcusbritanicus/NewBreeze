@@ -4,7 +4,7 @@
 	*
 */
 
-#include "NBIconProvider.hpp"
+#include "NBIconProvider.hh"
 
 /*
 	*

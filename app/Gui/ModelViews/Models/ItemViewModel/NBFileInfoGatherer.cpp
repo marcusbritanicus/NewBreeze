@@ -4,12 +4,12 @@
 	*
 */
 
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
 #include "NBFileInfoGatherer.hpp"
 
 NBQuickFileInfoGatherer::NBQuickFileInfoGatherer() {
 
-	fileTypes = new QSettings( ":/Data/NBFSExtData.conf", QSettings::NativeFormat );
+	fileTypes = new QSettings( ":/data/NBFSExtData.conf", QSettings::NativeFormat );
 };
 
 QString NBQuickFileInfoGatherer::permStr( mode_t fileMode ) {
@@ -83,7 +83,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 		info << QString( "%1 item%2" ).arg( info.at( 1 ).toLongLong() ).arg( info.at( 1 ).toLongLong() > 1 ? "s": "" );
 		info << "Directory";
 		info << "inode/directory";
-		info << QDateTime::fromTime_t( statbuf.st_mtime ).toString( "ddd, dd MMM, yyyy" );
+		info << QDateTime::fromTime_t( statbuf.st_mtime );
 		info << permStr( statbuf.st_mode );
 		info << "root";
 		info << "/";
@@ -174,50 +174,10 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 	else
 		return QVariantList() << "" << "" << "" << "" << "" << "" << "" << "" << "" << "";
 
-	info << QDateTime::fromTime_t( statbuf.st_mtime ).toString( "ddd, dd MMM, yyyy" );
+	info << QDateTime::fromTime_t( statbuf.st_mtime );
 	info << permStr( statbuf.st_mode );
 	info << ( ( pwdinfo == NULL ) ? QString::number( statbuf.st_uid ) : pwdinfo->pw_name );
 	info << path;
 
 	return info;
-};
-
-NBFileInfoGatherer::NBFileInfoGatherer( bool *term ) : QThread() {
-
-	__terminate = term;
-
-	entryList.clear();
-	rootPath.clear();
-};
-
-NBFileInfoGatherer::~NBFileInfoGatherer() {
-
-	wait();
-};
-
-void NBFileInfoGatherer::gatherInfo( QStringList entries, QString root ) {
-
-	entryList << entries;
-	rootPath = QString( root );
-
-	start();
-};
-
-void NBFileInfoGatherer::run() {
-
-	if ( rootPath != "/dev/" ) {
-		foreach( QString entry, entryList ) {
-			if ( *__terminate )
-				break;
-
-			QMimeType mimeType = mimeDb.mimeTypeForFile( rootPath + entry );
-			QStringList info;
-
-			info << NBIconProvider::icon( rootPath + entry, mimeType );
-			info << mimeType.comment();
-			info << mimeType.name();
-
-			emit done( rootPath, entry, info );
-		}
-	}
 };

@@ -51,19 +51,22 @@ class NBMarkDownPreview : public QObject, NBPluginInterface {
 		 QString version();
 
 		/* The QAction */
-		 QList<QAction*> actions( QStringList );
+		 QList<QAction*> actions( Interface, QStringList );
 
 		/* Interface type: preview, rename etc */
-		 Interface interface();
+		 Interfaces interfaces();
 
 		/* Interface type: preview, rename etc */
-		 Type type();
+		 Type type( Interface );
 
 		/* Plugin load context */
-		 Contexts contexts();
+		 Contexts contexts( Interface );
 
 		/* Mimetypes handled by the plugin */
 		 QStringList mimetypes();
+
+		/* Invoke slots called called by triggering the actions */
+		void actionTrigger( Interface, QString, QStringList nodes );
 
 		/* Store the called widget pointer */
 		 void setCaller( QWidget *caller );

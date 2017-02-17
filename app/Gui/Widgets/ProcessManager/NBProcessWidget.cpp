@@ -279,30 +279,41 @@ void NBProcessWidget::timerEvent( QTimerEvent *tEvent ) {
 						case NBProcess::Copy: {
 							title = "NewBreeze - Error copying files";
 							message += "copying";
+							break;
 						}
 
 						case NBProcess::Move: {
 							title = "NewBreeze - Error copying files";
 							message += "moving";
+							break;
 						}
 
 						case NBProcess::Trash: {
 							title = "NewBreeze - Error trashing files";
 							message += "trashing";
+							break;
 						}
 
 						case NBProcess::Delete: {
 							title = "NewBreeze - Error deleting files";
 							message += "deleteing";
+							break;
 						}
 
 						case NBProcess::Properties: {
-							title = "NewBreeze - Error setiings permissions";
+							title = "NewBreeze - Error settings permissions";
 							message += "settings the permissions for";
+							break;
+						}
+
+						default: {
+							title = "NewBreeze - Error performing operation";
+							message += "performing an operation(!!) on";
+							break;
 						}
 					}
 
-					message += "the nodes you requested. The list of nodes which were not processed are given below.";
+					message += "the nodes you requested. The list of nodes which were not processed correctly are given below.";
 
 					NBErrorsDialog *errDlg = new NBErrorsDialog( title, message, mProcess->errors(), this );
 					errDlg->exec();

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Global.hpp"
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
 
 class NBTrashNode {
 

@@ -33,12 +33,23 @@ void NBFileSystemWatcher::startWatch( QString wPath ) {
 	if ( not wPath.endsWith( "/" ) )
 		wPath += "/";
 
+	/* Try removing the existing path */
+	if ( ( monitor.wd != -1 ) and ( inotify_rm_watch( inotify_fd, monitor.wd ) ) ) {
+		qWarning() << "Failed to remove existing watch:" << monitor.path;
+		qWarning() << "inotify_rm_watch(...) returned error:" << errno << strerror( errno );
+	}
+
 	monitor.path = strdup( wPath.toLatin1().data() );
 	monitor.wd = inotify_add_watch( inotify_fd, monitor.path, IN_ALL_EVENTS );
+
+	/* If the watch fails, do not start a watch */
 	if ( monitor.wd < 0 ) {
 		qCritical() << "Failed to add watch:" << monitor.path;
 		qCritical() << "inotify_add_watch(...) returned error:" << errno << strerror( errno );
 		emit watchFailed();
+
+		mStopWatch = false;
+		return;
 	}
 
 	mStopWatch = false;

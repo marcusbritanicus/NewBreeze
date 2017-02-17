@@ -10,8 +10,30 @@ typedef QList<NBCrumb*> NBCrumbsList;
 
 static inline QWidget *getCrumbsHolder( QWidget *parent, QString path, QString cPath, const int width, bool *xCrumbsRequired ) {
 
+	if ( path.startsWith( "NB://" ) ) {
+
+		QHBoxLayout *crumbsLyt = new QHBoxLayout();
+		crumbsLyt->setContentsMargins( QMargins() );
+		crumbsLyt->setSpacing( 0 );
+
+		/* We have only one crumb */
+		NBCrumb *specialCrumb = new NBCrumb( path, true );
+		QObject::connect( specialCrumb, SIGNAL( loadPath( QString ) ), parent, SIGNAL( openLocation( QString ) ) );
+		crumbsLyt->addWidget( specialCrumb );
+
+		crumbsLyt->addStretch();
+
+		QWidget *crumbsHolder = new QWidget( parent );
+		crumbsHolder->setLayout( crumbsLyt );
+
+		return crumbsHolder;
+	}
+
 	QList<NBCrumbsList> linesList;
 	linesList << NBCrumbsList();
+
+	path = QFileInfo( path ).canonicalFilePath();
+	cPath = QFileInfo( cPath ).canonicalFilePath();
 
 	NBCrumbsList fullList;
 
@@ -19,14 +41,14 @@ static inline QWidget *getCrumbsHolder( QWidget *parent, QString path, QString c
 	QString completed = "/";
 
 	/* We now add the root - '/' first */
-	crumb = new NBCrumb( "/", ( QDir( cPath ) == QDir::rootPath() ), NULL );
+	crumb = new NBCrumb( "/", ( QDir( cPath ) == QDir::rootPath() ) );
 	QObject::connect( crumb, SIGNAL( loadPath( QString ) ), parent, SIGNAL( openLocation( QString ) ) );
 	fullList << crumb;
 
 	Q_FOREACH( QString crumbStr, path.split( "/", QString::SkipEmptyParts ) ) {
 		completed += ( crumbStr + "/" );
 
-		crumb = new NBCrumb( completed, ( QDir( completed ) == QDir( cPath ) ), NULL );
+		crumb = new NBCrumb( completed, ( QDir( completed ) == QDir( cPath ) ) );
 		QObject::connect( crumb, SIGNAL( loadPath( QString ) ), parent, SIGNAL( openLocation( QString ) ) );
 
 		fullList << crumb;
@@ -182,7 +204,7 @@ NBCrumbsBarX::NBCrumbsBarX( QString path, QString cPath, QWidget *parent ) : QWi
 	QString completed = "/";
 
 	/* We now add the root - '/' first */
-	crumb = new NBCrumb( "/", ( QDir( cPath ) == QDir::rootPath() ), NULL );
+	crumb = new NBCrumb( "/", ( QDir( cPath ) == QDir::rootPath() ) );
 	connect( crumb, SIGNAL( loadPath( QString ) ), this, SIGNAL( loadPath( QString ) ) );
 	connect( crumb, SIGNAL( loadPath( QString ) ), this, SLOT( close() ) );
 	lyt->addWidget( crumb );
@@ -190,7 +212,7 @@ NBCrumbsBarX::NBCrumbsBarX( QString path, QString cPath, QWidget *parent ) : QWi
 	Q_FOREACH( QString crumbStr, path.split( "/", QString::SkipEmptyParts ) ) {
 		completed += ( crumbStr + "/" );
 
-		crumb = new NBCrumb( completed, ( QDir( completed ) == QDir( cPath ) ), NULL );
+		crumb = new NBCrumb( completed, ( QDir( completed ) == QDir( cPath ) ) );
 		connect( crumb, SIGNAL( loadPath( QString ) ), this, SIGNAL( loadPath( QString ) ) );
 		connect( crumb, SIGNAL( loadPath( QString ) ), this, SLOT( close() ) );
 

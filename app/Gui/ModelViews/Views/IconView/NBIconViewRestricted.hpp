@@ -15,7 +15,7 @@ class NBIconViewRestricted : public NBIconView {
 	Q_OBJECT
 
 	public:
-		NBIconViewRestricted( NBItemViewModel* );
+		NBIconViewRestricted( NBItemViewModel*, QWidget* );
 
 		NBItemViewModel* mdl;
 

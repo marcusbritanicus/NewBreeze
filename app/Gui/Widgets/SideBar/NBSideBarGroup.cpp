@@ -65,7 +65,7 @@ NBSideBarItem* NBSideBarGroup::item( int position ) {
 	return itemList.at( position );
 };
 
-void NBSideBarGroup::addItem( QString name, QString icon, QString target ) {
+int NBSideBarGroup::addItem( QString name, QString icon, QString target ) {
 
 	NBSideBarItem *itm = new NBSideBarItem( name, icon, target, this );
 	connect( itm, SIGNAL( clicked( QString ) ), this, SIGNAL( clicked( QString ) ) );
@@ -75,6 +75,8 @@ void NBSideBarGroup::addItem( QString name, QString icon, QString target ) {
 
 	QWidget::resize( 0, 0 );
 	updateGeometry();
+
+	return itemList.indexOf( itm );
 };
 
 void NBSideBarGroup::clearHighlights() {

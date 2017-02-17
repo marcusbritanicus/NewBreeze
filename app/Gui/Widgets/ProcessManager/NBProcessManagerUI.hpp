@@ -10,7 +10,7 @@
 #include "NBDialog.hpp"
 #include "NBAbstractProcess.hpp"
 #include "NBProcessWidget.hpp"
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
 #include "NBMessageDialog.hpp"
 #include "NBProcessManager.hpp"
 

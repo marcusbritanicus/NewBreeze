@@ -15,7 +15,5 @@
 #include <libgen.h>
 
 #if QT_VERSION >= 0x050000
-    #include <QCryptographicHash>
-#else
-    #include <QCryptographicHash5.hpp>
+    #include <QtWidgets>
 #endif

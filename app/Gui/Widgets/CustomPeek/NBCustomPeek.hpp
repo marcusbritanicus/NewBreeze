@@ -8,7 +8,7 @@
 
 #include "Global.hpp"
 #include "NBGuiWidgets.hpp"
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
 
 class NBCustomPeek : public QWidget {
 	Q_OBJECT

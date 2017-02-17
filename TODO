@@ -1,37 +1,40 @@
-Widgets
-	✓ NBIconView:                                                                                                                    [ 3 of 3 ]
-		✓ Per directory view options
-		✗ Single click Open (point to select)
-		✓ Selections
-
-NBProcessManager                                                                                                                     [ 1 of 4 ]
-	✓ NBIOProcess
+NBProcessManager                                                                                                                      [ 2 of 4 ]
+	✍ NBIOProcess
 	✓ NBDeleteProcess
 	⬜ NBPropertiesProcess
-	✍ Undo-Redo Sequences (Only for Copy and Move)
+	✗ Undo-Redo Sequences (Only for Copy and Move)
 
-NBItemViewModel                                                                                                                      [ 2 of 2 ]
-	✓ Unify ApplicationsModel, CatalogModel and FileSystemModel
-	✓ SuperStart
+NBIconProvider                                                                                                                        [ 1 of 2 ]
+	✍ Create a full icon provider class
+	✗ Provide icon strings based on size
 
-NBIconView                                                                                                                           [ 1 of 3 ]
+NBIconView                                                                                                                            [ 1 of 5 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
-	⬜ Fix @aboveIndex @belowIndex
-	⬜ Enable PageUp and PageDown navigation
+	⬜ Improve the selection model
+	⬜ Fix cursor movements
+	✗ Enable PageUp and PageDown navigation
+	⬜ Enable perfolder folded category memory
+	⬜ Mac style semi-folded categories
+	  • One click on category icon, partially folds it, clicking again expands it.
+	  • Clicking minimize icon folds the category completely, clicking it again opens it completely
 
-NewBreeze Theming and Styling                                                                                                        [ 4 of 4 ]
-	✓ Remove all the redundant stylesheets
-	✗ Enable user defined theming
-	✓ Faster icon loading for image files
-	✓ Qt supported styles
+NBItemViewModel                                                                                                                       [ 0 of 2 ]
+	✍ Read icon data directly from NBItemNode* rather than create it repeatedly.
+	✓ Use other functions from dirent.h, vis-a-vis, scandir, fnmatch, etc
 
-Archives                                                                                                                             [ 4 of 5 ]
+NBFolderWidget                                                                                                                        [ 0 of 1 ]
+	⬜ Extended copy/move support
+
+Archives                                                                                                                              [ 4 of 6 ]
 	✗ Zip and tar preview: PeekPlugin using archivemount
 	✗ Writing archives will be done in NBProcessManager, show the percentage of data compressed.
 	✗ Extraction of archives to be done in NBProcessManager, show the percentage of data processed
-	✓ Use an external library to do the work - libarchive
+	✓ Use an external library to do the work - libarchive, liblzma, libz, libbz2
+	⬜ Add support for .lz, .lzo, .uu
 	⬜ Archive preview using Folder Flash
 
+Settings                                                                                                                              [ 0 of 1 ]
+	⬜ Apply the settings to the existing windows immediately
 
 Note:
 	✍ - Work in progress

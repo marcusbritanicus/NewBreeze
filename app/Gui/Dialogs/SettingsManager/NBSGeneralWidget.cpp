@@ -19,7 +19,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 	defaultViewModeCB = new QComboBox( this );
 	defaultViewModeCB->addItems( QStringList() << "Icons" << "Tiles" << "Details" );
-	if ( sett.value( "ViewMode" ).toString() == "Icons" )
+	if ( sett.value( "ViewMode" ).toString().isEmpty() or sett.value( "ViewMode" ).toString() == "Icons" )
 		defaultViewModeCB->setCurrentIndex( 0 );
 
 	else if ( sett.value( "ViewMode" ).toString() == "Tiles" )
@@ -116,6 +116,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	openWithSuperStartRB = new QRadioButton( "Open with S&uperStart", this );
 	openWithSuperStartRB->setChecked( sett.value( "SuperStart" ).toBool() );
 	connect( openWithSuperStartRB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithToggled() ) );
+	openWithSuperStartRB->setDisabled( true );
 
 	if ( not openWithCB->isChecked() ) {
 		openWithCatalogRB->setDisabled( true );
@@ -242,8 +243,7 @@ void NBSGeneralWidget::handleShowSidePanelToggled( bool showPanel ) {
 };
 
 void NBSGeneralWidget::handleSidePanelChoice() {
-	/* Modern: 0 */
-	/* Classic: 0 */
+	/* Modern: 0; Classic: 1 */
 
 	if ( qobject_cast<QRadioButton*>( sender() ) == sidePanelRB )
 		Settings->setValue( "SidePanelType", 0 );
@@ -271,7 +271,7 @@ void NBSGeneralWidget::handleOpenWithToggled() {
 			Settings->General.SuperStart = gSettings.value( "SuperStart", false ).toBool();
 
 			openWithCatalogRB->setEnabled( true );
-			openWithSuperStartRB->setEnabled( true );
+			// openWithSuperStartRB->setEnabled( true );
 		}
 
 		else {

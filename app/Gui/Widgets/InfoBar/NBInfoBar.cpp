@@ -76,7 +76,7 @@ NBInfoBar::NBInfoBar( QWidget *parent ) : QWidget( parent ) {
 	setLayout( lyt );
 
 	/* Styling */
-	setStyleSheet( "QWidget#base { border-top: 1px solid gray; }" );
+	setStyleSheet( "QWidget#base { border-top: 1px solid darkgray; }" );
 };
 
 void NBInfoBar::updateInfoBarCF( QString folderPath ) {

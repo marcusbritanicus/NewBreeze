@@ -4,7 +4,7 @@
 	*
 */
 
-#include <NBEncFS.hpp>
+#include "NBEncFS.hpp"
 
 NBEncFS::NBEncFS( QString source, QString target, QWidget *parent ) : QObject( parent ) {
 
@@ -49,11 +49,9 @@ void NBEncFS::mountDir() {
 		QString password = pKeyPad->password();
 		pKeyPad->clear();
 
-		qDebug() << "Entered password";
 		proc.write( password.toLocal8Bit().data() );
 		proc.write( "\n" );
 		password.clear();
-		qDebug() << "Waiting for mount";
 		proc.waitForFinished();
 
 		if ( proc.exitCode() )
@@ -73,7 +71,6 @@ void NBEncFS::mountDir() {
 
 	else {
 		proc.terminate();
-		qDebug() << text;
 		QMessageBox::information(
 			mParent,
 			"NewBreeze EncFS - Mount Failed",
@@ -100,7 +97,7 @@ void NBEncFS::unmountDir() {
 		return;
 
 	QProcess proc;
-	proc.start( "fusermount", QStringList() << "-u" << mTarget );
+	proc.start( "fusermount", QStringList() << "-uz" << mTarget );
 	proc.waitForFinished( -1 );
 
 	if ( proc.exitCode() == 0 ) {
@@ -112,7 +109,6 @@ void NBEncFS::unmountDir() {
 	}
 
 	else {
-		qDebug() << proc.readAllStandardOutput() + proc.readAllStandardError();
 		QMessageBox::information(
 			mParent,
 			"Unmount Failed",
@@ -245,5 +241,50 @@ void NBEncFS::createEncFS() {
 				);
 			}
 		}
+	}
+};
+
+void NBEncFS::changePass() {
+
+	QMessageBox::warning(
+		mParent,
+		"NewBreeze - Warning",
+		QString::fromUtf8( "<p>Please note that I have <b>no way of validating the current password</b> before obtaining the new password. "
+		"The current password field will show <font color='darkgreen'><b>Password Validated ✓</b></font> irrespective of "
+		"whether the password is valid or not.</p>"
+		"<p>Inputting the wrong password will <b>not<b> cause any damage to the encrypted data.</p>" )
+	);
+
+	NBPasswordDialog *pDlg = new NBPasswordDialog( true, qobject_cast<QWidget*>( parent() ) );
+
+	/* By pass the true password validation, as the password cannot be validated */
+	connect( pDlg, SIGNAL( oldPasswordValidated( bool ) ), pDlg, SLOT( setValidated( bool ) ) );
+
+	if ( pDlg->exec() != QDialog::Accepted )
+		return;
+
+	/* Get the passwords */
+	QString oPassword = pDlg->oldPassword();
+	QString nPassword = pDlg->password();
+	pDlg->clear();
+
+	QString command( "printf '%1\n%2\n' | encfsctl autopasswd %3" );
+
+	int exitCode = system( command.arg( oPassword ).arg( nPassword ).arg( mSource ).toLocal8Bit().constData() );
+
+	if ( not exitCode ) {
+		QMessageBox::information(
+			mParent,
+			"NewBreeze - Success",
+			"The password has been updated successfully. You may now mount the directory using the new password."
+		);
+	}
+
+	else {
+		QMessageBox::information(
+			mParent,
+			"NewBreeze - Failed",
+			"The password has not been altered. This is likely due to inputting the wrong password."
+		);
 	}
 };

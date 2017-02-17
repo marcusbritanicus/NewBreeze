@@ -39,8 +39,3 @@
 #include "NBSystemInfo.hpp"
 #include "NBTools.hpp"
 #include "NBXdg.hpp"
-#include "QCryptographicHash5.hpp"
-#include "QMimeDatabase.hpp"
-#include "QMimeType.hpp"
-#include "QStandardPaths.hpp"
-#include "QStorageInfo.hpp"

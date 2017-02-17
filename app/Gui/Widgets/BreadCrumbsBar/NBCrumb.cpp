@@ -6,7 +6,7 @@
 
 #include "NBCrumb.hpp"
 
-NBCrumb::NBCrumb( QString text, bool currentPath, QWidget *parent ) : QWidget( parent ) {
+NBCrumb::NBCrumb( QString text, bool currentPath ) : QWidget() {
 
 	/* Track mouse movements */
 	setMouseTracking( true );
@@ -14,10 +14,19 @@ NBCrumb::NBCrumb( QString text, bool currentPath, QWidget *parent ) : QWidget( p
 	/* NoFocus */
 	setFocusPolicy( Qt::NoFocus );
 
+	/* Font */
+	setFont( QFont( "DejaVu Sans Mono", 9 ) );
+
 	if ( text == "/" ) {
 		/* Set the root path */
 		mPath = "/";
 		mCrumbText = "Root";
+	}
+
+	else if ( QFileInfo( text ).canonicalFilePath() == QDir::homePath() ) {
+
+		mPath = text;
+		mCrumbText = ":HOME:";
 	}
 
 	else {
@@ -33,7 +42,7 @@ NBCrumb::NBCrumb( QString text, bool currentPath, QWidget *parent ) : QWidget( p
 	m_Current = currentPath;
 
 	/* Set the size of the crumb: buffer 10 ( maxSize = 500 ) */
-	if ( currentPath ) {
+	if ( currentPath and mCrumbText != ":HOME:" ) {
 		/* If this is the directory we are showing, make it bold */
 		QFontMetrics fm( QFont( font().family(), font().pointSize(), QFont::Bold ) );
 		/* width = text width + menu button + buffer */
@@ -41,8 +50,14 @@ NBCrumb::NBCrumb( QString text, bool currentPath, QWidget *parent ) : QWidget( p
 		if ( mWidth > 500 ) {
 			mWidth = 500;
 			/* Buffer 10, hence width: 490 */
-			mCrumbText = fm.elidedText( mCrumbText, Qt::ElideRight, 490 );
+			mCrumbText = fm.elidedText( mCrumbText, Qt::ElideMiddle, 480 );
 		}
+	}
+
+	else if ( mCrumbText == ":HOME:" ) {
+
+		/* Icon width + arrow width + buffer */
+		mWidth = 32 + 16 + 10;
 	}
 
 	else {
@@ -53,7 +68,7 @@ NBCrumb::NBCrumb( QString text, bool currentPath, QWidget *parent ) : QWidget( p
 		if ( mWidth > 500 ) {
 			mWidth = 500;
 			/* Buffer 10, hence width: 490 */
-			mCrumbText = fm.elidedText( mCrumbText, Qt::ElideRight, 490 );
+			mCrumbText = fm.elidedText( mCrumbText, Qt::ElideMiddle, 480 );
 		}
 	}
 
@@ -65,6 +80,10 @@ NBCrumb::NBCrumb( QString text, bool currentPath, QWidget *parent ) : QWidget( p
 
 	/* Tooltip */
 	setToolTip( mPath );
+
+	/* Cursor Shape */
+	if ( not currentPath )
+		setCursor( Qt::PointingHandCursor );
 
 	setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed ) );
 	updateGeometry();
@@ -86,23 +105,52 @@ void NBCrumb::showMenu() {
 	repaint();
 
 	QMenu *menu = new QMenu( this );
-	if ( cwd.entryList().count() ) {
-		foreach( QString dir, cwd.entryList() )
-			menu->addAction( QIcon::fromTheme( "folder" ), dir, this, SLOT( onMenuItemClicked() ) );
+	if ( mPath.startsWith( "NB://SuperStart" ) ) {
+		QSettings sett( "NewBreeze", "SuperStart" );
+		sett.beginGroup( "Places" );
+
+		if ( sett.childKeys().count() ) {
+			foreach( QString dir, sett.childKeys() ) {
+				QAction *act = new QAction( QIcon::fromTheme( "folder" ), baseName( dir ), this );
+				act->setData( sett.value( dir ) );
+				connect( act, SIGNAL( triggered() ), this, SLOT( onMenuItemClicked() ) );
+				menu->addAction( act );
+			}
+		}
+
+		else {
+			QAction *action = menu->addAction( QIcon::fromTheme( "folder" ), "No folders" );
+			action->setDisabled( true );
+		}
+
+		sett.endGroup();
 	}
 
-	else {
+	else if ( mPath.startsWith( "NB://" ) ) {
+
 		QAction *action = menu->addAction( QIcon::fromTheme( "folder" ), "No folders" );
 		action->setDisabled( true );
 	}
 
-	menu->move( mapToGlobal( rect().bottomLeft() ) );
+	else {
 
-	QEventLoop loop;
-	connect( menu, SIGNAL( aboutToHide() ), &loop, SLOT( quit() ) );
+		if ( cwd.entryList().count() ) {
+			foreach( QString dir, cwd.entryList() ) {
+				QAction *act = new QAction( QIcon::fromTheme( "folder" ), dir, this );
+				act->setData( cwd.absoluteFilePath( dir ) );
+				connect( act, SIGNAL( triggered() ), this, SLOT( onMenuItemClicked() ) );
+				menu->addAction( act );
+			}
 
-	menu->show();
-	loop.exec();
+		}
+
+		else {
+			QAction *action = menu->addAction( QIcon::fromTheme( "folder" ), "No folders" );
+			action->setDisabled( true );
+		}
+	}
+
+	menu->exec( mapToGlobal( rect().bottomLeft() ) );
 
 	m_MenuButtonPressed = false;
 	repaint();
@@ -110,7 +158,7 @@ void NBCrumb::showMenu() {
 
 void NBCrumb::onMenuItemClicked() {
 
-	emit loadPath( cwd.filePath( qobject_cast<QAction *>( sender() )->text() ) );
+	emit loadPath( qobject_cast<QAction *>( sender() )->data().toString() );
 };
 
 void NBCrumb::mousePressEvent( QMouseEvent *mEvent ) {
@@ -203,12 +251,16 @@ void NBCrumb::paintEvent( QPaintEvent *pEvent ) {
 		painter->setFont( QFont( font().family(), font().pointSize(), QFont::Bold ) );
 
 	/* Draw the text */
-	painter->drawText( QRect( 1, 1, eWidth, 24 ), Qt::AlignCenter | Qt::TextShowMnemonic, mCrumbText );
+	if ( mCrumbText == ":HOME:" )
+		painter->drawPixmap( QRect( 8, 0, 24, 24 ), QIcon::fromTheme( "go-home", QIcon( ":/icons/home.png" ) ).pixmap( 24 ) );
+
+	else
+		painter->drawText( QRect( 1, 1, eWidth, 24 ), Qt::AlignCenter, mCrumbText );
 
 	/* Draw the menu */
 	if ( m_MenuButtonPressed ) {
 		/* We are showing a menu, hence, arrow down */
-		QStyleOptionSpinBox options;
+		QStyleOption options;
 		options.rect = QRect( eWidth, 0, 16, 24 );
 		options.state = QStyle::State_MouseOver | QStyle::State_Enabled;
 		options.palette = palette();
@@ -217,8 +269,8 @@ void NBCrumb::paintEvent( QPaintEvent *pEvent ) {
 	}
 
 	else {
-		/* Normal situaltion, arrow right */
-		QStyleOptionSpinBox options;
+		/* Normal situation, arrow right */
+		QStyleOption options;
 		options.rect = QRect( eWidth, 0, 16, 24 );
 		options.state = QStyle::State_Off | QStyle::State_Enabled;
 		options.palette = palette();

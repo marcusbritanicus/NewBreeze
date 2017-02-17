@@ -98,8 +98,15 @@ static bool isPseudoFs(const QStorageIterator &it)
     QByteArray type = it.fileSystemType();
     if (type == "tmpfs")
         return false;
-    if (type == "rootfs" || type == "rpc_pipefs")
+
+    if ( ( type == "rootfs" ) || ( type == "rpc_pipefs" ) )
         return true;
+
+	if ( ( type == "encfs" ) || ( type == "fuse.encfs" ) )
+		return false;
+
+	if ( ( type == "archivemount" ) || ( type == "fuse.archivemount" ) )
+		return false;
 
     if (!it.device().startsWith('/'))
         return true;

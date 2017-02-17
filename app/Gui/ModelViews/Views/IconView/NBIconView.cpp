@@ -16,84 +16,84 @@ static inline bool isExecutable( QString path ) {
 		return false;
 };
 
-NBIconView::NBIconView( NBItemViewModel *fsModel ) : QAbstractItemView() {
+NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractItemView( parent ) {
 
-	// Current folder viewMode
+	/* Current folder viewMode */
 	currentViewMode = Settings->General.ViewMode;
 
-	// Icon rects
+	/* Icon rects */
 	idealHeight = 0;
 	hashIsDirty = true;
 
-	// Category Height
+	/* Category Height */
 	myCategoryHeight = 24;
 
-	// Category Spacing
+	/* Category Spacing */
 	myCategorySpacing = 10;
 
-	// Contents Margins
+	/* Contents Margins */
 	myContentsMargins = QMargins( 10, 10, 10, 10 );
 
-	// Inlay Margins
+	/* Inlay Margins */
 	myInlayMargins = QMargins( 10, 0, 10, 0 );
 
-	// Grid Size
+	/* Grid Size */
 	myGridSizeMin = QSize( 120, 80 );
 	myGridSize = QSize( 120, 80 );
 	myItemSize = QSize( 110, 70 );
 
-	// Persistent vertical column
+	/* Persistent vertical column */
 	persistentVCol = 0;
 
-	// Items per visual row
+	/* Items per visual row */
 	itemsPerRow = 1;
 	numberOfRows = 0;
 	padding = 0;
 
-	// Set the Apps Delegate
+	/* Set the Apps Delegate */
 	setItemDelegate( new NBIconDelegate() );
 
-	// Applications Model
+	/* Applications Model */
 	cModel = fsModel;
 	setModel( cModel );
 
-	// Icon Size
+	/* Icon Size */
 	setIconSize( Settings->General.IconSize );
 
-	// Selection
+	/* Selection */
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 	setSelectionBehavior( QAbstractItemView::SelectRows );
 	mSelectedIndexes = QModelIndexList();
 
-	// Internal Object Name
+	/* Internal Object Name */
 	setObjectName( "mainList" );
 
 	/* Styling */
 	setStyleSheet( "#mainList{ border:none; }" );
 
-	// Minimum Size
+	/* Minimum Size */
 	setMinimumWidth( 640 );
 
-	// Focus Policy
+	/* Focus Policy */
 	setFocusPolicy( Qt::StrongFocus );
 
-	// Font
+	/* Font */
 	setFont( qApp->font() );
 
-	// Mouse tracking
+	/* Mouse tracking */
 	setMouseTracking( true );
 
-	// No Horizontal ScrollBar
+	/* No Horizontal ScrollBar */
 	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
-	// DragAndDrop
+	/* DragAndDrop */
 	viewport()->setAcceptDrops( true );
 	setDragEnabled( true );
 	setAcceptDrops( true );
 	setDragDropMode( QListView::DragDrop );
 	setDropIndicatorShown( true );
 
-	// Context Menu
+	/* Context Menu */
 	setContextMenuPolicy( Qt::CustomContextMenu );
 
 	connect( cModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( reload() ) );
@@ -101,7 +101,7 @@ NBIconView::NBIconView( NBItemViewModel *fsModel ) : QAbstractItemView() {
 	connect( cModel, SIGNAL( layoutChanged() ), this, SLOT( reload() ) );
 	connect( this, SIGNAL( customContextMenuRequested( QPoint ) ), this, SIGNAL( contextMenuRequested( QPoint ) ) );
 
-	// Zoom In and Out actions
+	/* Zoom In and Out actions */
 	QAction *zoomInAct = new QAction( "Zoom In", this );
 	zoomInAct->setShortcut( QKeySequence::ZoomIn );
 	connect( zoomInAct, SIGNAL( triggered() ), this, SLOT( zoomIn() ) );
@@ -332,6 +332,7 @@ void NBIconView::reload() {
 	persistentVCol = 0;
 
 	mSelectedIndexes.clear();
+	hiddenCategories.clear();
 
 	categoryList = cModel->categories();
 	calculateRectsIfNecessary();
@@ -552,10 +553,10 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		option.palette = pltt;
 
 		NBIconDelegate *dlgt = qobject_cast<NBIconDelegate*>( itemDelegate() );
-		if ( currentViewMode == QString( "IconsView" ) )
+		if ( currentViewMode == QString( "Icons" ) )
 			dlgt->paintIcons( &painter, option, idx );
 
-		else if ( currentViewMode == QString( "TilesView" ) )
+		else if ( currentViewMode == QString( "Tiles" ) )
 			dlgt->paintTiles( &painter, option, idx );
 
 		else
@@ -799,6 +800,7 @@ void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 			switch( cModel->modelDataType() ) {
 				case NBItemViewModel::SuperStart: {
 
+					/* If we are showing a desktop file (application) */
 					if ( idx.data( Qt::UserRole + 9 ).toString().count() ) {
 						QStringList execList = idx.data( Qt::UserRole + 3 ).toStringList();
 						bool runInTerminal = idx.data( Qt::UserRole + 7 ).toBool();
@@ -815,6 +817,7 @@ void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 						}
 					}
 
+					/* If we are showing a place */
 					else {
 
 						emit open( idx );
@@ -988,7 +991,9 @@ void NBIconView::dropEvent( QDropEvent *dpEvent ) {
 
 void NBIconView::keyPressEvent( QKeyEvent *kEvent ) {
 
-	if ( ( kEvent->key() == Qt::Key_Return ) and ( selectionModel()->isSelected( currentIndex() ) ) ) {
+	QList<int> retKeys = QList<int>() << Qt::Key_Return << Qt::Key_Enter;
+
+	if ( retKeys.contains( kEvent->key() ) and ( selectionModel()->isSelected( currentIndex() ) ) ) {
 
 		QModelIndex idx = currentIndex();
 		switch( cModel->modelDataType() ) {
@@ -1056,7 +1061,7 @@ void NBIconView::keyPressEvent( QKeyEvent *kEvent ) {
 
 void NBIconView::computeGridSize( QSize iconSize ) {
 
-	if ( currentViewMode == "IconsView" ) {
+	if ( currentViewMode == "Icons" ) {
 		/*
 			* width: 3 * iconSize
 			* height: iconSize + iconSize * 2
@@ -1064,7 +1069,7 @@ void NBIconView::computeGridSize( QSize iconSize ) {
 		myGridSizeMin = QSize( qMin( 256, qMax( 144, iconSize.width() * 3 ) ), qMax( iconSize.height() + 21, iconSize.height() * 2 ) );
 	}
 
-	else if ( currentViewMode == QString( "TilesView" ) ) {
+	else if ( currentViewMode == QString( "Tiles" ) ) {
 		/* iconSize + padding left + padding right + fixed width text ( max = 256px ) */
 		padding = ( int ) round( iconSize.width() * 0.1 );
 		myGridSizeMin = QSize( iconSize.width() + padding * 2 + qMin( 256, qMax( 144, iconSize.width() * 3 ) ), iconSize.height() + padding * 2 );
@@ -1126,7 +1131,7 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 				return prevIndex();
 
 			case QAbstractItemView::MoveDown: {
-				if ( currentViewMode == "DetailsView" ) {
+				if ( currentViewMode == "Details" ) {
 					if ( idx.row() == cModel->rowCount() - 1 ) {
 						emit selectionChanged();
 						return cModel->index( 0, 0, idx.parent() );
@@ -1144,7 +1149,7 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 
 			case QAbstractItemView::MoveUp: {
 
-				if ( currentViewMode == "DetailsView" ) {
+				if ( currentViewMode == "Details" ) {
 					if ( idx.row() == 0 ) {
 						emit selectionChanged();
 						return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
@@ -1672,7 +1677,7 @@ QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorActio
 			}
 
 			case QAbstractItemView::MoveDown: {
-				if ( currentViewMode == "DetailsView" ) {
+				if ( currentViewMode == "Details" ) {
 					if ( idx.row() == cModel->rowCount() - 1 ) {
 						emit selectionChanged();
 						return cModel->index( 0, 0, idx.parent() );
@@ -1696,7 +1701,7 @@ QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorActio
 			}
 
 			case QAbstractItemView::MoveUp: {
-				if ( currentViewMode == "DetailsView" ) {
+				if ( currentViewMode == "Details" ) {
 					if ( idx.row() == 0 ) {
 						emit selectionChanged();
 						return cModel->index( cModel->rowCount() - 1, 0, idx.parent() );
@@ -1861,10 +1866,10 @@ void NBIconView::calculateRectsIfNecessary() const {
 
 void NBIconView::calculateCategorizedRects() const {
 
-	if ( currentViewMode == QString( "IconsView" ) )
+	if ( currentViewMode == QString( "Icons" ) )
 		calculateCategorizedIconsRects();
 
-	else if ( currentViewMode == QString( "DetailsView" ) )
+	else if ( currentViewMode == QString( "Details" ) )
 		calculateCategorizedDetailsRects();
 
 	else
@@ -2018,10 +2023,10 @@ void NBIconView::calculateCategorizedDetailsRects() const {
 
 void NBIconView::calculateNonCategorizedRects() const {
 
-	if ( currentViewMode == QString( "IconsView" ) )
+	if ( currentViewMode == QString( "Icons" ) )
 		calculateNonCategorizedIconsRects();
 
-	else if ( currentViewMode == QString( "DetailsView" ) )
+	else if ( currentViewMode == QString( "Details" ) )
 		calculateNonCategorizedDetailsRects();
 
 	else
@@ -2107,7 +2112,7 @@ void NBIconView::computeRowsAndColumns() const {
 	int vWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
 	vWidth = vWidth - myInlayMargins.left() - myInlayMargins.right();
 
-	if ( currentViewMode == QString( "DetailsView" ) ) {
+	if ( currentViewMode == QString( "Details" ) ) {
 		itemsPerRow = 1;
 		numberOfRows = cModel->rowCount();
 	}
@@ -2166,7 +2171,7 @@ void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const
 
 void NBIconView::zoomIn() {
 
-	if ( currentViewMode == QString( "DetailsView" ) ) {
+	if ( currentViewMode == QString( "Details" ) ) {
 		if ( myIconSize.width() >= 64 )
 			setIconSize( QSize( 64, 64 ) );
 

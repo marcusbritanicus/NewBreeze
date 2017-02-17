@@ -15,16 +15,16 @@
 #include "NBDeleteManager.hpp"
 #include "NBDeleteProcess.hpp"
 #include "NBErrorsDialog.hpp"
-#include "NBFileDialog.hpp"
 #include "NBItemViewModel.hpp"
 #include "NBFolderFlash.hpp"
 #include "NBGuiWidgets.hpp"
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
 #include "NBIconView.hpp"
 #include "NBIOProcess.hpp"
 #include "NBLogger.hpp"
 #include "NBMessageDialog.hpp"
 #include "NBNewNodeDialog.hpp"
+#include "NBPluginManager.hpp"
 #include "NBPreviewInterface.hpp"
 #include "NBProcessManager.hpp"
 #include "NBPropertiesDialog.hpp"
@@ -43,7 +43,7 @@ class NBFolderView : public QStackedWidget {
 		bool hasSelection();
 
 		QAction *peekAct, *moveAct, *copyAct, *pasteAct, *renameAct, *reloadAct, *trashAct, *delAct, *propertiesAct, *permissionsAct;
-		QAction *actPrevDir, *actNextDir, *actParDir, *actHomeDir, *showHideDotFiles, *openVTE;
+		QAction *actPrevDir, *actNextDir, *actParDir, *actHomeDir, *actGoHome, *showHideDotFiles, *openVTE;
 		QAction *actNewDir, *actNewFile;
 		QAction *sortByNameAct, *sortByTypeAct, *sortBySizeAct, *sortByDateAct;
 		QAction *groupsAct;
@@ -73,6 +73,7 @@ class NBFolderView : public QStackedWidget {
 		void doOpen( QModelIndex );
 		void doOpen( QString loc );
 		void doOpenHome();
+		void loadHomeDir();
 		void doOpenWith();
 		void doOpenInNewWindow();
 		void doOpenInNewTab();
@@ -104,8 +105,6 @@ class NBFolderView : public QStackedWidget {
 		void setFocus();
 
 	private slots :
-		void updatePeekAct();
-
 		void prepareCopy();
 		void prepareMove();
 		void prepareIO();
@@ -114,8 +113,7 @@ class NBFolderView : public QStackedWidget {
 		void extract( QString );
 		void compress( QStringList );
 
-		void updateProgress( QString, float, float );
-		void handleDeleteFailure( QStringList, QStringList );
+		void updateActions();
 
 	Q_SIGNALS :
 		void newWindow( QString );

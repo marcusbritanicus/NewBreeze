@@ -9,7 +9,7 @@
 /* Name of the plugin */
 QString NBPreviewWidget::name() {
 
-	return "MarkdownPreview";
+	return "DefaultPreview";
 };
 
 /* The plugin version */
@@ -19,47 +19,42 @@ QString NBPreviewWidget::version() {
 };
 
 /* The QAction hooks for menus/toolbars */
-QList<QAction*> NBPreviewWidget::actions( QStringList nodes ) {
+QList<QAction*> NBPreviewWidget::actions( Interface, QStringList nodes ) {
 
 	QList<QAction*> actList;
 
 	if ( ( nodes.count() == 1 ) and isFile( nodes.at( 0 ) ) ) {
+		QString previewNode = nodes.at( 0 );
 		QMimeType mime = mimeDb.mimeTypeForFile( nodes.at( 0 ) );
 
 		QAction *act = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), "&Peek", this );
 
 		if ( mime == mimeDb.mimeTypeForFile( "file.odt" ) ) {
-			NBOdfOgle *peek = new NBOdfOgle( nodes.at( 0 ) );
+			NBOdfOgle *peek = new NBOdfOgle( previewNode );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
 		}
 
 		else if ( mime == mimeDb.mimeTypeForFile( "file.pdf" ) ) {
-			NBPdfPeep *peek = new NBPdfPeep( nodes.at( 0 ) );
+			NBPdfPeep *peek = new NBPdfPeep( previewNode );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
 		}
 
-		else if ( mime == mimeDb.mimeTypeForFile( "file.djvu" ) ) {
-			NBDjvuDisplay *peek = new NBDjvuDisplay( nodes.at( 0 ) );
+		else if ( mime.name().contains( "djvu" ) ) {
+			NBDjvuDisplay *peek = new NBDjvuDisplay( previewNode );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
 		}
 
-		else if ( ( mime == mimeDb.mimeTypeForFile( "file.html" ) ) or ( mime.name() == "text/html" ) ) {
-			NBWebWatch *peek = new NBWebWatch( nodes.at( 0 ) );
+		else if ( mime.name().contains( "html" ) or mime.name().contains( "xml" ) ) {
+			NBWebWatch *peek = new NBWebWatch( previewNode );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
 		}
 
-		else if ( mime.name().contains( "image" ) ) {
-			NBImagePeek *peek = new NBImagePeek( nodes.at( 0 ) );
-			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
-			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
-		}
-
-		else if ( mime.name().contains( "text" ) or mime.allAncestors().filter( "text" ).count() ) {
-			NBWordView *peek = new NBWordView( nodes.at( 0 ) );
+		else if ( mime.name().startsWith( "image" ) or ( mime.name() == ( "video/x-mng" ) ) ) {
+			NBImagePeek *peek = new NBImagePeek( previewNode );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
 		}
@@ -71,19 +66,19 @@ QList<QAction*> NBPreviewWidget::actions( QStringList nodes ) {
 };
 
 /* Interface type: preview, rename etc */
-NBPluginInterface::Interface NBPreviewWidget::interface() {
+NBPluginInterface::Interfaces NBPreviewWidget::interfaces() {
 
-	return NBPluginInterface::PreviewInterface;
+	return Interfaces() << NBPluginInterface::PreviewInterface;
 };
 
 /* Interface type: preview, rename etc */
-NBPluginInterface::Type NBPreviewWidget::type() {
+NBPluginInterface::Type NBPreviewWidget::type( Interface ) {
 
 	return NBPluginInterface::Enhancement;
 };
 
 /* Plugin load contexts */
-NBPluginInterface::Contexts NBPreviewWidget::contexts() {
+NBPluginInterface::Contexts NBPreviewWidget::contexts( Interface ) {
 
 	return Contexts() << NBPluginInterface::File;
 };
@@ -95,6 +90,7 @@ QStringList NBPreviewWidget::mimetypes() {
 	/* DjVu Mime type */
 	mimeList << mimeDb.mimeTypeForFile( "file.djvu" ).name();
 	mimeList << mimeDb.mimeTypeForFile( "file.djvu" ).aliases();
+	mimeList << "image/vnd.djvu+multipage";
 
 	/* Pdf mime type */
 	mimeList << mimeDb.mimeTypeForFile( "file.pdf" ).name();
@@ -103,6 +99,7 @@ QStringList NBPreviewWidget::mimetypes() {
 	/* Html mime type */
 	mimeList << mimeDb.mimeTypeForFile( "file.html" ).name();
 	mimeList << mimeDb.mimeTypeForFile( "file.html" ).aliases();
+	mimeList << "application/xhtml+xml" << "text/html" << "applixation/xml";
 
 	/* ODT mime type */
 	mimeList << mimeDb.mimeTypeForFile( "file.odt" ).name();
@@ -114,14 +111,48 @@ QStringList NBPreviewWidget::mimetypes() {
 		mimeList << mimeDb.mimeTypeForFile( QString( "file.%1" ).arg( QString( arr ) ) ).aliases();
 	}
 
-	/* Text mime type */
-	Q_FOREACH( QMimeType mime, mimeDb.allMimeTypes() ) {
-		if ( mime.name().contains( "text" ) or mime.allAncestors().filter( "text" ).count() ) {
-			mimeList << mime.name();
-		}
-	}
+	mimeList.removeDuplicates();
+	mimeList.removeAll( "application/octet-stream" );
 
 	return mimeList;
+};
+
+/* Invoke slots called called by triggering the actions */
+void NBPreviewWidget::actionTrigger( Interface, QString, QStringList nodes ) {
+
+	if ( ( nodes.count() == 1 ) and isFile( nodes.at( 0 ) ) ) {
+		QMimeType mime = mimeDb.mimeTypeForFile( nodes.at( 0 ) );
+
+		if ( mime == mimeDb.mimeTypeForFile( "file.odt" ) ) {
+			NBOdfOgle *peek = new NBOdfOgle( nodes.at( 0 ) );
+			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
+			peek->exec();
+		}
+
+		else if ( mime == mimeDb.mimeTypeForFile( "file.pdf" ) ) {
+			NBPdfPeep *peek = new NBPdfPeep( nodes.at( 0 ) );
+			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
+			peek->exec();
+		}
+
+		else if ( mime.name().contains( "djvu" ) ) {
+			NBDjvuDisplay *peek = new NBDjvuDisplay( nodes.at( 0 ) );
+			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
+			peek->exec();
+		}
+
+		else if ( mime.name().contains( "html" ) or mime.name().contains( "xml" ) ) {
+			NBWebWatch *peek = new NBWebWatch( nodes.at( 0 ) );
+			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
+			peek->exec();
+		}
+
+		else if ( mime.name().contains( "image" ) ) {
+			NBImagePeek *peek = new NBImagePeek( nodes.at( 0 ) );
+			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
+			peek->exec();
+		}
+	}
 };
 
 void NBPreviewWidget::setCaller( QWidget *caller ) {

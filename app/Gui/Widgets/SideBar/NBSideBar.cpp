@@ -6,6 +6,16 @@
 
 #include "NBSideBar.hpp"
 
+static const QString tooltipSkel = QString(
+	"%1"
+	"<table width = '100%' style = 'background-color: gray; font-size: 3pt;' CELLPADDING = 0 CELLSPACING = 0 >"
+	"	<tr>"
+	"		<td width = '%2%' style = 'background-color: %3;'></td>"
+	"		<td></td>"
+	"	</tr>"
+	"</table>"
+);
+
 NBSideBar::NBSideBar( QWidget *parent ) : QWidget( parent ) {
 
 	populateSideBar();
@@ -75,8 +85,13 @@ void NBSideBar::reloadDevices() {
 	drives->clear();
 	vfs->clear();
 
-	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDrives() )
-		drives->addItem( info.driveLabel(), ":/icons/" + info.driveType() + ".png", info.mountPoint() );
+	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDrives() ) {
+		int pos = drives->addItem( info.driveLabel(), ":/icons/" + info.driveType() + ".png", info.mountPoint() );
+
+		/* Special tooltip hack */
+		int percent = 100 * info.usedSpace() / info.driveSize();
+		drives->item( pos )->setToolTip( tooltipSkel.arg( info.mountPoint() ).arg( percent ).arg( percent < 90 ? "darkgreen" : "darkred" ) );
+	}
 
 	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allVirtualMounts() )
 		vfs->addItem( info.driveLabel(), ":/icons/" + info.driveType() + ".png", info.mountPoint() );
@@ -99,7 +114,7 @@ void NBSideBar::reloadBookmarks() {
 	bookmarks->clear();
 
 	Q_FOREACH( NBBookmarkInfo info, NBBookmarkInfo::allBookmarks() )
-		bookmarks->addItem( info.displayLabel, NBIconProvider::themeIcon( "bookmarks" ), info.mountPoint );
+		bookmarks->addItem( info.displayLabel, NBIconProvider::themeIcon( "bookmarks", ":/icons/bookmark.png" ), info.mountPoint );
 
 	if ( bookmarks->itemCount() )
 		bookmarks->show();
@@ -179,9 +194,8 @@ void NBSideBar::paintEvent( QPaintEvent *pEvent ) {
 
 	QPainter painter( this );
 	painter.setRenderHint( QPainter::HighQualityAntialiasing );
-	painter.setPen( Qt::gray );
+	painter.setPen( Qt::darkGray );
 
-	// painter.drawRoundedRect( QRectF( rect().adjusted( 0, 0, -1, -1 ) ), 2.0, 2.0 );
 	painter.drawLine( rect().topRight(), rect().bottomRight() );
 	painter.end();
 

@@ -9,7 +9,7 @@
 #include "Global.hpp"
 #include "NBDialog.hpp"
 #include "NBGuiWidgets.hpp"
-#include "NBIconProvider.hpp"
+#include "NBIconManager.hpp"
 #include "NBButtons.hpp"
 
 class NBConfirmDeleteDialog : public NBDialog {

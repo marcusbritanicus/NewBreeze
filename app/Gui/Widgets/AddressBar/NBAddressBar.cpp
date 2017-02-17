@@ -88,7 +88,7 @@ NBAddressEdit::NBAddressEdit( QWidget *parent ) : QLineEdit( parent ) {
 NBAddressWidget::NBAddressWidget( QWidget *parent ) : QWidget( parent ) {
 
 	addressEdit = new NBAddressEdit( this );
-	addressEdit->setFont( QFont( "Envy Code R", 11 ) );
+	addressEdit->setFont( QFont( "DejaVu Sans Mono", 9 ) );
 	addressEdit->setFocusPolicy( Qt::NoFocus );
 
 	connect( addressEdit, SIGNAL( returnPressed() ), this, SLOT( revertToCrumbsBar() ) );
@@ -107,7 +107,7 @@ NBAddressWidget::NBAddressWidget( QWidget *parent ) : QWidget( parent ) {
 	bLyt->addWidget( toggleBtn );
 
 	QWidget *base = new QWidget( this );
-	base->setObjectName( "base" );
+	base->setObjectName( "addressWidget" );
 	base->setLayout( bLyt );
 
 	QHBoxLayout *lyt = new QHBoxLayout();
@@ -151,13 +151,13 @@ void NBAddressWidget::setShowHidden( bool shown ) {
 void NBAddressWidget::setWidgetProperties() {
 
 	setContentsMargins( QMargins() );
-	setFont( QFont( "Envy Code R", 10 ) );
+	setFont( QFont( "DejaVu Sans Mono", 9 ) );
 
 	setFixedHeight( 28 );
 
 	toggleBtn->setChecked( false );
 	toggleBtn->setFocusPolicy( Qt::NoFocus );
-	toggleBtn->setShortcut( Settings->Shortcuts.ToggleCrumbLE.at( 0 ) );
+	toggleBtn->setShortcut( Settings->Shortcuts.ToggleCrumbLE.at( 0 ).toString() );
 
 	connect( toggleBtn, SIGNAL( clicked() ), this, SLOT( toggleCrumbsBarAndEdit() ) );
 };
@@ -200,17 +200,23 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	fLyt->setContentsMargins( QMargins( 3, 0, 0, 0 ) );
 
 	// Previous button
-	backBtn = new NBButton( QIcon::fromTheme( "go-previous" ), this );
+	backBtn = new NBButton( QIcon( NBIconProvider::themeIcon( "go-previous", ":/icons/arrow-left.png" ) ), this );
 	backBtn->setFocusPolicy( Qt::NoFocus );
 	backBtn->setFlat( true );
 
 	// Next Button
-	forwardBtn = new NBButton( QIcon::fromTheme( "go-next" ), this );
+	forwardBtn = new NBButton( QIcon( NBIconProvider::themeIcon( "go-next", ":/icons/arrow-right.png" ) ), this );
 	forwardBtn->setFocusPolicy( Qt::NoFocus );
 	forwardBtn->setFlat( true );
 
+	// Home Button
+	homeBtn = new NBButton( QIcon( NBIconProvider::themeIcon( "go-home", ":/icons/home.png" ) ), this );
+	homeBtn->setFocusPolicy( Qt::NoFocus );
+	homeBtn->setFlat( true );
+
 	NBSegmentButton *navBtns = new NBSegmentButton( this );
 	navBtns->addSegment( backBtn );
+	navBtns->addSegment( homeBtn );
 	navBtns->addSegment( forwardBtn );
 
 	// AddressWidget
@@ -225,28 +231,28 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 	viewModes->setSelectionBehavior( NBSegmentButton::SelectOne );
 
 	// Tiles
-	viewModes->setSegmentIcon( 0, QIcon::fromTheme( "view-list-details" ) );
+	viewModes->setSegmentIcon( 0, QIcon( NBIconProvider::themeIcon( "view-list-details", ":/icons/view-list.png" ) ) );
 	viewModes->segment( 0 )->setFocusPolicy( Qt::NoFocus );
 
 	// Icons
-	viewModes->setSegmentIcon( 1, QIcon::fromTheme( "view-list-icons" ) );
+	viewModes->setSegmentIcon( 1, QIcon( NBIconProvider::themeIcon( "view-list-icons", ":/icons/view-icon.png" ) ) );
 	viewModes->segment( 1 )->setFocusPolicy( Qt::NoFocus );
 
 	// Details
-	viewModes->setSegmentIcon( 2, QIcon::fromTheme( "view-list-text" ) );
+	viewModes->setSegmentIcon( 2, QIcon( NBIconProvider::themeIcon( "view-list-text", ":/icons/view-details.png" ) ) );
 	viewModes->segment( 2 )->setFocusPolicy( Qt::NoFocus );
 
 	if ( Settings->General.ViewMode == "Tiles" )
 		viewModes->segment( 0 )->setChecked( true );
 
-	else if ( Settings->General.ViewMode == "Tiles" )
+	else if ( Settings->General.ViewMode == "Icons" )
 		viewModes->segment( 1 )->setChecked( true );
 
 	else
-		viewModes->segment( 1 )->setChecked( true );
+		viewModes->segment( 2 )->setChecked( true );
 
 	// FilterButton
-	filterBtn = new NBButton( QIcon::fromTheme( "edit-find", QIcon( ":/icons/search.png" ) ) );
+	filterBtn = new NBButton( QIcon( NBIconProvider::themeIcon( "edit-finder", ":/icons/search.png" ) ) );
 	filterBtn->setObjectName( "base" );
 	filterBtn->setFocusPolicy( Qt::NoFocus );
 
@@ -281,6 +287,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
 
 	/* Connections */
 	connect( backBtn, SIGNAL( clicked() ), this, SIGNAL( goBack() ) );
+	connect( homeBtn, SIGNAL( clicked() ), this, SIGNAL( goHome() ) );
 	connect( forwardBtn, SIGNAL( clicked() ), this, SIGNAL( goForward() ) );
 	connect( addressWidget, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
 	connect( filterBtn, SIGNAL( clicked() ), this, SIGNAL( openSearch() ) );
@@ -321,5 +328,5 @@ void NBAddressBar::hideSearchButton() {
 
 void NBAddressBar::showSearchButton() {
 
-	filterBtn->setIcon( QIcon::fromTheme( "edit-find", QIcon( ":/icons/search.png" ) ) );
+	filterBtn->setIcon( QIcon( NBIconProvider::themeIcon( "edit-finder", ":/icons/search.png" ) ) );
 };

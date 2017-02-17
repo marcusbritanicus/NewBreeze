@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include <Global.hpp>
-#include <NBPasswordInput.hpp>
-#include <NBNewEncFS.hpp>
-#include <NBTools.hpp>
+#include "Global.hpp"
+#include "NBPasswordInput.hpp"
+#include "NBPasswordDialog.hpp"
+#include "NBNewEncFS.hpp"
+#include "NBTools.hpp"
 
 class NBEncFS : public QObject {
 	Q_OBJECT
@@ -22,6 +23,7 @@ class NBEncFS : public QObject {
 		void mountDir();
 		void unmountDir();
 		void createEncFS();
+		void changePass();
 
 	private:
 		QString mSource;

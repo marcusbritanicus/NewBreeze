@@ -49,10 +49,14 @@ void NBIconUpdater::run() {
 	}
 };
 
-NBItemViewModel::NBItemViewModel() : QAbstractItemModel() {
+bool NBItemViewModel::__showHidden = false;
+QStringList NBItemViewModel::__nameFilters = QStringList();
+bool NBItemViewModel::__filterFolders = false;
+
+NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent ) {
 
 	/* By default we don't show hidden files */
-	__showHidden = false;
+	__showHidden = Settings->General.ShowHidden;
 
 	/* Filter both files and folders? */
 	__filterFolders = Settings->General.FilterFolders;
@@ -91,8 +95,6 @@ NBItemViewModel::NBItemViewModel() : QAbstractItemModel() {
 	connect( watcher, SIGNAL( nodeDeleted( QString ) ), this, SLOT( handleNodeDeleted( QString ) ) );
 	connect( watcher, SIGNAL( nodeRenamed( QString, QString ) ), this, SLOT( handleNodeRenamed( QString, QString ) ) );
 	connect( watcher, SIGNAL( watchPathDeleted() ), this, SLOT( loadHome() ) );
-
-	// connect( this, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateAllNodes( QString ) ) );
 };
 
 NBItemViewModel::~NBItemViewModel() {
@@ -174,13 +176,10 @@ QVariant NBItemViewModel::data( const QModelIndex &index, int role ) const {
 				switch( __mModelDataType ) {
 					case NBItemViewModel::Applications: {
 						QString icoStr( node->data( 2, true ).toString() );
-						QIcon icon = QIcon::fromTheme( icoStr );
+						QIcon icon = QIcon( NBIconProvider::themeIcon( icoStr, "application-x-executable" ) );
 
 						if ( icon.isNull() )
-							icon = QIcon( NBIconProvider::pixmapIcon( icoStr ) );
-
-						if ( icon.isNull() )
-							icon = QIcon::fromTheme( "application-x-desktop", QIcon::fromTheme( "application-x-executable", QIcon( ":/icons/exec.png" ) ) );
+							icon = QIcon( ":/icons/exec.png" );
 
 						return icon;
 					}
@@ -189,39 +188,29 @@ QVariant NBItemViewModel::data( const QModelIndex &index, int role ) const {
 						QString icoStr( node->data( 2, true ).toString() );
 
 						if ( node->data( 0, true ).toString() == "System" ) {
-							QIcon icon = QIcon::fromTheme( icoStr );
+							QIcon icon = QIcon( NBIconProvider::themeIcon( icoStr, "application-x-executable" ) );
 
 							if ( icon.isNull() )
-								icon = QIcon( NBIconProvider::pixmapIcon( icoStr ) );
-
-							if ( icon.isNull() )
-								icon = QIcon::fromTheme( "application-x-desktop", QIcon::fromTheme( "application-x-executable", QIcon( ":/icons/exec.png" ) ) );
+								icon = QIcon( ":/icons/exec.png" );
 
 							return icon;
 						}
 
 						// Icon we got from the theme
-						QIcon themeIcon = QIcon::fromTheme( icoStr, QIcon( icoStr ) );
+						QIcon themeIcon = QIcon( NBIconProvider::themeIcon( icoStr, "unknown" ) );
 
 						if ( not themeIcon.isNull() )
 							return themeIcon;
 
 						else
-							return QIcon::fromTheme( "unknown", QIcon( ":/icons/unknown.png" ) );
+							return QIcon( ":/icons/unknown.png" );
 					}
+
 					case NBItemViewModel::Catalogs:
 					case NBItemViewModel::FileSystem: {
-						// Icon String
-						QString icoStr( node->data( 2, true ).toString() );
 
-						// Icon we got from the theme
-						QIcon themeIcon = QIcon::fromTheme( icoStr, QIcon( icoStr ) );
-
-						if ( not themeIcon.isNull() )
-							return themeIcon;
-
-						else
-							return QIcon::fromTheme( "unknown", QIcon( ":/icons/unknown.png" ) );
+						// Icon stored in the node
+						return node->icon();
 					}
 				}
 			}
@@ -399,13 +388,13 @@ bool NBItemViewModel::insertNode( QString nodeName ) {
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 	endResetModel();
 
-	NBFileInfoGatherer *ig = new NBFileInfoGatherer( &__terminate );
+	NBIconUpdater *ig = new NBIconUpdater( __rootPath, QStringList() << nodeName,  &__terminate );
 	connect(
-		ig, SIGNAL( done( QString, QString, QStringList ) ),
+		ig, SIGNAL( updated( QString, QString, QStringList ) ),
 		this, SLOT( saveInfo( QString, QString, QStringList ) )
 	);
 
-	ig->gatherInfo( QStringList() << nodeName, __rootPath );
+	ig->start();
 
 	return true;
 };
@@ -430,13 +419,13 @@ void NBItemViewModel::updateNode( QString nodeName ) {
 		node->setData( 1, formatSize( node->data( 1, true ).toLongLong() ), false );
 	}
 
-	NBFileInfoGatherer *ig = new NBFileInfoGatherer( &__terminate );
+	NBIconUpdater *ig = new NBIconUpdater( __rootPath, QStringList() << nodeName, &__terminate );
 	connect(
 		ig, SIGNAL( done( QString, QString, QStringList ) ),
 		this, SLOT( saveInfo( QString, QString, QStringList ) )
 	);
 
-	ig->gatherInfo( QStringList() << nodeName, __rootPath );
+	ig->start();
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 };
 
@@ -618,6 +607,14 @@ QPixmap NBItemViewModel::pixmapForCategory( QString categoryName ) const {
 
 			else
 				return QIcon( ":/icons/catalogs-alt.png" ).pixmap( 16, 16 );
+		}
+
+		case NBItemViewModel::SuperStart: {
+			if ( categoryName == "Places" )
+				return QIcon( ":/icons/folder.png" ).pixmap( 16, 16 );
+
+			else
+				return QIcon( ":/icons/applications.png" ).pixmap( 16, 16 );
 		}
 
 		default: {
@@ -1023,11 +1020,11 @@ void NBItemViewModel::goUp() {
 
 void NBItemViewModel::goHome() {
 
-	if ( Settings->General.SuperStart )
-		setRootPath( "NB://SuperStart" );
+	// if ( Settings->General.SpecialOpen and Settings->General.SuperStart )
+		// setRootPath( "NB://SuperStart" );
 
-	else if ( Settings->General.SuperStart )
-		setRootPath( "NB://SuperStart" );
+	/*else*/ if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog )
+		setRootPath( "NB://Catalogs" );
 
 	else
 		setRootPath( QDir::homePath() );
@@ -1129,74 +1126,24 @@ void NBItemViewModel::setupFileSystemData() {
 	emit directoryLoading( __rootPath );
 
 	beginResetModel();
-	if ( dir != NULL ) {
-		while ( ( ent = readdir( dir ) ) != NULL) {
-			if ( currentLoadStatus.stopLoading ) {
-				endResetModel();
-				currentLoadStatus.stopLoading = false;
-				closedir( dir );
-				return;
-			}
 
-			/*
-				*
-				* Do not show . and ..
-				*
-			*/
-			QString nodeName = QString::fromLocal8Bit( ent->d_name );
-			if ( ( nodeName.compare( "." ) == 0 ) or ( nodeName.compare( ".." ) == 0 ) )
-				continue;
+	/* Get file list */
+	struct dirent **fileList;
+	int numFiles = scandir( __rootPath.toStdString().c_str(), &fileList, nameFilter, NULL );
 
-			QVariantList data = quickDataGatherer->getQuickFileInfo( __rootPath + nodeName );
-			/* Show Hidden */
-			if ( __showHidden ) {
-				/* We should be able to filter folders if need be */
-				if ( __nameFilters.count() ) {
-					/* If filter folders is false, don't bother about filtering folders */
-					if ( not __filterFolders and ent->d_type == DT_DIR ) {
-						rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
-						__childNames << nodeName;
-					}
-
-					else if ( matchesFilter( __nameFilters, nodeName ) ) {
-						rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
-						__childNames << nodeName;
-					}
-				}
-				else {
-					rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
-					__childNames << nodeName;
-				}
-			}
-
-			/* Hide Hidden */
-			else {
-				if ( not nodeName.startsWith( "." ) ) {
-					/* We want to filter folders too */
-					if ( __nameFilters.count() ) {
-						if ( not __filterFolders and ent->d_type == DT_DIR ) {
-							rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
-							__childNames << nodeName;
-						}
-
-						else if ( matchesFilter( __nameFilters, nodeName ) ) {
-							rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
-							__childNames << nodeName;
-						}
-					}
-
-					else {
-						rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
-						__childNames << nodeName;
-					}
-				}
-			}
+	/* Add the files to the model */
+	if ( numFiles >= 0 ) {
+		for( int i = 0; i < numFiles; i++ ) {
+			QString _nodeName = QString::fromLocal8Bit( fileList[ i ]->d_name );
+			QVariantList data = quickDataGatherer->getQuickFileInfo( __rootPath + _nodeName );
+			rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
+			__childNames << _nodeName;
 		}
-
-		closedir( dir );
 	}
+
 	endResetModel();
 
+	/* We make all the categories visible by default */
 	foreach( QString mCategoryName, rootNode->categoryList() )
 		categoryVisibilityMap[ mCategoryName ] = true;
 
@@ -1257,6 +1204,7 @@ void NBItemViewModel::setupSuperStartData() {
 	superStart.endGroup();
 	endResetModel();
 
+	/* We make all the categories visible by default */
 	foreach( QString mCategoryName, rootNode->categoryList() )
 		categoryVisibilityMap[ mCategoryName ] = true;
 
@@ -1302,6 +1250,7 @@ void NBItemViewModel::setupApplicationsData() {
 	}
 	endResetModel();
 
+	/* We make all the categories visible by default */
 	foreach( QString mCategoryName, rootNode->categoryList() )
 		categoryVisibilityMap[ mCategoryName ] = true;
 
@@ -1349,6 +1298,7 @@ void NBItemViewModel::setupCatalogData() {
 	catalogsSettings.endGroup();
 	endResetModel();
 
+	/* We make all the categories visible by default */
 	foreach( QString mCategoryName, rootNode->categoryList() )
 		categoryVisibilityMap[ mCategoryName ] = true;
 
@@ -1481,6 +1431,30 @@ void NBItemViewModel::recategorize() {
 	rootNode->updateCategories();
 };
 
+int NBItemViewModel::nameFilter( const struct dirent *entry ) {
+
+	/* Always filter . and .. */
+	if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
+		return 0;
+
+	/* If we are not to show hidden files/folders, filter all names starting with . */
+	if ( not __showHidden and not strncmp( entry->d_name, ".", 1 ) )
+		return 0;
+
+	/* Name filter */
+	if ( __nameFilters.count() ) {
+		/* Do not filter folders, if the flag is not set */
+		if ( not __filterFolders and ( entry->d_type == DT_DIR ) )
+			return 1;
+
+		/* If the name matches any one of the nameFilters, show it */
+		return matchesFilter( __nameFilters, entry->d_name );
+	}
+
+	/* If no filter, select all */
+	return 1;
+};
+
 void NBItemViewModel::terminateInfoGathering() {
 
 	__terminate = true;
@@ -1557,8 +1531,9 @@ void NBItemViewModel::handleNodeChanged( QString node ) {
 			lastUpdatedTimes << QTime::currentTime();
 		}
 
+		/* To handle copying or moving, or any continually changing node */
 		else {
-			/* Past update was more than a second ago */
+			/* Past update was more than ten second ago */
 			if ( lastUpdatedTimes.at( idx ).secsTo( QTime::currentTime() ) > 10000 ) {
 				lastUpdatedTimes.replace( idx, QTime::currentTime() );
 				updateNode( baseName( node ) );
@@ -1569,7 +1544,7 @@ void NBItemViewModel::handleNodeChanged( QString node ) {
 				if ( not delayedUpdateList.contains( node ) )
 					delayedUpdateList << node;
 
-				/* Start timer to perform the update two seconds later */
+				/* Start timer to perform the update ten seconds later */
 				if ( not updateTimer.isActive() )
 					updateTimer.start( 10000, this );
 			}

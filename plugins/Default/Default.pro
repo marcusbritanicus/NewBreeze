@@ -5,8 +5,8 @@ TARGET = DefaultPeekPlugins
 INCLUDEPATH += ../../common/ ../../common/include
 DEPENDPATH += ../../common/ ../../common/include
 
-DEPENDPATH += . DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch WordView
-INCLUDEPATH += . DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch WordView
+DEPENDPATH += . DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch
+INCLUDEPATH += . DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch
 
 isEqual( QT_MAJOR_VERSION, 4 ) {
 	LIBS += -L../../common/ -lnewbreeze-common
@@ -132,11 +132,6 @@ SOURCES += PdfPeep/NBPdfPeep.cpp
 ## ========
 HEADERS += WebWatch/NBWebWatch.hpp
 SOURCES += WebWatch/NBWebWatch.cpp
-
-## WordView
-## ========
-HEADERS += WordView/NBWordView.hpp
-SOURCES += WordView/NBWordView.cpp
 
 unix {
 	isEmpty(PREFIX) {

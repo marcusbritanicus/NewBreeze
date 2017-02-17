@@ -34,7 +34,7 @@ class NBSideBarGroup : public QWidget {
 
 		int itemCount();
 		NBSideBarItem* item( int );
-		void addItem( QString name, QString icon, QString target );
+		int addItem( QString name, QString icon, QString target );
 
 		void clear();
 		void clearHighlights();

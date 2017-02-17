@@ -13,11 +13,16 @@ class NBDriveInfo;
 namespace DesktopSession {
 	enum Session {
 		KDE,
+		KDE4 = KDE,
+		KDE5,
 		GNOME,
 		XFCE,
 		RAZOR,
 		LXDE,
-		OBOX,
+		LXQT,
+		CINNAMON,
+		MATE,
+		ENLIGHTENMENT,
 		UNKNOWN
 	};
 

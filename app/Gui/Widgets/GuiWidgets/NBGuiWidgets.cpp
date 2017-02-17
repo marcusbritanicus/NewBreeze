@@ -17,111 +17,54 @@ void NBLineEdit::paintEvent( QPaintEvent *pEvent ) {
 	pEvent->accept();
 };
 
-NBDriveLabel::NBDriveLabel( const QString path, QWidget *parent ) : QWidget( parent ) {
+NBDriveInfo::NBDriveInfo( NBDeviceInfo dInfo, QWidget *parent ) : QWidget ( parent ) {
 
-	painter = new QPainter();
-	label = QString( path );
+	quint64 usedSize = dInfo.usedSpace();
+	quint64 freeSize = dInfo.freeSpace();
+	quint64 totalSize = dInfo.driveSize();
 
-	setFixedHeight( 32 );
-	QFontMetrics fm( font() );
-	setMinimumWidth( 42 + fm.maxWidth() * path.count() );
-};
+	percent = 1.0 * usedSize / totalSize;
 
-NBDriveLabel::~NBDriveLabel() {
+	QString freeStr = formatSize( totalSize - usedSize );
 
-	if ( painter->isActive() )
-		painter->end();
+	name = dInfo.driveLabel();
+	disk = dInfo.driveName();
+	icon = ":/icons/" + dInfo.driveType() + ".png";
+	info = QString( "%1 free of %2 (%3% used)" ).arg( freeStr ).arg( formatSize( totalSize ) ).arg( 100 * percent, 0, 'f', 2 );
 
-	delete painter;
-};
-
-void NBDriveLabel::paintEvent( QPaintEvent *pEvent ) {
-
-	painter->begin( this );
-	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
-
-	QPixmap pix = QIcon::fromTheme( "drive-harddisk" ).pixmap( 28, 28 );
-
-	painter->setPen( palette().color( QPalette::WindowText ) );
-
-	// 10 px padding along X
-	int pixX = 7;
-
-	// Centering along Y
-	int pixY = ( height() - 28 ) / 2;
-
-	// icon padding-left + icons size + text padding-left
-	int textX = 7 + 28 + 7;
-	// Text is painted using Qt Alignent Flags
-	int textY = 0;
-	// Total width - text start - text-padding-right - right icon size - icon padding-right
-	int textW = width() - textX - 7 - 28 - 7;
-	// Text height is full label height
-	int textH = height();
-
-	// painter->begin( this );
-	painter->drawPixmap( pixX, pixY, 28, 28, pix );
-	painter->drawText( textX, textY, textW, textH, Qt::AlignVCenter + Qt::TextWordWrap, label );
-	painter->end();
-
-	pEvent->accept();
-};
-
-NBDriveInfo::NBDriveInfo( qint64 used, qint64 total, QWidget *parent ) : QFrame( parent ) {
-
-	setFrameStyle( QFrame::StyledPanel | QFrame::Plain );
-	setMaximumHeight( 32 );
-
-	painter = new QPainter();
-
-	percent = 1.0 * used / total;
-	QString freeStr = formatSize( total - used );
-	QString totalStr = formatSize( total );
-
-	QFont xFont( font() );
-	xFont.setBold( true );
-
-	QLabel *label = new QLabel( QString( "%1 free of %2 (%3% used)" ).arg( freeStr ).arg( totalStr ).arg( 100 * percent, 0, 'f', 2 ) );
-	label->setFont( xFont );
-
-	QHBoxLayout *lyt = new QHBoxLayout();
-	lyt->addWidget( label );
-	lyt->setAlignment( Qt::AlignCenter );
-
-	setLayout( lyt );
-};
-
-NBDriveInfo::~NBDriveInfo() {
-
-	if ( painter->isActive() )
-		painter->end();
-
-	delete painter;
+	setFixedHeight( 64 );
 };
 
 void NBDriveInfo::paintEvent( QPaintEvent *pEvent ) {
 
-	painter->begin( this );
-	painter->setRenderHints( QPainter::Antialiasing );
+	QPainter painter( this );
+	painter.setRenderHints( QPainter::HighQualityAntialiasing | QPainter::Antialiasing | QPainter::TextAntialiasing );
 
-	painter->setPen( Qt::NoPen );
+	painter.save();
+	painter.drawPixmap( QRect( 8, 8, 48, 48 ), QPixmap( icon ).scaled( QSize( 64, 64 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	painter.drawText( QRect( 74, 0, width(), height() ), Qt::AlignLeft | Qt::AlignVCenter, QString( "%1 (%2)\n%3" ).arg( name ).arg( disk ).arg( info ) );
+	painter.restore();
 
-	// Draw the percentage bar with the correct color
-	if ( percent > 0.9 )
-		painter->setBrush( QBrush( Qt::darkRed ) );
+	painter.save();
+	painter.setPen( Qt::darkGray );
+	painter.setBrush( Qt::gray );
+	painter.drawEllipse( QPointF( width() - 32.0, 32.0 ), 32.0, 32.0 );
+	painter.restore();
 
-	else
-		painter->setBrush( QBrush( Qt::darkGreen ) );
+	painter.save();
+	qreal radius = 32 * sqrt( percent );
+	painter.setPen( Qt::NoPen );
+	painter.setBrush( percent < .9 ? Qt::darkGreen : Qt::darkRed );
+	painter.drawEllipse( QPointF( width() - 32.0, 32.0 ), radius, radius );
+	painter.restore();
 
-	painter->drawRoundedRect( 1, 1, width() * percent, height() - 2, 5, 5 );
+	painter.save();
+	painter.setPen( Qt::white );
+	painter.setFont( QFont( font().family(), font().pointSize(), QFont::Bold ) );
+	painter.drawText( QRect( width() - 64, 0, 64, 64 ), Qt::AlignCenter, QString( "%1%" ).arg( percent * 100, 0, 'f', 2 ) );
+	painter.restore();
 
-	// Now draw a border
-	painter->setPen( QColor( Qt::gray ) );
-	painter->setBrush( Qt::transparent );
-	painter->drawRoundedRect( 0, 0, width(), height(), 6, 6 );
-
-	painter->end();
-
+	painter.end();
 	pEvent->accept();
 };
 
