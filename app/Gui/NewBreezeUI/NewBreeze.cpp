@@ -170,11 +170,25 @@ void NewBreeze::setupSidePanel() {
 	connect( SideBar, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
 	connect( SideBar, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
 
-	if ( Settings->General.SidePanelType == 0 )
-		SideBar->hide();
+	/* If we are showing sidepanel */
+	if ( Settings->General.SidePanel ) {
+		/* Modern SideBar */
+		if ( Settings->General.SidePanelType == 0 ) {
+			SidePanel->show();
+			SideBar->hide();
+		}
+		/* Classic SidePanel */
+		else {
+			SidePanel->hide();
+			SideBar->show();
+		}
+	}
 
-	else
+	/* We are not showing the sidepanel at all */
+	else {
+		SideBar->hide();
 		SidePanel->hide();
+	}
 };
 
 void NewBreeze::setWindowProperties() {
@@ -793,19 +807,25 @@ void NewBreeze::toggleGrouping() {
 
 void NewBreeze::toggleSideBarVisible() {
 
-	// if ( SidePanel->isVisible() )
-		// SidePanel->hide();
+	/* Modern SideBar */
+	if ( Settings->General.SidePanelType == 0 ) {
+		if ( SidePanel->isVisible() )
+			SidePanel->hide();
 
-	// else
-		// SidePanel->show();
+		else
+			SidePanel->show();
+	}
 
-	if ( SideBar->isVisible() )
-		SideBar->hide();
+	/* Classic SidePanel */
+	else {
+		if ( SideBar->isVisible() )
+			SideBar->hide();
 
-	else
-		SideBar->show();
+		else
+			SideBar->show();
+	}
 
-	Settings->setValue( "Session/SidePanel", SidePanel->isVisible() );
+	Settings->setValue( "SidePanel", SidePanel->isVisible() );
 };
 
 void NewBreeze::showHideTermWidget() {

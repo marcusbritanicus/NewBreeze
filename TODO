@@ -8,7 +8,7 @@ NBIconProvider                                                                  
 	✍ Create a full icon provider class
 	✗ Provide icon strings based on size
 
-NBIconView                                                                                                                            [ 1 of 5 ]
+NBIconView                                                                                                                            [ 1 of 7 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
 	⬜ Improve the selection model
 	⬜ Fix cursor movements
@@ -17,9 +17,10 @@ NBIconView                                                                      
 	⬜ Mac style semi-folded categories
 	  • One click on category icon, partially folds it, clicking again expands it.
 	  • Clicking minimize icon folds the category completely, clicking it again opens it completely
+	⬜ Catalog icons need to be fixed
 
-NBItemViewModel                                                                                                                       [ 0 of 2 ]
-	✍ Read icon data directly from NBItemNode* rather than create it repeatedly.
+NBItemViewModel                                                                                                                       [ 2 of 2 ]
+	✓ Read icon data directly from NBItemNode* rather than create it repeatedly.
 	✓ Use other functions from dirent.h, vis-a-vis, scandir, fnmatch, etc
 
 NBFolderWidget                                                                                                                        [ 0 of 1 ]
