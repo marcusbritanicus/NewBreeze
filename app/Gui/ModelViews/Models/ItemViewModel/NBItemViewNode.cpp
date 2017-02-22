@@ -16,6 +16,8 @@ NBItemViewNode::NBItemViewNode() {
 	for( int i = 0; i < 10; i++ )
 		nodeData << "";
 
+	mIcon = QIcon( ":/icons/unknown.png" );
+
 	mCategoryList.clear();
 	myCategory = "Uncategorized";
 	parentNode = 0;
@@ -25,6 +27,11 @@ NBItemViewNode::NBItemViewNode( QVariantList data, QString category, NBItemViewN
 
 	nodeData << data;
 	myCategory = category;
+
+	mIcon = QIcon::fromTheme( data.at( 2 ).toString(), QIcon( data.at( 2 ).toString() ) );
+
+	if ( mIcon.isNull() )
+		mIcon = QIcon( ":/icons/unknown.png" );
 
 	parentNode = parent;
 };
