@@ -814,6 +814,8 @@ void NewBreeze::toggleSideBarVisible() {
 
 		else
 			SidePanel->show();
+
+		Settings->setValue( "SidePanel", SidePanel->isVisible() );
 	}
 
 	/* Classic SidePanel */
@@ -823,9 +825,9 @@ void NewBreeze::toggleSideBarVisible() {
 
 		else
 			SideBar->show();
-	}
 
-	Settings->setValue( "SidePanel", SidePanel->isVisible() );
+		Settings->setValue( "SidePanel", SideBar->isVisible() );
+	}
 };
 
 void NewBreeze::showHideTermWidget() {
