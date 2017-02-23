@@ -15,7 +15,7 @@
 */
 
 // Initialize nbIconTheme to current settings value
-QString NBIconProvider::nbIconTheme = NBSystemIconTheme();
+QString NBIconProvider::nbIconTheme = Settings->General.IconTheme;
 
 inline QStringList getInheritedThemes( QString theme ) {
 

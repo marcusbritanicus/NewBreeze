@@ -11,7 +11,7 @@
 
 void detectCrash() {
 
-	/* We check for an ending good by in the last 12 chars. */
+	/* We check for an ending good by reading the last 12 chars. */
 	// QFile nblogf( logPath );
 	// if ( nblogf.open( QFile::ReadOnly ) ) {
 		// nblogf.seek( nblogf.size() - 12 );
@@ -70,7 +70,7 @@ void NBStartup() {
 		* Set the Icon Theme
 		*
 	*/
-	QIcon::setThemeName( NBSystemIconTheme() );
+	QIcon::setThemeName( Settings->General.IconTheme );
 
 	/*
 		*

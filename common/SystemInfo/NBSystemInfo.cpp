@@ -82,9 +82,9 @@ QString NBSystemIconTheme() {
 		*     razorqt:	      <QSettings> ~/.razor/razor.conf/[General]/icon_theme
 		*     lxde:           <QSettings> ~/.config/lxsession/LXDE/desktop.conf/[GTK/sNet/IconThemeName
 		*     lxqt:           <QSettings> ~/.config/lxqt/lxqt.conf/[General/icon_theme
-		*     cinnamon:       ???
-		*     MATE:           ???
-		*     Enlightenment:  ???
+		*     cinnamon:       gsettings get org.cinnamon.desktop.interface icon-theme
+		*     MATE:           gsettings get org.mate.interface icon-theme
+		*     Enlightenment:  $E_ICON_THEME
 		*
 	*/
 
@@ -121,6 +121,29 @@ QString NBSystemIconTheme() {
 
 		case DesktopSession::LXQT:
 			return QSettings( qgetenv( "HOME" ) + "/.config/lxqt/lxqt.conf", QSettings::NativeFormat ).value( "icon_theme" ).toString();
+
+		case DesktopSession::CINNAMON : {
+			QStringList args = QStringList() << "get" << "org.cinnamon.desktop.interface" << "icon-theme";
+			QProcess proc;
+			proc.start(  "gsettings", args, QProcess::ReadOnly );
+			proc.waitForFinished( -1 );
+
+			return QString( proc.readAllStandardOutput() ).simplified();
+		}
+
+		case DesktopSession::MATE : {
+			QStringList args = QStringList() << "get" << "org.mate.interface" << "icon-theme";
+			QProcess proc;
+			proc.start(  "gsettings", args, QProcess::ReadOnly );
+			proc.waitForFinished( -1 );
+
+			return QString( proc.readAllStandardOutput() ).simplified();
+		}
+
+		case DesktopSession::ENLIGHTENMENT : {
+
+			return qgetenv( "E_ICON_THEME" );
+		}
 
 		default :
 			return QString( "hicolor" );
