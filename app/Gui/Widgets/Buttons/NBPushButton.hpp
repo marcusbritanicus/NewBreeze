@@ -6,9 +6,12 @@
 
 #pragma once
 
-// #include "Global.hpp"
 #include <QtCore>
 #include <QtGui>
+
+#if QT_VERSION >= 0x050000
+	#include <QtWidgets>
+#endif
 
 class NBPushButton : public QPushButton {
 	Q_OBJECT

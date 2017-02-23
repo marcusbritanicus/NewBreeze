@@ -284,13 +284,13 @@ void NBFolderView::goForward() {
 void NBFolderView::doOpenHome() {
 
 	// if ( Settings->General.SpecialOpen and Settings->General.SuperStart )
-		// NBDebugMsg( DbgMsgPart::ONESHOT, "Opening SuperStart" );
+		// qDebug() << "Opening SuperStart";
 
 	/*else*/ if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog )
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening Catalogs" );
+		qDebug() << "Opening Catalogs";
 
 	// else
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", NBXdg::home().toLocal8Bit().data() );
+		qDebug() << "Opening dir:" << NBXdg::home();
 
 	fsModel->goHome();
 };
@@ -347,7 +347,7 @@ void NBFolderView::doOpen( QString loc ) {
 	}
 
 	if ( isDir( loc ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s ", loc.toLocal8Bit().data() );
+		qDebug() << "Opening dir:" << loc.toLocal8Bit().data();
 
 		setCursor( QCursor( Qt::WaitCursor ) );
 		fsModel->setRootPath( loc );
@@ -432,7 +432,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 		}
 
 		if ( isDir( fileToBeOpened ) ) {
-			NBDebugMsg( DbgMsgPart::ONESHOT, "Opening dir: %s", fileToBeOpened.toLocal8Bit().data() );
+			qDebug() << "Opening dir:" << fileToBeOpened.toLocal8Bit().data();
 			if ( index == idx ) {
 				setCursor( QCursor( Qt::WaitCursor ) );
 				fsModel->setRootPath( fileToBeOpened );
@@ -603,7 +603,7 @@ void NBFolderView::doPeek() {
 
 	/* For directories we use the inbuild previewer */
 	if ( isDir( currentNode ) ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing folder: %s", currentNode.toLocal8Bit().data() );
+		qDebug() << "Previewing folder:" << currentNode.toLocal8Bit().data();
 		NBFolderFlash *previewer = new NBFolderFlash( currentNode );
 
 		connect( previewer, SIGNAL( loadFolder( QString ) ), this, SLOT( doOpen( QString ) ) );
@@ -637,7 +637,7 @@ void NBFolderView::doPeek() {
 	}
 
 	// Custom Peeking
-	NBDebugMsg( DbgMsgPart::ONESHOT, "Previewing file: %s", currentNode.toLocal8Bit().data() );
+	qDebug() << "Previewing file:" << currentNode.toLocal8Bit().data();
 	NBCustomPeek *previewer = new NBCustomPeek( currentNode );
 	previewer->show();
 
@@ -646,19 +646,19 @@ void NBFolderView::doPeek() {
 
 void NBFolderView::doReload() {
 
-	NBDebugMsg( DbgMsgPart::ONESHOT, "Reloading..." );
+	qDebug() << "Reloading...";
 	fsModel->reload();
 };
 
 void NBFolderView::doToggleHidden() {
 
 	if ( fsModel->showHidden() ) {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Hiding dot files..." );
+		qDebug() << "Hiding dot files...";
 		fsModel->setShowHidden( false );
 	}
 
 	else {
-		NBDebugMsg( DbgMsgPart::ONESHOT, "Showing dot files..." );
+		qDebug() << "Showing dot files...";
 		fsModel->setShowHidden( true );
 	}
 

@@ -128,4 +128,9 @@ unix {
 
 	static.path = $$PREFIX/lib/newbreeze
 	static.files = libnewbreeze-common.a
+
+	greaterThan(QT_MAJOR_VERSION, 4) {
+		static.path = $$PREFIX/lib/newbreeze
+		static.files = libnewbreeze-common5.a
+	}
 }

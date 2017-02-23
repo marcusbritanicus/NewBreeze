@@ -1,3 +1,6 @@
+NBAddressBar                                                                                                                          [ 0 of 1 ]
+	⬜ Addressbar icons are not visible in GNOME/LxQt
+
 NBProcessManager                                                                                                                      [ 2 of 4 ]
 	✍ NBIOProcess
 	✓ NBDeleteProcess
@@ -8,23 +11,26 @@ NBIconProvider                                                                  
 	✍ Create a full icon provider class
 	✗ Provide icon strings based on size
 
-NBIconView                                                                                                                            [ 1 of 7 ]
+NBIconView                                                                                                                            [ 2 of 8 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
 	⬜ Improve the selection model
+	  • Currently mouse-over on click selection is enabled.
 	⬜ Fix cursor movements
 	✗ Enable PageUp and PageDown navigation
 	⬜ Enable perfolder folded category memory
+	⬜ Category icons need to be added
 	⬜ Mac style semi-folded categories
 	  • One click on category icon, partially folds it, clicking again expands it.
 	  • Clicking minimize icon folds the category completely, clicking it again opens it completely
-	⬜ Catalog icons need to be fixed
+	⬜ CatalogView and its icons need to be fixed
 
 NBItemViewModel                                                                                                                       [ 2 of 2 ]
 	✓ Read icon data directly from NBItemNode* rather than create it repeatedly.
 	✓ Use other functions from dirent.h, vis-a-vis, scandir, fnmatch, etc
 
 NBFolderWidget                                                                                                                        [ 0 of 1 ]
-	⬜ Extended copy/move support
+	◐ Extended copy/move support
+	  • Extended copy/move causes crash
 
 Archives                                                                                                                              [ 4 of 6 ]
 	✗ Zip and tar preview: PeekPlugin using archivemount
