@@ -28,25 +28,25 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	createGUI();
 
 	/* Open with SuperStart */
-	// if ( Settings->General.SpecialOpen and Settings->General.SuperStart and loc.isEmpty() )
-		// FolderView->doOpen( "NB://SuperStart" );
+	if ( Settings->General.SpecialOpen and Settings->General.SuperStart and loc.isEmpty() )
+		FolderView->doOpen( "NB://SuperStart" );
 
 	/* Open with Catalogs */
-	/*else*/ if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog and loc.isEmpty() )
+	else if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog and loc.isEmpty() )
 		FolderView->doOpen( "NB://Catalogs" );
 
 	/* Load the a folder */
 	else if ( not loc.isEmpty() ) {
-		// if ( loc.startsWith( "NB://SuperStart" ) )
-			// FolderView->doOpen( "NB://SuperStart" );
+		if ( loc.startsWith( "NB://SuperStart" ) )
+			FolderView->doOpen( "NB://SuperStart" );
 
-		// else if ( loc.startsWith( "NB://Applications" ) )
-			// FolderView->doOpen( "NB://Applications" );
+		else if ( loc.startsWith( "NB://Applications" ) )
+			FolderView->doOpen( "NB://Applications" );
 
-		// else if ( loc.startsWith( "NB://Catalogs" ) )
-			// FolderView->doOpen( "NB://Catalogs" );
+		else if ( loc.startsWith( "NB://Catalogs" ) )
+			FolderView->doOpen( "NB://Catalogs" );
 
-		/*else*/ if ( isFile( loc ) ) {
+		if ( isFile( loc ) ) {
 
 			/* This is a file, just open the file */
 			openFile( loc );
@@ -83,10 +83,6 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 			FolderView->doOpen( QString( QDir::homePath() ) );
 		}
 	}
-
-	/* Show/hide hidden files */
-	if ( Settings->General.ShowHidden )
-		FolderView->fsModel->setShowHidden( true );
 
 	/* Focus the CurrentWidget in FolderView */
 	FolderView->currentWidget()->setFocus();
@@ -867,6 +863,9 @@ void NewBreeze::quit() {
 
 void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 
+	// We hide this window immediately, other processes may take a while longer to close down
+	QMainWindow::close();
+
 	/* If we have a UI */
 	// Close down Info Gathering
 	FolderView->fsModel->terminateInfoGathering();
@@ -888,10 +887,8 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	chdir( NBXdg::home().toLocal8Bit().constData() );
 	Terminal->changeDir( NBXdg::home() );
 
-	// Now hide this window, other processes may take a while longer to close down
-	QMainWindow::close();
-	mClosed = true;
-
 	cEvent->accept();
+
+	mClosed = true;
 	qDebug( "Good Bye!" );
 };

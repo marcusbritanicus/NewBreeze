@@ -32,6 +32,10 @@ few changes in NewBreeze 3.
    - A redesigned sidepanel with elegant menu listing the devices and bookmarks.
    - Devices show the space usage.
 
+=> NBSideBar
+   - A mac-like side panel
+   - User can switch between classic and modern side panels
+
 => NBButton
    - NBButton has been rewritten to be a subclass of QPushButton, with better styling.
    - Issues with NBSegmentControl has caused me to go back to NBButtons, which "look" better.

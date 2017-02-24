@@ -30,8 +30,17 @@ NBItemViewNode::NBItemViewNode( QVariantList data, QString category, NBItemViewN
 
 	mIcon = QIcon::fromTheme( data.at( 2 ).toString(), QIcon( data.at( 2 ).toString() ) );
 
-	if ( mIcon.isNull() )
-		mIcon = QIcon( ":/icons/unknown.png" );
+	/* SuperStart hack */
+	if ( mIcon.isNull() ) {
+		if ( data.at( 0 ).toString().toLower() == "application" )
+			mIcon = QIcon::fromTheme( "application-x-executable", QIcon( ":/icons/exec.png" ) );
+
+		else if ( data.at( 0 ).toString().toLower() == "dir" )
+			mIcon = QIcon::fromTheme( "folder", QIcon( ":/icons/folder.png" ) );
+
+		else
+			mIcon = QIcon::fromTheme( "unknown", QIcon( ":/icons/unknown.png" ) );
+	}
 
 	parentNode = parent;
 };

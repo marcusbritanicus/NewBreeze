@@ -329,7 +329,7 @@ unix {
 	icons.files = icons/newbreeze.png
 
 	data.path = $$PREFIX/share/newbreeze/
-	data.files = README Changelog ReleaseNotes
+	data.files = README ../Changelog ../ReleaseNotes
 
 	mime.path = $$PREFIX/share/mime/packages/
 	mime.files = ../data/x-encrypted-file.xml

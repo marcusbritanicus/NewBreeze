@@ -45,6 +45,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.FilterFolders = true;
 	defaultSettings->General.SuperStart = true;
 	defaultSettings->General.SpecialOpen = true;
+	defaultSettings->General.DirectIO = false;
 
 	defaultSettings->Special.ClosingDown = false;
 
@@ -154,6 +155,9 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "SpecialOpen" ) ) )
 		settings->General.SpecialOpen = gSettings.value( "SpecialOpen" ).toBool();
+
+	if ( gaKeys.contains( QString( "DirectIO" ) ) )
+		settings->General.DirectIO = gSettings.value( "DirectIO" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		settings->Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
@@ -274,11 +278,18 @@ NBSettings* NBSettings::instance() {
 
 void NBSettings::reload() {
 
-	if ( not defaultSettings->init )
+	/* We do not need to reload if this is the first initiation */
+	if ( not defaultSettings->init ) {
 		defaultInstance();
-
-	if ( not settings->init )
 		instance();
+		return;
+	}
+
+	/* We do not need to reload if this is the first initiation */
+	if ( not settings->init ) {
+		instance();
+		return;
+	}
 
 	QSettings gSettings( "NewBreeze", "NewBreeze" );
 	QSettings sSettings( "NewBreeze", "Shortcuts" );
@@ -289,7 +300,7 @@ void NBSettings::reload() {
 	if ( gaKeys.contains( QString( "Style" ) ) )
 		General.Style = gSettings.value( "Style" ).toString();
 
-	if ( gaKeys.contains( QString( "FolderView" ) ) )
+	if ( gaKeys.contains( QString( "ViewMode" ) ) )
 		General.ViewMode = gSettings.value( "ViewMode" ).toString();
 
 	if ( gaKeys.contains( QString( "IconTheme" ) ) )
@@ -300,18 +311,6 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "TrayIcon" ) ) )
 		General.TrayIcon = gSettings.value( "TrayIcon" ).toBool();
-
-	if ( gaKeys.contains( QString( "OpenWithCatalog" ) ) )
-		General.OpenWithCatalog = gSettings.value( "OpenWithCatalog" ).toBool();
-
-	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
-		Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
-
-	if ( gaKeys.contains( QString( "Session/LastDir" ) ) )
-		Session.LastDir = gSettings.value( "Session/LastDir" ).toString();
-
-	if ( gaKeys.contains( QString( "Session/Maximized" ) ) )
-		Session.Maximized = gSettings.value( "Session/Maximized" ).toBool();
 
 	if ( gaKeys.contains( QString( "SidePanel" ) ) )
 		General.SidePanel = gSettings.value( "SidePanel" ).toBool();
@@ -340,8 +339,26 @@ void NBSettings::reload() {
 	if ( gaKeys.contains( QString( "FilterFolders" ) ) )
 		General.FilterFolders = gSettings.value( "FilterFolders" ).toBool();
 
+	if ( gaKeys.contains( QString( "OpenWithCatalog" ) ) )
+		General.OpenWithCatalog = gSettings.value( "OpenWithCatalog" ).toBool();
+
 	if ( gaKeys.contains( QString( "SuperStart" ) ) )
 		General.SuperStart = gSettings.value( "SuperStart" ).toBool();
+
+	if ( gaKeys.contains( QString( "SpecialOpen" ) ) )
+		General.SpecialOpen = gSettings.value( "SpecialOpen" ).toBool();
+
+	if ( gaKeys.contains( QString( "DirectIO" ) ) )
+		General.DirectIO = gSettings.value( "DirectIO" ).toBool();
+
+	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
+		Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
+
+	if ( gaKeys.contains( QString( "Session/LastDir" ) ) )
+		Session.LastDir = gSettings.value( "Session/LastDir" ).toString();
+
+	if ( gaKeys.contains( QString( "Session/Maximized" ) ) )
+		Session.Maximized = gSettings.value( "Session/Maximized" ).toBool();
 
 	if ( saKeys.contains( QString( "AboutNB" ) ) )
 		Shortcuts.AboutNB = getShortcuts( "AboutNB" );

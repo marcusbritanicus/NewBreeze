@@ -143,7 +143,7 @@ QVariant NBMimeTypeModel::data( const QModelIndex &index, int role ) const {
 
 QModelIndex NBMimeTypeModel::index( int row, int column, const QModelIndex &parent ) const {
 
-    if (row < 0 || column < 0)
+    if ( row < 0 || column < 0 )
         return QModelIndex();
 
     if ( not ( ( row < rowCount( parent ) ) and ( column < columnCount( parent ) ) ) )

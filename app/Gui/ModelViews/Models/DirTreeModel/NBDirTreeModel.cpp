@@ -237,10 +237,7 @@ bool NBDirTreeModel::showHidden() const {
 
 void NBDirTreeModel::setShowHidden( bool shown ) {
 
-	__showHidden = shown;
-
-	// if ( not __rootPath.isNull() or not __rootPath.isEmpty() )
-		// setupModelData();
+	plantTree();
 };
 
 Qt::DropActions NBDirTreeModel::supportedDragActions() const {
@@ -295,7 +292,7 @@ void NBDirTreeModel::clearNameFilters() {
 
 void NBDirTreeModel::reload() {
 
-	// setupModelData();
+	plantTree();
 };
 
 QString NBDirTreeModel::nodeName( const QModelIndex idx ) const {

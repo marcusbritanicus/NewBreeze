@@ -1,16 +1,28 @@
 newbreeze (3.0.0a) unstable; urgency=low
 
+  * Feature: Startup Wizard for initial customization
   * Feature: Per-folder View options
-  * Feature: Scaling for NBIconView
+  * Feature: Zoom for NBIconView
   * Feature: NBArchiveDialog helps to create an archive
   * Feature: Improved AboutNB dialog
-  * Feature: Added License dialog, shoing the complete GPL3 license
+  * Feature: Added License dialog, showing the complete GPL3 license
   * Feature: NBProcessManager replaces NBIOManager with better functionality
-  * Feature: Categories can be shown and hidden with a single click
-  * Feature: Categories can be selected and deselected with a single click
+  * Feature: Categories can be shown/hidden, selected/deselected with single click
+  * Feature: Encryption using salsa20 for files and encfs for folders
+  * Feature: MarkDownPreview plugin, using libsoldout markdown library
+  * Feature: TextEditor plugin for quick editing of text
+  * Feature: SuperStart, listing out your most used apps and favorite folders
+  * Feature: NBPluginInterface supports file peeking
+  * Feature: New Classic mac-style panel
+  * Feature: Bug Reporting Interface
+  * NBIconManager replaces NBIconProvider with better functionality
+  * Icon themes are correctly detected over various DEs
+  * Faster moadelmodel loading via scandir
+  * LibArchive, liblzma, libz, lbz2 do the a rchiving
+  * Cursor shape chages to WaitCursor during model loading
+  * NBItemViewModel now supports both real and virtual locations
   * Archive creation and extraction are performed using QtConcurrent::run
-  * Plugins are new part of the NewBreeze source tree
-  * MarkDownPreview plugin now uses libsoldout markdown library
+  * Plugins are now part of the NewBreeze source tree
   * NewBreeze uses QtSingleApplication for one instance multiple windows
   * Redesigned UI for better code maintenance
   * Redesigned NBCrumbsBar (formerly, NBBreadCrumbsBar)
@@ -24,7 +36,8 @@ newbreeze (3.0.0a) unstable; urgency=low
   * QuickMenuBar removed, as its more of a hinderance
   * UtilityBar (custom title bar) removed, uses native title bar
   * The /proc/pid/cwd always points to the current directory
-  * PeekPlugins interface rewritten to support dynamic loading plugins.
+  * BugFix: Mouse+Cursor selection is fixed
+  * BugFix: Icon loading is fixed
   * BugFix: Unmounting a drive is possible when NB3 is open
   * BugFix: Removed buggy tabs
 

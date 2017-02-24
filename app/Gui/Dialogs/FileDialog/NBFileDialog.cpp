@@ -48,7 +48,6 @@ void NBFileDialog::createGUI() {
 			connect( addressBar->addressEdit, SIGNAL( returnPressed() ), this, SLOT( openAddressBar() ) );
 
 			fsModel = new NBItemViewModel( this );
-			fsModel->setShowHidden( Settings->General.ShowHidden );
 			fsModel->setCategorizationEnabled( Settings->General.Grouping );
 			fsModel->setFilterFolders( false );
 			connect( fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateToolBar() ) );

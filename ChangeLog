@@ -7,13 +7,18 @@ Version 3.0.0 Alpha
 	- Feature: Added License dialog, showing the complete GPL3 license
 	- Feature: NBProcessManager replaces NBIOManager with better functionality
 	- Feature: Categories can be shown/hidden, selected/deselected with single click
+	- Feature: Encryption using salsa20 for files and encfs for folders
 	- Feature: MarkDownPreview plugin, using libsoldout markdown library
-	- Feature: NBCrypt plugin for file and folder encryption
 	- Feature: TextEditor plugin for quick editing of text
-	- Feature: SuperStart, listing out your most used apps and favorite folders
+	- Feature: SuperStart, listing out your most used apps and favorite folders (disabled)
 	- Feature: NBPluginInterface supports file peeking
 	- Feature: New Classic mac-style panel
 	- Feature: Bug Reporting Interface
+	- Feature: Extended Copy/Move interface
+	- NBIconManager replaces NBIconProvider with better functionality
+	- Icon themes are correctly detected over various DEs
+	- Faster moadelmodel loading via scandir
+	- LibArchive, liblzma, libz, lbz2 do the a rchiving
 	- Cursor shape chages to WaitCursor during model loading
 	- NBItemViewModel now supports both real and virtual locations
 	- Archive creation and extraction are performed using QtConcurrent::run
@@ -31,6 +36,8 @@ Version 3.0.0 Alpha
 	- QuickMenuBar removed, as its more of a hinderance
 	- UtilityBar (custom title bar) removed, uses native title bar
 	- The /proc/pid/cwd always points to the current directory
+	- BugFix: Mouse+Cursor selection is fixed
+	- BugFix: Icon loading is fixed
 	- BugFix: Unmounting a drive is possible when NB3 is open
 	- BugFix: Removed buggy tabs
 
@@ -284,4 +291,3 @@ Version 1.0.1
 
 Version 1.0.0
     - Initial release
-

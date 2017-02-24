@@ -173,46 +173,9 @@ QVariant NBItemViewModel::data( const QModelIndex &index, int role ) const {
 
 		case Qt::DecorationRole: {
 			if ( index.column() == 0 ) {
-				switch( __mModelDataType ) {
-					case NBItemViewModel::Applications: {
-						QString icoStr( node->data( 2, true ).toString() );
-						QIcon icon = QIcon( NBIconProvider::themeIcon( icoStr, "application-x-executable" ) );
 
-						if ( icon.isNull() )
-							icon = QIcon( ":/icons/exec.png" );
-
-						return icon;
-					}
-
-					case NBItemViewModel::SuperStart: {
-						QString icoStr( node->data( 2, true ).toString() );
-
-						if ( node->data( 0, true ).toString() == "System" ) {
-							QIcon icon = QIcon( NBIconProvider::themeIcon( icoStr, "application-x-executable" ) );
-
-							if ( icon.isNull() )
-								icon = QIcon( ":/icons/exec.png" );
-
-							return icon;
-						}
-
-						// Icon we got from the theme
-						QIcon themeIcon = QIcon( NBIconProvider::themeIcon( icoStr, "unknown" ) );
-
-						if ( not themeIcon.isNull() )
-							return themeIcon;
-
-						else
-							return QIcon( ":/icons/unknown.png" );
-					}
-
-					case NBItemViewModel::Catalogs:
-					case NBItemViewModel::FileSystem: {
-
-						// Icon stored in the node
-						return node->icon();
-					}
-				}
+				/* Icon stored in the node */
+				return node->icon();
 			}
 
 			return QVariant();
@@ -1020,10 +983,10 @@ void NBItemViewModel::goUp() {
 
 void NBItemViewModel::goHome() {
 
-	// if ( Settings->General.SpecialOpen and Settings->General.SuperStart )
-		// setRootPath( "NB://SuperStart" );
+	if ( Settings->General.SpecialOpen and Settings->General.SuperStart )
+		setRootPath( "NB://SuperStart" );
 
-	/*else*/ if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog )
+	else if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog )
 		setRootPath( "NB://Catalogs" );
 
 	else
@@ -1087,22 +1050,22 @@ void NBItemViewModel::setupModelData() {
 	switch( __mModelDataType ) {
 		case NBItemViewModel::SuperStart: {
 			setupSuperStartData();
-			break;
+			return;
 		}
 
 		case NBItemViewModel::Applications: {
 			setupApplicationsData();
-			break;
+			return;
 		}
 
 		case NBItemViewModel::Catalogs: {
 			setupCatalogData();
-			break;
+			return;
 		}
 
 		case NBItemViewModel::FileSystem: {
 			setupFileSystemData();
-			break;
+			return;
 		}
 	}
 };
@@ -1165,15 +1128,29 @@ void NBItemViewModel::setupSuperStartData() {
 	emit directoryLoading( __rootPath );
 
 	QSettings superStart( "NewBreeze", "SuperStart" );
-	superStart.beginGroup( "Applications" );
 
 	beginResetModel();
+
+	/* Recent Folders */
+	superStart.beginGroup( "Places" );
+	foreach( QString key, superStart.childKeys() ) {
+		QString location = superStart.value( key ).toString();
+		if ( not exists( location ) )
+			continue;
+
+		QVariantList data = quickDataGatherer->getQuickFileInfo( location );
+		rootNode->addChild( new NBItemViewNode( data, "Places", rootNode ) );
+	}
+	superStart.endGroup();
+
+	/* Recent Applications */
+	superStart.beginGroup( "Applications" );
 	foreach( QString appName, superStart.childKeys() ) {
 		NBAppFile app( superStart.value( appName ).toString() );
 		QVariantList data;
 
 		/* Special Data */
-		data << "System" << 0 << app.value( NBAppFile::Icon );
+		data << "Application" << 0 << app.value( NBAppFile::Icon );
 
 		/* Normal Data */
 		data << app.value( NBAppFile::Name );												/* Qt::UserRole + 0 */
@@ -1191,17 +1168,6 @@ void NBItemViewModel::setupSuperStartData() {
 	}
 	superStart.endGroup();
 
-	/* Custom Catalogs */
-	superStart.beginGroup( "Places" );
-	foreach( QString key, superStart.childKeys() ) {
-		QString location = superStart.value( key ).toString();
-		if ( not exists( location ) )
-			continue;
-
-		QVariantList data = quickDataGatherer->getQuickFileInfo( location );
-		rootNode->addChild( new NBItemViewNode( data, "Places", rootNode ) );
-	}
-	superStart.endGroup();
 	endResetModel();
 
 	/* We make all the categories visible by default */
@@ -1232,7 +1198,7 @@ void NBItemViewModel::setupApplicationsData() {
 		QVariantList data;
 
 		/* Special Data */
-		data << "System" << 0 << app.value( NBAppFile::Icon );
+		data << "Application" << 0 << app.value( NBAppFile::Icon );
 
 		/* Normal Data */
 		data << app.value( NBAppFile::Name );												/* Qt::UserRole + 0 */

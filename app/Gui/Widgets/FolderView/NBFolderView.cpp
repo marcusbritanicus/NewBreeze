@@ -283,13 +283,13 @@ void NBFolderView::goForward() {
 
 void NBFolderView::doOpenHome() {
 
-	// if ( Settings->General.SpecialOpen and Settings->General.SuperStart )
-		// qDebug() << "Opening SuperStart";
+	if ( Settings->General.SpecialOpen and Settings->General.SuperStart )
+		qDebug() << "Opening SuperStart";
 
-	/*else*/ if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog )
+	else if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog )
 		qDebug() << "Opening Catalogs";
 
-	// else
+	else
 		qDebug() << "Opening dir:" << NBXdg::home();
 
 	fsModel->goHome();
@@ -298,6 +298,7 @@ void NBFolderView::doOpenHome() {
 void NBFolderView::loadHomeDir() {
 
 	setCursor( QCursor( Qt::WaitCursor ) );
+	qDebug() << "Opening dir:" << NBXdg::home();
 	fsModel->setRootPath( NBXdg::home() );
 	setCursor( QCursor( Qt::ArrowCursor ) );
 };
@@ -346,12 +347,12 @@ void NBFolderView::doOpen( QString loc ) {
 		return;
 	}
 
+	setCursor( QCursor( Qt::WaitCursor ) );
+
 	if ( isDir( loc ) ) {
 		qDebug() << "Opening dir:" << loc.toLocal8Bit().data();
 
-		setCursor( QCursor( Qt::WaitCursor ) );
 		fsModel->setRootPath( loc );
-		setCursor( QCursor( Qt::ArrowCursor ) );
 	}
 
 	else if ( isFile( loc ) ) {
@@ -406,6 +407,7 @@ void NBFolderView::doOpen( QString loc ) {
 		return;
 	}
 
+	setCursor( QCursor( Qt::ArrowCursor ) );
 	currentWidget()->setFocus();
 };
 
@@ -654,15 +656,15 @@ void NBFolderView::doToggleHidden() {
 
 	if ( fsModel->showHidden() ) {
 		qDebug() << "Hiding dot files...";
-		fsModel->setShowHidden( false );
+		Settings->General.ShowHidden = false;
 	}
 
 	else {
 		qDebug() << "Showing dot files...";
-		fsModel->setShowHidden( true );
+		Settings->General.ShowHidden = true;
 	}
 
-	Settings->General.ShowHidden = fsModel->showHidden();
+	fsModel->reload();
 };
 
 void NBFolderView::prepareCopy() {
@@ -685,21 +687,23 @@ void NBFolderView::prepareCopy() {
 
 	clipBoard->setMimeData( mData );
 
-	NBProcess::Progress *progress = new NBProcess::Progress;
-	progress->sourceDir = fsModel->currentDir();
-	progress->targetDir = NBFileDialog::getDirectoryName( this, "NewBreeze - Choose target directory", fsModel->currentDir() );
+	if ( Settings->General.DirectIO ) {
+		NBProcess::Progress *progress = new NBProcess::Progress;
+		progress->sourceDir = fsModel->currentDir();
+		progress->targetDir = NBFileDialog::getDirectoryName( this, "NewBreeze - Choose target directory", fsModel->currentDir() );
 
-	if ( not progress->targetDir.count() )
-		return;
+		if ( not progress->targetDir.count() )
+			return;
 
-	progress->type = NBProcess::Copy;
+		progress->type = NBProcess::Copy;
 
-	NBIOProcess *proc = new NBIOProcess( srcList, progress );
-	pMgr->addProcess( progress, proc );
+		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		pMgr->addProcess( progress, proc );
 
-	progress->startTime = QTime::currentTime();
+		progress->startTime = QTime::currentTime();
 
-	proc->start();
+		proc->start();
+	}
 };
 
 void NBFolderView::prepareMove() {
@@ -722,21 +726,23 @@ void NBFolderView::prepareMove() {
 
 	clipBoard->setMimeData( mData );
 
-	NBProcess::Progress *progress = new NBProcess::Progress;
-	progress->sourceDir = fsModel->currentDir();
-	progress->targetDir = NBFileDialog::getDirectoryName( this,"NewBreeze - Choose target directory", fsModel->currentDir() );
+	if ( Settings->General.DirectIO ) {
+		NBProcess::Progress *progress = new NBProcess::Progress;
+		progress->sourceDir = fsModel->currentDir();
+		progress->targetDir = NBFileDialog::getDirectoryName( this,"NewBreeze - Choose target directory", fsModel->currentDir() );
 
-	if ( not progress->targetDir.count() )
-		return;
+		if ( not progress->targetDir.count() )
+			return;
 
-	progress->type = NBProcess::Move;
+		progress->type = NBProcess::Move;
 
-	NBIOProcess *proc = new NBIOProcess( srcList, progress );
-	pMgr->addProcess( progress, proc );
+		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		pMgr->addProcess( progress, proc );
 
-	progress->startTime = QTime::currentTime();
+		progress->startTime = QTime::currentTime();
 
-	proc->start();
+		proc->start();
+	}
 };
 
 void NBFolderView::copy( QStringList sources, QString tgt ) {

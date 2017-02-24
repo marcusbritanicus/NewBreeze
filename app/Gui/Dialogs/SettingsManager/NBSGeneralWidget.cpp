@@ -116,7 +116,6 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	openWithSuperStartRB = new QRadioButton( "Open with S&uperStart", this );
 	openWithSuperStartRB->setChecked( sett.value( "SuperStart" ).toBool() );
 	connect( openWithSuperStartRB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithToggled() ) );
-	openWithSuperStartRB->setDisabled( true );
 
 	if ( not openWithCB->isChecked() ) {
 		openWithCatalogRB->setDisabled( true );
@@ -126,6 +125,15 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	imagePreviewCB = new QCheckBox( "&Show Image Previews" );
 	imagePreviewCB->setChecked( Settings->General.ImagePreviews );
 	connect( imagePreviewCB, SIGNAL( stateChanged( int ) ), this, SLOT( handleCheckStateChanged( int ) ) );
+
+	directIOCB = new QCheckBox( "Enable exten&ded IO" );
+	directIOCB->setChecked( Settings->General.DirectIO );
+	directIOCB->setToolTip(
+		"Extended IO is a replacement for 'Copy/Move to' menu option. When enabled, "
+		"a dialog opens where you can choose the target directory to which you want "
+		"to copy/move."
+	);
+	connect( directIOCB, SIGNAL( toggled( bool ) ), this, SLOT( handleDirectIOChanged( bool ) ) );
 
 	QVBoxLayout *grpLyt = new QVBoxLayout( this );
 	grpLyt->addLayout( comboBoxLyt1 );
@@ -147,6 +155,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	otherGBLyt->addWidget( openWithCB );
 	otherGBLyt->addLayout( rbLyt );
 	otherGBLyt->addWidget( imagePreviewCB );
+	otherGBLyt->addWidget( directIOCB );
 
 	QGroupBox *otherOptionsGB = new QGroupBox( "Other Options", this );
 	otherOptionsGB->setLayout( otherGBLyt );
@@ -323,4 +332,10 @@ void NBSGeneralWidget::handleCheckStateChanged( int state ) {
 			Settings->General.ImagePreviews = true;
 			break;
 	}
-}
+};
+
+void NBSGeneralWidget::handleDirectIOChanged( bool enabled ) {
+
+	Settings->setValue( "DirectIO", enabled );
+	Settings->General.DirectIO = enabled;
+};

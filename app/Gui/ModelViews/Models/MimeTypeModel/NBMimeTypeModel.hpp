@@ -71,9 +71,6 @@ class NBMimeTypeModel : public QAbstractItemModel {
 		QModelIndexList indexListForCategory( QString ) const;
 		QModelIndexList categorySiblings( QModelIndex ) const;
 
-		bool showHidden() const;
-		void setShowHidden( bool );
-
 		/* Filters */
 		QStringList nameFilters();
 		void setNameFilters( QStringList );
@@ -105,9 +102,6 @@ class NBMimeTypeModel : public QAbstractItemModel {
 
 		/* Info Gatherer kill switch */
 		bool mTerminate;
-
-		NBQuickFileInfoGatherer *quickDataGatherer;
-		NBFileSystemWatcher *watcher;
 
 	private slots:
 		void updateAllNodes();
