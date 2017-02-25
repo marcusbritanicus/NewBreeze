@@ -586,7 +586,7 @@ void NBFolderView::doPeek() {
 		return;
 	}
 
-	QString currentNode = QDir( fsModel->currentDir() ).absoluteFilePath( curIndex.data().toString() );
+	QString currentNode = fsModel->nodePath( curIndex );
 
 	if ( not isReadable( currentNode ) ) {
 		NBMessageDialog::error( this,
@@ -654,7 +654,7 @@ void NBFolderView::doReload() {
 
 void NBFolderView::doToggleHidden() {
 
-	if ( fsModel->showHidden() ) {
+	if ( Settings->General.ShowHidden ) {
 		qDebug() << "Hiding dot files...";
 		Settings->General.ShowHidden = false;
 	}

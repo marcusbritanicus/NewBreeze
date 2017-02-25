@@ -216,15 +216,16 @@ bool NBIconProvider::thumb( QString path, QString hashPath ) {
 
 bool NBIconProvider::hasIcon( QString icon ) {
 
-	/* Inbuilt icon */
+	/* Inbuilt icon absolute path */
 	if ( exists( icon ) )
 		return true;
 
-	/* Get system theme */
-	QStringList themes = QStringList() << NBSystemIconTheme();
+	/* Get NB IconTheme and System Icon Theme */
+	QStringList themes = QStringList() << Settings->General.IconTheme << NBSystemIconTheme();
 
 	/* Themes inherited by system theme */
 	themes << getInheritedThemes( themes.at( 0 ) );
+	themes << getInheritedThemes( themes.at( 1 ) );
 
 	/* We always include this: generic */
 	themes << "hicolor";
@@ -260,24 +261,24 @@ bool NBIconProvider::hasIcon( QString icon ) {
 
 QString NBIconProvider::themeIcon( QString icon, QString theme ) {
 
-	/*
-		*
-		* List of themes
-		*
-		* First we input our stored theme.
-		* Then get its inherited themes.
-		* We check if our theme is system theme.
-		* If yes, end of story
-		* Else, add the system theme and
-		*
-	*/
+	/* Inbuilt icon absolute path */
+	if ( exists( icon ) )
+		return icon;
 
 	if ( not theme.count() )
-		theme = NBSystemIconTheme();
+		theme = Settings->General.IconTheme;
 
-	QStringList themes = QStringList() << NBSystemIconTheme();
+	/* Get NB IconTheme and System Icon Theme */
+	QStringList themes = QStringList() << Settings->General.IconTheme << NBSystemIconTheme();
+
+	/* Themes inherited by system theme */
 	themes << getInheritedThemes( themes.at( 0 ) );
+	themes << getInheritedThemes( themes.at( 1 ) );
+
+	/* We always include this: generic */
 	themes << "hicolor";
+
+	/* Clear duplicates */
 	themes.removeDuplicates();
 
 	// Folders
@@ -303,7 +304,8 @@ QString NBIconProvider::themeIcon( QString icon, QString theme ) {
 		}
 	}
 
-	return QString();
+	/* As a last resort, check if the icon exists in the pixmaps directory */
+	return pixmapIcon( icon );
 };
 
 QString NBIconProvider::pixmapIcon( QString icon ) {

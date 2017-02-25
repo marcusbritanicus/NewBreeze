@@ -7,10 +7,6 @@
 #include "NBItemViewNode.hpp"
 #include "NBIconManager.hpp"
 
-static int __sortColumn = Settings->General.SortColumn;
-static bool __sortCase = Settings->General.SortCase;
-static bool __sortCategory = Settings->General.Grouping;
-
 NBItemViewNode::NBItemViewNode() {
 
 	for( int i = 0; i < 10; i++ )
@@ -201,9 +197,9 @@ int NBItemViewNode::row() {
 
 void NBItemViewNode::sort( int column, bool cs, bool categorized ) {
 
-	__sortColumn = column;
-	__sortCase = cs;
-	__sortCategory = categorized;
+	Settings->General.SortColumn = column;
+	Settings->General.SortCase = cs;
+	Settings->General.Grouping = categorized;
 
 	if ( categorized )
 		mCategoryList = sortCategoryList( mCategoryList );
@@ -220,7 +216,7 @@ void NBItemViewNode::updateCategories() {
 			mCategoryList << newCategory;
 	}
 
-	if ( __sortCategory )
+	if ( Settings->General.Grouping )
 		mCategoryList = sortCategoryList( mCategoryList );
 };
 
@@ -230,14 +226,14 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 	int secondIdx = second->categoryIndex();
 
 	/* If its not a categorized sorting, then both have equal categorization weights */
-	if ( not __sortCategory )
+	if ( not Settings->General.Grouping )
 		firstIdx = secondIdx;
 
 	if ( firstIdx == secondIdx ) {
 		if ( ( first->data( 0, true ) == "dir" ) and ( second->data( 0, true ) == "dir" ) ) {
-			switch( __sortColumn ) {
+			switch( Settings->General.SortColumn ) {
 				case 0: {
-					if ( __sortCase )
+					if ( Settings->General.SortCase )
 						return first->data( 0 ).toString() < second->data( 0 ).toString();
 
 					else
@@ -249,11 +245,11 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 				}
 
 				default: {
-					if ( first->data( __sortColumn ).toString() < second->data( __sortColumn ).toString() )
+					if ( first->data( Settings->General.SortColumn ).toString() < second->data( Settings->General.SortColumn ).toString() )
 						return true;
 
-					else if ( first->data( __sortColumn ).toString() == second->data( __sortColumn ).toString() )
-						if ( __sortCase )
+					else if ( first->data( Settings->General.SortColumn ).toString() == second->data( Settings->General.SortColumn ).toString() )
+						if ( Settings->General.SortCase )
 							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseSensitive ) < 0;
 
 						else
@@ -282,9 +278,9 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 
 		else if ( ( first->data( 0, true ) == "file" ) and ( second->data( 0, true ) == "file" ) ) {
 
-			switch( __sortColumn ) {
+			switch( Settings->General.SortColumn ) {
 				case 0: {
-					if ( __sortCase )
+					if ( Settings->General.SortCase )
 						return first->data( 0 ).toString() < second->data( 0 ).toString();
 
 					else
@@ -296,11 +292,11 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 				}
 
 				default: {
-					if ( first->data( __sortColumn ).toString() < second->data( __sortColumn ).toString() )
+					if ( first->data( Settings->General.SortColumn ).toString() < second->data( Settings->General.SortColumn ).toString() )
 						return true;
 
-					else if ( first->data( __sortColumn ).toString() == second->data( __sortColumn ).toString() )
-						if ( __sortCase )
+					else if ( first->data( Settings->General.SortColumn ).toString() == second->data( Settings->General.SortColumn ).toString() )
+						if ( Settings->General.SortCase )
 							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseSensitive ) < 0;
 
 						else
@@ -329,9 +325,9 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 
 		else if ( ( first->data( 0, true ) == "system" ) and ( second->data( 0, true ) == "system" ) ) {
 
-			switch( __sortColumn ) {
+			switch( Settings->General.SortColumn ) {
 				case 0: {
-					if ( __sortCase )
+					if ( Settings->General.SortCase )
 						return first->data( 0 ).toString() < second->data( 0 ).toString();
 
 					else
@@ -343,11 +339,11 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 				}
 
 				default: {
-					if ( first->data( __sortColumn ).toString() < second->data( __sortColumn ).toString() )
+					if ( first->data( Settings->General.SortColumn ).toString() < second->data( Settings->General.SortColumn ).toString() )
 						return true;
 
-					else if ( first->data( __sortColumn ).toString() == second->data( __sortColumn ).toString() )
-						if ( __sortCase )
+					else if ( first->data( Settings->General.SortColumn ).toString() == second->data( Settings->General.SortColumn ).toString() )
+						if ( Settings->General.SortCase )
 							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseSensitive ) < 0;
 
 						else
@@ -389,7 +385,7 @@ inline bool listLessThanB( QString a, QString b ) {
 
 QStringList sortCategoryList( QStringList& cList ) {
 
-	switch( __sortColumn ) {
+	switch( Settings->General.SortColumn ) {
 		/* Name sort */
 		case 0: {
 			qSort( cList.begin(), cList.end(), listLessThanA );

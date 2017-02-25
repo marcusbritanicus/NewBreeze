@@ -49,7 +49,6 @@ void NBFileDialog::createGUI() {
 
 			fsModel = new NBItemViewModel( this );
 			fsModel->setCategorizationEnabled( Settings->General.Grouping );
-			fsModel->setFilterFolders( false );
 			connect( fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateToolBar() ) );
 			fsModel->setRootPath( location );
 
@@ -58,6 +57,8 @@ void NBFileDialog::createGUI() {
 			connect( mainView, SIGNAL( open( QString ) ), this, SLOT( doOpen( QString ) ) );
 
 			nameLE = new NBLineEdit( this );
+			nameLE->setDisabled( true );
+			nameLE->hide();
 
 			filtersCB = new QComboBox( this );
 			connect( filtersCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( resetFilters() ) );
@@ -119,6 +120,8 @@ void NBFileDialog::createGUI() {
 
 			dirView = new NBDirectoryView( this );
 			nameLE = new NBLineEdit( this );
+			nameLE->setDisabled( true );
+			nameLE->hide();
 
 			QHBoxLayout *bodyLyt = new QHBoxLayout();
 			bodyLyt->addWidget( sidePanel );
@@ -135,6 +138,7 @@ void NBFileDialog::createGUI() {
 			baseLyt->setContentsMargins( QMargins() );
 			baseLyt->setSpacing( 0 );
 			baseLyt->addLayout( bodyLyt );
+			baseLyt->addWidget( Separator::horizontal( this ) );
 			baseLyt->addLayout( nameLyt );
 			baseLyt->addLayout( btnsLyt );
 
@@ -285,14 +289,44 @@ void NBFileDialog::openAddressBar() {
 
 void NBFileDialog::open( QModelIndex idx ) {
 
-	fsModel->setRootPath( fsModel->nodePath( idx ) );
-	mainView->setFocus();
+	switch( type ) {
+		case Icon: {
+
+			break;
+		}
+
+		case File: {
+			fsModel->setRootPath( fsModel->nodePath( idx ) );
+			mainView->setFocus();
+			break;
+		}
+
+		case Directory: {
+			break;
+		}
+	}
 };
 
 void NBFileDialog::open( QString path ) {
 
-	fsModel->setRootPath( path );
-	mainView->setFocus();
+	switch( type ) {
+		case Icon: {
+
+			break;
+		}
+
+		case File: {
+			fsModel->setRootPath( path );
+			mainView->setFocus();
+			break;
+		}
+
+		case Directory: {
+			dirView->setCurrentBranch( path );
+			dirView->setFocus();
+			break;
+		}
+	}
 };
 
 void NBFileDialog::resetFilters() {

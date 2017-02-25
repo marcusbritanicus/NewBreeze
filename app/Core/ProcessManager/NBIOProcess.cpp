@@ -240,16 +240,6 @@ void NBIOProcess::copyFile( QString srcFile ) {
 	stat( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data(), &iStat );
 	stat( mProgress->targetDir.toLocal8Bit().data(), &oStat );
 
-	/* If the operation is intra-partition operation and its a move, then we can simply rename the file */
-	if ( ( iStat.st_dev == oStat.st_dev ) and ( mProgress->type == NBProcess::Move ) ) {
-		if ( rename( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data(), currentFile.toLocal8Bit().data() ) ) {
-			qDebug() << "Error moving file:" << srcFile;
-			qDebug() << "[Error]:" << strerror( errno );
-			errorNodes << srcFile;
-		}
-		return;
-	}
-
 	/* Open the input file descriptor fro reading */
 	int iFileFD = open( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data(), O_RDONLY );
 
@@ -312,62 +302,10 @@ void NBIOProcess::copyFile( QString srcFile ) {
 
 	if ( mProgress->fileBytesCopied != quint64( iStat.st_size ) )
 		errorNodes << srcFile;
-
-	if ( mProgress->type == NBProcess::Move )
-		/* If there were no errors encountered, and its a move operation, delete the file */
-		if ( not errorNodes.contains( srcFile ) )
-			unlink( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data() );
 };
 
 void NBIOProcess::run() {
 
-	/* Undo for NBProcess::Copy */
-	if ( mUndo ) {
-
-		mProgress->state = NBProcess::Started;
-
-		if ( mCanceled ) {
-			emit canceled( errorNodes );
-
-			quit();
-			return;
-		}
-
-		while ( mPaused ) {
-			if ( mCanceled ) {
-				emit canceled( errorNodes );
-
-				return;
-			}
-
-			usleep( 100 );
-			qApp->processEvents();
-		}
-
-		errorNodes.clear();
-
-		/* We want the progressbars to be swaying */
-		mProgress->totalBytesCopied = -1;
-		mProgress->fileBytesCopied = -1;
-
-		mProgress->progressText = "Deleting files...";
-		Q_FOREACH( QString path, sourceList )
-			unlink( ( mProgress->targetDir + path ).toLocal8Bit().data() );
-
-		mProgress->progressText = "Deleting directory tree...";
-		Q_FOREACH( QString path, origSources )
-			removeDir( mProgress->targetDir + path );
-
-		mUndo = false;
-
-		mProgress->state = NBProcess::Completed;
-		emit completed( errorNodes );
-
-		quit();
-		return;
-	}
-
-	/* Actual IO */
 	if ( mCanceled ) {
 		emit canceled( errorNodes );
 
@@ -376,7 +314,7 @@ void NBIOProcess::run() {
 	}
 
 	while ( mPaused ) {
-		if ( mCanceled ){
+		if ( mCanceled ) {
 			emit canceled( errorNodes );
 
 			return;
@@ -393,6 +331,8 @@ void NBIOProcess::run() {
 		return;
 	}
 
+	/* Actual IO Begins */
+
 	mProgress->progressText = QString();
 	mProgress->state = NBProcess::Started;
 
@@ -401,7 +341,7 @@ void NBIOProcess::run() {
 		stat( mProgress->sourceDir.toLocal8Bit().data(), &srcStat );
 		stat( mProgress->targetDir.toLocal8Bit().data(), &tgtStat );
 
-		/* If the source and the are the same */
+		/* If the source and the target devices are the same */
 		if ( srcStat.st_dev == tgtStat.st_dev ) {
 			Q_FOREACH( QString node, sourceList ) {
 				QString srcNode = mProgress->sourceDir + node;
@@ -424,7 +364,7 @@ void NBIOProcess::run() {
 		/* Otherwise, we let the copying take place, then delete the sources at the end. */
 	}
 
-	/* Perform the IO */
+	/* Copying: Perform the IO */
 	Q_FOREACH( QString node, sourceList ) {
 
 		/* Update the current file */
@@ -497,6 +437,10 @@ void NBIOProcess::run() {
 
 	if ( mProgress->type == NBProcess::Move ) {
 		Q_FOREACH( QString node, sourceList ) {
+			/* If the source was not copied properly */
+			if ( errorNodes.contains( node ) )
+				continue;
+
 			/* sourceList will be just a list of files */
 			if ( unlink( ( mProgress->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
 				qDebug() << "Error removing original file:" << mProgress->sourceDir + node;
@@ -505,8 +449,14 @@ void NBIOProcess::run() {
 			}
 		}
 
+		/* Mixture of files and folders */
 		Q_FOREACH( QString node, origSources ) {
+			/* Deletion of folders */
 			if ( isDir( mProgress->sourceDir + node ) ) {
+				/* If a file in this directory was not copied, do not delete it */
+				if ( errorNodes.filter( node ).count() )
+					continue;
+
 				if ( not removeDir( mProgress->sourceDir + node ) ) {
 					qDebug() << "Error removing original directory:" << mProgress->sourceDir + node;
 					qDebug() << "[Error]:" << strerror( errno );
@@ -514,12 +464,11 @@ void NBIOProcess::run() {
 				}
 			}
 
-			else if ( exists( mProgress->sourceDir + node ) ) {
-				if ( unlink( ( mProgress->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
-					qDebug() << "Error removing original file:" << mProgress->sourceDir + node;
-					qDebug() << "[Error]:" << strerror( errno );
-					errorNodes << node;
-				}
+			/* Deletion of files */
+			else if ( unlink( ( mProgress->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
+				qDebug() << "Error removing original file:" << mProgress->sourceDir + node;
+				qDebug() << "[Error]:" << strerror( errno );
+				errorNodes << node;
 			}
 		}
 	}

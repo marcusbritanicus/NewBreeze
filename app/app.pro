@@ -1,5 +1,9 @@
 TEMPLATE = app
+
 TARGET = newbreeze3
+greaterThan(QT_MAJOR_VERSION, 4) {
+	TARGET = newbreeze3qt5
+}
 
 QT += network sql
 greaterThan(QT_MAJOR_VERSION, 4) {

@@ -45,7 +45,8 @@ Settings                                                                        
 	⬜ Enable fast icon theme loading
 
 SuperStart                                                                                                                            [ 0 of 1 ]
-	⬜ Enable and refine SuperStart
+	◐ Enable and refine SuperStart
+	  • SuperStart enabled, refinement needs to be done
 
 BugReporting                                                                                                                          [ 0 of 1 ]
 	⬜ Option for bug reporting after crash

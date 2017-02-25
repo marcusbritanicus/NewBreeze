@@ -25,7 +25,7 @@ class NBIconUpdater : public QThread {
 		QStringList entryList;
 		QString rootPath;
 
-		bool *__terminate;
+		bool *mTerminate;
 
 	signals:
 		void updated( QString, QString, QStringList );
@@ -119,9 +119,6 @@ class NBItemViewModel : public QAbstractItemModel {
 		void setNameFilters( QStringList );
 		void clearNameFilters();
 
-		bool filterFolders() const;
-		void setFilterFolders( bool );
-
 		void sort( int column, bool cs, bool categorized );
 		void reload();
 
@@ -184,8 +181,8 @@ class NBItemViewModel : public QAbstractItemModel {
 
 		NBItemViewNode *rootNode;
 
-		QString __rootPath;
-		QStringList __childNames;
+		QString mRootPath;
+		QStringList mChildNames;
 
 		QHash<QString, QList<int> > categoryRowMap;
 		QHash<QString, bool> categoryVisibilityMap;
@@ -203,16 +200,13 @@ class NBItemViewModel : public QAbstractItemModel {
 			bool stopLoading;
 		} currentLoadStatus;
 
-		static bool __showHidden;
-
-		static QStringList __nameFilters;
-		static bool __filterFolders;
+		static QStringList mNameFilters;
 
 		/* Showing virtual data */
-		bool __mVirtualData;
+		bool mVirtualData;
 
 		/* Showing which data type */
-		quint64 __mModelDataType;
+		quint64 mModelDataType;
 
 		/* History */
 		QStringList oldRoots;
@@ -223,15 +217,15 @@ class NBItemViewModel : public QAbstractItemModel {
 		mutable QStringList lastUpdatedNodes;
 		mutable QList<QTime> lastUpdatedTimes;
 		mutable QStringList delayedUpdateList;
-		QBasicTimer updateTimer;
 
 		/* Info Gatherer kill switch */
-		bool __terminate;
+		bool mTerminate;
 
 		NBQuickFileInfoGatherer *quickDataGatherer;
 		NBFileSystemWatcher *watcher;
 
 	private slots:
+		void updateNodes( QString root = QString(), QStringList nodes = QStringList() );
 		void updateAllNodes( QString root = QString() );
 		void saveInfo( QString, QString, QStringList );
 
@@ -242,9 +236,6 @@ class NBItemViewModel : public QAbstractItemModel {
 		void loadHome();
 
 		void updateDelayedNodes();
-
-	protected:
-		void timerEvent( QTimerEvent* );
 
 	Q_SIGNALS:
 		/* Updated Node */
