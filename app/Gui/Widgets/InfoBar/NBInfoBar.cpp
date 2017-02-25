@@ -82,20 +82,35 @@ NBInfoBar::NBInfoBar( QWidget *parent ) : QWidget( parent ) {
 void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 
 	// Icon
-	QString icoStr = QSettings( QDir( folderPath ).filePath( ".directory" ), QSettings::NativeFormat ).value( "Desktop Entry/Icon" ).toString();
-	if ( icoStr.isNull() )
-		setIcon( QIcon::fromTheme( "folder", QIcon( ":/icons/folder.png" ) ) );
+	if ( folderPath.startsWith( "NB://Super" ) )
+		setIcon( QIcon( ":/icons/superstart.png" ) );
 
-	else
-		setIcon( QIcon::fromTheme( icoStr, QIcon( icoStr ) ) );
+	else if ( folderPath.startsWith( "NB://App" ) )
+		setIcon( QIcon( ":/icons/applications.png" ) );
+
+	else if ( folderPath.startsWith( "NB://Cat" ) )
+		setIcon( QIcon( ":/icons/catalogs.png" ) );
+
+	else {
+		QString icn( NBIconProvider::icon( folderPath ) );
+		setIcon( QIcon::fromTheme( icn, QIcon( icn ) ) );
+	}
 
 	// Name
 	QString name;
-	if ( folderPath.split( "/", QString::SkipEmptyParts ).count() )
+	if ( folderPath.startsWith( "NB://" ) )
+		name = folderPath;
+
+	else if ( folderPath.split( "/", QString::SkipEmptyParts ).count() )
 		name = folderPath.split( "/", QString::SkipEmptyParts ).takeLast();
 
 	else
 		name = "/ (root)";
+
+	if ( folderPath.startsWith( "NB://" ) ) {
+		infoLbl->setText( name, "", "", "" );
+		return;
+	}
 
 	// Size
 	int folders = 0, files = 0, others = 0;

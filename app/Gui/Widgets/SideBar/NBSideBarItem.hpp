@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Global.hpp"
+#include "NBDeleteProcess.hpp"
 #include "NBProcessManager.hpp"
 
 class NBSideBarItem : public QLabel {

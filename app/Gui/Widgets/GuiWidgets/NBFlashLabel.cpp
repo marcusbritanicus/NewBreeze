@@ -310,12 +310,16 @@ void NBTrashLabel::dropEvent( QDropEvent *dpEvent ) {
 			color = QColor( Qt::darkYellow );
 			color.setAlpha( 150 );
 
-			NBDeleteManager *deleteManager = new NBDeleteManager( this, true );
-			connect(
-				deleteManager, SIGNAL( trashOperationComplete( QStringList, QStringList ) ),
-				this, SLOT( handleDeleteFailure( QStringList, QStringList ) )
-			);
-			deleteManager->sendToTrash( toBeDeleted );
+			NBProcess::Progress *progress = new NBProcess::Progress;
+			progress->sourceDir = dirName( mData->urls().at( 0 ).toLocalFile() );
+			progress->targetDir = QString();
+			progress->type = NBProcess::Trash;
+
+			NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
+			NBProcessManager::instance()->addProcess( progress, proc );
+
+			progress->startTime = QTime::currentTime();
+			proc->start();
 
 			flashLabel();
 		}
@@ -329,12 +333,16 @@ void NBTrashLabel::dropEvent( QDropEvent *dpEvent ) {
 			if ( not deleteMsg->exec() )
 				return;
 
-			NBDeleteManager *deleteManager = new NBDeleteManager( this, false );
-			connect(
-				deleteManager, SIGNAL( deleteOperationComplete( QStringList, QStringList ) ),
-				this, SLOT( handleDeleteFailure( QStringList, QStringList ) )
-			);
-			deleteManager->deleteFromDisk( toBeDeleted );
+			NBProcess::Progress *progress = new NBProcess::Progress;
+			progress->sourceDir = dirName( mData->urls().at( 0 ).toLocalFile() );
+			progress->targetDir = QString();
+			progress->type = NBProcess::Delete;
+
+			NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
+			NBProcessManager::instance()->addProcess( progress, proc );
+
+			progress->startTime = QTime::currentTime();
+			proc->start();
 
 			flashLabel();
 		}

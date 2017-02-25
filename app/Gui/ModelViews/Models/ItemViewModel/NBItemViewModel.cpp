@@ -388,7 +388,7 @@ void NBItemViewModel::updateNode( QString nodeName ) {
 
 	NBIconUpdater *ig = new NBIconUpdater( mRootPath, QStringList() << nodeName, &mTerminate );
 	connect(
-		ig, SIGNAL( done( QString, QString, QStringList ) ),
+		ig, SIGNAL( update( QString, QString, QStringList ) ),
 		this, SLOT( saveInfo( QString, QString, QStringList ) )
 	);
 
@@ -737,16 +737,15 @@ bool NBItemViewModel::rename( QString oldName, QString newName ) {
 	}
 
 	/* If the file @newName is not in the current dir */
-	else if ( dirName( oldName ) != mRootPath ) {
+	else if ( dirName( newName ) != mRootPath ) {
 		removeNode( baseName( oldName ) );
 		return true;
 	}
 
 	else {
 		/* Same folder */
-		NBItemViewNode *node = rootNode->child( baseName( oldName ) );
-		node->setData( 0, baseName( newName ) );
-		updateNode( baseName( newName ) );
+		removeNode( baseName( oldName ) );
+		insertNode( baseName( newName ) );
 
 		return true;
 	}

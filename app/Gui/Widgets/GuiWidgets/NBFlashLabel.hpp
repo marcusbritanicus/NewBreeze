@@ -7,7 +7,8 @@
 #pragma once
 
 #include "Global.hpp"
-#include "NBDeleteManager.hpp"
+#include "NBDeleteProcess.hpp"
+#include "NBProcessManager.hpp"
 #include "NBMessageDialog.hpp"
 #include "NBConfirmDeleteDialog.hpp"
 

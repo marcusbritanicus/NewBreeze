@@ -154,7 +154,7 @@ void NBSideBarItem::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 		return;
 	}
 
-	if ( not isWritable( mTarget ) ) {
+	if ( not isWritable( mTarget ) and not mTarget.startsWith( "NB://Tr" ) ) {
 		dmEvent->ignore();
 		return;
 	}
@@ -165,8 +165,15 @@ void NBSideBarItem::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 	}
 
 	else {
-		dmEvent->setDropAction( Qt::CopyAction );
-		dmEvent->accept();
+		if ( mTarget == "NB://Trash" ) {
+			dmEvent->setDropAction( Qt::MoveAction );
+			dmEvent->accept();
+		}
+
+		else {
+			dmEvent->setDropAction( Qt::CopyAction );
+			dmEvent->accept();
+		}
 	}
 };
 
@@ -177,7 +184,7 @@ void NBSideBarItem::dropEvent( QDropEvent *dpEvent ) {
 		return;
 	}
 
-	if ( not isWritable( mTarget ) ) {
+	if ( not isWritable( mTarget ) and not mTarget.startsWith( "NB://Tr" ) ) {
 		dpEvent->ignore();
 		return;
 	}
@@ -187,22 +194,42 @@ void NBSideBarItem::dropEvent( QDropEvent *dpEvent ) {
 		return;
 	}
 
-	NBProcess::Progress *progress = new NBProcess::Progress;
-	progress->sourceDir = dirName( dpEvent->mimeData()->urls().at( 0 ).toLocalFile() );
-	progress->targetDir = mTarget;
+	const QMimeData *mData = dpEvent->mimeData();
 
-	QStringList srcList;
-	Q_FOREACH( QUrl url, dpEvent->mimeData()->urls() )
-		srcList << url.toLocalFile().replace( progress->sourceDir, "" );
+	if ( mTarget == "NB://Trash" ) {
+		NBProcess::Progress *progress = new NBProcess::Progress;
+		progress->sourceDir = dirName( mData->urls().at( 0 ).toLocalFile() );
+		progress->targetDir = QString();
+		progress->type = NBProcess::Trash;
 
-	progress->type = NBProcess::Copy;
+		QStringList toBeDeleted;
+		Q_FOREACH( QUrl url, mData->urls() )
+			toBeDeleted << url.toLocalFile().replace( progress->sourceDir, "" );
 
-	NBIOProcess *proc = new NBIOProcess( srcList, progress );
-	NBProcessManager::instance()->addProcess( progress, proc );
+		NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
+		NBProcessManager::instance()->addProcess( progress, proc );
 
-	progress->startTime = QTime::currentTime();
+		progress->startTime = QTime::currentTime();
+		proc->start();
+	}
 
-	proc->start();
+	else {
+		NBProcess::Progress *progress = new NBProcess::Progress;
+		progress->sourceDir = dirName( mData->urls().at( 0 ).toLocalFile() );
+		progress->targetDir = mTarget;
+		progress->type = NBProcess::Copy;
+
+		QStringList srcList;
+		Q_FOREACH( QUrl url, mData->urls() )
+			srcList << url.toLocalFile().replace( progress->sourceDir, "" );
+
+		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBProcessManager::instance()->addProcess( progress, proc );
+
+		progress->startTime = QTime::currentTime();
+
+		proc->start();
+	}
 
 	dpEvent->accept();
 };
