@@ -42,18 +42,6 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 	QT += webkitwidgets
 }
 
-# NBPreviewInterface.hpp
-# ====================
-NB_HEADER_PATH = $$(NB_INCLUDES)
-isEmpty( NB_HEADER_PATH ) {
-	error( NewBreeze plugin interface header file not detected. Please set the envronmental variable NB_INCLUDES. )
-}
-
-else {
-	INCLUDEPATH += $$NB_HEADER_PATH
-	DEPENDPATH += $$NB_HEADER_PATH
-}
-
 # Poppler-Qt4
 # ===========
 lessThan( QT_MAJOR_VERSION, 5 ) {

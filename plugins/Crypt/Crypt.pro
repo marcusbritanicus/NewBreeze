@@ -29,17 +29,6 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 	QT += widgets
 }
 
-# NBPreviewInterface.hpp
-# ====================
-NB_HEADER_PATH = $$(NB_INCLUDES)
-isEmpty( NB_HEADER_PATH ) {
-	error( NewBreeze plugin interface header file not detected. Please set the envronmental variable NB_INCLUDES. )
-}
-else {
-	INCLUDEPATH += $$NB_HEADER_PATH
-	DEPENDPATH += $$NB_HEADER_PATH
-}
-
 # C++11 Support
 QMAKE_CFLAGS += -std=c++11
 QMAKE_CXXFLAGS += -std=c++11
