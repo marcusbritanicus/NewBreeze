@@ -8,7 +8,7 @@
 
 typedef QList<NBCrumb*> NBCrumbsList;
 
-static inline QWidget *getCrumbsHolder( QWidget *parent, QString path, QString cPath, const int width, bool *xCrumbsRequired ) {
+inline QWidget *getCrumbsHolder( QWidget *parent, QString path, QString cPath, const int width, bool *xCrumbsRequired ) {
 
 	if ( path.startsWith( "NB://" ) ) {
 

@@ -37,9 +37,6 @@ Some of its features are
 * Enter `NewBreeze-master`
 * Open the terminal and type: `qmake && make`
 * To install, as root type: `make install`
-* To compile the plugins, type: `./BuildPlugins.sh build`
-* To install plugins (global), type: `./BuildPlugins.sh install`
-* To install plugins (local), type: `./BuildPlugins.sh local`
 
 ### Dependencies:
 * Qt4/Qt5
@@ -48,7 +45,11 @@ Some of its features are
 * liblzma
 * libbzip2
 * libarchive
+* xdg-utls
 * libpoppler-qt4/qt5
+* libsource-highlight-dev (optional)
+* libpoppler-qt4-dev/libpoppler-qt5-dev (optional)
+* libdjvulibre-dev (optional)
 
 ### Known Bugs
 * SegmentationFault in `NBIconView` `::aboveIndex(...)`, `::belowIndex(...)`

@@ -6,7 +6,7 @@
 
 #include "NBPluginManager.hpp"
 
-static QList<NBPluginInterface::Interface> developedInterfaces;
+QList<NBPluginInterface::Interface> developedInterfaces;
 
 NBPluginManager *NBPluginManager::pMgr = NULL;
 
@@ -90,54 +90,6 @@ void NBPluginManager::reloadPlugins() {
 };
 
 void NBPluginManager::reloadPeekPlugins() {
-
-	/* For now we will be reading just the plugins folder of the home directory */
-	QStringList pluginPaths;
-	#if QT_VERSION >= 0x050000
-		pluginPaths << "/usr/lib/newbreeze/plugins5/" << NBXdg::home() + "/.config/NewBreeze/plugins5/";
-	#else
-		pluginPaths << "/usr/lib/newbreeze/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
-	#endif
-
-	/* Our MimeDatabase object */
-	QMimeDatabase mdb;
-
-	/* Clear the mimePluginMap and pluginPriorityMap */
-	mimePluginMap.clear();
-	pluginPriorityMap.clear();
-
-	/* Prepare the map */
-	Q_FOREACH( QMimeType mType, mdb.allMimeTypes() )
-		mimePluginMap[ mType.name() ] = QStringList();
-
-	/* For now we will be handling just the plugins based on the PreviewInterface */
-	QDir pPathDir;
-	#if QT_VERSION >= 0x050000
-		pPathDir.setPath( NBXdg::home() + "/.config/NewBreeze/plugins5/" );
-	#else
-		pPathDir.setPath( NBXdg::home() + "/.config/NewBreeze/plugins/" );
-	#endif
-
-	Q_FOREACH( QString pluginSo, pPathDir.entryList( QDir::Files ) ) {
-		QPluginLoader loader( pPathDir.absoluteFilePath( pluginSo ) );
-		QObject *plugin = loader.instance();
-		if ( plugin ) {
-			NBPreviewInterface *interface = qobject_cast<NBPreviewInterface*>( plugin );
-			if ( not interface )
-				continue;
-
-			Q_FOREACH( QString mime, interface->mimeTypesHandled() )
-				mimePluginMap[ mime ] << pPathDir.absoluteFilePath( pluginSo );
-		}
-	}
-
-	QSettings pluginPriorities( "NewBreeze", "Plugins" );
-	pluginPriorities.beginGroup( "Priorities" );
-	Q_FOREACH( QString plugin, pluginPriorities.childKeys() )
-		pluginPriorityMap[ plugin ] = pluginPriorities.value( plugin ).toInt();
-
-	pluginPriorities.endGroup();
-	pluginPriorities.sync();
 };
 
 void NBPluginManager::reloadOtherPlugins() {

@@ -15,7 +15,7 @@
 class NBIconUpdater : public QThread {
 	Q_OBJECT
 
-		public:
+	public:
 		NBIconUpdater( QString, QStringList, bool *term );
 		~NBIconUpdater();
 
@@ -176,9 +176,6 @@ class NBItemViewModel : public QAbstractItemModel {
 		QString getCategory( QVariantList );
 		void recategorize();
 
-		/* Filtering */
-		static int nameFilter( const struct dirent * );
-
 		NBItemViewNode *rootNode;
 
 		QString mRootPath;
@@ -200,7 +197,7 @@ class NBItemViewModel : public QAbstractItemModel {
 			bool stopLoading;
 		} currentLoadStatus;
 
-		static QStringList mNameFilters;
+		QStringList mNameFilters;
 
 		/* Showing virtual data */
 		bool mVirtualData;

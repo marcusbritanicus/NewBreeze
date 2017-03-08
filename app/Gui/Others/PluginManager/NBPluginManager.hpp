@@ -8,7 +8,6 @@
 
 #include "Global.hpp"
 #include "NBPluginInterface.hpp"
-#include "NBPreviewInterface.hpp"
 
 /* PluginList */
 typedef QList<NBPluginInterface*> PluginList;

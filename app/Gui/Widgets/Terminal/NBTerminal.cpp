@@ -24,6 +24,8 @@ NBTerminal::NBTerminal( QString wDir, QWidget *parent ) : QWidget( parent ) {
 	setLayout( lyt );
 
 	setFocusPolicy( Qt::NoFocus );
+	setAttribute( Qt::WA_TranslucentBackground );
+	Terminal->setTerminalOpacity( 0.9 );
 
 	connect( Terminal, SIGNAL( finished() ), this, SLOT( openNewTerminal() ) );
 };

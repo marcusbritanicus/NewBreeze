@@ -6,9 +6,9 @@
 
 #include "NBFileSystemWatcher.hpp"
 
-QMutex mutex;
+static QMutex mutex;
 
-static inline QStringList entries( QString mPath ) {
+inline QStringList entries( QString mPath ) {
 
 	QStringList contents;
 
@@ -40,7 +40,7 @@ static inline QStringList entries( QString mPath ) {
 	return QStringList();
 };
 
-static inline QPair<QStringList, QStringList> difference( QStringList oldList, QStringList newList ) {
+inline QPair<QStringList, QStringList> difference( QStringList oldList, QStringList newList ) {
 
 	QPair<QStringList, QStringList> pair;
 

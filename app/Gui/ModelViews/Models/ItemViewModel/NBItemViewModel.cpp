@@ -7,14 +7,38 @@
 #include "NBItemViewModel.hpp"
 
 static QMutex mutex;
+QStringList lambdaUseFilterList;
 
-inline bool matchesFilter( QStringList filters, QString text ) {
+inline int matchesFilter( QStringList filters, QString text ) {
 
 	Q_FOREACH( QString filter, filters )
 		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
-			return true;
+			return 1;
 
-	return false;
+	return 0;
+};
+
+int scandirCallback( const struct dirent* entry ) {
+	/* Always filter . and .. */
+	if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
+		return 0;
+
+	/* If we are not to show hidden files/folders, filter all names starting with . */
+	if ( not Settings->General.ShowHidden and not strncmp( entry->d_name, ".", 1 ) )
+		return 0;
+
+	/* Name filter */
+	if ( lambdaUseFilterList.count() ) {
+		/* Do not filter folders, if the flag is not set */
+		if ( not Settings->General.FilterFolders and ( entry->d_type == DT_DIR ) )
+			return 1;
+
+		/* If the name matches any one of the nameFilters, show it */
+		return matchesFilter( lambdaUseFilterList, entry->d_name );
+	}
+
+	/* If no filter, select all */
+	return 1;
 };
 
 NBIconUpdater::NBIconUpdater( QString root, QStringList entries, bool *term ) : QThread() {
@@ -60,8 +84,6 @@ void NBIconUpdater::run() {
 		}
 	}
 };
-
-QStringList NBItemViewModel::mNameFilters = QStringList();
 
 NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent ) {
 
@@ -1086,7 +1108,9 @@ void NBItemViewModel::setupFileSystemData() {
 
 	/* Get file list */
 	struct dirent **fileList;
-	int numFiles = scandir( mRootPath.toStdString().c_str(), &fileList, nameFilter, NULL );
+	lambdaUseFilterList << mNameFilters;
+	int numFiles = scandir( mRootPath.toStdString().c_str(), &fileList, scandirCallback, NULL );
+	lambdaUseFilterList.clear();
 
 	/* Add the files to the model */
 	if ( numFiles >= 0 ) {
@@ -1095,7 +1119,9 @@ void NBItemViewModel::setupFileSystemData() {
 			QVariantList data = quickDataGatherer->getQuickFileInfo( mRootPath + _nodeName );
 			rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 			mChildNames << _nodeName;
+			free( fileList[ i ] );
 		}
+		free( fileList );
 	}
 
 	endResetModel();
@@ -1385,30 +1411,6 @@ void NBItemViewModel::recategorize() {
 			node->setCategory( getCategory( node->allData() ) );
 
 	rootNode->updateCategories();
-};
-
-int NBItemViewModel::nameFilter( const struct dirent *entry ) {
-
-	/* Always filter . and .. */
-	if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
-		return 0;
-
-	/* If we are not to show hidden files/folders, filter all names starting with . */
-	if ( not Settings->General.ShowHidden and not strncmp( entry->d_name, ".", 1 ) )
-		return 0;
-
-	/* Name filter */
-	if ( mNameFilters.count() ) {
-		/* Do not filter folders, if the flag is not set */
-		if ( not Settings->General.FilterFolders and ( entry->d_type == DT_DIR ) )
-			return 1;
-
-		/* If the name matches any one of the nameFilters, show it */
-		return matchesFilter( mNameFilters, entry->d_name );
-	}
-
-	/* If no filter, select all */
-	return 1;
 };
 
 void NBItemViewModel::terminateInfoGathering() {

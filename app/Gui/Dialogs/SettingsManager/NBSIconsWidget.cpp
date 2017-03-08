@@ -160,7 +160,7 @@ void NBIconThemeModel::setupModel() {
 	Q_FOREACH( QMimeType mime, mimeDb.allMimeTypes() ) {
 		QString ico = NBIconProvider::themeIcon( mime.iconName(), mime.genericIconName() );
 
-		/* We will now show mimes with out icons */
+		/* We will not show mimes with out icons */
 		if ( ico.isEmpty() ) {
 
 			continue;
