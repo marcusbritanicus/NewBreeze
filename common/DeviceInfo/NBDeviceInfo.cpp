@@ -1,306 +1,187 @@
 /*
 	*
-	* NBDeviceInfo.cpp - DeviceInfo class for NewBreeze
+	* NBDeviceInfo.cpp - NBDeviceInfo Class
 	*
 */
 
 #include "NBDeviceInfo.hpp"
-
-inline QString readLink( QString path ) {
-
-	char linkTarget[ 1024 ] = { 0 };
-	readlink( path.toLocal8Bit().data(), linkTarget, 1023 );
-
-	return QString( linkTarget );
-};
-
-inline QString baseName( QString path ) {
-
-	if ( path.endsWith( "/" ) )
-		path.chop( 1 );
-
-	return QString( basename( strdup( path.toLocal8Bit().data() ) ) );
-};
-
-inline QString getDevType( QString dev, QString vfsType ) {
-
-	QStringList cdTypes = QStringList() << "cdfs" << "iso9660" << "udf";
-	QString devType = QString( "unknown" );
-
-	if ( cdTypes.contains( vfsType ) )
-		return "optical";
-
-	if ( vfsType.contains( "encfs" ) )
-		return "encfs";
-
-	if ( vfsType.contains( "archivemount" ) )
-		return "archive";
-
-	QDir disks = QDir( "/dev/disk/by-path" );
-	disks.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System );
-	foreach( QString disk, disks.entryList() ) {
-		QFileInfo info( disks.filePath( disk ) );
-		if ( info.symLinkTarget() == dev ) {
-			if ( info.absoluteFilePath().contains( "usb" ) )
-				return QString( "usb" );
-
-			else {
-				if ( vfsType.toLower().contains( "ntfs" ) )
-					return QString( "hdd-win" );
-
-				else if ( vfsType.toLower().contains( "fuseblk" ) )
-					return QString( "hdd-win" );
-
-				else if ( vfsType.toLower().contains( "ext" ) )
-					return QString( "hdd-linux" );
-
-				else if ( vfsType.toLower().contains( "jfs" ) )
-					return QString( "hdd-linux" );
-
-				else if ( vfsType.toLower().contains( "reiser" ) )
-					return QString( "hdd-linux" );
-
-				else if ( vfsType.toLower().contains( "zfs" ) )
-					return QString( "hdd-linux" );
-
-				else if ( vfsType.toLower().contains( "xfs" ) )
-					return QString( "hdd-linux" );
-
-				else if ( vfsType.toLower().contains( "btrfs" ) )
-					return QString( "hdd-linux" );
-
-				else
-					return QString( "hdd" );
-			}
-		}
-	}
-
-	if ( devType == "unknown" ) {
-		/*
-			*
-			* Lets try /sys/block approach
-			*
-			* Take /dev/<dev> part of the /dev/<dev> and check if 'usb' ia part of
-			* target of /sys/block/<dev>. Else check the starting of <dev> and determine the type
-			*
-		*/
-		QString sysfsPath = QString( "/sys/block/%1" ).arg( baseName( dev ) );
-		if ( readLink( sysfsPath ).contains( "usb" ) )
-			return QString( "usb" );
-
-		else {
-			if ( baseName( dev ).startsWith( "sd" ) )
-			// We have a generic mass storage device
-				return QString( "hdd" );
-
-			else if ( baseName( dev ).startsWith( "sr" ) )
-				return QString( "optical" );
-
-			else if ( baseName( dev ).startsWith( "se" ) or baseName( dev ).startsWith( "ses" ) )
-				return QString( "enclosure" );
-
-			else if ( baseName( dev ).startsWith( "st" ) )
-				return QString( "tape" );
-
-			else
-				return devType;
-		}
-	}
-
-	return devType;
-};
-
-inline QString getDevLabel( QString name1, QString name2 ) {
-
-	if ( ( name1 == "/" ) or ( name2 == "/" ) )
-		return "FileSystem";
-
-	if ( not name1.isEmpty() )
-		return name1.replace( "\\x20", " " );
-
-	else if ( not name2.isEmpty() )
-		return baseName( name2 ).replace( "\\x20", " " );
-
-	else
-		return "Device X";
-};
-
-NBDeviceManager::NBDeviceManager( QObject *parent ) : QObject( parent ) {
-
-};
-
-QList<NBDeviceInfo> NBDeviceManager::allMounts() {
-
-	QList<NBDeviceInfo> devices;
-
-	Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() ) {
-		NBDeviceInfo devInfo;
-
-		if ( sInfo.fileSystemType().contains( "gvfs" ) )
-			continue;
-
-		devInfo.dN = sInfo.device();
-		devInfo.dL = getDevLabel( sInfo.name(), sInfo.displayName() );
-		devInfo.fS = sInfo.fileSystemType();
-		devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
-		devInfo.mP = sInfo.rootPath();
-		devInfo.fSz = sInfo.bytesFree();
-		devInfo.aSz = sInfo.bytesAvailable();
-		devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
-		devInfo.dSz = sInfo.bytesTotal();
-
-		devices << devInfo;
-	}
-
-	return devices;
-};
-
-QList<NBDeviceInfo> NBDeviceManager::allDrives() {
-
-	QList<NBDeviceInfo> devices;
-
-	Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() ) {
-		NBDeviceInfo devInfo;
-
-		if ( not sInfo.device().startsWith( "/dev/" ) )
-			continue;
-
-		devInfo.dN = sInfo.device();
-		devInfo.dL = getDevLabel( sInfo.name(), sInfo.displayName() );
-		devInfo.fS = sInfo.fileSystemType();
-		devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
-		devInfo.mP = sInfo.rootPath();
-		devInfo.fSz = sInfo.bytesFree();
-		devInfo.aSz = sInfo.bytesAvailable();
-		devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
-		devInfo.dSz = sInfo.bytesTotal();
-
-		devices << devInfo;
-	}
-
-	return devices;
-};
-
-QList<NBDeviceInfo> NBDeviceManager::allVirtualMounts() {
-
-	QList<NBDeviceInfo> devices;
-
-	Q_FOREACH( QStorageInfo sInfo, QStorageInfo::mountedVolumes() ) {
-		NBDeviceInfo devInfo;
-
-		if ( sInfo.device().startsWith( "/dev" ) )
-			continue;
-
-		if ( sInfo.rootPath().startsWith( "/run" ) )
-			continue;
-
-		devInfo.dN = sInfo.device();
-		devInfo.dL = getDevLabel( sInfo.name(), sInfo.displayName() );
-		devInfo.fS = sInfo.fileSystemType();
-		devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
-		devInfo.mP = sInfo.rootPath();
-		devInfo.fSz = sInfo.bytesFree();
-		devInfo.aSz = sInfo.bytesAvailable();
-		devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
-		devInfo.dSz = sInfo.bytesTotal();
-
-		devices << devInfo;
-	}
-
-	return devices;
-};
-
-NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
-
-	NBDeviceInfo devInfo;
-
-	QStorageInfo sInfo;
-	sInfo.setPath( path );
-
-	devInfo.dN = sInfo.device();
-	devInfo.dL = getDevLabel( sInfo.name(), sInfo.displayName() );
-	devInfo.fS = sInfo.fileSystemType();
-	devInfo.dT = getDevType( devInfo.dN, devInfo.fS );
-	devInfo.mP = sInfo.rootPath();
-	devInfo.fSz = sInfo.bytesFree();
-	devInfo.aSz = sInfo.bytesAvailable();
-	devInfo.uSz = sInfo.bytesTotal() - sInfo.bytesFree();
-	devInfo.dSz = sInfo.bytesTotal();
-
-
-	if ( devInfo.mP == "/" )
-		devInfo.dT = "hdd";
-
-	return devInfo;
-};
+#include "NBDeviceInfo_p.hpp"
 
 NBDeviceInfo::NBDeviceInfo() {
 
-	dN = QString( "unknown" );
-	dL = QString( "unknown" );
-	fS = QString( "unknown" );
-	dT = QString( "unknown" );
-	mP = QString( "unknown" );
-	fSz = 0;
-	aSz = 0;
-	uSz = 0;
-	dSz = 0;
+	d = new NBDeviceInfoPrivate();
 };
 
-NBDeviceInfo::NBDeviceInfo( const NBDeviceInfo& other ) {
+NBDeviceInfo::NBDeviceInfo( const QString path ) {
 
-	dN = other.driveName();
-	dL = other.driveLabel();
-	fS = other.driveFS();
-	dT = other.driveType();
-	mP = other.mountPoint();
-	fSz = other.freeSpace();
-	aSz = other.availSpace();
-	uSz = other.usedSpace();
-	dSz = other.driveSize();
+	d = NBDeviceInfo( NBDeviceManager::deviceInfoForPath( path ) ).d;
 };
 
-QString NBDeviceInfo::driveName() const {
+NBDeviceInfo::NBDeviceInfo( const NBDeviceInfo &info ) {
 
-	return dN;
+	d = info.d;
 };
 
-QString NBDeviceInfo::driveLabel() const {
+NBDeviceInfo::NBDeviceInfo( NBDeviceInfoPrivate *infoPriv ) {
 
-	return dL;
+	d = QExplicitlySharedDataPointer<NBDeviceInfoPrivate>( infoPriv );
 };
 
-QString NBDeviceInfo::driveFS() const {
+NBDeviceInfo::~NBDeviceInfo() {
 
-	return fS;
 };
 
-QString NBDeviceInfo::driveType() const {
+NBDeviceInfo &NBDeviceInfo::operator=(const NBDeviceInfo &other) {
 
-	return dT;
+    d = other.d;
+    return *this;
 };
 
 QString NBDeviceInfo::mountPoint() const {
 
-	return mP;
+	return d->mountPoint;
 };
 
-quint64 NBDeviceInfo::freeSpace() const {
+QString NBDeviceInfo::device() const {
 
-	return fSz;
+	return d->device;
 };
 
-quint64 NBDeviceInfo::availSpace() const {
+QString NBDeviceInfo::fileSystemType() const {
 
-	return aSz;
+	return d->fileSystemType;
 };
 
-quint64 NBDeviceInfo::usedSpace() const {
+QString NBDeviceInfo::displayName() const {
 
-	return uSz;
+	return d->label;
 };
 
-quint64 NBDeviceInfo::driveSize() const {
+qint64 NBDeviceInfo::bytesTotal() const {
 
-	return dSz;
+	return d->bytesTotal;
+};
+
+qint64 NBDeviceInfo::bytesUsed() const {
+
+	return d->bytesUsed;
+};
+
+qint64 NBDeviceInfo::bytesAvailable() const {
+
+	return d->bytesAvailable;
+};
+
+int NBDeviceInfo::blockSize() const {
+
+	return d->blockSize;
+};
+
+bool NBDeviceInfo::isReadOnly() const {
+
+	return d->readOnly;
+};
+
+bool NBDeviceInfo::isValid() const {
+
+	return d->mIsValid;
+};
+
+bool NBDeviceManager::init = false;
+QHash<QString, NBDeviceInfo> NBDeviceManager::devicesList = QHash<QString, NBDeviceInfo>();
+
+QList<NBDeviceInfo> NBDeviceManager::allMounts() {
+
+	if ( not init )
+		pollDevices();
+
+	return devicesList.values();
+};
+
+QList<NBDeviceInfo> NBDeviceManager::allDrives() {
+
+	if ( not init )
+		pollDevices();
+
+	QList<NBDeviceInfo> devList;
+	Q_FOREACH( NBDeviceInfo info, devicesList.values() ){
+		if ( info.device().startsWith( "/dev/" ) )
+			devList << info;
+	}
+
+	return devList;
+};
+
+QList<NBDeviceInfo> NBDeviceManager::allVirtualMounts() {
+
+	if ( not init )
+		pollDevices();
+
+	QList<NBDeviceInfo> devList;
+	Q_FOREACH( NBDeviceInfo info, devicesList.values() ) {
+		if ( info.device().startsWith( "/dev/" ) )
+			continue;
+
+		if ( info.device().startsWith( "/run/" ) )
+			continue;
+
+		devList << info;
+	}
+
+	return devList;
+};
+
+NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
+
+	if ( not init )
+		pollDevices();
+
+	if ( not path.endsWith( "/" ) )
+		path += "/";
+
+	if ( devicesList.keys().contains( path ) )
+		return devicesList.value( path );
+
+	int bestMatch = path.size();
+	NBDeviceInfo bestDevice;
+
+	Q_FOREACH( QString mt, devicesList.keys() ) {
+		int match = path.compare( mt );
+		if ( ( match > 0 ) and ( match < bestMatch ) ) {
+			bestMatch = match;
+			bestDevice = devicesList.value( mt );
+		}
+	}
+
+	return bestDevice;
+};
+
+void NBDeviceManager::pollDevices() {
+
+	/* mtab file path */
+	FILE *fp = setmntent( "/etc/mtab", "r" );
+
+	/* Entry struct */
+	struct mntent *entry;
+
+	/* Clear devices list */
+	devicesList.clear();
+
+	QStringList virtualFS;
+	virtualFS << "sysfs" << "cgroup" << "proc" << "devtmpfs" << "devpts";
+	virtualFS << "tmpfs" << "securityfs" << "pstore" << "autofs" << "mqueue";
+	virtualFS << "debugfs" << "hugetlbfs" << "fusectl" << "fuse.gvfsd-fuse";
+
+	while( ( entry = getmntent( fp ) ) != NULL ) {
+		/* Remove virtual mount points: dev, sys, proc etc */
+		if ( virtualFS.contains( entry->mnt_type ) )
+			continue;
+
+		NBDeviceInfo info( new NBDeviceInfoPrivate( entry->mnt_fsname, entry->mnt_dir, entry->mnt_type ) );
+		devicesList[ entry->mnt_dir ] = info;
+	};
+
+	endmntent( fp );
+
+	init = true;
 };

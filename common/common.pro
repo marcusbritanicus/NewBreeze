@@ -3,8 +3,8 @@ TARGET = newbreeze-common
 
 VERSION = 3.0.0
 
-INCLUDEPATH += . include AppFile Archive DeviceInfo QStorageInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
-DEPENDPATH += . include AppFile Archive DeviceInfo QStorageInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
+INCLUDEPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
+DEPENDPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
 
 LIBS += -lmagic -larchive -lbz2 -llzma -lz
 DEFINES += COMMON
@@ -16,11 +16,11 @@ HEADERS += NBPluginInterface.hpp
 HEADERS += include/NBAppEngine.hpp
 HEADERS += include/NBAppFile.hpp
 HEADERS += include/NBArchive.hpp
+HEADERS += include/NBDeviceInfo.hpp
 HEADERS += include/NBLibBZip2.hpp
 HEADERS += include/NBLibGZip.hpp
 HEADERS += include/NBLibLzma.hpp
 HEADERS += include/NBLibLzma2.hpp
-HEADERS += include/NBDeviceInfo.hpp
 HEADERS += include/NBSystemInfo.hpp
 HEADERS += include/NBTools.hpp
 HEADERS += include/NBXdg.hpp
@@ -35,6 +35,7 @@ SOURCES += Archive/NBLibGZip.cpp
 SOURCES += Archive/NBLibLzma.cpp
 SOURCES += Archive/NBLibLzma2.cpp
 SOURCES += DeviceInfo/NBDeviceInfo.cpp
+SOURCES += DeviceInfo/NBDeviceInfoUnix.cpp
 SOURCES += SystemInfo/NBSystemInfo.cpp
 SOURCES += Tools/NBTools.cpp
 SOURCES += XDG/NBXdg.cpp
@@ -46,11 +47,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 	HEADERS += include/QCryptographicHash5.hpp
 	SOURCES += QCryptographicHash5/QCryptographicHash5.cpp
 
-	# QStorageInfo from Qt5 v5.4
-	HEADERS += include/QStorageInfo.hpp
-
-	SOURCES += QStorageInfo/QStorageInfo.cpp
-	SOURCES += QStorageInfo/QStorageInfo_unix.cpp
+	# NBDeviceInfo from Qt5 v5.4
 
 	# QMimeType from Qt5 v5.0+
 	HEADERS += include/QMimeDatabase.hpp
@@ -73,14 +70,6 @@ isEqual(QT_MAJOR_VERSION, 5) {
 		# CryptographicHash Sha3 from Qt5 v5.1
 		HEADERS += include/QCryptographicHash5.hpp
 		SOURCES += QCryptographicHash5/QCryptographicHash5.cpp
-	}
-
-	lessThan(QT_MINOR_VERSION, 4) {
-		# QStorageInfo from Qt5 v5.4
-		HEADERS += include/QStorageInfo.hpp
-
-		SOURCES += QStorageInfo/QStorageInfo.cpp
-		SOURCES += QStorageInfo/QStorageInfo_unix.cpp
 	}
 }
 

@@ -18,7 +18,7 @@ inline int matchesFilter( QStringList filters, QString text ) {
 	return 0;
 };
 
-int scandirCallback( const struct dirent* entry ) {
+inline int scandirCallback( const struct dirent* entry ) {
 	/* Always filter . and .. */
 	if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
 		return 0;

@@ -8,7 +8,7 @@
 
 #include "common.hpp"
 
-/* Qt4 Equivalent of linux dirname and basename */
+/* Qt Equivalent of linux dirname and basename */
 QString dirName( QString path );
 QString baseName( QString path );
 

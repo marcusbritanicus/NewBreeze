@@ -90,8 +90,8 @@ QString NBIconProvider::icon( QString path, QMimeType mimetype ) {
 		Q_FOREACH( QString key, settPrnt.allKeys() ) {
 			if ( settPrnt.value( key ).toString() == baseName( path ) ) {
 				/* If it is mounted, we return folder-unlocked */
-				Q_FOREACH( QStorageInfo info, QStorageInfo::mountedVolumes() ) {
-					if ( info.rootPath() == path )
+				Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allVirtualMounts() ) {
+					if ( info.mountPoint() == path )
 						return QString( ":/icons/folder-unlocked.png" );
 				}
 

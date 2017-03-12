@@ -147,7 +147,7 @@ bool NBIOProcess::preIO() {
 	mProgress->progressText = QString( "Checking space requirements..." );
 	NBDeviceInfo tgtInfo = NBDeviceManager::deviceInfoForPath( mProgress->targetDir );
 
-	if ( tgtInfo.availSpace() <= mProgress->totalBytes ) {
+	if ( tgtInfo.bytesAvailable() <= mProgress->totalBytes ) {
 
 		emit noSpace();
 

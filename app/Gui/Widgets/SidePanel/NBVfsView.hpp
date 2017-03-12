@@ -112,7 +112,7 @@ class NBVfsAction : public QWidget {
 
 	private:
 		QString mMountPoint;
-		quint64 percentUsed;
+		qreal percentUsed;
 		QIcon icon;
 		QString mDeviceLabel;
 

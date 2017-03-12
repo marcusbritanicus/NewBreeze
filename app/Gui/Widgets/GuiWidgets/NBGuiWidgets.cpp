@@ -6,6 +6,97 @@
 
 #include "NBGuiWidgets.hpp"
 
+inline QString getDevType( NBDeviceInfo info ) {
+
+	QString dev = info.device();
+	QString vfsType = info.fileSystemType();
+
+	QStringList cdTypes = QStringList() << "cdfs" << "iso9660" << "udf";
+	QString devType = QString( "unknown" );
+
+	if ( cdTypes.contains( vfsType ) )
+		return ":/icons/optical.png";
+
+	if ( vfsType.contains( "encfs" ) )
+		return ":/icons/encfs.png";
+
+	if ( vfsType.contains( "archivemount" ) )
+		return ":/icons/archive.png";
+
+	QDir disks = QDir( "/dev/disk/by-path" );
+	disks.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System );
+	foreach( QString disk, disks.entryList() ) {
+		QFileInfo info( disks.filePath( disk ) );
+		if ( info.symLinkTarget() == dev ) {
+			if ( info.absoluteFilePath().contains( "usb" ) )
+				return QString( ":/icons/usb.png" );
+
+			else {
+				if ( vfsType.toLower().contains( "ntfs" ) )
+					return QString( ":/icons/hdd-win.png" );
+
+				else if ( vfsType.toLower().contains( "fuseblk" ) )
+					return QString( ":/icons/hdd-win.png" );
+
+				else if ( vfsType.toLower().contains( "ext" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else if ( vfsType.toLower().contains( "jfs" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else if ( vfsType.toLower().contains( "reiser" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else if ( vfsType.toLower().contains( "zfs" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else if ( vfsType.toLower().contains( "xfs" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else if ( vfsType.toLower().contains( "btrfs" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else
+					return QString( ":/icons/hdd.png" );
+			}
+		}
+	}
+
+	if ( devType == "unknown" ) {
+		/*
+			*
+			* Lets try /sys/block approach
+			*
+			* Take /dev/<dev> part of the /dev/<dev> and check if 'usb' ia part of
+			* target of /sys/block/<dev>. Else check the starting of <dev> and determine the type
+			*
+		*/
+		QString sysfsPath = QString( "/sys/block/%1" ).arg( baseName( dev ) );
+		if ( readLink( sysfsPath ).contains( "usb" ) )
+			return QString( ":/icons/usb.png" );
+
+		else {
+			if ( baseName( dev ).startsWith( "sd" ) )
+			// We have a generic mass storage device
+				return QString( ":/icons/hdd.png" );
+
+			else if ( baseName( dev ).startsWith( "sr" ) )
+				return QString( ":/icons/optical.png" );
+
+			else if ( baseName( dev ).startsWith( "se" ) or baseName( dev ).startsWith( "ses" ) )
+				return QString( ":/icons/enclosure.png" );
+
+			else if ( baseName( dev ).startsWith( "st" ) )
+				return QString( ":/icons/tape.png" );
+
+			else
+				return devType;
+		}
+	}
+
+	return devType;
+};
+
 NBLineEdit::NBLineEdit( QWidget *parent ) : QLineEdit( parent ) {
 
 	setMinimumHeight( 32 );
@@ -19,18 +110,16 @@ void NBLineEdit::paintEvent( QPaintEvent *pEvent ) {
 
 NBDriveInfo::NBDriveInfo( NBDeviceInfo dInfo, QWidget *parent ) : QWidget ( parent ) {
 
-	quint64 usedSize = dInfo.usedSpace();
-	quint64 freeSize = dInfo.freeSpace();
-	quint64 totalSize = dInfo.driveSize();
+	quint64 usedSize = dInfo.bytesUsed();
+	quint64 freeSize = dInfo.bytesAvailable();
+	quint64 totalSize = dInfo.bytesTotal();
 
-	percent = 1.0 * usedSize / totalSize;
+	percent = 100.0 * usedSize / totalSize;
 
-	QString freeStr = formatSize( totalSize - usedSize );
-
-	name = dInfo.driveLabel();
-	disk = dInfo.driveName();
-	icon = ":/icons/" + dInfo.driveType() + ".png";
-	info = QString( "%1 free of %2 (%3% used)" ).arg( freeStr ).arg( formatSize( totalSize ) ).arg( 100 * percent, 0, 'f', 2 );
+	name = dInfo.displayName();
+	disk = dInfo.device();
+	icon = getDevType( dInfo );
+	info = QString( "%1 free of %2 (%3% used)" ).arg( formatSize( freeSize ) ).arg( formatSize( totalSize ) ).arg( percent, 0, 'f', 2 );
 
 	setFixedHeight( 64 );
 };

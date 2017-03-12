@@ -6,6 +6,97 @@
 
 #include "NBDeviceView.hpp"
 
+inline QString getDevType( NBDeviceInfo info ) {
+
+	QString dev = info.device();
+	QString vfsType = info.fileSystemType();
+
+	QStringList cdTypes = QStringList() << "cdfs" << "iso9660" << "udf";
+	QString devType = QString( "unknown" );
+
+	if ( cdTypes.contains( vfsType ) )
+		return ":/icons/optical.png";
+
+	if ( vfsType.contains( "encfs" ) )
+		return ":/icons/encfs.png";
+
+	if ( vfsType.contains( "archivemount" ) )
+		return ":/icons/archive.png";
+
+	QDir disks = QDir( "/dev/disk/by-path" );
+	disks.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System );
+	foreach( QString disk, disks.entryList() ) {
+		QFileInfo info( disks.filePath( disk ) );
+		if ( info.symLinkTarget() == dev ) {
+			if ( info.absoluteFilePath().contains( "usb" ) )
+				return QString( ":/icons/usb.png" );
+
+			else {
+				if ( vfsType.toLower().contains( "ntfs" ) )
+					return QString( ":/icons/hdd-win.png" );
+
+				else if ( vfsType.toLower().contains( "fuseblk" ) )
+					return QString( ":/icons/hdd-win.png" );
+
+				else if ( vfsType.toLower().contains( "ext" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else if ( vfsType.toLower().contains( "jfs" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else if ( vfsType.toLower().contains( "reiser" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else if ( vfsType.toLower().contains( "zfs" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else if ( vfsType.toLower().contains( "xfs" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else if ( vfsType.toLower().contains( "btrfs" ) )
+					return QString( ":/icons/hdd-linux.png" );
+
+				else
+					return QString( ":/icons/hdd.png" );
+			}
+		}
+	}
+
+	if ( devType == "unknown" ) {
+		/*
+			*
+			* Lets try /sys/block approach
+			*
+			* Take /dev/<dev> part of the /dev/<dev> and check if 'usb' ia part of
+			* target of /sys/block/<dev>. Else check the starting of <dev> and determine the type
+			*
+		*/
+		QString sysfsPath = QString( "/sys/block/%1" ).arg( baseName( dev ) );
+		if ( readLink( sysfsPath ).contains( "usb" ) )
+			return QString( ":/icons/usb.png" );
+
+		else {
+			if ( baseName( dev ).startsWith( "sd" ) )
+			// We have a generic mass storage device
+				return QString( ":/icons/hdd.png" );
+
+			else if ( baseName( dev ).startsWith( "sr" ) )
+				return QString( ":/icons/optical.png" );
+
+			else if ( baseName( dev ).startsWith( "se" ) or baseName( dev ).startsWith( "ses" ) )
+				return QString( ":/icons/enclosure.png" );
+
+			else if ( baseName( dev ).startsWith( "st" ) )
+				return QString( ":/icons/tape.png" );
+
+			else
+				return devType;
+		}
+	}
+
+	return devType;
+};
+
 NBDevicesIcon::NBDevicesIcon( QWidget *parent ) : QWidget( parent ) {
 
 	/* Default Pixmap */
@@ -331,17 +422,17 @@ NBDeviceAction::NBDeviceAction( NBDeviceInfo info, QWidget *parent ) : QWidget( 
 
 	/* Width computation */
 	QFontMetrics fm( font() );
-	setMinimumWidth( qMax( 32 + fm.width( info.driveLabel() ) + 10, 150 ) );
+	setMinimumWidth( qMax( 32 + fm.width( info.displayName() ) + 10, 150 ) );
 
 	/*Data for Display  */
-	mDeviceLabel = info.driveLabel();
-	icon = QIcon( ":/icons/" + info.driveType() + ".png" );
+	mDeviceLabel = info.displayName();
+	icon = QIcon( getDevType( info ) );
 	mMountPoint = info.mountPoint();
 	if ( not mMountPoint.endsWith( "/" ) )
 		mMountPoint += "/";
 
 	/* Disk Usage */
-	percentUsed = ( int )( info.usedSpace() * 100.0 / info.driveSize() );
+	percentUsed = 1.0 * info.bytesUsed() / info.bytesTotal();
 
 	/* Enable drag and drop */
 	setAcceptDrops( true );
@@ -392,30 +483,29 @@ void NBDeviceAction::paintEvent( QPaintEvent *pEvent ) {
 
 	// Used/Free Size
 	painter.save();
-	double mFraction = percentUsed / 100.0;
 
 	int red = 0, green = 0;
 	// Lots of free space
-	if ( mFraction <= 0.4 ) {
+	if ( percentUsed <= 0.4 ) {
 		green = ( int )( 255 );
-		red = ( int )( mFraction * 638 );
+		red = ( int )( percentUsed * 638 );
 	}
 
 	// Around 50% free space remains
-	else if ( mFraction <= 0.6 ) {
+	else if ( percentUsed <= 0.6 ) {
 		red = 255;
 		green = 255;
 	}
 
 	// Very less free space remaining
 	else {
-		green = ( int )( ( 1 - mFraction ) * 638 );
+		green = ( int )( ( 1 - percentUsed ) * 638 );
 		red = ( int )( 255 );
 	}
 
 	painter.setPen( Qt::NoPen );
 	painter.setBrush( QColor( red, green, 0 ) );
-	painter.drawRoundedRect( QRect( 32, 20, ( width() - 32 - 10 ) * mFraction, 6 ), 4.0, 4.0 );
+	painter.drawRoundedRect( QRect( 32, 20, ( width() - 32 - 10 ) * percentUsed, 6 ), 4.0, 4.0 );
 
 	painter.restore();
 

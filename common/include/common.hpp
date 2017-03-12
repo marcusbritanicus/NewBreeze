@@ -32,6 +32,8 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <sys/statvfs.h>
+#include <mntent.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <utime.h>
@@ -44,6 +46,8 @@
 #include <time.h>
 #include <pwd.h>
 #include <grp.h>
+#include <dirent.h>
+#include <mntent.h>
 
 #if QT_VERSION >= 0x050000
 	#include <QMimeDatabase>
