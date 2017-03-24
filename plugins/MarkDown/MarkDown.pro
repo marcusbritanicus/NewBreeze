@@ -54,10 +54,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 HEADERS += NBMarkDownPreviewWidget.hpp
 
 SOURCES += NBMarkDownPreviewWidget.cpp
-SOURCES += array.c
-SOURCES += buffer.c
-SOURCES += markdown.c
-SOURCES += renderers.c
+
+RESOURCES += markdown.qrc
 
 unix {
 	isEmpty(PREFIX) {

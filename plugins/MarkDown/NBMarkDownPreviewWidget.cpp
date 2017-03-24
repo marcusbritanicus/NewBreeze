@@ -4,14 +4,7 @@
 	*
 */
 
-#include <NBMarkDownPreviewWidget.hpp>
-
-extern "C" {
-	#include "array.h"
-	#include "buffer.h"
-	#include "markdown.h"
-	#include "renderers.h"
-}
+#include "NBMarkDownPreviewWidget.hpp"
 
 NBWebWatch::NBWebWatch( QString pth, QWidget *parent ) : QDialog( parent ) {
 
@@ -45,6 +38,7 @@ void NBWebWatch::createGUI() {
 
 	peekWidgetBase = new QWebView();
 	peekWidgetBase->setRenderHints( QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing );
+	peekWidgetBase->setFont( QFont( "sans", 10 ) );
 
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
@@ -108,36 +102,9 @@ void NBWebWatch::paintEvent( QPaintEvent *pEvent ) {
 
 void NBWebWatch::loadDocument() {
 
-	struct buf *ib, *ob;
-	size_t ret;
-
-	FILE *in = fopen( path.toLocal8Bit().data(), "r" );
-
-	const struct mkd_renderer *hrndr, **prndr;
-
-	hrndr = &mkd_html;
-	prndr = &hrndr;
-
-	/* reading everything */
-	ib = bufnew( BUFSIZ );
-	bufgrow( ib, BUFSIZ );
-	while ( ( ret = fread( ib->data + ib->size, 1, ib->asize - ib->size, in ) ) > 0 ) {
-		ib->size += ret;
-		bufgrow( ib, ib->size + BUFSIZ );
-	}
-
-	fclose( in );
-
-	/* performing markdown parsing */
-	ob = bufnew( BUFSIZ );
-	markdown( ob, ib, *prndr );
-
-	/* Load the document */
-	peekWidgetBase->setHtml( QString::fromLocal8Bit( ob->data, ob->size ), QUrl::fromLocalFile( path ) );
-
-	/* cleanup */
-	bufrelease( ib );
-	bufrelease( ob );
+	Document *doc = new Document( path );
+	peekWidgetBase->page()->mainFrame()->addToJavaScriptWindowObject( "doc", doc );
+	peekWidgetBase->load( QUrl( "qrc:///index.html" ) );
 };
 
 void NBWebWatch::openInExternal() {

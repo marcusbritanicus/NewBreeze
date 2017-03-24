@@ -6,7 +6,7 @@
 
 ### Note: NewBreeze 3.0 is in the oven. Expect several changes..!!
 
-Built on top of the Powerful Qt4/Qt5 GUI Toolkit, this file manager is sleek, stylish and fast.
+Built on top of the Powerful Qt GUI Toolkit, this file manager is sleek, stylish and fast.
 Some of its features are
 
 * Fast startup and browsing
@@ -23,11 +23,12 @@ Some of its features are
 * Custom Actions
 * Inline terminal
 * SingleApplication Mode for resource sharing
+* Plugin System Support
 
 ## Linux Source Available
 ### Windows source is no longer being maintained
 
-## Please READ the ReleaseNotes for information on the new features
+### Please READ the ReleaseNotes for information on the new features
 
 ### Notes for compiling - linux:
 

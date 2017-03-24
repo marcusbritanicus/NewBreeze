@@ -22,6 +22,6 @@ feel free to contribute them both to NewBreeze via github.
 
 ### Note:
 I have finished porting the NBPreviewInterface code to NBPluginInterface,
-I will be removing it in the next release.
+I will be removing it in the next release: NewBreeze v3.0.0
 
 **NBPreviewInterface** is deprecated. Please do not use it to write plugins.

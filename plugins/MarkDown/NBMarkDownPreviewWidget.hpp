@@ -12,6 +12,28 @@
 	#include <QtWebKitWidgets>
 #endif
 
+class Document : public QObject {
+	Q_OBJECT
+
+	public:
+		Document( QString path ) {
+
+			QFile f( path );
+			f.open( QFile::ReadOnly );
+
+			mText = QString::fromLocal8Bit( f.readAll() );
+			f.close();
+		};
+
+		Q_INVOKABLE QString text() {
+
+			return mText;
+		};
+
+	private:
+		QString mText;
+};
+
 class NBWebWatch : public QDialog {
 	Q_OBJECT
 

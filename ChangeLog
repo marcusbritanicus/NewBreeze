@@ -15,6 +15,7 @@ Version 3.0.0 Alpha
 	- Feature: New Classic mac-style panel
 	- Feature: Bug Reporting Interface
 	- Feature: Extended Copy/Move interface
+	- Markdown is now rendered using marked.js from http://github.com/chjj/marked
 	- NBIconManager replaces NBIconProvider with better functionality
 	- Icon themes are correctly detected over various DEs
 	- Faster moadelmodel loading via scandir
