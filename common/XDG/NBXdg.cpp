@@ -45,7 +45,7 @@ QString NBXdg::xdgDefaultApp( QString mimeType ) {
 	files << QString( "/usr/share/applications/mimeinfo.cache" );
 
 	QString defaultValue;
-	foreach( QString file, files ) {
+	Q_FOREACH( QString file, files ) {
 		QSettings defaults( file, QSettings::NativeFormat );
 		defaultValue = defaults.value( QString( "Default Applications/%1" ).arg( mimeType ) ).toString();
 		if ( defaultValue.isEmpty() )

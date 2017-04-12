@@ -72,10 +72,10 @@ class NBCOMMON_DLLSPEC NBDeviceManager : public QObject {
 		/* Volume info for path */
 		static NBDeviceInfo deviceInfoForPath( QString path );
 
-	private slots:
+	private:
+		/* Reload all the devices */
 		static void pollDevices();
 
-	private:
 		static QHash<QString, NBDeviceInfo> devicesList;
 		static bool init;
 };

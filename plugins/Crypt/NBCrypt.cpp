@@ -39,8 +39,8 @@ QList<QAction*> NBCrypt::actions( Interface, QStringList nodes ) {
 			if ( sett.childKeys().contains( baseName( path ) ) ) {
 
 				/* If this source is mounted we need to unmount it */
-				Q_FOREACH( QStorageInfo info, QStorageInfo::mountedVolumes() ) {
-					if ( info.rootPath() == path ) {
+				Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allMounts() ) {
+					if ( info.mountPoint() == path + "/" ) {
 
 						/* Unmount Action */
 						QAction *act = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), "&Unmount EncFS Volume", this );
@@ -67,8 +67,8 @@ QList<QAction*> NBCrypt::actions( Interface, QStringList nodes ) {
 			Q_FOREACH( QString key, sett.childKeys() ) {
 				if ( sett.value( key ).toString() == baseName( path ) ) {
 					/* If it is mounted, we return unmount action */
-					Q_FOREACH( QStorageInfo info, QStorageInfo::mountedVolumes() ) {
-						if ( info.rootPath() == path ) {
+					Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allMounts() ) {
+						if ( info.mountPoint() == path + "/" ) {
 
 							/* Unmount Action */
 							QAction *act = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), "&Unmount EncFS Volume", this );

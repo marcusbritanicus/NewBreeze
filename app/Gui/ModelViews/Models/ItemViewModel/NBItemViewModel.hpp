@@ -183,6 +183,7 @@ class NBItemViewModel : public QAbstractItemModel {
 
 		QHash<QString, QList<int> > categoryRowMap;
 		QHash<QString, bool> categoryVisibilityMap;
+		QHash<QString, QString> mCategoryIconMap;
 
 		bool mCategorizationEnabled;
 

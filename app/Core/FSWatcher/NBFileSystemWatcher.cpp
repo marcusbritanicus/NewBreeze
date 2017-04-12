@@ -24,6 +24,9 @@ inline QStringList entries( QString mPath ) {
 			if ( ( nodeName.compare( "." ) == 0 ) or ( nodeName.compare( ".." ) == 0 ) )
 				continue;
 
+			if ( not Settings->General.ShowHidden and nodeName.startsWith( "." ) )
+				continue;
+
 			/* Show Hidden */
 			if ( ent->d_type == DT_DIR )
 				contents << mPath + nodeName + "/";

@@ -79,7 +79,7 @@ void NBDeviceInfoPrivate::getDeviceLabel() {
 			continue;
 
 		if ( readLink( pathDiskByLabel + entryName ).compare( device ) == 0 ) {
-			label = QString( entryName );
+			label = QString( entryName ).replace( "\\x20", " " );
 			return;
 		}
 	};

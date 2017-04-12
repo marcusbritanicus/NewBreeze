@@ -190,7 +190,7 @@ QVariant NBItemViewModel::data( const QModelIndex &index, int role ) const {
 	switch( role ) {
 
 		case Qt::DisplayRole: {
-			if (  ( index.column() >= 0 ) and ( index.column() <= 9  ) )
+			if ( ( index.column() >= 0 ) and ( index.column() <= 9  ) )
 				return node->data( index.column() );
 
 			else
@@ -607,11 +607,18 @@ QPixmap NBItemViewModel::pixmapForCategory( QString categoryName ) const {
 		}
 
 		default: {
-			if ( categoryVisibilityMap[ categoryName ] == false )
-				return QIcon::fromTheme( "arrow-right" ).pixmap( 16, 16 );
+			QIcon icon = QIcon::fromTheme( mCategoryIconMap[ categoryName ] );
+			if ( icon.isNull() ) {
+				if ( categoryVisibilityMap[ categoryName ] == false )
+					return QIcon::fromTheme( "arrow-right" ).pixmap( 16, 16 );
 
-			else
-				return QIcon::fromTheme( "arrow-down" ).pixmap( 16, 16 );
+				else
+					return QIcon::fromTheme( "arrow-down" ).pixmap( 16, 16 );
+			}
+			else {
+
+				return icon.pixmap( 16, 16 );
+			}
 		}
 	}
 };
@@ -1089,10 +1096,6 @@ void NBItemViewModel::setupModelData() {
 
 void NBItemViewModel::setupFileSystemData() {
 
-	DIR *dir;
-	struct dirent *ent;
-	dir = opendir( mRootPath.toLocal8Bit().data() );
-
 	mChildNames.clear();
 	rootNode->clearChildren();
 	currentLoadStatus.loading = true;
@@ -1117,8 +1120,10 @@ void NBItemViewModel::setupFileSystemData() {
 		for( int i = 0; i < numFiles; i++ ) {
 			QString _nodeName = QString::fromLocal8Bit( fileList[ i ]->d_name );
 			QVariantList data = quickDataGatherer->getQuickFileInfo( mRootPath + _nodeName );
-			rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
+			QString _category = getCategory( data );
+			rootNode->addChild( new NBItemViewNode( data, _category, rootNode ) );
 			mChildNames << _nodeName;
+			mCategoryIconMap[ _category ] = data.at( 2 ).toString();
 			free( fileList[ i ] );
 		}
 		free( fileList );
@@ -1380,13 +1385,13 @@ QString NBItemViewModel::getCategory( QVariantList data ) {
 				else if ( date.weekNumber() == QDate::currentDate().weekNumber() )
 					return "This Week";
 
-				else if (  date.weekNumber() == QDate::currentDate().weekNumber() - 1 )
+				else if ( date.weekNumber() == QDate::currentDate().weekNumber() - 1 )
 					return "Last Week";
 
-				else if (  date.month() == QDate::currentDate().month() )
+				else if ( date.month() == QDate::currentDate().month() )
 					return "This Month";
 
-				else if (  date.month()== QDate::currentDate().month() - 1 )
+				else if ( date.month()== QDate::currentDate().month() - 1 )
 					return "Last Month";
 
 				else
@@ -1452,13 +1457,13 @@ void NBItemViewModel::saveInfo( QString root, QString entry, QStringList info ) 
 		NBItemViewNode *node = rootNode->child( entry );
 
 		/* Updating the icon */
-		if (  info.count() == 1 ) {
+		if ( info.count() == 1 ) {
 
 			node->setData( 2, info.at( 0 ), true );
 		}
 
 		/* Updating the icons, mime and category */
-		else if (  info.count() == 3 ) {
+		else if ( info.count() == 3 ) {
 			node->setData( 2, info.at( 0 ), true );
 			node->setData( 2, info.at( 1 ), false );
 			node->setData( 3, info.at( 2 ), false );
@@ -1474,13 +1479,13 @@ void NBItemViewModel::saveInfo( QString root, QString entry, QStringList info ) 
 	NBItemViewNode *node = rootNode->child( entry );
 
 	/* Updating the icon */
-	if (  info.count() == 1 ) {
+	if ( info.count() == 1 ) {
 
 		node->setData( 2, info.at( 0 ), true );
 	}
 
 	/* Updating the icons, mime and category */
-	else if (  info.count() == 3 ) {
+	else if ( info.count() == 3 ) {
 		node->setData( 2, info.at( 0 ), true );
 		node->setData( 2, info.at( 1 ), false );
 		node->setData( 3, info.at( 2 ), false );

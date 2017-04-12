@@ -141,7 +141,7 @@ void NBDriveInfo::paintEvent( QPaintEvent *pEvent ) {
 	painter.restore();
 
 	painter.save();
-	qreal radius = 32 * sqrt( percent );
+	qreal radius = 32 * sqrt( percent / 100 );
 	painter.setPen( Qt::NoPen );
 	painter.setBrush( percent < .9 ? Qt::darkGreen : Qt::darkRed );
 	painter.drawEllipse( QPointF( width() - 32.0, 32.0 ), radius, radius );
@@ -150,7 +150,7 @@ void NBDriveInfo::paintEvent( QPaintEvent *pEvent ) {
 	painter.save();
 	painter.setPen( Qt::white );
 	painter.setFont( QFont( font().family(), font().pointSize(), QFont::Bold ) );
-	painter.drawText( QRect( width() - 64, 0, 64, 64 ), Qt::AlignCenter, QString( "%1%" ).arg( percent * 100, 0, 'f', 2 ) );
+	painter.drawText( QRect( width() - 64, 0, 64, 64 ), Qt::AlignCenter, QString( "%1%" ).arg( percent, 0, 'f', 2 ) );
 	painter.restore();
 
 	painter.end();

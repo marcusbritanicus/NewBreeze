@@ -9,7 +9,7 @@ NBProcessManager                                                                
 
 NBIconProvider                                                                                                                        [ 1 of 2 ]
 	✍ Create a full icon provider class
-	✗ Provide icon strings based on size
+	✍ Provide icon strings based on size
 
 NBIconView                                                                                                                            [ 2 of 8 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
@@ -28,6 +28,12 @@ NBItemViewModel                                                                 
 	✓ Read icon data directly from NBItemNode* rather than create it repeatedly.
 	✓ Use other functions from dirent.h, vis-a-vis, scandir, fnmatch, etc
 
+NBFileSystemWatcher                                                                                                                   [ 1 of 3 ]
+	⬜ Replace my buggy implementation of inotify with QFileSystemWatcher
+	⬜ Fix the double trigger caused by node rename
+	⬜ Use inode numbers obtained from stat(...) to identify renames
+	⬜ Think of using inotify.hpp by Erik Zenker for NBFileSystemWatcher
+
 NBFolderWidget                                                                                                                        [ 2 of 2 ]
 	✓ Extended copy/move support
 	✓ Add an option in Settings Dialog
@@ -37,7 +43,7 @@ Archives                                                                        
 	✗ Writing archives will be done in NBProcessManager, show the percentage of data compressed.
 	✗ Extraction of archives to be done in NBProcessManager, show the percentage of data processed
 	✓ Use an external library to do the work - libarchive, liblzma, libz, libbz2
-	⬜ Add support for .lz, .lzo, .uu
+	✗ Add support for .lz, .lzo, .uu
 	⬜ Archive preview using Folder Flash
 
 Settings                                                                                                                              [ 0 of 2 ]

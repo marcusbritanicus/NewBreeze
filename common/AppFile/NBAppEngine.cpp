@@ -38,7 +38,7 @@ NBAppsList NBAppEngine::appsForMimeType( QMimeType mimeType ) {
 
 	QString defaultName = NBXdg::xdgDefaultApp( mimeType.name() );
 	for( int i = 0; i < appsForMimeList.count(); i++ ) {
-		if ( appsForMimeList.at( i ).desktopFileName() == defaultName ) {
+		if ( appsForMimeList.at( i ).desktopFileName() == baseName( defaultName ) ) {
 			appsForMimeList.move( i, 0 );
 			break;
 		}

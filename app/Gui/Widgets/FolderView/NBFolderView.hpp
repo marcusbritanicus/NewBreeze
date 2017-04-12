@@ -25,7 +25,6 @@
 #include "NBMessageDialog.hpp"
 #include "NBNewNodeDialog.hpp"
 #include "NBPluginManager.hpp"
-#include "NBPreviewInterface.hpp"
 #include "NBProcessManager.hpp"
 #include "NBPropertiesDialog.hpp"
 #include "NBRenameDialog.hpp"

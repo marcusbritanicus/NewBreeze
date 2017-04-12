@@ -788,7 +788,7 @@ void NBPropertiesDialog::setDirIcon() {
 			tr( "NewBreeze - Select Icon" ),
 			"/usr/share/icons/",
 			QStringList(
-				QStringList() << "Images ( *.png *.bmp *.jpg *.svg *.gif *.ppm )"
+				QStringList() << "Images ( *.png *.bmp *.jpg *.svg *.gif *.ppm )" << "All Files (*)"
 			),
 			QString( "PNG (*.png)" )
 	);

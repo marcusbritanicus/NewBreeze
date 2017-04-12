@@ -1,4 +1,4 @@
- /*
+/*
 	*
 	* NBIconManager.hpp - Icon Manager for NewBreeze
 	*
@@ -29,6 +29,9 @@ class NBIconManager {
 
 		/* Function to populate themeFallbackHash */
 		void readThemeInheritance();
+
+		/* Generate theme database */
+		void generateThemeDatabase();
 
 		/* Global Instance */
 		static NBIconManager *iMgr;

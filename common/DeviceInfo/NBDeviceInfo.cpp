@@ -92,16 +92,14 @@ QHash<QString, NBDeviceInfo> NBDeviceManager::devicesList = QHash<QString, NBDev
 
 QList<NBDeviceInfo> NBDeviceManager::allMounts() {
 
-	if ( not init )
-		pollDevices();
+	pollDevices();
 
 	return devicesList.values();
 };
 
 QList<NBDeviceInfo> NBDeviceManager::allDrives() {
 
-	if ( not init )
-		pollDevices();
+	pollDevices();
 
 	QList<NBDeviceInfo> devList;
 	Q_FOREACH( NBDeviceInfo info, devicesList.values() ){
@@ -114,8 +112,7 @@ QList<NBDeviceInfo> NBDeviceManager::allDrives() {
 
 QList<NBDeviceInfo> NBDeviceManager::allVirtualMounts() {
 
-	if ( not init )
-		pollDevices();
+	pollDevices();
 
 	QList<NBDeviceInfo> devList;
 	Q_FOREACH( NBDeviceInfo info, devicesList.values() ) {
@@ -133,10 +130,9 @@ QList<NBDeviceInfo> NBDeviceManager::allVirtualMounts() {
 
 NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
 
-	if ( not init )
-		pollDevices();
+	pollDevices();
 
-	if ( not path.endsWith( "/" ) )
+	if ( isDir( path ) and not path.endsWith( "/" ) )
 		path += "/";
 
 	if ( devicesList.keys().contains( path ) )
@@ -146,6 +142,9 @@ NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
 	NBDeviceInfo bestDevice;
 
 	Q_FOREACH( QString mt, devicesList.keys() ) {
+		if ( not path.startsWith( mt ) )
+			continue;
+
 		int match = path.compare( mt );
 		if ( ( match > 0 ) and ( match < bestMatch ) ) {
 			bestMatch = match;

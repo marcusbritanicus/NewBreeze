@@ -290,7 +290,7 @@ void NBFolderView::doOpenHome() {
 		qDebug() << "Opening Catalogs";
 
 	else
-		qDebug() << "Opening dir:" << NBXdg::home();
+		qDebug() << "Opening dir:" << NBXdg::home().toLocal8Bit().data();
 
 	fsModel->goHome();
 };
@@ -298,7 +298,7 @@ void NBFolderView::doOpenHome() {
 void NBFolderView::loadHomeDir() {
 
 	setCursor( QCursor( Qt::WaitCursor ) );
-	qDebug() << "Opening dir:" << NBXdg::home();
+	qDebug() << "Opening dir:" << NBXdg::home().toLocal8Bit().data();
 	fsModel->setRootPath( NBXdg::home() );
 	setCursor( QCursor( Qt::ArrowCursor ) );
 };
