@@ -923,11 +923,6 @@ void NBFolderView::doDelete() {
 			toBeDeleted << path.replace( progress->sourceDir, "" );
 	}
 
-	NBConfirmDeleteDialog *delDlg = new NBConfirmDeleteDialog( fsModel->currentDir(), toBeDeleted, this );
-
-	if ( not delDlg->exec() )
-		return;
-
 	/* If some files have protection inform the user */
 	if ( toBeDeleted.count() != selectedList.count() ) {
 		NBMessageDialog::warning( NULL,
@@ -937,6 +932,15 @@ void NBFolderView::doDelete() {
 			"files, please remove the protection and try again."
 		);
 	}
+
+	/* If all the selected files are under ADP, just return */
+	if ( not toBeDeleted.count() )
+		return;
+
+	NBConfirmDeleteDialog *delDlg = new NBConfirmDeleteDialog( fsModel->currentDir(), toBeDeleted, this );
+
+	if ( not delDlg->exec() )
+		return;
 
 	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
 	pMgr->addProcess( progress, proc );

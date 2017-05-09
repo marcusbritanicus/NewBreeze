@@ -114,6 +114,17 @@ void NBStartup() {
 		}
 	}
 
+	if ( settings.value( "Terminals/qterminal" ).toString().isEmpty() ) {
+		QStringList paths = QString( getenv( "PATH" ) ).split( ":" );
+		foreach( QString path, paths ) {
+			if ( QFileInfo( path + "/qterminal" ).exists() ) {
+				QStringList termInfo = QStringList() << "qterminal" << "--workdir" << "%1" << "-e" << "%2";
+				settings.setValue( "Terminals/qterminal", QVariant( termInfo ) );
+				break;
+			}
+		}
+	}
+
 	if ( settings.value( "Terminals/konsole" ).toString().isEmpty() ) {
 		QStringList paths = QString( getenv( "PATH" ) ).split( ":" );
 		foreach( QString path, paths ) {

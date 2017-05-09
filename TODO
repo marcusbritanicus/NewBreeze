@@ -1,5 +1,5 @@
-NBAddressBar                                                                                                                          [ 0 of 1 ]
-	⬜ Addressbar icons are not visible in GNOME/LxQt
+NBAddressBar                                                                                                                          [ 1 of 1 ]
+	✓ Addressbar icons are not visible in GNOME/LxQt
 
 NBProcessManager                                                                                                                      [ 2 of 4 ]
 	✍ NBIOProcess
@@ -7,9 +7,10 @@ NBProcessManager                                                                
 	⬜ NBPropertiesProcess
 	✗ Undo-Redo Sequences (Only for Copy and Move)
 
-NBIconProvider                                                                                                                        [ 1 of 2 ]
+NBIconProvider/NBIconManager                                                                                                          [ 0 of 3 ]
 	✍ Create a full icon provider class
-	✍ Provide icon strings based on size
+	✍ Provide icon strings for multiple sizes
+	✍ Integrate NBIconManager with newbreeze-common
 
 NBIconView                                                                                                                            [ 2 of 8 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
@@ -17,11 +18,11 @@ NBIconView                                                                      
 	  • Currently mouse-over on click selection is enabled.
 	⬜ Fix cursor movements
 	✗ Enable PageUp and PageDown navigation
-	⬜ Enable perfolder folded category memory
-	⬜ Category icons need to be added
-	⬜ Mac style semi-folded categories
+	✍ Enable perfolder folded category memory
+	✍ Category icons need to be added
+	✍ Mac style semi-folded categories
 	  • One click on category icon, partially folds it, clicking again expands it.
-	  • Clicking minimize icon folds the category completely, clicking it again opens it completely
+	  • Double-clicking category, toggles folding
 	✓ CatalogView and its icons need to be fixed
 
 NBItemViewModel                                                                                                                       [ 2 of 2 ]
@@ -59,6 +60,15 @@ BugReporting                                                                    
 
 StartupWizard                                                                                                                         [ 0 of 1 ]
 	⬜ Startup Wizard to initiate basic settings
+
+General                                                                                                                               [ 2 of 5 ]
+	✓ Accidental Delete Protection
+	⬜ OS File Protection as Root
+		No OS node can be directly trashed or deleted. To delete/trash any OS node, an extra layer of protection will be applied.
+		A good example is entering a phrase to validate deletion.
+	✓ Plugin barrier as root
+	⬜ Add support for addition of terminal emulators
+	⬜ Enhanced new file creation
 
 Note:
 	✍ - Work in progress

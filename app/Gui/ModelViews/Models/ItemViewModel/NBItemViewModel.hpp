@@ -101,6 +101,7 @@ class NBItemViewModel : public QAbstractItemModel {
 
 		int indexListCountForCategory( QString ) const;
 		QModelIndexList indexListForCategory( QString ) const;
+		int indexInCategory( QModelIndex ) const;
 		QModelIndexList categorySiblings( QModelIndex ) const;
 
 		bool showHidden() const;

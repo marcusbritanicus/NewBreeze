@@ -73,3 +73,8 @@ class NBDeleteErrorsDialog : public NBDialog {
 	signals:
 		void closed();
 };
+
+// namespace NBProtectOSNodeDialog {
+
+	// int {}
+// };

@@ -432,6 +432,7 @@ QModelIndexList NBIconView::selection() {
 
 bool NBIconView::isIndexVisible( QModelIndex idx ) const {
 
+	// We consider the space reserved for the category but not the indexes listed under it
 	if ( hiddenCategories.contains( cModel->category( idx ) ) )
 		return false;
 
@@ -462,8 +463,24 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 
 	for ( int row = 0; row < cModel->rowCount( rootIndex() ); row++ ) {
 		QModelIndex idx = cModel->index( row, 0, rootIndex() );
-		if ( not canShowIndex( idx ) )
+		if ( not canShowIndex( idx ) ) {
+			if ( cModel->indexInCategory( idx ) == itemsPerRow - 1 ) {
+				qDebug() << idx.data().toString() << cModel->indexInCategory( idx ) << itemsPerRow;
+				qDebug() << "Drawing dummy";
+				QRect rect = viewportRectForRow( row );
+				if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
+					continue;
+
+				qDebug() << rect;
+
+				painter.save();
+				painter.setPen( Qt::black );
+				int n = cModel->indexListCountForCategory( cModel->category( idx ) ) - itemsPerRow + 1;
+				painter.drawText( rect, Qt::AlignCenter | Qt::TextWordWrap, QString( "%1 more item%2" ).arg( n ).arg( n > 1 ? "s" : "" ) );
+				painter.restore();
+			}
 			continue;
+		}
 
 		QRect rect = viewportRectForRow( row );
 		if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
@@ -634,11 +651,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 			/* Category arrow clicked */
 			if ( QRect( topLeft.x() + 4, topLeft.y() + 4, 16, 16 ).contains( mpEvent->pos() ) )
-				showHideCategory( categoryAt( mpEvent->pos() ) );
-
-			/* Category bar pressed */
-			else
-				toggleCategorySelection( categoryAt( mpEvent->pos() ) );
+				toggleFoldCategory( categoryAt( mpEvent->pos() ) );
 
 			/* Repaint the viewport */
 			viewport()->repaint();
@@ -682,7 +695,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 		/* Valid category */
 		else if ( categoryAt( mpEvent->pos() ).count() ) {
-			toggleCategorySelection( categoryAt( mpEvent->pos() ) );
+			setCategorySelected( categoryAt( mpEvent->pos() ), true );
 			viewport()->repaint();
 		}
 
@@ -691,6 +704,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 		}
 	}
 
+	/* Control Modifier */
 	else if ( qApp->keyboardModifiers() & Qt::ControlModifier ) {
 		/* Valid index */
 		if ( idx.isValid() ) {
@@ -705,7 +719,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 		/* Valid category */
 		else if ( categoryAt( mpEvent->pos() ).count() ) {
-			toggleCategorySelection( categoryAt( mpEvent->pos() ) );
+			setCategorySelected( categoryAt( mpEvent->pos() ), false );
 			viewport()->repaint();
 		}
 
@@ -1240,37 +1254,16 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 	return idx;
 };
 
-void NBIconView::toggleCategorySelection( QString category ) {
+void NBIconView::setCategorySelected( QString category, bool yes ) {
 
-	if ( mSelectedCategories.contains( category ) ) {
-		mSelectedCategories.removeAll( category );
-		Q_FOREACH( QModelIndex idx, cModel->indexListForCategory( category ) )
-			mSelectedIndexes.removeAll( idx );
-	}
-
-	else {
-		mSelectedCategories << category;
+	if ( yes ) {
 		Q_FOREACH( QModelIndex idx, cModel->indexListForCategory( category ) ) {
 			if ( not mSelectedIndexes.contains( idx ) )
 				mSelectedIndexes << idx;
 		}
 	}
-};
-
-void NBIconView::setCategorySelected( QString category, bool yes ) {
-
-	if ( yes ) {
-		if ( not mSelectedCategories.contains( category ) ) {
-			mSelectedCategories << category;
-			Q_FOREACH( QModelIndex idx, cModel->indexListForCategory( category ) ) {
-				if ( not mSelectedIndexes.contains( idx ) )
-					mSelectedIndexes << idx;
-			}
-		}
-	}
 
 	else {
-		mSelectedCategories.removeAll( category );
 		Q_FOREACH( QModelIndex idx, cModel->indexListForCategory( category ) )
 			mSelectedIndexes.removeAll( idx );
 	}
@@ -1838,6 +1831,10 @@ void NBIconView::calculateRectsIfNecessary() const {
 	if ( not hashIsDirty )
 		return;
 
+	QSettings sett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
+	hiddenCategories = sett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+	foldedCategories = sett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
 	computeRowsAndColumns();
 
 	rectForRow.clear();
@@ -1897,24 +1894,48 @@ void NBIconView::calculateCategorizedIconsRects() const {
 		if ( hiddenCategories.contains( cModel->category( mList.value( 0 ) ) ) )
 			continue;
 
-		// Mimimum X and Y for indexes
-		minX += myInlayMargins.left();
-		minY += myCategoryHeight;
+		// We consider the space reserved for the category and one row of indexes
+		else if ( foldedCategories.contains( cModel->category( mList.value( 0 ) ) ) ) {
+			// Mimimum X and Y for indexes
+			minX += myInlayMargins.left();
+			minY += myCategoryHeight;
 
-		prevRows = mList.count() / itemsPerRow;
-		if ( mList.count() % itemsPerRow )
-			prevRows++;
+			totalRows++;
+			int limit = mList.count() >= itemsPerRow ? itemsPerRow : mList.count();
 
-		totalRows += prevRows;
+			for( int lrow = 0; lrow < limit; lrow++ ) {
+				int row = lrow / itemsPerRow;
+				int col = lrow % itemsPerRow;
 
-		for( int lrow = 0; lrow < mList.count(); lrow++ ) {
-			int row = lrow / itemsPerRow;
-			int col = lrow % itemsPerRow;
+				x = minX + col * myGridSize.width();
+				y = minY + row * myGridSize.height();
 
-			x = minX + col * myGridSize.width();
-			y = minY + row * myGridSize.height();
+				rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
+			}
 
-			rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
+			continue;
+		}
+
+		else {
+			// Mimimum X and Y for indexes
+			minX += myInlayMargins.left();
+			minY += myCategoryHeight;
+
+			prevRows = mList.count() / itemsPerRow;
+			if ( mList.count() % itemsPerRow )
+				prevRows++;
+
+			totalRows += prevRows;
+
+			for( int lrow = 0; lrow < mList.count(); lrow++ ) {
+				int row = lrow / itemsPerRow;
+				int col = lrow % itemsPerRow;
+
+				x = minX + col * myGridSize.width();
+				y = minY + row * myGridSize.height();
+
+				rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
+			}
 		}
 	}
 
@@ -1946,6 +1967,26 @@ void NBIconView::calculateCategorizedTilesRects() const {
 		if ( hiddenCategories.contains( cModel->category( mList.value( 0 ) ) ) )
 			continue;
 
+		if ( foldedCategories.contains( cModel->category( mList.value( 0 ) ) ) ) {
+			// Mimimum X and Y for indexes
+			minX += myInlayMargins.left();
+			minY += myCategoryHeight;
+
+			totalRows++;
+
+			for( int lrow = 0; lrow < mList.count(); lrow++ ) {
+				int row = lrow / itemsPerRow;
+				int col = lrow % itemsPerRow;
+
+				x = minX + col * myGridSize.width();
+				y = minY + row * myGridSize.height();
+
+				rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
+			}
+
+			continue;
+		}
+
 		// Mimimum X and Y for indexes
 		minX += myInlayMargins.left();
 		minY += myCategoryHeight;
@@ -1955,8 +1996,9 @@ void NBIconView::calculateCategorizedTilesRects() const {
 			prevRows++;
 
 		totalRows += prevRows;
+		int limit = mList.count() >= itemsPerRow ? itemsPerRow : mList.count();
 
-		for( int lrow = 0; lrow < mList.count(); lrow++ ) {
+		for( int lrow = 0; lrow < limit; lrow++ ) {
 			int row = lrow / itemsPerRow;
 			int col = lrow % itemsPerRow;
 
@@ -2285,15 +2327,55 @@ void NBIconView::emitCML() {
 
 void NBIconView::showHideCategory( QString category ) {
 
+	QSettings dirSett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
+	QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+	QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
 	if ( hiddenCategories.contains( category ) ) {
 		hiddenCategories.removeAll( category );
+		hidden.removeAll( category );
+		folded.removeAll( category );
 		cModel->openCategory( category );
 	}
 
 	else{
 		hiddenCategories.append( category );
+		hidden.append( category );
 		cModel->foldCategory( category );
 	}
+
+	hidden.removeDuplicates();
+	dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+	dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+	dirSett.sync();
+
+	hashIsDirty = true;
+	calculateRectsIfNecessary();
+};
+
+void NBIconView::toggleFoldCategory( QString category ) {
+
+	QSettings dirSett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
+	QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+	QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
+	if ( foldedCategories.contains( category ) ) {
+		foldedCategories.removeAll( category );
+		folded.removeAll( category );
+		hidden.removeAll( category );
+		cModel->openCategory( category );
+	}
+
+	else{
+		foldedCategories.append( category );
+		folded.append( category );
+		cModel->foldCategory( category );
+	}
+
+	folded.removeDuplicates();
+	dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+	dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+	dirSett.sync();
 
 	hashIsDirty = true;
 	calculateRectsIfNecessary();
@@ -2301,5 +2383,20 @@ void NBIconView::showHideCategory( QString category ) {
 
 bool NBIconView::canShowIndex( QModelIndex idx ) {
 
-	return not hiddenCategories.contains( cModel->category( idx ) );
+	QString category( cModel->category( idx ) );
+
+	if ( hiddenCategories.contains( category ) )
+		return false;
+
+	else if ( foldedCategories.contains( category ) ) {
+		QModelIndexList mList = cModel->indexListForCategory( category );
+		if ( mList.indexOf( idx ) >= itemsPerRow - 1 )
+			return false;
+
+		else
+			return true;
+	}
+
+	else
+		return true;
 };

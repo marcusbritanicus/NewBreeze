@@ -109,7 +109,6 @@ class NBIconView : public QAbstractItemView {
 		QModelIndex moveCursorCategorized( QAbstractItemView::CursorAction cursorAction );
 		QModelIndex moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction );
 
-		void toggleCategorySelection( QString );
 		void setCategorySelected( QString, bool );
 
 		// Cursor Movement Helpers
@@ -145,6 +144,7 @@ class NBIconView : public QAbstractItemView {
 		void paintSelection( QPainter *painter, const QModelIndexList ) const;
 
 		void showHideCategory( QString );
+		void toggleFoldCategory( QString );
 		bool canShowIndex( QModelIndex );
 
 		// FileSystem Model
@@ -197,6 +197,9 @@ class NBIconView : public QAbstractItemView {
 
 		// Hidden Categories
 		mutable QStringList hiddenCategories;
+
+		// Folded Categories
+		mutable QStringList foldedCategories;
 
 		QPoint dragStartPosition;
 

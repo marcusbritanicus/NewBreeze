@@ -19,6 +19,7 @@ inline int matchesFilter( QStringList filters, QString text ) {
 };
 
 inline int scandirCallback( const struct dirent* entry ) {
+
 	/* Always filter . and .. */
 	if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
 		return 0;
@@ -671,6 +672,11 @@ QModelIndexList NBItemViewModel::categorySiblings( QModelIndex idx ) const {
 	return mList;
 };
 
+int NBItemViewModel::indexInCategory( QModelIndex idx ) const {
+
+	return indexListForCategory( category( idx ) ).indexOf( idx );
+};
+
 Qt::DropActions NBItemViewModel::supportedDragActions() const {
 
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
@@ -1131,9 +1137,12 @@ void NBItemViewModel::setupFileSystemData() {
 
 	endResetModel();
 
-	/* We make all the categories visible by default */
+	/* We make all the categories visible by default, except the saved ones */
+	QSettings dirSett( mRootPath + ".directory", QSettings::NativeFormat );
+	QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+
 	foreach( QString mCategoryName, rootNode->categoryList() )
-		categoryVisibilityMap[ mCategoryName ] = true;
+		categoryVisibilityMap[ mCategoryName ] = ( hidden.contains( mCategoryName ) ? false : true );
 
 	/* Sort the contents */
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
