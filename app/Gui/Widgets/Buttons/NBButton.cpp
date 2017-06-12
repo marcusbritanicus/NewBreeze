@@ -278,4 +278,6 @@ void NBButton::initPrivateVariables() {
 
 	/* Set the default button style */
 	setButtonStyle();
+
+	/* No focus by default: Do we need this? */
 };

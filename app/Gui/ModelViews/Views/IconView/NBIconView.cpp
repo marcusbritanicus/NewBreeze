@@ -464,14 +464,13 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 	for ( int row = 0; row < cModel->rowCount( rootIndex() ); row++ ) {
 		QModelIndex idx = cModel->index( row, 0, rootIndex() );
 		if ( not canShowIndex( idx ) ) {
+			if ( hiddenCategories.contains( cModel->category( idx ) ) )
+				continue;
+
 			if ( cModel->indexInCategory( idx ) == itemsPerRow - 1 ) {
-				qDebug() << idx.data().toString() << cModel->indexInCategory( idx ) << itemsPerRow;
-				qDebug() << "Drawing dummy";
 				QRect rect = viewportRectForRow( row );
 				if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
 					continue;
-
-				qDebug() << rect;
 
 				painter.save();
 				painter.setPen( Qt::black );
@@ -1912,8 +1911,6 @@ void NBIconView::calculateCategorizedIconsRects() const {
 
 				rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
 			}
-
-			continue;
 		}
 
 		else {
@@ -1967,7 +1964,7 @@ void NBIconView::calculateCategorizedTilesRects() const {
 		if ( hiddenCategories.contains( cModel->category( mList.value( 0 ) ) ) )
 			continue;
 
-		if ( foldedCategories.contains( cModel->category( mList.value( 0 ) ) ) ) {
+		else if ( foldedCategories.contains( cModel->category( mList.value( 0 ) ) ) ) {
 			// Mimimum X and Y for indexes
 			minX += myInlayMargins.left();
 			minY += myCategoryHeight;
@@ -1983,29 +1980,29 @@ void NBIconView::calculateCategorizedTilesRects() const {
 
 				rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
 			}
-
-			continue;
 		}
 
-		// Mimimum X and Y for indexes
-		minX += myInlayMargins.left();
-		minY += myCategoryHeight;
+		else {
+			// Mimimum X and Y for indexes
+			minX += myInlayMargins.left();
+			minY += myCategoryHeight;
 
-		prevRows = mList.count() / itemsPerRow;
-		if ( mList.count() % itemsPerRow )
-			prevRows++;
+			prevRows = mList.count() / itemsPerRow;
+			if ( mList.count() % itemsPerRow )
+				prevRows++;
 
-		totalRows += prevRows;
-		int limit = mList.count() >= itemsPerRow ? itemsPerRow : mList.count();
+			totalRows += prevRows;
+			int limit = mList.count() >= itemsPerRow ? itemsPerRow : mList.count();
 
-		for( int lrow = 0; lrow < limit; lrow++ ) {
-			int row = lrow / itemsPerRow;
-			int col = lrow % itemsPerRow;
+			for( int lrow = 0; lrow < limit; lrow++ ) {
+				int row = lrow / itemsPerRow;
+				int col = lrow % itemsPerRow;
 
-			x = minX + col * myGridSize.width();
-			y = minY + row * myGridSize.height();
+				x = minX + col * myGridSize.width();
+				y = minY + row * myGridSize.height();
 
-			rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
+				rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
+			}
 		}
 	}
 

@@ -18,7 +18,7 @@ NBPropertiesBase::NBPropertiesBase( QStringList paths, QWidget *parent ) : QWidg
 	QString name;
 	if ( pathsList.count() == 1 ) {
 		QString iconName = NBIconProvider::icon( pathsList.at( 0 ) );
-		iconLabel->setPixmap( QIcon::fromTheme( iconName, QIcon( iconName ) ).pixmap( 48, 48 ) );
+		iconLabel->setPixmap( QIcon::fromTheme( iconName, QIcon( iconName ) ).pixmap( QSize( 36, 36 ) ) );
 		if ( isDir( pathsList.at( 0 ) ) )
 			iconLabel->setClickable( true );
 
@@ -44,17 +44,17 @@ NBPropertiesBase::NBPropertiesBase( QStringList paths, QWidget *parent ) : QWidg
 		QString foldersText = QString( "%1 folder%2" ).arg( nFolders ).arg( ( nFolders > 1 ? "s" : "" ) );
 
 		if ( nFiles and nFolders ) {
-			iconLabel->setPixmap( QIcon( ":/icons/others.png" ).pixmap( QSize( 48, 48 ) ) );
+			iconLabel->setPixmap( QIcon( ":/icons/others.png" ).pixmap( QSize( 36, 36 ) ) );
 			name = QString(filesText + ", " + foldersText );
 		}
 
 		else if ( nFiles and not nFolders ) {
-			iconLabel->setPixmap( QIcon( ":/icons/documents.png" ).pixmap( QSize( 48, 48 ) ) );
+			iconLabel->setPixmap( QIcon( ":/icons/documents.png" ).pixmap( QSize( 36, 36 ) ) );
 			name = QString(filesText );
 		}
 
 		else {
-			iconLabel->setPixmap( QIcon( ":/icons/folders.png" ).pixmap( QSize( 48, 48 ) ) );
+			iconLabel->setPixmap( QIcon( ":/icons/folders.png" ).pixmap( QSize( 36, 36 ) ) );
 			name = QString(foldersText );
 		}
 
@@ -82,7 +82,7 @@ NBPropertiesBase::NBPropertiesBase( QStringList paths, QWidget *parent ) : QWidg
 
 void NBPropertiesBase::setNewIcon( QString icoStr ) {
 
-	iconLabel->setPixmap( QIcon( icoStr ).pixmap( 48 ) );
+	iconLabel->setPixmap( QIcon( icoStr ).pixmap( QSize( 36, 36 ) ) );
 };
 
 NBPropertiesWidget::NBPropertiesWidget( QStringList paths, bool *term, QWidget *parent ) : QWidget( parent ) {
@@ -792,13 +792,6 @@ void NBPropertiesDialog::setDirIcon() {
 			),
 			QString( "PNG (*.png)" )
 	);
-
-	// QString iconName = QFileDialog::getOpenFileName(
-			// this,
-			// tr( "NewBreeze - Select Icon" ),
-			// "/usr/share/icons/" + NBSystemIconTheme(),
-			// "Images ( *.png *.bmp *.jpg *.svg *.gif *.ppm )"
-	// );
 
 	if ( not iconName.isEmpty() ) {
 		propsB->setNewIcon( iconName );

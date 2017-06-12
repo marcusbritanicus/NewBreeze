@@ -690,7 +690,7 @@ void NBFolderView::prepareCopy() {
 	if ( Settings->General.DirectIO ) {
 		NBProcess::Progress *progress = new NBProcess::Progress;
 		progress->sourceDir = fsModel->currentDir();
-		progress->targetDir = NBFileDialog::getDirectoryName( this, "NewBreeze - Choose target directory", fsModel->currentDir() );
+		progress->targetDir = NBDirectoryDialog::getDirectoryName( this, "NewBreeze - Choose target directory", fsModel->currentDir() );
 
 		if ( not progress->targetDir.count() )
 			return;
@@ -729,7 +729,7 @@ void NBFolderView::prepareMove() {
 	if ( Settings->General.DirectIO ) {
 		NBProcess::Progress *progress = new NBProcess::Progress;
 		progress->sourceDir = fsModel->currentDir();
-		progress->targetDir = NBFileDialog::getDirectoryName( this,"NewBreeze - Choose target directory", fsModel->currentDir() );
+		progress->targetDir = NBDirectoryDialog::getDirectoryName( this,"NewBreeze - Choose target directory", fsModel->currentDir() );
 
 		if ( not progress->targetDir.count() )
 			return;

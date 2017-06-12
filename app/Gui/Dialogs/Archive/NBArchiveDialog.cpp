@@ -87,7 +87,7 @@ void NBArchiveDialog::createGUI() {
 	segBtn->segment( 0 )->setObjectName( "okBtn" );
 	connect( segBtn->segment( 0 ), SIGNAL( clicked() ), this, SLOT( accept() ) );
 
-	segBtn->setSegmentIcon( 1, QIcon( ":/icons/archive.png" ) );
+	segBtn->setSegmentIcon( 1, QIcon( ":/icons/delete.png" ) );
 	segBtn->setSegmentText( 1, "&Cancel" );
 	segBtn->segment( 1 )->setObjectName( "cancelBtn" );
 	connect( segBtn->segment( 1 ), SIGNAL( clicked() ), this, SLOT( reject() ) );
@@ -126,7 +126,7 @@ void NBArchiveDialog::updateFileName( QString fn ) {
 
 void NBArchiveDialog::updateDirName() {
 
-	QString loc = NBFileDialog::getDirectoryName( this, "NewBreeze - Choose Directory", QDir::currentPath() );
+	QString loc = NBDirectoryDialog::getDirectoryName( this, "NewBreeze - Choose Directory", QDir::currentPath() );
 	if ( not loc.isEmpty() ) {
 		locationLE->setText( loc );
 		location = loc;

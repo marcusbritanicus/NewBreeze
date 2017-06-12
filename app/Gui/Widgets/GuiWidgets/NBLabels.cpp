@@ -12,6 +12,8 @@ NBClickLabel::NBClickLabel( QPixmap icon, QWidget *parent ) : QLabel( parent ) {
 
 	setPixmap( icon );
 	setAlignment( Qt::AlignCenter );
+
+	setStyleSheet( "QLabel{border: 1px solid gray; border-radius: 3px; padding: 5px;}" );
 };
 
 NBClickLabel::NBClickLabel( QString text, QWidget *parent ) : QLabel( parent ) {

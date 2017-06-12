@@ -16,16 +16,10 @@
 #include "NBMessageDialog.hpp"
 #include "NBGuiWidgets.hpp"
 
-class NBFileDialog : public NBDialog {
+class NBFileDialog : public QDialog {
 	Q_OBJECT
 
 	public:
-		enum DialogType {
-			Icon					= 0xA01B73,
-			File,
-			Directory
-		};
-
 		void setNameFilters( QStringList, QString );
 		void clearNameFilter();
 
@@ -35,10 +29,9 @@ class NBFileDialog : public NBDialog {
 		QString selectedFilter();
 
 		static QString getFileName( QWidget*, QString, QString, QStringList, QString );
-		static QString getDirectoryName( QWidget*, QString, QString );
 
 	private:
-		NBFileDialog( QWidget *parent, QString title, QString location, DialogType type );
+		NBFileDialog( QWidget *parent, QString title, QString location );
 
 		void createGUI();
 		void createAndSetupActions();
@@ -50,6 +43,41 @@ class NBFileDialog : public NBDialog {
 		NBSideBar *sidePanel;
 
 		NBIconView *mainView;
+
+		NBLineEdit *nameLE;
+		QComboBox *filtersCB;
+
+		QStringList filters;
+
+		QString title;
+		QString location;
+
+	private slots:
+		void openAddressBar();
+		void open( QModelIndex );
+		void open( QString );
+
+		void resetFilters();
+		void updateToolBar();
+};
+
+class NBDirectoryDialog : public NBDialog {
+	Q_OBJECT
+
+	public:
+		static QString getDirectoryName( QWidget*, QString, QString );
+
+		QString selectedItem();
+
+	private:
+		NBDirectoryDialog( QWidget *parent, QString title, QString location );
+
+		void createGUI();
+		void setWindowProperties();
+
+		NBAddressWidget *addressBar;
+		NBSideBar *sidePanel;
+
 		NBDirectoryView *dirView;
 
 		NBLineEdit *nameLE;
@@ -59,13 +87,4 @@ class NBFileDialog : public NBDialog {
 
 		QString title;
 		QString location;
-		DialogType type;
-
-	private slots:
-		void openAddressBar();
-		void open( QModelIndex );
-		void open( QString );
-
-		void resetFilters();
-		void updateToolBar();
 };
