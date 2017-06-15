@@ -119,7 +119,10 @@ QList<NBDeviceInfo> NBDeviceManager::allVirtualMounts() {
 		if ( info.device().startsWith( "/dev/" ) )
 			continue;
 
-		if ( info.device().startsWith( "/run/" ) )
+		if ( info.mountPoint().startsWith( "/run/" ) )
+			continue;
+
+		if ( info.mountPoint().startsWith( "/proc/" ) )
 			continue;
 
 		devList << info;

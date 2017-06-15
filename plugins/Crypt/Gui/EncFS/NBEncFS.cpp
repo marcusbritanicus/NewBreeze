@@ -174,7 +174,7 @@ void NBEncFS::createEncFS() {
 		decBase = baseName( mSource );
 	}
 
-	NBNewEncFS *newEncFS = new NBNewEncFS( pDir + encBase, pDir + encBase, mParent );
+	NBNewEncFS *newEncFS = new NBNewEncFS( pDir + encBase, pDir + decBase, mParent );
 	if ( newEncFS->exec() == QDialog::Accepted ) {
 
 		QString encPath = newEncFS->encryptedPath();
@@ -199,6 +199,8 @@ void NBEncFS::createEncFS() {
 
 		/* Question 1: standard mode, expert mode (x) or paranoia mode (p): p */
 		proc.write( "p\n" );
+
+		qDebug() << passwd;
 
 		/* Question 2: Input password */
 		proc.write( ( passwd + "\n" ).toLocal8Bit().data() );
