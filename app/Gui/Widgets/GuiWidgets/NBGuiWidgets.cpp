@@ -143,7 +143,7 @@ void NBDriveInfo::paintEvent( QPaintEvent *pEvent ) {
 	painter.save();
 	qreal radius = 32 * sqrt( percent / 100 );
 	painter.setPen( Qt::NoPen );
-	painter.setBrush( percent < .9 ? Qt::darkGreen : Qt::darkRed );
+	painter.setBrush( percent / 100 < .9 ? Qt::darkGreen : Qt::darkRed );
 	painter.drawEllipse( QPointF( width() - 32.0, 32.0 ), radius, radius );
 	painter.restore();
 

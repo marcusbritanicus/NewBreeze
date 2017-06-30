@@ -37,6 +37,7 @@ Version 3.0.0 Alpha
 	- QuickMenuBar removed, as its more of a hinderance
 	- UtilityBar (custom title bar) removed, uses native title bar
 	- The /proc/pid/cwd always points to the current directory
+	- BugFix: Double trigger for renames fixed
     - BugFix: NBFileSystemWatcher now uses QFileSystemWatcher as its backend
 	- BugFix: Mouse+Cursor selection is fixed
 	- BugFix: Icon loading is fixed

@@ -839,15 +839,17 @@ void NBFolderView::doSendToTrash() {
 
 	QString srcDir = fsModel->currentDir();
 
-	/* If we are deleting system files, wake up the user */
-	if ( ( not srcDir.startsWith( NBXdg::home() ) ) and ( not srcDir.startsWith( "/media" ) ) and not srcDir.startsWith( "/tmp" ) ) {
-		NBMessageDialog::critical( this,
-			"NewBreeze - Trashing system files",
-			"You are attempting to send system files to trash. This operation is potentially dangerous and hence, has been disabled. "
-			"If you wish to trash system files, you'll have to open a terminal and perform the operation."
-		);
+	/* If we are root and deleting system files, wake up the user */
+	if ( geteuid() == 0 ) {
+		if ( ( not srcDir.startsWith( NBXdg::home() ) ) and ( not srcDir.startsWith( "/media" ) ) and not srcDir.startsWith( "/tmp" ) ) {
+			NBMessageDialog::critical( this,
+				"NewBreeze - Trashing system files",
+				"You are attempting to send system files to trash. This operation is potentially dangerous and hence, has been disabled. "
+				"If you wish to trash system files, you'll have to open a terminal and perform the operation."
+			);
 
-		return;
+			return;
+		}
 	}
 
 	QList<QModelIndex> selectedList = getSelection();
@@ -894,15 +896,17 @@ void NBFolderView::doDelete() {
 
 	QString srcDir = fsModel->currentDir();
 
-	/* If we are deleting system files, wake up the user */
-	if ( ( not srcDir.startsWith( NBXdg::home() ) ) and ( not srcDir.startsWith( "/media" ) ) and not srcDir.startsWith( "/tmp" ) ) {
-		NBMessageDialog::critical( this,
-			"NewBreeze - Deleting system files",
-			"You are attempting to delete send system files. This operation is potentially dangerous and hence, has been disabled. "
-			"If you wish to delete system files, you'll have to open a terminal and perform the operation."
-		);
+	/* If we are root and deleting system files, wake up the user */
+	if ( geteuid() == 0 ) {
+		if ( ( not srcDir.startsWith( NBXdg::home() ) ) and ( not srcDir.startsWith( "/media" ) ) and not srcDir.startsWith( "/tmp" ) ) {
+			NBMessageDialog::critical( this,
+				"NewBreeze - Deleting system files",
+				"You are attempting to delete send system files. This operation is potentially dangerous and hence, has been disabled. "
+				"If you wish to delete system files, you'll have to open a terminal and perform the operation."
+			);
 
-		return;
+			return;
+		}
 	}
 
 	QList<QModelIndex> selectedList = getSelection();
@@ -918,9 +922,19 @@ void NBFolderView::doDelete() {
 
 	QStringList toBeDeleted;
 	Q_FOREACH( QModelIndex idx, selectedList ) {
-		QString path = QDir( fsModel->rootPath() ).filePath( idx.data().toString() );
-		if ( not safeNodes.contains( path ) )
-			toBeDeleted << path.replace( progress->sourceDir, "" );
+		QString path( srcDir );
+		bool addOk = false;
+		while ( path != "/" ) {
+			if ( safeNodes.contains( path ) ) {
+				addOk = false;
+				break;
+			}
+
+			path = dirName( path );
+		}
+
+		if ( addOk )
+			toBeDeleted << idx.data().toString();
 	}
 
 	/* If some files have protection inform the user */
@@ -972,19 +986,7 @@ void NBFolderView::doRename() {
 	QString npath = QDir( fsModel->currentDir() ).filePath( renamer->newName() );
 
 	NBDebugMsg( DbgMsgPart::HEAD, "Renaming %s to %s... ", opath.toLocal8Bit().data(), npath.toLocal8Bit().data() );
-	if ( rename( opath.toLocal8Bit().data(), npath.toLocal8Bit().data() ) ) {
-
-		NBDebugMsg( DbgMsgPart::TAIL, "[Failed]" );
-	}
-
-	else {
-
-		NBDebugMsg( DbgMsgPart::TAIL, "[Done]" );
-		/* To spare the trouble with NBFileSystemWatcher */
-		/* This is only an internal fix, external renames */
-		/* still need NBFileSystemWatcher trigger. */
-		fsModel->rename( opath, npath );
-	}
+	NBDebugMsg( DbgMsgPart::TAIL, ( rename( opath.toLocal8Bit().data(), npath.toLocal8Bit().data() ) ? "[Failed]" : "[Done]" ) );
 };
 
 void NBFolderView::sortByName() {

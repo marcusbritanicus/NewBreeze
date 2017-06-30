@@ -1,5 +1,6 @@
-NBAddressBar                                                                                                                          [ 1 of 1 ]
+NBAddressBar                                                                                                                          [ 1 of 2 ]
 	✓ Addressbar icons are not visible in GNOME/LxQt
+	⬜ ViewMode updates are one-way: from buttons to views only; enable reverse.
 
 NBProcessManager                                                                                                                      [ 2 of 4 ]
 	✍ NBIOProcess
@@ -12,14 +13,14 @@ NBIconProvider/NBIconManager                                                    
 	✍ Provide icon strings for multiple sizes
 	✍ Integrate NBIconManager with newbreeze-common
 
-NBIconView                                                                                                                            [ 2 of 8 ]
+NBIconView                                                                                                                            [ 4 of 8 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
 	◐ Improve the selection model
 	  • Currently mouse-over on click selection is enabled.
-	⬜ Fix cursor movements
+	⬜ Fix cursor movements due to semi-folded categories
 	✗ Enable PageUp and PageDown navigation
-	✍ Enable perfolder folded category memory
-	✍ Category icons need to be added
+	✓ Enable per-folder folded category memory
+	✓ Category icons need to be added
 	✍ Mac style semi-folded categories
 	  • One click on category icon, partially folds it, clicking again expands it.
 	  • Double-clicking category, toggles folding
@@ -29,17 +30,17 @@ NBItemViewModel                                                                 
 	✓ Read icon data directly from NBItemNode* rather than create it repeatedly.
 	✓ Use other functions from dirent.h, vis-a-vis, scandir, fnmatch, etc
 
-NBFileSystemWatcher                                                                                                                   [ 1 of 3 ]
-	⬜ Replace my buggy implementation of inotify with QFileSystemWatcher
-	⬜ Fix the double trigger caused by node rename
-	⬜ Use inode numbers obtained from stat(...) to identify renames
-	⬜ Think of using inotify.hpp by Erik Zenker for NBFileSystemWatcher
+NBFileSystemWatcher                                                                                                                   [ 4 of 4 ]
+	✓ Replace my buggy implementation of inotify with QFileSystemWatcher
+	✓ Fix the double trigger caused by node rename
+	✗ Use inode numbers obtained from stat(...) to identify renames
+	✗ Think of using inotify.hpp by Erik Zenker for NBFileSystemWatcher: uses boost-filesystem
 
 NBFolderWidget                                                                                                                        [ 2 of 2 ]
 	✓ Extended copy/move support
 	✓ Add an option in Settings Dialog
 
-Archives                                                                                                                              [ 4 of 6 ]
+Archives                                                                                                                              [ 5 of 6 ]
 	✗ Zip and tar preview: PeekPlugin using archivemount
 	✗ Writing archives will be done in NBProcessManager, show the percentage of data compressed.
 	✗ Extraction of archives to be done in NBProcessManager, show the percentage of data processed
@@ -56,19 +57,19 @@ SuperStart                                                                      
 	  • SuperStart enabled, refinement needs to be done
 
 BugReporting                                                                                                                          [ 0 of 1 ]
-	⬜ Option for bug reporting after crash
+	✗ Option for bug reporting after crash
 
 StartupWizard                                                                                                                         [ 0 of 1 ]
-	⬜ Startup Wizard to initiate basic settings
+	✗ Startup Wizard to initiate basic settings
 
 General                                                                                                                               [ 2 of 5 ]
 	✓ Accidental Delete Protection
-	⬜ OS File Protection as Root
+	◐ OS File Protection as Root
 		No OS node can be directly trashed or deleted. To delete/trash any OS node, an extra layer of protection will be applied.
 		A good example is entering a phrase to validate deletion.
 	✓ Plugin barrier as root
 	⬜ Add support for addition of terminal emulators
-	⬜ Enhanced new file creation
+	✍ Enhanced new file creation
 
 Note:
 	✍ - Work in progress
