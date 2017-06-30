@@ -15,11 +15,12 @@ Version 3.0.0 Alpha
 	- Feature: New Classic mac-style panel
 	- Feature: Bug Reporting Interface
 	- Feature: Extended Copy/Move interface
+	- Feature: Accidental Delete Protection
 	- Markdown is now rendered using marked.js from http://github.com/chjj/marked
 	- NBIconManager replaces NBIconProvider with better functionality
 	- Icon themes are correctly detected over various DEs
-	- Faster moadelmodel loading via scandir
-	- LibArchive, liblzma, libz, lbz2 do the a rchiving
+	- Faster model loading via scandir(...)
+	- LibArchive, liblzma, libz, lbz2 do the archiving
 	- Cursor shape chages to WaitCursor during model loading
 	- NBItemViewModel now supports both real and virtual locations
 	- Archive creation and extraction are performed using QtConcurrent::run

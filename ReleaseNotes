@@ -7,13 +7,12 @@ few changes in NewBreeze 3.
 => Qt5 Support
    - This release onwards Qt5 builds are supported. Use qmake-qt5 to build using Qt5.
 
-=> User interface rebuiltm integrating code from NewBreeze and NewBreezeUI
+=> User interface rebuilt, integrating code from NewBreeze and NewBreezeUI
    - File/Folder filtering
 
 => NBFileSystemWatcher
-    - NBFileSystemWatcher was rewritten with a cleaner code based on the inotify-example.c from http://www.lanedo.com/users/amorgado/fanotify/inotify-example.c
-    - The above code was buggy and hence has been replaced with QFileSystemWatcher as the backend (renames cause double triggers).
-    - This will be replaced with inotify.hpp by Erik Zenker in the future after further testing
+    - NBFileSystemWatcher was earlier rewritten with a cleaner code based on the inotify-example.c from http://www.lanedo.com/users/amorgado/fanotify/inotify-example.c
+    - The above code was buggy and hence has been replaced with QFileSystemWatcher as the backend.
 
 => NBItemViewModel( QAbsractItemModel )
    - Formerly NBFileSystemModel, now it models Applications, Catalogs, and the FileSystem
@@ -47,11 +46,11 @@ few changes in NewBreeze 3.
 
 => NBPluginInterface
    - All plugins are updated to use the standard NBPluginInteface.
-   - NBInterface can be used easily to extend Preview support for NewBreeze.
+   - NBPluginInterface can be used easily to extend Preview support for NewBreeze.
    - Defaults Plugins will now be shipped with NewBreeze rather than as a separate repo.
 
 => NBArchive extended
    - NBArchive is now rebuilt using libarchive for archive processing
    - GZip, BZip2, and XZ files are processed independently
    - Archive creation now shows a pretty dialog with some options
-   - Archive creation and extraction is done via QtConcurrent::run( ... )
+   - Archive creation and extraction is done via QtConcurrent::run(...)
