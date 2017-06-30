@@ -20,7 +20,7 @@ QString dirName( QString path ) {
 	QString dirPth = QString( dirname( dupPath ) ) + "/";
 	free( dupPath );
 
-	return dirPth;
+	return ( dirPth == "//" ? "/" : dirPth );
 };
 
 QString baseName( QString path ) {
