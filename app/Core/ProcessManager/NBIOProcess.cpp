@@ -80,22 +80,11 @@ void NBIOProcess::resume() {
 
 bool NBIOProcess::canUndo() {
 
-	return ( exists( mProgress->sourceDir ) and exists( mProgress->targetDir ) );
+	return false;
 };
 
 void NBIOProcess::undo() {
 
-	/* If we copied the nodes, then delete them */
-	if ( mProgress->type == NBProcess::Copy ) {
-		mUndo = true;
-		start();
-	}
-
-	/* We moved the files, move them back */
-	else {
-		mProgress->sourceDir.swap( mProgress->targetDir );
-		start();
-	}
 };
 
 bool NBIOProcess::preIO() {

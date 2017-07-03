@@ -58,15 +58,11 @@ void NBDeleteProcess::resume() {
 
 bool NBDeleteProcess::canUndo() {
 
-	return ( mProgress->type != NBProcess::Delete );
+	return false;
 };
 
 void NBDeleteProcess::undo() {
 
-	if ( mProgress->type == NBProcess::Trash ) {
-		mUndo = true;
-		start();
-	}
 };
 
 void NBDeleteProcess::deleteNode( QString path ) {

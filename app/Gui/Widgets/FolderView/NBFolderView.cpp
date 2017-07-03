@@ -931,12 +931,15 @@ void NBFolderView::doDelete() {
 	progress->type = NBProcess::Delete;
 
 	QStringList toBeDeleted;
+	QStringList toBeSaved;
 	QString path = dirName( srcDir );
 	Q_FOREACH( QModelIndex idx, selectedList ) {
-		bool addOk = false;
+		bool addOk = true;
 
-		if ( safeNodes.contains( srcDir + idx.data().toString() ) )
+		if ( safeNodes.contains( srcDir + idx.data().toString() ) ) {
+			toBeSaved << idx.data().toString();
 			continue;
+		}
 
 		while ( path != "/" ) {
 			if ( safeNodes.contains( path ) ) {
@@ -949,37 +952,33 @@ void NBFolderView::doDelete() {
 
 		if ( addOk )
 			toBeDeleted << idx.data().toString();
+
+		else
+			toBeSaved << idx.data().toString();
 	}
 
-	/* If some files have protection inform the user */
-	if ( not toBeDeleted.count() )  {
-		NBMessageDialog::warning( NULL,
-			"Error deleting protected files",
-			"<p>All the nodes you are trying to delete are under <b><tt>Accidental Delete Protection</tt></b>. None of them will be deleted."
-			"Only the files without accidental protection will be deleted. If you really want to delete protected "
-			"files, please remove the protection and try again.</p>"
-			"<p><small>PS: Note that Accidental Delete Protection is recursive, i.e., all the files and folders that are under the "
-			"protected node will also be treated as protected.</small></p>"
-		);
+	/* If some files have protection, confirm deletion */
+	if ( toBeDeleted.count() != selectedList.count() ) {
+		NBConfirmDeleteProtectedDialog *delDlg = new NBConfirmDeleteProtectedDialog( fsModel->currentDir(), QStringList() << toBeDeleted << toBeSaved, this );
+		switch ( delDlg->exec() ) {
+			case 2:
+				toBeDeleted << toBeSaved;
+				break;
 
-		return;
+			case 1:
+				break;
+
+			case 0:
+				return;
+		}
 	}
 
-	else if ( toBeDeleted.count() != selectedList.count() ) {
-		NBMessageDialog::warning( NULL,
-			"Error deleting protected files",
-			"<p>Some of the nodes you are trying to delete are under <b><tt>Accidental Delete Protection</tt></b>. "
-			"Only the files without accidental protection will be deleted. If you really want to delete protected "
-			"files, please remove the protection and try again.</p>"
-			"<p><small>PS: Note that Accidental Delete Protection is recursive, i.e., all the files and folders that are under the "
-			"protected node will also be treated as protected.</small></p>"
-		);
+	else {
+		NBConfirmDeleteDialog *delDlg = new NBConfirmDeleteDialog( fsModel->currentDir(), toBeDeleted, true, this );
+		if ( not delDlg->exec() )
+			return;
 	}
 
-	NBConfirmDeleteDialog *delDlg = new NBConfirmDeleteDialog( fsModel->currentDir(), toBeDeleted, this );
-
-	if ( not delDlg->exec() )
-		return;
 
 	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
 	pMgr->addProcess( progress, proc );

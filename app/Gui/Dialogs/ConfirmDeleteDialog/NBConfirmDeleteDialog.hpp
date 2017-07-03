@@ -47,6 +47,44 @@ class NBConfirmDeleteDialog : public NBDialog {
 		void closed();
 };
 
+class NBConfirmDeleteProtectedDialog : public NBDialog {
+	Q_OBJECT
+
+	public:
+		NBConfirmDeleteProtectedDialog( QString, QStringList, bool permanent = false, QWidget *parent = 0 );
+
+	private:
+		QLabel *iconLbl, *textLbl;
+		NBSegmentButton *segBtns;
+		QLineEdit *confirmPhraseLE;
+		QTableWidget *table;
+		QStringList deletePaths;
+		QString source;
+
+		void setupGUI( bool );
+		void setupTable();
+		void addEntry( QString );
+
+		int deleteFiles;
+
+	protected:
+		void keyPressEvent( QKeyEvent *keyEvent );
+
+	public slots:
+		void close();
+		int exec();
+
+	private slots:
+		void handleSegmentClick( int );
+		void handleTextChanged( QString );
+		void deleteAll();
+		void deleteOthers();
+		void deleteCancel();
+
+	signals:
+		void closed();
+};
+
 class NBDeleteErrorsDialog : public NBDialog {
 	Q_OBJECT
 

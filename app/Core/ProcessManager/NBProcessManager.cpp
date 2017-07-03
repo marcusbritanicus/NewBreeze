@@ -7,7 +7,7 @@
 	* not necessary to register that process with NBProcessManager.
 	*
 	* Registering a process with NBProcessManager has an added advantage, i.e., it is
-	* possible to undo the process.
+	* possible to undo the process: UNDO not implemented.
 	*
 	* Note: All processes can not be undone, example Deleting a node from the disk can
 	* not be undone using NBProcessManager. Similarly, it is not possible to undo the

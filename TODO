@@ -2,8 +2,8 @@ NBAddressBar                                                                    
 	✓ Addressbar icons are not visible in GNOME/LxQt
 	⬜ ViewMode updates are one-way: from buttons to views only; enable reverse.
 
-NBProcessManager                                                                                                                      [ 2 of 4 ]
-	✍ NBIOProcess
+NBProcessManager                                                                                                                      [ 3 of 4 ]
+	✓ NBIOProcess
 	✓ NBDeleteProcess
 	⬜ NBPropertiesProcess
 	✗ Undo-Redo Sequences (Only for Copy and Move)
