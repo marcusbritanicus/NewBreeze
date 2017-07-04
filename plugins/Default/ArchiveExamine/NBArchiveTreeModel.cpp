@@ -274,9 +274,6 @@ void NBArchiveTreeModel::growTree() {
 
 	beginResetModel();
 
-	QStringList data;
-	/* Read the archive */
-
 	struct archive *a;
 	struct archive_entry *entry;
 	int r;
@@ -300,7 +297,8 @@ void NBArchiveTreeModel::growTree() {
 			return;
 
 		QString name = QString::fromUtf8( archive_entry_pathname_utf8( entry ) );
-		data << name;
+		int type = archive_entry_filetype( entry );
+
 		QStringList tokens = QStringList() << name.split( "/", QString::SkipEmptyParts );
 		tree->addBranch( new NBTreeBranch( tokens.value( 0 ), QIcon::fromTheme( "folder" ), tree ) );
 		if ( tokens.size() == 1 )
@@ -309,7 +307,8 @@ void NBArchiveTreeModel::growTree() {
 		NBTreeBranch *branch = tree;
 		for( int i = 1; i < tokens.size(); i++ ) {
 			branch = branch->branch( tokens.value( i - 1 ) );
-			branch->addBranch( new NBTreeBranch( tokens.value( i ), QIcon::fromTheme( i == tokens.size() - 1 ? "unknown" : "folder" ), branch ) );
+			QString iconName = ( ( type == AE_IFDIR ) ? "folder" : mimeDb.mimeTypeForFile( tokens.value( i ) ).iconName() );
+			branch->addBranch( new NBTreeBranch( tokens.value( i ), QIcon::fromTheme( iconName ), branch ) );
 		}
 
 		archive_read_data_skip( a );

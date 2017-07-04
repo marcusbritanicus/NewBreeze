@@ -30,7 +30,7 @@ void NBArchiveExamine::createGUI() {
 	QWidget *baseWidget = new QWidget( this );
 	baseWidget->setObjectName( tr( "guiBase" ) );
 
-	connect( openBtn, SIGNAL( clicked() ), this, SLOT( loadFolder() ) );
+	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
 	peekWidgetBase = new QTreeView( this );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );

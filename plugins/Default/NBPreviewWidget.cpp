@@ -173,6 +173,12 @@ void NBPreviewWidget::actionTrigger( Interface, QString, QStringList nodes ) {
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			peek->exec();
 		}
+
+		else if ( isArchive( nodes.at( 0 ) ) ) {
+			NBArchiveExamine *peek = new NBArchiveExamine( nodes.at( 0 ) );
+			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
+			peek->exec();
+		}
 	}
 };
 
