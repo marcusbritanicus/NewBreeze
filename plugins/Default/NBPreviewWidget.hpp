@@ -8,6 +8,7 @@
 
 #include "NBPluginInterface.hpp"
 
+#include "NBArchiveExamine.hpp"
 #include "NBDjvuDisplay.hpp"
 #include "NBImagePeek.hpp"
 #include "NBOdfOgle.hpp"

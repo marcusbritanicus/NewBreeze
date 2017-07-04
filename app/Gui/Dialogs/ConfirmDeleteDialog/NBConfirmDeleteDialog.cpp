@@ -183,7 +183,7 @@ void NBConfirmDeleteDialog::deleteCancel() {
 	close();
 };
 
-NBConfirmDeleteProtectedDialog::NBConfirmDeleteProtectedDialog( QString src, QStringList paths, bool permanent, QWidget *parent ) : NBDialog( parent ) {
+NBConfirmDeleteProtectedDialog::NBConfirmDeleteProtectedDialog( QString src, QStringList paths, bool root, QWidget *parent ) : NBDialog( parent ) {
 
 	deletePaths = paths;
 	source = src;
@@ -191,11 +191,11 @@ NBConfirmDeleteProtectedDialog::NBConfirmDeleteProtectedDialog( QString src, QSt
 	/* deleteFiles flag: 0 means cancel, 1 means delete others, 2 means delete all */
 	deleteFiles = 0;
 
-	setupGUI( permanent );
+	setupGUI( root );
 	setupTable();
 }
 
-void NBConfirmDeleteProtectedDialog::setupGUI( bool permanent ) {
+void NBConfirmDeleteProtectedDialog::setupGUI( bool root ) {
 
 	QVBoxLayout *dlgLyt = new QVBoxLayout();
 	QHBoxLayout *msgLyt = new QHBoxLayout();
@@ -205,13 +205,12 @@ void NBConfirmDeleteProtectedDialog::setupGUI( bool permanent ) {
 	iconLbl->setMaximumSize( QSize( 64, 64 ) );
 	iconLbl->setPixmap( QPixmap( ":/icons/question.png" ).scaled( 64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 
-	if ( permanent ) {
+	if ( root) {
 		textLbl = new QLabel(
 			QString(
-			"<p>One or more of the nodes you are trying to delete are under <b><tt>Accidental Delete Protection</tt></b>. "
-			"If you really want to delete them, please type <tt><b>Yes, I really want to delete the selected files</b></tt> "
-			"in the box below and press <tt>Delete</tt>.</p>"
-			"<p>To only the unprotected nodes, press <tt>Delete others</tt>. To cancel the operation, press <tt>Cancel</tt></p>"
+				"You are attempting to delete some system files. This operation is potentially dangerous. "
+				"If you really want to delete them, please type <tt><b>Yes, I really want to delete the selected files</b></tt> "
+				"in the box below and press <tt>Delete</tt>.</p>"
 			)
 		);
 	}
@@ -219,10 +218,10 @@ void NBConfirmDeleteProtectedDialog::setupGUI( bool permanent ) {
 	else {
 		textLbl = new QLabel(
 			QString(
-			"<p>One or more of the nodes you are trying to trash are under <b><tt>Accidental Delete Protection</tt></b>. "
+			"<p>One or more of the nodes you are trying to delete are under <b><tt>Accidental Delete Protection</tt></b>. "
 			"If you really want to delete them, please type <tt><b>Yes, I really want to delete the selected files</b></tt> "
-			"in the box below and press <tt>Trash</tt>.</p>"
-			"<p>To only the unprotected nodes, press <tt>Trash others</tt>. To cancel the operation, press <tt>Cancel</tt></p>"
+			"in the box below and press <tt>Delete</tt>.</p>"
+			"<p>To delete only the unprotected nodes, press <tt>Delete others</tt>. To cancel the operation, press <tt>Cancel</tt></p>"
 			)
 		);
 	}
@@ -243,6 +242,7 @@ void NBConfirmDeleteProtectedDialog::setupGUI( bool permanent ) {
 	connect( confirmPhraseLE, SIGNAL( textChanged( QString ) ), this, SLOT( handleTextChanged( QString ) ) );
 
 	segBtns = new NBSegmentButton( this );
+
 	segBtns->setCount( 3 );
 
 	segBtns->setSegmentIcon( 0, QIcon( ":/icons/delete.png" ) );
@@ -259,6 +259,9 @@ void NBConfirmDeleteProtectedDialog::setupGUI( bool permanent ) {
 	segBtns->segment( 2 )->setObjectName( "cancelBtn" );
 	segBtns->segment( 2 )->setFocus();
 
+	if ( root )
+		segBtns->segment( 1 )->hide();
+
 	connect( segBtns, SIGNAL( clicked( int ) ), this, SLOT( handleSegmentClick( int ) ) );
 
 	btnLyt->addStretch( 0 );
@@ -272,7 +275,7 @@ void NBConfirmDeleteProtectedDialog::setupGUI( bool permanent ) {
 
 	NBDialog::setLayout( dlgLyt );
 
-	setFixedSize( 480, 640 );
+	setFixedSize( 480, 540 );
 };
 
 void NBConfirmDeleteProtectedDialog::setupTable() {

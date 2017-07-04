@@ -896,34 +896,11 @@ void NBFolderView::doDelete() {
 
 	QString srcDir = fsModel->currentDir();
 
-	/* If we are root and deleting system files, wake up the user */
-	if ( geteuid() == 0 ) {
-		if ( ( not srcDir.startsWith( NBXdg::home() ) ) and ( not srcDir.startsWith( "/media" ) ) and not srcDir.startsWith( "/tmp" ) ) {
-			NBMessageDialog::critical( this,
-				"NewBreeze - Deleting system files",
-				"You are attempting to delete send system files. This operation is potentially dangerous and hence, has been disabled. "
-				"If you wish to delete system files, you'll have to open a terminal and perform the operation."
-			);
-
-			return;
-		}
-	}
-
 	QList<QModelIndex> selectedList = getSelection();
 
 	/* Check if we have protection set */
 	QSettings nbSettings( "NewBreeze", "NewBreeze" );
 	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
-
-	if ( safeNodes.contains( srcDir ) or safeNodes.contains( srcDir.left( srcDir.size() - 1 ) ) ) {
-		NBMessageDialog::warning( NULL,
-			"Error deleting protected files",
-			"You have enabled <b><tt>Accidental Delete Protection</tt></b> for the current folder. I will not delete any of its contents. "
-			"If you really want to delete these files, please remove the protection and try again."
-		);
-
-		return;
-	}
 
 	NBProcess::Progress *progress = new NBProcess::Progress;
 	progress->sourceDir = srcDir;
@@ -932,7 +909,9 @@ void NBFolderView::doDelete() {
 
 	QStringList toBeDeleted;
 	QStringList toBeSaved;
-	QString path = dirName( srcDir );
+	QString path = srcDir;
+
+	/* Create a list of files to be deleted */
 	Q_FOREACH( QModelIndex idx, selectedList ) {
 		bool addOk = true;
 
@@ -959,7 +938,7 @@ void NBFolderView::doDelete() {
 
 	/* If some files have protection, confirm deletion */
 	if ( toBeDeleted.count() != selectedList.count() ) {
-		NBConfirmDeleteProtectedDialog *delDlg = new NBConfirmDeleteProtectedDialog( fsModel->currentDir(), QStringList() << toBeDeleted << toBeSaved, this );
+		NBConfirmDeleteProtectedDialog *delDlg = new NBConfirmDeleteProtectedDialog( fsModel->currentDir(), QStringList() << toBeDeleted << toBeSaved, false, this );
 		switch ( delDlg->exec() ) {
 			case 2:
 				toBeDeleted << toBeSaved;
@@ -974,18 +953,29 @@ void NBFolderView::doDelete() {
 	}
 
 	else {
-		NBConfirmDeleteDialog *delDlg = new NBConfirmDeleteDialog( fsModel->currentDir(), toBeDeleted, true, this );
-		if ( not delDlg->exec() )
-			return;
-	}
+		/* If we have permission for deleting system files, wake up the user */
+		if ( ( not srcDir.startsWith( NBXdg::home() ) ) and ( not srcDir.startsWith( "/media" ) ) and not srcDir.startsWith( "/tmp" ) ) {
+			if ( eaccess( srcDir.toLocal8Bit().constData(), W_OK | X_OK ) == 0 ) {
+				NBConfirmDeleteProtectedDialog *delDlg = new NBConfirmDeleteProtectedDialog( fsModel->currentDir(), toBeDeleted, true, this );
+				if ( not delDlg->exec() )
+					return;
+			}
+		}
 
+		/* Otherwise confirm deletion */
+		else {
+			NBConfirmDeleteDialog *delDlg = new NBConfirmDeleteDialog( fsModel->currentDir(), toBeDeleted, false, this );
+			if ( not delDlg->exec() )
+				return;
+		}
+	}
 
 	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
 	pMgr->addProcess( progress, proc );
 
 	progress->startTime = QTime::currentTime();
 
-	proc->start();
+	// proc->start();
 };
 
 void NBFolderView::doRename() {

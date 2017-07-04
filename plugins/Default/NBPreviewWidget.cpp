@@ -59,6 +59,12 @@ QList<QAction*> NBPreviewWidget::actions( Interface, QStringList nodes ) {
 			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
 		}
 
+		else if ( isArchive( previewNode ) ) {
+			NBArchiveExamine *peek = new NBArchiveExamine( previewNode );
+			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
+			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
+		}
+
 		actList << act;
 	}
 
@@ -87,6 +93,21 @@ NBPluginInterface::Contexts NBPreviewWidget::contexts( Interface ) {
 QStringList NBPreviewWidget::mimetypes() {
 
 	QStringList mimeList;
+
+	/* Archive mime types */
+
+	mimeList << "application/x-7z-compressed"
+			<< "application/x-ar"
+			<< "application/x-cpio"
+			<< "application/x-rar"
+			<< "application/x-tar"
+			<< "application/x-compressed-tar"
+			<< "application/x-bzip-compressed-tar"
+			<< "application/x-lzma-compressed-tar"
+			<< "application/x-xz-compressed-tar"
+			<< "application/zip"
+			<< "application/x-cd-image";
+
 	/* DjVu Mime type */
 	mimeList << mimeDb.mimeTypeForFile( "file.djvu" ).name();
 	mimeList << mimeDb.mimeTypeForFile( "file.djvu" ).aliases();

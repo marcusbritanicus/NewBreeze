@@ -379,10 +379,7 @@ bool NBItemViewModel::insertNode( QString nodeName ) {
 	endResetModel();
 
 	NBIconUpdater *ig = new NBIconUpdater( mRootPath, QStringList() << nodeName,  &mTerminate );
-	connect(
-		ig, SIGNAL( updated( QString, QString, QStringList ) ),
-		this, SLOT( saveInfo( QString, QString, QStringList ) )
-	);
+	connect( ig, SIGNAL( updated( QString, QString, QStringList ) ), this, SLOT( saveInfo( QString, QString, QStringList ) ) );
 
 	ig->start();
 
@@ -410,10 +407,7 @@ void NBItemViewModel::updateNode( QString nodeName ) {
 	}
 
 	NBIconUpdater *ig = new NBIconUpdater( mRootPath, QStringList() << nodeName, &mTerminate );
-	connect(
-		ig, SIGNAL( update( QString, QString, QStringList ) ),
-		this, SLOT( saveInfo( QString, QString, QStringList ) )
-	);
+	connect( ig, SIGNAL( updated( QString, QString, QStringList ) ), this, SLOT( saveInfo( QString, QString, QStringList ) ) );
 
 	ig->start();
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );

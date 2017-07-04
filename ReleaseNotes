@@ -24,6 +24,9 @@ few changes in NewBreeze 3.
    - Fixed the small issue of mouse/cursor selection conflict.
    - Partially fixed the SegFault with cursor up and down movements.
 
+=> UI
+   - An elementary Accidental Delete Protection (ADP) has been added. However it is not mature enough for commercial use.
+
 => NBAddressBar redesigned
    - NBBreadCrumbsBar is now called NBCrumbsBar.
    - It redesigned to make sure long paths do not run out of the widget.
