@@ -53,13 +53,13 @@ QList<QAction*> NBPreviewWidget::actions( Interface, QStringList nodes ) {
 			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
 		}
 
-		else if ( mime.name().startsWith( "image" ) or ( mime.name() == ( "video/x-mng" ) ) ) {
+		else if ( mime.name().startsWith( "image" ) or ( mime.name() == "video/x-mng" ) ) {
 			NBImagePeek *peek = new NBImagePeek( previewNode );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
 		}
 
-		else if ( isArchive( previewNode ) ) {
+		else if ( isArchive( previewNode ) or mime.name() == "application/x-cd-image" ) {
 			NBArchiveExamine *peek = new NBArchiveExamine( previewNode );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
@@ -168,13 +168,13 @@ void NBPreviewWidget::actionTrigger( Interface, QString, QStringList nodes ) {
 			peek->exec();
 		}
 
-		else if ( mime.name().contains( "image" ) ) {
+		else if ( mime.name().startsWith( "image" ) or ( mime.name() == "video/x-mng" ) ) {
 			NBImagePeek *peek = new NBImagePeek( nodes.at( 0 ) );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			peek->exec();
 		}
 
-		else if ( isArchive( nodes.at( 0 ) ) ) {
+		else if ( isArchive( nodes.at( 0 ) ) or mime.name() == "application/x-cd-image" ) {
 			NBArchiveExamine *peek = new NBArchiveExamine( nodes.at( 0 ) );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			peek->exec();

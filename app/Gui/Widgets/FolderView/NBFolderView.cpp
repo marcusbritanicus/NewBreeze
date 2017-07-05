@@ -617,7 +617,6 @@ void NBFolderView::doPeek() {
 	/* Other mimetypes, we depend on the PluginManager */
 	/* If the PluginManager returns a valid path, we use it */
 	else {
-
 		NBPluginManager *plMgr = NBPluginManager::instance();
 
 		QString node = fsModel->nodePath( curIndex );
