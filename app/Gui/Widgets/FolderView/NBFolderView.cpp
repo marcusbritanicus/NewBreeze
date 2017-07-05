@@ -975,7 +975,7 @@ void NBFolderView::doDelete() {
 
 	progress->startTime = QTime::currentTime();
 
-	// proc->start();
+	proc->start();
 };
 
 void NBFolderView::doRename() {
