@@ -64,7 +64,8 @@ void NBArchiveExamine::setWindowProperties() {
 
 int NBArchiveExamine::exec() {
 
-	QTimer::singleShot( 0, this, SLOT( loadArchive() ) );
+	/* Let the archive loading start later */
+	QTimer::singleShot( 100, this, SLOT( loadArchive() ) );
 
 	return QDialog::exec();
 };
