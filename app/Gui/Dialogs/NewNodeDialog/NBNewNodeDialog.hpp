@@ -21,7 +21,6 @@ class NBNewNodeDialog : public NBDialog {
 		NBNewNodeDialog( QString, QDir, QString text = QString(), QWidget *parent = 0 );
 		NBLineEdit *le;
 		NBButton *okBtn, *cancelBtn;
-		QString name;
 		QDir dir;
 		QString data;
 
@@ -30,6 +29,29 @@ class NBNewNodeDialog : public NBDialog {
 
 	private slots :
 		void createFileFolder();
+		void cancel();
+		void handleTextChanged( QString newText );
+
+	Q_SIGNALS:
+		void nodeCreated( QString );
+};
+
+class NBNewFileDialog : public NBDialog {
+	Q_OBJECT
+
+	public :
+		NBNewFileDialog( QDir, QWidget *parent = 0 );
+		QComboBox *cb;
+		NBLineEdit *le;
+		NBButton *okBtn, *cancelBtn;
+		QDir dir;
+		QStringList mimetypes;
+
+	private:
+		void setWindowProperties();
+
+	private slots :
+		void createFile();
 		void cancel();
 		void handleTextChanged( QString newText );
 

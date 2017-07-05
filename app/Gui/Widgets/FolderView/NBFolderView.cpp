@@ -305,7 +305,7 @@ void NBFolderView::loadHomeDir() {
 
 void NBFolderView::newFile() {
 
-	NBNewNodeDialog *newFile = new NBNewNodeDialog( "file", QDir( fsModel->currentDir() ), QString(), this );
+	NBNewFileDialog *newFile = new NBNewFileDialog( QDir( fsModel->currentDir() ), this );
 	newFile->exec();
 };
 

@@ -40,13 +40,13 @@ NBFolderWidget                                                                  
 	✓ Extended copy/move support
 	✓ Add an option in Settings Dialog
 
-Archives                                                                                                                              [ 5 of 6 ]
+Archives                                                                                                                              [ 6 of 6 ]
 	✗ Zip and tar preview: PeekPlugin using archivemount
 	✗ Writing archives will be done in NBProcessManager, show the percentage of data compressed.
 	✗ Extraction of archives to be done in NBProcessManager, show the percentage of data processed
 	✓ Use an external library to do the work - libarchive, liblzma, libz, libbz2
 	✗ Add support for .lz, .lzo, .uu
-	⬜ Archive preview using Folder Flash
+	✓ Archive preview using Folder Flash
 
 Settings                                                                                                                              [ 0 of 2 ]
 	⬜ Apply the settings to the existing windows immediately
@@ -56,20 +56,20 @@ SuperStart                                                                      
 	◐ Enable and refine SuperStart
 	  • SuperStart enabled, refinement needs to be done
 
-BugReporting                                                                                                                          [ 0 of 1 ]
+BugReporting                                                                                                                          [ 1 of 1 ]
 	✗ Option for bug reporting after crash
 
-StartupWizard                                                                                                                         [ 0 of 1 ]
+StartupWizard                                                                                                                         [ 1 of 1 ]
 	✗ Startup Wizard to initiate basic settings
 
-General                                                                                                                               [ 2 of 5 ]
+General                                                                                                                               [ 4 of 5 ]
 	✓ Accidental Delete Protection
-	◐ OS File Protection as Root
+	✓ OS File Protection as Root
 		No OS node can be directly trashed or deleted. To delete/trash any OS node, an extra layer of protection will be applied.
 		A good example is entering a phrase to validate deletion.
 	✓ Plugin barrier as root
 	⬜ Add support for addition of terminal emulators
-	✍ Enhanced new file creation
+	✓ Enhanced new file creation
 
 Note:
 	✍ - Work in progress
