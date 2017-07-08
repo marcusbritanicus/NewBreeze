@@ -11,6 +11,10 @@
 
 		Q_UNUSED( context );
 
+		/* If we are unable to open a log file, write to /dev/null */
+		if ( not nblog )
+			nblog = fopen( "/dev/null", "w" );
+
 		switch ( type ) {
 			case QtDebugMsg: {
 				fprintf( nblog, "NewBreeze::Debug# %s\n", message.toLocal8Bit().data() );
@@ -45,6 +49,10 @@
 	};
 #else
 	void NBMessageOutput( QtMsgType type, const char* message ) {
+
+		/* If we are unable to open a log file, write to /dev/null */
+		if ( not nblog )
+			nblog = fopen( "/dev/null", "w" );
 
 		switch ( type ) {
 
