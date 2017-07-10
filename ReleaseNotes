@@ -10,6 +10,11 @@ few changes in NewBreeze 3.
 => User interface rebuilt, integrating code from NewBreeze and NewBreezeUI
    - File/Folder filtering
 
+=> NBIconManager
+    - NBIconManager now replaces old NBIconProvider
+    - NBIconManager supports different icons for different sizes.
+    - Very fast loading of icons
+
 => NBFileSystemWatcher
     - NBFileSystemWatcher was earlier rewritten with a cleaner code based on the inotify-example.c from http://www.lanedo.com/users/amorgado/fanotify/inotify-example.c
     - The above code was buggy and hence has been replaced with QFileSystemWatcher as the backend.
@@ -22,7 +27,7 @@ few changes in NewBreeze 3.
 => NBIconView( QAbstractItemModel )
    - Per-folder views are now enabled. Each folder remembers its previous state ( size, grouping, list view, etc )
    - Fixed the small issue of mouse/cursor selection conflict.
-   - Partially fixed the SegFault with cursor up and down movements.
+   - Fixed the SegFault with cursor up and down movements.
 
 => UI
    - An elementary Accidental Delete Protection (ADP) has been added. However it is not mature enough for commercial use.
@@ -57,3 +62,4 @@ few changes in NewBreeze 3.
    - GZip, BZip2, and XZ files are processed independently
    - Archive creation now shows a pretty dialog with some options
    - Archive creation and extraction is done via QtConcurrent::run(...)
+   - Archive previews are now available

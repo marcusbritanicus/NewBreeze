@@ -1,17 +1,17 @@
-NBAddressBar                                                                                                                          [ 1 of 2 ]
+NBAddressBar                                                                                                                          [ 2 of 2 ]
 	✓ Addressbar icons are not visible in GNOME/LxQt
 	✓ ViewMode updates are one-way: from buttons to views only; enable reverse.
 
-NBProcessManager                                                                                                                      [ 3 of 4 ]
+NBProcessManager                                                                                                                      [ 4 of 4 ]
 	✓ NBIOProcess
 	✓ NBDeleteProcess
-	⬜ NBPropertiesProcess
+	✗ NBPropertiesProcess
 	✗ Undo-Redo Sequences (Only for Copy and Move)
 
-NBIconProvider/NBIconManager                                                                                                          [ 0 of 3 ]
-	✍ Create a full icon provider class
-	✍ Provide icon strings for multiple sizes
-	✍ Integrate NBIconManager with newbreeze-common
+NBIconProvider/NBIconManager                                                                                                          [ 3 of 3 ]
+	✓ Create a full icon provider class
+	✓ Provide icon strings for multiple sizes
+	✗ Integrate NBIconManager with newbreeze-common
 
 NBIconView                                                                                                                            [ 6 of 8 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
@@ -59,10 +59,10 @@ SuperStart                                                                      
 BugReporting                                                                                                                          [ 1 of 1 ]
 	✗ Option for bug reporting after crash
 
-StartupWizard                                                                                                                         [ 1 of 1 ]
-	✗ Startup Wizard to initiate basic settings
+StartupWizard                                                                                                                         [ 0 of 1 ]
+	✍ Startup Wizard to initiate basic settings
 
-General                                                                                                                               [ 4 of 5 ]
+General                                                                                                                               [ 4 of 6 ]
 	✓ Accidental Delete Protection
 	✓ OS File Protection as Root
 		No OS node can be directly trashed or deleted. To delete/trash any OS node, an extra layer of protection will be applied.
@@ -70,6 +70,7 @@ General                                                                         
 	✓ Plugin barrier as root
 	⬜ Add support for addition of terminal emulators
 	✓ Enhanced new file creation
+	⬜ Vault: A Single place to securely store all your private files
 
 Note:
 	✍ - Work in progress

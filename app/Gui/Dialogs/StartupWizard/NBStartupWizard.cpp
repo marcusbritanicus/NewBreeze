@@ -33,15 +33,6 @@ void NBStartupWizard::createGui() {
 	createPages();
 };
 
-void NBStartupWizard::setupConnections() {
-	/*setupConnections() -> None
-
-	Setup the Signal Connections
-
-	@return None
-	*/
-};
-
 void NBStartupWizard::createPages() {
 	/*createPages() -> None
 
@@ -94,27 +85,27 @@ void NBStartupWizard::createPages() {
 	);
 	p2lbl1->setWordWrap( true );
 
-	QGroupBox *p2gb1 = new QGroupBox( "Yes, enable &grouping by default" );
+	p2gb1 = new QGroupBox( "Yes, enable &grouping by default" );
 
-	QCommandLinkButton *p2btn1 = new QCommandLinkButton( p2gb1 );
+	p2btn1 = new QCommandLinkButton( p2gb1 );
 	p2btn1->setCheckable( true );
 	p2btn1->setChecked( false );
 	p2btn1->setText( "&Name" );
 	p2btn1->setDescription( "Files having the same starting letter will be shown together." );
 
-	QCommandLinkButton *p2btn2 = new QCommandLinkButton( p2gb1 );
+	p2btn2 = new QCommandLinkButton( p2gb1 );
 	p2btn2->setCheckable( true );
 	p2btn2->setChecked( false );
 	p2btn2->setText( "&Type" );
 	p2btn2->setDescription( "Files with the same extensions will be shown together." );
 
-	QCommandLinkButton *p2btn3 = new QCommandLinkButton( p2gb1 );
+	p2btn3 = new QCommandLinkButton( p2gb1 );
 	p2btn3->setCheckable( true );
 	p2btn3->setChecked( false );
 	p2btn3->setText( "&Size" );
 	p2btn3->setDescription( "Files having comparable sizes will be shown together." );
 
-	QCommandLinkButton *p2btn4 = new QCommandLinkButton( p2gb1 );
+	p2btn4 = new QCommandLinkButton( p2gb1 );
 	p2btn4->setCheckable( true );
 	p2btn4->setChecked( false );
 	p2btn4->setText( "&Date" );
@@ -137,7 +128,7 @@ void NBStartupWizard::createPages() {
 	p2gb1->setChecked( false );
 	p2gb1->setLayout( p2gb1Lyt );
 
-	QButtonGroup *p2btnGrp1 = new QButtonGroup();
+	p2btnGrp1 = new QButtonGroup();
 	p2btnGrp1->setExclusive( true );
 	p2btnGrp1->addButton( p2btn1, 1 );
 	p2btnGrp1->addButton( p2btn2, 2 );
@@ -169,7 +160,7 @@ void NBStartupWizard::createPages() {
 	page3->setSubTitle( "How would you like to see the icons when you open a folder?" );
 
 	QLabel *p3lbl1 = new QLabel(
-		"<p>In NewBreeze folder contents can be shown in three ways as Icons, Tiles or Details.</p>"
+		"<p>In NewBreeze, folder contents can be shown in three ways as Icons, Tiles or Details.</p>"
 		"<p>Icons mode is the standard way almost all file browsers display the folder contents: A prominent icon, below which is the name.</p>"
 		"<p>Tiles mode is reminiscent of MS Windows Style: A prominent icon, with the name and some details to the right of the icon.</p>"
 		"<p>Details mode shows all the inmportant information about the node in a single row.</p>"
@@ -178,7 +169,7 @@ void NBStartupWizard::createPages() {
 
 	QLabel *p3lbl2 = new QLabel( "Default &View Mode" );
 
-	QComboBox *p3cb1 = new QComboBox( this );
+	p3cb1 = new QComboBox( this );
 	p3cb1->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ) );
 	p3cb1->addItems( QStringList() << "Icons" << "Tiles" << "Details" );
 
@@ -186,7 +177,7 @@ void NBStartupWizard::createPages() {
 
 	QLabel *p3lbl3 = new QLabel( "Default &Icon Size" );
 
-	QSlider *p3sl1 = new QSlider( Qt::Horizontal );
+	p3sl1 = new QSlider( Qt::Horizontal );
 	p3sl1->setTickPosition( QSlider::TicksBelow );
 	p3sl1->setRange( 16, 128 );
 	p3sl1->setTickInterval( 16 );
@@ -206,7 +197,7 @@ void NBStartupWizard::createPages() {
 	p3gb1Lyt->addWidget( p3sl1, 1, 1 );
 	p3gb1Lyt->addWidget( p3lbl4, 1, 2 );
 
-	QGroupBox *p3gb1 = new QGroupBox( "View mode and Icon Size" );
+	p3gb1 = new QGroupBox( "View mode and Icon Size" );
 	p3gb1->setLayout( p3gb1Lyt );
 
 	QVBoxLayout *p3Lyt = new QVBoxLayout();
@@ -235,13 +226,13 @@ void NBStartupWizard::createPages() {
 	);
 	p4lbl1->setWordWrap( true );
 
-	QCheckBox *p4cb1 = new QCheckBox( "Enable fi&ltering of folders along with files" );
+	p4cb1 = new QCheckBox( "Enable fi&ltering of folders along with files" );
 	p4cb1->setChecked( false );
 
 	QHBoxLayout *p4gb1Lyt = new QHBoxLayout();
 	p4gb1Lyt->addWidget( p4cb1 );
 
-	QGroupBox *p4gb1 = new QGroupBox( "Filter files  and folders" );
+	p4gb1 = new QGroupBox( "Filter files  and folders" );
 	p4gb1->setLayout( p4gb1Lyt );
 
 	QVBoxLayout *p4Lyt = new QVBoxLayout();
@@ -269,13 +260,13 @@ void NBStartupWizard::createPages() {
 	);
 	p5lbl1->setWordWrap( true );
 
-	QCheckBox *p5cb1 = new QCheckBox( "Yes, enable case-sensitive sorting of files and folders" );
+	p5cb1 = new QCheckBox( "Yes, enable case-sensitive sorting of files and folders" );
 	p5cb1->setChecked( false );
 
 	QHBoxLayout *p5gb1Lyt = new QHBoxLayout();
 	p5gb1Lyt->addWidget( p5cb1 );
 
-	QGroupBox *p5gb1 = new QGroupBox( "Case-sensitive sorting" );
+	p5gb1 = new QGroupBox( "Case-sensitive sorting" );
 	p5gb1->setLayout( p5gb1Lyt );
 
 	QVBoxLayout *p5Lyt = new QVBoxLayout();
@@ -303,13 +294,13 @@ void NBStartupWizard::createPages() {
 	);
 	p6lbl1->setWordWrap( true );
 
-	QCheckBox *p6cb1 = new QCheckBox( "Show thumbnails of images in NewBreeze" );
+	p6cb1 = new QCheckBox( "Show thumbnails of images in NewBreeze" );
 	p6cb1->setChecked( false );
 
 	QHBoxLayout *p6gb1Lyt = new QHBoxLayout();
 	p6gb1Lyt->addWidget( p6cb1 );
 
-	QGroupBox *p6gb1 = new QGroupBox( "Image thumbnails" );
+	p6gb1 = new QGroupBox( "Image thumbnails" );
 	p6gb1->setLayout( p6gb1Lyt );
 
 	QLabel *p6lbl2 = new QLabel(
@@ -370,6 +361,18 @@ void NBStartupWizard::createPages() {
 	addPage( pageL );
 };
 
+void NBStartupWizard::setupConnections() {
+	/*setupConnections() -> None
+
+	Setup the Signal Connections
+
+	@return None
+	*/
+
+	connect( p2gb1, SIGNAL(), this, SLOT( saveSettings() ) );
+	connect( p2btnGrp1, SIGNAL(), this, SLOT( saveSettings() ) );
+};
+
 void NBStartupWizard::setWindowProperties() {
 	/*setWindowProperties() -> None
 
@@ -392,6 +395,11 @@ void NBStartupWizard::setWindowProperties() {
 	move( hpos, vpos );
 
 	setWindowFlags( windowFlags() | Qt::FramelessWindowHint );
+};
+
+void NBStartupWizard::saveSettings() {
+
+	close();
 };
 
 void NBStartupWizard::paintEvent( QPaintEvent *pEvent ) {

@@ -15,8 +15,6 @@
 class NBNewNodeDialog : public NBDialog {
 	Q_OBJECT
 
-	enum{ File, Directory };
-
 	public :
 		NBNewNodeDialog( QString, QDir, QString text = QString(), QWidget *parent = 0 );
 		NBLineEdit *le;

@@ -19,6 +19,10 @@
 
 #include "NBIconManager.hpp"
 
+#if QT_VERSION >= 0x050000
+	#include <QtConcurrent>
+#endif
+
 /* Theme Database */
 static QSettings mdb( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) + "NewBreeze/mimetypes.db", QSettings::NativeFormat );
 static QSettings idb( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) + "NewBreeze/icons.db", QSettings::NativeFormat );
@@ -85,7 +89,8 @@ NBIconManager::NBIconManager() {
 	/* Set the default theme path */
 	iconThemePath = QString( "/usr/share/icons/" );
 
-	// generateThemeDatabase();
+	if ( not exists( mdb.fileName() ) or not exists( idb.fileName() ) )
+		generateThemeDatabase();
 };
 
 QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
@@ -130,6 +135,7 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 		return ( hasIcon( icoStr ) ? QStringList() << icoStr : mdb.value( mName ).toStringList() );
 	}
 
+	/* This is an image file */
 	else if ( mName.startsWith( "image/" ) ) {
 		if ( Settings->General.ImagePreviews ) {
 			/* DJVU issue comes only when we have to show previews */

@@ -11,9 +11,6 @@ NBNewNodeDialog::NBNewNodeDialog( QString type, QDir curDir, QString text, QWidg
 	if ( type == QString( "dir" ) )
 		setDialogTitle( "New Folder" );
 
-	else if ( type == QString( "file" ) )
-		setDialogTitle( "New File" );
-
 	else
 		setDialogTitle( "Paste Into File" );
 
@@ -44,10 +41,7 @@ NBNewNodeDialog::NBNewNodeDialog( QString type, QDir curDir, QString text, QWidg
 		lbl->setText( tr( "Create new folder in:\n%1" ).arg( curDir.path() ) );
 		le->setText( "New Folder" );
 	}
-	else if ( type == QString( "file" ) ) {
-		lbl->setText( tr( "Create new file in:\n%1" ).arg( curDir.path() ) );
-		le->setText( "New File" );
-	}
+
 	else {
 		lbl->setText( tr( "Paste clipboard contents in:" ) );
 		le->setText( "New File" );
@@ -100,19 +94,6 @@ void NBNewNodeDialog::createFileFolder() {
 		}
 
 		emit nodeCreated( dir.filePath( le->text() ) );
-	}
-
-	else if ( windowTitle() == QString( "New File" ) ) {
-		QFile file( dir.filePath( le->text() ) );
-		if ( !file.open( QFile::WriteOnly ) ) {
-			NBMessageDialog::critical( this, "Access Error",
-				"There was an error creating the file. May be you donot have sufficient permission to write here." );
-
-			return;
-		}
-
-		emit nodeCreated( dir.filePath( le->text() ) );
-		file.close();
 	}
 
 	else {
