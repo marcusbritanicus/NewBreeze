@@ -219,5 +219,7 @@ class NBIconView : public QAbstractItemView {
 		void move( QStringList, QString );
 		void link( QStringList, QString );
 
+		void updateViewMode( QString );
+
 		void selectionChanged();
 };

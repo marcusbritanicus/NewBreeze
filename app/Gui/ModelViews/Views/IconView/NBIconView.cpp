@@ -325,6 +325,8 @@ void NBIconView::reload() {
 	QString viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
 	int iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
 
+	emit updateViewMode( viewMode );
+
 	currentViewMode = viewMode;
 	setIconSize( iconSize, iconSize );
 

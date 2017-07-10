@@ -12,25 +12,6 @@
 #include "NBFileInfoGatherer.hpp"
 #include "NBFileSystemWatcher.hpp"
 
-class NBIconUpdater : public QThread {
-	Q_OBJECT
-
-	public:
-		NBIconUpdater( QString, QStringList, bool *term );
-		~NBIconUpdater();
-
-	private:
-		void run();
-
-		QStringList entryList;
-		QString rootPath;
-
-		bool *mTerminate;
-
-	signals:
-		void updated( QString, QString, QStringList );
-};
-
 class NBItemViewModel : public QAbstractItemModel {
     Q_OBJECT
 
@@ -145,9 +126,6 @@ class NBItemViewModel : public QAbstractItemModel {
 		QString parentDir() const;
 		QString lastOpenedFolder() const;
 
-		/* To halt the Info Gathering */
-		void terminateInfoGathering();
-
 	public Q_SLOTS:
 		void goUp();
 		void goBack();
@@ -217,17 +195,10 @@ class NBItemViewModel : public QAbstractItemModel {
 		mutable QList<QTime> lastUpdatedTimes;
 		mutable QStringList delayedUpdateList;
 
-		/* Info Gatherer kill switch */
-		bool mTerminate;
-
 		NBQuickFileInfoGatherer *quickDataGatherer;
 		NBFileSystemWatcher *watcher;
 
 	private slots:
-		void updateNodes( QString root = QString(), QStringList nodes = QStringList() );
-		void updateAllNodes( QString root = QString() );
-		void saveInfo( QString, QString, QStringList );
-
 		void handleNodeCreated( QString );
 		void handleNodeChanged( QString );
 		void handleNodeDeleted( QString );

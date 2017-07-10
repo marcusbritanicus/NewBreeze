@@ -8,27 +8,43 @@
 
 #include "Global.hpp"
 
+// #include "newbreeze.hpp"
+// #include <QtGui>
+
+// static QMimeDatabase mimeDb;
+
+// /* Thumbnails Storage Directory */
+// const QString thumbsDir( QDir( QStandardPaths::writableLocation( QStandardPaths::GenericCacheLocation ) ).filePath( "NewBreeze/Thumbs/" ) );
+
+// /* NewBreeze Preferences */
+// static QSettings actionSettings( "NewBreeze", "CustomActions" );
+// static QSettings bookmarkSettings( "NewBreeze", "Bookmarks" );
+// static QSettings thumbsInfo( thumbsDir + "Thumbs.cache", QSettings::NativeFormat );
+
+typedef QMap<QString, QString> DeviceInfo;
+typedef QPair<QString, QString> BookMark;
+
 class NBIconManager {
 
 	public:
 		/* Unique single instance */
-		NBIconManager *instance();
+		static NBIconManager *instance();
 
-		/* Icon string for file */
-		QString iconStringForFile( QString, QMimeType mType = QMimeType() );
+		/* Icon string for file type: @mName: Mime Name */
+		QStringList iconsForFile( QString mName, QString file = QString() );
 
-		/* Icon string for file */
-		QByteArray imageThumbnail( QString, QMimeType mType = QMimeType() );
+		/* Icon string for file type: @mName: Mime Name */
+		QStringList icon( QString iName );
+
+		/* Icon string for file type: @mName: Icon Name */
+		bool hasIcon( QString iName );
+
+		/* Thumbnail for an image file */
+		QString imageThumbnail( QString );
 
 	private:
 		/* Private init function */
 		NBIconManager();
-
-		/* Function to populate themeDirsHash */
-		void readThemeDirectories();
-
-		/* Function to populate themeFallbackHash */
-		void readThemeInheritance();
 
 		/* Generate theme database */
 		void generateThemeDatabase();
@@ -37,20 +53,8 @@ class NBIconManager {
 		static NBIconManager *iMgr;
 		bool init;
 
-		/* We store the themes and their directories here */
-		QHash<QString, QStringList> themeDirsHash;
-
-		/* Store the fallbacks per theme, non-recursive */
-		QHash<QString, QStringList> themeFallbackHash;
-
 		/* Default theme location */
 		QString iconThemePath;
-
-		/* Create a thumbnail database object */
-		QSqlDatabase thumbsDb;
-
-		/* Create an icon database object */
-		QSqlDatabase iconsDb;
 };
 
 class NBIconProvider {

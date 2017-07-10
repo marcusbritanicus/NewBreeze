@@ -191,9 +191,8 @@ void NBAddressWidget::revertToCrumbsBar() {
 	}
 };
 
-NBAddressBar::NBAddressBar( QWidget *parent ) : QFrame( parent ) {
+NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 
-	setFrameStyle( NoFrame );
 	setFixedHeight( 28 );
 
 	QHBoxLayout *fLyt = new QHBoxLayout();
@@ -329,4 +328,16 @@ void NBAddressBar::hideSearchButton() {
 void NBAddressBar::showSearchButton() {
 
 	filterBtn->setIcon( QIcon::fromTheme( NBIconProvider::themeIcon( "edit-finder" ), QIcon( ":/icons/search.png" ) ) );
+};
+
+void NBAddressBar::updateViewMode( QString mode ) {
+
+	if ( mode == "Tiles" )
+		viewModes->segment( 0 )->setChecked( true );
+
+	else if ( mode == "Icons" )
+		viewModes->segment( 1 )->setChecked( true );
+
+	else
+		viewModes->segment( 2 )->setChecked( true );
 };

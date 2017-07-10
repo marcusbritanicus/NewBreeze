@@ -7,6 +7,14 @@
 #include "NBItemViewNode.hpp"
 #include "NBIconManager.hpp"
 
+inline static QStringList getIcons( QString name, QString type ) {
+
+	char *newPath[ PATH_MAX ] = { 0 };
+
+	QString path = QString::fromLocal8Bit( realpath( name.toLocal8Bit().constData(), NULL ) );
+	return NBIconManager::instance()->iconsForFile( type, path );
+};
+
 NBItemViewNode::NBItemViewNode() {
 
 	for( int i = 0; i < 10; i++ )
@@ -24,21 +32,15 @@ NBItemViewNode::NBItemViewNode( QVariantList data, QString category, NBItemViewN
 	nodeData << data;
 	myCategory = category;
 
-	mIcon = QIcon::fromTheme( data.at( 2 ).toString(), QIcon( data.at( 2 ).toString() ) );
-
-	/* SuperStart hack */
-	if ( mIcon.isNull() ) {
-		if ( data.at( 0 ).toString().toLower() == "application" )
-			mIcon = QIcon::fromTheme( "application-x-executable", QIcon( ":/icons/exec.png" ) );
-
-		else if ( data.at( 0 ).toString().toLower() == "dir" )
-			mIcon = QIcon::fromTheme( "folder", QIcon( ":/icons/folder.png" ) );
-
-		else
-			mIcon = QIcon::fromTheme( "unknown", QIcon( ":/icons/unknown.png" ) );
-	}
+	Q_FOREACH( QString icoStr, getIcons( data.at( 3 ).toString(), data.at( 6 ).toString() ) )
+		mIcon.addFile( icoStr );
 
 	parentNode = parent;
+};
+
+NBItemViewNode::~NBItemViewNode() {
+
+	// delete &future;
 };
 
 void NBItemViewNode::addChild( NBItemViewNode *node ) {

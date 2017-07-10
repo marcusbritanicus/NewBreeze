@@ -232,6 +232,9 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( setBusyCursor() ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( setNormalCursor() ) );
 
+	/* Update View Modes on the UI */
+	connect( FolderView->IconView, SIGNAL( updateViewMode( QString ) ), AddressBar, SLOT( updateViewMode( QString ) ) );
+
 	// About NB
 	QAction *aboutNBAct = new QAction( this );
 	aboutNBAct->setShortcuts( Settings->Shortcuts.AboutNB );
@@ -865,10 +868,6 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 
 	// We hide this window immediately, other processes may take a while longer to close down
 	QMainWindow::close();
-
-	/* If we have a UI */
-	// Close down Info Gathering
-	FolderView->fsModel->terminateInfoGathering();
 
 	// Close down recursive size checker in Properties
 	mTerminate = true;

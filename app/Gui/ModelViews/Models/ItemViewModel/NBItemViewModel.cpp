@@ -42,54 +42,7 @@ inline int scandirCallback( const struct dirent* entry ) {
 	return 1;
 };
 
-NBIconUpdater::NBIconUpdater( QString root, QStringList entries, bool *term ) : QThread() {
-
-	mTerminate = term;
-
-	entryList.clear();
-	entryList << entries;
-
-	rootPath.clear();
-	rootPath = root;
-	if ( ( not root.startsWith( "NB://" ) ) and ( not root.endsWith( "/" ) ) )
-		rootPath += "/";
-};
-
-NBIconUpdater::~NBIconUpdater() {
-
-	terminate();
-	wait();
-};
-
-void NBIconUpdater::run() {
-
-	/* If we are updating SuperStart or Catalog icons */
-	if ( rootPath.startsWith( "NB://") ) {
-		foreach( QString entry, entryList ) {
-			if ( *mTerminate )
-				break;
-
-			QMimeType mimeType = mimeDb.mimeTypeForFile( entry );
-			emit updated( rootPath, entry, QStringList() << NBIconProvider::icon( entry, mimeType ) );
-		}
-		return;
-	}
-
-	if ( rootPath != "/dev/" ) {
-		foreach( QString entry, entryList ) {
-			if ( *mTerminate )
-				break;
-
-			QMimeType mimeType = mimeDb.mimeTypeForFile( rootPath + entry );
-			emit updated( rootPath, entry, QStringList() << NBIconProvider::icon( rootPath + entry, mimeType ) );
-		}
-	}
-};
-
 NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent ) {
-
-	/* Switch for temination of data gathering */
-	mTerminate = false;
 
 	/* Do we show the special directories */
 	mModelDataType = NBItemViewModel::FileSystem;
@@ -378,11 +331,6 @@ bool NBItemViewModel::insertNode( QString nodeName ) {
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 	endResetModel();
 
-	NBIconUpdater *ig = new NBIconUpdater( mRootPath, QStringList() << nodeName,  &mTerminate );
-	connect( ig, SIGNAL( updated( QString, QString, QStringList ) ), this, SLOT( saveInfo( QString, QString, QStringList ) ) );
-
-	ig->start();
-
 	return true;
 };
 
@@ -406,10 +354,6 @@ void NBItemViewModel::updateNode( QString nodeName ) {
 		node->setData( 1, formatSize( node->data( 1, true ).toLongLong() ), false );
 	}
 
-	NBIconUpdater *ig = new NBIconUpdater( mRootPath, QStringList() << nodeName, &mTerminate );
-	connect( ig, SIGNAL( updated( QString, QString, QStringList ) ), this, SLOT( saveInfo( QString, QString, QStringList ) ) );
-
-	ig->start();
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 };
 
@@ -1146,9 +1090,6 @@ void NBItemViewModel::setupFileSystemData() {
 
 	/* Emit directory loaded */
 	emit directoryLoaded( mRootPath );
-
-	/* Update all the icons */
-	updateAllNodes( mRootPath );
 };
 
 void NBItemViewModel::setupSuperStartData() {
@@ -1214,8 +1155,6 @@ void NBItemViewModel::setupSuperStartData() {
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
 	currentLoadStatus.loading = false;
-
-	updateNodes( mRootPath, dirs );
 
 	emit directoryLoaded( mRootPath );
 };
@@ -1317,8 +1256,6 @@ void NBItemViewModel::setupCatalogData() {
 
 	currentLoadStatus.loading = false;
 
-	updateNodes( mRootPath, dirs );
-
 	emit directoryLoaded( mRootPath );
 };
 
@@ -1419,82 +1356,6 @@ void NBItemViewModel::recategorize() {
 			node->setCategory( getCategory( node->allData() ) );
 
 	rootNode->updateCategories();
-};
-
-void NBItemViewModel::terminateInfoGathering() {
-
-	mTerminate = true;
-};
-
-void NBItemViewModel::updateAllNodes( QString root ) {
-
-	NBIconUpdater *iconUpdater = new NBIconUpdater( root, mChildNames, &mTerminate );
-	connect( iconUpdater, SIGNAL( updated( QString, QString, QStringList ) ), this, SLOT( saveInfo( QString, QString, QStringList ) ) );
-
-	iconUpdater->start();
-};
-
-void NBItemViewModel::updateNodes( QString root, QStringList nodes ) {
-
-	NBIconUpdater *iconUpdater = new NBIconUpdater( root, nodes, &mTerminate );
-	connect( iconUpdater, SIGNAL( updated( QString, QString, QStringList ) ), this, SLOT( saveInfo( QString, QString, QStringList ) ) );
-
-	iconUpdater->start();
-};
-
-void NBItemViewModel::saveInfo( QString root, QString entry, QStringList info ) {
-
-	/*
-		 *
-		 * info -> [ iconStr, Type, MimeType ]
-		 * idx  -> [   s2   ,  n2 ,    n3    ]
-		 *
-	*/
-
-	if ( root != mRootPath )
-		return;
-
-	if ( root.startsWith( "NB://" ) ) {
-		entry = baseName( entry );
-		QModelIndex idx = index( entry );
-		NBItemViewNode *node = rootNode->child( entry );
-
-		/* Updating the icon */
-		if ( info.count() == 1 ) {
-
-			node->setData( 2, info.at( 0 ), true );
-		}
-
-		/* Updating the icons, mime and category */
-		else if ( info.count() == 3 ) {
-			node->setData( 2, info.at( 0 ), true );
-			node->setData( 2, info.at( 1 ), false );
-			node->setData( 3, info.at( 2 ), false );
-		}
-
-		emit dataChanged( idx, idx );
-	}
-
-	if ( not exists( root + entry ) )
-		return;
-
-	QModelIndex idx = index( entry );
-	NBItemViewNode *node = rootNode->child( entry );
-
-	/* Updating the icon */
-	if ( info.count() == 1 ) {
-
-		node->setData( 2, info.at( 0 ), true );
-	}
-
-	/* Updating the icons, mime and category */
-	else if ( info.count() == 3 ) {
-		node->setData( 2, info.at( 0 ), true );
-		node->setData( 2, info.at( 1 ), false );
-		node->setData( 3, info.at( 2 ), false );
-	}
-
-	emit dataChanged( idx, idx );
 };
 
 void NBItemViewModel::handleNodeCreated( QString node ) {

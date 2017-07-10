@@ -73,7 +73,7 @@ class NBAddressWidget : public QWidget {
 		void openLocation( QString );
 };
 
-class NBAddressBar : public QFrame {
+class NBAddressBar : public QWidget {
 	Q_OBJECT
 
 	public:
@@ -98,6 +98,8 @@ class NBAddressBar : public QFrame {
 
 		void showSearchButton();
 		void hideSearchButton();
+
+		void updateViewMode( QString );
 
 	Q_SIGNALS:
 		void openLocation( QString );
