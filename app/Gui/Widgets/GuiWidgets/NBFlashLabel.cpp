@@ -5,6 +5,7 @@
 */
 
 #include "NBFlashLabel.hpp"
+#include "NBGuiFunctions.hpp"
 
 NBFlashLabel::NBFlashLabel( QWidget *parent ) : QWidget( parent ) {
 
@@ -387,8 +388,7 @@ void NBTrashLabel::handleDeleteFailure( QStringList files, QStringList dirs ) {
 	table->setColumnWidth( 1, 100 );
 
 	foreach( QString path, dirs ) {
-		QString iconName = NBIconProvider::icon( path );
-		QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), path );
+		QTableWidgetItem *itm1 = new QTableWidgetItem( icon( NBIconManager::instance()->iconsForFile( "", path ) ), path );
 		QTableWidgetItem *itm2 = new QTableWidgetItem( formatSize( getSize( path ) ) );
 
 		itm1->setFlags( itm1->flags() & ~Qt::ItemIsEditable );
@@ -400,8 +400,7 @@ void NBTrashLabel::handleDeleteFailure( QStringList files, QStringList dirs ) {
 		table->setItem( table->rowCount() - 1, 1, itm2 );
 	}
 	foreach( QString path, files ) {
-		QString iconName = NBIconProvider::icon( path );
-		QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), path );
+		QTableWidgetItem *itm1 = new QTableWidgetItem( icon( NBIconManager::instance()->iconsForFile( "", path ) ), path );
 		QTableWidgetItem *itm2 = new QTableWidgetItem( formatSize( getSize( path ) ) );
 
 		itm1->setFlags( itm1->flags() & ~Qt::ItemIsEditable );

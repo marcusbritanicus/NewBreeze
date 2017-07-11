@@ -11,6 +11,7 @@
 #include "NBItemViewNode.hpp"
 #include "NBFileInfoGatherer.hpp"
 #include "NBFileSystemWatcher.hpp"
+#include "NBThumbnailer.hpp"
 
 class NBItemViewModel : public QAbstractItemModel {
     Q_OBJECT
@@ -155,6 +156,9 @@ class NBItemViewModel : public QAbstractItemModel {
 		QString getCategory( QVariantList );
 		void recategorize();
 
+		/* Thumbnailer */
+		NBThumbnailer *thumbnailer;
+
 		NBItemViewNode *rootNode;
 
 		QString mRootPath;
@@ -205,13 +209,11 @@ class NBItemViewModel : public QAbstractItemModel {
 		void handleNodeRenamed( QString, QString );
 		void loadHome();
 
-		void updateDelayedNodes();
-
-	Q_SIGNALS:
-		/* Updated Node */
 		void nodeUpdated( QString );
 
+	Q_SIGNALS:
 		void directoryLoading( QString );
 		void directoryLoaded( QString );
+
 		void runningHome( QString );
 };

@@ -5,6 +5,7 @@
 */
 
 #include "NBPropertiesDialog.hpp"
+#include "NBGuiFunctions.hpp"
 
 NBPropertiesBase::NBPropertiesBase( QStringList paths, QWidget *parent ) : QWidget( parent ) {
 
@@ -17,8 +18,7 @@ NBPropertiesBase::NBPropertiesBase( QStringList paths, QWidget *parent ) : QWidg
 
 	QString name;
 	if ( pathsList.count() == 1 ) {
-		QString iconName = NBIconProvider::icon( pathsList.at( 0 ) );
-		iconLabel->setPixmap( QIcon::fromTheme( iconName, QIcon( iconName ) ).pixmap( QSize( 36, 36 ) ) );
+		iconLabel->setPixmap( icon( NBIconManager::instance()->iconsForFile( "", paths.at( 0 ) ) ).pixmap( QSize( 36, 36 ) ) );
 		if ( isDir( pathsList.at( 0 ) ) )
 			iconLabel->setClickable( true );
 

@@ -9,3 +9,4 @@
 #include "Global.hpp"
 
 bool isBrightColor( QColor, QColor );
+QIcon icon( QStringList );

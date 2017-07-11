@@ -157,26 +157,15 @@ void NBIconThemeModel::setupModel() {
 	mimeTypeList.clear();
 
 	beginResetModel();
-	Q_FOREACH( QMimeType mime, mimeDb.allMimeTypes() ) {
-		QString ico = NBIconProvider::themeIcon( mime.iconName(), mime.genericIconName() );
+	QSettings mdb( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) + "NewBreeze/mimetypes.db", QSettings::NativeFormat );
+	Q_FOREACH( QString key, mdb.allKeys() ) {
+		QIcon ico;
+		Q_FOREACH( QString path, mdb.value( key ).toStringList() )
+			ico.addFile( path );
 
-		/* We will not show mimes with out icons */
-		if ( ico.isEmpty() ) {
+		mimeIconList << ico;
+		mimeTypeList << key;
 
-			continue;
-		}
-
-		/* These have mimes */
-		else {
-			if ( mime.preferredSuffix().count() )
-				mimeNameList << mime.preferredSuffix().toUpper();
-
-			else
-				mimeNameList << mime.comment();
-
-			mimeIconList << QIcon( ico );
-			mimeTypeList << mime.name();
-		}
 		qApp->processEvents();
 	}
 	endResetModel();

@@ -33,11 +33,13 @@ NBTrashNode::NBTrashNode( QStringList data, QString category, NBTrashNode *paren
 	mSize = formatSize( getSize( data.last() ) );
 	mDate = QDateTime::fromString( data.at( 2 ), "yyyyMMddThh:mm:ss" );
 
-	QString icoStr = NBIconProvider::icon( data.last() );
-	if ( icoStr.contains( dirName( data.at( 1 ) ) ) )
-		icoStr.replace( dirName( data.at( 1 ) ), dirName( data.at( 3 ) ) );
+	QStringList icoStrs = NBIconManager::instance()->iconsForFile( QString(), data.last() );
+	Q_FOREACH( QString icoStr, icoStrs ) {
+		if ( icoStr.contains( dirName( data.at( 1 ) ) ) )
+			icoStr.replace( dirName( data.at( 1 ) ), dirName( data.at( 3 ) ) );
 
-	mIcon = QIcon::fromTheme( icoStr, QIcon( icoStr ) );
+		mIcon.addFile( icoStr );
+	}
 
 	parentNode = parent;
 };

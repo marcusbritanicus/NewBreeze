@@ -75,6 +75,9 @@ NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent
 	connect( watcher, SIGNAL( nodeDeleted( QString ) ), this, SLOT( handleNodeDeleted( QString ) ) );
 	connect( watcher, SIGNAL( nodeRenamed( QString, QString ) ), this, SLOT( handleNodeRenamed( QString, QString ) ) );
 	connect( watcher, SIGNAL( watchPathDeleted() ), this, SLOT( loadHome() ) );
+
+	thumbnailer = new NBThumbnailer();
+	connect( thumbnailer, SIGNAL( updateNode( QString ) ), this, SLOT( nodeUpdated( QString ) ) );
 };
 
 NBItemViewModel::~NBItemViewModel() {
@@ -357,20 +360,6 @@ void NBItemViewModel::updateNode( QString nodeName ) {
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 };
 
-void NBItemViewModel::updateDelayedNodes() {
-
-	/* Make a local copy */
-	QStringList nodeList;
-	nodeList << delayedUpdateList;
-
-	/* Clear the delayed nodes list */
-	delayedUpdateList.clear();
-
-	QMutexLocker locker( &mutex );
-	Q_FOREACH( QString node, nodeList )
-		updateNode( baseName( node ) );
-};
-
 bool NBItemViewModel::removeNode( QString nodeName ) {
 
 	if ( not mChildNames.contains( nodeName ) )
@@ -393,6 +382,14 @@ bool NBItemViewModel::removeNode( QString nodeName ) {
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
 	return false;
+};
+
+void NBItemViewModel::nodeUpdated( QString nodeName ) {
+
+	NBItemViewNode *node = rootNode->child( baseName( nodeName ) );
+	node->updateIcon();
+
+	emit dataChanged( index( nodeName ), index( nodeName ) );
 };
 
 QModelIndex NBItemViewModel::index( int row, int column, const QModelIndex &parent ) const {
@@ -827,6 +824,7 @@ void NBItemViewModel::setRootPath( QString path ) {
 		mModelDataType = (quint64)NBItemViewModel::FileSystem;
 
 		mRootPath = ( path.endsWith( "/" ) ? path : path + "/" );
+		thumbnailer->createThumbnails( mRootPath );
 	}
 
 	/* Navigation: If we are in the middle, remove all 'forawrd' roots */
@@ -1033,6 +1031,7 @@ void NBItemViewModel::setupModelData() {
 
 		case NBItemViewModel::FileSystem: {
 			setupFileSystemData();
+			thumbnailer->createThumbnails( mRootPath );
 			return;
 		}
 	}

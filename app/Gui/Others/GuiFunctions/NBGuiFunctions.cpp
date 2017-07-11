@@ -42,3 +42,12 @@ bool isBrightColor( QColor dst, QColor src ) {
 	else
 		return false;
 };
+
+QIcon icon( QStringList icoStrs ) {
+
+	QIcon icn;
+	Q_FOREACH( QString icoStr, icoStrs )
+		icn.addFile( icoStr );
+
+	return icn;
+}

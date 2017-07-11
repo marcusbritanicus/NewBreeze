@@ -5,6 +5,7 @@
 */
 
 #include "NBBookmarkView.hpp"
+#include "NBGuiFunctions.hpp"
 
 NBBookmarksIcon::NBBookmarksIcon( QWidget *parent ) : QWidget( parent ) {
 
@@ -284,7 +285,7 @@ void NBBookmarksIcon::showBookmarks() {
 	bmkView->addAction( lblAct );
 
 	Q_FOREACH( NBBookmarkInfo info, NBBookmarkInfo::allBookmarks() ) {
-		QAction *act = new QAction( QIcon::fromTheme( info.displayIcon , QIcon( NBIconProvider::themeIcon( "bookmarks", ":/icons/bookmark.png" ) ) ), info.displayLabel, bmkView );
+		QAction *act = new QAction( icon( NBIconManager::instance()->icon( "bookmarks" ) ), info.displayLabel, bmkView );
 		act->setData( info.mountPoint );
 
 		bmkView->addAction( act );

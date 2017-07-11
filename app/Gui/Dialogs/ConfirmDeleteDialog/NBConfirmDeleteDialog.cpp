@@ -5,6 +5,7 @@
 */
 
 #include "NBConfirmDeleteDialog.hpp"
+#include "NBGuiFunctions.hpp"
 
 NBConfirmDeleteDialog::NBConfirmDeleteDialog( QString src, QStringList paths, bool permanent, QWidget *parent ) : NBDialog( parent ) {
 
@@ -115,9 +116,7 @@ void NBConfirmDeleteDialog::setupTable() {
 
 void NBConfirmDeleteDialog::addEntry( QString path ) {
 
-	QString iconName = NBIconProvider::icon( path );
-
-	QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), baseName( path ) );
+	QTableWidgetItem *itm1 = new QTableWidgetItem( icon( NBIconManager::instance()->iconsForFile( "", path ) ), baseName( path ) );
 	QTableWidgetItem *itm2;
 	if ( isDir( path ) )
 		itm2 = new QTableWidgetItem( QString( "%1 items" ).arg( nChildren( path ) ) );
@@ -310,9 +309,7 @@ void NBConfirmDeleteProtectedDialog::setupTable() {
 
 void NBConfirmDeleteProtectedDialog::addEntry( QString path ) {
 
-	QString iconName = NBIconProvider::icon( path );
-
-	QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), baseName( path ) );
+	QTableWidgetItem *itm1 = new QTableWidgetItem( icon( NBIconManager::instance()->iconsForFile( "", path ) ), baseName( path ) );
 	QTableWidgetItem *itm2;
 	if ( isDir( path ) )
 		itm2 = new QTableWidgetItem( QString( "%1 items" ).arg( nChildren( path ) ) );
@@ -488,9 +485,7 @@ void NBDeleteErrorsDialog::setupTable() {
 
 void NBDeleteErrorsDialog::addEntry( QString path ) {
 
-	QString iconName = NBIconProvider::icon( path );
-
-	QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), baseName( path ) );
+	QTableWidgetItem *itm1 = new QTableWidgetItem( icon( NBIconManager::instance()->iconsForFile( "", path ) ), baseName( path ) );
 	QTableWidgetItem *itm2;
 	if ( isDir( path ) )
 		itm2 = new QTableWidgetItem( QString( "%1 items" ).arg( nChildren( path ) ) );

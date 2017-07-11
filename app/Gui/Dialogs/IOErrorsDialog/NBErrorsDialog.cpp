@@ -5,6 +5,7 @@
 */
 
 #include "NBErrorsDialog.hpp"
+#include "NBGuiFunctions.hpp"
 
 NBErrorsDialog::NBErrorsDialog( QString title, QString text, QStringList nodes, QWidget *parent ) : NBDialog( parent ) {
 
@@ -93,9 +94,7 @@ void NBErrorsDialog::setupTable() {
 
 void NBErrorsDialog::addEntry( QString path ) {
 
-	QString iconName = NBIconProvider::icon( path );
-
-	QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon::fromTheme( iconName, QIcon( iconName ) ), baseName( path ) );
+	QTableWidgetItem *itm1 = new QTableWidgetItem( icon( NBIconManager::instance()->iconsForFile( "", path ) ), baseName( path ) );
 	QTableWidgetItem *itm2;
 	if ( isDir( path ) )
 		itm2 = new QTableWidgetItem( QString( "%1 items" ).arg( nChildren( path ) ) );

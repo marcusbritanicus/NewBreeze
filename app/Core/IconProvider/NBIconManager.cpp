@@ -48,25 +48,6 @@ static inline QStringList listFiles( QString path ) {
 	return QStringList();
 };
 
-static inline void saveThumb( QString path, QString hashPath ) {
-
-	/* If @path is non-existent */
-	if ( not exists( path ) )
-		return;
-
-	/* If the thumbnail is already formed */
-	if ( exists( hashPath ) )
-		return;
-
-	// Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/
-	QImage thumb = QImage( path ).scaled( 512, 512, Qt::KeepAspectRatio ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
-
-	if ( thumb.save( hashPath, "PNG", 0 ) ) {
-		thumbsInfo.setValue( path, QFileInfo( path ).lastModified() );
-		thumbsInfo.sync();
-	}
-};
-
 NBIconManager *NBIconManager::iMgr = NULL;
 
 NBIconManager* NBIconManager::instance() {
@@ -94,6 +75,13 @@ NBIconManager::NBIconManager() {
 };
 
 QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
+
+	if ( mName.isEmpty() ) {
+		if ( file.isEmpty() )
+			return QStringList() << ":/icons/unknwon.png";
+
+		mName = mimeDb.mimeTypeForFile( file ).name();
+	}
 
 	if ( not mName.compare( "inode/directory" ) ) {
 
@@ -142,10 +130,7 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 			if ( mName.contains( "djv" ) )
 				return mdb.value( mName ).toStringList();
 
-			QString hashPath = QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
-			QtConcurrent::run( saveThumb, file, hashPath );
-
-			return QStringList() << hashPath;
+			return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
 		}
 	}
 
@@ -252,14 +237,7 @@ void NBIconManager::generateThemeDatabase() {
 
 	/* Desktop file Fix */
 	mdb.setValue( "application/x-desktop", QStringList() << ":/icons/exec.png" );
+
+	/* PPTX Fix */
+	mdb.setValue( "application/vnd.openxmlformats-officedocument.presentationml.presentation", icon( "application-vnd.ms-powerpoint" ) );
 };
-
-// int main( int argc, char *argv[] ) {
-
-	// QCoreApplication app( argc, argv );
-
-	// NBIconManager *iMgr = NBIconManager::instance();
-	// qDebug() << iMgr->iconsForFile( "image/jpeg", "/home/cosmos/hourglass_icon.jpg" );
-
-	// return 0;
-// };

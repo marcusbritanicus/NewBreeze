@@ -5,6 +5,7 @@
 */
 
 #include "NBInfoBar.hpp"
+#include "NBGuiFunctions.hpp"
 
 inline QString getPermissions( QString path ) {
 
@@ -91,10 +92,8 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 	else if ( folderPath.startsWith( "NB://Cat" ) )
 		setIcon( QIcon( ":/icons/catalogs.png" ) );
 
-	else {
-		QString icn( NBIconProvider::icon( folderPath ) );
-		setIcon( QIcon::fromTheme( icn, QIcon( icn ) ) );
-	}
+	else
+		setIcon( icon( NBIconManager::instance()->iconsForFile( "", folderPath ) ) );
 
 	// Name
 	QString name;
@@ -157,8 +156,7 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
 
 	// Icon
-	QString icoStr = NBIconProvider::icon( itemPath );
-	setIcon( QIcon::fromTheme( icoStr, QIcon( icoStr ) ) );
+	setIcon( icon( NBIconManager::instance()->iconsForFile( "", itemPath ) ) );
 
 	// Name
 	QString name = itemPath.split( "/", QString::SkipEmptyParts ).takeLast();

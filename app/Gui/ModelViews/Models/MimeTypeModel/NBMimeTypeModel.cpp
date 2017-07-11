@@ -43,8 +43,8 @@ void NBMimeIconUpdater::run() {
 			if ( *mTerminate )
 				break;
 
-			QMimeType mimeType = mimeDb.mimeTypeForFile( rootPath + entry );
-			emit updated( rootPath, entry, QStringList() << NBIconProvider::icon( rootPath + entry, mimeType ) );
+			QString mName = mimeDb.mimeTypeForFile( rootPath + entry ).name();
+			emit updated( rootPath, entry, NBIconManager::instance()->icon( mName ) );
 		}
 	}
 };

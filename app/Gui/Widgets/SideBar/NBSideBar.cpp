@@ -5,6 +5,7 @@
 */
 
 #include "NBSideBar.hpp"
+#include "NBGuiFunctions.hpp"
 
 static const QString tooltipSkel = QString(
 	"%1"
@@ -205,7 +206,7 @@ void NBSideBar::reloadBookmarks() {
 	bookmarks->clear();
 
 	Q_FOREACH( NBBookmarkInfo info, NBBookmarkInfo::allBookmarks() )
-		bookmarks->addItem( info.displayLabel, NBIconProvider::themeIcon( "bookmarks", ":/icons/bookmark.png" ), info.mountPoint );
+		bookmarks->addItem( info.displayLabel, NBIconManager::instance()->icon( "bookmarks" ).at( 0 ), info.mountPoint );
 
 	if ( bookmarks->itemCount() )
 		bookmarks->show();

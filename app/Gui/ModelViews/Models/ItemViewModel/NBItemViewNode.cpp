@@ -7,12 +7,16 @@
 #include "NBItemViewNode.hpp"
 #include "NBIconManager.hpp"
 
-inline static QStringList getIcons( QString name, QString type ) {
+inline static QIcon getIcon( QString name, QString type ) {
 
 	char *newPath[ PATH_MAX ] = { 0 };
 
 	QString path = QString::fromLocal8Bit( realpath( name.toLocal8Bit().constData(), NULL ) );
-	return NBIconManager::instance()->iconsForFile( type, path );
+	QIcon icon;
+	Q_FOREACH( QString icoStr, NBIconManager::instance()->iconsForFile( type, path ) )
+		icon.addFile( icoStr );
+
+	return icon;
 };
 
 NBItemViewNode::NBItemViewNode() {
@@ -32,8 +36,7 @@ NBItemViewNode::NBItemViewNode( QVariantList data, QString category, NBItemViewN
 	nodeData << data;
 	myCategory = category;
 
-	Q_FOREACH( QString icoStr, getIcons( data.at( 3 ).toString(), data.at( 6 ).toString() ) )
-		mIcon.addFile( icoStr );
+	mIcon = getIcon( data.at( 3 ).toString(), data.at( 6 ).toString() );
 
 	parentNode = parent;
 };
@@ -207,6 +210,11 @@ void NBItemViewNode::sort( int column, bool cs, bool categorized ) {
 		mCategoryList = sortCategoryList( mCategoryList );
 
 	qSort( childNodes.begin(), childNodes.end(), columnSort2 );
+};
+
+void NBItemViewNode::updateIcon() {
+
+	mIcon = getIcon( nodeData.at( 3 ).toString(), nodeData.at( 6 ).toString() );
 };
 
 void NBItemViewNode::updateCategories() {

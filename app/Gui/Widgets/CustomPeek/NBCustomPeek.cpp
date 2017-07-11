@@ -5,6 +5,7 @@
 */
 
 #include "NBCustomPeek.hpp"
+#include "NBGuiFunctions.hpp"
 
 NBCustomPeek::NBCustomPeek( QString pth, QWidget *parent ) : QWidget( parent ) {
 
@@ -135,8 +136,7 @@ void NBCustomPeek::paintEvent( QPaintEvent *pEvent ) {
 
 void NBCustomPeek::getFileProps() {
 
-	QString icoStr = NBIconProvider::icon( path );
-	iconLbl->setPixmap( QIcon::fromTheme( icoStr, QIcon( icoStr ) ).pixmap( QSize( 64, 64 ) ) );
+	iconLbl->setPixmap( icon( NBIconManager::instance()->iconsForFile( "", path ) ).pixmap( QSize( 64, 64 ) ) );
 	QFileInfo info( path );
 
 	QFontMetrics fm( nameLbl->font() );
