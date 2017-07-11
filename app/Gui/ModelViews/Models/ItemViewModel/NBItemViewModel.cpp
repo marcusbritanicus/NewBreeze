@@ -334,6 +334,8 @@ bool NBItemViewModel::insertNode( QString nodeName ) {
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 	endResetModel();
 
+	thumbnailer->createThumbnails( mRootPath );
+
 	return true;
 };
 
@@ -358,6 +360,8 @@ void NBItemViewModel::updateNode( QString nodeName ) {
 	}
 
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
+
+	thumbnailer->createThumbnails( mRootPath );
 };
 
 bool NBItemViewModel::removeNode( QString nodeName ) {
