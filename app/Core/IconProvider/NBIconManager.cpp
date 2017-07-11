@@ -91,10 +91,14 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 		/* User defined directory icon from @path/.directory */
 		QSettings settPath( QDir( file ).filePath( ".directory" ), QSettings::NativeFormat );
 		QString icoStr = settPath.value( "Desktop Entry/Icon" ).toString();
-		if ( !icoStr.isNull() and ( hasIcon( icoStr ) or exists( icoStr ) ) ) {
-			/* This means we have a file named @v icoStr or a theme icon named @v icoStr */
+		if ( hasIcon( icoStr ) )
+			return icon( icoStr );
+
+		else if ( exists( icoStr ) )
 			return QStringList() << icoStr;
-		}
+
+		else
+			return mdb.value( "inode/directory" ).toStringList();
 
 		/* EncFS Encrypted/Decrypted Folder */
 		QSettings settPrnt( QDir( dirName( file ) ).filePath( ".directory" ), QSettings::NativeFormat );
@@ -184,11 +188,13 @@ void NBIconManager::generateThemeDatabase() {
 			if ( exists( dir + mIcon + ".svg" ) )
 				paths << dir + mIcon + ".svg";
 
-			if ( exists( dir + gmIcon + ".png" ) )
-				paths << dir + gmIcon + ".png";
+			if ( not paths.count() ) {
+				if ( exists( dir + gmIcon + ".png" ) )
+					paths << dir + gmIcon + ".png";
 
-			if ( exists( dir + gmIcon + ".svg" ) )
-				paths << dir + gmIcon + ".svg";
+				if ( exists( dir + gmIcon + ".svg" ) )
+					paths << dir + gmIcon + ".svg";
+			}
 		}
 
 		if ( paths.count() )
