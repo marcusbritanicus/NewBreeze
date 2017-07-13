@@ -9,12 +9,24 @@
 
 inline static QIcon getIcon( QString name, QString type ) {
 
-	char *newPath[ PATH_MAX ] = { 0 };
-
-	QString path = QString::fromLocal8Bit( realpath( name.toLocal8Bit().constData(), NULL ) );
 	QIcon icon;
-	Q_FOREACH( QString icoStr, NBIconManager::instance()->iconsForFile( type, path ) )
-		icon.addFile( icoStr );
+	if ( type.isEmpty() ) {
+		if ( exists( name ) )
+			icon.addFile( name );
+
+		else {
+			Q_FOREACH( QString icoStr, NBIconManager::instance()->icon( name ) )
+				icon.addFile( icoStr );
+		}
+	}
+
+	else {
+		char *newPath[ PATH_MAX ] = { 0 };
+
+		QString path = QString::fromLocal8Bit( realpath( name.toLocal8Bit().constData(), NULL ) );
+		Q_FOREACH( QString icoStr, NBIconManager::instance()->iconsForFile( type, path ) )
+			icon.addFile( icoStr );
+	}
 
 	return icon;
 };
@@ -36,7 +48,11 @@ NBItemViewNode::NBItemViewNode( QVariantList data, QString category, NBItemViewN
 	nodeData << data;
 	myCategory = category;
 
-	mIcon = getIcon( data.at( 3 ).toString(), data.at( 6 ).toString() );
+	if ( data.at( 0 ).toString() == "Application" )
+		mIcon = getIcon( data.at( 7 ).toString(), QString() );
+
+	else
+		mIcon = getIcon( data.at( 3 ).toString(), data.at( 6 ).toString() );
 
 	parentNode = parent;
 };
