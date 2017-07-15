@@ -91,6 +91,10 @@
 
 void NBDebugMsg(  DbgMsgPart::MsgPart part, const char *format, ... ) {
 
+	/* If we are unable to open a log file, write to /dev/null */
+	if ( not nblog )
+		nblog = fopen( "/dev/null", "w" );
+
 	switch ( part ) {
 		case DbgMsgPart::HEAD: {
 			fprintf( nblog, "NewBreeze::Debug# " );

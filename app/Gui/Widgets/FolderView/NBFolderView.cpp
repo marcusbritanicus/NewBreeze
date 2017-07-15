@@ -995,11 +995,10 @@ void NBFolderView::doRename() {
 		return;
 	}
 
-	QString opath = QDir( fsModel->currentDir() ).filePath( curFile );
-	QString npath = QDir( fsModel->currentDir() ).filePath( renamer->newName() );
+	QString opath( QDir( fsModel->currentDir() ).filePath( curFile ) );
+	QString npath( QDir( fsModel->currentDir() ).filePath( renamer->newName() ) );
 
-	NBDebugMsg( DbgMsgPart::HEAD, "Renaming %s to %s... ", opath.toLocal8Bit().data(), npath.toLocal8Bit().data() );
-	NBDebugMsg( DbgMsgPart::TAIL, ( rename( opath.toLocal8Bit().data(), npath.toLocal8Bit().data() ) ? "[Failed]" : "[Done]" ) );
+	qDebug() << "Renaming" << curFile << "to" << renamer->newName() << ( rename( opath.toLocal8Bit().data(), npath.toLocal8Bit().data() ) ? "[Failed]" : "[Done]" );
 };
 
 void NBFolderView::sortByName() {

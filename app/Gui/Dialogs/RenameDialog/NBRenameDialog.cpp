@@ -8,11 +8,11 @@
 
 NBRenameDialog::NBRenameDialog( QString origName, QDir curDir, QWidget *parent ) : NBDialog( parent ) {
 
-	name = QString ( origName );
+	name = QString( origName );
 	dir = QDir( curDir );
 
 	createGUI();
-}
+};
 
 void NBRenameDialog::createGUI() {
 
@@ -105,31 +105,7 @@ void NBRenameDialog::handleTextChanged( QString newText ) {
 
 void NBRenameDialog::handleCBStateChanged() {
 
-	QString newText = le->text();
-
-	if ( newText.isEmpty() ) {
-		segBtns->setSegmentDisabled( 0 );
-		return;
-	}
-
-	if ( newText == name )
-		segBtns->setSegmentDisabled( 0 );
-
-	else if ( replaceCB->isChecked() ) {
-		if ( isDir( dir.filePath( newText ) ) )
-			segBtns->setSegmentDisabled( 0 );
-
-		else
-			segBtns->setSegmentEnabled( 0 );
-	}
-
-	else {
-		if ( dir.entryList().contains( newText ) )
-			segBtns->setSegmentDisabled( 0 );
-
-		else
-			segBtns->setSegmentEnabled( 0 );
-	}
+	handleTextChanged( le->text() );
 };
 
 void NBRenameDialog::handleSegmentClick( int seg ) {
