@@ -1,5 +1,10 @@
-newbreeze-plugins (3.0.0) unstable; urgency=medium
+newbreeze-plugins (3.0.0a) unstable; urgency=medium
 
   * Initial Release.
+  * Feature: Encryption using salsa20 for files and encfs for folders
+  * Feature: MarkDownPreview plugin, using marked.js markdown library
+  * Feature: TextEditor plugin for quick editing of text
+  * Feature: Archive preview
+  * Plugins are now part of the NewBreeze source tree
 
- -- Marcus Britanicus <marcusbritanicus@gmail.com>  Mon, 13 Jun 2016 19:16:13 +0530
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Tue, 18 Jul 2017 12:00:00 +0530

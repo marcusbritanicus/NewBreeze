@@ -1,5 +1,4 @@
 Version 3.0.0 Alpha
-	- Feature: Startup Wizard for initial customization
 	- Feature: Per-folder View options
 	- Feature: Zoom for NBIconView
 	- Feature: NBArchiveDialog helps to create an archive
@@ -8,15 +7,12 @@ Version 3.0.0 Alpha
 	- Feature: NBProcessManager replaces NBIOManager with better functionality
 	- Feature: Categories can be shown/hidden, selected/deselected with single click
 	- Feature: Encryption using salsa20 for files and encfs for folders
-	- Feature: MarkDownPreview plugin, using libsoldout markdown library
+	- Feature: MarkDownPreview plugin, using marked.js markdown library
 	- Feature: TextEditor plugin for quick editing of text
-	- Feature: SuperStart, listing out your most used apps and favorite folders (disabled)
 	- Feature: NBPluginInterface supports file peeking
 	- Feature: New Classic mac-style panel
-	- Feature: Bug Reporting Interface
 	- Feature: Extended Copy/Move interface
 	- Feature: Accidental Delete Protection
-	- Markdown is now rendered using marked.js from http://github.com/chjj/marked
 	- NBIconManager replaces NBIconProvider with better functionality
 	- Icon themes are correctly detected over various DEs
 	- Faster model loading via scandir(...)
