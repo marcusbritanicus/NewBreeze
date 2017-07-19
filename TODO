@@ -69,9 +69,13 @@ General                                                                         
 		A good example is entering a phrase to validate deletion.
 	✓ Plugin barrier as root
 	✓ Enhanced new file creation
-	⬜ Add support for addition of terminal emulators
-	⬜ Vault: A Single place to securely store all your private files
+	✗ Add support for addition of terminal emulators
 
+NewBreeze Vault
+	✍ Vault: A Single place to securely store all your private files
+	  • Safe Mode - Activated immediately
+	  • Secure Mode - Research needed
+	  • Paranoid Mode - Currently not supported
 Note:
 	✍ - Work in progress
 	⬜ - Work to be started

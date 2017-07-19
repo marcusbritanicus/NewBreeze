@@ -63,3 +63,9 @@ few changes in NewBreeze 3.
    - Archive creation now shows a pretty dialog with some options
    - Archive creation and extraction is done via QtConcurrent::run(...)
    - Archive previews are now available
+
+=> NewBreeze Vault
+   - This is work in progress. It will be completed by NB v3.0.0-rc1.
+   - A single place to access all your encrypted files and folders
+   - Use one key to lock/unlock the vault or add/remove files and folders from it.
+   - Each added file or folder will be encrypted using a unique 1024 bit key.

@@ -244,6 +244,12 @@ void NBIconManager::generateThemeDatabase() {
 	/* Desktop file Fix */
 	mdb.setValue( "application/x-desktop", QStringList() << ":/icons/exec.png" );
 
+	/* DOCX Fix */
+	mdb.setValue( "application/vnd.openxmlformats-officedocument.wordprocessingml.document", icon( "application-vnd.ms-word" ) );
+
 	/* PPTX Fix */
 	mdb.setValue( "application/vnd.openxmlformats-officedocument.presentationml.presentation", icon( "application-vnd.ms-powerpoint" ) );
+
+	/* XLSX Fix */
+	mdb.setValue( "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", icon( "application-vnd.ms-excel" ) );
 };
