@@ -70,8 +70,7 @@ NBIconManager::NBIconManager() {
 	/* Set the default theme path */
 	iconThemePath = QString( "/usr/share/icons/" );
 
-	if ( not exists( mdb.fileName() ) or not exists( idb.fileName() ) )
-		generateThemeDatabase();
+	generateThemeDatabase();
 };
 
 QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
@@ -170,48 +169,13 @@ void NBIconManager::generateThemeDatabase() {
 		Q_FOREACH( QString dir, index.value( "Icon Theme/Directories" ).toStringList() )
 			themeDirs << iconThemePath + theme + "/" + dir + "/";
 	}
+	themeDirs.removeDuplicates();
 
+	/* Clear our older icon database */
+	idb.clear();
+
+	/* Create our icon database */
 	int counter = 0;
-	Q_FOREACH( QMimeType mType, mimeDb.allMimeTypes() ) {
-		QString mIcon = mType.iconName();
-		QString gmIcon = mType.genericIconName();
-
-		QStringList paths;
-
-		Q_FOREACH( QString dir, themeDirs ) {
-			if ( not dir.contains( "mimetypes" ) )
-				continue;
-
-			if ( exists( dir + mIcon + ".png" ) )
-				paths << dir + mIcon + ".png";
-
-			if ( exists( dir + mIcon + ".svg" ) )
-				paths << dir + mIcon + ".svg";
-
-			if ( not paths.count() ) {
-				if ( exists( dir + gmIcon + ".png" ) )
-					paths << dir + gmIcon + ".png";
-
-				if ( exists( dir + gmIcon + ".svg" ) )
-					paths << dir + gmIcon + ".svg";
-			}
-		}
-
-		if ( paths.count() )
-			mdb.setValue( mType.name(), paths );
-
-		else
-			mdb.setValue( mType.name(), QStringList() << ":/icons/unknown.png" );
-
-		counter++;
-	}
-
-	/* Sync our database */
-	mdb.sync();
-
-	qDebug() << "Added" << counter << "mimetypes to the database";
-
-	counter = 0;
 	Q_FOREACH( QString dir, themeDirs ) {
 		Q_FOREACH( QString file, listFiles( dir ) ) {
 			if ( not file.endsWith( ".png" ) and not file.endsWith( ".svg" ) and not file.endsWith( ".xpm" ) and not file.endsWith( ".svgz" ) )
@@ -228,9 +192,37 @@ void NBIconManager::generateThemeDatabase() {
 
 	qDebug() << "Added" << counter << "icons to the database";
 
+	/* Clear our older mimetype database */
+	mdb.clear();
+
+	/* Create our mimetype database */
+	counter = 0;
+	Q_FOREACH( QMimeType mType, mimeDb.allMimeTypes() ) {
+		QString mIcon = mType.iconName();
+		QString gmIcon = mType.genericIconName();
+
+		QStringList paths;
+
+		paths << icon( mIcon );
+		if ( not paths.count() )
+			paths << icon( gmIcon );
+
+		if ( paths.count() )
+			mdb.setValue( mType.name(), paths );
+
+		else
+			mdb.setValue( mType.name(), QStringList() << ":/icons/unknown.png" );
+
+		counter++;
+	}
+
+	/* Sync our database */
+	mdb.sync();
+
+	qDebug() << "Added" << counter << "mimetypes to the database";
+
 	/* DJVU Fix */
-	if ( hasIcon( "application-x-office-document" ) )
-		mdb.setValue( "image/vnd.djvu+multipage", QStringList() << "" << "" );
+	mdb.setValue( "image/vnd.djvu+multipage", QStringList() << icon( "x-office-document" ) );
 
 	/* Executable Fix */
 	mdb.setValue( "application/x-executable", QStringList() << ":/icons/exec.png" );
