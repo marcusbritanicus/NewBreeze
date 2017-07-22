@@ -43,19 +43,6 @@ QString getMimeType( QString path ) {
 	return mimeDb.mimeTypeForFile( path ).name();
 };
 
-inline QMimeType getMime( QString path ) {
-
-	return mimeDb.mimeTypeForFile( path );
-};
-
-QString getMimeTypeAlt( QString path ) {
-
-	magic_t mgcMime = magic_open( MAGIC_MIME_TYPE );
-	magic_load( mgcMime, NULL );
-
-	return QString( magic_file( mgcMime, path.toLocal8Bit().constData() ) );
-};
-
 QString termFormatString( QString file ) {
 
 	QString chars = "!\"#$%&'()*+,:;<=>?@[\\]^`{|}~ ";

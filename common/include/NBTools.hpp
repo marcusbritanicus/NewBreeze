@@ -14,7 +14,6 @@ QString baseName( QString path );
 
 /* MimeType from QMimeDatabase and libmagic */
 QString getMimeType( QString path );
-QString getMimeTypeAlt( QString path );
 
 /* Format a string so that it can be used in bash as an argument */
 QString termFormatString( QString file );

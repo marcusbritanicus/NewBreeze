@@ -40,7 +40,6 @@
 #include <errno.h>
 #include <sys/vfs.h>
 #include <libgen.h>
-#include <magic.h>
 #include <sys/inotify.h>
 #include <limits.h>
 #include <time.h>

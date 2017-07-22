@@ -312,6 +312,7 @@ void NBArchiveTreeModel::growTree() {
 		}
 
 		archive_read_data_skip( a );
+		qApp->processEvents();
 	}
 
 	archive_read_close( a );

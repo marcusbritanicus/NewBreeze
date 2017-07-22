@@ -9,7 +9,6 @@ Installation Instructions for NewBreeze v3.0.0
 
       1. Qt4/Qt5 libraries (Qt4: libqt4-dev, libqtwebkit-dev. Qt5: qtbase5-dev, libqt5webkit5-dev )
       2. xdg-utils
-      3. libmagic-dev
       4. libarchive-dev
       5. libbz2-dev
       6. zlib1g-dev

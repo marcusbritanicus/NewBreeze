@@ -41,7 +41,6 @@ Some of its features are
 
 ### Dependencies:
 * Qt4/Qt5
-* libmagic and libmagic-dev
 * zlib
 * liblzma
 * libbzip2
@@ -53,9 +52,8 @@ Some of its features are
 * libdjvulibre-dev (optional)
 
 ### Known Bugs
-* SegmentationFault in `NBIconView` `::aboveIndex(...)`, `::belowIndex(...)`
-* No update of nodes in NBIconView which are being copied.
+* Extended copy/move causes crashes. Disabled by default.
 
 ### Upcoming
-* Application Editor ( Desktop file editor )
+* Application Editor (Desktop file editor)
 * Any other feature you request for... :)

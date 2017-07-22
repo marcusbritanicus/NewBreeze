@@ -93,8 +93,6 @@ void NBPdfPeep::loadPdf() {
 	int pageWidth = 700 - peekWidgetBase->verticalScrollBar()->width() - 4;
 	Poppler::Document *doc = Poppler::Document::load( path );
 
-	qDebug() << "ABC";
-
 	if ( not doc ) {
 		QLabel *page = new QLabel( this );
 		page->setAlignment( Qt::AlignCenter );

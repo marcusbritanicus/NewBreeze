@@ -62,7 +62,7 @@ BugReporting                                                                    
 StartupWizard                                                                                                                         [ 1 of 1 ]
 	✗ Startup Wizard to initiate basic settings
 
-General                                                                                                                               [ 4 of 6 ]
+General                                                                                                                               [ 6 of 6 ]
 	✓ Accidental Delete Protection
 	✓ OS File Protection as Root
 		No OS node can be directly trashed or deleted. To delete/trash any OS node, an extra layer of protection will be applied.
@@ -70,6 +70,7 @@ General                                                                         
 	✓ Plugin barrier as root
 	✓ Enhanced new file creation
 	✗ Add support for addition of terminal emulators
+	✓ Remove libmagic dependency. Its too slow
 
 NewBreeze Vault
 	✍ Vault: A Single place to securely store all your private files
