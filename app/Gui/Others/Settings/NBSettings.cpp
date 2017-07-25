@@ -36,6 +36,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.OpenWithCatalog = false;
 	defaultSettings->General.SidePanel = true;
 	defaultSettings->General.SidePanelType = 1;
+	defaultSettings->General.InfoPanel = false;
 	defaultSettings->General.ShowHidden = false;
 	defaultSettings->General.IconSize = QSize( 48, 48 );
 	defaultSettings->General.SortColumn = 2;
@@ -125,6 +126,9 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "SidePanelType" ) ) )
 		settings->General.SidePanelType = gSettings.value( "SidePanelType" ).toInt();
+
+	if ( gaKeys.contains( QString( "InfoPanel" ) ) )
+		settings->General.InfoPanel = gSettings.value( "InfoPanel" ).toBool();
 
 	if ( gaKeys.contains( QString( "ShowHidden" ) ) )
 		settings->General.ShowHidden = gSettings.value( "ShowHidden" ).toBool();
@@ -317,6 +321,9 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "SidePanelType" ) ) )
 		General.SidePanelType = gSettings.value( "SidePanelType" ).toInt();
+
+	if ( gaKeys.contains( QString( "InfoPanel" ) ) )
+		settings->General.InfoPanel = gSettings.value( "InfoPanel" ).toBool();
 
 	if ( gaKeys.contains( QString( "ShowHidden" ) ) )
 		General.ShowHidden = gSettings.value( "ShowHidden" ).toBool();

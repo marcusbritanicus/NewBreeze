@@ -15,6 +15,7 @@
 #include "NBFolderView.hpp"
 #include "NBGuiWidgets.hpp"
 #include "NBInfoBar.hpp"
+#include "NBInfoPanel.hpp"
 #include "NBLogger.hpp"
 #include "NBMessageDialog.hpp"
 #include "NBPropertiesDialog.hpp"
@@ -39,6 +40,9 @@ class NewBreeze : public QMainWindow {
 		/* Setup the SidePanel */
 		void setupSidePanel();
 
+		/* Setup the InfoPanel */
+		void setupInfoPanel();
+
 		/* Set window title, icon, size etc */
 		void setWindowProperties();
 
@@ -54,6 +58,7 @@ class NewBreeze : public QMainWindow {
 		NBFolderView *FolderView;
 		NBTerminal *Terminal;
 		NBInfoBar *InfoBar;
+		NBInfoPanel *InfoPanel;
 		NBFilterWidget *FilterWidget;
 
 		bool mTerminate;
@@ -100,6 +105,7 @@ class NewBreeze : public QMainWindow {
 		void toggleGrouping();
 
 		void toggleSideBarVisible();
+		void toggleInfoPanel();
 		void showHideTermWidget();
 
 		/* Busy cursor during loading of models */

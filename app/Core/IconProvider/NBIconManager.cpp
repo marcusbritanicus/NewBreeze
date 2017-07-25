@@ -207,6 +207,11 @@ void NBIconManager::generateThemeDatabase() {
 		if ( not paths.count() )
 			paths << icon( gmIcon );
 
+		else if ( paths.at( 0 ) == ":/icons/unknown.png" ) {
+			paths.clear();
+			paths << icon( gmIcon );
+		}
+
 		if ( paths.count() )
 			mdb.setValue( mType.name(), paths );
 

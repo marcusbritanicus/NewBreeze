@@ -32,7 +32,7 @@ INCLUDEPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTyp
 INCLUDEPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/ModelViews/Views/DirectoryView Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others
 INCLUDEPATH += Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
 INCLUDEPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets
-INCLUDEPATH += Gui/Widgets/InfoBar Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
+INCLUDEPATH += Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
 INCLUDEPATH += Gui/Widgets/TrashManager
 
 DEPENDPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs
@@ -43,7 +43,7 @@ DEPENDPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeType
 DEPENDPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/ModelViews/Views/DirectoryView Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others
 DEPENDPATH += Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
 DEPENDPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets
-DEPENDPATH += Gui/Widgets/InfoBar Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
+DEPENDPATH += Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
 DEPENDPATH += Gui/Widgets/TrashManager
 
 # Headers
@@ -126,6 +126,7 @@ HEADERS += Gui/Widgets/GuiWidgets/NBGuiWidgets.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBLabels.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBProgressBar.hpp
 HEADERS += Gui/Widgets/InfoBar/NBInfoBar.hpp
+HEADERS += Gui/Widgets/InfoPanel/NBInfoPanel.hpp
 HEADERS += Gui/Widgets/ProcessManager/NBProcessManagerUI.hpp
 HEADERS += Gui/Widgets/ProcessManager/NBProcessWidget.hpp
 HEADERS += Gui/Widgets/SideBar/NBSideBarGroup.hpp
@@ -247,6 +248,7 @@ SOURCES += Gui/Widgets/GuiWidgets/NBGuiWidgets.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBLabels.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBProgressBar.cpp
 SOURCES += Gui/Widgets/InfoBar/NBInfoBar.cpp
+SOURCES += Gui/Widgets/InfoPanel/NBInfoPanel.cpp
 SOURCES += Gui/Widgets/ProcessManager/NBProcessManagerUI.cpp
 SOURCES += Gui/Widgets/ProcessManager/NBProcessWidget.cpp
 SOURCES += Gui/Widgets/SideBar/NBSideBar.cpp

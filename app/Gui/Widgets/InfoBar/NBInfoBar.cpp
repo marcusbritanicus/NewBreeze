@@ -7,7 +7,7 @@
 #include "NBInfoBar.hpp"
 #include "NBGuiFunctions.hpp"
 
-inline QString getPermissions( QString path ) {
+inline static QString getPermissions( QString path ) {
 
 	QString text;
 	// Read Permissions

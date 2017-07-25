@@ -36,9 +36,10 @@ NBFileSystemWatcher                                                             
 	✗ Use inode numbers obtained from stat(...) to identify renames
 	✗ Think of using inotify.hpp by Erik Zenker for NBFileSystemWatcher: uses boost-filesystem
 
-NBFolderWidget                                                                                                                        [ 2 of 2 ]
+NBFolderWidget                                                                                                                        [ 3 of 3 ]
 	✓ Extended copy/move support
 	✓ Add an option in Settings Dialog
+	✓ Preview Pane for files and folders
 
 Archives                                                                                                                              [ 6 of 6 ]
 	✗ Zip and tar preview: PeekPlugin using archivemount
@@ -77,6 +78,7 @@ NewBreeze Vault
 	  • Safe Mode - Activated immediately
 	  • Secure Mode - Research needed
 	  • Paranoid Mode - Currently not supported
+
 Note:
 	✍ - Work in progress
 	⬜ - Work to be started

@@ -109,6 +109,7 @@ void NewBreeze::createGUI() {
 	FolderView = new NBFolderView( this );
 	Terminal = new NBTerminal( QString(), this );
 	InfoBar = new NBInfoBar( this );
+	setupInfoPanel();
 	FilterWidget = new NBFilterWidget( FolderView );
 
 	QWidget *Spacer = new QWidget();
@@ -124,6 +125,7 @@ void NewBreeze::createGUI() {
 	ViewLayout->addWidget( SideBar );
 
 	ViewLayout->addWidget( FolderView );
+	ViewLayout->addWidget( InfoPanel );
 
 	QVBoxLayout *BaseLayout = new QVBoxLayout();
 	BaseLayout->setContentsMargins( QMargins( 0, 3, 0, 0 ) );
@@ -185,6 +187,26 @@ void NewBreeze::setupSidePanel() {
 		SideBar->hide();
 		SidePanel->hide();
 	}
+};
+
+void NewBreeze::setupInfoPanel() {
+
+	/* Create the InfoPanel */
+	InfoPanel = new NBInfoPanel( this );
+
+	/* Show infopanel and hide infobar */
+	if ( Settings->General.InfoPanel ) {
+		InfoPanel->show();
+		InfoBar->hide();
+	}
+
+	/* Show infobar and hide infopanel */
+	else {
+		InfoPanel->hide();
+		InfoBar->show();
+	}
+
+	updateInfoBar();
 };
 
 void NewBreeze::setWindowProperties() {
@@ -286,6 +308,11 @@ void NewBreeze::createAndSetupActions() {
 	toggleSideBar->setShortcuts( Settings->Shortcuts.ToggleSideBar );
 	connect( toggleSideBar, SIGNAL( triggered() ), this, SLOT( toggleSideBarVisible() ) );
 
+	// Show/Hide info panel
+	QAction *toggleInfoPanelAct = new QAction( "Toggle InfoPanel", this );
+	toggleInfoPanelAct->setShortcut( QKeySequence( tr( "F7" ) ) );
+	connect( toggleInfoPanelAct, SIGNAL( triggered() ), this, SLOT( toggleInfoPanel() ) );
+
 	// Change View Mode
 	QAction *viewModeAct = new QAction( "Change View Mode", this );
 	viewModeAct->setShortcuts( Settings->Shortcuts.ViewMode );
@@ -326,6 +353,7 @@ void NewBreeze::createAndSetupActions() {
 	addAction( addBookMarkAct );
 	addAction( termWidgetAct );
 	addAction( toggleSideBar );
+	addAction( toggleInfoPanelAct );
 	addAction( viewModeAct );
 	addAction( showApplicationsAct );
 	addAction( showCatalogsAct );
@@ -597,6 +625,7 @@ void NewBreeze::updateInfoBar() {
 	if ( qobject_cast<NBItemViewModel*>( sender() ) == FolderView->fsModel ) {
 
 		InfoBar->updateInfoBarCF( FolderView->fsModel->currentDir() );
+		InfoPanel->updatePanel( FolderView->fsModel->currentDir(), QModelIndexList() );
 	}
 
 	else {
@@ -609,6 +638,8 @@ void NewBreeze::updateInfoBar() {
 
 		else
 			InfoBar->updateInfoBarSelection( FolderView->fsModel->currentDir(), selectedIndexes );
+
+		InfoPanel->updatePanel( FolderView->fsModel->currentDir(), selectedIndexes );
 	}
 };
 
@@ -826,6 +857,23 @@ void NewBreeze::toggleSideBarVisible() {
 			SideBar->show();
 
 		Settings->setValue( "SidePanel", SideBar->isVisible() );
+	}
+};
+
+void NewBreeze::toggleInfoPanel() {
+
+	if ( InfoPanel->isVisible() ) {
+		InfoPanel->hide();
+		InfoBar->show();
+
+		Settings->setValue( "InfoPanel", false );
+	}
+
+	else {
+		InfoPanel->show();
+		InfoBar->hide();
+
+		Settings->setValue( "InfoPanel", true );
 	}
 };
 

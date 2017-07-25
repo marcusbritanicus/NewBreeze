@@ -30,6 +30,7 @@ class NBSettings {
 				bool OpenWithCatalog;							// Show catalog on NB Open?
 				bool SidePanel;									// Show sidepanel?
 				int SidePanelType;								// Show classic or modern?
+				bool InfoPanel;									// Show infopanel?
 				bool ShowHidden;								// Show Hidden files and folders?
 				QSize IconSize;									// Default Icon Size
 				int SortColumn;									// Default Sort Column
