@@ -8,12 +8,12 @@
 	*
 	* The new Icon Manager replaces the old NBIconProvider. The functionalities will be enhanced greatly in this class.
 	* New:
-	* 		- Icons for images will be stored in a single massive database.
+	* 		- All icons will be stored in a massive database
+	*				Icon 1								[ Path 1, Path 2, Path 3, ... ]
 	* 		- Standard icon database will be created which matches a mimetype to icons paths of all sizes
 	*				MimeType 1							[ Path 1, Path 2, Path 3, ... ]
 	*		  This ensures that we do not have to search the same icon multiple times.
-	* 		- We create this Standard Icon Database once using the startup wizard. Subsequent updation needs to be done manually.
-	* 		- The database gets updated if the icon theme is changed.
+	* 		- We create these databases every time a unique instance of newbreeze starts. Databasing takes < 2s
 	*
 */
 
