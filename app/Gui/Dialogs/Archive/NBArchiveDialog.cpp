@@ -20,7 +20,7 @@ NBArchive* NBArchiveDialog::newArchive( QWidget *parent ) {
 
 NBArchiveDialog::NBArchiveDialog( QWidget *parent ) : NBDialog( parent ) {
 
-	format = ".tar.xz"
+	format = ".tar.xz";
 	createGUI();
 };
 
