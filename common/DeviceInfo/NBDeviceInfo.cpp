@@ -125,6 +125,9 @@ QList<NBDeviceInfo> NBDeviceManager::allVirtualMounts() {
 		if ( info.mountPoint().startsWith( "/proc/" ) )
 			continue;
 
+		if ( info.mountPoint().startsWith( "/sys/" ) )
+			continue;
+
 		devList << info;
 	}
 
@@ -170,7 +173,7 @@ void NBDeviceManager::pollDevices() {
 	devicesList.clear();
 
 	QStringList virtualFS;
-	virtualFS << "sysfs" << "cgroup" << "proc" << "devtmpfs" << "devpts";
+	virtualFS << "sysfs" << "cgroup" << "cgroup2" << "proc" << "devtmpfs" << "devpts";
 	virtualFS << "tmpfs" << "securityfs" << "pstore" << "autofs" << "mqueue";
 	virtualFS << "debugfs" << "hugetlbfs" << "fusectl" << "fuse.gvfsd-fuse";
 
