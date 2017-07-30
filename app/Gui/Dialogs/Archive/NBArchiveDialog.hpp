@@ -29,4 +29,4 @@ class NBArchiveDialog : public NBDialog {
 		void updateFileName( QString );
 		void updateDirName();
 		void updateFormat( QString );
- };
+};
