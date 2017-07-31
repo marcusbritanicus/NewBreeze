@@ -46,6 +46,7 @@ class NBFolderView : public QStackedWidget {
 		QAction *actNewDir, *actNewFile;
 		QAction *sortByNameAct, *sortByTypeAct, *sortBySizeAct, *sortByDateAct;
 		QAction *groupsAct;
+		QAction *addToSuperStartAct;
 
 		NBIconView *IconView;
 
@@ -113,6 +114,7 @@ class NBFolderView : public QStackedWidget {
 		void compress( QStringList );
 
 		void updateActions();
+		void addToSuperStart();
 
 	Q_SIGNALS :
 		void newWindow( QString );

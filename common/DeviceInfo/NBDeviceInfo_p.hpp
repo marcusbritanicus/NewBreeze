@@ -19,6 +19,7 @@ class NBDeviceInfoPrivate : public QSharedData {
 	private:
 		void retrieveVolumeInfo();
 		void getDeviceLabel();
+		void getDeviceType( QString, QString );
 
 	public:
 		/* Device block path */
@@ -26,6 +27,9 @@ class NBDeviceInfoPrivate : public QSharedData {
 
 		/* File System Type */
 		QString fileSystemType;
+
+		/* Device Type */
+		QString deviceType;
 
 		/* Display Label */
 		QString label;

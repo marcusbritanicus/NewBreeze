@@ -17,97 +17,6 @@ static const QString tooltipSkel = QString(
 	"</table>"
 );
 
-inline QString getDevType( NBDeviceInfo info ) {
-
-	QString dev = info.device();
-	QString vfsType = info.fileSystemType();
-
-	QStringList cdTypes = QStringList() << "cdfs" << "iso9660" << "udf";
-	QString devType = QString( "unknown" );
-
-	if ( cdTypes.contains( vfsType ) )
-		return ":/icons/optical.png";
-
-	if ( vfsType.contains( "encfs" ) )
-		return ":/icons/encfs.png";
-
-	if ( vfsType.contains( "archivemount" ) )
-		return ":/icons/archive.png";
-
-	QDir disks = QDir( "/dev/disk/by-path" );
-	disks.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System );
-	foreach( QString disk, disks.entryList() ) {
-		QFileInfo info( disks.filePath( disk ) );
-		if ( info.symLinkTarget() == dev ) {
-			if ( info.absoluteFilePath().contains( "usb" ) )
-				return QString( ":/icons/usb.png" );
-
-			else {
-				if ( vfsType.toLower().contains( "ntfs" ) )
-					return QString( ":/icons/hdd-win.png" );
-
-				else if ( vfsType.toLower().contains( "fuseblk" ) )
-					return QString( ":/icons/hdd-win.png" );
-
-				else if ( vfsType.toLower().contains( "ext" ) )
-					return QString( ":/icons/hdd-linux.png" );
-
-				else if ( vfsType.toLower().contains( "jfs" ) )
-					return QString( ":/icons/hdd-linux.png" );
-
-				else if ( vfsType.toLower().contains( "reiser" ) )
-					return QString( ":/icons/hdd-linux.png" );
-
-				else if ( vfsType.toLower().contains( "zfs" ) )
-					return QString( ":/icons/hdd-linux.png" );
-
-				else if ( vfsType.toLower().contains( "xfs" ) )
-					return QString( ":/icons/hdd-linux.png" );
-
-				else if ( vfsType.toLower().contains( "btrfs" ) )
-					return QString( ":/icons/hdd-linux.png" );
-
-				else
-					return QString( ":/icons/hdd.png" );
-			}
-		}
-	}
-
-	if ( devType == "unknown" ) {
-		/*
-			*
-			* Lets try /sys/block approach
-			*
-			* Take /dev/<dev> part of the /dev/<dev> and check if 'usb' ia part of
-			* target of /sys/block/<dev>. Else check the starting of <dev> and determine the type
-			*
-		*/
-		QString sysfsPath = QString( "/sys/block/%1" ).arg( baseName( dev ) );
-		if ( readLink( sysfsPath ).contains( "usb" ) )
-			return QString( ":/icons/usb.png" );
-
-		else {
-			if ( baseName( dev ).startsWith( "sd" ) )
-			// We have a generic mass storage device
-				return QString( ":/icons/hdd.png" );
-
-			else if ( baseName( dev ).startsWith( "sr" ) )
-				return QString( ":/icons/optical.png" );
-
-			else if ( baseName( dev ).startsWith( "se" ) or baseName( dev ).startsWith( "ses" ) )
-				return QString( ":/icons/enclosure.png" );
-
-			else if ( baseName( dev ).startsWith( "st" ) )
-				return QString( ":/icons/tape.png" );
-
-			else
-				return devType;
-		}
-	}
-
-	return devType;
-};
-
 NBSideBar::NBSideBar( QWidget *parent ) : QWidget( parent ) {
 
 	populateSideBar();
@@ -178,7 +87,7 @@ void NBSideBar::reloadDevices() {
 	vfs->clear();
 
 	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDrives() ) {
-		int pos = drives->addItem( info.displayName(), getDevType( info ), info.mountPoint() );
+		int pos = drives->addItem( info.displayName(), ":/icons/" + info.deviceType() + ".png", info.mountPoint() );
 
 		/* Special tooltip hack */
 		int percent = 100 * info.bytesUsed() / info.bytesTotal();
@@ -186,7 +95,7 @@ void NBSideBar::reloadDevices() {
 	}
 
 	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allVirtualMounts() )
-		vfs->addItem( info.displayName(), getDevType( info ), info.mountPoint() );
+		vfs->addItem( info.displayName(), ":/icons/" + info.deviceType() + ".png", info.mountPoint() );
 
 	if ( drives->itemCount() )
 		drives->show();

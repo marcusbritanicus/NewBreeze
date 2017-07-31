@@ -569,12 +569,13 @@ void NBAddToCatalogMenu::addToNewCatalog() {
 
 void NBFolderView::showContextMenu( QPoint position ) {
 
+	QList<QModelIndex> selectedList = getSelection();
+
 	if ( not fsModel->isRealLocation() ) {
 		/* We should fix this later */
+
 		return;
 	}
-
-	QList<QModelIndex> selectedList = getSelection();
 
 	QMenu *menu = new QMenu( this );
 	if ( selectedList.isEmpty() ) {
@@ -605,6 +606,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		menu->addSeparator();
 
 		menu->addMenu( addToCatalogMenu );
+		menu->addAction( addToSuperStartAct );
 		menu->addSeparator();
 
 		menu->addAction( pasteAct );
@@ -667,9 +669,11 @@ void NBFolderView::showContextMenu( QPoint position ) {
 			NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 			connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 			menu->addMenu( addToCatalogMenu );
-
-			menu->addSeparator();
 		}
+
+		/* We can add file or folder to SuperStart */
+		menu->addAction( addToSuperStartAct );
+		menu->addSeparator();
 
 		menu->addMenu( customMenu );
 		menu->addSeparator();
@@ -721,6 +725,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		menu->addSeparator();
 
 		menu->addMenu( addToCatalogMenu );
+		menu->addAction( addToSuperStartAct );
 		menu->addSeparator();
 
 		menu->addMenu( customMenu );

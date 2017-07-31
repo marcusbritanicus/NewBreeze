@@ -7,6 +7,94 @@
 #include "common.hpp"
 #include "NBDeviceInfo_p.hpp"
 
+inline static QString getDeviceTypeReal( QString dev, QString vfsType ) {
+
+	QStringList cdTypes = QStringList() << "cdfs" << "iso9660" << "udf";
+	QString devType = QString( "unknown" );
+
+	if ( cdTypes.contains( vfsType ) )
+		return "optical";
+
+	if ( vfsType.contains( "encfs" ) )
+		return "encfs";
+
+	if ( vfsType.contains( "archivemount" ) )
+		return "archive";
+
+	QDir disks = QDir( "/dev/disk/by-path" );
+	disks.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System );
+	Q_FOREACH( QString disk, disks.entryList() ) {
+		QFileInfo info( disks.filePath( disk ) );
+		if ( info.symLinkTarget() == dev ) {
+			if ( info.absoluteFilePath().contains( "usb" ) )
+				return QString( "usb" );
+
+			else {
+				if ( vfsType.toLower().contains( "ntfs" ) )
+					return QString( "hdd-win" );
+
+				else if ( vfsType.toLower().contains( "fuseblk" ) )
+					return QString( "hdd-win" );
+
+				else if ( vfsType.toLower().contains( "ext" ) )
+					return QString( "hdd-linux" );
+
+				else if ( vfsType.toLower().contains( "jfs" ) )
+					return QString( "hdd-linux" );
+
+				else if ( vfsType.toLower().contains( "reiser" ) )
+					return QString( "hdd-linux" );
+
+				else if ( vfsType.toLower().contains( "zfs" ) )
+					return QString( "hdd-linux" );
+
+				else if ( vfsType.toLower().contains( "xfs" ) )
+					return QString( "hdd-linux" );
+
+				else if ( vfsType.toLower().contains( "btrfs" ) )
+					return QString( "hdd-linux" );
+
+				else
+					return QString( "hdd" );
+			}
+		}
+	}
+
+	if ( devType == "unknown" ) {
+		/*
+			*
+			* Lets try /sys/block approach
+			*
+			* Take /dev/<dev> part of the /dev/<dev> and check if 'usb' ia part of
+			* target of /sys/block/<dev>. Else check the starting of <dev> and determine the type
+			*
+		*/
+		QString sysfsPath = QString( "/sys/block/%1" ).arg( baseName( dev ) );
+		if ( readLink( sysfsPath ).contains( "usb" ) )
+			return QString( "usb" );
+
+		else {
+			if ( baseName( dev ).startsWith( "sd" ) )
+			// We have a generic mass storage device
+				return QString( "hdd" );
+
+			else if ( baseName( dev ).startsWith( "sr" ) )
+				return QString( "optical" );
+
+			else if ( baseName( dev ).startsWith( "se" ) or baseName( dev ).startsWith( "ses" ) )
+				return QString( "enclosure" );
+
+			else if ( baseName( dev ).startsWith( "st" ) )
+				return QString( "tape" );
+
+			else
+				return devType;
+		}
+	}
+
+	return devType;
+};
+
 NBDeviceInfoPrivate::NBDeviceInfoPrivate() {
 
 	/* Invalid Device Info */
@@ -17,6 +105,9 @@ NBDeviceInfoPrivate::NBDeviceInfoPrivate() {
 
 	/* File System Type */
 	fileSystemType = "";
+
+	/* Device Type */
+	deviceType = "";
 
 	/* Display Label */
 	label = "";
@@ -50,6 +141,9 @@ NBDeviceInfoPrivate::NBDeviceInfoPrivate( QString dev, QString mountPt, QString 
 
 	/* Read the Storage Information */
 	retrieveVolumeInfo();
+
+	/* Get DeviceType */
+	deviceType = getDeviceTypeReal( dev, fs );
 };
 
 bool NBDeviceInfoPrivate::isValid() {
@@ -113,4 +207,7 @@ void NBDeviceInfoPrivate::retrieveVolumeInfo() {
 
 	/* Read Only mount? */
 	readOnly = ( statfs_buf.f_flag & ST_RDONLY ) != 0;
+};
+
+void NBDeviceInfoPrivate::getDeviceType( QString dev, QString vfsType ) {
 };

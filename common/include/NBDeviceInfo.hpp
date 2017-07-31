@@ -23,6 +23,7 @@ class NBCOMMON_DLLSPEC NBDeviceInfo {
 		QString mountPoint() const;
 		QString device() const;
 		QString fileSystemType() const;
+		QString deviceType() const;
 		QString displayName() const;
 
 		qint64 bytesTotal() const;

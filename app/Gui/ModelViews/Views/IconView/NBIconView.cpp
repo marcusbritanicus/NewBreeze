@@ -517,14 +517,13 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 			if ( ftype.isSymLink() )
 				pltt.setColor( QPalette::Text, QColor( "darkslateblue" ) );
 
-			#warning "Possible Qt bug: Registers all files on encfs mounted path as executable."
 			else if ( isExecutable( ftype.absoluteFilePath().toLocal8Bit().data() ) && ftype.isFile() )
 				pltt.setColor( QPalette::Text, QColor( "darkgreen" ) );
 
 			else if ( ftype.isHidden() )
 				pltt.setColor( QPalette::Text, pltt.color( QPalette::Text ).lighter() );
 
-			else if ( !ftype.isReadable() )
+			else if ( !ftype.isReadable() and cModel->isRealLocation() )
 				pltt.setColor( QPalette::Text, QColor( "darkred" ) );
 
 			else if ( option.state & QStyle::State_Selected )
@@ -552,7 +551,7 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 			else if ( ftype.isHidden() )
 				pltt.setColor( QPalette::Text, pltt.color( QPalette::Text ).darker( 125 ) );
 
-			else if ( !ftype.isReadable() )
+			else if ( !ftype.isReadable() and cModel->isRealLocation() )
 				pltt.setColor( QPalette::Text, QColor( "indianred" ) );
 
 			else if ( option.state & QStyle::State_Selected )
@@ -815,28 +814,13 @@ void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 			switch( cModel->modelDataType() ) {
 				case NBItemViewModel::SuperStart: {
 
-					/* If we are showing a desktop file (application) */
-					if ( idx.data( Qt::UserRole + 9 ).toString().count() ) {
-						QStringList execList = idx.data( Qt::UserRole + 3 ).toStringList();
-						bool runInTerminal = idx.data( Qt::UserRole + 7 ).toBool();
-
-						if ( not runInTerminal ) {
-
-							// Try to run this program
-							QProcess::startDetached( execList.at( 0 ) );
-						}
-
-						else {
-							QStringList terminalList = getTerminal().join( " " ).arg( QDir::homePath() ).arg( execList.at( 0 ) ).split( " " );
-							QProcess::startDetached( terminalList.takeFirst(), terminalList );
-						}
-					}
+					/* If we are showing a drive file (Computer) */
+					if ( not idx.data( Qt::UserRole + 6 ).toString().count() )
+						emit open( idx.data( Qt::UserRole + 2 ).toString() );
 
 					/* If we are showing a place */
-					else {
-
+					else
 						emit open( idx );
-					}
 
 					break;
 				}
@@ -1014,26 +998,11 @@ void NBIconView::keyPressEvent( QKeyEvent *kEvent ) {
 		switch( cModel->modelDataType() ) {
 
 			case NBItemViewModel::SuperStart: {
-				if ( idx.data( Qt::UserRole + 9 ).toString().count() ) {
-					QStringList execList = idx.data( Qt::UserRole + 3 ).toStringList();
-					bool runInTerminal = idx.data( Qt::UserRole + 7 ).toBool();
+				if ( not idx.data( Qt::UserRole + 6 ).toString().count() )
+					emit open( idx.data( Qt::UserRole + 2 ).toString() );
 
-					if ( not runInTerminal ) {
-
-						// Try to run this program
-						QProcess::startDetached( execList.at( 0 ) );
-					}
-
-					else {
-						QStringList terminalList = getTerminal().join( " " ).arg( QDir::homePath() ).arg( execList.at( 0 ) ).split( " " );
-						QProcess::startDetached( terminalList.takeFirst(), terminalList );
-					}
-				}
-
-				else {
-
+				else
 					emit open( idx );
-				}
 
 				break;
 			}
@@ -1885,8 +1854,10 @@ void NBIconView::calculateCategorizedIconsRects() const {
 		int minX = myContentsMargins.left();
 		int minY = myContentsMargins.top() + catIdx * myCategoryHeight + catIdx * myCategorySpacing + totalRows * myGridSize.height();
 
+		/* Extra Spacing in SuperStart */
 		if ( cModel->modelDataType() == NBItemViewModel::SuperStart )
-			minY += ( catIdx ? myGridSize.height() : 0 );
+			minY += catIdx * myGridSize.height() / 3;
+
 
 		int categoryWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
 		rectForCategory[ catIdx ] = QRect( minX, minY, categoryWidth, 24 );

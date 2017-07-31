@@ -155,6 +155,9 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 
 void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
 
+	if ( not exists( itemPath ) )
+		return;
+
 	// Icon
 	setIcon( icon( NBIconManager::instance()->iconsForFile( "", itemPath ) ) );
 
@@ -188,6 +191,8 @@ void NBInfoBar::updateInfoBarSelection( QString folderPath, QModelIndexList sele
 
 	foreach( QModelIndex entry, selection ) {
 		QString itemPath = QDir( folderPath ).filePath( entry.data().toString() );
+		if ( not exists( itemPath ) )
+			continue;
 
 		if ( isDir( itemPath ) ) {
 			folders++;

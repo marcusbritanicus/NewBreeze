@@ -542,8 +542,11 @@ QPixmap NBItemViewModel::pixmapForCategory( QString categoryName ) const {
 			if ( categoryName == "Places" )
 				return QIcon( ":/icons/folder.png" ).pixmap( 16, 16 );
 
+			else if ( categoryName == "Computer" )
+				return QIcon( ":/icons/comp.png" ).pixmap( 16, 16 );
+
 			else
-				return QIcon( ":/icons/applications.png" ).pixmap( 16, 16 );
+				return QIcon( ":/icons/files.png" ).pixmap( 16, 16 );
 		}
 
 		default: {
@@ -683,7 +686,7 @@ void NBItemViewModel::sort( int column, bool cs, bool categorized ) {
 	prevSort.categorized = categorized;
 
 	recategorize();
-	rootNode->sort( column, cs, categorized );
+	rootNode->sort( column, cs, false );
 
 	// Create a map of categoryIndex versus rows
 	categoryRowMap.clear();
@@ -746,7 +749,7 @@ QString NBItemViewModel::nodePath( const QModelIndex idx ) const {
 		NBItemViewNode *node = static_cast<NBItemViewNode*>( idx.internalPointer() );
 
 		/* If its an application, its path is Qt::UserRole + 9 */
-		if ( node->data( 0, true ).toString().toLower() == "application" )
+		if ( node->data( 0, true ).toString().toLower() == "superstart" )
 			return idx.data( Qt::UserRole + 9 ).toString();
 
 		else
@@ -1101,15 +1104,24 @@ void NBItemViewModel::setupSuperStartData() {
 	rootNode->clearChildren();
 	currentLoadStatus.loading = true;
 
-	QStringList dirs;
-
 	emit directoryLoading( mRootPath );
 
 	QSettings superStart( "NewBreeze", "SuperStart" );
 
 	beginResetModel();
 
-	/* Recent Folders */
+	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allMounts() ) {
+		QVariantList data;
+		data << "SuperStart" << 0 << ":/icons/" + info.deviceType() + ".png";
+		data << info.displayName();
+		data << QString( "%1% used" ).arg( info.bytesUsed() * 100 / info.bytesTotal() );
+		data << info.mountPoint();
+
+		rootNode->addChild( new NBItemViewNode( data, "Computer", rootNode ) );
+		mChildNames << info.displayName();
+	};
+
+	/* Bookmarked Folders */
 	superStart.beginGroup( "Places" );
 	foreach( QString key, superStart.childKeys() ) {
 		QString location = superStart.value( key ).toString();
@@ -1117,35 +1129,21 @@ void NBItemViewModel::setupSuperStartData() {
 			continue;
 
 		QVariantList data = quickDataGatherer->getQuickFileInfo( location );
+		data[ 0 ] = "dirss";
+		data[ 3 ] = key;
 		rootNode->addChild( new NBItemViewNode( data, "Places", rootNode ) );
-		mChildNames << data.at( 3 ).toString();
-		dirs << location;
+		mChildNames << key;
 	}
 	superStart.endGroup();
 
 	/* Recent Applications */
-	superStart.beginGroup( "Applications" );
-	foreach( QString appName, superStart.childKeys() ) {
-		NBAppFile app( superStart.value( appName ).toString() );
-		QVariantList data;
-
-		/* Special Data */
-		data << "Application" << 0 << app.value( NBAppFile::Icon );
-
-		/* Normal Data */
-		data << app.value( NBAppFile::Name );												/* Qt::UserRole + 0 */
-		data << app.value( NBAppFile::Exec );												/* Qt::UserRole + 1 */
-		data << app.value( NBAppFile::Comment );											/* Qt::UserRole + 2 */
-		data << app.execArgs();																/* Qt::UserRole + 3 */
-		data << app.value( NBAppFile::Icon );												/* Qt::UserRole + 4 */
-		data << app.value( NBAppFile::WorkPath );											/* Qt::UserRole + 5 */
-		data << app.value( NBAppFile::MimeTypes );											/* Qt::UserRole + 6 */
-		data << app.value( NBAppFile::TerminalMode );										/* Qt::UserRole + 7 */
-		data << app.value( NBAppFile::Categories );											/* Qt::UserRole + 8 */
-		data << app.filePath();																/* Qt::UserRole + 9 */
-
-		rootNode->addChild( new NBItemViewNode( data, "Applications", rootNode ) );
-		mChildNames << data.at( 3 ).toString();
+	superStart.beginGroup( "Files" );
+	foreach( QString key, superStart.childKeys() ) {
+		QString path = superStart.value( key ).toString();
+		QVariantList data = quickDataGatherer->getQuickFileInfo( path );
+		data[ 3 ] = key;
+		rootNode->addChild( new NBItemViewNode( data, "Files", rootNode ) );
+		mChildNames << key;
 	}
 	superStart.endGroup();
 

@@ -64,6 +64,13 @@ few changes in NewBreeze 3.
    - Archive creation and extraction is done via QtConcurrent::run(...)
    - Archive previews are now available
 
+=> SuperStart: A Super start to your day
+   - All Drives are shown as you start NewBreeze
+   - Find all the important files and folders as soon as you start NewBreeze
+   - Press Ctrl+U to add file(s)/folder(s) to SuperStart
+   - In SuperStart, press Delete to remove them.
+   - A menu will be added later
+
 => NewBreeze Vault
    - This is work in progress. It will be completed by NB v3.0.0-rc1.
    - A single place to access all your encrypted files and folders

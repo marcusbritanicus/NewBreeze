@@ -51,6 +51,12 @@ NBItemViewNode::NBItemViewNode( QVariantList data, QString category, NBItemViewN
 	if ( data.at( 0 ).toString() == "Application" )
 		mIcon = getIcon( data.at( 7 ).toString(), QString() );
 
+	else if ( data.at( 0 ).toString() == "SuperStart" )
+		mIcon = QIcon( data.at( 2 ).toString() );
+
+	else if ( data.at( 0 ).toString() == "dirss" )
+		mIcon = getIcon( data.at( 10 ).toString(), QString( "inode/directory" ) );
+
 	else
 		mIcon = getIcon( data.at( 3 ).toString(), data.at( 6 ).toString() );
 
@@ -143,17 +149,17 @@ QVariant NBItemViewNode::data( int column, bool special ) const {
 		* If we want normal data, then we can choose columns 0 to 6, internally 3 onwards
 		*
 		* [
-		* 	dir/file/system
-		*   rawsize
-		*   iconstr
-		*   name = 0
-		*   size = 1
-		*   type = 2
-		*   mime = 3
-		*   time = 4
-		*   perm = 5
-		*   ownr = 6
-		*   mtpt = 7
+		* 	dir/file/system			0
+		*   rawsize					1
+		*   iconstr					2
+		*   name = 0				3
+		*   size = 1				4
+		*   type = 2				5
+		*   mime = 3				6
+		*   time = 4				7
+		*   perm = 5				8
+		*   ownr = 6				9
+		*   mtpt = 7				10
 		* ]
 		*
 	*/
@@ -217,10 +223,6 @@ int NBItemViewNode::row() {
 };
 
 void NBItemViewNode::sort( int column, bool cs, bool categorized ) {
-
-	Settings->General.SortColumn = column;
-	Settings->General.SortCase = cs;
-	Settings->General.Grouping = categorized;
 
 	if ( categorized )
 		mCategoryList = sortCategoryList( mCategoryList );

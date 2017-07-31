@@ -147,7 +147,7 @@ class NBIconView : public QAbstractItemView {
 		void toggleFoldCategory( QString );
 		bool canShowIndex( QModelIndex );
 
-		// FileSystem Model
+		// Categorized Item Model
 		NBItemViewModel *cModel;
 
 		// ViewMode

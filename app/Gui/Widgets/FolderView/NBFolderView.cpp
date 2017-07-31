@@ -253,6 +253,14 @@ void NBFolderView::createAndSetupActions() {
 	groupsAct->setCheckable( true );
 	groupsAct->setChecked( Settings->General.Grouping );
 	connect( groupsAct, SIGNAL( triggered() ), this, SIGNAL( toggleGroups() ) );
+
+	addToSuperStartAct = new QAction( QIcon( ":/icons/superstart.png" ), "Add to S&uperStart", this );
+	addToSuperStartAct->setShortcut( tr( "Ctrl+U" ) );
+
+	connect( addToSuperStartAct, SIGNAL( triggered() ), this, SLOT( addToSuperStart() ) );
+	addAction( addToSuperStartAct );
+
+	updateActions();
 };
 
 QModelIndexList NBFolderView::getSelection() {
@@ -832,7 +840,22 @@ void NBFolderView::prepareIO() {
 
 void NBFolderView::doSendToTrash() {
 
-	if ( !IconView->selection().count() ) {
+	if ( not IconView->selection().count() ) {
+		return;
+	}
+
+	if ( fsModel->modelDataType() == NBItemViewModel::SuperStart ) {
+		QSettings superStart( "NewBreeze", "SuperStart" );
+		Q_FOREACH( QModelIndex idx, getSelection() ) {
+			if ( fsModel->category( idx ) == "Computer" )
+				continue;
+
+			superStart.remove( fsModel->category( idx ) + "/" + idx.data().toString() );
+		}
+
+		superStart.sync();
+		fsModel->reload();
+
 		return;
 	}
 
@@ -889,9 +912,11 @@ void NBFolderView::doSendToTrash() {
 
 void NBFolderView::doDelete() {
 
-	if ( not IconView->selection().count() ) {
+	if ( not IconView->selection().count() )
 		return;
-	}
+
+	if ( fsModel->modelDataType() != NBItemViewModel::FileSystem )
+		return;
 
 	QString srcDir = fsModel->currentDir();
 
@@ -1123,7 +1148,17 @@ void NBFolderView::updateActions() {
 	// QAction *sortByNameAct, *sortByTypeAct, *sortBySizeAct, *sortByDateAct;
 	// QAction *groupsAct;
 
-	if ( not isWritable( fsModel->currentDir() ) ) {
+	if ( not fsModel->isRealLocation() ) {
+
+		moveAct->setDisabled( true );
+		pasteAct->setDisabled( true );
+		renameAct->setDisabled( true );
+		delAct->setDisabled( true );
+		actNewDir->setDisabled( true );
+		actNewFile->setDisabled( true );
+	}
+
+	else if ( not isWritable( fsModel->currentDir() ) ) {
 
 		moveAct->setDisabled( true );
 		pasteAct->setDisabled( true );
@@ -1144,4 +1179,31 @@ void NBFolderView::updateActions() {
 		actNewDir->setEnabled( true );
 		actNewFile->setEnabled( true );
 	}
+};
+
+void NBFolderView::addToSuperStart() {
+
+	QSettings superStart( "NewBreeze", "SuperStart" );
+
+	QModelIndexList selectedItems = getSelection();
+
+	if ( not selectedItems.count() ) {
+		QString cwd = fsModel->currentDir();
+		superStart.setValue( "Places/" + baseName( cwd ), cwd );
+		superStart.sync();
+
+		return;
+	}
+
+	Q_FOREACH( QModelIndex idx, selectedItems ) {
+		QString name = idx.data().toString();
+		QString cwd = fsModel->currentDir();
+		if ( isDir( cwd + name ) )
+			superStart.setValue( "Places/" + name, cwd + name );
+
+		else if ( isFile( cwd + name ) )
+			superStart.setValue( "Files/" + name, cwd + name );
+	}
+
+	superStart.sync();
 };

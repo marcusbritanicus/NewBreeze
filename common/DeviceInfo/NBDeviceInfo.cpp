@@ -52,6 +52,11 @@ QString NBDeviceInfo::fileSystemType() const {
 	return d->fileSystemType;
 };
 
+QString NBDeviceInfo::deviceType() const {
+
+	return d->deviceType;
+};
+
 QString NBDeviceInfo::displayName() const {
 
 	return d->label;
