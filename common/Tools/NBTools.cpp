@@ -10,29 +10,17 @@ static QMimeDatabase mimeDb;
 
 QString dirName( QString path ) {
 
-	while( path.contains( "//" ) )
-		path = path.replace( "//", "/" );
-
-	if ( path.endsWith( "/" ) )
-		path.chop( 1 );
-
 	char *dupPath = strdup( path.toLocal8Bit().constData() );
-	QString dirPth = QString( dirname( dupPath ) ) + "/";
+	QString dirPth = QString( dirname( canonicalize_file_name( dupPath ) ) ) + "/";
 	free( dupPath );
 
-	return ( dirPth == "//" ? "/" : dirPth );
+	return dirPth;
 };
 
 QString baseName( QString path ) {
 
-	while( path.contains( "//" ) )
-		path = path.replace( "//", "/" );
-
-	if ( path.endsWith( "/" ) )
-		path.chop( 1 );
-
 	char *dupPath = strdup( path.toLocal8Bit().constData() );
-	QString basePth = QString( basename( dupPath ) );
+	QString basePth = QString( basename( canonicalize_file_name( dupPath ) ) );
 	free( dupPath );
 
 	return basePth;

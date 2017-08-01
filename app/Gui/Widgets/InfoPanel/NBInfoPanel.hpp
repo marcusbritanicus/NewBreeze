@@ -1,6 +1,6 @@
 /*
 	*
-	* NBInfoPanel.hpp - SideBar class Header
+	* NBInfoPanel.hpp - InfoPanel class Header
 	*
 */
 
@@ -19,6 +19,12 @@ class NBInfoPanel : public QWidget {
 	private:
 		QLabel *iconLbl;
 		QLabel *infoLbl;
+
+		QLabel *nameLbl;
+		QLabel *sizeLbl;
+		QLabel *pathLbl;
+		QLabel *permLbl;
+		QLabel *mimeLbl;
 
 		void setIcon( QPixmap );
 		void setIcon( QIcon );

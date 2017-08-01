@@ -455,6 +455,16 @@ QStringList sortCategoryList( QStringList& cList ) {
 			}
 
 			else {
+				if ( cList.contains( "Computer  " ) ) {
+					QStringList catList;
+					catList << "Computer  ";
+					if ( cList.contains( "Places  " ) )
+						catList << "Places  ";
+					if ( cList.contains( "Files  " ) )
+						catList << "Files  ";
+
+					return catList;
+				}
 				qSort( cList.begin(), cList.end(), listLessThanB );
 			}
 

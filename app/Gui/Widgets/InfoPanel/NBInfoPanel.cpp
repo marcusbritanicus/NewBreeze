@@ -1,6 +1,6 @@
 /*
 	*
-	* NBInfoPanel.cpp - SideBar class for NewBreeze
+	* NBInfoPanel.cpp - InfoPanel class for NewBreeze
 	*
 */
 
@@ -52,12 +52,34 @@ NBInfoPanel::NBInfoPanel( QWidget *parent ) :QWidget( parent ) {
 
 	/* Widgets */
 	iconLbl = new QLabel();
-	iconLbl->setFixedSize( QSize( 256, 256 ) );
+	iconLbl->setFixedWidth( 256 );
+	iconLbl->setMinimumHeight( 256 );
 	iconLbl->setAlignment( Qt::AlignCenter );
 
-	infoLbl = new QLabel();
-	infoLbl->setWordWrap( true );
-	infoLbl->setAlignment( Qt::AlignCenter );
+	nameLbl = new QLabel();
+	nameLbl->setFixedWidth( 256 );
+	nameLbl->setWordWrap( true );
+	nameLbl->setAlignment( Qt::AlignCenter );
+
+	sizeLbl = new QLabel();
+	sizeLbl->setFixedWidth( 256 );
+	sizeLbl->setWordWrap( true );
+	sizeLbl->setAlignment( Qt::AlignCenter );
+
+	pathLbl = new QLabel();
+	pathLbl->setFixedWidth( 256 );
+	pathLbl->setWordWrap( true );
+	pathLbl->setAlignment( Qt::AlignCenter );
+
+	permLbl = new QLabel();
+	permLbl->setFixedWidth( 256 );
+	permLbl->setWordWrap( true );
+	permLbl->setAlignment( Qt::AlignCenter );
+
+	mimeLbl = new QLabel();
+	mimeLbl->setFixedWidth( 256 );
+	mimeLbl->setWordWrap( true );
+	mimeLbl->setAlignment( Qt::AlignCenter );
 
 	/* Layouts */
 	QVBoxLayout *baseLyt = new QVBoxLayout();
@@ -65,7 +87,11 @@ NBInfoPanel::NBInfoPanel( QWidget *parent ) :QWidget( parent ) {
 	baseLyt->setAlignment( Qt::AlignCenter );
 
 	baseLyt->addWidget( iconLbl );
-	baseLyt->addWidget( infoLbl );
+	baseLyt->addWidget( nameLbl );
+	baseLyt->addWidget( sizeLbl );
+	baseLyt->addWidget( pathLbl );
+	baseLyt->addWidget( permLbl );
+	baseLyt->addWidget( mimeLbl );
 	baseLyt->addStretch( 0 );
 
 	setLayout( baseLyt );
@@ -73,185 +99,191 @@ NBInfoPanel::NBInfoPanel( QWidget *parent ) :QWidget( parent ) {
 
 void NBInfoPanel::updatePanel( QString rootPath, QModelIndexList selection ) {
 
-	if ( selection.count() == 0 ) {
-		// Icon
-		if ( rootPath.startsWith( "NB://Super" ) )
+	nameLbl->clear();
+	sizeLbl->clear();
+	pathLbl->clear();
+	permLbl->clear();
+	mimeLbl->clear();
+
+	if ( rootPath.startsWith( "NB://SuperStart" ) ) {
+		if ( selection.isEmpty() ) {
 			setIcon( QIcon( ":/icons/superstart.png" ) );
-
-		else if ( rootPath.startsWith( "NB://App" ) )
-			setIcon( QIcon( ":/icons/applications.png" ) );
-
-		else if ( rootPath.startsWith( "NB://Cat" ) )
-			setIcon( QIcon( ":/icons/catalogs.png" ) );
-
-		else
-			setIcon( icon( NBIconManager::instance()->iconsForFile( "", rootPath ) ) );
-
-		// Name
-		QString name;
-		if ( rootPath.startsWith( "NB://" ) )
-			name = rootPath;
-
-		else if ( rootPath.split( "/", QString::SkipEmptyParts ).count() )
-			name = rootPath.split( "/", QString::SkipEmptyParts ).takeLast();
-
-		else
-			name = "/ (root)";
-
-		if ( rootPath.startsWith( "NB://" ) ) {
-			infoLbl->setText( QString( "<center><b>%1</b><br>%2<br>%3<br>%4<br></center>" ).arg( name ).arg( QString() ).arg( QString() ).arg( QString() ) );
-			return;
+			nameLbl->setText( "<b>SuperStart</b>");
+			pathLbl->setText( "Give a super start to your day!" );
 		}
 
-		// Size
-		int folders = 0, files = 0, others = 0;
-		QDir dir( rootPath );
-		dir.setFilter( QDir::Dirs | QDir::Files | QDir::System | QDir::NoDotAndDotDot );
-		foreach( QString entry, dir.entryList() ) {
-			if ( isDir( QDir( rootPath ).filePath( entry ) ) )
-				folders++;
-
-			else if ( isFile( QDir( rootPath ).filePath( entry ) ) )
-				files++;
-
-			else
-				others++;
-		}
-		QString sizeTxt;
-		if ( folders and files and others )
-			sizeTxt += QString( "%1 Folders, %2 Files, %3 Others" ).arg( folders ).arg( files ).arg( others );
-
-		else if ( folders and files )
-			sizeTxt += QString( "%1 Folders, %2 Files" ).arg( folders ).arg( files );
-
-		else if ( folders and others )
-			sizeTxt += QString( "%1 Folders, %2 Others" ).arg( folders ).arg( others );
-
-		else if ( files and others )
-			sizeTxt += QString( "%1 Files, %2 Others" ).arg( files ).arg( others );
-
-		else if ( folders )
-			sizeTxt += QString( "%1 Folders" ).arg( folders );
-
-		else if ( files )
-			sizeTxt += QString( "%1 Files" ).arg( files );
-
-		else if ( others )
-			sizeTxt += QString( "%1 Others" ).arg( others );
-
-		else
-			sizeTxt += QString( "%1 items" ).arg( QDir( rootPath ).entryList().count() );
-
-		infoLbl->setText( QString( "<center><b>%1</b><br>%2<br>%3<br>%4<br></center>" ).arg( name ).arg( sizeTxt ).arg( "Folder" ).arg( getPermissions( rootPath ) ) );
-	}
-
-	else if ( selection.count() == 1 ) {
-		QString itemPath = QDir( rootPath ).filePath( selection.at( 0 ).data().toString() );
-
-		// Icon
-		setIcon( icon( NBIconManager::instance()->iconsForFile( "", itemPath ) ) );
-
-		// Name
-		QString name = itemPath.split( "/", QString::SkipEmptyParts ).takeLast();
-		if ( isLink( itemPath ) )
-			name += QString( "<tt> > %1</tt>" ).arg( readLink( itemPath ) );
-
-		// Size
-		QString sizeTxt;
-		if ( isDir( itemPath ) )
-			sizeTxt = QString( "%1 items" ).arg( nChildren( itemPath ) );
-
-		else
-			sizeTxt = formatSize( getSize( itemPath ) );
-
-		// Type
-		QString typeTxt = mimeDb.mimeTypeForFile( itemPath ).comment();
-
-		// Perm
-		QString permTxt = getPermissions( itemPath );
-
-		// Info
-		infoLbl->setText( QString( "<center><b>%1</b><br>%2<br>%3<br>%4<br></center>" ).arg( name ).arg( sizeTxt ).arg( typeTxt ).arg( permTxt ) );
-	}
-
-	else {
-		int folders = 0, files = 0, others = 0;
-		qint64 totsize = 0;
-
-		foreach( QModelIndex entry, selection ) {
-			QString itemPath = QDir( rootPath ).filePath( entry.data().toString() );
-
-			if ( isDir( itemPath ) ) {
-				folders++;
-			}
-
-			else if ( isFile( itemPath ) ) {
-				files++;
-				totsize += getSize( itemPath );
-			}
-
-			else {
-				others++;
-				totsize += getSize( itemPath );
-			}
-		}
-
-		QString nameText, sizeText;
-		QIcon icon;
-		if ( folders and files and others ) {
-			nameText += QString( "%1 Folders, %2 Files, %3 Others" ).arg( folders ).arg( files ).arg( others );
-			sizeText = formatSize( totsize );
-			icon = QIcon( ":/icons/others.png" );
-		}
-
-		else if ( folders and files ) {
-			nameText += QString( "%1 Folders, %2 Files" ).arg( folders ).arg( files );
-			sizeText = formatSize( totsize );
-			icon = QIcon( ":/icons/others.png" );
-		}
-
-		else if ( folders and others ) {
-			nameText += QString( "%1 Folders, %2 Others" ).arg( folders ).arg( others );
-			sizeText = formatSize( totsize );
-			icon = QIcon( ":/icons/others.png" );
-		}
-
-		else if ( files and others ) {
-			nameText += QString( "%1 Files, %2 Others" ).arg( files ).arg( others );
-			sizeText = formatSize( totsize );
-			icon = QIcon( ":/icons/documents.png" );
-		}
-
-		else if ( folders ) {
-			nameText += QString( "%1 Folders" ).arg( folders );
-			icon = QIcon( ":/icons/folders.png" );
-		}
-
-		else if ( files ) {
-			nameText += QString( "%1 Files" ).arg( files );
-			sizeText = formatSize( totsize );
-			icon = QIcon( ":/icons/documents.png" );
-		}
-
-		else if ( others ) {
-			nameText += QString( "%1 Others" ).arg( others );
-			if ( totsize )
-				sizeText = formatSize( totsize );
-			icon = QIcon( ":/icons/documents.png" );
+		else if ( selection.count() == 1 ) {
+			//
 		}
 
 		else {
-			nameText += QString( "%1 items" ).arg( QDir( rootPath ).entryList().count() );
-			if ( totsize )
-				sizeText = formatSize( totsize );
-			icon = QIcon::fromTheme( "folder" );
+			//
+		}
+	}
+
+	else if ( rootPath.startsWith( "NB://Applications" ) ) {
+		if ( selection.isEmpty() ) {
+			setIcon( QIcon( ":/icons/applications.png" ) );
+			nameLbl->setText( "<b>Applications</b>");
+			pathLbl->setText( "Run an application without leaving NB3" );
 		}
 
-		// Icon
-		setIcon( icon );
+		else if ( selection.count() == 1 ) {
 
-		// Info
-		infoLbl->setText( QString( "<center><b>%1</b><br>%2<br>%3<br>%4<br></center>" ).arg( nameText ).arg( sizeText ).arg( QString() ).arg( QString() ) );
+		}
+
+		else {
+
+		}
+	}
+
+	else if ( rootPath.startsWith( "NB://Catalogs" ) ) {
+		if ( selection.isEmpty() ) {
+			setIcon( QIcon( ":/icons/superstart.png" ) );
+			nameLbl->setText( "<b>Catalogs</b>");
+			pathLbl->setText( "Browse your Catalogs" );
+		}
+
+		else if ( selection.count() == 1 ) {
+
+		}
+
+		else {
+
+		}
+	}
+
+	else {
+		if ( selection.isEmpty() ) {
+			setIcon( icon( NBIconManager::instance()->iconsForFile( "inode/directory", rootPath ) ) );
+			if ( rootPath.count( "/" ) > 1 )
+				nameLbl->setText( "<b>" + baseName( rootPath ) + "</b>" );
+
+			else
+				nameLbl->setText( "<b>/ (root)</b>" );
+
+			/* Size */
+			int folders = 0, files = 0, others = 0;
+			QDir dir( rootPath );
+			dir.setFilter( QDir::Dirs | QDir::NoDotAndDotDot );
+			folders = dir.entryList().count();
+
+			dir.setFilter( QDir::Files | QDir::NoDotAndDotDot );
+			files = dir.entryList().count();
+
+			dir.setFilter( QDir::AllEntries | QDir::System | QDir::NoDotAndDotDot );
+			others = dir.entryList().count() - folders - files;
+
+			QString sizeTxt;
+			if ( folders and files and others )
+				sizeTxt += QString( "%1 Folders, %2 Files, %3 Others" ).arg( folders ).arg( files ).arg( others );
+
+			else if ( folders and files )
+				sizeTxt += QString( "%1 Folders, %2 Files" ).arg( folders ).arg( files );
+
+			else if ( folders and others )
+				sizeTxt += QString( "%1 Folders, %2 Others" ).arg( folders ).arg( others );
+
+			else if ( files and others )
+				sizeTxt += QString( "%1 Files, %2 Others" ).arg( files ).arg( others );
+
+			else if ( folders )
+				sizeTxt += QString( "%1 Folders" ).arg( folders );
+
+			else if ( files )
+				sizeTxt += QString( "%1 Files" ).arg( files );
+
+			else if ( others )
+				sizeTxt += QString( "%1 Others" ).arg( others );
+
+			else
+				sizeTxt += QString( "%1 items" ).arg( QDir( rootPath ).entryList().count() );
+
+			sizeLbl->setText( sizeTxt );
+			mimeLbl->setText( "Folder" );
+			pathLbl->setText( dirName( rootPath ) );
+			permLbl->setText( getPermissions( rootPath ) );
+		}
+
+		else if ( selection.count() == 1 ) {
+			QMimeType mType = mimeDb.mimeTypeForFile( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() );
+			setIcon( icon( NBIconManager::instance()->iconsForFile( mType.name(), selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) ) );
+			nameLbl->setText( "<b>" + baseName( rootPath ) + "</b>" );
+
+			/* Size */
+			QString sizeTxt;
+			if ( isDir( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) )
+				sizeTxt = QString( "%1 items" ).arg( nChildren( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
+
+			else
+				sizeTxt = formatSize( getSize( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
+
+			sizeLbl->setText( sizeTxt );
+			mimeLbl->setText( mType.comment() );
+			pathLbl->setText( rootPath );
+			permLbl->setText( getPermissions( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
+		}
+
+		else {
+			int folders = 0, files = 0, others = 0;
+			qint64 totsize = 0;
+
+			foreach( QModelIndex entry, selection ) {
+				QString itemPath = entry.data( Qt::UserRole + 7 ).toString();
+				if ( not exists( itemPath ) )
+					continue;
+
+				if ( isDir( itemPath ) ) {
+					folders++;
+				}
+
+				else if ( isFile( itemPath ) ) {
+					files++;
+					totsize += getSize( itemPath );
+				}
+
+				else {
+					others++;
+					totsize += getSize( itemPath );
+				}
+			}
+
+			QString nameText, sizeText;
+			QIcon icon;
+
+			if ( folders )
+				nameText += QString( "%1 folder%2" ).arg( folders ).arg( folders > 1 ? "s" : "" );
+
+			if ( files ) {
+				if ( folders )
+					nameText += QString( ", %1 file%2" ).arg( files ).arg( files > 1 ? "s" : "" );
+
+				else
+					nameText += QString( "%1 file%2" ).arg( files ).arg( files > 1 ? "s" : "" );
+			}
+
+			if ( others ) {
+				if ( files or folders )
+					nameText += QString( ", %1 other%2" ).arg( others ).arg( others > 1 ? "s" : "" );
+
+				else
+					nameText += QString( "%1 other%2" ).arg( others ).arg( others > 1 ? "s" : "" );
+			}
+
+			if ( folders and not ( files + others ) )
+				icon = QIcon( ":/icons/folders.png" );
+
+			else if ( not folders and files + others )
+				icon = QIcon( ":/icons/documents.png" );
+
+			else
+				icon = QIcon( ":/icons/others.png" );
+
+			setIcon( icon );
+			nameLbl->setText( nameText );
+			sizeLbl->setText( totsize ? formatSize( totsize ) : "" );
+			pathLbl->setText( rootPath );
+		}
 	}
 };
 

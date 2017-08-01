@@ -539,10 +539,10 @@ QPixmap NBItemViewModel::pixmapForCategory( QString categoryName ) const {
 		}
 
 		case NBItemViewModel::SuperStart: {
-			if ( categoryName == "Places" )
+			if ( categoryName == "Places  " )
 				return QIcon( ":/icons/folder.png" ).pixmap( 16, 16 );
 
-			else if ( categoryName == "Computer" )
+			else if ( categoryName == "Computer  " )
 				return QIcon( ":/icons/comp.png" ).pixmap( 16, 16 );
 
 			else
@@ -748,9 +748,9 @@ QString NBItemViewModel::nodePath( const QModelIndex idx ) const {
 
 		NBItemViewNode *node = static_cast<NBItemViewNode*>( idx.internalPointer() );
 
-		/* If its an application, its path is Qt::UserRole + 9 */
+		/* If its a drive, its path is Qt::UserRole + 2 */
 		if ( node->data( 0, true ).toString().toLower() == "superstart" )
-			return idx.data( Qt::UserRole + 9 ).toString();
+			return idx.data( Qt::UserRole + 2 ).toString();
 
 		else
 			return idx.data( Qt::UserRole + 7 ).toString();
@@ -1117,7 +1117,7 @@ void NBItemViewModel::setupSuperStartData() {
 		data << QString( "%1% used" ).arg( info.bytesUsed() * 100 / info.bytesTotal() );
 		data << info.mountPoint();
 
-		rootNode->addChild( new NBItemViewNode( data, "Computer", rootNode ) );
+		rootNode->addChild( new NBItemViewNode( data, "Computer  ", rootNode ) );
 		mChildNames << info.displayName();
 	};
 
@@ -1131,7 +1131,7 @@ void NBItemViewModel::setupSuperStartData() {
 		QVariantList data = quickDataGatherer->getQuickFileInfo( location );
 		data[ 0 ] = "dirss";
 		data[ 3 ] = key;
-		rootNode->addChild( new NBItemViewNode( data, "Places", rootNode ) );
+		rootNode->addChild( new NBItemViewNode( data, "Places  ", rootNode ) );
 		mChildNames << key;
 	}
 	superStart.endGroup();
@@ -1142,7 +1142,7 @@ void NBItemViewModel::setupSuperStartData() {
 		QString path = superStart.value( key ).toString();
 		QVariantList data = quickDataGatherer->getQuickFileInfo( path );
 		data[ 3 ] = key;
-		rootNode->addChild( new NBItemViewNode( data, "Files", rootNode ) );
+		rootNode->addChild( new NBItemViewNode( data, "Files  ", rootNode ) );
 		mChildNames << key;
 	}
 	superStart.endGroup();

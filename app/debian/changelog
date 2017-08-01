@@ -1,4 +1,4 @@
-newbreeze (3.0.0a) unstable; urgency=low
+newbreeze (3.0.0) unstable; urgency=low
 
   * Feature: Per-folder View options
   * Feature: Zoom for NBIconView
@@ -7,10 +7,15 @@ newbreeze (3.0.0a) unstable; urgency=low
   * Feature: Added License dialog, showing the complete GPL3 license
   * Feature: NBProcessManager replaces NBIOManager with better functionality
   * Feature: Categories can be shown/hidden, selected/deselected with single click
+  * Feature: Encryption using salsa20 for files and encfs for folders
+  * Feature: MarkDownPreview plugin, using marked.js markdown library
+  * Feature: TextEditor plugin for quick editing of text
   * Feature: NBPluginInterface supports file peeking
   * Feature: New Classic mac-style panel
   * Feature: Extended Copy/Move interface
   * Feature: Accidental Delete Protection
+  * Feature: Archive Preview
+  * Feature: SuperStart enabled
   * NBIconManager replaces NBIconProvider with better functionality
   * Icon themes are correctly detected over various DEs
   * Faster model loading via scandir(...)
@@ -18,6 +23,7 @@ newbreeze (3.0.0a) unstable; urgency=low
   * Cursor shape chages to WaitCursor during model loading
   * NBItemViewModel now supports both real and virtual locations
   * Archive creation and extraction are performed using QtConcurrent::run
+  * Plugins are now part of the NewBreeze source tree
   * NewBreeze uses QtSingleApplication for one instance multiple windows
   * Redesigned UI for better code maintenance
   * Redesigned NBCrumbsBar (formerly, NBBreadCrumbsBar)
@@ -38,4 +44,4 @@ newbreeze (3.0.0a) unstable; urgency=low
   * BugFix: Unmounting a drive is possible when NB3 is open
   * BugFix: Removed buggy tabs
 
- -- Marcus Britanicus <marcusbritanicus@gmail.com>  Tue, 18 Jul 2017 12:00:00 +0530
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Tue, 31 Jul 2017 12:00:00 +0530

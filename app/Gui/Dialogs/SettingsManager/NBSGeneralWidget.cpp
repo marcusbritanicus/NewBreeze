@@ -280,7 +280,7 @@ void NBSGeneralWidget::handleOpenWithToggled() {
 			Settings->General.SuperStart = gSettings.value( "SuperStart", false ).toBool();
 
 			openWithCatalogRB->setEnabled( true );
-			// openWithSuperStartRB->setEnabled( true );
+			openWithSuperStartRB->setEnabled( true );
 		}
 
 		else {

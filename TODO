@@ -17,7 +17,7 @@ NBIconView                                                                      
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
 	◐ Improve the selection model
 	  • Currently mouse-over on click selection is enabled.
-	⬜ Fix cursor movements due to semi-folded categories
+	□ Fix cursor movements due to semi-folded categories
 	✗ Enable PageUp and PageDown navigation
 	✓ Enable per-folder folded category memory
 	✓ Category icons need to be added
@@ -25,6 +25,7 @@ NBIconView                                                                      
 	  • One click on category icon, partially folds it, clicking again expands it.
 	  • Double-clicking category, toggles folding
 	✓ CatalogView and its icons need to be fixed
+	□ Add symbols to represent symlink, executable, system files etc.
 
 NBItemViewModel                                                                                                                       [ 2 of 2 ]
 	✓ Read icon data directly from NBItemNode* rather than create it repeatedly.
@@ -82,7 +83,7 @@ NewBreeze Vault
 
 Note:
 	✍ - Work in progress
-	⬜ - Work to be started
+	□ - Work to be started
 	✓ - Work Completed
 	✗ - Not working on this
 	◐ - Partial Support

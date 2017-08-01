@@ -101,7 +101,7 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 		name = folderPath;
 
 	else if ( folderPath.split( "/", QString::SkipEmptyParts ).count() )
-		name = folderPath.split( "/", QString::SkipEmptyParts ).takeLast();
+		name = baseName( folderPath );
 
 	else
 		name = "/ (root)";
@@ -114,17 +114,15 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 	// Size
 	int folders = 0, files = 0, others = 0;
 	QDir dir( folderPath );
-	dir.setFilter( QDir::Dirs | QDir::Files | QDir::System | QDir::NoDotAndDotDot );
-	foreach( QString entry, dir.entryList() ) {
-		if ( isDir( QDir( folderPath ).filePath( entry ) ) )
-			folders++;
+	dir.setFilter( QDir::Dirs | QDir::NoDotAndDotDot );
+	folders = dir.entryList().count();
 
-		else if ( isFile( QDir( folderPath ).filePath( entry ) ) )
-			files++;
+	dir.setFilter( QDir::Files | QDir::NoDotAndDotDot );
+	files = dir.entryList().count();
 
-		else
-			others++;
-	}
+	dir.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot );
+	others = dir.entryList().count() - folders - files;
+
 	QString sizeTxt;
 	if ( folders and files and others )
 		sizeTxt += QString( "%1 Folders, %2 Files, %3 Others" ).arg( folders ).arg( files ).arg( others );
@@ -155,8 +153,10 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 
 void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
 
-	if ( not exists( itemPath ) )
+	if ( not exists( itemPath ) ) {
+		qDebug() << "updateInfoBarSingle(...)" << itemPath;
 		return;
+	}
 
 	// Icon
 	setIcon( icon( NBIconManager::instance()->iconsForFile( "", itemPath ) ) );

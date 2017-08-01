@@ -14,6 +14,7 @@ Version 3.0.0 Alpha
 	- Feature: Extended Copy/Move interface
 	- Feature: Accidental Delete Protection
 	- Feature: Archive Preview
+	- Feature: SuperStart enabled
 	- NBIconManager replaces NBIconProvider with better functionality
 	- Icon themes are correctly detected over various DEs
 	- Faster model loading via scandir(...)

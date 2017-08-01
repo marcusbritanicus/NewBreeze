@@ -572,7 +572,6 @@ void NBFolderView::doOpenWithCmd() {
 
 void NBFolderView::showFolders() {
 
-	qDebug() << "NBFolderView::showFolders()";
 	setCursor( QCursor( Qt::WaitCursor ) );
 	fsModel->setRootPath( "NB://Folders" );
 	setCursor( QCursor( Qt::ArrowCursor ) );
