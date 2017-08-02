@@ -544,7 +544,6 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 			if ( ftype.isSymLink() )
 				pltt.setColor( QPalette::Text, QColor( "skyblue" ) );
 
-			#warning "Possible Qt bug: Registers all files on encfs mounted path as executable."
 			else if ( isExecutable( ftype.absoluteFilePath().toLocal8Bit().data() ) && ftype.isFile() )
 				pltt.setColor( QPalette::Text, QColor( "darkgreen" ) );
 

@@ -10,6 +10,9 @@ static QMimeDatabase mimeDb;
 
 QString dirName( QString path ) {
 
+	if ( path == "/" )
+		return path;
+
 	char *dupPath = strdup( path.toLocal8Bit().constData() );
 	QString dirPth = QString( dirname( canonicalize_file_name( dupPath ) ) ) + "/";
 	free( dupPath );
