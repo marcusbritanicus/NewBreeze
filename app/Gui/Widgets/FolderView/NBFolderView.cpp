@@ -948,7 +948,7 @@ void NBFolderView::doDelete() {
 			continue;
 		}
 
-		while ( path != "/" ) {
+		while ( ( path != "/" ) and ( path != "//" ) ) {
 			if ( safeNodes.contains( path ) ) {
 				addOk = false;
 				break;
