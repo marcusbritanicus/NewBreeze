@@ -31,7 +31,7 @@ void NBConfirmDeleteDialog::setupGUI( bool permanent ) {
 			QString(
 				"<p>You are about to delete the below listed files/directories from</p>"
 				"<center><b><tt>%1</tt></b></center>"
-				"<p>Items once deleted cannot be retrieved. Do you wan't to continue?</p>"
+				"<p>Items once deleted cannot be retrieved. Do you want to continue?</p>"
 			).arg( source )
 		);
 	}

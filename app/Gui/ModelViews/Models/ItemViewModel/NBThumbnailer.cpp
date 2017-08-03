@@ -5,6 +5,7 @@
 */
 
 #include "NBThumbnailer.hpp"
+#include "NBIconManager.hpp"
 
 static QList<QByteArray> supported = QImageReader::supportedImageFormats();
 
@@ -71,10 +72,13 @@ void NBThumbnailer::run() {
 		/* Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/ */
 		QImage thumb = QImage( file ).scaled( 512, 512, Qt::KeepAspectRatio ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 
-		if ( thumb.save( hashPath, "PNG", 0 ) )
+		if ( thumb.save( hashPath, "PNG", 0 ) ) {
 			emit updateNode( file );
+		}
 
-		else
-			qDebug() << "Failed to create thumbnail:" << baseName( file );
+		else {
+			QFile::copy( ":/icons/image.png", hashPath );
+			qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default image.";
+		}
 	}
 };

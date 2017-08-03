@@ -5,6 +5,7 @@
 */
 
 #include "NBIconView.hpp"
+#include "NBStyleOptionViewItem.hpp"
 
 static inline bool isExecutable( QString path ) {
 
@@ -487,7 +488,7 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
 			continue;
 
-		QStyleOptionViewItem option = viewOptions();
+		NBStyleOptionViewItem option = NBStyleOptionViewItem( viewOptions() );
 
 		/* Rect */
 		option.rect = rect;
@@ -511,6 +512,13 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		/* Palette */
 		QPalette pltt = qApp->palette();
 		QFileInfo ftype = cModel->nodeInfo( idx );
+
+		if ( ftype.isSymLink() )
+			option.nodeType = NBStyleOptionViewItem::SymLink;
+
+		else if ( isExecutable( ftype.absoluteFilePath().toLocal8Bit().data() ) && ftype.isFile() )
+			option.nodeType = NBStyleOptionViewItem::Executable;
+
 
 		/* Dark text colors will suit here */
 		if ( isBrightColor( pltt.color( QPalette::Base ), pltt.color( QPalette::Highlight ) ) ) {

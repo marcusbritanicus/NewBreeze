@@ -7,7 +7,7 @@
 #include "NBIconDelegate.hpp"
 #include "NBItemViewModel.hpp"
 
-void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
+void NBIconDelegate::paintIcons( QPainter *painter, const NBStyleOptionViewItem &option, const QModelIndex &index ) const {
 
 	maxLines = 1;
 	textLines = 1;
@@ -147,6 +147,13 @@ void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &
 		// Paint Icon
 		painter->drawPixmap( iconRect, icon );
 
+		// Paint emblem
+		if ( option.nodeType == NBStyleOptionViewItem::SymLink )
+			painter->drawPixmap( QRect( iconRect.bottomRight() - QPoint( 16, 16 ), QSize( 16, 16 ) ), QIcon::fromTheme( "emblem-symbolic-link" ).pixmap( 16 ) );
+
+		else if ( option.nodeType == NBStyleOptionViewItem::Executable )
+			painter->drawPixmap( QRect( iconRect.bottomRight() - QPoint( 16, 16 ), QSize( 16, 16 ) ), QIcon::fromTheme( "application-x-executable" ).pixmap( 16 ) );
+
 		painter->save();
 		// Text Painter Settings
 		painter->setPen( option.palette.color( QPalette::Text ) );
@@ -162,7 +169,7 @@ void NBIconDelegate::paintIcons( QPainter *painter, const QStyleOptionViewItem &
 	}
 };
 
-void NBIconDelegate::paintTiles( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
+void NBIconDelegate::paintTiles( QPainter *painter, const NBStyleOptionViewItem &option, const QModelIndex &index ) const {
 
 	maxLines = 1;
 	textLines = 1;
@@ -316,7 +323,7 @@ void NBIconDelegate::paintTiles( QPainter *painter, const QStyleOptionViewItem &
 	}
 };
 
-void NBIconDelegate::paintDetails( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const {
+void NBIconDelegate::paintDetails( QPainter *painter, const NBStyleOptionViewItem &option, const QModelIndex &index ) const {
 
 	maxLines = 1;
 	textLines = 1;

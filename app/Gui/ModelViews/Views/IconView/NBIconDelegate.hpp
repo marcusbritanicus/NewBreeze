@@ -7,14 +7,15 @@
 #pragma once
 
 #include "Global.hpp"
+#include "NBStyleOptionViewItem.hpp"
 
 class NBIconDelegate : public QItemDelegate {
     Q_OBJECT
 
 	public:
-		void paintIcons( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
-		void paintTiles( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
-		void paintDetails( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
+		void paintIcons( QPainter *painter, const NBStyleOptionViewItem &option, const QModelIndex &index ) const;
+		void paintTiles( QPainter *painter, const NBStyleOptionViewItem &option, const QModelIndex &index ) const;
+		void paintDetails( QPainter *painter, const NBStyleOptionViewItem &option, const QModelIndex &index ) const;
 
 	private:
 		void paintIconTextDetails( QPainter *painter, QRect &textRect, const QModelIndex &index ) const;

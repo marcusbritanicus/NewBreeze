@@ -25,18 +25,18 @@
 	*
 */
 
-#include <Global.hpp>
+#include "Global.hpp"
 
-#include <NewBreeze.hpp>
+#include "NewBreeze.hpp"
 
-#include <NBMessageDialog.hpp>
-#include <AboutNB.hpp>
-#include <NBSettingsManager.hpp>
-#include <NewBreezeTray.hpp>
+#include "NBMessageDialog.hpp"
+#include "AboutNB.hpp"
+#include "NBSettingsManager.hpp"
+#include "NewBreezeTray.hpp"
 
-#include <NBLogger.hpp>
-#include <NBCLParser.hpp>
-#include <NBApplication.hpp>
+#include "NBLogger.hpp"
+#include "NBCLParser.hpp"
+#include "NBApplication.hpp"
 
 int main( int argc, char **argv ) {
 

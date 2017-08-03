@@ -899,9 +899,9 @@ void NBFolderView::doSendToTrash() {
 	/* If some files have protection inform the user */
 	if ( toBeDeleted.count() != selectedList.count() ) {
 		NBMessageDialog::warning( NULL,
-			"Error deleting protected files",
+			"Error deleting protected nodes",
 			"You have enabled <b><tt>Accidental Delete Protection</tt></b> for some of the files or folders. "
-			"Only the files without accidental protection will be deleted. If you really want to delete protected "
+			"Only the files without accidental protection will be trashed. If you really want to trash protected "
 			"files, please remove the protection and try again."
 		);
 	}
@@ -992,7 +992,7 @@ void NBFolderView::doDelete() {
 
 		/* Otherwise confirm deletion */
 		else {
-			NBConfirmDeleteDialog *delDlg = new NBConfirmDeleteDialog( fsModel->currentDir(), toBeDeleted, false, this );
+			NBConfirmDeleteDialog *delDlg = new NBConfirmDeleteDialog( fsModel->currentDir(), toBeDeleted, true, this );
 			if ( not delDlg->exec() )
 				return;
 		}
