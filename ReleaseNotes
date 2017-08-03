@@ -31,6 +31,7 @@ few changes in NewBreeze 3.
 
 => UI
    - An elementary Accidental Delete Protection (ADP) has been added. However it is not mature enough for commercial use.
+   - ADP is rather buggy. It may not be advisable to enable it for all nodes.
 
 => NBAddressBar redesigned
    - NBBreadCrumbsBar is now called NBCrumbsBar.
@@ -65,11 +66,12 @@ few changes in NewBreeze 3.
    - Archive previews are now available
 
 => SuperStart: A Super start to your day
-   - All Drives are shown as you start NewBreeze
-   - Find all the important files and folders as soon as you start NewBreeze
-   - Press Ctrl+U to add file(s)/folder(s) to SuperStart
-   - In SuperStart, press Delete to remove them.
-   - A menu will be added later
+   - All Drives are shown as you start NewBreeze.
+   - Find all the important files and folders as soon as you start NewBreeze.
+   - Press Ctrl+U to add file(s)/folder(s) to SuperStart.
+   - In SuperStart, press Delete to remove them, F2 change the display name.
+   - Note that changing display name does not rename the actual file of the hard drive.
+   - A menu will be added later.
 
 => NewBreeze Vault
    - This is work in progress. It will be completed by NB v3.0.0-rc1.

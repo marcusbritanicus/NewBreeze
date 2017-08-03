@@ -162,9 +162,16 @@ void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
 	setIcon( icon( NBIconManager::instance()->iconsForFile( "", itemPath ) ) );
 
 	// Name
-	QString name = itemPath.split( "/", QString::SkipEmptyParts ).takeLast();
-	if ( isLink( itemPath ) )
-		name += QString( "<tt> > %1</tt>" ).arg( readLink( itemPath ) );
+	QString name;
+	if ( itemPath == "/" ) {
+		name = "/ (root)";
+	}
+
+	else {
+		name = itemPath.split( "/", QString::SkipEmptyParts ).takeLast();
+		if ( isLink( itemPath ) )
+			name += QString( "<tt> > %1</tt>" ).arg( readLink( itemPath ) );
+	}
 
 	// Size
 	QString sizeTxt;

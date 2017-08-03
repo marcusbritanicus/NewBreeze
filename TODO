@@ -25,7 +25,7 @@ NBIconView                                                                      
 	  • One click on category icon, partially folds it, clicking again expands it.
 	  • Double-clicking category, toggles folding
 	✓ CatalogView and its icons need to be fixed
-	□ Add symbols to represent symlink, executable, system files etc.
+	□ Add symbols to icons representing symlink, executables, system files etc for NBItemDelegate
 
 NBItemViewModel                                                                                                                       [ 2 of 2 ]
 	✓ Read icon data directly from NBItemNode* rather than create it repeatedly.

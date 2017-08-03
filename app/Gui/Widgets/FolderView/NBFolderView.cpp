@@ -59,6 +59,8 @@ void NBFolderView::createAndSetupActions() {
 		this, SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) )
 	);
 
+	connect( IconView->selectionModel(), SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ), this, SLOT( updateActions() ) );
+
 	connect( IconView, SIGNAL( link( QStringList, QString ) ), this, SLOT( link( QStringList, QString ) ) );
 
 	// DragDrop copy
@@ -840,6 +842,7 @@ void NBFolderView::prepareIO() {
 void NBFolderView::doSendToTrash() {
 
 	if ( not IconView->selection().count() ) {
+
 		return;
 	}
 
@@ -849,7 +852,9 @@ void NBFolderView::doSendToTrash() {
 			if ( fsModel->category( idx ) == "Computer" )
 				continue;
 
-			superStart.remove( fsModel->category( idx ) + "/" + idx.data().toString() );
+			QString item = idx.data().toString();
+			qDebug() << "Removing" << item << "from SuperStart";
+			superStart.remove( fsModel->category( idx ).simplified() + "/" + item );
 		}
 
 		superStart.sync();
@@ -1008,6 +1013,31 @@ void NBFolderView::doRename() {
 	if ( !curIndex.isValid() )
 		return;
 
+	if ( fsModel->modelDataType() == NBItemViewModel::SuperStart ) {
+		QSettings superStart( "NewBreeze", "SuperStart" );
+		Q_FOREACH( QModelIndex idx, getSelection() ) {
+			if ( fsModel->category( idx ) == "Computer" )
+				continue;
+
+			QString item = idx.data().toString();
+			QString category = fsModel->category( idx ).simplified();
+
+			NBSuperStartRenameDialog *renDlg = new NBSuperStartRenameDialog( item, category, this );
+			renDlg->exec();
+
+			if ( renDlg->canRename() ) {
+				QString newText = renDlg->newName();
+				superStart.setValue( category + "/" + newText, superStart.value( category + "/" + item ) );
+				superStart.remove( category + "/" + item );
+			}
+		}
+
+		superStart.sync();
+		fsModel->reload();
+
+		return;
+	}
+
 	QString curFile = curIndex.data().toString();
 	NBRenameDialog *renamer = new NBRenameDialog( curFile, QDir( fsModel->currentDir() ), this );
 	renamer->exec();
@@ -1147,11 +1177,12 @@ void NBFolderView::updateActions() {
 	// QAction *sortByNameAct, *sortByTypeAct, *sortBySizeAct, *sortByDateAct;
 	// QAction *groupsAct;
 
-	if ( not fsModel->isRealLocation() ) {
+	if ( fsModel->modelDataType() == NBItemViewModel::SuperStart ) {
 
 		moveAct->setDisabled( true );
 		pasteAct->setDisabled( true );
-		renameAct->setDisabled( true );
+		renameAct->setEnabled( true );
+		trashAct->setEnabled( true );
 		delAct->setDisabled( true );
 		actNewDir->setDisabled( true );
 		actNewFile->setDisabled( true );

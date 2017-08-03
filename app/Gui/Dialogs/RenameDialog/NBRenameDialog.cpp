@@ -132,3 +132,115 @@ void NBRenameDialog::cancel() {
 	renameOk = false;
 	close();
 };
+
+NBSuperStartRenameDialog::NBSuperStartRenameDialog( QString origName, QString category, QWidget *parent ) : NBDialog( parent ) {
+
+	name = QString( origName );
+	category = QString( category );
+
+	createGUI();
+};
+
+void NBSuperStartRenameDialog::createGUI() {
+
+	setDialogTitle( "Rename" );
+	setDialogIcon( QIcon( ":/icons/rename.png" ) );
+
+	renameOk = false;
+
+	QVBoxLayout *lyt = new QVBoxLayout();
+	QHBoxLayout *btnLyt = new QHBoxLayout();
+
+	QLabel *lbl = new QLabel();
+	le = new NBLineEdit( this );
+
+	lbl->setText( tr( "Change display name of '%1' to:" ).arg( name ) );
+
+	le->setText( name );
+	le->selectAll();
+
+	segBtns = new NBSegmentButton( this );
+	segBtns->setCount( 2 );
+
+	segBtns->setSegmentIcon( 0, QIcon( ":/icons/ok.png" ) );
+	segBtns->setSegmentText( 0, tr( "&Rename" ) );
+	segBtns->segment( 0 )->setObjectName( "okBtn" );
+	segBtns->setSegmentDisabled( 0 );
+
+	segBtns->setSegmentIcon( 1, QIcon( ":/icons/cancel.png" ) );
+	segBtns->setSegmentText( 1, tr( "&Cancel" ) );
+	segBtns->segment( 1 )->setObjectName( "cancelBtn" );
+
+	connect( segBtns, SIGNAL( clicked( int ) ), this, SLOT( handleSegmentClick( int ) ) );
+
+	btnLyt->addStretch( 0 );
+	btnLyt->addWidget( segBtns );
+
+	lyt->addWidget( lbl );
+	lyt->addWidget( le );
+	lyt->addLayout( btnLyt );
+
+	connect( le, SIGNAL( textEdited( QString ) ), this, SLOT( handleTextChanged( QString ) ) );
+	connect( le, SIGNAL( returnPressed() ), this, SLOT( rename() ) );
+
+	setLayout( lyt );
+	le->setFocus();
+};
+
+QString NBSuperStartRenameDialog::newName() {
+
+	return le->text();
+};
+
+bool NBSuperStartRenameDialog::canRename() {
+
+	return renameOk;
+};
+
+void NBSuperStartRenameDialog::handleTextChanged( QString newText ) {
+
+	QSettings sett( "NewBreeze", "SuperStart" );
+	sett.beginGroup( category );
+
+	if ( newText.isEmpty() ) {
+		segBtns->setSegmentDisabled( 0 );
+		return;
+	}
+
+	if ( newText == name )
+		segBtns->setSegmentDisabled( 0 );
+
+	else {
+		if ( sett.allKeys().contains( newText ) )
+			segBtns->setSegmentDisabled( 0 );
+
+		else
+			segBtns->setSegmentEnabled( 0 );
+	}
+	sett.endGroup();
+};
+
+void NBSuperStartRenameDialog::handleSegmentClick( int seg ) {
+
+	switch( seg ) {
+		case 0:
+			return rename();
+
+		case 1:
+			return cancel();
+	}
+};
+
+void NBSuperStartRenameDialog::rename() {
+
+	if ( segBtns->segment( 0 )->isEnabled() ) {
+		renameOk = true;
+		close();
+	}
+};
+
+void NBSuperStartRenameDialog::cancel() {
+
+	renameOk = false;
+	close();
+};

@@ -37,3 +37,30 @@ class NBRenameDialog : public NBDialog {
 		void handleTextChanged( QString newText );
 		void handleCBStateChanged();
 };
+
+class NBSuperStartRenameDialog : public NBDialog {
+	Q_OBJECT
+
+	public :
+		NBSuperStartRenameDialog( QString origName, QString category, QWidget *parent = 0 );
+		QString newName();
+		bool canRename();
+
+	private:
+		void createGUI();
+
+		NBSegmentButton *segBtns;
+
+		NBLineEdit *le;
+
+		QString name;
+		QString category;
+
+		bool renameOk;
+
+	private slots :
+		void handleSegmentClick( int );
+		void rename();
+		void cancel();
+		void handleTextChanged( QString newText );
+};
