@@ -178,7 +178,7 @@ void NBIconManager::generateThemeDatabase() {
 	int counter = 0;
 	Q_FOREACH( QString dir, themeDirs ) {
 		Q_FOREACH( QString file, listFiles( dir ) ) {
-			if ( not file.endsWith( ".png" ) and not file.endsWith( ".svg" ) and not file.endsWith( ".xpm" ) and not file.endsWith( ".svgz" ) )
+			if ( not ( file.endsWith( ".png" ) or file.endsWith( ".svg" ) or file.endsWith( ".xpm" ) or file.endsWith( ".svgz" ) ) )
 				continue;
 
 			QString base = baseName( file ).replace( ".png", "" ).replace( ".svg", "" ).replace( ".xpm", "" ).replace( ".svgz", "" );

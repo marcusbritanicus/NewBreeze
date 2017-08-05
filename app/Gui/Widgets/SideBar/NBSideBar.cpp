@@ -115,7 +115,7 @@ void NBSideBar::reloadBookmarks() {
 	bookmarks->clear();
 
 	Q_FOREACH( NBBookmarkInfo info, NBBookmarkInfo::allBookmarks() )
-		bookmarks->addItem( info.displayLabel, NBIconManager::instance()->icon( "bookmarks" ).at( 0 ), info.mountPoint );
+		bookmarks->addItem( info.displayLabel, NBIconManager::instance()->icon( "folder-favorites" ).at( 0 ), info.mountPoint );
 
 	if ( bookmarks->itemCount() )
 		bookmarks->show();

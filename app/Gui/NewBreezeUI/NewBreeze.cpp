@@ -27,6 +27,10 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	/* Create the UI */
 	createGUI();
 
+	/* Make sure we always have absolute paths */
+	if ( loc.count() )
+		loc = QFileInfo( loc ).absoluteFilePath();
+
 	/* Open with SuperStart */
 	if ( Settings->General.SpecialOpen and Settings->General.SuperStart and loc.isEmpty() )
 		FolderView->doOpen( "NB://SuperStart" );

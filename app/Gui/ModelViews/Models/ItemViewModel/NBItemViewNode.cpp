@@ -15,8 +15,12 @@ inline static QIcon getIcon( QString name, QString type ) {
 			icon.addFile( name );
 
 		else {
-			Q_FOREACH( QString icoStr, NBIconManager::instance()->icon( name ) )
-				icon.addFile( icoStr );
+			Q_FOREACH( QString icoStr, NBIconManager::instance()->icon( name ) ) {
+				QRegExp rx( "[0-9]+" );
+				rx.indexIn( icoStr );
+				int num = rx.cap( 0 ).toInt();
+				icon.addFile( icoStr, QSize( num, num ) );
+			}
 		}
 	}
 
@@ -24,8 +28,12 @@ inline static QIcon getIcon( QString name, QString type ) {
 		char *newPath[ PATH_MAX ] = { 0 };
 
 		QString path = QString::fromLocal8Bit( realpath( name.toLocal8Bit().constData(), NULL ) );
-		Q_FOREACH( QString icoStr, NBIconManager::instance()->iconsForFile( type, path ) )
-			icon.addFile( icoStr );
+		Q_FOREACH( QString icoStr, NBIconManager::instance()->iconsForFile( type, path ) ) {
+			QRegExp rx( "[0-9]+" );
+			rx.indexIn( icoStr );
+			int num = rx.cap( 0 ).toInt();
+			icon.addFile( icoStr, QSize( num, num ) );
+		}
 	}
 
 	return icon;

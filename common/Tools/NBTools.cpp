@@ -13,8 +13,11 @@ QString dirName( QString path ) {
 	if ( path == "/" or path == "//" )
 		return "/";
 
+	/* Simple clean path" remove '//' and './' */
+	path = path.replace( "//", "/" ).replace( "/./", "/" );
+
 	char *dupPath = strdup( path.toLocal8Bit().constData() );
-	QString dirPth = QString( dirname( canonicalize_file_name( dupPath ) ) ) + "/";
+	QString dirPth = QString::fromLocal8Bit( dirname( dupPath ) ) + "/";
 	free( dupPath );
 
 	return dirPth;
@@ -22,8 +25,14 @@ QString dirName( QString path ) {
 
 QString baseName( QString path ) {
 
+	if ( path == "/" or path == "//" )
+		return "/";
+
+	/* Simple clean path" remove '//' and './' */
+	path = path.replace( "//", "/" ).replace( "/./", "/" );
+
 	char *dupPath = strdup( path.toLocal8Bit().constData() );
-	QString basePth = QString( basename( canonicalize_file_name( dupPath ) ) );
+	QString basePth = QString::fromLocal8Bit( basename( dupPath ) );
 	free( dupPath );
 
 	return basePth;
@@ -155,6 +164,18 @@ bool isReadable( QString path ) {
 bool isWritable( QString path ) {
 
 	return not access( path.toLocal8Bit().constData(), W_OK );
+};
+
+bool isExecutable( QString path ) {
+
+	struct stat statbuf;
+	if ( stat( path.toLocal8Bit().data(), &statbuf ) != 0 )
+		return false;
+
+	if ( ( statbuf.st_mode & S_IXUSR ) and mimeDb.mimeTypeForFile( path ).parentMimeTypes().contains( "application/x-executable" ) )
+		return true;
+
+	return false;
 };
 
 qint64 nChildren( QString path ) {

@@ -46,8 +46,12 @@ bool isBrightColor( QColor dst, QColor src ) {
 QIcon icon( QStringList icoStrs ) {
 
 	QIcon icn;
-	Q_FOREACH( QString icoStr, icoStrs )
-		icn.addFile( icoStr );
+	Q_FOREACH( QString icoStr, icoStrs ) {
+		QRegExp rx( "[0-9]+" );
+		rx.indexIn( icoStr );
+		int num = rx.cap( 0 ).toInt();
+		icn.addFile( icoStr, QSize( num, num ) );
+	}
 
 	return icn;
 }

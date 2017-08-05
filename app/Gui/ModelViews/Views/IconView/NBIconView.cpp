@@ -7,16 +7,6 @@
 #include "NBIconView.hpp"
 #include "NBStyleOptionViewItem.hpp"
 
-static inline bool isExecutable( QString path ) {
-
-	struct stat statbuf;
-	if ( stat( path.toLocal8Bit().data(), &statbuf ) == 0 )
-		return ( statbuf.st_mode & S_IXUSR );
-
-	else
-		return false;
-};
-
 NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractItemView( parent ) {
 
 	/* Current folder viewMode */

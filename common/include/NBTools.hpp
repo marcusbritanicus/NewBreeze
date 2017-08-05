@@ -40,6 +40,7 @@ bool removeDir( QString );
 /* Is the path readable */
 bool isReadable( QString path );
 bool isWritable( QString path );
+bool isExecutable( QString path );
 
 /* Get the number of children of a dir */
 qint64 nChildren( QString );
