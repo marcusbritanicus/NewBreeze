@@ -31,12 +31,14 @@ class NBSideBar : public QWidget {
 		NBSideBarGroup *drives;
 		NBSideBarGroup *vfs;
 		NBSideBarGroup *bookmarks;
+		NBSideBarGroup *quickFiles;
 
 		NBSideBarItem *trash;
 
 	public Q_SLOTS:
 		void reloadDevices();
 		void reloadBookmarks();
+		void reloadQuickFiles();
 		void highlight( QString );
 
 	protected:

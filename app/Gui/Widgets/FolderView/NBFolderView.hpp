@@ -129,4 +129,6 @@ class NBFolderView : public QStackedWidget {
 
 		void hideStatusBar();
 		void showStatusBar();
+
+		void updateQuickFiles();
 };

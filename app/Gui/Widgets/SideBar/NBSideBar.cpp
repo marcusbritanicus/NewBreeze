@@ -23,8 +23,9 @@ NBSideBar::NBSideBar( QWidget *parent ) : QWidget( parent ) {
 
 	reloadDevices();
 	reloadBookmarks();
+	reloadQuickFiles();
 
-	// Update devices list
+	/* Update devices list */
 	int mountsFD = open( "/proc/self/mounts", O_RDONLY, 0 );
 	QSocketNotifier *devWatcher = new QSocketNotifier( mountsFD, QSocketNotifier::Write );
 	connect( devWatcher, SIGNAL( activated( int ) ), this, SLOT( reloadDevices() ) );
@@ -50,6 +51,9 @@ void NBSideBar::populateSideBar() {
 	bookmarks = new NBSideBarGroup( "Bookmarks", ":/icons/bookmark.png", this );
 	connect( bookmarks, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 
+	quickFiles = new NBSideBarGroup( "Quick Files", ":/icons/bookmark.png", this );
+	connect( quickFiles, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+
 	trash = new NBSideBarItem( "Trash", ":/icons/trash.png", "NB://Trash", this );
 	connect( trash, SIGNAL( clicked() ), this, SIGNAL( showTrash() ) );
 
@@ -63,6 +67,7 @@ void NBSideBar::populateSideBar() {
 	baseLayout->addWidget( drives );
 	baseLayout->addWidget( vfs );
 	baseLayout->addWidget( bookmarks );
+	baseLayout->addWidget( quickFiles );
 	baseLayout->addStretch();
 	baseLayout->addWidget( trash );
 
@@ -122,6 +127,25 @@ void NBSideBar::reloadBookmarks() {
 
 	else
 		bookmarks->hide();
+};
+
+void NBSideBar::reloadQuickFiles() {
+
+	quickFiles->clear();
+
+	QSettings qfList( "NewBreeze", "SuperStart" );
+	qfList.beginGroup( "Files" );
+
+	Q_FOREACH( QString key, qfList.allKeys() )
+		quickFiles->addItem( key, NBIconManager::instance()->icon( "bookmarks" ).at( 0 ), qfList.value( key ).toString() );
+
+	qfList.endGroup();
+
+	if ( quickFiles->itemCount() )
+		quickFiles->show();
+
+	else
+		quickFiles->hide();
 };
 
 void NBSideBar::highlight( QString tgt ) {

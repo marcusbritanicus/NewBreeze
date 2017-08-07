@@ -249,6 +249,8 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( hideStatusBar() ), InfoBar, SLOT( hide() ) );
 	connect( FolderView, SIGNAL( showStatusBar() ), InfoBar, SLOT( show() ) );
 
+	connect( FolderView, SIGNAL( updateQuickFiles() ), SideBar, SLOT( reloadQuickFiles() ) );
+
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateInfoBar() ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), FolderView, SLOT( updateActions() ) );

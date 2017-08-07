@@ -172,8 +172,20 @@ bool isExecutable( QString path ) {
 	if ( stat( path.toLocal8Bit().data(), &statbuf ) != 0 )
 		return false;
 
-	if ( ( statbuf.st_mode & S_IXUSR ) and mimeDb.mimeTypeForFile( path ).parentMimeTypes().contains( "application/x-executable" ) )
-		return true;
+	if ( ( statbuf.st_mode & S_IXUSR ) ) {
+		QMimeType m = mimeDb.mimeTypeForFile( path );
+		if ( m.name() == "application/x-executable" )
+			return true;
+
+		else if ( m.name() == "application/x-sharedlib" )
+			return true;
+
+		else if ( m.parentMimeTypes().contains( "application/x-executable" ) )
+			return true;
+
+		/* Default is false */
+		return false;
+	}
 
 	return false;
 };
@@ -304,28 +316,27 @@ bool isText( QString path ) {
 
 bool isExec( QString path ) {
 
-	/* If the exec bit set there is not point continuing */
+	/* If the exec bit is not set there is no point continuing */
 	if ( access( path.toLocal8Bit().constData(), X_OK ) )
 		return false;
 
-	/* If this is and application/x-executable, it can be executed */
-	if ( ( mimeDb.mimeTypeForFile( path ).name() == "applications/x-executable" ) )
+	QMimeType mType = mimeDb.mimeTypeForFile( path );
+	/* If this is an application/x-executable, it can be executed */
+	if ( ( mType.name() == "application/x-executable" ) )
 		return true;
 
 	/* There might be a file, say a .'odt' or 'txt' with exec bit set. Rule it out */
 	/* So if this has application/x-executable in its ancestry tree, then it can be executed */
-	if ( mimeDb.mimeTypeForFile( path ).allAncestors().contains( "application/x-executable" ) )
+	if ( mType.allAncestors().contains( "application/x-executable" ) )
 		return true;
 
 	/* Some shared libraries, and a few other file can also be executed */
 	QStringList execMimes;
 	execMimes << "application/x-sharedlib"
-				<< "application/x-executable"
-				<< "application/x-shellscript"
 				<< "application/x-install";
 
 	/* We'll execute them */
-	if ( execMimes.contains( getMimeType( path ) ) )
+	if ( execMimes.contains( mType.name() ) )
 		return true;
 
 	return false;

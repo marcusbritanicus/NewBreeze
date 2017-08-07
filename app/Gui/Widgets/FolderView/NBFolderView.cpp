@@ -860,6 +860,8 @@ void NBFolderView::doSendToTrash() {
 		superStart.sync();
 		fsModel->reload();
 
+		emit updateQuickFiles();
+
 		return;
 	}
 
@@ -1034,6 +1036,8 @@ void NBFolderView::doRename() {
 
 		superStart.sync();
 		fsModel->reload();
+
+		emit updateQuickFiles();
 
 		return;
 	}
@@ -1236,4 +1240,5 @@ void NBFolderView::addToSuperStart() {
 	}
 
 	superStart.sync();
+	emit updateQuickFiles();
 };

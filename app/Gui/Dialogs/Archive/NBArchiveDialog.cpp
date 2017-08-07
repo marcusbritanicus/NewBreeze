@@ -4,8 +4,6 @@
 	*
 */
 
-#pragma once
-
 #include "NBArchiveDialog.hpp"
 
 NBArchive* NBArchiveDialog::newArchive( QWidget *parent ) {

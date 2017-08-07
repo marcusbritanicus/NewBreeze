@@ -22,7 +22,7 @@ NBSideBarItem::NBSideBarItem( QString name, QString icon, QString target, QWidge
 	mIcon = icon;
 	mTarget = target;
 
-	if ( exists( mTarget ) and not mTarget.endsWith( "/" ) )
+	if ( isDir( mTarget ) and not mTarget.endsWith( "/" ) )
 		mTarget += "/";
 
 	if ( parent->objectName() == "SideBarGroup" ) {
