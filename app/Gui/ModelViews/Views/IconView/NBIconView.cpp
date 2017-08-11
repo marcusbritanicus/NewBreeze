@@ -442,6 +442,8 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 	QPainter painter( viewport() );
 	painter.setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing );
 
+	painter.fillRect( viewport()->rect(), palette().color( QPalette::Base ) );
+
 	/* We need to draw the categories only if the model is categorization enabled */
 	if ( cModel->isCategorizationEnabled() ) {
 		for ( int catIdx = 0; catIdx < categoryList.count(); catIdx++ ) {
