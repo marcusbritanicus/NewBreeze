@@ -7,8 +7,10 @@
 #pragma once
 
 #include "Global.hpp"
+#include "pdfview.h"
 #if QT_VERSION >= 0x050000
 	#include <poppler-qt5.h>
+	#include <QtPrintSupport>
 #else
 	#include <poppler-qt4.h>
 #endif
@@ -19,7 +21,7 @@ class NBPdfPeep : public QDialog {
 	public :
 		NBPdfPeep( QString path = QDir::homePath() );
 		QString path;
-		QScrollArea *peekWidgetBase;
+		PdfView *peekWidgetBase;
 
 	private :
 		void createGUI();

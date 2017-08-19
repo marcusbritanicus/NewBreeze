@@ -5,14 +5,17 @@ TARGET = DefaultPeekPlugins
 INCLUDEPATH += ../../common/ ../../common/include
 DEPENDPATH += ../../common/ ../../common/include
 
-DEPENDPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch
-INCLUDEPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle PdfPeep WebWatch
+DEPENDPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle PdfPeep PdfPeep/libPdf WebWatch
+INCLUDEPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle PdfPeep PdfPeep/libPdf WebWatch
+
+include(PdfPeep/libPdf/src.pri)
 
 isEqual( QT_MAJOR_VERSION, 4 ) {
 	LIBS += -L../../common/ -lnewbreeze-common
 }
 
 isEqual( QT_MAJOR_VERSION, 5 ) {
+	QT += printsupport
 	LIBS += -L../../common/ -lnewbreeze-common5
 }
 

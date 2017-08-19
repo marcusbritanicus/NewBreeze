@@ -13,7 +13,7 @@ NBIconProvider/NBIconManager                                                    
 	✓ Provide icon strings for multiple sizes
 	✗ Integrate NBIconManager with newbreeze-common
 
-NBIconView                                                                                                                            [ 6 of 8 ]
+NBIconView                                                                                                                            [ 8 of 9 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
 	◐ Improve the selection model
 	  • Currently mouse-over on click selection is enabled.
@@ -54,8 +54,8 @@ Settings                                                                        
 	✗ Apply the settings to the existing windows immediately
 	✗ Enable fast icon theme loading
 
-SuperStart                                                                                                                            [ 0 of 1 ]
-	✍ Enable and refine SuperStart
+SuperStart                                                                                                                            [ 1 of 1 ]
+	✓ Enable and refine SuperStart
 	  • SuperStart enabled, refinement is being done
 	  • SuperStart menu needs to be crafted
 
@@ -76,10 +76,8 @@ General                                                                         
 	✓ Remove libmagic dependency. Its too slow
 
 NewBreeze Vault
-	✍ Vault: A Single place to securely store all your private files
-	  • Safe Mode - Activated immediately
-	  • Secure Mode - Research needed
-	  • Paranoid Mode - Currently not supported
+	✍ Vault: A Single place to access all your private files
+		  • We shall use libgpgmepp6 or libqgpgme7
 
 Note:
 	✍ - Work in progress
