@@ -1242,3 +1242,4 @@ void NBFolderView::addToSuperStart() {
 	superStart.sync();
 	emit updateQuickFiles();
 };
+

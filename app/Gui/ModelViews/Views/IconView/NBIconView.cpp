@@ -51,7 +51,7 @@ NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractI
 	/* Icon Size */
 	setIconSize( Settings->General.IconSize );
 
-	/* Selection */
+	/* Default Selection Rules */
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 	setSelectionBehavior( QAbstractItemView::SelectRows );
 	mSelectedIndexes = QModelIndexList();
@@ -308,6 +308,20 @@ void NBIconView::updateGeometries() {
 };
 
 void NBIconView::reload() {
+
+	switch( cModel->modelDataType() ) {
+		case NBItemViewModel::FileSystem: {
+
+			setSelectionMode( QAbstractItemView::ExtendedSelection );
+			break;
+		}
+
+		default: {
+
+			setSelectionMode( QAbstractItemView::SingleSelection );
+			break;
+		}
+	}
 
 	/* Change view mode according to the .desktop file */
 	QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );

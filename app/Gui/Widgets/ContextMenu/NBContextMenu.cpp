@@ -8,6 +8,7 @@
 #include "NBFolderView.hpp"
 #include "NBPluginInterface.hpp"
 #include "NBPluginManager.hpp"
+#include "NBGuiFunctions.hpp"
 
 NBActionsMenu::NBActionsMenu( QList<QModelIndex> selectedIndexes, QString dir, QWidget *parent ) : QMenu( parent ) {
 	/*
@@ -356,7 +357,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 				addAction( openWithAct );
 			}
 
-			// Add
+			// Add a separator
 			addSeparator();
 
 			QAction *openWithCmdAct = new QAction( QIcon( ":/icons/openWith.png" ), "&Open with...", this );
@@ -367,40 +368,42 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 	}
 
 	else {
-		QString file = QDir( workingDir ).absoluteFilePath( selection[ 0 ].data().toString() );
+		QString path;
+		if ( workingDir.isEmpty() ) {
+			path = selection[ 0 ].data( Qt::UserRole + 2 ).toString();
+			path = exists( path ) ? path : selection[ 0 ].data( Qt::UserRole + 7 ).toString();
+		}
+
+		else {
+
+			path = QDir( workingDir ).absoluteFilePath( selection[ 0 ].data().toString() );
+		}
 
 		NBAppEngine *engine = NBAppEngine::instance();
-		NBAppsList apps = engine->appsForMimeType( mimeDb.mimeTypeForFile( file ) );
-		foreach( NBAppFile app, apps.toQList() ) {
+		NBAppsList apps = engine->appsForMimeType( mimeDb.mimeTypeForFile( path ) );
+		Q_FOREACH( NBAppFile app, apps.toQList() ) {
 			QString name = app.value( NBAppFile::Name ).toString();
 			QStringList exec = app.execArgs();
-			QString icon = app.value( NBAppFile::Icon ).toString();
+			QString iconStr = app.value( NBAppFile::Icon ).toString();
 
-			QIcon progIcon = QIcon::fromTheme( icon, QIcon( icon ) );
-			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
-				progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".png" );
-
-			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
-				progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".xpm" );
-
-			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
-				progIcon = QIcon( ":/icons/exec.png" );
+			// '::icon(...)' means @icon is an externally defined function
+			QIcon progIcon = ::icon( NBIconManager::instance()->icon( iconStr ) );
 
 			// Prepare @v exec
 			if ( app.takesArgs() )
 				if ( app.multipleArgs() ) {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-pathS#>" );
 					exec.removeAt( idx );
-					exec.insert( idx, file );
+					exec.insert( idx, path );
 				}
 
 				else {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-path#>" );
 					exec.removeAt( idx );
-					exec.insert( idx, file );
+					exec.insert( idx, path );
 				}
 			else
-				exec << file;
+				exec << path;
 
 			QAction *openWithAct = new QAction( progIcon, name, this );
 			openWithAct->setData( QVariant( QStringList() << exec ) );
@@ -409,22 +412,22 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 		}
 
 		// Open with vlc
-		if ( isDir( file ) ) {
+		if ( isDir( path ) ) {
 			QAction *openWithVLCAct = new QAction( QIcon::fromTheme( "vlc" ), "Open with &VLC", this );
-			openWithVLCAct->setData( QVariant( QStringList() << "vlc" << file ) );
+			openWithVLCAct->setData( QVariant( QStringList() << "vlc" << path ) );
 			connect( openWithVLCAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 			addSeparator();
 			addAction( openWithVLCAct );
 		}
 
 		// Execute and Execute in terminal
-		if ( isFile( file ) and isExec( file ) ) {
+		if ( isFile( path ) and isExec( path ) ) {
 			QAction *runAct = new QAction( QIcon( ":/icons/exec.png" ), "Execute", this );
-			runAct->setData( QVariant( file ) );
+			runAct->setData( QVariant( path ) );
 			connect( runAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 
 			QAction *runInTermAct = new QAction( QIcon( ":/icons/exec.png" ), "Execute in terminal", this );
-			runInTermAct->setData( QVariant( ( getTerminal().join( " " ).arg( workingDir ).arg( file ) ).split( " " ) ) );
+			runInTermAct->setData( QVariant( ( getTerminal().join( " " ).arg( workingDir ).arg( path ) ).split( " " ) ) );
 			connect( runInTermAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 
 			addSeparator();
@@ -435,7 +438,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 		addSeparator();
 
 		QAction *openWithCmdAct = new QAction( QIcon( ":/icons/openWith.png" ), "&Open with...", this );
-		openWithCmdAct->setData( QVariant( file ) );
+		openWithCmdAct->setData( QVariant( path ) );
 		connect( openWithCmdAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWithCmd() ) );
 		addAction( openWithCmdAct );
 	}
@@ -570,181 +573,243 @@ void NBAddToCatalogMenu::addToNewCatalog() {
 void NBFolderView::showContextMenu( QPoint position ) {
 
 	QList<QModelIndex> selectedList = getSelection();
-
-	if ( not fsModel->isRealLocation() ) {
-		/* We should fix this later */
-
-		return;
-	}
-
 	QMenu *menu = new QMenu( this );
-	if ( selectedList.isEmpty() ) {
 
-		// Create a new file/directory
-		QMenu *createNewMenu = new QMenu( "Create &New" );
-		createNewMenu->setIcon( QIcon::fromTheme( "archive-insert" ) );
+	switch( fsModel->modelDataType() ) {
+		case NBItemViewModel::SuperStart: {
 
-		createNewMenu->addAction( actNewDir );
-		createNewMenu->addAction( actNewFile );
+			/* No selections */
+			if ( not selectedList.count() ) {
 
-		// Add this folder to catalog
-		NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
-		connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
+				menu->addAction( reloadAct );
+			}
 
-		// File/directory sorting
-		QMenu *sortMenu = new QMenu( "&Sort by" );
-		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
+			/* Single selection */
+			else {
+				menu->addAction( peekAct );
 
-		sortMenu->addAction( sortByNameAct );
-		sortMenu->addAction( sortBySizeAct );
-		sortMenu->addAction( sortByTypeAct );
-		sortMenu->addAction( sortByDateAct );
-		sortMenu->addSeparator();
-		sortMenu->addAction( groupsAct );
+				QFileInfo fInfo( fsModel->nodeInfo( selectedList[ 0 ] ) );
+				QString file = termFormatString( fInfo.absoluteFilePath() );
 
-		menu->addMenu( createNewMenu );
-		menu->addSeparator();
+				if ( fInfo.isDir() ) {
+					QAction *openInNewWinAct = new QAction( QIcon( ":/icons/newwin.png" ), "Open in New &Window", this );
+					openInNewWinAct->setData( QVariant( fInfo.absoluteFilePath() ) );
+					connect( openInNewWinAct, SIGNAL( triggered() ), this, SLOT( doOpenInNewWindow() ) );
+					menu->addAction( openInNewWinAct );
+				}
 
-		menu->addMenu( addToCatalogMenu );
-		menu->addAction( addToSuperStartAct );
-		menu->addSeparator();
+				NBOpenWithMenu *openWithMenu = new NBOpenWithMenu( ":/icons/openWith.png", "&Open With", this );
+				openWithMenu->setWorkingDirectory( "" );
+				openWithMenu->buildMenu( selectedList );
 
-		menu->addAction( pasteAct );
-		menu->addSeparator();
+				menu->addMenu( openWithMenu );
+				menu->addSeparator();
 
-		menu->addAction( reloadAct );
-		menu->addSeparator();
+				/* If the node is a folder */
+				if ( fInfo.isDir() ) {
+					/* Add to catalogs to menu */
+					NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
+					connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
+					menu->addMenu( addToCatalogMenu );
+				}
 
-		menu->addSeparator();
-		menu->addMenu( sortMenu );
+				menu->addAction( renameAct );
 
-		menu->addSeparator();
-		menu->addAction( propertiesAct );
-		menu->addAction( permissionsAct );
-	}
+				menu->addSeparator();
 
-	else if ( selectedList.count() == 1 ) {
-		menu->addAction( peekAct );
+				trashAct->setText( "Remove from &SuperStart" );
+				menu->addAction( trashAct );
 
-		QFileInfo fInfo( fsModel->nodePath( selectedList[ 0 ].data().toString() ) );
-		QString file = termFormatString( fInfo.absoluteFilePath() );
+				menu->addSeparator();
+				menu->addAction( propertiesAct );
+				menu->addAction( permissionsAct );
+			}
 
-		if ( fInfo.isDir() ) {
-			QAction *openInNewTabAct = new QAction( QIcon::fromTheme( "tab-new" ), "Open in &New Tab", this );
-			openInNewTabAct->setData( QVariant( fInfo.absoluteFilePath() ) );
-			connect( openInNewTabAct, SIGNAL( triggered() ), this, SLOT( doOpenInNewTab() ) );
-			// menu->addAction( openInNewTabAct );
+			menu->exec( mapToGlobal( position ) );
 
-			QAction *openInNewWinAct = new QAction( QIcon( ":/icons/newwin.png" ), "Open in New &Window", this );
-			openInNewWinAct->setData( QVariant( fInfo.absoluteFilePath() ) );
-			connect( openInNewWinAct, SIGNAL( triggered() ), this, SLOT( doOpenInNewWindow() ) );
-			menu->addAction( openInNewWinAct );
+			return;
 		}
 
-		NBOpenWithMenu *openWithMenu = new NBOpenWithMenu( ":/icons/openWith.png", "&Open With", this );
-		openWithMenu->setWorkingDirectory( fsModel->currentDir() );
-		openWithMenu->buildMenu( selectedList );
+		case NBItemViewModel::Applications: {
+			/* We should fix this later */
 
-		customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
-		connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
-		connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
-
-		// File/directory sorting
-		QMenu *sortMenu = new QMenu( "&Sort by" );
-		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
-
-		sortMenu->addAction( sortByNameAct );
-		sortMenu->addAction( sortBySizeAct );
-		sortMenu->addAction( sortByTypeAct );
-		sortMenu->addAction( sortByDateAct );
-		sortMenu->addSeparator();
-		sortMenu->addAction( groupsAct );
-
-		menu->addMenu( openWithMenu );
-		menu->addSeparator();
-
-		/* If the node is a folder */
-		if ( fInfo.isDir() ) {
-			/* Add to catalogs to menu */
-			NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
-			connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
-			menu->addMenu( addToCatalogMenu );
+			return;
 		}
 
-		/* We can add file or folder to SuperStart */
-		menu->addAction( addToSuperStartAct );
-		menu->addSeparator();
+		case NBItemViewModel::Catalogs: {
+			/* We should fix this later */
 
-		menu->addMenu( customMenu );
-		menu->addSeparator();
+			return;
+		}
 
-		menu->addAction( moveAct );
-		menu->addAction( copyAct );
-		menu->addSeparator();
+		case NBItemViewModel::FileSystem: {
+			if ( selectedList.isEmpty() ) {
 
-		menu->addAction( renameAct );
+				// Create a new file/directory
+				QMenu *createNewMenu = new QMenu( "Create &New" );
+				createNewMenu->setIcon( QIcon::fromTheme( "archive-insert" ) );
 
-		menu->addSeparator();
+				createNewMenu->addAction( actNewDir );
+				createNewMenu->addAction( actNewFile );
 
-		menu->addAction( trashAct );
-		menu->addAction( delAct );
+				// Add this folder to catalog
+				NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
+				connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 
-		menu->addSeparator();
-		menu->addMenu( sortMenu );
+				// File/directory sorting
+				QMenu *sortMenu = new QMenu( "&Sort by" );
+				sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
 
-		menu->addSeparator();
-		menu->addAction( propertiesAct );
-		menu->addAction( permissionsAct );
+				sortMenu->addAction( sortByNameAct );
+				sortMenu->addAction( sortBySizeAct );
+				sortMenu->addAction( sortByTypeAct );
+				sortMenu->addAction( sortByDateAct );
+				sortMenu->addSeparator();
+				sortMenu->addAction( groupsAct );
+
+				menu->addMenu( createNewMenu );
+				menu->addSeparator();
+
+				menu->addMenu( addToCatalogMenu );
+				menu->addAction( addToSuperStartAct );
+				menu->addSeparator();
+
+				menu->addAction( pasteAct );
+				menu->addSeparator();
+
+				menu->addAction( reloadAct );
+				menu->addSeparator();
+
+				menu->addSeparator();
+				menu->addMenu( sortMenu );
+
+				menu->addSeparator();
+				menu->addAction( propertiesAct );
+				menu->addAction( permissionsAct );
+			}
+
+			else if ( selectedList.count() == 1 ) {
+				menu->addAction( peekAct );
+
+				QFileInfo fInfo( fsModel->nodeInfo( selectedList[ 0 ] ) );
+				QString file = termFormatString( fInfo.absoluteFilePath() );
+
+				if ( fInfo.isDir() ) {
+					QAction *openInNewWinAct = new QAction( QIcon( ":/icons/newwin.png" ), "Open in New &Window", this );
+					openInNewWinAct->setData( QVariant( fInfo.absoluteFilePath() ) );
+					connect( openInNewWinAct, SIGNAL( triggered() ), this, SLOT( doOpenInNewWindow() ) );
+					menu->addAction( openInNewWinAct );
+				}
+
+				NBOpenWithMenu *openWithMenu = new NBOpenWithMenu( ":/icons/openWith.png", "&Open With", this );
+				openWithMenu->setWorkingDirectory( fsModel->currentDir() );
+				openWithMenu->buildMenu( selectedList );
+
+				customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
+				connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
+				connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
+
+				// File/directory sorting
+				QMenu *sortMenu = new QMenu( "&Sort by" );
+				sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
+
+				sortMenu->addAction( sortByNameAct );
+				sortMenu->addAction( sortBySizeAct );
+				sortMenu->addAction( sortByTypeAct );
+				sortMenu->addAction( sortByDateAct );
+				sortMenu->addSeparator();
+				sortMenu->addAction( groupsAct );
+
+				menu->addMenu( openWithMenu );
+				menu->addSeparator();
+
+				/* If the node is a folder */
+				if ( fInfo.isDir() ) {
+					/* Add to catalogs to menu */
+					NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
+					connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
+					menu->addMenu( addToCatalogMenu );
+				}
+
+				/* We can add file or folder to SuperStart */
+				menu->addAction( addToSuperStartAct );
+				menu->addSeparator();
+
+				menu->addMenu( customMenu );
+				menu->addSeparator();
+
+				menu->addAction( moveAct );
+				menu->addAction( copyAct );
+				menu->addSeparator();
+
+				menu->addAction( renameAct );
+
+				menu->addSeparator();
+
+				trashAct->setText( "Move to trash" );
+				menu->addAction( trashAct );
+				menu->addAction( delAct );
+
+				menu->addSeparator();
+				menu->addMenu( sortMenu );
+
+				menu->addSeparator();
+				menu->addAction( propertiesAct );
+				menu->addAction( permissionsAct );
+			}
+
+			else {
+				NBOpenWithMenu *openWithMenu = new NBOpenWithMenu( ":/icons/openWith.png", "&Open With", this );
+				openWithMenu->setWorkingDirectory( fsModel->currentDir() );
+				openWithMenu->buildMenu( selectedList );
+
+				// Add this folder to catalog
+				NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
+				connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
+
+				customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
+				connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
+				connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
+
+				// File/directory sorting
+				QMenu *sortMenu = new QMenu( "&Sort by" );
+				sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
+
+				sortMenu->addAction( sortByNameAct );
+				sortMenu->addAction( sortBySizeAct );
+				sortMenu->addAction( sortByTypeAct );
+				sortMenu->addAction( sortByDateAct );
+				sortMenu->addSeparator();
+				sortMenu->addAction( groupsAct );
+
+				menu->addMenu( openWithMenu );
+				menu->addSeparator();
+
+				menu->addMenu( addToCatalogMenu );
+				menu->addAction( addToSuperStartAct );
+				menu->addSeparator();
+
+				menu->addMenu( customMenu );
+				menu->addSeparator();
+
+				menu->addAction( moveAct );
+				menu->addAction( copyAct );
+				menu->addSeparator();
+
+				trashAct->setText( "Move to trash" );
+				menu->addAction( trashAct );
+				menu->addAction( delAct );
+
+				menu->addSeparator();
+				menu->addMenu( sortMenu );
+
+				menu->addSeparator();
+				menu->addAction( propertiesAct );
+				menu->addAction( permissionsAct );
+			}
+
+			menu->exec( mapToGlobal( position ) );
+			return;
+		}
 	}
-
-	else {
-		NBOpenWithMenu *openWithMenu = new NBOpenWithMenu( ":/icons/openWith.png", "&Open With", this );
-		openWithMenu->setWorkingDirectory( fsModel->currentDir() );
-		openWithMenu->buildMenu( selectedList );
-
-		// Add this folder to catalog
-		NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
-		connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
-
-		customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
-		connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
-		connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
-
-		// File/directory sorting
-		QMenu *sortMenu = new QMenu( "&Sort by" );
-		sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
-
-		sortMenu->addAction( sortByNameAct );
-		sortMenu->addAction( sortBySizeAct );
-		sortMenu->addAction( sortByTypeAct );
-		sortMenu->addAction( sortByDateAct );
-		sortMenu->addSeparator();
-		sortMenu->addAction( groupsAct );
-
-		menu->addMenu( openWithMenu );
-		menu->addSeparator();
-
-		menu->addMenu( addToCatalogMenu );
-		menu->addAction( addToSuperStartAct );
-		menu->addSeparator();
-
-		menu->addMenu( customMenu );
-		menu->addSeparator();
-
-		menu->addAction( moveAct );
-		menu->addAction( copyAct );
-		menu->addSeparator();
-
-		menu->addAction( trashAct );
-		menu->addAction( delAct );
-
-		menu->addSeparator();
-		menu->addMenu( sortMenu );
-
-		menu->addSeparator();
-		menu->addAction( propertiesAct );
-		menu->addAction( permissionsAct );
-	}
-
-	menu->exec( mapToGlobal( position ) );
 };

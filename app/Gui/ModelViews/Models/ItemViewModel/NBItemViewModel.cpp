@@ -779,7 +779,7 @@ QFileInfo NBItemViewModel::nodeInfo( const QModelIndex idx ) const {
 
 		case NBItemViewModel::SuperStart: {
 
-			QString path = idx.data( Qt::UserRole + 9 ).toString();
+			QString path = idx.data( Qt::UserRole + 2 ).toString();
 			if ( exists( path ) )
 				return QFileInfo( path );
 
@@ -1129,7 +1129,7 @@ void NBItemViewModel::setupSuperStartData() {
 			continue;
 
 		QVariantList data = quickDataGatherer->getQuickFileInfo( location );
-		data[ 0 ] = "dirss";
+		data[ 0 ] = "dirss";				// dirss Needed for getting the right icon
 		data[ 3 ] = key;
 		rootNode->addChild( new NBItemViewNode( data, "Places  ", rootNode ) );
 		mChildNames << key;

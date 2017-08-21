@@ -13,11 +13,12 @@ NBIconProvider/NBIconManager                                                    
 	✓ Provide icon strings for multiple sizes
 	✗ Integrate NBIconManager with newbreeze-common
 
-NBIconView                                                                                                                            [ 8 of 9 ]
+NBIconView                                                                                                                            [ 8 of 10 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
 	◐ Improve the selection model
 	  • Currently mouse-over on click selection is enabled.
-	□ Fix cursor movements due to semi-folded categories
+	  • Change selection policy with model data type
+	□ Rewrite cursor movements from scratch taking into account category folding
 	✗ Enable PageUp and PageDown navigation
 	✓ Enable per-folder folded category memory
 	✓ Category icons need to be added
@@ -26,6 +27,7 @@ NBIconView                                                                      
 	  • Double-clicking category, toggles folding
 	✓ CatalogView and its icons need to be fixed
 	✓ Add symbols to icons representing symlink, executables, system files etc for NBItemDelegate
+	□ Fix drag-and-drop to take care of SuperStart
 
 NBItemViewModel                                                                                                                       [ 2 of 2 ]
 	✓ Read icon data directly from NBItemNode* rather than create it repeatedly.
