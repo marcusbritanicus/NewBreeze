@@ -1,6 +1,7 @@
 # NewBreeze
-
 ## A fast and light-weight file manager based on Qt
+
+Chat with me at [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/newbreezefm/)
 
 ### Qt5 builds are now supported
 
