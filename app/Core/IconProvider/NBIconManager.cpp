@@ -4,19 +4,6 @@
 	*
 */
 
-/*
-	*
-	* The new Icon Manager replaces the old NBIconProvider. The functionalities will be enhanced greatly in this class.
-	* New:
-	* 		- All icons will be stored in a massive database
-	*				Icon 1								[ Path 1, Path 2, Path 3, ... ]
-	* 		- Standard icon database will be created which matches a mimetype to icons paths of all sizes
-	*				MimeType 1							[ Path 1, Path 2, Path 3, ... ]
-	*		  This ensures that we do not have to search the same icon multiple times.
-	* 		- We create these databases every time a unique instance of newbreeze starts. Databasing takes < 2s
-	*
-*/
-
 #include "NBIconManager.hpp"
 
 #if QT_VERSION >= 0x050000
@@ -70,6 +57,7 @@ NBIconManager::NBIconManager() {
 	/* Set the default theme path */
 	iconThemePath = QString( "/usr/share/icons/" );
 
+	/* Generate the theme database */
 	generateThemeDatabase();
 };
 
@@ -82,7 +70,8 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 		mName = mimeDb.mimeTypeForFile( file ).name();
 	}
 
-	if ( not mName.compare( "inode/directory" ) ) {
+	/* If we have a directory */
+	if ( not mName.compare( "inode/directory" ) ) {				// QString.compare(...) returns 0 for a match
 
 		if ( not file.endsWith( "/" ) )
 			file += "/";
@@ -95,9 +84,6 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 
 		else if ( exists( icoStr ) )
 			return QStringList() << icoStr;
-
-		else
-			return mdb.value( "inode/directory" ).toStringList();
 
 		/* EncFS Encrypted/Decrypted Folder */
 		QSettings settPrnt( QDir( dirName( file ) ).filePath( ".directory" ), QSettings::NativeFormat );
@@ -116,6 +102,8 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 				return QStringList() << ":/icons/folder-locked.png";
 			}
 		}
+
+		return mdb.value( "inode/directory" ).toStringList();
 	}
 
 	// If it is a desktop file

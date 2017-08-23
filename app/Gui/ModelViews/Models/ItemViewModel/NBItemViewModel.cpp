@@ -738,34 +738,32 @@ QString NBItemViewModel::nodeName( const QModelIndex idx ) const {
 
 QString NBItemViewModel::nodePath( const QModelIndex idx ) const {
 
-	if ( not mRootPath.startsWith( "NB://" ) ) {
-		/* Straight forward */
-		return idx.data( Qt::UserRole + 7 ).toString();
-	}
+	switch ( mModelDataType ) {
 
-	else {
-		/* We need to determine the node type: dir or Application */
+		case NBItemViewModel::Applications: {
 
-		NBItemViewNode *node = static_cast<NBItemViewNode*>( idx.internalPointer() );
+			return idx.data( Qt::UserRole + 9 ).toString();
+		}
 
-		/* If its a drive, its path is Qt::UserRole + 2 */
-		if ( node->data( 0, true ).toString().toLower() == "superstart" )
-			return idx.data( Qt::UserRole + 2 ).toString();
+		case NBItemViewModel::SuperStart: {
 
-		else
+			QString path = idx.data( Qt::UserRole + 2 ).toString();
+			if ( exists( path ) )
+				return path;
+
+			else
+				return idx.data( Qt::UserRole + 7 ).toString();
+		}
+
+		case NBItemViewModel::Catalogs:
+		case NBItemViewModel::FileSystem:
 			return idx.data( Qt::UserRole + 7 ).toString();
 	}
 };
 
 QString NBItemViewModel::nodePath( const QString path ) const {
 
-	if ( mVirtualData ) {
-		QModelIndex idx = index( path );
-		return idx.data( Qt::UserRole + 7 ).toString();
-	}
-
-	else
-		return mRootPath + path;
+	return nodePath( index( path ) );
 };
 
 QFileInfo NBItemViewModel::nodeInfo( const QModelIndex idx ) const {

@@ -63,6 +63,13 @@ int main( int argc, char **argv ) {
 	else
 		app.setQuitOnLastWindowClosed( true );
 
+	/* Proxy Setup */
+	QNetworkProxyQuery npq( QUrl( "http://www.google.com" ) );
+	QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery( npq );
+	if ( listOfProxies.size() )
+		QNetworkProxy::setApplicationProxy( listOfProxies[ 0 ] );
+
+	/* Arg Parser */
 	switch( NBArgParser( argc, argv ) ) {
 
 		/* We want only the server running in the tray */

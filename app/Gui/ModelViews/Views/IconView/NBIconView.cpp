@@ -886,6 +886,9 @@ void NBIconView::dragEnterEvent( QDragEnterEvent *deEvent ) {
 
 void NBIconView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 
+	/* Default is ignore event */
+	dmEvent->ignore();
+
 	const QMimeData *mData = dmEvent->mimeData();
 	if ( not mData->hasUrls() )
 		return;
@@ -895,19 +898,40 @@ void NBIconView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 
 	/* Incoming drop from else where */
 	if ( source != cModel->currentDir() ) {
-		if ( isWritable( cModel->currentDir() ) ) {
-			dmEvent->setDropAction( Qt::CopyAction );
-			dmEvent->accept();
-		}
+		switch ( cModel->modelDataType() ) {
+			case NBItemViewModel::SuperStart: {
+				QModelIndex idx = indexAt( dmEvent->pos() );
+				if ( idx.isValid() ) {
+					if ( not isWritable( cModel->nodePath( idx ) ) or not isDir( cModel->nodePath( idx ) ) )
+						return;
 
-		else
-			dmEvent->ignore();
+					dmEvent->setDropAction( Qt::CopyAction );
+					dmEvent->accept();
+				}
+
+				break;
+			}
+
+			case NBItemViewModel::FileSystem: {
+				if ( isWritable( cModel->currentDir() ) ) {
+					dmEvent->setDropAction( Qt::CopyAction );
+					dmEvent->accept();
+				}
+
+				break;
+			}
+
+			default : {
+				dmEvent->ignore();
+				break;
+			}
+		}
 	}
 
 	/* drag and drop in the current folder */
 	else if ( indexAt( dmEvent->pos() ).isValid() ) {
 		QModelIndex idx = indexAt( dmEvent->pos() );
-		QString mtpt = cModel->nodePath( cModel->data( idx ).toString() );
+		QString mtpt = cModel->nodePath( idx );
 
 		Q_FOREACH( QUrl url, mData->urls() ) {
 			if ( url.toLocalFile() == mtpt ) {
@@ -925,16 +949,23 @@ void NBIconView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 			dmEvent->ignore();
 	}
 
-	else
+	else {
+
 		dmEvent->ignore();
+	}
 };
 
 void NBIconView::dropEvent( QDropEvent *dpEvent ) {
 
 	QModelIndex idx = indexAt( dpEvent->pos() );
-	QString mtpt = cModel->nodePath( cModel->data( idx ).toString() );
+	QString mtpt = cModel->nodePath( idx );
 
 	if ( not isDir( mtpt ) ) {
+		dpEvent->ignore();
+		return;
+	}
+
+	else if ( isDir( mtpt ) and not isWritable( mtpt ) ) {
 		dpEvent->ignore();
 		return;
 	}
