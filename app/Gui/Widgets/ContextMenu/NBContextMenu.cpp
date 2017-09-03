@@ -392,13 +392,13 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 			// Prepare @v exec
 			if ( app.takesArgs() )
 				if ( app.multipleArgs() ) {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-pathS#>" );
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
 					exec.removeAt( idx );
 					exec.insert( idx, path );
 				}
 
 				else {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-path#>" );
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
 					exec.removeAt( idx );
 					exec.insert( idx, path );
 				}

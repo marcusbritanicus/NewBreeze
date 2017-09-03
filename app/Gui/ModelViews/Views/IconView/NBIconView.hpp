@@ -186,6 +186,7 @@ class NBIconView : public QAbstractItemView {
 
 		// Persistent vertical column
 		mutable int persistentVCol;
+		mutable QPair<int, int> curIdx;
 
 		// Items per visual row
 		mutable int itemsPerRow;

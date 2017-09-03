@@ -477,7 +477,7 @@ QStringList NBItemViewModel::categories() const {
 	return rootNode->categoryList();
 };
 
-QPixmap NBItemViewModel::pixmapForCategory( QString categoryName ) const {
+QPixmap NBItemViewModel::pixmapForCategory( QString categoryName, bool folded ) const {
 
 	switch ( mModelDataType ) {
 
@@ -552,7 +552,7 @@ QPixmap NBItemViewModel::pixmapForCategory( QString categoryName ) const {
 		default: {
 			QIcon icon = QIcon::fromTheme( mCategoryIconMap[ categoryName ] );
 			if ( icon.isNull() ) {
-				if ( categoryVisibilityMap[ categoryName ] == false )
+				if ( folded )
 					return QIcon::fromTheme( "arrow-right" ).pixmap( 16, 16 );
 
 				else
@@ -564,21 +564,6 @@ QPixmap NBItemViewModel::pixmapForCategory( QString categoryName ) const {
 			}
 		}
 	}
-};
-
-void NBItemViewModel::foldCategory( QString categoryName ) {
-
-	categoryVisibilityMap[ categoryName ] = false;
-};
-
-void NBItemViewModel::openCategory( QString categoryName ) {
-
-	categoryVisibilityMap[ categoryName ] = true;
-};
-
-bool NBItemViewModel::isCategoryOpen( QString categoryName ) const {
-
-	return categoryVisibilityMap[ categoryName ];
 };
 
 int NBItemViewModel::indexListCountForCategory( QString mCategory ) const {
@@ -601,6 +586,16 @@ QModelIndexList NBItemViewModel::indexListForCategory( QString mCategory ) const
 	}
 
 	return mList;
+};
+
+int NBItemViewModel::indexListCountForCategory( int mCategoryIdx ) const {
+
+	return indexListCountForCategory( rootNode->categoryList().at( mCategoryIdx ) );
+};
+
+QModelIndexList NBItemViewModel::indexListForCategory( int mCategoryIdx ) const {
+
+	return indexListForCategory( rootNode->categoryList().at( mCategoryIdx ) );
 };
 
 QModelIndexList NBItemViewModel::categorySiblings( QModelIndex idx ) const {
@@ -1081,10 +1076,6 @@ void NBItemViewModel::setupFileSystemData() {
 
 	/* We make all the categories visible by default, except the saved ones */
 	QSettings dirSett( mRootPath + ".directory", QSettings::NativeFormat );
-	QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
-
-	foreach( QString mCategoryName, rootNode->categoryList() )
-		categoryVisibilityMap[ mCategoryName ] = ( hidden.contains( mCategoryName ) ? false : true );
 
 	/* Sort the contents */
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
@@ -1147,10 +1138,6 @@ void NBItemViewModel::setupSuperStartData() {
 
 	endResetModel();
 
-	/* We make all the categories visible by default */
-	foreach( QString mCategoryName, rootNode->categoryList() )
-		categoryVisibilityMap[ mCategoryName ] = true;
-
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
 	currentLoadStatus.loading = false;
@@ -1192,10 +1179,6 @@ void NBItemViewModel::setupApplicationsData() {
 		rootNode->addChild( new NBItemViewNode( data, app.category(), rootNode ) );
 	}
 	endResetModel();
-
-	/* We make all the categories visible by default */
-	foreach( QString mCategoryName, rootNode->categoryList() )
-		categoryVisibilityMap[ mCategoryName ] = true;
 
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
@@ -1246,10 +1229,6 @@ void NBItemViewModel::setupCatalogData() {
 	}
 	catalogsSettings.endGroup();
 	endResetModel();
-
-	/* We make all the categories visible by default */
-	foreach( QString mCategoryName, rootNode->categoryList() )
-		categoryVisibilityMap[ mCategoryName ] = true;
 
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 

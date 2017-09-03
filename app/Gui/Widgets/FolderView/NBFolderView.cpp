@@ -1114,7 +1114,7 @@ void NBFolderView::selectAll() {
 
 void NBFolderView::openTerminal() {
 
-	NBDebugMsg( DbgMsgPart::HEAD, "Opening the console at %s... ", fsModel->currentDir().toLocal8Bit().data() );
+	NBDebugMsg( DbgMsgPart::HEAD, "Opening the console at %s... ", fsModel->currentDir().toLocal8Bit().constData() );
 	QStringList commandList = getTerminal();
 	QString command = commandList.takeFirst();
 

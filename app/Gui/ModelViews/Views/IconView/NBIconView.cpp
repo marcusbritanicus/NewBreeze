@@ -35,6 +35,8 @@ NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractI
 
 	/* Persistent vertical column */
 	persistentVCol = 0;
+	/* QPair( catIdx, elmInCatIdx */
+	curIdx = qMakePair( 0, 0 );
 
 	/* Items per visual row */
 	itemsPerRow = 1;
@@ -87,7 +89,6 @@ NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractI
 	/* Context Menu */
 	setContextMenuPolicy( Qt::CustomContextMenu );
 
-	connect( cModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( reload() ) );
 	connect( cModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( reload() ) );
 	connect( cModel, SIGNAL( layoutChanged() ), this, SLOT( reload() ) );
 	connect( this, SIGNAL( customContextMenuRequested( QPoint ) ), this, SIGNAL( contextMenuRequested( QPoint ) ) );
@@ -439,8 +440,12 @@ QModelIndexList NBIconView::selection() {
 
 bool NBIconView::isIndexVisible( QModelIndex idx ) const {
 
-	// We consider the space reserved for the category but not the indexes listed under it
+	/* We consider the space reserved for the category but not the indexes listed under it */
 	if ( hiddenCategories.contains( cModel->category( idx ) ) )
+		return false;
+
+	/* If the index belongs to a folded category and the index position is greater than itemsPerRow - 1 */
+	if ( foldedCategories.contains( cModel->category( idx ) ) and cModel->indexInCategory( idx ) >= itemsPerRow - 1 )
 		return false;
 
 	QRect rect = viewportRectForRow( idx.row() );
@@ -473,9 +478,11 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 	for ( int row = 0; row < cModel->rowCount( rootIndex() ); row++ ) {
 		QModelIndex idx = cModel->index( row, 0, rootIndex() );
 		if ( not canShowIndex( idx ) ) {
+			/* If we the category to which this index belongs, continue to next index */
 			if ( hiddenCategories.contains( cModel->category( idx ) ) )
 				continue;
 
+			/* If the position of this index is the last in row of a folded category, paint a '+' */
 			if ( cModel->indexInCategory( idx ) == itemsPerRow - 1 ) {
 				QRect rect = viewportRectForRow( row );
 				if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
@@ -746,8 +753,11 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 	}
 
 	/* Set the clicked index as the current index */
-	if( idx.isValid() )
+	if( idx.isValid() ) {
+		curIdx = qMakePair( categoryList.indexOf( cModel->category( idx ) ), cModel->indexInCategory( idx ) );
+		persistentVCol = cModel->indexInCategory( idx ) % itemsPerRow;
 		setCurrentIndex( idx );
+	}
 
 	mpEvent->accept();
 };
@@ -1127,33 +1137,13 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 	/* If there exists a current index */
 	if ( idx.isValid() ) {
 
-		int thisCategoryIdx = cModel->categoryIndex( idx );
-		/* If we are in the first category go to the last one */
-		int prevCategoryIdx = ( thisCategoryIdx == 0 ? cModel->categoryCount() - 1 : thisCategoryIdx - 1 );
-		/* If we are in the last category go to the first one */
-		int nextCategoryIdx = ( ( thisCategoryIdx == cModel->categoryCount() - 1 ) ? 0 : thisCategoryIdx + 1 );
-
-		QString prevCategory = categoryList.value( prevCategoryIdx );
-		QString thisCategory = cModel->category( idx );
-		QString nextCategory = categoryList.value( nextCategoryIdx );
-
-		QModelIndexList prevCategoryIndexes = cModel->indexListForCategory( prevCategory );
-		QModelIndexList thisCategoryIndexes = cModel->indexListForCategory( thisCategory );
-		QModelIndexList nextCategoryIndexes = cModel->indexListForCategory( nextCategory );
-
 		switch( cursorAction ) {
 			case QAbstractItemView::MoveNext:
-				emit selectionChanged();
-				return nextIndex();
-
 			case QAbstractItemView::MoveRight:
 				emit selectionChanged();
 				return nextIndex();
 
 			case QAbstractItemView::MovePrevious:
-				emit selectionChanged();
-				return prevIndex();
-
 			case QAbstractItemView::MoveLeft:
 				emit selectionChanged();
 				return prevIndex();
@@ -1227,33 +1217,15 @@ QModelIndex NBIconView::moveCursorCategorized( QAbstractItemView::CursorAction c
 	else {
 		switch( cursorAction ) {
 			case QAbstractItemView::MoveHome:
-				emit selectionChanged();
-				return firstIndex();
-
 			case QAbstractItemView::MoveRight:
-				emit selectionChanged();
-				return firstIndex();
-
 			case QAbstractItemView::MoveNext:
-				emit selectionChanged();
-				return firstIndex();
-
 			case QAbstractItemView::MoveDown:
 				emit selectionChanged();
 				return firstIndex();
 
 			case QAbstractItemView::MoveEnd:
-				emit selectionChanged();
-				return lastIndex();
-
 			case QAbstractItemView::MoveLeft:
-				emit selectionChanged();
-				return lastIndex();
-
 			case QAbstractItemView::MovePrevious:
-				emit selectionChanged();
-				return lastIndex();
-
 			case QAbstractItemView::MoveUp:
 				emit selectionChanged();
 				return firstIndex();
@@ -1286,277 +1258,211 @@ void NBIconView::setCategorySelected( QString category, bool yes ) {
 QModelIndex NBIconView::nextIndex() {
 
 	QModelIndex idx = currentIndex();
-	/*
-		*
-		* 1. Check if the next index in still in this category.
-		* 2. If not, list out the next visible category
-		*
-	*/
 
-	// CurrentCategory
-	QString cCategory = cModel->category( idx );
-	int cCatIdx = categoryList.indexOf( cCategory );
-	QModelIndexList cIdxList = cModel->indexListForCategory( cCategory );
+	/* The next index is in the current category */
+	int nextIdx = curIdx.second + 1;
+	if ( nextIdx < cModel->indexListCountForCategory( curIdx.first ) ) {
+		QString curCat = categoryList.at( curIdx.first );
 
-	// Next Category
-	QString nCategory;
-	int nCatIdx = -1;
+		/* If the current category is not folded, just return the next index */
+		if ( not foldedCategories.contains( curCat ) ) {
+			curIdx = qMakePair( curIdx.first, nextIdx );
+			persistentVCol = nextIdx % itemsPerRow;
+			return cModel->indexListForCategory( curIdx.first )[ nextIdx ];
+		}
 
-	/* We search for all the categories ahead, from the current category */
-	for( int i = cCatIdx + 1; i < categoryList.count(); i++ ) {
-		if ( not hiddenCategories.contains( categoryList.at( i ) ) ) {
-			nCatIdx = i;
-			nCategory = categoryList.at( i );
+		/* If the current category is folded, and the next index in in the first row of the current category */
+		else if ( foldedCategories.contains( curCat ) and nextIdx < ( itemsPerRow - 1 ) ) {
+			curIdx = qMakePair( curIdx.first, nextIdx );
+			persistentVCol = nextIdx % itemsPerRow;
+			return cModel->indexListForCategory( curIdx.first )[ nextIdx ];
+		}
+	}
+
+	/* The next index is the first index of the next visible category */
+	int nCatIdx = curIdx.first < categoryList.count() - 1 ? curIdx.first + 1 : 0;
+	while ( ( nCatIdx < categoryList.count() ) and ( nCatIdx != curIdx.first ) ) {
+		if ( not hiddenCategories.contains( categoryList.at( nCatIdx ) ) )
 			break;
-		}
-	}
-	/* If we find none, we search for all categories from 0, till the current one */
-	if ( nCatIdx == -1 ) {
-		for( int i = 0; i <= cCatIdx; i++ ) {
-			if ( not hiddenCategories.contains( categoryList.at( i ) ) ) {
-				nCatIdx = i;
-				nCategory = categoryList.at( i );
-				break;
-			}
-		}
+
+		nCatIdx += 1;
+		if ( nCatIdx == categoryList.count() )
+			nCatIdx = 0;
 	}
 
-	QModelIndexList nIdxList = cModel->indexListForCategory( nCategory );
+	curIdx = qMakePair( nCatIdx, 0 );
+	persistentVCol = 0;
+	return cModel->indexListForCategory( nCatIdx ).first();
 
-	/* If the current category is hidden, close your eyes and return the first index of the next category */
-	if ( hiddenCategories.contains( cCategory ) ) {
-		persistentVCol = 0;
-		if ( nIdxList.count() )
-			return nIdxList.first();
-
-		else
-			return QModelIndex();
-	}
-
-	// This is not the last index of the current category
-	if ( cIdxList.last() != idx ) {
-		persistentVCol = ( cIdxList.indexOf( idx ) + 1 ) % itemsPerRow;
-		return cIdxList.at( cIdxList.indexOf( idx ) + 1 );
-	}
-
-	// This is the last index of the current category
-	else {
-		persistentVCol = 0;
-		return nIdxList.first();
-	}
+	return QModelIndex();
 };
 
 QModelIndex NBIconView::prevIndex() {
 
 	QModelIndex idx = currentIndex();
-	/*
-		*
-		* 1. Check if the next index in still in this category.
-		* 2. If not, list out the previous visible category
-		*
-	*/
 
-	// CurrentCategory
-	QString cCategory = cModel->category( idx );
-	int cCatIdx = categoryList.indexOf( cCategory );
-	QModelIndexList cIdxList = cModel->indexListForCategory( cCategory );
+	/* The previous index is in the current category */
+	int prevIdx = curIdx.second - 1;
+	if ( prevIdx >= 0 ) {
+		curIdx = qMakePair( curIdx.first, prevIdx );
+		persistentVCol = prevIdx % itemsPerRow;
+		return cModel->indexListForCategory( curIdx.first )[ prevIdx ];
+	}
 
-	// Previous Category
-	QString pCategory;
-	int pCatIdx = -1;
-
-	/* We search for all the categories before this one */
-	for( int i = cCatIdx - 1; i >= 0; i-- ) {
-		if ( not hiddenCategories.contains( categoryList.at( i ) ) ) {
-			pCatIdx = i;
-			pCategory = categoryList.at( i );
+	/* The prev index is the last index of the previous visible category */
+	int pCatIdx = curIdx.first > 0 ? curIdx.first - 1 : categoryList.count() - 1;
+	while ( ( pCatIdx < categoryList.count() ) and ( pCatIdx != curIdx.first ) ) {
+		if ( not hiddenCategories.contains( categoryList.at( pCatIdx ) ) )
 			break;
-		}
-	}
-	/* If we find none, we search backwards from the lastt to the current one */
-	if ( pCatIdx == -1 ) {
-		for( int j = categoryList.count() - 1; j >= cCatIdx; j-- ) {
-			if ( not hiddenCategories.contains( categoryList.at( j ) ) ) {
-				pCatIdx = j;
-				pCategory = categoryList.at( j );
-				break;
-			}
-		}
+
+		pCatIdx -= 1;
+		if ( pCatIdx == -1 )
+			pCatIdx = categoryList.count() - 1;
 	}
 
-	QModelIndexList pIdxList = cModel->indexListForCategory( pCategory );
-
-	// This is not the first index of this category
-	if ( cIdxList.first() != idx ) {
-		persistentVCol = ( cIdxList.indexOf( idx ) - 1 ) % itemsPerRow;
-		return cIdxList.at( cIdxList.indexOf( idx ) - 1 );
+	QString prevCat = categoryList.at( pCatIdx );
+	/* If the previous category is folded */
+	if ( foldedCategories.contains( prevCat ) ) {
+		curIdx = qMakePair( pCatIdx, itemsPerRow - 2 );
+		persistentVCol = itemsPerRow - 2;
+		return cModel->indexListForCategory( pCatIdx )[ itemsPerRow - 2 ];
 	}
 
-	// This is the first index of the current category
+	/* The category is not folded */
 	else {
-		persistentVCol = ( pIdxList.count() - 1 ) % itemsPerRow;
-		return pIdxList.last();
+		QModelIndexList catIdxes = cModel->indexListForCategory( pCatIdx );
+		curIdx = qMakePair( pCatIdx, catIdxes.count() - 1 );
+		persistentVCol = ( catIdxes.count() - 1 ) % itemsPerRow;
+		return catIdxes.last();
 	}
+
+	return QModelIndex();
 };
 
 QModelIndex NBIconView::belowIndex() {
 
 	QModelIndex idx = currentIndex();
-	/*
-		*
-		* 1. If we have an index below this in this category
-		* 2. Else, we have a row below this in this category
-		* 3. If we have an index below this in the next category
-		* 4. Else, we return the last index in the next category
-		*
-	*/
 
-	// CurrentCategory
-	QString cCategory = cModel->category( idx );
-	int cCatIdx = categoryList.indexOf( cCategory );
-	QModelIndexList cIdxList = cModel->indexListForCategory( cCategory );
+	/* If the current category is not folded, just return the next index */
+	if ( not foldedCategories.contains( cModel->category( idx ) ) ) {
+		/* The next index is in the current category */
+		int nextIdx = curIdx.second + itemsPerRow;
+		if ( nextIdx < cModel->indexListCountForCategory( curIdx.first ) - 1 ) {
 
-	// Next Category
-	QString nCategory;
-	int nCatIdx = -1;
-
-	/* We search for all the categories ahead, from the current category */
-	for( int i = cCatIdx + 1; i < categoryList.count(); i++ ) {
-		if ( not hiddenCategories.contains( categoryList.at( i ) ) ) {
-			nCatIdx = i;
-			nCategory = categoryList.at( i );
-			break;
+			curIdx = qMakePair( curIdx.first, nextIdx );
+			return cModel->indexListForCategory( curIdx.first )[ nextIdx ];
 		}
-	}
-	/* If we find none, we search for all categories from 0, till the current one */
-	if ( nCatIdx == -1 ) {
-		for( int i = 0; i <= cCatIdx; i++ ) {
-			if ( not hiddenCategories.contains( categoryList.at( i ) ) ) {
-				nCatIdx = i;
-				nCategory = categoryList.at( i );
-				break;
+
+		/* If the number of rows is greater than the current row of the current index */
+		else {
+			int curRow = ceil( 1.0 * curIdx.second / itemsPerRow );
+			int catRows = ceil( cModel->indexListCountForCategory( curIdx.first ) / itemsPerRow );
+			if ( catRows > curRow and curRow != 0 ) {
+				curIdx = qMakePair( curIdx.first, cModel->indexListCountForCategory( curIdx.first ) - 1 );
+				return cModel->indexListForCategory( curIdx.first ).last();
 			}
 		}
 	}
 
-	QModelIndexList nIdxList = cModel->indexListForCategory( nCategory );
+	/* The next index is in the next visible category */
+	int nCatIdx = curIdx.first < categoryList.count() - 1 ? curIdx.first + 1 : 0;
+	while ( ( nCatIdx < categoryList.count() ) and ( nCatIdx != curIdx.first ) ) {
+		if ( not hiddenCategories.contains( categoryList.at( nCatIdx ) ) )
+			break;
 
-	/* Compute the number of rows in the current category */
-	int cRows = cIdxList.count() / itemsPerRow;
-	if ( cIdxList.count() % itemsPerRow )
-		cRows++;
-
-	/* Check which row are we in */
-	int cRow = ( 1 + cIdxList.indexOf( idx ) ) / itemsPerRow;
-	if ( ( 1 + cIdxList.indexOf( idx ) ) % itemsPerRow )
-		cRow++;
-
-	/* Compute the number of rows in the previous category */
-	int nRows = nIdxList.count() / itemsPerRow;
-	if ( nIdxList.count() % itemsPerRow )
-		nRows++;
-
-	/* If we have a row below us and persistentVCol index exists */
-	if ( ( cRow < cRows ) and ( ( cRow * itemsPerRow + persistentVCol ) < cIdxList.count() - 1 ) ) {
-
-		return cIdxList.at( cIdxList.indexOf( idx ) + itemsPerRow );
+		nCatIdx += 1;
+		if ( nCatIdx == categoryList.count() )
+			nCatIdx = 0;
 	}
 
-	/* We have another row, just not an index below this */
-	else if ( ( cRow < cRows ) and ( ( cRow * itemsPerRow + persistentVCol ) >= cIdxList.count() - 1 ) ) {
+	/* The next category is folded */
+	if ( foldedCategories.contains( categoryList.at( nCatIdx ) ) ) {
+		if ( persistentVCol <= itemsPerRow - 2 ) {
+			curIdx = qMakePair( nCatIdx, persistentVCol );
+			return cModel->indexListForCategory( nCatIdx ).at( persistentVCol );
+		}
 
-		return cIdxList.last();
+		else {
+			curIdx = qMakePair( nCatIdx, itemsPerRow - 2 );
+			return cModel->indexListForCategory( nCatIdx ).at( itemsPerRow - 2 );
+		}
 	}
 
-	/* There is an index below this one in the next category */
-	else if ( nIdxList.count() > persistentVCol ) {
-
-		return nIdxList.at( persistentVCol );
+	if ( persistentVCol < cModel->indexListCountForCategory( nCatIdx ) - 1 ) {
+		curIdx = qMakePair( nCatIdx, persistentVCol );
+		return cModel->indexListForCategory( nCatIdx ).at( persistentVCol );
 	}
 
-	/* Last one in the next category */
 	else {
-
-		return nIdxList.last();
+		curIdx = qMakePair( nCatIdx, cModel->indexListCountForCategory( nCatIdx ) - 1 );
+		return cModel->indexListForCategory( nCatIdx ).last();
 	}
+
+	return QModelIndex();
 };
 
 QModelIndex NBIconView::aboveIndex() {
 
 	QModelIndex idx = currentIndex();
-	/*
-		*
-		* 1. Check if there are rows above the current one in this index
-		* 2. If not, check if there is an index above this in the previous category
-		* 3. Else, the last index of the previous category
-		*
-	*/
 
-	// CurrentCategory
-	QString cCategory = cModel->category( idx );
-	int cCatIdx = categoryList.indexOf( cCategory );
-	QModelIndexList cIdxList = cModel->indexListForCategory( cCategory );
-
-	// Previous Category
-	QString pCategory;
-	int pCatIdx = -1;
-
-	/* We search for all the categories before this one */
-	for( int i = cCatIdx - 1; i >= 0; i-- ) {
-		if ( not hiddenCategories.contains( categoryList.at( i ) ) ) {
-			pCatIdx = i;
-			pCategory = categoryList.at( i );
-			break;
-		}
+	/* The previous index is in the current category */
+	/* Note that if this category is folded, the next block will have already put the
+	 * current index in the first row of this category. */
+	int curRow = ceil( curIdx.second / itemsPerRow );
+	if ( curRow > 0 ) {
+		int nIdx = ( curRow - 1 ) * itemsPerRow + persistentVCol;
+		curIdx = qMakePair( curIdx.first, nIdx );
+		return cModel->indexListForCategory( curIdx.first ).at( nIdx );
 	}
-	/* If we find none, we search backwards from the lastt to the current one */
-	if ( pCatIdx == -1 ) {
-		for( int j = categoryList.count() - 1; j >= cCatIdx; j-- ) {
-			if ( not hiddenCategories.contains( categoryList.at( j ) ) ) {
-				pCatIdx = j;
-				pCategory = categoryList.at( j );
-				break;
+
+	/* The previous index is in the previous category */
+	int pCatIdx = curIdx.first > 0 ? curIdx.first - 1 : categoryList.count() - 1;
+	while ( ( pCatIdx < categoryList.count() ) and ( pCatIdx != curIdx.first ) ) {
+		if ( not hiddenCategories.contains( categoryList.at( pCatIdx ) ) )
+			break;
+
+		pCatIdx -= 1;
+		if ( pCatIdx == -1 )
+			pCatIdx = categoryList.count() - 1;
+	}
+
+	/* The prev index is the last visible index of the previous visible category */
+	QString prevCat = categoryList.at( pCatIdx );
+	if ( foldedCategories.contains( prevCat ) ) {
+		if ( persistentVCol <= cModel->indexListCountForCategory( prevCat ) - 1 ) {
+			if ( persistentVCol <= itemsPerRow - 2 ) {
+				curIdx = qMakePair( pCatIdx, persistentVCol );
+				return cModel->indexListForCategory( prevCat ).at( persistentVCol );
+			}
+
+			else {
+				curIdx = qMakePair( pCatIdx, itemsPerRow - 2 );
+				return cModel->indexListForCategory( prevCat ).at( itemsPerRow - 2 );
 			}
 		}
+
+		/* Safegaurd: This should never happen */
+		else {
+			curIdx = qMakePair( pCatIdx, cModel->indexListCountForCategory( pCatIdx ) - 1 );
+			return cModel->indexListForCategory( pCatIdx ).last();
+		}
 	}
 
-	QModelIndexList pIdxList = cModel->indexListForCategory( pCategory );
-
-	/* Compute the number of rows in the current category */
-	int cRows = cIdxList.count() / itemsPerRow;
-	if ( cIdxList.count() % itemsPerRow )
-		cRows++;
-
-	/* Check which row are we in */
-	int cRow = ( 1 + cIdxList.indexOf( idx ) ) / itemsPerRow;
-	if ( ( 1 + cIdxList.indexOf( idx ) ) % itemsPerRow )
-		cRow++;
-
-	/* Compute the number of rows in the previous category */
-	int pRows = pIdxList.count() / itemsPerRow;
-	if ( pIdxList.count() % itemsPerRow )
-		pRows++;
-
-	/* Check the number of items in the last row */
-	int nLast = pIdxList.count() - ( pRows - 1 ) * itemsPerRow;
-
-	/* If we have a row above us in the current category, return the persistent index above */
-	if ( cRow > 1 ) {
-
-		return cIdxList.at( ( cIdxList.indexOf( idx ) / itemsPerRow - 1 ) * itemsPerRow + persistentVCol );
+	/* Last index of the previous category is the above index */
+	int lIdxCol = cModel->indexListCountForCategory( prevCat ) % itemsPerRow;
+	if ( lIdxCol <= persistentVCol and lIdxCol != 0 ) {
+		curIdx = qMakePair( pCatIdx, cModel->indexListCountForCategory( pCatIdx ) - 1 );
+		return cModel->indexListForCategory( pCatIdx ).last();
 	}
 
-	/* We have to return from the previous category */
-	else if ( persistentVCol < nLast ) {
-
-		return pIdxList.at( ( pRows - 1 ) * itemsPerRow + persistentVCol );
-	}
-
-	/* The last index of the previous category */
 	else {
-
-		return pIdxList.last();
+		int nRows = ceil( 1.0 * cModel->indexListCountForCategory( prevCat ) / itemsPerRow );
+		int pIdx = ( nRows - 1 ) * itemsPerRow + persistentVCol;
+		curIdx = qMakePair( pCatIdx, pIdx );
+		return cModel->indexListForCategory( pCatIdx ).at( pIdx );
 	}
+
+	return QModelIndex();
 };
 
 QModelIndex NBIconView::firstIndex() {
@@ -1571,6 +1477,8 @@ QModelIndex NBIconView::firstIndex() {
 		}
 	}
 
+	curIdx = qMakePair( firstVisibleCatIdx, 0 );
+
 	verticalScrollBar()->setValue( 0 );
 
 	if ( firstVisibleCatIdx >= 0 )
@@ -1583,22 +1491,29 @@ QModelIndex NBIconView::firstIndex() {
 QModelIndex NBIconView::lastIndex() {
 
 	int lastVisibleCatIdx = -1;
-	for( int i = categoryList.count() - 1; i >= 0; i-- ) {
-		if ( not hiddenCategories.contains( categoryList.at( i ) ) ) {
-			lastVisibleCatIdx = i;
+	for( lastVisibleCatIdx = categoryList.count() - 1; lastVisibleCatIdx >= 0; lastVisibleCatIdx-- ) {
+		if ( not hiddenCategories.contains( categoryList.at( lastVisibleCatIdx ) ) )
 			break;
-		}
 	}
 
 	verticalScrollBar()->setValue( verticalScrollBar()->maximum() );
 
-	persistentVCol = ( cModel->indexListCountForCategory( categoryList.at( lastVisibleCatIdx ) ) - 1 ) % itemsPerRow;
+	int categoryNodeCount = cModel->indexListCountForCategory( lastVisibleCatIdx );
+
+	if ( foldedCategories.contains( categoryList.at( lastVisibleCatIdx ) ) ) {
+		persistentVCol = ( categoryNodeCount < itemsPerRow ? categoryNodeCount : itemsPerRow - 2 );
+		curIdx = qMakePair( lastVisibleCatIdx, persistentVCol );
+	}
+
+	else {
+		persistentVCol = ( categoryNodeCount - 1 ) % itemsPerRow;
+		curIdx = qMakePair( lastVisibleCatIdx, categoryNodeCount - 1 );
+	}
 
 	if ( lastVisibleCatIdx >= 0 )
-		return cModel->indexListForCategory( categoryList.at( lastVisibleCatIdx ) ).last();
+		return cModel->indexListForCategory( categoryList.at( lastVisibleCatIdx ) ).at( curIdx.second );
 
-	else
-		return QModelIndex();
+	return QModelIndex();
 };
 
 QModelIndex NBIconView::indexPageBelow() {
@@ -2213,7 +2128,7 @@ void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const
 
 	painter->setPen( QPen( textColor ) );
 
-	QPixmap pix = cModel->pixmapForCategory( text );
+	QPixmap pix = cModel->pixmapForCategory( text, hiddenCategories.contains( text ) );
 	QPoint topLeft = rectangle.topLeft();
 
 	painter->drawPixmap( topLeft.x() + 4, topLeft.y() + 4, 16, 16, pix );
@@ -2349,13 +2264,11 @@ void NBIconView::showHideCategory( QString category ) {
 		hiddenCategories.removeAll( category );
 		hidden.removeAll( category );
 		folded.removeAll( category );
-		cModel->openCategory( category );
 	}
 
 	else{
 		hiddenCategories.append( category );
 		hidden.append( category );
-		cModel->foldCategory( category );
 	}
 
 	hidden.removeDuplicates();
@@ -2373,17 +2286,29 @@ void NBIconView::toggleFoldCategory( QString category ) {
 	QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
 	QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
 
-	if ( foldedCategories.contains( category ) ) {
+	/* If @category is hidden, show it folded */
+	if ( hiddenCategories.contains( category ) ) {
+		hidden.removeAll( category );
+		hiddenCategories.removeAll( category );
+		if ( cModel->indexListCountForCategory( category ) > itemsPerRow ) {
+			foldedCategories.append( category );
+			folded.append( category );
+		}
+	}
+
+	else if ( foldedCategories.contains( category ) ) {
+		hiddenCategories.removeAll( category );
+		hidden.removeAll( category );
+
 		foldedCategories.removeAll( category );
 		folded.removeAll( category );
-		hidden.removeAll( category );
-		cModel->openCategory( category );
 	}
 
 	else{
-		foldedCategories.append( category );
-		folded.append( category );
-		cModel->foldCategory( category );
+		if ( cModel->indexListCountForCategory( category ) > itemsPerRow ) {
+			foldedCategories.append( category );
+			folded.append( category );
+		}
 	}
 
 	folded.removeDuplicates();

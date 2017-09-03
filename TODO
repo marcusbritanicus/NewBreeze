@@ -18,7 +18,7 @@ NBIconView                                                                      
 	◐ Improve the selection model
 	  • Currently mouse-over on click selection is enabled.
 	  • Change selection policy with model data type
-	□ Rewrite cursor movements from scratch taking into account category folding
+	✓ Rewrite cursor movements from scratch taking into account category folding
 	✗ Enable PageUp and PageDown navigation
 	✓ Enable per-folder folded category memory
 	✓ Category icons need to be added

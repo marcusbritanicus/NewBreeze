@@ -75,14 +75,12 @@ class NBItemViewModel : public QAbstractItemModel {
 		QString category( const QModelIndex &index = QModelIndex() ) const;
 		int categoryIndex( const QModelIndex &index = QModelIndex() ) const;
 		QStringList categories() const;
-		QPixmap pixmapForCategory( QString ) const;
-
-		void foldCategory( QString );
-		void openCategory( QString );
-		bool isCategoryOpen( QString ) const;
+		QPixmap pixmapForCategory( QString, bool folded = false ) const;
 
 		int indexListCountForCategory( QString ) const;
 		QModelIndexList indexListForCategory( QString ) const;
+		int indexListCountForCategory( int ) const;
+		QModelIndexList indexListForCategory( int ) const;
 		int indexInCategory( QModelIndex ) const;
 		QModelIndexList categorySiblings( QModelIndex ) const;
 
