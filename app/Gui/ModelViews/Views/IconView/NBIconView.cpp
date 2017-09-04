@@ -1347,7 +1347,7 @@ QModelIndex NBIconView::belowIndex() {
 	if ( not foldedCategories.contains( cModel->category( idx ) ) ) {
 		/* The next index is in the current category */
 		int nextIdx = curIdx.second + itemsPerRow;
-		if ( nextIdx < cModel->indexListCountForCategory( curIdx.first ) - 1 ) {
+		if ( nextIdx <= cModel->indexListCountForCategory( curIdx.first ) - 1 ) {
 
 			curIdx = qMakePair( curIdx.first, nextIdx );
 			return cModel->indexListForCategory( curIdx.first )[ nextIdx ];
@@ -1355,9 +1355,9 @@ QModelIndex NBIconView::belowIndex() {
 
 		/* If the number of rows is greater than the current row of the current index */
 		else {
-			int curRow = ceil( 1.0 * curIdx.second / itemsPerRow );
-			int catRows = ceil( cModel->indexListCountForCategory( curIdx.first ) / itemsPerRow );
-			if ( catRows > curRow and curRow != 0 ) {
+			int curRow = ceil( ( 1.0 + curIdx.second ) / itemsPerRow );
+			int catRows = ceil( 1.0 * cModel->indexListCountForCategory( curIdx.first ) / itemsPerRow );
+\			if ( catRows > curRow and curRow != 0 ) {
 				curIdx = qMakePair( curIdx.first, cModel->indexListCountForCategory( curIdx.first ) - 1 );
 				return cModel->indexListForCategory( curIdx.first ).last();
 			}
