@@ -34,15 +34,18 @@ Notes for compiling - linux:
 
 Dependencies:
     - Qt4/Qt5
-    - libmagic and libmagic-dev
     - zlib
     - liblzma
     - libbzip2
     - libarchive
+    - xdg-utls
+    - libpoppler-qt4/qt5
+    - libsource-highlight-dev (optional)
+    - libpoppler-qt4-dev/libpoppler-qt5-dev (optional)
+    - libdjvulibre-dev (optional)
 
 Known Bugs
-    - SegmentationFault in NBIconView ::aboveIndex(...), ::belowIndex(...)
-    - No update of nodes in NBIconView which are being copied.
+    - Extended copy/move causes crashes. Disabled by default.
 
 List of shortcuts
 +==============================================================+============================+
