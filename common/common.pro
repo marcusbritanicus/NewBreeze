@@ -24,6 +24,7 @@ HEADERS += include/NBLibLzma2.hpp
 HEADERS += include/NBSystemInfo.hpp
 HEADERS += include/NBTools.hpp
 HEADERS += include/NBXdg.hpp
+HEADERS += include/SimpleCrypt.hpp
 
 # Sources
 # =======
@@ -36,6 +37,7 @@ SOURCES += Archive/NBLibLzma.cpp
 SOURCES += Archive/NBLibLzma2.cpp
 SOURCES += DeviceInfo/NBDeviceInfo.cpp
 SOURCES += DeviceInfo/NBDeviceInfoUnix.cpp
+SOURCES += SimpleCrypt/SimpleCrypt.cpp
 SOURCES += SystemInfo/NBSystemInfo.cpp
 SOURCES += Tools/NBTools.cpp
 SOURCES += XDG/NBXdg.cpp

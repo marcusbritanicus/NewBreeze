@@ -8,8 +8,6 @@ DEPENDPATH += ../../common/ ../../common/include
 DEPENDPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle PdfPeep PdfPeep/libPdf WebWatch
 INCLUDEPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle PdfPeep PdfPeep/libPdf WebWatch
 
-include(PdfPeep/libPdf/src.pri)
-
 isEqual( QT_MAJOR_VERSION, 4 ) {
 	LIBS += -L../../common/ -lnewbreeze-common
 }
@@ -21,9 +19,6 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 
 # Same as NewBreeze version
 VERSION = "3.0.0"
-
-# Needs libz
-LIBS += -lz
 
 # Needs QtXml
 QT += xml
@@ -121,8 +116,8 @@ SOURCES += OdfOgle/styleinformation.cpp OdfOgle/styleparser.cpp
 
 ## PdfPeep
 ## =======
-HEADERS += PdfPeep/NBPdfPeep.hpp
-SOURCES += PdfPeep/NBPdfPeep.cpp
+HEADERS += PdfPeep/NBPdfPeep.hpp PdfPeep/PdfDocument.hpp PdfPeep/PdfView.hpp
+SOURCES += PdfPeep/NBPdfPeep.cpp PdfPeep/PdfDocument.cpp PdfPeep/PdfView.cpp
 
 ## WebWatch
 ## ========

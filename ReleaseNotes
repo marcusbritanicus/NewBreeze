@@ -74,7 +74,8 @@ few changes in NewBreeze 3.
    - A menu will be added later.
 
 => NewBreeze Vault
-   - This is work in progress. It will be completed by NB v3.0.0-rc1.
-   - A single place to access all your encrypted files and folders
-   - Use one key to lock/unlock the vault or add/remove files and folders from it.
-   - Each added file or folder will be encrypted using a unique 1024 bit key.
+   NOTE: This is work in progress. The first implementation will be completed by NB v3.0.0-rc1.
+   - When fully implemented NewBreeze Vault will be a single place to access all your encrypted files and folders.
+   - Currently, all the encrypted files and folders will be in stored in and retrieved from an encrypted database.
+   - Each added file or folder will be encrypted using a randomly generated unique 8196 bit (1 kiB) key.
+   - NBCrypt Plugin is deprecated and a dummy will be installed in its place.

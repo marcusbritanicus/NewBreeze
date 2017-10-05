@@ -34,8 +34,7 @@ void NBPdfPeep::createGUI() {
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
-	peekWidgetBase = new PdfView();
-	peekWidgetBase->setMouseTool( PdfView::TextSelection );
+	peekWidgetBase = new PdfView( path, this );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
 
 	QWidget *pdfBase = new QWidget();
@@ -73,22 +72,10 @@ void NBPdfPeep::setWindowProperties() {
 	setAttribute( Qt::WA_DeleteOnClose );
 };
 
-int NBPdfPeep::exec() {
-
-	QTimer::singleShot( 0, this, SLOT( loadPdf() ) );
-	return QDialog::exec();
-};
-
 void NBPdfPeep::openInExternal() {
 
 	QProcess::startDetached( "xdg-open " + path );
 	close();
-};
-
-void NBPdfPeep::loadPdf() {
-
-	peekWidgetBase->load( path );
-	peekWidgetBase->setMaximumPageWidth( 670 );
 };
 
 void NBPdfPeep::keyPressEvent( QKeyEvent *keyEvent ) {

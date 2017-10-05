@@ -1,10 +1,13 @@
 /*
 	*
-	* NBCrypt.cpp - NewBreeze File Folder Encryption Class
+	* NBCrypt.cpp - NewBreeze File Folder Encryption Class DUMMY
 	*
 */
 
 #include "NBCrypt.hpp"
+
+#warning "This is a dummy implementation to replace the existing plugin. "				\
+         "All the NBCrypt Plugin functionality has been merged with the main app."
 
 /* Name of the plugin */
 QString NBCrypt::name() {
@@ -15,137 +18,19 @@ QString NBCrypt::name() {
 /* The plugin version */
 QString NBCrypt::version() {
 
-	return "3.0.0";
+	return "3.0.0-dummy";
 };
 
 /* The QAction hooks for menus/toolbars */
-QList<QAction*> NBCrypt::actions( Interface, QStringList nodes ) {
+QList<QAction*> NBCrypt::actions( Interface, QStringList ) {
 
-	if ( nodes.count() > 1 ) {
-		/* Create a encrypted folder with multiple input folders */
-		return QList<QAction*>();
-	}
-
-	else if ( nodes.count() == 1 ) {
-
-		QString path = nodes.at( 0 );
-		if ( isDir( path ) ) {
-
-			/* Parent Settings object */
-			QSettings sett( QDir( dirName( path ) ).filePath( ".directory" ), QSettings::NativeFormat );
-			sett.beginGroup( "EncFS" );
-
-			/* Check if the current directory is an EncFS source */
-			if ( sett.childKeys().contains( baseName( path ) ) ) {
-
-				/* If this source is mounted we need to unmount it */
-				Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allMounts() ) {
-					if ( info.mountPoint() == path + "/" ) {
-
-						/* Unmount Action */
-						QAction *act = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), "&Unmount EncFS Volume", this );
-
-						NBEncFS *encfs = new NBEncFS( path, dirName( path ) + sett.value( baseName( path ) ).toString(), mParent );
-						connect( act, SIGNAL( triggered() ), encfs, SLOT( unmountDir() ) );
-
-						return QList<QAction*>() << act;
-					}
-				}
-
-				/* Mount Action */
-				QAction *act1 = new QAction( QIcon( ":/icons/emblem-mounted.png" ), "&Mount EncFS Volume", this );
-				QAction *act2 = new QAction( QIcon( ":/icons/key.png" ), "&Change EncFS Password", this );
-
-				NBEncFS *encfs = new NBEncFS( path, dirName( path ) + sett.value( baseName( path ) ).toString(), mParent );
-				connect( act1, SIGNAL( triggered() ), encfs, SLOT( mountDir() ) );
-				connect( act2, SIGNAL( triggered() ), encfs, SLOT( changePass() ) );
-
-				return QList<QAction*>() << act1 << act2;
-			}
-
-			/* Otherwise it might be EncFS target */
-			Q_FOREACH( QString key, sett.childKeys() ) {
-				if ( sett.value( key ).toString() == baseName( path ) ) {
-					/* If it is mounted, we return unmount action */
-					Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allMounts() ) {
-						if ( info.mountPoint() == path + "/" ) {
-
-							/* Unmount Action */
-							QAction *act = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), "&Unmount EncFS Volume", this );
-
-							NBEncFS *encfs = new NBEncFS( dirName( path ) + key, path, mParent );
-							connect( act, SIGNAL( triggered() ), encfs, SLOT( unmountDir() ) );
-
-							return QList<QAction*>() << act;
-						}
-					}
-
-					/* Otherwise we return mount action */
-					QAction *act1 = new QAction( QIcon( ":/icons/emblem-mounted.png" ), "&Mount EncFS Volume", this );
-					QAction *act2 = new QAction( QIcon( ":/icons/key.png" ), "&Change EncFS Password", this );
-
-					NBEncFS *encfs = new NBEncFS( dirName( path ) + key, path, mParent );
-					connect( act1, SIGNAL( triggered() ), encfs, SLOT( mountDir() ) );
-					connect( act2, SIGNAL( triggered() ), encfs, SLOT( changePass() ) );
-
-					return QList<QAction*>() << act1 << act2;
-				}
-			}
-
-			/* So, its neither encrypted nor mounted volume */
-			QAction *act = new QAction( QIcon( ":/icons/encrypt.png" ), "&Create EncFS Volume", this );
-
-			NBEncFS *encfs = new NBEncFS( path, QString(), mParent );
-			connect( act, SIGNAL( triggered() ), encfs, SLOT( createEncFS() ) );
-
-			return QList<QAction*>() << act;
-		}
-
-		/* We have no way of telling which is an encrypted file, which is not, except by extension */
-		else if ( isFile( nodes.at( 0 ) ) ) {
-			/* If the extension is .s20, we decrypt it */
-			if ( nodes.at( 0 ).endsWith( ".s20" ) ) {
-				QAction *act1 = new QAction( QIcon::fromTheme( "document-decrypt" ), "&Decrypt File", this );
-				QAction *act2 = new QAction( QIcon( ":/icons/key.png" ), "Change &Password", this );
-
-				NBSalsa20 *s20 = new NBSalsa20( path, mParent );
-				connect( act1, SIGNAL( triggered() ), s20, SLOT( decrypt() ) );
-				connect( act2, SIGNAL( triggered() ), s20, SLOT( changePass() ) );
-
-				return QList<QAction*>() << act1 << act2;
-			}
-
-			/* Otherwise, we encrypt */
-			else {
-				QAction *act = new QAction( QIcon::fromTheme( "document-encrypt" ), "&Encrypt File", this );
-
-				NBSalsa20 *s20 = new NBSalsa20( path, mParent );
-				connect( act, SIGNAL( triggered() ), s20, SLOT( encrypt() ) );
-
-				return QList<QAction*>() << act;
-			}
-		}
-
-		else {
-			/* Cannot encrypt this type of node */
-			qDebug() << "Unable to encrypt/decrypt this node:" << path;
-			return QList<QAction*>();
-		}
-	}
-
-	/* Otherwise we return create encfs action */
-	QAction *act = new QAction( QIcon( ":/icons/encrypt.png" ), "&Create EncFS Volume", this );
-
-	NBEncFS *encfs = new NBEncFS( QString(), QString(), mParent );
-	connect( act, SIGNAL( triggered() ), encfs, SLOT( createEncFS() ) );
-
-	return QList<QAction*>() << act;
+	return QList<QAction*>();
 };
 
 /* Interface type: preview, rename etc */
 NBPluginInterface::Interfaces NBCrypt::interfaces() {
 
-	return NBPluginInterface::Interfaces() << NBPluginInterface::ActionInterface;
+	return NBPluginInterface::Interfaces();
 };
 
 /* Interface type: preview, rename etc */
@@ -157,19 +42,18 @@ NBPluginInterface::Type NBCrypt::type( NBPluginInterface::Interface ) {
 /* Plugin load contexts */
 NBPluginInterface::Contexts NBCrypt::contexts( NBPluginInterface::Interface ) {
 
-	return Contexts() << NBPluginInterface::File << NBPluginInterface::Dir << NBPluginInterface::None;
+	return Contexts() << NBPluginInterface::None;
 };
 
 /* Mimetypes handled by the plugin */
 QStringList NBCrypt::mimetypes() {
 
-	return QStringList() << "*";
+	return QStringList() << "invalid/none";
 };
 
 /* Invoke slots called called by triggering the actions */
-void NBCrypt::actionTrigger( Interface, QString, QStringList nodes ) {
+void NBCrypt::actionTrigger( Interface, QString, QStringList ) {
 
-	#warning "Fix this..!!!"
 };
 
 void NBCrypt::setCaller( QWidget *caller ) {

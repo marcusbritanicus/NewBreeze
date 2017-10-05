@@ -7,13 +7,7 @@
 #pragma once
 
 #include "Global.hpp"
-#include "pdfview.h"
-#if QT_VERSION >= 0x050000
-	#include <poppler-qt5.h>
-	#include <QtPrintSupport>
-#else
-	#include <poppler-qt4.h>
-#endif
+#include "PdfView.hpp"
 
 class NBPdfPeep : public QDialog {
 	Q_OBJECT
@@ -30,12 +24,8 @@ class NBPdfPeep : public QDialog {
 		QVBoxLayout *pdfLyt;
 		QLabel *lbl;
 
-	public slots:
-		int exec();
-
 	private slots :
 		void openInExternal();
-		void loadPdf();
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );

@@ -17,6 +17,8 @@ class NBIconDelegate : public QItemDelegate {
 		void paintTiles( QPainter *painter, const NBStyleOptionViewItem &option, const QModelIndex &index ) const;
 		void paintDetails( QPainter *painter, const NBStyleOptionViewItem &option, const QModelIndex &index ) const;
 
+		void paintSuperStartIcons( QPainter *painter, const NBStyleOptionViewItem &option, const QModelIndex &index ) const;
+
 	private:
 		void paintIconTextDetails( QPainter *painter, QRect &textRect, const QModelIndex &index ) const;
 		void paintTileTextDetails( QPainter *painter, QRect &textRect, const QModelIndex &index ) const;

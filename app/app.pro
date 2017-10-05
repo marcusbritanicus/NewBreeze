@@ -12,11 +12,11 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 }
 
 isEqual( QT_MAJOR_VERSION, 4 ) {
-	 LIBS += -L../common/ -lnewbreeze-common
+	 LIBS += -L../common/ -lnewbreeze-common -larchive -lz
 }
 
 isEqual( QT_MAJOR_VERSION, 5 ) {
-	LIBS +=  -L../common/ -lnewbreeze-common5
+	LIBS +=  -L../common/ -lnewbreeze-common5 -larchive -lz
 }
 
 # Common Sources
@@ -24,7 +24,7 @@ INCLUDEPATH += ../common/ ../common/include
 DEPENDPATH += ../common/ ../common/include
 
 # Source Paths
-INCLUDEPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs
+INCLUDEPATH += . Core Core/ArgParser Core/BookmarkInfo Core/Circle Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs
 INCLUDEPATH += Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BugCatcher Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
 INCLUDEPATH += Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
 INCLUDEPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
@@ -35,7 +35,7 @@ INCLUDEPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/Cus
 INCLUDEPATH += Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
 INCLUDEPATH += Gui/Widgets/TrashManager
 
-DEPENDPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs
+DEPENDPATH += . Core Core/ArgParser Core/BookmarkInfo Core/Circle Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs
 DEPENDPATH += Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BugCatcher Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
 DEPENDPATH += Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
 DEPENDPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
@@ -49,6 +49,7 @@ DEPENDPATH += Gui/Widgets/TrashManager
 # Headers
 HEADERS += Core/ArgParser/NBCLParser.hpp
 HEADERS += Core/BookmarkInfo/NBBookmarkInfo.hpp
+HEADERS += Core/Circle/NBCircle.hpp
 HEADERS += Core/DeleteManager/NBDeleteManager.hpp
 HEADERS += Core/FSWatcher/NBFileSystemWatcher.hpp
 HEADERS += Core/IconProvider/NBIconManager.hpp
@@ -172,6 +173,7 @@ HEADERS += optionparser.hpp
 # Sources
 SOURCES += Core/ArgParser/NBCLParser.cpp
 SOURCES += Core/BookmarkInfo/NBBookmarkInfo.cpp
+SOURCES += Core/Circle/NBCircle.cpp
 SOURCES += Core/DeleteManager/NBDeleteManager.cpp
 SOURCES += Core/FSWatcher/NBFileSystemWatcher.cpp
 SOURCES += Core/IconProvider/NBIconManager.cpp
@@ -283,6 +285,73 @@ SOURCES += Gui/Widgets/Terminal/lib/Vt102Emulation.cpp
 SOURCES += Gui/Widgets/Terminal/NBTerminal.cpp
 SOURCES += Gui/Widgets/TrashManager/NBTrashManager.cpp
 SOURCES += Main.cpp
+
+# Vault Sources
+INCLUDEPATH += Vault Vault/EncFS Vault/KeyDialog Vault/MicroDB Vault/MicroDB/Compressors Vault/MicroDB/Encryption Vault/Salsa20
+DEPENDPATH += Vault Vault/EncFS Vault/KeyDialog Vault/MicroDB Vault/MicroDB/Compressors Vault/MicroDB/Encryption Vault/Salsa20
+
+HEADERS += Vault/EncFS/NBEncFS.hpp
+HEADERS += Vault/KeyDialog/NBPasswordDialog.hpp
+HEADERS += Vault/KeyDialog/NBPasswordEdit.hpp
+HEADERS += Vault/KeyDialog/NBPasswordInput.hpp
+HEADERS += Vault/KeyDialog/NBPatternPad.hpp
+HEADERS += Vault/MicroDB/AbZip.h
+HEADERS += Vault/MicroDB/abzip_p.h
+HEADERS += Vault/MicroDB/CentralDirFileHeader.h
+HEADERS += Vault/MicroDB/Compressors/Bzip2Compressor.h
+HEADERS += Vault/MicroDB/Compressors/Bzip2Decompressor.h
+HEADERS += Vault/MicroDB/Compressors/Compressor.h
+HEADERS += Vault/MicroDB/Compressors/DeflateCompressor.h
+HEADERS += Vault/MicroDB/Compressors/InflateCompressor.h
+HEADERS += Vault/MicroDB/Compressors/LzmaCompressor.h
+HEADERS += Vault/MicroDB/Compressors/LzmaDecompressor.h
+HEADERS += Vault/MicroDB/Compressors/StoreCompressor.h
+HEADERS += Vault/MicroDB/Encryption/AesEncryption.h
+HEADERS += Vault/MicroDB/Encryption/CrcEncryption.h
+HEADERS += Vault/MicroDB/Encryption/encryption.h
+HEADERS += Vault/MicroDB/EndOfCentralDir.h
+HEADERS += Vault/MicroDB/ExtraFields.h
+HEADERS += Vault/MicroDB/iobuffer.h
+HEADERS += Vault/MicroDB/LocalFileHeader.h
+HEADERS += Vault/MicroDB/Utils.h
+HEADERS += Vault/MicroDB/ZipCentralDir.h
+HEADERS += Vault/MicroDB/ZipDirIterator.h
+HEADERS += Vault/MicroDB/ZipFileInfo.h
+HEADERS += Vault/MicroDB/zipglobal.h
+HEADERS += Vault/NBVaultDatabase.hpp
+HEADERS += Vault/NBVault.hpp
+HEADERS += Vault/Salsa20/NBSalsa20.hpp
+HEADERS += Vault/Salsa20/Salsa20.hpp
+
+SOURCES += Vault/EncFS/NBEncFS.cpp
+SOURCES += Vault/KeyDialog/NBPasswordDialog.cpp
+SOURCES += Vault/KeyDialog/NBPasswordEdit.cpp
+SOURCES += Vault/KeyDialog/NBPasswordInput.cpp
+SOURCES += Vault/KeyDialog/NBPatternPad.cpp
+SOURCES += Vault/MicroDB/AbZip.cpp
+SOURCES += Vault/MicroDB/CentralDirFileHeader.cpp
+SOURCES += Vault/MicroDB/Compressors/Bzip2Compressor.cpp
+SOURCES += Vault/MicroDB/Compressors/Bzip2Decompressor.cpp
+SOURCES += Vault/MicroDB/Compressors/Compressor.cpp
+SOURCES += Vault/MicroDB/Compressors/DeflateCompressor.cpp
+SOURCES += Vault/MicroDB/Compressors/InflateCompressor.cpp
+SOURCES += Vault/MicroDB/Compressors/LzmaCompressor.cpp
+SOURCES += Vault/MicroDB/Compressors/LzmaDecompressor.cpp
+SOURCES += Vault/MicroDB/Compressors/StoreCompressor.cpp
+SOURCES += Vault/MicroDB/Encryption/AesEncryption.cpp
+SOURCES += Vault/MicroDB/Encryption/CrcEncryption.cpp
+SOURCES += Vault/MicroDB/Encryption/encryption.cpp
+SOURCES += Vault/MicroDB/EndOfCentralDir.cpp
+SOURCES += Vault/MicroDB/ExtraFields.cpp
+SOURCES += Vault/MicroDB/iobuffer.cpp
+SOURCES += Vault/MicroDB/LocalFileHeader.cpp
+SOURCES += Vault/MicroDB/Utils.cpp
+SOURCES += Vault/MicroDB/ZipCentralDir.cpp
+SOURCES += Vault/MicroDB/ZipDirIterator.cpp
+SOURCES += Vault/MicroDB/ZipFileInfo.cpp
+SOURCES += Vault/NBVault.cpp
+SOURCES += Vault/NBVaultDatabase.cpp
+SOURCES += Vault/Salsa20/NBSalsa20.cpp
 
 # Icon and stylesheet resources
 RESOURCES += NewBreeze.qrc ../data/data.qrc

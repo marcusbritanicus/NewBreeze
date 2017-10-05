@@ -15,6 +15,7 @@ Version 3.0.0 Alpha
 	- Feature: Accidental Delete Protection
 	- Feature: Archive Preview
 	- Feature: SuperStart enabled
+	- Feature: Inbuilt encryption support via NBVault
 	- NBIconManager replaces NBIconProvider with better functionality
 	- Icon themes are correctly detected over various DEs
 	- Faster model loading via scandir(...)
@@ -36,6 +37,7 @@ Version 3.0.0 Alpha
 	- QuickMenuBar removed, as its more of a hinderance
 	- UtilityBar (custom title bar) removed, uses native title bar
 	- The /proc/pid/cwd always points to the current directory
+	- Redesigned cursor movements
 	- BugFix: Double trigger for renames fixed
     - BugFix: NBFileSystemWatcher now uses QFileSystemWatcher as its backend
 	- BugFix: Mouse+Cursor selection is fixed

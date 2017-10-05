@@ -590,14 +590,19 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		option.palette = pltt;
 
 		NBIconDelegate *dlgt = qobject_cast<NBIconDelegate*>( itemDelegate() );
-		if ( currentViewMode == QString( "Icons" ) )
-			dlgt->paintIcons( &painter, option, idx );
+		if ( cModel->modelDataType() == NBItemViewModel::SuperStart )
+			dlgt->paintSuperStartIcons( &painter, option, idx );
 
-		else if ( currentViewMode == QString( "Tiles" ) )
-			dlgt->paintTiles( &painter, option, idx );
+		else {
+			if ( currentViewMode == QString( "Icons" ) )
+				dlgt->paintIcons( &painter, option, idx );
 
-		else
-			dlgt->paintDetails( &painter, option, idx );
+			else if ( currentViewMode == QString( "Tiles" ) )
+				dlgt->paintTiles( &painter, option, idx );
+
+			else
+				dlgt->paintDetails( &painter, option, idx );
+		}
 	}
 
 	painter.end();
@@ -1357,7 +1362,7 @@ QModelIndex NBIconView::belowIndex() {
 		else {
 			int curRow = ceil( ( 1.0 + curIdx.second ) / itemsPerRow );
 			int catRows = ceil( 1.0 * cModel->indexListCountForCategory( curIdx.first ) / itemsPerRow );
-\			if ( catRows > curRow and curRow != 0 ) {
+			if ( catRows > curRow and curRow != 0 ) {
 				curIdx = qMakePair( curIdx.first, cModel->indexListCountForCategory( curIdx.first ) - 1 );
 				return cModel->indexListForCategory( curIdx.first ).last();
 			}

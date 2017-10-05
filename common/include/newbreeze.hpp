@@ -39,3 +39,4 @@
 #include "NBSystemInfo.hpp"
 #include "NBTools.hpp"
 #include "NBXdg.hpp"
+#include "SimpleCrypt.hpp"

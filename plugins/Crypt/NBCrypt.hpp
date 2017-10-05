@@ -1,15 +1,10 @@
 /*
 	*
-	* NBCrypt.hpp - NewBreeze File Folder Encryption Class Header
+	* NBCrypt.hpp - NewBreeze File Folder Encryption Class Header DUMMY
 	*
 */
 
 #pragma once
-
-#include "Global.hpp"
-#include "NBEncFS.hpp"
-#include "NBSalsa20.hpp"
-#include "NBTools.hpp"
 
 #include <QtPlugin>
 #include "NBPluginInterface.hpp"

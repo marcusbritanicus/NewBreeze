@@ -77,9 +77,10 @@ General                                                                         
 	✗ Add support for addition of terminal emulators
 	✓ Remove libmagic dependency. Its too slow
 
-NewBreeze Vault
-	✍ Vault: A Single place to access all your private files
-		  • We shall use libgpgmepp6 or libqgpgme7
+NewBreeze Vault                                                                                                                       [ 0 of 1 ]
+	✍ Vault: A Single place to access all your private files and folders
+		  • This is the very first implementation, and is not very secure
+		  • NBCrypt plugin will be merged with NewBreeze app
 
 Note:
 	✍ - Work in progress
