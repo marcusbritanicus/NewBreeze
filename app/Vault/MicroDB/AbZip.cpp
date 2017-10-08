@@ -1405,16 +1405,6 @@ void AbZip::setZipFileName( const QString& name ) {
 };
 
 
-void AbZip::setPassword( const QString& pw ) {
-
-	d_ptr->password = pw;
-};
-
-void AbZip::clearPassword( ) {
-
-	d_ptr->password.clear();
-};
-
 int AbZip::errorCode() const
 {
 	return d_ptr->errorCode;
@@ -1439,37 +1429,10 @@ void AbZip::clearErrors() {
 
 
 
-bool AbZip::setComment(const QString& comment) {
-
-	if ( d_ptr->isOpen() )
-	{
-		d_ptr->centralDir->endOfCentralDir.setComment( comment );
-		return true;
-	}
-	return false;
-};
-
-QString AbZip::getComment()const
-{
-	return d_ptr->centralDir->endOfCentralDir.getComment();
-};
-
 ZipInfo AbZip::getInfo()const
 {
 	return d_ptr->getInfo( );
 };
-
-void AbZip::setNameFilters( const QStringList& nameFilters ) {
-
-	d_ptr->nameFilters = nameFilters;
-};
-
-void AbZip::clearNameFilters( ) {
-
-	d_ptr->nameFilters.clear();
-};
-
-
 
 bool AbZip::addFile(const QString& file, const QString& root, AbZip::ZipOptions options, int level ) {
 
@@ -1499,79 +1462,8 @@ bool AbZip::writeFile(const QString& file, const QByteArray& data, AbZip::ZipOpt
 	return ret;
 };
 
-bool AbZip::addDirectory(const QString& srcPath, const QString& root, AbZip::ZipOptions options, int level ) {
-
-	return d_ptr->addDirectory( srcPath, root, options, level );
-};
-
-bool AbZip::addDirectory(const QString& srcPath, AbZip::ZipOptions options, int level ) {
-
-	return d_ptr->addDirectory( srcPath, QString(), options, level );
-};
-
-
-bool AbZip::extractFile(const QString& filename, const QString& destPath, AbZip::ZipOptions options) {
-
-	return d_ptr->extractFile(filename, destPath, options);
-};
-
-
-bool AbZip::extractFiles(const QStringList& listFiles, const QString& destPath, ZipOptions options) {
-
-	qint32 count = 0;
-	foreach( const QString& filename, listFiles)
-	{
-		if ( d_ptr->extractFile( filename, destPath, options ) )
-			count++;
-		else if ( !options.testFlag( AbZip::ContinueOnError ) )
-			return false;
-	};
-
-	return (count == listFiles.count()) ? true : false;
-};
-
-
 bool AbZip::deleteFile(const QString& filename, AbZip::ZipOptions options) {
 
 	return d_ptr->deleteFile(*this, filename, options);
-
-};
-
-bool AbZip::renameFile(const QString& oldFilename, const QString& newFilename, AbZip::ZipOptions options) {
-
-	return d_ptr->renameFile( oldFilename, newFilename, options);
-
-};
-
-bool AbZip::extractAll(const QString& path, AbZip::ZipOptions options) {
-
-	return d_ptr->extractAll(*this, path, QString(), options);
-};
-
-bool AbZip::extractAll(const QString& path, const QString& fromRoot, AbZip::ZipOptions options) {
-
-	return d_ptr->extractAll(*this, path, fromRoot, options);
-};
-
-
-QList<ZipFileInfo> AbZip::findFile( const QString& filename, ZipOptions options  ) {
-
-	return d_ptr->findFile(*this, filename, QString(), options);
-};
-
-QList<ZipFileInfo> AbZip::findFile( const QString& filename, const QString& root, ZipOptions options ) {
-
-	return d_ptr->findFile(*this, filename, root, options);
-};
-
-bool AbZip::checkIntegrity() {
-
-	return d_ptr->checkIntegrity();
-
-};
-
-bool AbZip::repairArchive() {
-
-	return d_ptr->repairArchive();
 
 };

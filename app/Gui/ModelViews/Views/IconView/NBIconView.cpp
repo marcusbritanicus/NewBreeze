@@ -590,19 +590,14 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		option.palette = pltt;
 
 		NBIconDelegate *dlgt = qobject_cast<NBIconDelegate*>( itemDelegate() );
-		if ( cModel->modelDataType() == NBItemViewModel::SuperStart )
-			dlgt->paintSuperStartIcons( &painter, option, idx );
+		if ( currentViewMode == QString( "Icons" ) )
+			dlgt->paintIcons( &painter, option, idx );
 
-		else {
-			if ( currentViewMode == QString( "Icons" ) )
-				dlgt->paintIcons( &painter, option, idx );
+		else if ( currentViewMode == QString( "Tiles" ) )
+			dlgt->paintTiles( &painter, option, idx );
 
-			else if ( currentViewMode == QString( "Tiles" ) )
-				dlgt->paintTiles( &painter, option, idx );
-
-			else
-				dlgt->paintDetails( &painter, option, idx );
-		}
+		else
+			dlgt->paintDetails( &painter, option, idx );
 	}
 
 	painter.end();
