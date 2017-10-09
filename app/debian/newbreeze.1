@@ -1,4 +1,4 @@
-.TH NewBreeze 1 "March 10 2016"
+.TH NewBreeze 1 "October 9 2017"
 .SH NAME
 NewBreeze \- A Qt based lightweight and fast file manager
 .SH SYNOPSIS
@@ -12,8 +12,8 @@ Some of its features are
     - File Association support
     - Provides Categorized List, Icon and Details View
     - Sleek side panel showing drives and boomarks
-    - Full drag and drop support (N/A)
-    - Applications and Catalog View
+    - Drag and drop support (partial)
+    - SuperStart and Catalog View
     - Auto update devices list
     - Custom Folder Icons and Thumbnail Preview
     - Complete mime-icon support
@@ -57,3 +57,32 @@ Show version of program.
 .TP
 .B \-f, \-\-force-new
 	Kill the old server and start a new one.
+
+.SH Examples
+.TP
+Print the help message and exit
+newbreeze -h
+.TP
+Opens the last opened directory or SuperStart/Catalogs
+newbreeze
+.TP
+Opens an instance in tray
+newbreeze -t
+.TP
+Opens the settings dialog
+newbreeze -s
+.TP
+Opens the settings dialog
+newbreeze --settings
+.TP
+Opens the about NB dialog
+newbreeze -a
+.TP
+Opens the NB license dialog
+newbreeze --license
+.TP
+Kills the existsing server and opens window at the last opened location
+newbreeze --force-new
+.TP
+Kills the existsing server and opens a window at /home/cosmos
+newbreeze --force-new /home/cosmos

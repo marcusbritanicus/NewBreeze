@@ -392,7 +392,7 @@ unix {
 	}
 	BINDIR = $$PREFIX/bin
 
-	INSTALLS += target desktop icons data mime
+	INSTALLS += target desktop icons data mime templates
 	target.path = $$BINDIR
 
 	QMAKE_RPATHDIR += $$PREFIX/lib/newbreeze/
