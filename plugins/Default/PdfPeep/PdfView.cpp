@@ -11,6 +11,8 @@ PdfView::PdfView( QWidget *parent ) : QAbstractScrollArea( parent ) {
 	vScroll = new QScrollBar( Qt::Vertical, this );
 	vScroll->setRange( 0, 0 );
 	vScroll->setFixedWidth( 12 );
+	vScroll->setPageStep( height() / 4 * 3 );
+	vScroll->setSingleStep( 30 );
 
 	setVerticalScrollBar( vScroll );
 
@@ -71,6 +73,9 @@ void PdfView::reshapeView() {
 	int minHeight = 10;
 	int viewWidth = viewport()->width() - vScroll->width();
 
+	vScroll->setPageStep( height() / 4 * 3 );
+	vScroll->setSingleStep( 30 );
+
 	for( int i = 0; i < PdfDoc->pages(); i++ ) {
 		QSize pageSize = PdfDoc->page( i )->pageSize();
 		pageRects[ i ] = QRect( 0, minHeight, viewWidth, 1.0 * viewWidth * pageSize.height() / pageSize.width() );
@@ -80,7 +85,7 @@ void PdfView::reshapeView() {
 	}
 
 	viewport()->setFixedHeight( minHeight );
-	vScroll->setMaximum( minHeight - height() );
+	vScroll->setMaximum( minHeight );
 
 	repaint();
 };
@@ -141,25 +146,11 @@ void PdfView::lookAround() {
 	}
 };
 
-void PdfView::resizeEvent( QResizeEvent *rEvent ) {
-
-	rEvent->accept();
-	reshapeView();
-};
-
-void PdfView::wheelEvent( QWheelEvent *wEvent ) {
-
-	int cPos = vScroll->value();
-
-	int numDegrees = -wEvent->delta() / 8;
-	vScroll->setValue( cPos + numDegrees * vScroll->singleStep() );
-
-	wEvent->accept();
-
-	viewport()->repaint();
-};
-
 void PdfView::paintEvent( QPaintEvent *pEvent ) {
+
+	/* If the document is not loaded, return */
+	if ( currentPage == -1 )
+		return;
 
 	/* Init the painter */
 	QPainter painter( viewport() );
@@ -169,11 +160,6 @@ void PdfView::paintEvent( QPaintEvent *pEvent ) {
 
 	/* Get the current page */
 	getCurrentPage();
-	if ( currentPage == -1 ) {
-		painter.end();
-		return;
-	}
-
 	/* Vertical Scroll Bar Position */
 	int h = vScroll->value();
 
@@ -196,4 +182,22 @@ void PdfView::paintEvent( QPaintEvent *pEvent ) {
 	painter.end();
 
 	pEvent->accept();
+};
+
+void PdfView::resizeEvent( QResizeEvent *rEvent ) {
+
+	rEvent->accept();
+	reshapeView();
+};
+
+void PdfView::wheelEvent( QWheelEvent *wEvent ) {
+
+	int cPos = vScroll->value();
+
+	int numDegrees = -wEvent->delta() / 8;
+	vScroll->setValue( cPos + numDegrees * vScroll->singleStep() );
+
+	wEvent->accept();
+
+	viewport()->repaint();
 };

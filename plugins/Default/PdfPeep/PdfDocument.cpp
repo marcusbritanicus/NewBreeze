@@ -12,6 +12,16 @@ PdfDocument::PdfDocument( QString pdfPath ) : QObject() {
 	loadPdf();
 };
 
+Poppler::Document* PdfDocument::document() {
+
+	return mPdfDoc;
+};
+
+PdfPages PdfDocument::allPages() {
+
+	return mPages;
+};
+
 QString PdfDocument::name() const {
 
 	return mPdfPath;
@@ -34,15 +44,15 @@ PdfPage* PdfDocument::page( int pageNum ) const {
 
 void PdfDocument::loadPdf() {
 
-	document = Poppler::Document::load( mPdfPath );
-	document->setRenderHint( Poppler::Document::Antialiasing );
-	document->setRenderHint( Poppler::Document::TextAntialiasing );
-	document->setRenderHint( Poppler::Document::TextHinting );
+	mPdfDoc = Poppler::Document::load( mPdfPath );
+	mPdfDoc->setRenderHint( Poppler::Document::Antialiasing );
+	mPdfDoc->setRenderHint( Poppler::Document::TextAntialiasing );
+	mPdfDoc->setRenderHint( Poppler::Document::TextHinting );
 
-	document->setRenderBackend( Poppler::Document::SplashBackend );
+	mPdfDoc->setRenderBackend( Poppler::Document::SplashBackend );
 
-	for( int i = 0; i < document->numPages(); i++ ) {
-		PdfPage *p = document->page( i );
+	for( int i = 0; i < mPdfDoc->numPages(); i++ ) {
+		PdfPage *p = mPdfDoc->page( i );
 		mPages.append( p );
 	}
 

@@ -37,6 +37,10 @@ class PdfView : public QAbstractScrollArea {
 		void paintPage( int );
 		void paintRect( int );
 
+	public Q_SLOTS:
+		void slotZoomIn() {};
+		void slotZoomOut() {};
+
 	protected:
 		void paintEvent( QPaintEvent *pEvent );
 

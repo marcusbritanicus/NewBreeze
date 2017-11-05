@@ -22,6 +22,9 @@ class PdfDocument : public QObject {
 	public:
 		PdfDocument( QString pdfPath );
 
+		Poppler::Document* document();
+		PdfPages allPages();
+
 		QString name() const;
 		QString title() const;
 
@@ -29,7 +32,7 @@ class PdfDocument : public QObject {
 		PdfPage *page( int pageNum ) const;
 
 	private:
-		Poppler::Document *document;
+		Poppler::Document *mPdfDoc;
 		bool mDocumentLoaded;
 
 		QString mPdfPath;
