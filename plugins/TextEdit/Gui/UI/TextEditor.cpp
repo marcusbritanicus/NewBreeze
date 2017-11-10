@@ -26,7 +26,7 @@ TextEditor::TextEditor( QString fn, QWidget *parent ) : QMainWindow( parent ) {
 void TextEditor::setupGui()  {
 
 	QMimeType mime = mimeDb.mimeTypeForFile( filename );
-	ed = new Editor( this );
+	ed = new QsciEditor( this );
 
 	QLabel *iconLbl = new QLabel( this );
 	iconLbl->setStyleSheet( "background-color: darkgray; border-top-left-radius: 2px; border-bottom-left-radius: 2px;" );
@@ -217,7 +217,7 @@ void TextEditor::buildToolBar() {
 
 void TextEditor::setupConnections() {
 
-	connect( ed->document(), SIGNAL( modificationChanged( bool ) ), this, SLOT( updateModStatus( bool ) ) );
+	connect( ed, SIGNAL( modificationChanged( bool ) ), this, SLOT( updateModStatus( bool ) ) );
 	connect( ed, SIGNAL( autoSaved() ), this, SLOT( handleAutoSaved() ) );
 
 	connect( ed, SIGNAL( cursorPositionChanged() ), this, SLOT( updateStatusBar() ) );
@@ -274,7 +274,7 @@ void TextEditor::switchToEditMode() {
 
 void TextEditor::loadFile() {
 
-	ed->open( filename );
+	ed->loadFile( filename );
 
 	updateModStatus( ed->isModified() );
 	updateStatusBar();
@@ -282,7 +282,7 @@ void TextEditor::loadFile() {
 
 void TextEditor::saveFile() {
 
-	ed->save();
+	ed->saveFile();
 	ed->setModified( false );
 
 	statusBar()->showMessage( "The file was saved successfully.", 1000 );
@@ -323,23 +323,26 @@ void TextEditor::updateModStatus( bool modified ) {
 
 void TextEditor::updateStatusBar() {
 
-	lineCountLbl->setText( QString( "Line: %1/%2" ).arg( ed->textCursor().blockNumber() + 1 ).arg( ed->blockCount() ) );
-	cursorPosLbl->setText( QString( "Pos: %1" ).arg( ed->textCursor().positionInBlock() + 1 ) );
-	charCountLbl->setText( QString( "Chars: %1" ).arg( ed->document()->characterCount() ) );
-	selectionLbl->setText( QString( "Sel: %1" ).arg( ed->textCursor().selectedText().count() ) );
+	int line = 0, idx = 0;
+	ed->getCursorPosition( &line, &idx );
+
+	lineCountLbl->setText( QString( "Line: %1/%2" ).arg( line + 1 ).arg( ed->lines() ) );
+	cursorPosLbl->setText( QString( "Pos: %1" ).arg( idx + 1 ) );
+	charCountLbl->setText( QString( "Chars: %1" ).arg( ed->charCount() ) );
+	selectionLbl->setText( QString( "Sel: %1" ).arg( ed->selectedText().count() ) );
 };
 
 void TextEditor::updateToolBar() {
 
-	saveBtn->setEnabled( ed->document()->isModified() );
-	printBtn->setEnabled( not ed->document()->isEmpty() );
-	propsBtn->setEnabled( not ed->document()->isEmpty() );
-	cutBtn->setEnabled( ed->textCursor().hasSelection() );
-	copyBtn->setEnabled( ed->textCursor().hasSelection() );
-	pasteBtn->setEnabled( ed->canPaste() );
-	selectBtn->setEnabled( not ed->document()->isEmpty() );
-	undoBtn->setEnabled( ed->document()->isUndoAvailable() );
-	redoBtn->setEnabled( ed->document()->isRedoAvailable() );
+	saveBtn->setEnabled( ed->isModified() );
+	printBtn->setEnabled( ed->charCount() );
+	propsBtn->setEnabled( ed->charCount() );
+	cutBtn->setEnabled( ed->hasSelectedText() );
+	copyBtn->setEnabled( ed->hasSelectedText() );
+	pasteBtn->setEnabled( ed->SendScintilla( QsciScintilla::SCI_CANPASTE ) );
+	selectBtn->setEnabled( ed->charCount() );
+	undoBtn->setEnabled( ed->isUndoAvailable() );
+	redoBtn->setEnabled( ed->isRedoAvailable() );
 };
 
 void TextEditor::handleAutoSaved() {

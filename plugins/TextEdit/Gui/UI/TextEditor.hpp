@@ -8,7 +8,7 @@
 
 #include <Global.hpp>
 
-#include <Editor.hpp>
+#include <QsciEditor.hpp>
 #include <GuiWidgets.hpp>
 #include <NBWindowButton.hpp>
 
@@ -37,7 +37,7 @@ class TextEditor : public QMainWindow {
 		LedLight *safetyLed;
 
 		QString filename;
-		Editor *ed;
+		QsciEditor *ed;
 
 		bool preview;
 

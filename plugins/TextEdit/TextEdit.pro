@@ -6,16 +6,16 @@ VERSION = "3.0.0"
 
 # Plugin Mode
 # ===========
-CONFIG += plugin
+CONFIG += plugin qscintilla2
 
 # Common Sources
 INCLUDEPATH += ../../common/ ../../common/include
 DEPENDPATH += ../../common/ ../../common/include
 
-INCLUDEPATH += . Gui/Editor Gui/Editor/Syntaxer Gui/Application Gui/Widgets Gui/Widgets/Buttons Gui/Widgets/FileProps Gui/Widgets/Misc Gui/Widgets/SearchReplace
+INCLUDEPATH += . Gui/Editor Gui/Application Gui/Widgets Gui/Widgets/Buttons Gui/Widgets/FileProps Gui/Widgets/Misc Gui/Widgets/SearchReplace
 INCLUDEPATH += Gui/UI Resources Resources/icons
 
-DEPENDPATH += . Gui/Editor Gui/Editor/Syntaxer Gui/Application Gui/Widgets Gui/Widgets/Buttons Gui/Widgets/FileProps Gui/Widgets/Misc Gui/Widgets/SearchReplace
+DEPENDPATH += . Gui/Editor Gui/Application Gui/Widgets Gui/Widgets/Buttons Gui/Widgets/FileProps Gui/Widgets/Misc Gui/Widgets/SearchReplace
 DEPENDPATH += Gui/UI Resources Resources/icons
 
 # Qt5 Support
@@ -51,21 +51,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 # Headers
 HEADERS += Global.hpp
-HEADERS += Gui/Editor/Editor.hpp
-HEADERS += Gui/Editor/Syntaxer/GNUSyntaxHighlighter.h
-HEADERS += Gui/Editor/Syntaxer/HighlightStateData.h
-HEADERS += Gui/Editor/Syntaxer/LanguageComboBox.h
-HEADERS += Gui/Editor/Syntaxer/ParagraphMap.h
-HEADERS += Gui/Editor/Syntaxer/Qt4SourceHighlightStyleGenerator.h
-HEADERS += Gui/Editor/Syntaxer/Qt4SyntaxHighlighter.h
-HEADERS += Gui/Editor/Syntaxer/Qt4TextFormatterFactory.h
-HEADERS += Gui/Editor/Syntaxer/Qt4TextFormatter.h
-HEADERS += Gui/Editor/Syntaxer/QtColorMap.h
-HEADERS += Gui/Editor/Syntaxer/SourceHighlightExceptionBox.h
-HEADERS += Gui/Editor/Syntaxer/StyleComboBox.h
-HEADERS += Gui/Editor/Syntaxer/TextEditHighlighted.h
-HEADERS += Gui/Editor/Syntaxer/TextFormatterFactory.h
-HEADERS += Gui/Editor/Syntaxer/TextFormatter.h
+HEADERS += Gui/Editor/QsciEditor.hpp
+HEADERS += Gui/Editor/QsciLexer.hpp
+HEADERS += Gui/Editor/QsciLexerLaTeX.hpp
 HEADERS += Gui/Widgets/Buttons/NBWindowButton.hpp
 HEADERS += Gui/Widgets/Buttons/ButtonSet.hpp
 HEADERS += Gui/Widgets/FileProps/FileProps.hpp
@@ -75,20 +63,9 @@ HEADERS += Gui/UI/TextEditor.hpp
 HEADERS += NBTextEditPlugin.hpp
 
 # Sources
-SOURCES += Gui/Editor/Editor.cpp
-SOURCES += Gui/Editor/Syntaxer/GNUSyntaxHighlighter.cpp
-SOURCES += Gui/Editor/Syntaxer/LanguageComboBox.cpp
-SOURCES += Gui/Editor/Syntaxer/ParagraphMap.cpp
-SOURCES += Gui/Editor/Syntaxer/Qt4SourceHighlightStyleGenerator.cpp
-SOURCES += Gui/Editor/Syntaxer/Qt4SyntaxHighlighter.cpp
-SOURCES += Gui/Editor/Syntaxer/Qt4TextFormatter.cpp
-SOURCES += Gui/Editor/Syntaxer/Qt4TextFormatterFactory.cpp
-SOURCES += Gui/Editor/Syntaxer/QtColorMap.cpp
-SOURCES += Gui/Editor/Syntaxer/SourceHighlightExceptionBox.cpp
-SOURCES += Gui/Editor/Syntaxer/StyleComboBox.cpp
-SOURCES += Gui/Editor/Syntaxer/TextEditHighlighted.cpp
-SOURCES += Gui/Editor/Syntaxer/TextFormatter.cpp
-SOURCES += Gui/Editor/Syntaxer/TextFormatterFactory.cpp
+SOURCES += Gui/Editor/QsciEditor.cpp
+SOURCES += Gui/Editor/QsciLexer.cpp
+SOURCES += Gui/Editor/QsciLexerLaTeX.cpp
 SOURCES += Gui/Widgets/Buttons/NBWindowButton.cpp
 SOURCES += Gui/Widgets/Buttons/ButtonSet.cpp
 SOURCES += Gui/Widgets/FileProps/FileProps.cpp
@@ -96,10 +73,6 @@ SOURCES += Gui/Widgets/Misc/GuiWidgets.cpp
 SOURCES += Gui/Widgets/SearchReplace/SR.cpp
 SOURCES += Gui/UI/TextEditor.cpp
 SOURCES += NBTextEditPlugin.cpp
-
-# Pkg-Config for source-higlight
-CONFIG += link_pkgconfig
-PKGCONFIG += source-highlight
 
 unix {
 	isEmpty(PREFIX) {
@@ -113,5 +86,3 @@ unix {
 		target.path = $$PREFIX/lib/newbreeze/plugins5
 	}
 }
-
-DEFINES += "HAVE_GNU_SYNTAX_HILITE"

@@ -1,19 +1,19 @@
 /*
 	*
-	* wFileProps.hpp - TextEditor's File Properties Class Header
+	* FileProps.hpp - TextEditor's File Properties Class Header
 	*
 */
 
 #pragma once
 
 #include "Global.hpp"
-#include "Editor.hpp"
+#include "QsciEditor.hpp"
 
 class wFileProps: public QDialog {
     Q_OBJECT
 
 	public:
-		wFileProps( Editor *parent );
+		wFileProps( QsciEditor *parent );
 
 	private :
 		void createGUI();

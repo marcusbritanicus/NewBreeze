@@ -1,13 +1,13 @@
 /*
     *
-    * wFileProps.cpp - TextEditor's File Properties Class
+    * FileProps.cpp - TextEditor's File Properties Class
     *
 */
 
 #include "Global.hpp"
 #include "FileProps.hpp"
 #include "NBTools.hpp"
-#include "Editor.hpp"
+#include "QsciEditor.hpp"
 
 QPixmap getPixmap( QString path ) {
 
@@ -22,19 +22,20 @@ QPixmap getPixmap( QString path ) {
 	return icon.pixmap( 128, 128 );
 };
 
-wFileProps::wFileProps( Editor *editor ) : QDialog( editor ) {
+wFileProps::wFileProps( QsciEditor *editor ) : QDialog( editor ) {
 
 	fileName = editor->fileName();
 	if ( fileName.isEmpty() ) {
 		fileName = QString( "Untitled" );
 		noFileProps = true;
 	}
+
 	else
 		noFileProps = false;
 
-	lines = QString::number( editor->blockCount() );
+	lines = QString::number( editor->lineCount() );
 	words = QString::number( editor->wordCount() );
-	chars = QString::number( editor->document()->characterCount() );
+	chars = QString::number( editor->charCount() );
 
 	createGUI();
 	setWindowProperties();
