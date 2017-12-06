@@ -6,7 +6,11 @@
 
 #pragma once
 
-#include "Global.hpp"
+#ifdef STANDALONE
+	#include "Global2.hpp"
+#else
+	#include "Global.hpp"
+#endif
 #include "NBVaultDatabase.hpp"
 
 class NBVault {
@@ -38,6 +42,9 @@ class NBVault {
 
 		/* Change Vault Password */
 		bool changeVaultPassword();
+
+		/* Generate a random password */
+		QByteArray generatePassword();
 
 	private:
 		NBVault();

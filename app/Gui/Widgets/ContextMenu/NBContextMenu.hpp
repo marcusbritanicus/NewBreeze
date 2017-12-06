@@ -30,6 +30,9 @@ class NBActionsMenu : public QMenu {
 		void showCustomActionsDialog();
 		void doCustomAction();
 
+		void encrypt();
+		void decrypt();
+
 	Q_SIGNALS:
 		void extractArchive( QString );
 		void addToArchive( QStringList );

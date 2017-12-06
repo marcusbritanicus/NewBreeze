@@ -6,10 +6,12 @@
 
 #pragma once
 
-/* Local */
-#include "Global.hpp"
+#ifdef STANDALONE
+	#include "Global2.hpp"
+#else
+	#include "Global.hpp"
+#endif
 #include "Salsa20/NBSalsa20.hpp"
-#include "MicroDB/AbZip.h"
 
 typedef struct _NBVaultRecord {
 	QString encPath;
@@ -17,9 +19,11 @@ typedef struct _NBVaultRecord {
 	QByteArray recordPass;
 } NBVaultRecord;
 
-static QString vaultDB = QDir( NBXdg::userDir( NBXdg::XDG_CONFIG_HOME ) ).filePath( "NewBreeze/Vault.db" );
+static QSettings vaultDB( QDir( NBXdg::userDir( NBXdg::XDG_CONFIG_HOME ) ).filePath( "NewBreeze/Vault.db" ), QSettings::NativeFormat );
 
 namespace NBVaultDatabase {
+
+	bool isEncryptedLocation( QString path );
 
 	/* NBVaultRecord object for a given path */
 	NBVaultRecord* recordForPath( QString path, QByteArray vaultPass );
@@ -35,8 +39,4 @@ namespace NBVaultDatabase {
 
 	/* Change password of the Vault */
 	bool changeVaultPassword( QByteArray oldPass, QByteArray newPass );
-
-	/* Test functions: read and write encrypted dummy */
-	void testRead();
-	void testWrite();
 };

@@ -6,7 +6,11 @@
 
 #pragma once
 
-#include "Global.hpp"
+#ifdef STANDALONE
+	#include "Global2.hpp"
+#else
+	#include "Global.hpp"
+#endif
 #include "NBTools.hpp"
 
 class NBEncFS : public QObject {
@@ -17,11 +21,11 @@ class NBEncFS : public QObject {
 		NBEncFS( QString, QString target = QString(), QWidget *parent = NULL );
 
 	public Q_SLOTS:
-		void mountDir( QString );
-		void unmountDir();
+		bool mountDir( QString );
+		bool unmountDir();
 
-		void createEncFS( QString, QString, QString );
-		void changePass( QString, QString );
+		bool createEncFS( QString );
+		bool changePass( QString, QString );
 
 	private:
 		QString mSource;

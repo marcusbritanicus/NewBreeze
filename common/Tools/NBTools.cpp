@@ -13,7 +13,7 @@ QString dirName( QString path ) {
 	if ( path == "/" or path == "//" )
 		return "/";
 
-	/* Simple clean path" remove '//' and './' */
+	/* Simple clean path: remove '//' and './' */
 	path = path.replace( "//", "/" ).replace( "/./", "/" );
 
 	char *dupPath = strdup( path.toLocal8Bit().constData() );
@@ -180,7 +180,7 @@ bool isExecutable( QString path ) {
 		else if ( m.name() == "application/x-sharedlib" )
 			return true;
 
-		else if ( m.parentMimeTypes().contains( "application/x-executable" ) )
+		else if ( m.allAncestors().contains( "application/x-executable" ) )
 			return true;
 
 		/* Default is false */

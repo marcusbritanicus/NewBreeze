@@ -15,7 +15,7 @@ NBEncFS::NBEncFS( QString source, QString target, QWidget *parent ) : QObject( p
 	mParent = parent;
 };
 
-void NBEncFS::mountDir( QString password ) {
+bool NBEncFS::mountDir( QString password ) {
 
 	if ( not exists( mTarget ) ) {
 		if ( mkpath( mTarget ) ) {
@@ -26,7 +26,7 @@ void NBEncFS::mountDir( QString password ) {
 					"NewBreeze failed to create the target directory <tt>%1</tt>. "
 					"Please check if you sufficient permission to create folders here and try again." ).arg( mTarget )
 			);
-			return;
+			return false;
 		}
 	}
 
@@ -50,6 +50,8 @@ void NBEncFS::mountDir( QString password ) {
 				"NewBreeze EncFS - Mount Failed",
 				"NewBreeze falied to mount the given encfs volume. Please check if you have provided the correct password."
 			);
+
+			return false;
 		}
 
 		else {
@@ -58,6 +60,8 @@ void NBEncFS::mountDir( QString password ) {
 				"NewBreeze - Mount Success",
 				"The encrypted directory has been successfully decrypted and mounted."
 			);
+
+			return true;
 		}
 	}
 
@@ -69,10 +73,12 @@ void NBEncFS::mountDir( QString password ) {
 			"For some reason encfs has failed to mount the encrypted folder. Perhaps, the source folder was not an encryted volume. "
 			"Check the terminal for the debug messages for the text printed out by encfs."
 		);
+
+		return false;
 	}
 };
 
-void NBEncFS::unmountDir() {
+bool NBEncFS::unmountDir() {
 
 	QString queryTxt =  QString(
 		"<html><body><p>You have chosen to unmount and encrypt the archive which is mounted at</p>" \
@@ -86,7 +92,7 @@ void NBEncFS::unmountDir() {
 	int reply = QMessageBox::question( mParent, "Unmount?", queryTxt, btns );
 
 	if ( reply != QMessageBox::Yes )
-		return;
+		return false;
 
 	QProcess proc;
 	proc.start( "fusermount", QStringList() << "-uz" << mTarget );
@@ -98,6 +104,8 @@ void NBEncFS::unmountDir() {
 			"Unmount Success",
 			"The decrypted directory has been successfully unmounted and encrypted."
 		);
+
+		return true;
 	}
 
 	else {
@@ -107,21 +115,23 @@ void NBEncFS::unmountDir() {
 			"Could not unmount and encrypt the directory. This could be because some process may be active " \
 			"in the archive. Please make sure no processes are active in the archive and then try unmounting."
 		);
+
+		return false;
 	}
 };
 
-void NBEncFS::createEncFS( QString encPath, QString decPath, QString passwd ) {
+bool NBEncFS::createEncFS( QString passwd ) {
 
 	QString mSrcTmp;
 
-	if ( not encPath.endsWith( "/ ") )
-		encPath += "/";
+	if ( not mSource.endsWith( "/ ") )
+		mSource += "/";
 
-	if ( not decPath.endsWith( "/ ") )
-		decPath += "/";
+	if ( not mTarget.endsWith( "/ ") )
+		mTarget += "/";
 
-	/* If @decPath exists, copy data to a temporary location */
-	if ( exists( decPath ) and nChildren( decPath ) ) {
+	/* If @mTarget exists, copy data to a temporary location */
+	if ( exists( mTarget ) and nChildren( mTarget ) ) {
 		QMessageBox *mBox = new QMessageBox( mParent );
 		QString title = "NewBreeze - Create EncFS";
 		QString message = QString( "Save all open files and click 'Continue' to proceed." );
@@ -149,7 +159,7 @@ void NBEncFS::createEncFS( QString encPath, QString decPath, QString passwd ) {
 		mBox->exec();
 
 		if ( mBox->clickedButton() != continueBtn )
-			return;
+			return false;
 
 		mSrcTmp = mSource + ".tmp" + QDateTime::currentDateTime().toString( "yyyyMMddThhmmssAP" );
 		if ( rename( mSource.toLocal8Bit().data(), mSrcTmp.toLocal8Bit().data() ) != 0 ) {
@@ -159,24 +169,22 @@ void NBEncFS::createEncFS( QString encPath, QString decPath, QString passwd ) {
 				"I have failed to create a new EncFS volume. Please check if you have read write permissions in the directory and try again."
 			);
 
-			return;
+			return false;
 		}
 	}
 
 	/* Create encrypted directory path */
-	mkpath( encPath, 0700 );
+	mkpath( mSource, 0700 );
 
 	/* Create decrypted directory path */
-	mkpath( decPath, 0700 );
+	mkpath( mTarget, 0700 );
 
 	QProcess proc;
 	proc.setProcessChannelMode( QProcess::MergedChannels );
-	proc.start( "encfs", QStringList() << "-S" << encPath << decPath );
+	proc.start( "encfs", QStringList() << "-S" << mSource << mTarget );
 
 	/* Question 1: standard mode, expert mode (x) or paranoia mode (p): p */
 	proc.write( "p\n" );
-
-	qDebug() << passwd;
 
 	/* Question 2: Input password */
 	proc.write( ( passwd + "\n" ).toLocal8Bit().data() );
@@ -188,7 +196,7 @@ void NBEncFS::createEncFS( QString encPath, QString decPath, QString passwd ) {
 	proc.waitForFinished( -1 );
 
 	if ( proc.exitCode() ) {
-		qDebug() << "encfs -S " + encPath + " " + decPath;
+		qDebug() << "encfs -S " + mSource + " " + mTarget;
 		qDebug() << proc.readAll();
 		QMessageBox::information(
 			mParent,
@@ -196,11 +204,12 @@ void NBEncFS::createEncFS( QString encPath, QString decPath, QString passwd ) {
 			"For some reason unknown to me the creation of the encfs volume failed. Please check the debug messages to identify the error."
 		);
 
-		return;
+		/* We could not create the EncFS volume */
+		return false;
 	}
 
-	QSettings sett( QDir( dirName( encPath ) ).filePath( ".directory" ), QSettings::NativeFormat );
-	sett.setValue( "EncFS/" + baseName( encPath ), baseName( decPath ) );
+	QSettings sett( QDir( dirName( mSource ) ).filePath( ".directory" ), QSettings::NativeFormat );
+	sett.setValue( "EncFS/" + baseName( mSource ), baseName( mTarget ) );
 	QMessageBox::information(
 		mParent,
 		"NewBreeze - EncFS Creation Success",
@@ -208,20 +217,29 @@ void NBEncFS::createEncFS( QString encPath, QString decPath, QString passwd ) {
 	);
 
 	/* If source existed, and had contents: */
-	if ( mSource.count() and ( mSource == decPath ) ) {
+	if ( mSource.count() and ( mSource == mTarget ) ) {
 
 		int ret = system( ( "mv " + mSrcTmp + "/* " + mSource ).toLocal8Bit().data() );
 		if ( ret ) {
 			QMessageBox::information(
 				mParent,
-				"NewBreeze - Data Copy Failed",
-				"NewBreeze has encountered error in copying the data that existed in your target directory from the"
+				"NewBreeze - Data Restore Failed",
+				QString( "NewBreeze has encountered error in restoring the data that existed in your target directory from the temporary location. "
+				"You will find your data in the folder: %1" ).arg( mSrcTmp )
 			);
+
+			/* We created the EncFS volume properly, but data restore failed. */
+			return true;
 		}
+
+		removeDir( mSrcTmp );
 	}
+
+	/* Everything went on very well */
+	return true;
 };
 
-void NBEncFS::changePass( QString oPassword, QString nPassword ) {
+bool NBEncFS::changePass( QString oPassword, QString nPassword ) {
 
 	QString command( "printf '%1\n%2\n' | encfsctl autopasswd %3" );
 	int exitCode = system( command.arg( oPassword ).arg( nPassword ).arg( mSource ).toLocal8Bit().constData() );
@@ -232,13 +250,18 @@ void NBEncFS::changePass( QString oPassword, QString nPassword ) {
 			"NewBreeze - Success",
 			"The password has been updated successfully. You may now mount the directory using the new password."
 		);
+
+		return true;
 	}
 
 	else {
 		QMessageBox::information(
 			mParent,
 			"NewBreeze - Failed",
-			"The password has not been altered. This is likely due to inputting the wrong password."
+			"The password has not been altered. This is likely due to entering incorrect current password or "
+			"failing to verify the new password."
 		);
+
+		return false;
 	}
 };

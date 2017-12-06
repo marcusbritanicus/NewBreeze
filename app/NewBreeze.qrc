@@ -106,6 +106,11 @@
 		<file>icons/vte.png</file>
 		<file>icons/warning.png</file>
 
+		<file>icons/emblem-mounted.png</file>
+		<file>icons/emblem-unmounted.png</file>
+		<file>icons/encrypt.png</file>
+		<file>icons/key.png</file>
+
 		<file>README</file>
 
 		<file>../data/NBFSExtData.conf</file>

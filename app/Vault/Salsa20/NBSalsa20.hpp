@@ -13,7 +13,7 @@ class NBSalsa20 : public QObject {
 	Q_OBJECT
 
 	public:
-		NBSalsa20( QString path, QWidget* );
+		NBSalsa20( QString path = QString(), QWidget *parent = 0 );
 
 		void encrypt( QByteArray password );
 		void decrypt( QByteArray password );

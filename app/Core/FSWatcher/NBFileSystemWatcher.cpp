@@ -131,7 +131,7 @@ void NBFileSystemWatcher::handleChanged( QString cPath ) {
 	if ( cPath != watchPath ) {
 		/* Child modification, not rename, delete, etc */
 		if ( info.exists() ) {
-			qDebug() << "[MODIFY]:" << cPath;
+			// qDebug() << "[MODIFY]:" << cPath;
 			emit nodeChanged( cPath );
 		}
 

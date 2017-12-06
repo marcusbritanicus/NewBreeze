@@ -14,7 +14,7 @@ NBTrayIcon::NBTrayIcon() : QSystemTrayIcon() {
 	QMenu *menu = new QMenu( "TrayMenu" );
 	menu->addAction( QIcon( ":/icons/newbreeze.png" ), "New &Window", this, SIGNAL( newWindow() ) );
 	menu->addAction( "&Toggle Visible Windows", this, SLOT( toggleVisible() ) );
-	menu->addAction( QIcon( ":/icons/newbreeze.png" ), "&Quit NewBreeze", this, SLOT( quit() ) );
+	menu->addAction( QIcon( ":/icons/delete.png" ), "&Quit NewBreeze", this, SLOT( quit() ) );
 	setContextMenu( menu );
 };
 

@@ -18,12 +18,12 @@ class NBStyleOptionViewItem : public QStyleOptionViewItem {
 
 		NBStyleOptionViewItem() {
 
-			nodeType = NodeType::Normal;
+			nodeType = Normal;
 		};
 
 		NBStyleOptionViewItem( QStyleOptionViewItem other ) : QStyleOptionViewItem( other ) {
 
-			nodeType = NodeType::Normal;
+			nodeType = Normal;
 		};
 
 		int nodeType;

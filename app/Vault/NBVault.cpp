@@ -7,6 +7,7 @@
 #include "NBVault.hpp"
 #include "NBPasswordDialog.hpp"
 #include "NBPasswordInput.hpp"
+#include "EncFS/NBEncFS.hpp"
 
 QByteArray NBVault::vaultPass = QByteArray();
 NBVault::Options NBVault::mKeyStoreOption = NBVault::AskVaultKeyEverytime;
@@ -15,7 +16,7 @@ NBVault *NBVault::vault = NULL;
 
 NBVault::NBVault() {
 
-	if ( not exists( vaultDB ) ) {
+	if ( not vaultDB.value( "Password" ).toByteArray().size() ) {
 		QMessageBox::information(
 			NULL,
 			"NewBreeze Vault",
@@ -24,9 +25,7 @@ NBVault::NBVault() {
 
 		NBPasswordDialog *pDlg = new NBPasswordDialog( NULL );
 		if ( pDlg->exec() ) {
-			AbZip zip( vaultDB);
-			zip.writeFile( "passHash", QCryptographicHash5::hash( pDlg->password(), QCryptographicHash5::Sha3_512 ) );
-			zip.close();
+			vaultDB.setValue( "Password", QCryptographicHash5::hash( pDlg->password(), QCryptographicHash5::Sha3_512 ) );
 
 			init = true;
 		}
@@ -54,14 +53,46 @@ bool NBVault::decryptFile( QString path ) {
 	if ( not pass.count() )
 		return false;
 
+	if ( path.endsWith( ".s20" ) )
+		path.chop( 4 );
+
 	NBVaultRecord *record = NBVaultDatabase::recordForPath( path, pass );
-	Q_UNUSED( record );
+	if ( not record->recordPass.size() )
+		return false;
 
-	qDebug() << record->encPath;
-	qDebug() << record->type;
-	qDebug() << record->recordPass;
+	if ( not exists( path + ".s20" ) )
+		return false;
 
-	return false;
+	NBVaultDatabase::removeRecordForPath( path );
+	if ( not record->recordPass.size() )
+		return false;
+
+	NBSalsa20 s20( record->encPath );
+	s20.decrypt( record->recordPass );
+
+	return true;
+};
+
+bool NBVault::encryptFile( QString path ) {
+
+	QByteArray pass = vaultPassword();
+	if ( not pass.count() )
+		return false;
+
+	if ( not isFile( path ) )
+		return false;
+
+	NBVaultRecord *record = new NBVaultRecord();
+	record->encPath = path + ".s20";
+	record->type = QString( "file" );
+	record->recordPass = generatePassword();
+
+	NBSalsa20 s20( path );
+	s20.encrypt( record->recordPass );
+
+	NBVaultDatabase::addRecordForPath( path, record, pass );
+
+	return true;
 };
 
 bool NBVault::decryptDirectory( QString path ) {
@@ -71,9 +102,29 @@ bool NBVault::decryptDirectory( QString path ) {
 		return false;
 
 	NBVaultRecord *record = NBVaultDatabase::recordForPath( path, pass );
-	Q_UNUSED( record );
+	if ( not record->recordPass.size() )
+		return false;
 
-	return false;
+	NBEncFS encfs( record->encPath, path );
+	return encfs.mountDir( QString::fromLocal8Bit( record->recordPass.toHex() ) );
+};
+
+bool NBVault::encryptDirectory( QString path ) {
+
+	if ( NBVaultDatabase::isEncryptedLocation( path ) ) {
+		NBEncFS encfs( QString( " " ), path );
+		return encfs.unmountDir();
+	}
+
+	else {
+		NBVaultRecord *record = new NBVaultRecord();
+		record->encPath = dirName( path ) + "." + baseName( path ) + ".enc";
+		record->type = QString( "dir" );
+		record->recordPass = generatePassword();
+
+		NBEncFS encfs( record->encPath, path );
+		return encfs.createEncFS( record->recordPass.toHex() );
+	}
 };
 
 QByteArray NBVault::vaultPassword() {
@@ -84,13 +135,44 @@ QByteArray NBVault::vaultPassword() {
 	NBPasswordInput *pIn = new NBPasswordInput( NULL );
 	pIn->exec();
 
-	vaultPass = pIn->password().toLocal8Bit();
+	QByteArray passwd = pIn->password().toLocal8Bit();
 	pIn->clear();
 
-	if ( not NBVaultDatabase::checkVaultPassword( vaultPass ) ) {
+	if ( not NBVaultDatabase::checkVaultPassword( passwd ) ) {
 		QMessageBox::information( NULL, "NewBreeze Vault Error", "You have entered the wrong password!" );
-		vaultPass = QByteArray();
+		return QByteArray();
 	}
 
-	return vaultPass;
+	else {
+		if ( mKeyStoreOption == NBVault::StoreVaultKeyForSession )
+			vaultPass = passwd;
+
+		return passwd;
+	}
+};
+
+bool NBVault::changeVaultPassword() {
+
+	QByteArray oldPass = vaultPassword();
+	QByteArray newPass;
+
+	NBPasswordDialog *pDlg = new NBPasswordDialog( NULL );
+	if ( pDlg->exec() ) {
+		newPass = pDlg->password();
+		vaultDB.setValue( "Password", QCryptographicHash5::hash( pDlg->password(), QCryptographicHash5::Sha3_512 ) );
+
+		return NBVaultDatabase::changeVaultPassword( oldPass, newPass );
+	}
+
+	return false;
+};
+
+QByteArray NBVault::generatePassword() {
+
+	FILE *randF = fopen( "/dev/urandom", "r" );
+	char randData[ 1025 ] = { 0 };
+	fread( randData, 1, 1024, randF );
+	fclose( randF );
+
+	return QCryptographicHash5::hash( QByteArray( randData, 1024 ), QCryptographicHash5::Sha3_512 );
 };

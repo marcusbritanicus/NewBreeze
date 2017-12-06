@@ -6,7 +6,7 @@ VERSION = 3.0.0
 INCLUDEPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
 DEPENDPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
 
-LIBS += -lmagic -larchive -lbz2 -llzma -lz
+LIBS += -larchive -lbz2 -llzma -lz
 DEFINES += COMMON
 
 # Headers

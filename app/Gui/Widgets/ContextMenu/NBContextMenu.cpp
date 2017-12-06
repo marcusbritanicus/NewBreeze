@@ -9,6 +9,8 @@
 #include "NBPluginInterface.hpp"
 #include "NBPluginManager.hpp"
 #include "NBGuiFunctions.hpp"
+#include "NBVaultDatabase.hpp"
+#include "NBVault.hpp"
 
 NBActionsMenu::NBActionsMenu( QList<QModelIndex> selectedIndexes, QString dir, QWidget *parent ) : QMenu( parent ) {
 	/*
@@ -60,6 +62,22 @@ void NBActionsMenu::buildDefaultActions() {
 	}
 
 	addSeparator();
+
+	NBVault *vlt = NBVault::instance();
+	if ( selection.count() == 1 ) {
+		QString node = QDir( workingDir ).filePath( selection.at( 0 ).data().toString() );
+		if ( NBVaultDatabase::isEncryptedLocation( node ) ) {
+			QAction *decryptAct = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), tr( "&Decrypt" ), this );
+			connect( decryptAct, SIGNAL( triggered() ), this, SLOT( decrypt() ) );
+			addAction( decryptAct );
+		}
+
+		else{
+			QAction *encryptAct = new QAction( QIcon( ":/icons/emblem-mounted.png" ), tr( "&Encrypt" ), this );
+			connect( encryptAct, SIGNAL( triggered() ), this, SLOT( encrypt() ) );
+			addAction( encryptAct );
+		}
+	}
 };
 
 void NBActionsMenu::buildPluginsActions() {
@@ -239,6 +257,30 @@ void NBActionsMenu::compress() {
 		archiveList << QDir( workingDir ).filePath( idx.data().toString() );
 
 	emit addToArchive( archiveList );
+};
+
+void NBActionsMenu::decrypt() {
+
+	NBVault *vlt = NBVault::instance();
+
+	QString node = QDir( workingDir ).filePath( selection.at( 0 ).data().toString() );
+	if ( isDir( node ) )
+		vlt->decryptDirectory( node );
+
+	else if ( isFile( node ) )
+		vlt->decryptFile( node );
+};
+
+void NBActionsMenu::encrypt() {
+
+	NBVault *vlt = NBVault::instance();
+
+	QString node = QDir( workingDir ).filePath( selection.at( 0 ).data().toString() );
+	if ( isDir( node ) )
+		vlt->encryptDirectory( node );
+
+	else if ( isFile( node ) )
+		vlt->encryptFile( node );
 };
 
 void NBActionsMenu::showCustomActionsDialog() {

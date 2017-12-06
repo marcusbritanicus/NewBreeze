@@ -6,7 +6,11 @@
 
 #pragma once
 
-#include "Global.hpp"
+#ifdef STANDALONE
+	#include "Global2.hpp"
+#else
+	#include "Global.hpp"
+#endif
 #include "NBPasswordInput.hpp"
 #include "NBTools.hpp"
 
