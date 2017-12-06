@@ -125,7 +125,7 @@ NBIconThemeModel::NBIconThemeModel( QObject *parent ) : QAbstractListModel( pare
 int NBIconThemeModel::rowCount( const QModelIndex &parent ) const {
 
 	if ( parent == QModelIndex() )
-		return mimeTypeList.count();
+		return mimeNameList.count();
 
 	else
 		return 0;
@@ -157,14 +157,21 @@ void NBIconThemeModel::setupModel() {
 	mimeTypeList.clear();
 
 	beginResetModel();
-	QSettings mdb( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) + "NewBreeze/mimetypes.db", QSettings::NativeFormat );
-	Q_FOREACH( QString key, mdb.allKeys() ) {
+	QSettings mdb1( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) + "NewBreeze/mimetypes.db", QSettings::NativeFormat );
+	QSettings mdb2( ":/data/NBFSExtData.conf", QSettings::NativeFormat );
+	Q_FOREACH( QString ext, mdb2.allKeys() ) {
+		QString name = mdb2.value( ext ).toStringList().at( 0 );
+		QString mime = mdb2.value( ext ).toStringList().at( 1 );
+		if ( not mdb1.contains( mime ) )
+			continue;
+
 		QIcon ico;
-		Q_FOREACH( QString path, mdb.value( key ).toStringList() )
+		Q_FOREACH( QString path, mdb1.value( mime ).toStringList() )
 			ico.addFile( path );
 
+		mimeNameList << name;
 		mimeIconList << ico;
-		mimeTypeList << key;
+		mimeTypeList << mime;
 
 		qApp->processEvents();
 	}
@@ -201,6 +208,7 @@ NBIconThemeViewerWidget::NBIconThemeViewerWidget( QWidget *parent ) : QListView(
 
 	NBIconThemeModel *model = new NBIconThemeModel( this );
 	connect( this, SIGNAL( setupModel() ), model, SLOT( setupModel() ) );
+	connect( model, SIGNAL( layoutChanged() ), this, SLOT( update() ) );
 
 	setModel( model );
 };
