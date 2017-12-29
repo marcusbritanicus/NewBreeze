@@ -23,6 +23,7 @@ class NBCOMMON_DLLSPEC NBAppFile {
 			TerminalMode,
 			Categories,
 			Comment,
+			Description,
 			NoDisplay
 		};
 
@@ -57,6 +58,12 @@ class NBCOMMON_DLLSPEC NBAppFile {
 		// Category if this NBAppFile
 		QString category() const;
 
+		// Merge the other NBAppFile with this
+		void merge( NBAppFile other );
+
+		// Save this desktop file
+		bool save();
+
 		// Merge two NBAppFiles
 		static NBAppFile merge( NBAppFile first, NBAppFile second );
 
@@ -86,6 +93,7 @@ class NBCOMMON_DLLSPEC NBAppFile {
 
 		QStringList __categories;
 		QString __category;
+		QString __description;
 		QString __comment;
 		bool __nodisplay;
 

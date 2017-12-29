@@ -37,6 +37,9 @@ class NBVault {
 		/* Unmount and encrypt the directory at @path */
 		bool encryptDirectory( QString path );
 
+		/* Check if the directory @path is mounted */
+		bool isDirectoryDecrypted( QString path );
+
 		/* Get vault pass */
 		QByteArray vaultPassword();
 

@@ -117,14 +117,27 @@ bool NBVault::encryptDirectory( QString path ) {
 	}
 
 	else {
+		QByteArray pass = vaultPassword();
+		if ( not pass.count() )
+			return false;
+
 		NBVaultRecord *record = new NBVaultRecord();
 		record->encPath = dirName( path ) + "." + baseName( path ) + ".enc";
 		record->type = QString( "dir" );
 		record->recordPass = generatePassword();
 
 		NBEncFS encfs( record->encPath, path );
-		return encfs.createEncFS( record->recordPass.toHex() );
+		if ( encfs.createEncFS( record->recordPass.toHex() ) )
+			return NBVaultDatabase::addRecordForPath( path, record, pass );
+
+		else
+			return false;
 	}
+};
+
+bool NBVault::isDirectoryDecrypted( QString path ) {
+
+	return false;
 };
 
 QByteArray NBVault::vaultPassword() {

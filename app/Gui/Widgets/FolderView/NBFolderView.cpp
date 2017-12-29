@@ -375,12 +375,10 @@ void NBFolderView::doOpen( QString loc ) {
 				* permissions
 				*
 			*/
-			NBDebugMsg( DbgMsgPart::HEAD, "Executing: %s... ", loc.toLocal8Bit().data() );
-			NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( loc ) ? "[DONE]" : "[FAILED]" ) );
+			qDebug( "Executing %s... [%s]", loc.toLocal8Bit().data(), ( QProcess::startDetached( loc ) ? "DONE" : " FAILED" ) );
 		}
 
 		else {
-			NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", loc.toLocal8Bit().data() );
 			NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
 			if ( not app.isValid() )
 				doOpenWithCmd();
@@ -405,7 +403,7 @@ void NBFolderView::doOpen( QString loc ) {
 				exec << loc;
 			}
 
-			NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( exec.takeFirst(), exec ) ? "[DONE]" : " [FAILED]" ) );
+			qDebug( "Opening file: %s [%s]", loc.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
 		}
 	}
 
@@ -414,6 +412,8 @@ void NBFolderView::doOpen( QString loc ) {
 		QString text = QString( "I really do not have any idea how to open <tt><b>%1</b></tt>" ).arg( loc );
 
 		NBMessageDialog::error( this, title, text );
+
+		qDebug() << "Cannot open file:" << loc.toLocal8Bit().data();
 		return;
 	}
 
@@ -466,12 +466,11 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 					* or something of the sort and not a jpg file with exec perms
 					*
 				*/
-				NBDebugMsg( DbgMsgPart::HEAD, "Executing: %s... ", fileToBeOpened.toLocal8Bit().data() );
-				NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( fileToBeOpened ) ? "[DONE]" : "[FAILED]" ) );
+				qDebug( "Executing %s... [%s]", fileToBeOpened.toLocal8Bit().data(), ( QProcess::startDetached( fileToBeOpened ) ? "DONE" : " FAILED" ) );
+
 			}
 
 			else {
-				NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", fileToBeOpened.toLocal8Bit().data() );
 				NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( fileToBeOpened ) );
 				if ( not app.isValid() )
 					doOpenWithCmd();
@@ -496,7 +495,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 					exec << fileToBeOpened;
 				}
 
-				NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( exec.takeFirst(), exec ) ? "[DONE]" : " [FAILED]" ) );
+				qDebug( "Opening file: %s [%s]", fileToBeOpened.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
 			}
 		}
 
@@ -505,6 +504,8 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			QString text = QString( "I really do not have any idea how to open <b>%1</b>." ).arg( index.data().toString() );
 
 			NBMessageDialog::error( this, title, text );
+
+			qDebug() << "Cannot open file:" << fileToBeOpened.toLocal8Bit().data();
 			return;
 		}
 	}
@@ -1114,7 +1115,6 @@ void NBFolderView::selectAll() {
 
 void NBFolderView::openTerminal() {
 
-	NBDebugMsg( DbgMsgPart::HEAD, "Opening the console at %s... ", fsModel->currentDir().toLocal8Bit().constData() );
 	QStringList commandList = getTerminal();
 	QString command = commandList.takeFirst();
 
@@ -1126,7 +1126,7 @@ void NBFolderView::openTerminal() {
 		commandList[ 3 ] = "/bin/bash";
 	}
 
-	NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
+	qDebug( "Opening console at %s... [%s]", fsModel->currentDir().toLocal8Bit().data(), ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
 };
 
 void NBFolderView::setFocus() {

@@ -380,7 +380,6 @@ void NewBreeze::createAndSetupActions() {
 
 void NewBreeze::openFile( QString file ) {
 
-	NBDebugMsg( DbgMsgPart::HEAD, "Opening file: %s ", file.toLocal8Bit().data() );
 	NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( file ) );
 
 	/* Show Open with command  */
@@ -408,7 +407,7 @@ void NewBreeze::openFile( QString file ) {
 			else
 				exec << file;
 
-			NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( exec.takeFirst(), exec ) ? "[DONE]" : " [FAILED]" ) );
+			qDebug( "Opening file: %s [%s]", file.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
 		}
 	}
 
@@ -438,7 +437,7 @@ void NewBreeze::openFile( QString file ) {
 			exec << file;
 		}
 
-		NBDebugMsg( DbgMsgPart::TAIL, ( QProcess::startDetached( exec.takeFirst(), exec ) ? "[DONE]" : " [FAILED]" ) );
+		qDebug( "Opening file: %s [%s]", file.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
 	}
 };
 

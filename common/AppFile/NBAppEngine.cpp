@@ -69,6 +69,24 @@ NBAppsList NBAppEngine::allDesktops() {
 	return appsList;
 };
 
+NBAppFile NBAppEngine::application( QString exec ) {
+
+	NBAppsList list;
+	Q_FOREACH( NBAppFile app, appsList.toQList() ) {
+		if ( app.value( NBAppFile::Exec ).toString().contains( exec, Qt::CaseInsensitive ) )
+			list << app;
+
+		else if ( app.value( NBAppFile::Name ).toString().compare( exec, Qt::CaseInsensitive ) == 0 )
+			list << app;
+	};
+
+	NBAppFile merged = list.toQList().at( 0 );
+	Q_FOREACH( NBAppFile other, list.toQList() )
+		merged.merge( other );
+
+	return merged;
+};
+
 void NBAppEngine::parseDesktops() {
 
 	foreach( QString appDir, appsDirs ) {

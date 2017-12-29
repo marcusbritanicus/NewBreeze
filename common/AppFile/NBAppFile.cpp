@@ -206,6 +206,70 @@ QString NBAppFile::category() const {
 	return "Uncategorized";
 };
 
+void NBAppFile::merge( NBAppFile other ) {
+
+	__mimeTypes << other.value( NBAppFile::MimeTypes ).toStringList();
+	__categories << other.value( NBAppFile::Categories ).toStringList();
+	__takesArgs = __takesArgs or other.takesArgs();
+	__multipleFiles = __multipleFiles or other.multipleArgs();
+	__nodisplay = __nodisplay and other.value( NBAppFile::NoDisplay ).toBool();
+
+	if ( __grade < other.grade() ) {
+		__grade = other.grade();
+		fileUrl = other.filePath();
+	}
+
+	if ( __comment.isEmpty() and other.value( NBAppFile::Comment ).toString().count() )
+		__comment = other.value( NBAppFile::Comment ).toString();
+};
+
+bool NBAppFile::save() {
+
+	if ( __grade < 100 ) {
+		__grade = 100;
+		fileUrl = QDir::home().filePath( ".local/share/applications/" ) + baseName( fileUrl );
+	}
+
+	if ( not __exec.count() )
+		return false;
+
+	QFile desktopFile( fileUrl );
+	if ( not desktopFile.open( QFile::WriteOnly ) )
+		return false;
+
+	desktopFile.write( "[Desktop Entry]\n" );
+
+	desktopFile.write( "Name=" + __name.toLocal8Bit() + "\n" );
+	desktopFile.write( "Type=Application\n" );
+	desktopFile.write( "Exec=" + __exec.toLocal8Bit() + "\n" );
+
+	if ( __icon.count() )
+		desktopFile.write( "Icon=" + __icon.toLocal8Bit() + "\n" );
+
+	if ( __mimeTypes.count() )
+		desktopFile.write( "MimeType=" + __mimeTypes.join( ";" ).toLocal8Bit() + "\n" );
+
+	if ( __workPath.count() )
+		desktopFile.write( "WorkPath=" + __workPath.toLocal8Bit() + "\n" );
+
+	desktopFile.write( "Terminal=" + QByteArray( __terminalMode ? "true" : "false" ) + "\n" );
+
+	if ( __categories.count() )
+		desktopFile.write( "Categories=" + __categories.join( ";" ).toLocal8Bit() + "\n" );
+
+	if ( __comment.count() )
+		desktopFile.write( "Comment=" + __comment.toLocal8Bit() + "\n" );
+
+	if ( __description.count() )
+		desktopFile.write( "GenericName=" + __description.toLocal8Bit() + "\n" );
+
+	desktopFile.write( "NoDisplay=" + QByteArray( __nodisplay ? "true" : "false" ) + "\n" );
+
+	desktopFile.close();
+
+	return true;
+};
+
 NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
 
 	QVariantList data;
@@ -334,6 +398,7 @@ void NBAppFile::parseDesktopFile() {
 	QString rxTerm( "\nTerminal=(.*)(\n|\r\n)" );
 	QString rxCate( "\nCategories=(.*)(\n|\r\n)" );
 	QString rxComm( "\nComment=(.*)(\n|\r\n)" );
+	QString rxDscr( "\nGenericName=(.*)(\n|\r\n)" );
 	QString rxDisp( "\nNoDisplay=(.*)(\n|\r\n)" );
 
 	// Grade - location
@@ -354,12 +419,15 @@ void NBAppFile::parseDesktopFile() {
 	dFile.close();
 
 	__name = findIn( rxName, entry );
-
-	if ( __name.isEmpty() )
-		qDebug() << "Nameless monster:" << fileUrl;
-
 	__type = findIn( rxType, entry );
 	__exec = findIn( rxExec, entry );
+
+
+	if ( __name.isEmpty() ) {
+		qDebug() << "Nameless monster:" << fileUrl;
+		__name = __exec.split( " ", QString::SkipEmptyParts ).at( 0 );
+		__name = __name.at( 0 ).toUpper() + __name.right( __name.count() - 1 );
+	}
 
 	__icon = findIn( rxIcon, entry );
 	if ( __icon.isEmpty() )
@@ -371,6 +439,7 @@ void NBAppFile::parseDesktopFile() {
 
 	__categories << findIn( rxCate, entry ).split( ";", QString::SkipEmptyParts );
 	__comment = findIn( rxComm, entry );
+	__description = findIn( rxDscr, entry );
 	__nodisplay = ( findIn( rxDisp, entry ).toLower() == "true" ? true : false );
 
 	// By default set @v __multipleFiles to false
@@ -545,39 +614,46 @@ NBAppsList NBAppsList::operator<<( NBAppsList newList ) {
 
 NBAppsList NBAppsList::operator<<( NBAppFile app ) {
 
-	// If app is not an Application type,do not add it.
+	// If app is not an Application type, do not add it.
 	if ( app.value( NBAppFile::Type ).toString() != QString( "Application" ) )
 		return *this;
 
+	// If by chance there is no executable, do not add it
+	if ( not app.execArgs().count() )
+		return *this;
+
+	// If by chance there is no executable, do not add it
+	if ( not app.execArgs().count() )
+		return *this;
+
+	// If this executable does not exist, do not add it
+	if ( not exists( app.execArgs().at( 0 ) ) )
+		return *this;
+
+	// If this executable does not exist in $PATH, do not add it
+	bool found = false;
+	Q_FOREACH( QString path, QString( getenv( "PATH" ) ).split( ":" ) ) {
+		if ( exists( path + "/" + app.execArgs().at( 0 ) ) ) {
+			found = true;
+			break;
+		}
+	}
+	if ( not found )
+		return *this;
+
+	// Check if this application has been added already
 	foreach( NBAppFile other, __appsList ) {
 		if ( app.compare( other ) == INT_MAX ) {
 			// This means nothing. Just that the other app is not the same as this.
 			// So we continue the search.
+
 			continue;
 		}
 
-		else if ( app.compare( other ) < 0 ) {
-			// This has less priority than the one existing.
-			// So no more checks. We do not include this at all.
-			return *this;
-		}
+		else {
+			// Same executable. We just merge the two apps
 
-		else if ( app.compare( other ) > 0 ) {
-			// This has a higher priority than the one existing.
-			// We delete the other and append this.
-			__appsList.removeAt( __appsList.indexOf( other ) );
-			__appsList << app;
-
-			return *this;
-		}
-
-		else if ( app.compare( other ) == 0 ) {
-			// We already have an equivalent application.
-			// We'll try to merge the two and return.
-
-			__appsList.removeAt( __appsList.indexOf( other ) );
-			__appsList << NBAppFile::merge( app, other );
-
+			other.merge( app );
 			return *this;
 		}
 	}

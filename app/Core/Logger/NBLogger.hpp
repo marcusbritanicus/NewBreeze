@@ -26,5 +26,3 @@ namespace DbgMsgPart {
 #else
 	void NBMessageOutput( QtMsgType, const char* );
 #endif
-
-void NBDebugMsg( DbgMsgPart::MsgPart, const char*, ... );
