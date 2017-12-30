@@ -660,8 +660,15 @@ void NewBreeze::showProperties() {
 		foreach( QModelIndex idx, selectedList )
 			paths << FolderView->fsModel->nodePath( idx );
 
-	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, &mTerminate, this );
-	propsDlg->show();
+	if ( FolderView->fsModel->modelDataType() == NBItemViewModel::Applications ) {
+		NBDesktopFileEditor *desktopEditor = new NBDesktopFileEditor( this, paths.at( 0 ) );
+		desktopEditor->exec();
+	}
+
+	else {
+		NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, &mTerminate, this );
+		propsDlg->show();
+	}
 };
 
 void NewBreeze::showPermissions() {

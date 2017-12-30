@@ -24,6 +24,7 @@
 #include "NBSidePanel.hpp"
 #include "NBTerminal.hpp"
 #include "NBTrashManager.hpp"
+#include "NBAppEditorDialog.hpp"
 
 class NewBreeze : public QMainWindow {
 	Q_OBJECT

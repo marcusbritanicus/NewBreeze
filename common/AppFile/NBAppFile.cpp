@@ -36,6 +36,7 @@ inline QString baseName( QString path ) {
 NBAppFile::NBAppFile() {
 
 	mIsValid = false;
+	__type = QString( "Application" );
 };
 
 NBAppFile::NBAppFile( QString path ) {
@@ -66,6 +67,9 @@ NBAppFile::NBAppFile( QString path ) {
 
 QVariant NBAppFile::value( NBAppFile::Fields field ) const {
 
+	if ( not mIsValid )
+		return QVariant();
+
 	switch( field ) {
 		case Name:
 			return __name;
@@ -94,12 +98,67 @@ QVariant NBAppFile::value( NBAppFile::Fields field ) const {
 		case Comment:
 			return __comment;
 
+		case Description:
+			return __description;
+
 		case NoDisplay:
 			return __nodisplay;
 
 		default:
 			return QVariant();
 	};
+};
+
+void NBAppFile::setValue( NBAppFile::Fields field, QVariant data ) {
+
+	switch( field ) {
+		case Name:
+			__name = data.toString();
+			break;
+
+		case Type:
+			__type = data.toString();
+			break;
+
+		case Exec:
+			__exec = data.toString();
+			break;
+
+		case Icon:
+			__icon = data.toString();
+			break;
+
+		case MimeTypes:
+			__mimeTypes = data.toStringList();
+			break;
+
+		case WorkPath:
+			__workPath = data.toString();
+			break;
+
+		case TerminalMode:
+			__terminalMode = data.toBool();
+			break;
+
+		case Categories:
+			__categories = data.toStringList();
+			break;
+
+		case Comment:
+			__comment = data.toString();
+			break;
+
+		case Description:
+			__description = data.toString();
+			break;
+
+		case NoDisplay:
+			__nodisplay = data.toBool();
+			break;
+	};
+
+	if ( __name.count() and __exec.count() )
+		mIsValid = true;
 };
 
 QStringList NBAppFile::execArgs() const {
@@ -240,6 +299,13 @@ bool NBAppFile::save() {
 	desktopFile.write( "[Desktop Entry]\n" );
 
 	desktopFile.write( "Name=" + __name.toLocal8Bit() + "\n" );
+
+	if ( __description.count() )
+		desktopFile.write( "GenericName=" + __description.toLocal8Bit() + "\n" );
+
+	if ( __comment.count() )
+		desktopFile.write( "Comment=" + __comment.toLocal8Bit() + "\n" );
+
 	desktopFile.write( "Type=Application\n" );
 	desktopFile.write( "Exec=" + __exec.toLocal8Bit() + "\n" );
 
@@ -250,19 +316,12 @@ bool NBAppFile::save() {
 		desktopFile.write( "MimeType=" + __mimeTypes.join( ";" ).toLocal8Bit() + "\n" );
 
 	if ( __workPath.count() )
-		desktopFile.write( "WorkPath=" + __workPath.toLocal8Bit() + "\n" );
-
-	desktopFile.write( "Terminal=" + QByteArray( __terminalMode ? "true" : "false" ) + "\n" );
+		desktopFile.write( "Path=" + __workPath.toLocal8Bit() + "\n" );
 
 	if ( __categories.count() )
 		desktopFile.write( "Categories=" + __categories.join( ";" ).toLocal8Bit() + "\n" );
 
-	if ( __comment.count() )
-		desktopFile.write( "Comment=" + __comment.toLocal8Bit() + "\n" );
-
-	if ( __description.count() )
-		desktopFile.write( "GenericName=" + __description.toLocal8Bit() + "\n" );
-
+	desktopFile.write( "Terminal=" + QByteArray( __terminalMode ? "true" : "false" ) + "\n" );
 	desktopFile.write( "NoDisplay=" + QByteArray( __nodisplay ? "true" : "false" ) + "\n" );
 
 	desktopFile.close();

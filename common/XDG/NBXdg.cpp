@@ -32,6 +32,7 @@ QString NBXdg::xdgDefaultApp( QString mimeType ) {
 	*/
 
 	QStringList files;
+	files << NBXdg::home() + QString( "/.config/mimeapps.list" );
 	files << NBXdg::home() + QString( "/.local/share/applications/mimeapps.list" );
 	files << NBXdg::home() + QString( "/.local/share/applications/defaults.list" );
 	files << NBXdg::home() + QString( "/.local/share/applications/mimeinfo.cache" );

@@ -33,6 +33,9 @@ class NBCOMMON_DLLSPEC NBAppFile {
 		// Value of various fields
 		QVariant value( NBAppFile::Fields ) const;
 
+		// Value of various fields
+		void setValue( NBAppFile::Fields, QVariant );
+
 		// Contains only the arguments, expanded wherever necessary accoring to fredesktop.org standards
 		QStringList execArgs() const;
 

@@ -6,24 +6,15 @@
 
 #pragma once
 
-#include "Global.hpp"
+#ifdef STANDALONE
+	#include "AltGlobal.hpp"
+#else
+	#include "Global.hpp"
+#endif
 
 typedef QMap<QString, QStringList> MDict;
 
-class NBDesktopFileEditor : public QDialog {
-	Q_OBJECT
-
-	public:
-		NBDesktopFileEditor( QWidget*, NBAppFile ) {};
-
-	private:
-		void createGUI();
-
-		QLineEdit *nameLE, *descrLE, *cmtLE, *execLE;
-		QToolButton *iconBtn;
-};
-
-class NBMimeTypeSelector : public QDialog {
+class NBMimeTypeSelector : public QTreeWidget {
 	Q_OBJECT
 
 	public :
@@ -34,13 +25,53 @@ class NBMimeTypeSelector : public QDialog {
 		bool isChecked( QString );
 
 	private :
-		void populateGUI();
+		void populateTree();
 
-		QTreeWidget *mimeTree;
 		MDict mdict;
-
 		QStringList checked;
 
 	public slots :
 		void changeSelection( QTreeWidgetItem*, int );
+};
+
+class NBAppIconButton : public QToolButton {
+	Q_OBJECT
+
+	public:
+		NBAppIconButton( QWidget *parent );
+
+		void setIcon( QString );
+		QString iconPath();
+
+	private:
+		QString mIconFile;
+
+	private Q_SLOTS:
+		void selectIcon();
+};
+
+class NBDesktopFileEditor : public QDialog {
+	Q_OBJECT
+
+	public:
+		NBDesktopFileEditor( QWidget*, NBAppFile );
+
+	private:
+		void createGUI();
+		void updateEntries();
+		void setDialogProperties();
+
+		QLineEdit *nameLE, *descrLE, *cmtLE, *execLE;
+		NBAppIconButton *iconBtn;
+
+		QLineEdit *wrkPthLE;
+		QCheckBox *hiddenCB, *termCB;
+		NBMimeTypeSelector *mimesTW;
+
+		QPushButton *saveBtn, *cancelBtn;
+
+		NBAppFile mApp;
+
+	public Q_SLOTS:
+		void accept();
 };

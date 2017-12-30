@@ -16,21 +16,7 @@ NBVault *NBVault::vault = NULL;
 
 NBVault::NBVault() {
 
-	if ( not vaultDB.value( "Password" ).toByteArray().size() ) {
-		QMessageBox::information(
-			NULL,
-			"NewBreeze Vault",
-			"It seems that this is the first time you are using NewBreeze Vault. Please set the vault password."
-		);
-
-		NBPasswordDialog *pDlg = new NBPasswordDialog( NULL );
-		if ( pDlg->exec() ) {
-			vaultDB.setValue( "Password", QCryptographicHash5::hash( pDlg->password(), QCryptographicHash5::Sha3_512 ) );
-
-			init = true;
-		}
-	}
-
+	init = true;
 	mKeyStoreOption = NBVault::AskVaultKeyEverytime;
 };
 
@@ -141,6 +127,20 @@ bool NBVault::isDirectoryDecrypted( QString path ) {
 };
 
 QByteArray NBVault::vaultPassword() {
+
+	if ( not vaultDB.value( "Password" ).toByteArray().size() ) {
+		QMessageBox::information(
+			NULL,
+			"NewBreeze Vault",
+			"It seems that this is the first time you are using NewBreeze Vault. Please set the vault password."
+		);
+
+		NBPasswordDialog *pDlg = new NBPasswordDialog( NULL );
+		if ( pDlg->exec() ) {
+			vaultDB.setValue( "Password", QCryptographicHash5::hash( pDlg->password(), QCryptographicHash5::Sha3_512 ) );
+
+		}
+	}
 
 	if ( ( mKeyStoreOption == NBVault::StoreVaultKeyForSession ) and ( vaultPass.count() ) )
 		return vaultPass;

@@ -92,6 +92,7 @@ NBAppFile NBAppEngine::application( QString exec ) {
 
 void NBAppEngine::parseDesktops() {
 
+	appsList.clear();
 	foreach( QString appDir, appsDirs ) {
 		foreach( QString application, listApplications( appDir ) ) {
 
