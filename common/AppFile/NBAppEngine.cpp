@@ -80,6 +80,9 @@ NBAppFile NBAppEngine::application( QString exec ) {
 			list << app;
 	};
 
+	if ( not list.count() )
+		return NBAppFile();
+
 	NBAppFile merged = list.toQList().at( 0 );
 	Q_FOREACH( NBAppFile other, list.toQList() )
 		merged.merge( other );

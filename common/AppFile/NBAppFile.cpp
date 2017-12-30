@@ -622,14 +622,6 @@ NBAppsList NBAppsList::operator<<( NBAppFile app ) {
 	if ( not app.execArgs().count() )
 		return *this;
 
-	// If by chance there is no executable, do not add it
-	if ( not app.execArgs().count() )
-		return *this;
-
-	// If this executable does not exist, do not add it
-	if ( not exists( app.execArgs().at( 0 ) ) )
-		return *this;
-
 	// If this executable does not exist in $PATH, do not add it
 	bool found = false;
 	Q_FOREACH( QString path, QString( getenv( "PATH" ) ).split( ":" ) ) {
@@ -638,7 +630,7 @@ NBAppsList NBAppsList::operator<<( NBAppFile app ) {
 			break;
 		}
 	}
-	if ( not found )
+	if ( not found and not exists( app.execArgs().at( 0 ) ) )
 		return *this;
 
 	// Check if this application has been added already
