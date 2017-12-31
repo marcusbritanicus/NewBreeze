@@ -1,6 +1,6 @@
 /*
 	*
-	* NBDerypt.hpp - NewBreeze File Folder Decryption Class Header
+	* NBDerypt.hpp - NewBreeze Folder Encryption Class Header
 	*
 */
 
@@ -32,4 +32,27 @@ class NBEncFS : public QObject {
 		QString mTarget;
 
 		QWidget *mParent;
+};
+
+class NBCreateEncFS : public QDialog {
+	Q_OBJECT
+
+	public:
+		/* Init */
+		NBCreateEncFS( QWidget *parent = NULL );
+
+		QString directoryName();
+
+	private:
+		void createGUI();
+
+		QLineEdit *dirLE;
+
+		QString mSource;
+		QString mTarget;
+
+		QPushButton *createBtn;
+
+	private Q_SLOTS:
+		void updateButton();
 };

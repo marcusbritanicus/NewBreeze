@@ -38,12 +38,13 @@ NBNewNodeDialog::NBNewNodeDialog( QString type, QDir curDir, QString text, QWidg
 	segBtns->setSegmentWidth( 90 );
 
 	if ( type == QString( "dir" ) ) {
-		lbl->setText( tr( "Create new folder in:\n%1" ).arg( curDir.path() ) );
+		lbl->setText( tr( "Create a new folder in <b>%1</b> named:" ).arg( curDir.path() ) );
+		lbl->setWordWrap( true );
 		le->setText( "New Folder" );
 	}
 
 	else {
-		lbl->setText( tr( "Paste clipboard contents in:" ) );
+		lbl->setText( tr( "Paste clipboard contents in the file named:" ) );
 		le->setText( "New File" );
 	}
 
@@ -54,7 +55,6 @@ NBNewNodeDialog::NBNewNodeDialog( QString type, QDir curDir, QString text, QWidg
 
 	lyt->addWidget( lbl );
 	lyt->addWidget( le );
-	lyt->addWidget( Separator::horizontal() );
 	lyt->addLayout( btnLyt );
 
 	connect( le, SIGNAL( textEdited( QString ) ), this, SLOT( handleTextChanged( QString ) ) );
@@ -66,7 +66,7 @@ NBNewNodeDialog::NBNewNodeDialog( QString type, QDir curDir, QString text, QWidg
 	setLayout( lyt );
 	le->setFocus();
 
-	setFixedSize( 450, 150 );
+	setFixedSize( 450, 120 );
 };
 
 void NBNewNodeDialog::handleTextChanged( QString newText ) {
@@ -159,7 +159,7 @@ NBNewFileDialog::NBNewFileDialog( QDir curDir, QWidget *parent ) : NBDialog( par
 	segBtns->addSegment( cancelBtn );
 	segBtns->setSegmentWidth( 90 );
 
-	lbl->setText( tr( "Create new file in:\n%1" ).arg( curDir.path() ) );
+	lbl->setText( tr( "Create a new file in <b>%1</b> named:" ).arg( curDir.path() ) );
 	le->setText( "New File" );
 
 	le->selectAll();
@@ -170,7 +170,6 @@ NBNewFileDialog::NBNewFileDialog( QDir curDir, QWidget *parent ) : NBDialog( par
 	lyt->addWidget( lbl );
 	lyt->addWidget( cb );
 	lyt->addWidget( le );
-	lyt->addWidget( Separator::horizontal() );
 	lyt->addLayout( btnLyt );
 
 	connect( le, SIGNAL( textEdited( QString ) ), this, SLOT( handleTextChanged( QString ) ) );
@@ -182,7 +181,7 @@ NBNewFileDialog::NBNewFileDialog( QDir curDir, QWidget *parent ) : NBDialog( par
 	setLayout( lyt );
 	le->setFocus();
 
-	setFixedSize( 450, 180 );
+	setFixedSize( 450, 150 );
 };
 
 void NBNewFileDialog::handleTextChanged( QString newText ) {

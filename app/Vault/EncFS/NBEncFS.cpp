@@ -1,6 +1,6 @@
 /*
 	*
-	* NBEncFS.cpp - NewBreeze File Folder Decryption Class
+	* NBEncFS.cpp - NewBreeze Folder Encryption Class
 	*
 */
 
@@ -8,7 +8,10 @@
 
 NBEncFS::NBEncFS( QString source, QString target, QWidget *parent ) : QObject( parent ) {
 
+	/* Encrypted location */
 	mSource = QString( source );
+
+	/* Decrypted location */
 	mTarget = QString( target );
 
 	/* Store the parent */
@@ -122,56 +125,27 @@ bool NBEncFS::unmountDir() {
 
 bool NBEncFS::createEncFS( QString passwd ) {
 
-	QString mSrcTmp;
+	/* Create a temporary locations */
+	QString mTgtTmp = mTarget + QDateTime::currentDateTime().toString( ".yyyymmdd-hhmmss" );
 
+	/* If the source exists, move it to the above temporary location */
+	if ( exists( mTarget ) and not QFile::rename( mTarget, mTgtTmp ) ) {
+		QMessageBox::information(
+			mParent,
+			"NewBreeze - EncFS Creation Error",
+			QString( "" )
+		);
+
+		/* We could not create the EncFS volume properly */
+		return false;
+	}
+
+	/* encfs @mSource @mTarget */
 	if ( not mSource.endsWith( "/ ") )
 		mSource += "/";
 
 	if ( not mTarget.endsWith( "/ ") )
 		mTarget += "/";
-
-	/* If @mTarget exists, copy data to a temporary location */
-	if ( exists( mTarget ) and nChildren( mTarget ) ) {
-		QMessageBox *mBox = new QMessageBox( mParent );
-		QString title = "NewBreeze - Create EncFS";
-		QString message = QString( "Save all open files and click 'Continue' to proceed." );
-		QString details = QString(
-			"To create an EncFS volume, the folder %1 should be empty. I will attempt to move the data to a temporary location, "
-			"then create the volume and copy the data back. Please close all the open files in <tt>%1</tt> and click "
-			"'Continue' to proceed. You may click 'Abort' to cancel the creation of the encrypted volume."
-		).arg( baseName( mSource ) );
-
-		QPushButton *abortBtn = new QPushButton( QIcon::fromTheme( "dialog-cancel" ), "&Abort", mBox );
-		connect( abortBtn, SIGNAL( clicked() ), mBox, SLOT( reject() ) );
-
-		QPushButton *continueBtn = new QPushButton( QIcon::fromTheme( "dialog-ok-apply" ), "&Continue", mBox );
-		connect( continueBtn, SIGNAL( clicked() ), mBox, SLOT( accept() ) );
-
-		mBox->setWindowTitle( title );
-		mBox->setText( message );
-		mBox->setDetailedText( details );
-		mBox->setIcon( QMessageBox::Information );
-
-		mBox->addButton( abortBtn, QMessageBox::RejectRole );
-		mBox->addButton( continueBtn, QMessageBox::AcceptRole );
-
-		mBox->setDefaultButton( continueBtn );
-		mBox->exec();
-
-		if ( mBox->clickedButton() != continueBtn )
-			return false;
-
-		mSrcTmp = mSource + ".tmp" + QDateTime::currentDateTime().toString( "yyyyMMddThhmmssAP" );
-		if ( rename( mSource.toLocal8Bit().data(), mSrcTmp.toLocal8Bit().data() ) != 0 ) {
-			QMessageBox::critical(
-				mParent,
-				"NewBreeze - EncFS Creation Falied",
-				"I have failed to create a new EncFS volume. Please check if you have read write permissions in the directory and try again."
-			);
-
-			return false;
-		}
-	}
 
 	/* Create encrypted directory path */
 	mkpath( mSource, 0700 );
@@ -195,44 +169,47 @@ bool NBEncFS::createEncFS( QString passwd ) {
 	/* Wait for the process to be finished */
 	proc.waitForFinished( -1 );
 
+	/* If there was an error: print it in the debug output */
 	if ( proc.exitCode() ) {
 		qDebug() << "encfs -S " + mSource + " " + mTarget;
-		qDebug() << proc.readAll();
+		QString error = proc.readAll();
+		qDebug() << error;
 		QMessageBox::information(
 			mParent,
 			"NewBreeze - EncFS Creation Falied",
-			"For some reason unknown to me the creation of the encfs volume failed. Please check the debug messages to identify the error."
+			"<p>For some reason unknown to me the creation of the encfs volume failed. Following error message was obtained:</p>" + error
 		);
 
 		/* We could not create the EncFS volume */
 		return false;
 	}
 
+	/* Successfully created the directory, we add .directory entry */
 	QSettings sett( QDir( dirName( mSource ) ).filePath( ".directory" ), QSettings::NativeFormat );
 	sett.setValue( "EncFS/" + baseName( mSource ), baseName( mTarget ) );
 	QMessageBox::information(
 		mParent,
 		"NewBreeze - EncFS Creation Success",
-		"The EncFS volume has been successfully created and mounted. To unmount the volume, right click and press '<u>U</u>nmount EncFS Volume'."
+		"The EncFS volume has been successfully created and mounted. To unmount the volume, right click the folder and select '<u>U</u>nmount EncFS Volume'."
 	);
 
 	/* If source existed, and had contents: */
-	if ( mSource.count() and ( mSource == mTarget ) ) {
+	if ( exists( mTgtTmp ) ) {
 
-		int ret = system( ( "mv " + mSrcTmp + "/* " + mSource ).toLocal8Bit().data() );
+		int ret = system( ( "mv " + mTgtTmp + "/* " + mTarget ).toLocal8Bit().data() );
 		if ( ret ) {
 			QMessageBox::information(
 				mParent,
 				"NewBreeze - Data Restore Failed",
 				QString( "NewBreeze has encountered error in restoring the data that existed in your target directory from the temporary location. "
-				"You will find your data in the folder: %1" ).arg( mSrcTmp )
+				"You will find your data in the folder: %1" ).arg( mTgtTmp )
 			);
 
 			/* We created the EncFS volume properly, but data restore failed. */
 			return true;
 		}
 
-		removeDir( mSrcTmp );
+		removeDir( mTgtTmp );
 	}
 
 	/* Everything went on very well */
@@ -264,4 +241,63 @@ bool NBEncFS::changePass( QString oPassword, QString nPassword ) {
 
 		return false;
 	}
+};
+
+NBCreateEncFS::NBCreateEncFS( QWidget *parent ) : QDialog( parent ) {
+
+	createGUI();
+
+	QRect scrnSize = QDesktopWidget().screenGeometry();
+	int hpos = ( int )( ( scrnSize.width() - 700 ) / 2 );
+	int vpos = ( int )( ( scrnSize.height() - 400 ) / 2 );
+	move( hpos, vpos );
+
+	setFixedSize( 450, 120 );
+};
+
+QString NBCreateEncFS::directoryName() {
+
+	if ( result() == QDialog::Accepted )
+		return dirLE->text();
+
+	else
+		return QString();
+};
+
+void NBCreateEncFS::createGUI() {
+
+	QLabel *lbl = new QLabel( "Enter the name of the &directory:" );
+	dirLE = new QLineEdit( this );
+
+	lbl->setBuddy( dirLE );
+
+	createBtn = new QPushButton( QIcon::fromTheme( "dialog-ok" ), "&Create EncFS", this );
+	createBtn->setDisabled( true );
+	connect( createBtn, SIGNAL( clicked() ), this, SLOT( accept() ) );
+
+	QPushButton *cancelBtn = new QPushButton( QIcon::fromTheme( "dialog-close" ), "&Create EncFS", this );
+	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( reject() ) );
+
+	connect( dirLE, SIGNAL( textChanged( const QString& ) ), this, SLOT( updateButton() ) );
+
+	QHBoxLayout *btnLyt = new QHBoxLayout();
+	btnLyt->addStretch();
+	btnLyt->addWidget( createBtn );
+	btnLyt->addWidget( cancelBtn );
+
+	QVBoxLayout *lyt = new QVBoxLayout();
+	lyt->addWidget( lbl );
+	lyt->addWidget( dirLE );
+	lyt->addLayout( btnLyt );
+
+	setLayout( lyt );
+};
+
+void NBCreateEncFS::updateButton() {
+
+	if ( not dirLE->text().count() )
+		createBtn->setDisabled( true );
+
+	else
+		createBtn->setEnabled( true );
 };

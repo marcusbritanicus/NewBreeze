@@ -103,14 +103,17 @@ bool NBVault::encryptDirectory( QString path ) {
 	}
 
 	else {
-		QByteArray pass = vaultPassword();
+		NBVault *vlt = NBVault::instance();
+		QByteArray pass = vlt->vaultPassword();
 		if ( not pass.count() )
 			return false;
 
+		QString mtPt = baseName( path );
+
 		NBVaultRecord *record = new NBVaultRecord();
-		record->encPath = dirName( path ) + "." + baseName( path ) + ".enc";
+		record->encPath = dirName( path ) + "." + mtPt;
 		record->type = QString( "dir" );
-		record->recordPass = generatePassword();
+		record->recordPass = vlt->generatePassword();
 
 		NBEncFS encfs( record->encPath, path );
 		if ( encfs.createEncFS( record->recordPass.toHex() ) )
@@ -123,23 +126,47 @@ bool NBVault::encryptDirectory( QString path ) {
 
 bool NBVault::isDirectoryDecrypted( QString path ) {
 
+	if ( path.endsWith( "/" ) )
+		path.chop( 1 );
+
+	QProcess proc;
+	proc.start( "df -h" );
+	proc.waitForFinished();
+
+	QString output = QString::fromLocal8Bit( proc.readAllStandardOutput() );
+
+	if ( output.contains( " " + path + "\n" ) )
+		return true;
+
 	return false;
 };
 
 QByteArray NBVault::vaultPassword() {
 
 	if ( not vaultDB.value( "Password" ).toByteArray().size() ) {
-		QMessageBox::information(
-			NULL,
-			"NewBreeze Vault",
-			"It seems that this is the first time you are using NewBreeze Vault. Please set the vault password."
+		QMessageBox *msgBox = new QMessageBox( NULL );
+		msgBox->setWindowTitle( "NewBreeze - NBVault" );
+		msgBox->setIcon( QMessageBox::Information );
+		msgBox->setText( "NewBreeze Vault First Use" );
+		msgBox->setInformativeText(
+			"<p>It seems that this is the first time you are using NewBreeze Vault. Please read the following disclaimer carefully.</p>"
+			"<p><i>This implementation of NBVault is given to you as is without any without any warranty under the terms of the "
+			"GNU General Public License (version 3 or later). This implementation is <b>NOT CERTIFIED</b> by any cryptography expert. "
+			"NBVault is meant for keeping your private/sensitive stuff from prying eyes and not for secure storage of important data.</i></p>"
+			"<p>Please accept that you are using NBVault at your own risk and the developer is not responsible for any data loss.</p>"
 		);
+		msgBox->addButton( "&Accept", QMessageBox::AcceptRole );
+		msgBox->addButton( "&Reject", QMessageBox::RejectRole );
+
+		if ( msgBox->exec() == QMessageBox::RejectRole )
+			return QByteArray();
+
+		QMessageBox::information( NULL, "Newbreeze - NBVault", "Please set the vault password and remember it. If the vault password is forgotten, "
+		"you <b>cannot</b> retrieve the encrypted data from files/folders. You may set a pattern or use a text password." );
 
 		NBPasswordDialog *pDlg = new NBPasswordDialog( NULL );
-		if ( pDlg->exec() ) {
+		if ( pDlg->exec() )
 			vaultDB.setValue( "Password", QCryptographicHash5::hash( pDlg->password(), QCryptographicHash5::Sha3_512 ) );
-
-		}
 	}
 
 	if ( ( mKeyStoreOption == NBVault::StoreVaultKeyForSession ) and ( vaultPass.count() ) )

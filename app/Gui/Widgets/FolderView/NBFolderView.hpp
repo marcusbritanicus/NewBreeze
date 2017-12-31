@@ -15,6 +15,8 @@
 #include "NBDeleteManager.hpp"
 #include "NBDeleteProcess.hpp"
 #include "NBErrorsDialog.hpp"
+#include "NBEncFS.hpp"
+#include "NBFileDialog.hpp"
 #include "NBItemViewModel.hpp"
 #include "NBFolderFlash.hpp"
 #include "NBGuiWidgets.hpp"
@@ -29,6 +31,8 @@
 #include "NBPropertiesDialog.hpp"
 #include "NBRenameDialog.hpp"
 #include "NBRunCmdDialog.hpp"
+#include "NBVault.hpp"
+#include "NBVaultDatabase.hpp"
 
 class NBFolderView : public QStackedWidget {
 	Q_OBJECT
@@ -43,7 +47,7 @@ class NBFolderView : public QStackedWidget {
 
 		QAction *peekAct, *moveAct, *copyAct, *pasteAct, *renameAct, *reloadAct, *trashAct, *delAct, *propertiesAct, *permissionsAct;
 		QAction *actPrevDir, *actNextDir, *actParDir, *actHomeDir, *actGoHome, *showHideDotFiles, *openVTE;
-		QAction *actNewDir, *actNewFile;
+		QAction *actNewDir, *actNewFile, *actNewEncFS;
 		QAction *sortByNameAct, *sortByTypeAct, *sortBySizeAct, *sortByDateAct;
 		QAction *groupsAct;
 		QAction *addToSuperStartAct;
@@ -112,6 +116,8 @@ class NBFolderView : public QStackedWidget {
 		void handleWatchDogBark( QString path );
 		void extract( QString );
 		void compress( QStringList );
+
+		void createEncFS();
 
 		void updateActions();
 		void addToSuperStart();

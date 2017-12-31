@@ -15,7 +15,15 @@ bool NBVaultDatabase::isEncryptedLocation( QString path ) {
 	if ( isFile( path ) and path.endsWith( ".s20" ) )
 		path.chop( 4 );
 
-	return paths.contains( path );
+	if ( paths.contains( path ) )
+		return true;
+
+	else {
+		/* Typically, */
+		QString cpath = dirName( path ) + baseName( path ).remove( 0, 1 );
+	}
+
+	return false;
 };
 
 NBVaultRecord* NBVaultDatabase::recordForPath( QString path, QByteArray vaultPass ) {

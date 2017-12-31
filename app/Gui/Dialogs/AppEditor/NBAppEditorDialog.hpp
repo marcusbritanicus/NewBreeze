@@ -6,11 +6,7 @@
 
 #pragma once
 
-#ifdef STANDALONE
-	#include "AltGlobal.hpp"
-#else
-	#include "Global.hpp"
-#endif
+#include "Global.hpp"
 
 typedef QMap<QString, QStringList> MDict;
 

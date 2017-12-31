@@ -71,6 +71,7 @@ class NBSettings {
 				QList<QKeySequence> GoRight;
 				QList<QKeySequence> NewFolder;
 				QList<QKeySequence> NewFile;
+				QList<QKeySequence> NewEncFS;
 				QList<QKeySequence> Peek;
 				QList<QKeySequence> Reload;
 				QList<QKeySequence> ToggleHidden;

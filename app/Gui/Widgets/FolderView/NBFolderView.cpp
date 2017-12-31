@@ -5,7 +5,6 @@
 */
 
 #include "NBFolderView.hpp"
-#include "NBFileDialog.hpp"
 
 NBFolderView::NBFolderView( QWidget *parent ) : QStackedWidget( parent ) {
 
@@ -124,6 +123,13 @@ void NBFolderView::createAndSetupActions() {
 
 	connect( actNewFile, SIGNAL( triggered() ), this, SLOT( newFile() ) );
 	addAction( actNewFile );
+
+	// New file
+	actNewEncFS = new QAction( QIcon::fromTheme( "document-new" ), "New Encrypted Directory", this );
+	actNewEncFS->setShortcuts( Settings->Shortcuts.NewEncFS );
+
+	connect( actNewEncFS, SIGNAL( triggered() ), this, SLOT( createEncFS() ) );
+	addAction( actNewEncFS );
 
 	// Copy
 	copyAct = new QAction( QIcon( ":/icons/copy.png" ), "&Copy", this );
@@ -323,6 +329,33 @@ void NBFolderView::newFolder() {
 
 	NBNewNodeDialog *newFolder = new NBNewNodeDialog( "dir", QDir( fsModel->currentDir() ), QString(), this );
 	newFolder->exec();
+};
+
+void NBFolderView::createEncFS() {
+
+	NBVault *vlt = NBVault::instance();
+	QByteArray pass = vlt->vaultPassword();
+	if ( not pass.count() )
+		return;
+
+	NBCreateEncFS *newEncDir = new NBCreateEncFS( this );
+
+	if ( newEncDir->exec() == QDialog::Accepted ) {
+		QString mtPt = newEncDir->directoryName();
+		QString encDir = '.' + mtPt;
+
+		NBVaultRecord *record = new NBVaultRecord();
+		record->encPath = fsModel->currentDir() + "/" + "." + mtPt;
+		record->type = QString( "dir" );
+		record->recordPass = vlt->generatePassword();
+
+		NBEncFS encfs( record->encPath, fsModel->currentDir() + mtPt );
+		if ( encfs.createEncFS( record->recordPass.toHex() ) )
+			NBVaultDatabase::addRecordForPath( fsModel->currentDir() + mtPt, record, pass );
+
+		else
+			return;
+	}
 };
 
 void NBFolderView::doOpen( QString loc ) {
@@ -1190,6 +1223,7 @@ void NBFolderView::updateActions() {
 		delAct->setDisabled( true );
 		actNewDir->setDisabled( true );
 		actNewFile->setDisabled( true );
+		actNewEncFS->setDisabled( true );
 	}
 
 	else if ( not isWritable( fsModel->currentDir() ) ) {
@@ -1201,6 +1235,7 @@ void NBFolderView::updateActions() {
 		delAct->setDisabled( true );
 		actNewDir->setDisabled( true );
 		actNewFile->setDisabled( true );
+		actNewEncFS->setDisabled( true );
 	}
 
 	else {
@@ -1212,6 +1247,7 @@ void NBFolderView::updateActions() {
 		delAct->setEnabled( true );
 		actNewDir->setEnabled( true );
 		actNewFile->setEnabled( true );
+		actNewEncFS->setEnabled( true );
 	}
 };
 

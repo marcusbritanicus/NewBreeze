@@ -15,19 +15,20 @@ few changes in NewBreeze 3.
     - NBIconManager supports different icons for different sizes.
     - Very fast loading of icons
 
-=> NBFileSystemWatcher
+=> NBFileSystemWatcher( QFileSystemWatcher )
     - NBFileSystemWatcher was earlier rewritten with a cleaner code based on the inotify-example.c from http://www.lanedo.com/users/amorgado/fanotify/inotify-example.c
-    - The above code was buggy and hence has been replaced with QFileSystemWatcher as the backend.
+    - The above code was buggy and hence has been replaced with enhanced subclass of QFileSystemWatcher.
 
 => NBItemViewModel( QAbsractItemModel )
    - Formerly NBFileSystemModel, now it models Applications, Catalogs, and the FileSystem
-   - Buffed up for better performance.
-   - NBFileSystemModel provides upto 50% faster thumbnails for images.
+   - Code cleanup for better performance.
+   - NBItemViewModel provides upto 50% faster thumbnails loading for images.
 
 => NBIconView( QAbstractItemModel )
    - Per-folder views are now enabled. Each folder remembers its previous state ( size, grouping, list view, etc )
    - Fixed the small issue of mouse/cursor selection conflict.
    - Fixed the SegFault with cursor up and down movements.
+   # Currently has issues with cursorMovements. Will be fixed by v3-rc
 
 => UI
    - An elementary Accidental Delete Protection (ADP) has been added. However it is not mature enough for commercial use.
@@ -36,19 +37,17 @@ few changes in NewBreeze 3.
 => NBAddressBar redesigned
    - NBBreadCrumbsBar is now called NBCrumbsBar.
    - It redesigned to make sure long paths do not run out of the widget.
-   - The full path can be displayed using FlowLayout at anytime.
+   - The full path can be displayed using FlowLayout at anytime by pressing ▣
 
-=> NBSidePanel
-   - A redesigned sidepanel with elegant menu listing the devices and bookmarks.
-   - Devices show the space usage.
-
-=> NBSideBar
-   - A mac-like side panel
-   - User can switch between classic and modern side panels
+=> NBSidePanel and NBSideBar
+   - NBSidePanel: Redesigned sidepanel with elegant menu listing the devices and bookmarks.
+   - NBSideBar: A mac-like side panel
+   - Devices ( or their tool tips ) show the space usage.
+   - User can switch between classic and modern side panels from the
 
 => NBButton
    - NBButton has been rewritten to be a subclass of QPushButton, with better styling.
-   - Issues with NBSegmentControl has caused me to go back to NBButtons, which "look" better.
+   - Issues with NBSegmentControl has caused me to go back to NBButtons, which have better appearance.
 
 => NBPreviewInterface
    - NBPreviewInterface is deprecated and deleted.
@@ -63,7 +62,7 @@ few changes in NewBreeze 3.
    - GZip, BZip2, and XZ files are processed independently
    - Archive creation now shows a pretty dialog with some options
    - Archive creation and extraction is done via QtConcurrent::run(...)
-   - Archive previews are now available
+   - Archive previews are now available, though it needs some improvements
 
 => SuperStart: A Super start to your day
    - All Drives are shown as you start NewBreeze.
@@ -73,9 +72,11 @@ few changes in NewBreeze 3.
    - Note that changing display name does not rename the actual file of the hard drive.
    - A menu will be added later.
 
-=> NewBreeze Vault
-   NOTE: This is work in progress. The first implementation will be completed by NB v3.0.0-rc1.
-   - When fully implemented NewBreeze Vault will be a single place to access all your encrypted files and folders.
-   - Currently, all the encrypted files and folders will be in stored in and retrieved from an encrypted database.
+=> NewBreeze Vault: Requires 'encfs'
+   NOTE: This is work in progress. The first basic implementation is completed.
+   - You can now access all your encrypted files and folders with out having to remember every password.
+   - Currently, all the encrypted files and folders are being stored in and retrieved from an encrypted database.
    - Each added file or folder will be encrypted using a randomly generated unique 8196 bit (1 kiB) key.
    - NBCrypt Plugin is deprecated and a dummy will be installed in its place.
+   - Create a new ecrypted directory by pressing Ctrl+Shift+U.
+   - Existing files/directories can be encrypted by choosing Actions > Encrypt in the context menu.

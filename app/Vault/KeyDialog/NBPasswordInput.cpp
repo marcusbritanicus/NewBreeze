@@ -43,7 +43,7 @@ void NBPasswordInput::createGUI() {
 	connect( passwdLE, SIGNAL( returnPressed() ), this, SLOT( accept() ) );
 
 	QVBoxLayout *base = new QVBoxLayout();
-	base->addWidget( new QLabel( "Draw a pattern below:", this ) );
+	base->addWidget( new QLabel( "Draw your password pattern below:", this ) );
 	base->addWidget( pKeyPad );
 	base->addWidget( new QLabel( "Or type in a password:", this ) );
 	base->addWidget( passwdLE );

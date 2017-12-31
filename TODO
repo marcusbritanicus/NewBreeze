@@ -13,7 +13,7 @@ NBIconProvider/NBIconManager                                                    
 	✓ Provide icon strings for multiple sizes
 	✗ Integrate NBIconManager with newbreeze-common
 
-NBIconView                                                                                                                            [ 8 of 10 ]
+NBIconView                                                                                                                            [ 10 of 10 ]
 	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
 	◐ Improve the selection model
 	  • Currently mouse-over on click selection is enabled.
@@ -27,7 +27,7 @@ NBIconView                                                                      
 	  • Double-clicking category, toggles folding
 	✓ CatalogView and its icons need to be fixed
 	✓ Add symbols to icons representing symlink, executables, system files etc for NBItemDelegate
-	□ Fix drag-and-drop to take care of SuperStart
+	◐ Fix drag-and-drop to take care of SuperStart
 
 NBItemViewModel                                                                                                                       [ 2 of 2 ]
 	✓ Read icon data directly from NBItemNode* rather than create it repeatedly.
@@ -77,8 +77,8 @@ General                                                                         
 	✗ Add support for addition of terminal emulators
 	✓ Remove libmagic dependency. Its too slow
 
-NewBreeze Vault                                                                                                                       [ 0 of 1 ]
-	✍ Vault: A Single place to access all your private files and folders
+NewBreeze Vault                                                                                                                       [ 1 of 1 ]
+	✓ Vault: A Single place to access all your private files and folders
 		  • This is the very first implementation, and is not very secure
 		  • NBCrypt plugin will be merged with NewBreeze app
 

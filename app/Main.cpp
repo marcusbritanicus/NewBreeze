@@ -1,6 +1,6 @@
 /*
 	*
-	* Copyright 2014 Britanicus <marcusbritanicus@gmail.com>
+	* Copyright 2018 Britanicus <marcusbritanicus@gmail.com>
 	*
 
 	*

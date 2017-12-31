@@ -65,6 +65,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->Shortcuts.GoRight = QList<QKeySequence>() << QKeySequence( "Alt+Right" ) << QKeySequence( "Alt+Down" );
 	defaultSettings->Shortcuts.NewFolder = QList<QKeySequence>() << QKeySequence( "F10" );
 	defaultSettings->Shortcuts.NewFile = QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+N" );
+	defaultSettings->Shortcuts.NewEncFS = QList<QKeySequence>() << QKeySequence( "Ctrl+Shift+E" );
 	defaultSettings->Shortcuts.Peek = QList<QKeySequence>() << QKeySequence( "Ctrl+Return" );
 	defaultSettings->Shortcuts.Reload = QList<QKeySequence>() << QKeySequence( "F5" ) << QKeySequence( "Ctrl+R" );
 	defaultSettings->Shortcuts.ToggleHidden = QList<QKeySequence>() << QKeySequence( "Alt+." ) << QKeySequence( "Ctrl+H" );
@@ -202,8 +203,11 @@ NBSettings* NBSettings::instance() {
 	if ( saKeys.contains( QString( "NewFolder" ) ) )
 		settings->Shortcuts.NewFolder = getShortcuts( "NewFolder" );
 
-	if ( saKeys.contains( QString( "Style" ) ) )
+	if ( saKeys.contains( QString( "NewFile" ) ) )
 		settings->Shortcuts.NewFile = getShortcuts( "NewFile" );
+
+	if ( saKeys.contains( QString( "NewEncFS" ) ) )
+		settings->Shortcuts.NewEncFS = getShortcuts( "NewEncFS" );
 
 	if ( saKeys.contains( QString( "Peek" ) ) )
 		settings->Shortcuts.Peek = getShortcuts( "Peek" );
@@ -397,8 +401,11 @@ void NBSettings::reload() {
 	if ( saKeys.contains( QString( "NewFolder" ) ) )
 		Shortcuts.NewFolder = getShortcuts( "NewFolder" );
 
-	if ( saKeys.contains( QString( "Style" ) ) )
+	if ( saKeys.contains( QString( "NewFile" ) ) )
 		Shortcuts.NewFile = getShortcuts( "NewFile" );
+
+	if ( saKeys.contains( QString( "NewEncFS" ) ) )
+		Shortcuts.NewEncFS = getShortcuts( "NewEncFS" );
 
 	if ( saKeys.contains( QString( "Peek" ) ) )
 		Shortcuts.Peek = getShortcuts( "Peek" );

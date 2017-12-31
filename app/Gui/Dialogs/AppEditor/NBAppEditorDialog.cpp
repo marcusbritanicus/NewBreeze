@@ -254,16 +254,3 @@ void NBDesktopFileEditor::accept() {
 
 	QDialog::accept();
 };
-
-#ifdef STANDALONE
-int main( int argc, char **argv ) {
-
-	QApplication app( argc, argv );
-	NBDesktopFileEditor Gui( NULL, NBAppFile( "/usr/share/applications/gimp.desktop" ) );
-	Gui.show();
-
-	app.exec();
-
-	return 0;
-};
-#endif

@@ -67,9 +67,17 @@ void NBActionsMenu::buildDefaultActions() {
 	if ( selection.count() == 1 ) {
 		QString node = QDir( workingDir ).filePath( selection.at( 0 ).data().toString() );
 		if ( NBVaultDatabase::isEncryptedLocation( node ) ) {
-			QAction *decryptAct = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), tr( "&Decrypt" ), this );
-			connect( decryptAct, SIGNAL( triggered() ), this, SLOT( decrypt() ) );
-			addAction( decryptAct );
+			if ( isDir( node ) and vlt->isDirectoryDecrypted( node ) ) {
+				QAction *encryptAct = new QAction( QIcon( ":/icons/emblem-mounted.png" ), tr( "&Encrypt" ), this );
+				connect( encryptAct, SIGNAL( triggered() ), this, SLOT( encrypt() ) );
+				addAction( encryptAct );
+			}
+
+			else {
+				QAction *decryptAct = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), tr( "&Decrypt" ), this );
+				connect( decryptAct, SIGNAL( triggered() ), this, SLOT( decrypt() ) );
+				addAction( decryptAct );
+			}
 		}
 
 		else{
@@ -693,6 +701,8 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 				createNewMenu->addAction( actNewDir );
 				createNewMenu->addAction( actNewFile );
+				createNewMenu->addSeparator();
+				createNewMenu->addAction( actNewEncFS );
 
 				// Add this folder to catalog
 				NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
