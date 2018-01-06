@@ -263,6 +263,9 @@ void NewBreeze::createAndSetupActions() {
 	/* Update View Modes on the UI */
 	connect( FolderView->IconView, SIGNAL( updateViewMode( QString ) ), AddressBar, SLOT( updateViewMode( QString ) ) );
 
+	/* Update GUI if terminal cwd changes */
+	connect( Terminal, SIGNAL( chdir( QString ) ), this, SLOT( chdirUI( QString ) ) );
+
 	// About NB
 	QAction *aboutNBAct = new QAction( this );
 	aboutNBAct->setShortcuts( Settings->Shortcuts.AboutNB );
@@ -703,6 +706,15 @@ void NewBreeze::handleDriveUrl( QString url ){
 
 	else
 		FolderView->doOpen( url );
+};
+
+void NewBreeze::chdirUI( QString url ){
+
+	/* Update the UI to show the cwd of the shell */
+	FolderView->doOpen( url );
+
+	/* Keep the focus on Terminal widget */
+	Terminal->setFocus();
 };
 
 void NewBreeze::showApplications() {

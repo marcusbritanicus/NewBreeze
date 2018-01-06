@@ -14,7 +14,20 @@ class NBTerminalWidget : public QTermWidget {
 
 	public :
 		NBTerminalWidget( QString wDir, QWidget * );
+		~NBTerminalWidget();
+
 		QString currentWorkingDirectory();
+
+	private :
+		void setupCwdAutoDetect();
+
+		QString nb3rc, cwdfn, oldcwd;
+
+	private Q_SLOTS:
+		void handleCwdChange( QString fn );
+
+	Q_SIGNALS:
+		void chdir( QString );
 };
 
 class NBTerminal : public QWidget {
@@ -37,4 +50,5 @@ class NBTerminal : public QWidget {
 
 	Q_SIGNALS:
 		void shown( bool );
+		void chdir( QString );
 };

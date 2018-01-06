@@ -132,8 +132,7 @@ int QTermWidget::getShellPID()
     return m_impl->m_session->processId();
 }
 
-void QTermWidget::changeDir(const QString & dir)
-{
+void QTermWidget::changeDir(const QString & dir) {
     /*
        this is a very hackish way of trying to determine if the shell is in
        the foreground before attempting to change the directory.  It may not
@@ -145,9 +144,12 @@ void QTermWidget::changeDir(const QString & dir)
     strCmd.append(" | tail -1 | awk '{ print $5 }' | grep -q \\+");
     int retval = system(strCmd.toStdString().c_str());
 
-    if (!retval) {
-        QString cmd = "cd " + dir + "\n";
-        sendText(cmd);
+    if ( !retval ) {
+        QString cmd = "builtin cd " + dir + "\n\f";
+        m_impl->m_session->sendText( cmd );
+
+		m_impl->m_session->refresh();
+		m_impl->m_session->emulation()->clearHistory();
     }
 }
 

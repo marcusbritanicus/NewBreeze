@@ -93,6 +93,8 @@ class NewBreeze : public QMainWindow {
 		void showFolders();
 		void showTrash();
 
+		void chdirUI( QString );
+
 		void filterFiles( QString );
 		void clearFilters();
 
