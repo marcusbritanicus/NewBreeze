@@ -70,6 +70,9 @@ class NBCOMMON_DLLSPEC NBDeviceManager : public QObject {
 		/* List of all mounted vfs */
 		static QList<NBDeviceInfo> allVirtualMounts();
 
+		/* List of all mounted vfs */
+		static QList<NBDeviceInfo> allEncryptedMounts();
+
 		/* Volume info for path */
 		static NBDeviceInfo deviceInfoForPath( QString path );
 

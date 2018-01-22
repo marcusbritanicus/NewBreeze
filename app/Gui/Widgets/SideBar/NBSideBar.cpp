@@ -100,7 +100,7 @@ void NBSideBar::reloadDevices() {
 	}
 
 	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allVirtualMounts() )
-		vfs->addItem( info.displayName(), ":/icons/" + info.deviceType() + ".png", info.mountPoint() );
+		vfs->addItem( info.displayName(), ":/icons/encfs.png", info.mountPoint() );
 
 	if ( drives->itemCount() )
 		drives->show();

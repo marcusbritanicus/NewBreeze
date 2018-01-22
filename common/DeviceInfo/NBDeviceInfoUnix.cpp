@@ -209,5 +209,5 @@ void NBDeviceInfoPrivate::retrieveVolumeInfo() {
 	readOnly = ( statfs_buf.f_flag & ST_RDONLY ) != 0;
 };
 
-void NBDeviceInfoPrivate::getDeviceType( QString dev, QString vfsType ) {
+void NBDeviceInfoPrivate::getDeviceType( QString, QString ) {
 };

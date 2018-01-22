@@ -1,6 +1,6 @@
 /*
     *
-    * NBVault.hpp - NewBreeze Vault Header
+    * NBVault.hpp - NewBreeze Vault Class
     *
 */
 

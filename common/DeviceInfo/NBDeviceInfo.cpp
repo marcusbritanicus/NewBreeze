@@ -139,6 +139,25 @@ QList<NBDeviceInfo> NBDeviceManager::allVirtualMounts() {
 	return devList;
 };
 
+QList<NBDeviceInfo> NBDeviceManager::allEncryptedMounts() {
+
+	pollDevices();
+
+	QList<NBDeviceInfo> devList;
+	Q_FOREACH( NBDeviceInfo info, devicesList.values() ) {
+		if ( info.fileSystemType().contains( "encfs" ) )
+			devList << info;
+
+		else if ( info.fileSystemType().contains( "cryfs" ) )
+			devList << info;
+
+		else
+			continue;
+	}
+
+	return devList;
+};
+
 NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
 
 	pollDevices();
