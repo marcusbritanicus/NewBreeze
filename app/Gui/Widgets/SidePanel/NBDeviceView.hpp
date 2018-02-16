@@ -140,7 +140,14 @@ class NBDeviceMenu : public QMenu {
 
 	private:
 		QList<QWidgetAction*> actionList;
+		bool entered;
 
 	private slots:
 		void highlightAction( QAction *act );
+
+	public Q_SLOTS:
+		void close();
+
+	protected:
+		void enterEvent( QEvent * );
 };

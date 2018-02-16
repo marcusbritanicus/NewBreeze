@@ -595,6 +595,7 @@ void NBVfsAction::dropEvent( QDropEvent *dpEvent ) {
 
 NBVfsMenu::NBVfsMenu( QWidget *parent ) : QMenu( parent ) {
 
+	entered = false;
 	connect( this, SIGNAL( hovered( QAction* ) ), this, SLOT( highlightAction( QAction* ) ) );
 };
 
@@ -628,4 +629,16 @@ void NBVfsMenu::highlightAction( QAction *act ) {
 	NBVfsAction *devAct = qobject_cast<NBVfsAction*>( wAct->defaultWidget() );
 	if ( devAct )
 		devAct->highlight( true );
+};
+
+void NBVfsMenu::enterEvent( QEvent *eEvent ) {
+
+	entered = true;
+	eEvent->accept();
+};
+
+void NBVfsMenu::close() {
+
+	if ( not entered )
+		QMenu::close();
 };

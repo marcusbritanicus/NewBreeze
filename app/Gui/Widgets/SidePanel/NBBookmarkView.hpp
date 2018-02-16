@@ -10,6 +10,7 @@
 #include "NBBookmarkInfo.hpp"
 #include "NBIconManager.hpp"
 
+class NBBookmarkMenu;
 class NBBookmarksIcon : public QWidget {
 	Q_OBJECT
 
@@ -75,7 +76,7 @@ class NBBookmarksIcon : public QWidget {
 		/* should the flash be colored */
 		bool colorFlash;
 
-		QMenu *bmkView;
+		NBBookmarkMenu *bmkView;
 
 	private slots:
 		void showBookmarks();
@@ -97,4 +98,20 @@ class NBBookmarksIcon : public QWidget {
 
 	Q_SIGNALS:
 		void driveClicked( QString );
+};
+
+class NBBookmarkMenu : public QMenu {
+	Q_OBJECT
+
+	public:
+		NBBookmarkMenu( QWidget* parent );
+
+	private:
+		bool entered;
+
+	public Q_SLOTS:
+		void close();
+
+	protected:
+		void enterEvent( QEvent * );
 };

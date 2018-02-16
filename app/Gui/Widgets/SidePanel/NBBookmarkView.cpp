@@ -42,7 +42,7 @@ void NBBookmarksIcon::createGUI() {
 	setFixedSize( 48, 48 );
 
 	// BookmarksView
-	bmkView = new QMenu( this );
+	bmkView = new NBBookmarkMenu( this );
 	bmkView->setObjectName( "NBBookmarksMenu" );
 	connect( bmkView, SIGNAL( triggered( QAction* ) ), this, SLOT( clickDrive( QAction* ) ) );
 };
@@ -291,7 +291,7 @@ void NBBookmarksIcon::showBookmarks() {
 		bmkView->addAction( act );
 	}
 
-	closeTimer.start( 10000, this );
+	closeTimer.start( 1500, this );
 	bmkView->exec( mapToGlobal( QPoint( 49, 0 ) ) );
 };
 
@@ -299,4 +299,21 @@ void NBBookmarksIcon::clickDrive( QAction *act ) {
 
 	QString mtpt = act->data().toString();
 	emit driveClicked( mtpt );
+};
+
+NBBookmarkMenu::NBBookmarkMenu( QWidget *parent ) : QMenu( parent ) {
+
+	entered = false;
+};
+
+void NBBookmarkMenu::enterEvent( QEvent *eEvent ) {
+
+	entered = true;
+	eEvent->accept();
+};
+
+void NBBookmarkMenu::close() {
+
+	if ( not entered )
+		QMenu::close();
 };

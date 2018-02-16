@@ -594,6 +594,7 @@ void NBDeviceAction::dropEvent( QDropEvent *dpEvent ) {
 
 NBDeviceMenu::NBDeviceMenu( QWidget *parent ) : QMenu( parent ) {
 
+	entered = false;
 	connect( this, SIGNAL( hovered( QAction* ) ), this, SLOT( highlightAction( QAction* ) ) );
 };
 
@@ -627,4 +628,16 @@ void NBDeviceMenu::highlightAction( QAction *act ) {
 	NBDeviceAction *devAct = qobject_cast<NBDeviceAction*>( wAct->defaultWidget() );
 	if ( devAct )
 		devAct->highlight( true );
+};
+
+void NBDeviceMenu::enterEvent( QEvent *eEvent ) {
+
+	entered = true;
+	eEvent->accept();
+};
+
+void NBDeviceMenu::close() {
+
+	if ( not entered )
+		QMenu::close();
 };
