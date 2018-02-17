@@ -249,6 +249,8 @@ void TextEditor::setPreviewMode() {
 
 	preview = true;
 
+	closeSC = new QShortcut( Qt::Key_Escape, this, SLOT( close() ), SLOT( close() ), Qt::WindowShortcut );
+
 	toolBar->hide();
 	openBtn->show();
 	editBtn->show();
@@ -256,11 +258,13 @@ void TextEditor::setPreviewMode() {
 	ed->setReadOnly( true );
 
 	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
-}
+};
 
 void TextEditor::switchToEditMode() {
 
 	preview = false;
+
+	closeSC->setEnabled( false );
 
 	toolBar->show();
 	openBtn->hide();
@@ -270,7 +274,7 @@ void TextEditor::switchToEditMode() {
 	setWindowFlags( Qt::Window );
 
 	showMaximized();
-}
+};
 
 void TextEditor::loadFile() {
 
@@ -354,17 +358,6 @@ void TextEditor::openInExternal() {
 
 	QProcess::startDetached( "xdg-open " + filename );
 	close();
-};
-
-void TextEditor::keyPressEvent( QKeyEvent *kEvent ) {
-
-	if ( preview and kEvent->key() == Qt::Key_Escape ) {
-
-		close();
-	}
-
-	QMainWindow::keyPressEvent( kEvent );
-	kEvent->accept();
 };
 
 void TextEditor::resizeEvent( QResizeEvent *rEvent ) {

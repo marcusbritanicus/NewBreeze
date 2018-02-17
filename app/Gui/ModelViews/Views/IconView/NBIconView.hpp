@@ -78,6 +78,8 @@ class NBIconView : public QAbstractItemView {
 		void updateGeometries();
 		void reload();
 
+		void currentChanged( const QModelIndex &, const QModelIndex & );
+
 	protected:
 		QModelIndex moveCursor( QAbstractItemView::CursorAction cursorAction, Qt::KeyboardModifiers modifiers );
 		bool isIndexHidden( const QModelIndex& ) const { return false; }

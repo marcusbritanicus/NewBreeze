@@ -108,8 +108,6 @@ QString QsciLexerLaTeX::description( int style ) const {
 
 void QsciLexerLaTeX::styleText( int start, int end ) {
 
-	qWarning() << start << end << end - start;
-
 	if ( not editor() )
 		return;
 

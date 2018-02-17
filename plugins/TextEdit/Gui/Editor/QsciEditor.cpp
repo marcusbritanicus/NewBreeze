@@ -170,7 +170,7 @@ bool QsciEditor::saveFile( QString filepath ) {
 bool QsciEditor::reloadFile() {
 
 	/* Check of we have loaded a file */
-	qWarning() << mFilePath.isEmpty();
+	qWarning() << "Empty file:" << mFilePath.isEmpty();
 	if ( mFilePath.isEmpty() )
 		return false;
 

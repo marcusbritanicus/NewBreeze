@@ -54,6 +54,8 @@ class TextEditor : public QMainWindow {
 		QToolButton *openBtn;
 		QWidget *toolBar;
 
+		QShortcut *closeSC;
+
 	public slots:
 		void setPreviewMode();
 		void switchToEditMode();
@@ -78,8 +80,6 @@ class TextEditor : public QMainWindow {
 		void openInExternal();
 
 	protected :
-		void keyPressEvent( QKeyEvent * );
-
 		void resizeEvent( QResizeEvent * );
 		void paintEvent( QPaintEvent * );
 		void closeEvent( QCloseEvent * );

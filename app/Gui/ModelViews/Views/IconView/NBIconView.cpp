@@ -754,8 +754,6 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 	/* Set the clicked index as the current index */
 	if( idx.isValid() ) {
-		curIdx = qMakePair( categoryList.indexOf( cModel->category( idx ) ), cModel->indexInCategory( idx ) );
-		persistentVCol = cModel->indexInCategory( idx ) % itemsPerRow;
 		setCurrentIndex( idx );
 	}
 
@@ -2338,4 +2336,12 @@ bool NBIconView::canShowIndex( QModelIndex idx ) {
 
 	else
 		return true;
+};
+
+void NBIconView::currentChanged( const QModelIndex &cur, const QModelIndex &prev ) {
+
+	QAbstractItemView::currentChanged( cur, prev );
+
+	curIdx = qMakePair( categoryList.indexOf( cModel->category( cur ) ), cModel->indexInCategory( cur ) );
+	persistentVCol = cModel->indexInCategory( cur ) % itemsPerRow;
 };
