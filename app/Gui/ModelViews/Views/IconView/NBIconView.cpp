@@ -478,21 +478,18 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 	for ( int row = 0; row < cModel->rowCount( rootIndex() ); row++ ) {
 		QModelIndex idx = cModel->index( row, 0, rootIndex() );
 		if ( not canShowIndex( idx ) ) {
-			/* If we the category to which this index belongs, continue to next index */
+			/* If we have the category to which this index belongs, continue to next index */
 			if ( hiddenCategories.contains( cModel->category( idx ) ) )
 				continue;
 
 			/* If the position of this index is the last in row of a folded category, paint a '+' */
 			if ( cModel->indexInCategory( idx ) == itemsPerRow - 1 ) {
-				QRect rect = viewportRectForRow( row );
+				QRect rect = viewportRectForRow( row - 1 );
+				rect.translate( myGridSize.width(), 0 );
 				if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
 					continue;
 
-				painter.save();
-				painter.setPen( Qt::black );
-				int n = cModel->indexListCountForCategory( cModel->category( idx ) ) - itemsPerRow + 1;
-				painter.drawText( rect, Qt::AlignCenter | Qt::TextWordWrap, QString( "%1 more item%2" ).arg( n ).arg( n > 1 ? "s" : "" ) );
-				painter.restore();
+				paintFolded( &painter, rect, idx );
 			}
 			continue;
 		}
@@ -1830,7 +1827,7 @@ void NBIconView::calculateCategorizedIconsRects() const {
 			minY += myCategoryHeight;
 
 			totalRows++;
-			int limit = mList.count() >= itemsPerRow ? itemsPerRow : mList.count();
+			int limit = mList.count() >= itemsPerRow ? itemsPerRow - 1 : mList.count();
 
 			for( int lrow = 0; lrow < limit; lrow++ ) {
 				int row = lrow / itemsPerRow;
@@ -2135,6 +2132,22 @@ void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const
 	painter->setFont( categoryFont );
 	painter->drawText( topLeft.x() + 24, topLeft.y(), rectangle.width() - 48, rectangle.height(), Qt::AlignVCenter, text );
 
+	painter->restore();
+};
+
+void NBIconView::paintFolded( QPainter *painter, const QRect &rect, const QModelIndex &idx ) {
+
+	painter->save();
+	int n = cModel->indexListCountForCategory( cModel->category( idx ) ) - itemsPerRow + 1;
+
+	QPixmap pix( ":/icons/plus.png" );
+	pix = pix.scaled( myGridSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+
+	QRect r = QRect( rect.x() + abs( rect.width() - pix.width() ) / 2, rect.y() + abs( rect.height() - pix.height() ) / 2, pix.width(), pix.height() );
+	painter->drawPixmap( r, pix );
+
+	painter->setPen( Qt::black );
+	painter->drawText( rect, Qt::AlignCenter | Qt::TextWordWrap, QString( "%1 more item%2" ).arg( n ).arg( n > 1 ? "s" : "" ) );
 	painter->restore();
 };
 

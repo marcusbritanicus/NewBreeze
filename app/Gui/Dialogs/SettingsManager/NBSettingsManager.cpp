@@ -5,6 +5,7 @@
 */
 
 #include "NBSettingsManager.hpp"
+#include "NBSPluginsWidget.hpp"
 
 NBSettingsManager::NBSettingsManager( QWidget *parent ) : NBDialog( parent ) {
 
@@ -39,7 +40,7 @@ QHBoxLayout* NBSettingsManager::createBodyLayout() {
 	widgetLyt->addWidget( generalWidget );
 	widgetLyt->addWidget( iconWidget );
 	widgetLyt->addWidget( styleWidget );
-	widgetLyt->addWidget( new QLabel( "<center>Plugin Manager options will appear here soon.<center>", this ) );
+	widgetLyt->addWidget( new NBSPluginsWidget( this ) );
 	widgetLyt->addWidget( keysWidget );
 
 	splitLyt->addWidget( chooserWidget );

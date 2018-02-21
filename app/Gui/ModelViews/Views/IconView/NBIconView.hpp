@@ -144,6 +144,7 @@ class NBIconView : public QAbstractItemView {
 
 		void paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const;
 		void paintSelection( QPainter *painter, const QModelIndexList ) const;
+		void paintFolded( QPainter *painter, const QRect &rect, const QModelIndex &idx );
 
 		void showHideCategory( QString );
 		void toggleFoldCategory( QString );

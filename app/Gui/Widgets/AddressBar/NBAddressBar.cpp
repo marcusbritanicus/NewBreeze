@@ -234,6 +234,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	// Tiles
 	viewModes->setSegmentIcon( 0, icon( NBIconManager::instance()->icon( "view-list-details" ) ) );
 	viewModes->segment( 0 )->setFocusPolicy( Qt::NoFocus );
+	viewModes->setSegmentDisabled( 0 );
 
 	// Icons
 	viewModes->setSegmentIcon( 1, icon( NBIconManager::instance()->icon( "view-list-icons" ) ) );
@@ -242,15 +243,17 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	// Details
 	viewModes->setSegmentIcon( 2, icon( NBIconManager::instance()->icon( "view-list-text" ) ) );
 	viewModes->segment( 2 )->setFocusPolicy( Qt::NoFocus );
+	viewModes->setSegmentDisabled( 2 );
 
-	if ( Settings->General.ViewMode == "Tiles" )
-		viewModes->segment( 0 )->setChecked( true );
+	// if ( Settings->General.ViewMode == "Tiles" )
+		// viewModes->segment( 0 )->setChecked( true );
 
-	else if ( Settings->General.ViewMode == "Icons" )
+	// else if ( Settings->General.ViewMode == "Icons" )
 		viewModes->segment( 1 )->setChecked( true );
+		emit changeViewMode( 1 );
 
-	else
-		viewModes->segment( 2 )->setChecked( true );
+	// else
+		// viewModes->segment( 2 )->setChecked( true );
 
 	// FilterButton
 	filterBtn = new NBButton( icon( NBIconManager::instance()->icon( "edit-find" ) ) );

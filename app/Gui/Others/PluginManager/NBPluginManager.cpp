@@ -94,11 +94,13 @@ void NBPluginManager::reloadPeekPlugins() {
 
 void NBPluginManager::reloadOtherPlugins() {
 
+	QSettings nbsett( "NewBreeze", "NewBreeze" );
+
 	QStringList pluginPaths;
 	#if QT_VERSION >= 0x050000
-		pluginPaths << "/usr/lib/newbreeze/plugins5/" << NBXdg::home() + "/.config/NewBreeze/plugins5/";
+		pluginPaths << nbsett.value( "PluginPaths5", QStringList() << "./plugins5" ).toStringList();
 	#else
-		pluginPaths << "/usr/lib/newbreeze/plugins/" << NBXdg::home() + "/.config/NewBreeze/plugins/";
+		pluginPaths << nbsett.value( "PluginPaths", QStringList() << "./plugins" ).toStringList();
 	#endif
 
 	mPluginsHash.clear();

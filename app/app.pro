@@ -332,16 +332,16 @@ isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc-X
-OBJECTS_DIR = $$BUILD_PREFIX/obj-X
-RCC_DIR		= $$BUILD_PREFIX/qrc-X
-UI_DIR      = $$BUILD_PREFIX/uic-X
+MOC_DIR 	= $$BUILD_PREFIX/moc-qt4
+OBJECTS_DIR = $$BUILD_PREFIX/obj-qt4
+RCC_DIR		= $$BUILD_PREFIX/qrc-qt4
+UI_DIR      = $$BUILD_PREFIX/uic-qt4
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-	MOC_DIR 	= $$BUILD_PREFIX/moc-X5
-	OBJECTS_DIR = $$BUILD_PREFIX/obj-X5
-	RCC_DIR		= $$BUILD_PREFIX/qrc-X5
-	UI_DIR      = $$BUILD_PREFIX/uic-X5
+	MOC_DIR 	= $$BUILD_PREFIX/moc-qt5
+	OBJECTS_DIR = $$BUILD_PREFIX/obj-qt5
+	RCC_DIR		= $$BUILD_PREFIX/qrc-qt5
+	UI_DIR      = $$BUILD_PREFIX/uic-qt5
 }
 
 unix {

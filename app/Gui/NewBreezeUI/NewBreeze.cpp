@@ -829,19 +829,20 @@ void NewBreeze::changeViewMode( int mode ) {
 
 void NewBreeze::switchToNextView() {
 
-	if ( Settings->General.ViewMode == QString( "Tiles" ) )
+	// if ( Settings->General.ViewMode == QString( "Tiles" ) )
 		Settings->General.ViewMode = QString( "Icons" );
 
-	else if ( Settings->General.ViewMode == QString( "Icons" ) )
-		Settings->General.ViewMode = QString( "Details" );
+	// else if ( Settings->General.ViewMode == QString( "Icons" ) )
+		// Settings->General.ViewMode = QString( "Details" );
 
-	else
-		Settings->General.ViewMode = QString( "Tiles" );
+	// else
+		// Settings->General.ViewMode = QString( "Tiles" );
 
 	FolderView->updateViewMode();
 
 	QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
 	sett.setValue( "NewBreeze/ViewMode", Settings->General.ViewMode );
+	sett.sync();
 };
 
 void NewBreeze::toggleGrouping() {
