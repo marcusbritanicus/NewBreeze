@@ -30,7 +30,6 @@ Notes for compiling - linux:
         - Tar: wget https://github.com/marcusbritanicus/NewBreeze/archive/master.tar.gz && tar -xf master.tar.gz
     - Enter NewBreeze-master
     - Open the terminal and type: qmake && make
-    - To compile the plugins, type:sh BuildPlugins.sh
 
 Dependencies:
     - Qt4/Qt5
@@ -40,7 +39,6 @@ Dependencies:
     - libarchive
     - xdg-utls
     - libpoppler-qt4/qt5
-    - libsource-highlight-dev (optional)
     - libpoppler-qt4-dev/libpoppler-qt5-dev (optional)
     - libdjvulibre-dev (optional)
 
@@ -86,5 +84,4 @@ List of shortcuts
 +==============================================================+============================+
 
 Upcoming
-    - Application Editor ( Desktop file editor )
     - Any other feature you request for... :)

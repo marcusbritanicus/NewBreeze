@@ -48,7 +48,6 @@ Some of its features are
 * libarchive
 * xdg-utls
 * libpoppler-qt4/qt5
-* libsource-highlight-dev (optional)
 * libpoppler-qt4-dev/libpoppler-qt5-dev (optional)
 * libdjvulibre-dev (optional)
 
@@ -56,5 +55,4 @@ Some of its features are
 * Extended copy/move causes crashes. Disabled by default.
 
 ### Upcoming
-* Application Editor (Desktop file editor)
 * Any other feature you request for... :)

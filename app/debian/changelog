@@ -1,3 +1,13 @@
+newbreeze (3.0.0-beta) unstable; urgency=low
+
+  * Feature: Inbuilt encryption support via NBVault
+  * Feature: Inbuilt desktop file editor
+  * Improvements to NBSidePanel
+  * Fixed NBIconView selection bugs
+  * Several bug fixes.
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Fri, 23 Feb 2018 12:17:00 +0530
+
 newbreeze (3.0.0-alpha) unstable; urgency=low
 
   * Feature: Per-folder View options
@@ -16,7 +26,6 @@ newbreeze (3.0.0-alpha) unstable; urgency=low
   * Feature: Accidental Delete Protection
   * Feature: Archive Preview
   * Feature: SuperStart enabled
-  * Feature:
   * NBIconManager replaces NBIconProvider with better functionality
   * Icon themes are correctly detected over various DEs
   * Faster model loading via scandir(...)
