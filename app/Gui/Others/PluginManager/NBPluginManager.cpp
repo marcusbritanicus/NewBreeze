@@ -94,19 +94,19 @@ void NBPluginManager::reloadPeekPlugins() {
 
 void NBPluginManager::reloadOtherPlugins() {
 
-	QSettings nbsett( "NewBreeze", "NewBreeze" );
+	QSettings nbsett( "NewBreeze", "Plugins" );
 
 	QStringList pluginPaths;
-	#if QT_VERSION >= 0x050000
-		pluginPaths << nbsett.value( "PluginPaths5", QStringList() << "./plugins5" ).toStringList();
-	#else
-		pluginPaths << nbsett.value( "PluginPaths", QStringList() << "./plugins" ).toStringList();
-	#endif
+	pluginPaths << nbsett.value( "PluginPaths", QStringList() << "./plugins" ).toStringList();
+
+	int parsed = 0;
+	int added = 0;
 
 	mPluginsHash.clear();
 	Q_FOREACH( QString path, pluginPaths ) {
 		QDir pPathDir( path );
 		Q_FOREACH( QString pluginSo, pPathDir.entryList( QStringList() << "*.so", QDir::Files, QDir::Name ) ) {
+			parsed++;
 			QPluginLoader loader( pPathDir.absoluteFilePath( pluginSo ) );
 			QObject *pObject = loader.instance();
 			if ( pObject ) {
@@ -115,6 +115,7 @@ void NBPluginManager::reloadOtherPlugins() {
 					continue;
 
 				mPluginList << plugin;
+				added++;
 				Q_FOREACH( NBPluginInterface::Interface iface, plugin->interfaces() ) {
 					NBContextPluginHash cph = mPluginsHash.value( iface );
 					Q_FOREACH( NBPluginInterface::Context ctxt, plugin->contexts( iface ) ) {

@@ -1,9 +1,11 @@
-newbreeze (3.0.0-beta) unstable; urgency=low
+newbreeze (3.0.0-beta2) unstable; urgency=low
 
   * Feature: Inbuilt encryption support via NBVault
   * Feature: Inbuilt desktop file editor
+  * Feature: Partial folding of categories
   * Improvements to NBSidePanel
   * Fixed NBIconView selection bugs
+  * Qt5 now preferred Qt version
   * Several bug fixes.
 
  -- Marcus Britanicus <marcusbritanicus@gmail.com>  Fri, 23 Feb 2018 12:17:00 +0530

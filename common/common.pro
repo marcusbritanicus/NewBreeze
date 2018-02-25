@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = newbreeze-common
+TARGET = newbreeze-common4
 
 VERSION = 3.0.0
 
@@ -49,8 +49,6 @@ lessThan(QT_MAJOR_VERSION, 5) {
 	HEADERS += include/QCryptographicHash5.hpp
 	SOURCES += QCryptographicHash5/QCryptographicHash5.cpp
 
-	# NBDeviceInfo from Qt5 v5.4
-
 	# QMimeType from Qt5 v5.0+
 	HEADERS += include/QMimeDatabase.hpp
 	HEADERS += include/QMimeType.hpp
@@ -89,13 +87,13 @@ isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc-common
-OBJECTS_DIR = $$BUILD_PREFIX/obj-common
-RCC_DIR		= $$BUILD_PREFIX/qrc-common
-UI_DIR      = $$BUILD_PREFIX/uic-common
+MOC_DIR 	= $$BUILD_PREFIX/moc-common4
+OBJECTS_DIR = $$BUILD_PREFIX/obj-common4
+RCC_DIR		= $$BUILD_PREFIX/qrc-common4
+UI_DIR      = $$BUILD_PREFIX/uic-common4
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-	TARGET = newbreeze-common5
+	TARGET = newbreeze-common
 	MOC_DIR 	= $$BUILD_PREFIX/moc-common5
 	OBJECTS_DIR = $$BUILD_PREFIX/obj-common5
 	RCC_DIR		= $$BUILD_PREFIX/qrc-common5
@@ -122,6 +120,6 @@ unix {
 
 	greaterThan(QT_MAJOR_VERSION, 4) {
 		static.path = $$PREFIX/lib/newbreeze
-		static.files = libnewbreeze-common5.a
+		static.files = libnewbreeze-common.a
 	}
 }

@@ -1,8 +1,8 @@
 TEMPLATE = app
 
-TARGET = newbreeze3
+TARGET = newbreeze3qt4
 greaterThan(QT_MAJOR_VERSION, 4) {
-	TARGET = newbreeze3qt5
+	TARGET = newbreeze3
 }
 
 QT += network sql
@@ -12,11 +12,11 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 }
 
 isEqual( QT_MAJOR_VERSION, 4 ) {
-	 LIBS += -L../common/ -lnewbreeze-common
+	 LIBS += -L../common/ -lnewbreeze-common4
 }
 
 isEqual( QT_MAJOR_VERSION, 5 ) {
-	LIBS +=  -L../common/ -lnewbreeze-common5
+	LIBS +=  -L../common/ -lnewbreeze-common
 }
 
 LIBS += -larchive -lz

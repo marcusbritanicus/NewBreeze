@@ -7,7 +7,7 @@ INCLUDEPATH += . ../../common/include EncFS KeyDialog Salsa20
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 	Qt += widgets
-	LIBS += -L../../common/ -lnewbreeze-common5
+	LIBS += -L../../common/ -lnewbreeze-common4
 }
 
 isEqual(QT_MAJOR_VERSION, 4) {
@@ -59,10 +59,10 @@ isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc-vault
-OBJECTS_DIR = $$BUILD_PREFIX/obj-vault
-RCC_DIR		= $$BUILD_PREFIX/qrc-vault
-UI_DIR      = $$BUILD_PREFIX/uic-vault
+MOC_DIR 	= $$BUILD_PREFIX/moc-vault4
+OBJECTS_DIR = $$BUILD_PREFIX/obj-vault4
+RCC_DIR		= $$BUILD_PREFIX/qrc-vault4
+UI_DIR      = $$BUILD_PREFIX/uic-vault4
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 	MOC_DIR 	= $$BUILD_PREFIX/moc-vault5

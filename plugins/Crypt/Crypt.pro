@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = NBCrypt
+TARGET = NBCrypt4
 
 # Common Sources
 INCLUDEPATH += ../../common/ ../../common/include
@@ -36,13 +36,13 @@ isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc-plugins
-OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins
-RCC_DIR		= $$BUILD_PREFIX/qrc-plugins
-UI_DIR      = $$BUILD_PREFIX/uic-plugins
+MOC_DIR 	= $$BUILD_PREFIX/moc-plugins4
+OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins4
+RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4
+UI_DIR      = $$BUILD_PREFIX/uic-plugins4
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-	TARGET = NBCrypt5
+	TARGET = NBCrypt
 	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5
 	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5
 	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5
@@ -65,7 +65,4 @@ unix {
 	QMAKE_RPATHDIR += $$PREFIX/lib/newbreeze/
 
 	target.path = $$PREFIX/lib/newbreeze/plugins
-	greaterThan(QT_MAJOR_VERSION, 4) {
-		target.path = $$PREFIX/lib/newbreeze/plugins5
-	}
 }

@@ -11,7 +11,6 @@
 class Document : public QObject {
 	Q_OBJECT
 
-    Q_PROPERTY(QString text MEMBER mText NOTIFY textChanged FINAL)
 	public:
 		Document( QString path ) {
 
@@ -20,30 +19,15 @@ class Document : public QObject {
 
 			mText = QString::fromLocal8Bit( f.readAll() );
 			f.close();
+		};
 
-			emit textChanged( mText );
+		Q_INVOKABLE QString text() {
+
+			return mText;
 		};
 
 	private:
 		QString mText;
-
-	Q_SIGNALS:
-		void textChanged( const QString &text );
-};
-
-class MarkedPage : public QWebEnginePage {
-	Q_OBJECT
-
-	public:
-		explicit MarkedPage( QObject *parent = NULL ) : QWebEnginePage( parent ) {};
-
-	protected:
-		bool acceptNavigationRequest( const QUrl &url, NavigationType, bool ) {
-			if ( url.scheme() == QString( "qrc" ) )
-				return true;
-
-			return false;
-		};
 };
 
 class NBWebWatch : public QDialog {
@@ -57,7 +41,7 @@ class NBWebWatch : public QDialog {
 		void setWindowProperties();
 
 		QString path;
-		QWebEngineView *peekWidgetBase;
+		QWebView *peekWidgetBase;
 
 	private slots :
 		void loadDocument();
@@ -72,9 +56,6 @@ class NBWebWatch : public QDialog {
 
 class NBMarkDownPreview : public QObject, NBPluginInterface {
 	Q_OBJECT
-	#if QT_VERSION >= 0x050000
-		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "MarkDownPreview5.json" )
-	#endif
 	Q_INTERFACES( NBPluginInterface )
 
 	public:

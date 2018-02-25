@@ -17,18 +17,12 @@ void NBSPluginsWidget::createGUI() {
 	pPathsLW = new QListWidget( this );
 
 	// Populating the pPathsLW
-	QSettings nbsett( "NewBreeze", "NewBreeze" );
+	QSettings nbsett( "NewBreeze", "Plugins" );
 
 	QStringList pluginPaths;
-	#if QT_VERSION >= 0x050000
-		if ( not nbsett.value( "PluginPaths5" ).toStringList().count() )
-			nbsett.setValue( "PluginPaths5", QStringList() << "/usr/lib/newbreeze/plugins5" << NBXdg::home() + ".config/NewBreeze/plugins5/" );
-		pPathsLW->addItems( nbsett.value( "PluginPaths5" ).toStringList() );
-	#else
-		if ( not nbsett.value( "PluginPaths" ).toStringList().count() )
-			nbsett.setValue( "PluginPaths", QStringList() << "/usr/lib/newbreeze/plugins" << NBXdg::home() + ".config/NewBreeze/plugins/" );
-		pPathsLW->addItems( nbsett.value( "PluginPaths" ).toStringList() );
-	#endif
+	if ( not nbsett.value( "PluginPaths" ).toStringList().count() )
+		nbsett.setValue( "PluginPaths", QStringList() << "/usr/lib/newbreeze/plugins" << NBXdg::home() + ".config/NewBreeze/plugins/" );
+	pPathsLW->addItems( nbsett.value( "PluginPaths" ).toStringList() );
 
 	pathsBtn = new NBSegmentButton( this );
 	pathsBtn->setCount( 2 );
@@ -91,19 +85,11 @@ void NBSPluginsWidget::updateSettings() {
 	QSettings nbsett( "NewBreeze", "NewBreeze" );
 
 	QStringList pluginPaths;
-	#if QT_VERSION >= 0x050000
-		if ( not paths.count() )
-			nbsett.setValue( "PluginPaths5", QStringList() << "/usr/lib/newbreeze/plugins5" << NBXdg::home() + ".config/NewBreeze/plugins5/" );
+	if ( not paths.count() )
+		nbsett.setValue( "PluginPaths", QStringList() << "/usr/lib/newbreeze/plugins" << NBXdg::home() + ".config/NewBreeze/plugins/" );
 
-		else
-			nbsett.setValue( "PluginPaths5", paths );
-	#else
-		if ( not paths.count() )
-			nbsett.setValue( "PluginPaths", QStringList() << "/usr/lib/newbreeze/plugins" << NBXdg::home() + ".config/NewBreeze/plugins/" );
-
-		else
-			nbsett.setValue( "PluginPaths", paths );
-	#endif
+	else
+		nbsett.setValue( "PluginPaths", paths );
 
 	pPathsLW->clear();
 	pPathsLW->addItems( nbsett.value( "PluginPaths5" ).toStringList() );

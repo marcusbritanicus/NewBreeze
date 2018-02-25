@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Global.hpp"
+#include <QtWebKit>
 
 class NBWebWatch : public QDialog {
 	Q_OBJECT
@@ -14,7 +15,7 @@ class NBWebWatch : public QDialog {
 	public :
 		NBWebWatch( QString path = QDir::homePath() );
 		QString path;
-		QWebEngineView *peekWidgetBase;
+		QWebView *peekWidgetBase;
 
 	private :
 		void createGUI();

@@ -36,7 +36,8 @@ void NBWebWatch::createGUI() {
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
-	peekWidgetBase = new QWebEngineView();
+	peekWidgetBase = new QWebView();
+	peekWidgetBase->setRenderHints( QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing );
 	peekWidgetBase->setFont( QFont( "sans", 10 ) );
 
 	lblBtnLyt->addWidget( lbl );
@@ -102,13 +103,8 @@ void NBWebWatch::paintEvent( QPaintEvent *pEvent ) {
 void NBWebWatch::loadDocument() {
 
 	Document *doc = new Document( path );
-	peekWidgetBase->setPage( new MarkedPage( peekWidgetBase ) );
-
-	QWebChannel *channel = new QWebChannel( this );
-	channel->registerObject( QStringLiteral( "content" ), doc );
-	peekWidgetBase->page()->setWebChannel( channel );
-
-	peekWidgetBase->load( QUrl( "qrc:/index.html" ) );
+	peekWidgetBase->page()->mainFrame()->addToJavaScriptWindowObject( "doc", doc );
+	peekWidgetBase->load( QUrl( "qrc:///index.html" ) );
 };
 
 void NBWebWatch::openInExternal() {
@@ -184,6 +180,4 @@ void NBMarkDownPreview::setCaller( QWidget *caller ) {
 	mParent = caller;
 };
 
-#if QT_VERSION < 0x050000
-	Q_EXPORT_PLUGIN2( MarkDownPreview, NBMarkDownPreview );
-#endif
+Q_EXPORT_PLUGIN2( MarkDownPreview, NBMarkDownPreview );

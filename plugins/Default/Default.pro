@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = DefaultPeekPlugins
+TARGET = DefaultPeekPlugins4
 
 # Common Sources
 INCLUDEPATH += ../../common/ ../../common/include
@@ -9,12 +9,12 @@ DEPENDPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle PdfPeep PdfPeep/lib
 INCLUDEPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle PdfPeep PdfPeep/libPdf WebWatch
 
 isEqual( QT_MAJOR_VERSION, 4 ) {
-	LIBS += -L../../common/ -lnewbreeze-common
+	LIBS += -L../../common/ -lnewbreeze-common4
 }
 
 isEqual( QT_MAJOR_VERSION, 5 ) {
 	QT += printsupport
-	LIBS += -L../../common/ -lnewbreeze-common5
+	LIBS += -L../../common/ -lnewbreeze-common
 }
 
 # Same as NewBreeze version
@@ -33,11 +33,14 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 # ===========
 CONFIG += plugin
 
-# Webkit Support for WebWatch
+# WebEngine Support for WebWatch
 # ===========================
-QT += webkit
-greaterThan(QT_MAJOR_VERSION, 4) {
-	QT += webkitwidgets
+isEqual(QT_MAJOR_VERSION, 4) {
+	QT += webkit
+}
+isEqual(QT_MAJOR_VERSION, 5) {
+	QT += webengine
+	QT += webenginewidgets
 }
 
 # Poppler-Qt4
@@ -70,13 +73,13 @@ isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc-plugins
-OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins
-RCC_DIR		= $$BUILD_PREFIX/qrc-plugins
-UI_DIR      = $$BUILD_PREFIX/uic-plugins
+MOC_DIR 	= $$BUILD_PREFIX/moc-plugins4
+OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins4
+RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4
+UI_DIR      = $$BUILD_PREFIX/uic-plugins4
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-	TARGET = DefaultPeekPlugins5
+	TARGET = DefaultPeekPlugins
 	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5
 	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5
 	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5
@@ -121,8 +124,14 @@ SOURCES += PdfPeep/NBPdfPeep.cpp PdfPeep/PdfDocument.cpp PdfPeep/PdfView.cpp
 
 ## WebWatch
 ## ========
-HEADERS += WebWatch/NBWebWatch.hpp
-SOURCES += WebWatch/NBWebWatch.cpp
+isEqual( QT_MAJOR_VERISON, 4 ) {
+	HEADERS += WebWatch/NBWebWatch4.hpp
+	SOURCES += WebWatch/NBWebWatch4.cpp
+}
+isEqual( QT_MAJOR_VERISON, 4 ) {
+	HEADERS += WebWatch/NBWebWatch.hpp
+	SOURCES += WebWatch/NBWebWatch.cpp
+}
 
 unix {
 	isEmpty(PREFIX) {
@@ -132,9 +141,5 @@ unix {
 	INSTALLS += target
 
 	QMAKE_RPATHDIR += $$PREFIX/lib/newbreeze/
-
 	target.path = $$PREFIX/lib/newbreeze/plugins
-	greaterThan(QT_MAJOR_VERSION, 4) {
-		target.path = $$PREFIX/lib/newbreeze/plugins5
-	}
 }

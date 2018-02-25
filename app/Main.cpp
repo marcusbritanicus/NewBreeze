@@ -48,6 +48,11 @@ int main( int argc, char **argv ) {
 
 	qRegisterMetaType<NBDeviceInfo>( "NBDeviceInfo" );
 
+	/* Necessary when using QWebEngine from plugins */
+	#if QT_VERSION >= 0x050400
+		QCoreApplication::setAttribute( Qt::AA_ShareOpenGLContexts );
+	#endif
+
 	NBApplication app( argc, argv, "NewBreeze" );
 
 	/* About Application */

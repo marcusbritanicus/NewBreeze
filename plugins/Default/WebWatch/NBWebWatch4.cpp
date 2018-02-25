@@ -34,7 +34,9 @@ void NBWebWatch::createGUI() {
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
-	peekWidgetBase = new QWebEngineView();
+	peekWidgetBase = new QWebView();
+	peekWidgetBase->setRenderHints( QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing );
+	peekWidgetBase->settings()->setUserStyleSheetUrl( QUrl::fromLocalFile( ":/StyleSheets/Template/CustomWebkit.qss" ) );
 
 	peekWidgetBase->load( QUrl::fromLocalFile( path ) );
 

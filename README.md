@@ -3,7 +3,7 @@
 
 Chat with me at [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/newbreezefm/)
 
-### Qt5 builds are now supported
+### Qt5 migration complete. Qt5 is now the preferred Qt version.
 
 ### Note: NewBreeze 3.0 is in the oven. Expect several changes..!!
 
@@ -16,13 +16,12 @@ Some of its features are
 * Provides Categorized List, Icon and Details View
 * Sleek side panel showing drives and boomarks
 * Full drag and drop support
-* Applications and Catalog View
+* Applications, Catalog View and SuperStart
 * Auto update devices list
 * Custom Folder Icons and Thumbnail Preview
 * Complete mime-icon support
 * BreadCrumbs Navigation Bar
-* Custom Actions
-* Inline terminal
+* Custom Actions and Inline terminal
 * SingleApplication Mode for resource sharing
 * Plugin System Support
 

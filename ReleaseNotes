@@ -5,7 +5,8 @@ This is a completely native style GUI application. NewBreeze Native UI has been 
 few changes in NewBreeze 3.
 
 => Qt5 Support
-   - This release onwards Qt5 builds are supported. Use qmake-qt5 to build using Qt5.
+   - Qt5 is now the preferred version. Changes may or may not be backwards compatible.
+   - This release onwards Qt5 builds are supported. Use qmake to build using Qt5.
 
 => User interface rebuilt, integrating code from NewBreeze and NewBreezeUI
    - File/Folder filtering
@@ -26,9 +27,11 @@ few changes in NewBreeze 3.
 
 => NBIconView( QAbstractItemModel )
    - Per-folder views are now enabled. Each folder remembers its previous state ( size, grouping, list view, etc )
+   - Mac-style partial folding of categories is now enabled.
    - Fixed the small issue of mouse/cursor selection conflict.
    - Fixed the SegFault with cursor up and down movements.
    # Currently has issues with cursorMovements. Will be fixed by v3-rc
+   # List View and Tiles view are currently disabled. Will be fixed by v3-beta3
 
 => UI
    - An elementary Accidental Delete Protection (ADP) has been added. However it is not mature enough for commercial use.
@@ -61,22 +64,22 @@ few changes in NewBreeze 3.
    - NBArchive is now rebuilt using libarchive for archive processing
    - GZip, BZip2, and XZ files are processed independently
    - Archive creation now shows a pretty dialog with some options
-   - Archive creation and extraction is done via QtConcurrent::run(...)
+   - Archive creation and extraction is done via QtConcurrent::run(...) [Needs improvements]
    - Archive previews are now available, though it needs some improvements
 
 => SuperStart: A Super start to your day
    - All Drives are shown as you start NewBreeze.
    - Find all the important files and folders as soon as you start NewBreeze.
-   - Press Ctrl+U to add file(s)/folder(s) to SuperStart.
+   - Press Ctrl+U to add selected file(s)/folder(s) to SuperStart.
    - In SuperStart, press Delete to remove them, F2 change the display name.
-   - Note that changing display name does not rename the actual file of the hard drive.
-   - A menu will be added later.
+   - Note that changing display name does not rename the actual file on the hard drive.
+   - A context menu will be added later.
 
 => NewBreeze Vault: Requires 'encfs'
    NOTE: This is work in progress. The first basic implementation is completed.
    - You can now access all your encrypted files and folders with out having to remember every password.
    - Currently, all the encrypted files and folders are being stored in and retrieved from an encrypted database.
    - Each added file or folder will be encrypted using a randomly generated unique 8196 bit (1 kiB) key.
-   - NBCrypt Plugin is deprecated and a dummy will be installed in its place.
+   - NBCrypt Plugin is deprecated and a dummy will be installed in its place. (Will be removed in V3 stable release.)
    - Create a new ecrypted directory by pressing Ctrl+Shift+U.
    - Existing files/directories can be encrypted by choosing Actions > Encrypt in the context menu.

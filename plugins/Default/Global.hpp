@@ -8,10 +8,13 @@
 
 #include <QtGui>
 #include <QtCore>
-#include <QtWebKit>
 
-#if QT_VERSION >= 0x050100
+#if QT_VERSION < 0x050000
+	#include <QtWebKit>
+#else
 	#include <QtWidgets>
+	#include <QtWebEngine>
+	#include <QtWebEngineWidgets>
 #endif
 
 #include "newbreeze.hpp"
