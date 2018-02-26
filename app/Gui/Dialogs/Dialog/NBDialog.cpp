@@ -23,7 +23,7 @@ void NBDialog::setupGUI() {
 void NBDialog::setupDialogProperties() {
 
 	/* Dialogs without close button */
-	setWindowFlags( Qt::CustomizeWindowHint | Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint );
+	setWindowFlags( Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
 
 	/* NewBreeze speciality */
 	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
