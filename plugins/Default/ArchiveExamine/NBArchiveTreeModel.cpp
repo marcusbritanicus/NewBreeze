@@ -296,7 +296,13 @@ void NBArchiveTreeModel::growTree() {
 		if ( r < ARCHIVE_WARN )
 			return;
 
-		QString name = QString::fromUtf8( archive_entry_pathname_utf8( entry ) );
+		QString name;
+		if ( ARCHIVE_VERSION_NUMBER < 3002000 )
+			name = QString::fromUtf8( archive_entry_pathname( entry ) );
+
+		else
+			name = QString::fromUtf8( archive_entry_pathname_utf8( entry ) );
+
 		int type = archive_entry_filetype( entry );
 
 		QStringList tokens = QStringList() << name.split( "/", QString::SkipEmptyParts );
