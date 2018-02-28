@@ -32,6 +32,11 @@ class NBProcessManagerUI : public NBDialog {
 		NBProcessManager *pMgr;
 		static NBProcessManagerUI* procMgrUI;
 
+		static int procCount;
+
+	public Q_SLOTS:
+		void show();
+
 	private Q_SLOTS:
 		void addProcess( NBProcess::Progress*, NBAbstractProcess* );
 };

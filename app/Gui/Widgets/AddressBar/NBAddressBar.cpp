@@ -215,9 +215,15 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	homeBtn->setFocusPolicy( Qt::NoFocus );
 	homeBtn->setFlat( true );
 
+	// SuperStart Button
+	ssBtn = new NBButton( QIcon( ":/icons/superstart.png" ), this );
+	ssBtn->setFocusPolicy( Qt::NoFocus );
+	ssBtn->setFlat( true );
+
 	NBSegmentButton *navBtns = new NBSegmentButton( this );
 	navBtns->addSegment( backBtn );
 	navBtns->addSegment( homeBtn );
+	navBtns->addSegment( ssBtn );
 	navBtns->addSegment( forwardBtn );
 
 	// AddressWidget
@@ -292,6 +298,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	/* Connections */
 	connect( backBtn, SIGNAL( clicked() ), this, SIGNAL( goBack() ) );
 	connect( homeBtn, SIGNAL( clicked() ), this, SIGNAL( goHome() ) );
+	connect( ssBtn, SIGNAL( clicked() ), this, SIGNAL( openSuperStart() ) );
 	connect( forwardBtn, SIGNAL( clicked() ), this, SIGNAL( goForward() ) );
 	connect( addressWidget, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
 	connect( filterBtn, SIGNAL( clicked() ), this, SIGNAL( openSearch() ) );

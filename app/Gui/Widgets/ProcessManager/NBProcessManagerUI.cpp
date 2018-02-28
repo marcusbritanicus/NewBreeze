@@ -6,6 +6,7 @@
 
 #include "NBProcessManagerUI.hpp"
 
+int NBProcessManagerUI::procCount = 0;
 NBProcessManagerUI* NBProcessManagerUI::procMgrUI = NULL;
 
 NBProcessManagerUI* NBProcessManagerUI::instance() {
@@ -66,8 +67,24 @@ void NBProcessManagerUI::setWindowProperties() {
 	setMinimumSize( QSize( 800, 500 ) );
 };
 
+void NBProcessManagerUI::show() {
+
+	if ( not procCount ) {
+		NBMessageDialog::information(
+			NULL,
+			"NB Process Manager",
+			"There are no processes running at the time."
+		);
+
+		return;
+	}
+
+	NBDialog::show();
+};
+
 void NBProcessManagerUI::addProcess( NBProcess::Progress* progress, NBAbstractProcess *process ) {
 
+	procCount++;
 	NBProcessWidget *procWidget = new NBProcessWidget( progress, process, this );
 	baseLyt->insertWidget( 0, procWidget );
 };

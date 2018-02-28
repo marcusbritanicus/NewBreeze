@@ -232,6 +232,7 @@ void NewBreeze::createAndSetupActions() {
 
 	connect( AddressBar, SIGNAL( goBack() ), FolderView, SLOT( goBack() ) );
 	connect( AddressBar, SIGNAL( goHome() ), FolderView, SLOT( doOpenHome() ) );
+	connect( AddressBar, SIGNAL( openSuperStart() ), FolderView, SLOT( doOpenHome() ) );
 	connect( AddressBar, SIGNAL( goForward() ), FolderView, SLOT( goForward() ) );
 
 	connect( FilterWidget, SIGNAL( search( QString ) ), this, SLOT( filterFiles( QString ) ) );
@@ -249,7 +250,9 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( hideStatusBar() ), InfoBar, SLOT( hide() ) );
 	connect( FolderView, SIGNAL( showStatusBar() ), InfoBar, SLOT( show() ) );
 
-	connect( FolderView, SIGNAL( updateQuickFiles() ), SideBar, SLOT( reloadQuickFiles() ) );
+	connect( FolderView, SIGNAL( reloadSuperStart() ), SideBar, SLOT( reloadQuickFiles() ) );
+	connect( FolderView, SIGNAL( reloadCatalogs() ), SidePanel, SLOT( flashCatalogs() ) );
+	connect( FolderView, SIGNAL( reloadBookmarks() ), SidePanel, SLOT( flashBookmarks() ) );
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateInfoBar() ) );
@@ -301,16 +304,10 @@ void NewBreeze::createAndSetupActions() {
 	newWindowAct->setShortcuts( Settings->Shortcuts.NewWindow );
 	connect( newWindowAct, SIGNAL( triggered() ), this, SLOT( newWindow() ) );
 
-	// Add bookmark
-	QAction *addBookMarkAct = new QAction( this );
-	addBookMarkAct->setShortcuts( Settings->Shortcuts.AddBookmark );
-	connect( addBookMarkAct, SIGNAL( triggered() ), this, SLOT( addBookMark() ) );
-
 	// Display terminal widget
 	QAction *termWidgetAct = new QAction( this );
 	termWidgetAct->setShortcuts( Settings->Shortcuts.InlineTerminal );
 	connect( termWidgetAct, SIGNAL( triggered() ), this, SLOT( showHideTermWidget() ) );
-	connect (Terminal, SIGNAL( shown( bool ) ), addBookMarkAct, SLOT( setDisabled( bool ) ) );
 
 	// Show/Hide side bar
 	QAction *toggleSideBar = new QAction( "Toggle Sidebar", this );
@@ -359,7 +356,6 @@ void NewBreeze::createAndSetupActions() {
 
 	addAction( focusAddressBarAct );
 	addAction( newWindowAct );
-	addAction( addBookMarkAct );
 	addAction( termWidgetAct );
 	addAction( toggleSideBar );
 	addAction( toggleInfoPanelAct );
@@ -759,27 +755,6 @@ void NewBreeze::clearFilters() {
 	FilterWidget->clear();
 	FolderView->fsModel->setNameFilters( QStringList() );
 	FolderView->setFocus();
-};
-
-void NewBreeze::addBookMark() {
-
-	QStringList order = bookmarkSettings.value( "Order" ).toStringList();
-
-	QString bmkPath = FolderView->fsModel->currentDir();
-	if ( bmkPath.endsWith( "/" ) )
-		bmkPath.chop( 1 );
-
-	QString label = QFileInfo( bmkPath ).isRoot() ? "FileSystem" : baseName( bmkPath );
-
-	order << bmkPath;
-	order.removeDuplicates();
-
-	bookmarkSettings.setValue( QUrl::toPercentEncoding( bmkPath ), label );
-	bookmarkSettings.setValue( "Order", order );
-	bookmarkSettings.sync();
-
-	SidePanel->flashBookmarks();
-	SideBar->reloadBookmarks();
 };
 
 void NewBreeze::openAddressBar() {

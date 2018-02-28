@@ -362,6 +362,8 @@ void NBPermissionsWidget::createGUI() {
 			"	<tr>"
 			"		<td width='15%'>User</td>"
 			"		<td width='35%'>%1</td>"
+			"	</tr>"
+			"	<tr>"
 			"		<td width='15%'>Group</td>"
 			"		<td width='35%'>%2</td>"
 			"	</tr>"

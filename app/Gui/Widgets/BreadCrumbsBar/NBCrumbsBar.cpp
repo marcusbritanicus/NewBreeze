@@ -142,7 +142,15 @@ void NBCrumbsBar::setCurrentDirectory( QString path ) {
 	if ( not path.endsWith( "/" ) )
 		path += "/";
 
-	if ( mPath.contains( path ) ) {
+	if ( path == "/" ) {
+
+		mCurrentPath = "/";
+		if ( not mPath.startsWith( "/" ) )
+			mPath = "/";
+	}
+
+	else if ( mPath.contains( path ) ) {
+
 		mCurrentPath = path;
 	}
 

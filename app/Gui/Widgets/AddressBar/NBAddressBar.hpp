@@ -87,7 +87,7 @@ class NBAddressBar : public QWidget {
 		int checkedAction();
 
 	private:
-		NBButton *backBtn, *forwardBtn, *homeBtn;
+		NBButton *backBtn, *forwardBtn, *homeBtn, *ssBtn;
 		NBButton *settingsBtn, *filterBtn;
 		NBSegmentButton *viewModes;
 		NBAddressWidget *addressWidget;
@@ -108,5 +108,6 @@ class NBAddressBar : public QWidget {
 
 		void goBack();
 		void goHome();
+		void openSuperStart();
 		void goForward();
 };

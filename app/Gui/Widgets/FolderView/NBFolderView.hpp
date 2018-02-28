@@ -46,11 +46,11 @@ class NBFolderView : public QStackedWidget {
 		bool hasSelection();
 
 		QAction *peekAct, *moveAct, *copyAct, *pasteAct, *renameAct, *reloadAct, *trashAct, *delAct, *propertiesAct, *permissionsAct;
-		QAction *actPrevDir, *actNextDir, *actParDir, *actHomeDir, *actGoHome, *showHideDotFiles, *openVTE;
+		QAction *actPrevDir, *actNextDir, *actParDir, *actHomeDir, *actGoHome, *showHideDotFiles, *openVTE, *openVTEin;
 		QAction *actNewDir, *actNewFile, *actNewEncFS;
 		QAction *sortByNameAct, *sortByTypeAct, *sortBySizeAct, *sortByDateAct;
 		QAction *groupsAct;
-		QAction *addToSuperStartAct;
+		QAction *addBookMarkAct, *addToSuperStartAct;
 
 		NBIconView *IconView;
 
@@ -77,6 +77,7 @@ class NBFolderView : public QStackedWidget {
 		void doOpen( QModelIndex );
 		void doOpen( QString loc );
 		void doOpenHome();
+		void doOpenSS();
 		void loadHomeDir();
 		void doOpenWith();
 		void doOpenInNewWindow();
@@ -103,6 +104,7 @@ class NBFolderView : public QStackedWidget {
 		void sortByDate();
 
 		void openTerminal();
+		void openTerminalIn();
 		void showContextMenu( QPoint );
 
 		// Over-riding the setFocus() of QWidget
@@ -120,6 +122,7 @@ class NBFolderView : public QStackedWidget {
 		void createEncFS();
 
 		void updateActions();
+		void addBookMark();
 		void addToSuperStart();
 
 	Q_SIGNALS :
@@ -131,10 +134,11 @@ class NBFolderView : public QStackedWidget {
 		void showPermissions();
 
 		void reloadCatalogs();
+		void reloadBookmarks();
+		void reloadSuperStart();
+
 		void toggleGroups();
 
 		void hideStatusBar();
 		void showStatusBar();
-
-		void updateQuickFiles();
 };

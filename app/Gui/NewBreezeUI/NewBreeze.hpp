@@ -98,8 +98,6 @@ class NewBreeze : public QMainWindow {
 		void filterFiles( QString );
 		void clearFilters();
 
-		void addBookMark();
-
 		void openAddressBar();
 		void openWithList();
 

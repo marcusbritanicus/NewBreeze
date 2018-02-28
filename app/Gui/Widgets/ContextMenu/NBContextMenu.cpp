@@ -661,6 +661,9 @@ void NBFolderView::showContextMenu( QPoint position ) {
 					NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 					connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 					menu->addMenu( addToCatalogMenu );
+					menu->addSeparator();
+					menu->addAction( openVTEin );
+					menu->addSeparator();
 				}
 
 				menu->addAction( renameAct );
@@ -723,7 +726,11 @@ void NBFolderView::showContextMenu( QPoint position ) {
 				menu->addSeparator();
 
 				menu->addMenu( addToCatalogMenu );
+				menu->addAction( addBookMarkAct );
 				menu->addAction( addToSuperStartAct );
+				menu->addSeparator();
+
+				menu->addAction( openVTE );
 				menu->addSeparator();
 
 				menu->addAction( pasteAct );
@@ -757,6 +764,11 @@ void NBFolderView::showContextMenu( QPoint position ) {
 				openWithMenu->setWorkingDirectory( fsModel->currentDir() );
 				openWithMenu->buildMenu( selectedList );
 
+				// Add this folder to catalog
+				NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
+				connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
+
+				// Custom Actions
 				customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
 				connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
 				connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
@@ -781,11 +793,17 @@ void NBFolderView::showContextMenu( QPoint position ) {
 					NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 					connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 					menu->addMenu( addToCatalogMenu );
+					menu->addAction( addBookMarkAct );
 				}
 
 				/* We can add file or folder to SuperStart */
 				menu->addAction( addToSuperStartAct );
 				menu->addSeparator();
+
+				if ( fInfo.isDir() ) {
+					menu->addAction( openVTEin );
+					menu->addSeparator();
+				}
 
 				menu->addMenu( customMenu );
 				menu->addSeparator();
@@ -819,6 +837,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 				NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 				connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 
+				// Custom Actions Menu
 				customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
 				connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
 				connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
@@ -838,6 +857,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 				menu->addSeparator();
 
 				menu->addMenu( addToCatalogMenu );
+				menu->addAction( addBookMarkAct );
 				menu->addAction( addToSuperStartAct );
 				menu->addSeparator();
 

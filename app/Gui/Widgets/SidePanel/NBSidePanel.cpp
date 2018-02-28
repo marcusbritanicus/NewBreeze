@@ -139,4 +139,6 @@ void NBSidePanel::flashVfs() {
 };
 
 void NBSidePanel::flashBookmarks() {
+
+	bmkIcon->flashLabel();
 };

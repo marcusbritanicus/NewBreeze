@@ -202,11 +202,16 @@ void NBFolderView::createAndSetupActions() {
 	addAction( permissionsAct );
 
 	// Open a virtual terminal emulator
-	openVTE = new QAction( "Open &VTE", this );
+	openVTE = new QAction( QIcon::fromTheme( "utilities-terminal" ), "Open &VTE", this );
 	openVTE->setShortcuts( Settings->Shortcuts.Terminal );
 
 	connect( openVTE, SIGNAL( triggered() ), this, SLOT( openTerminal() ) );
 	addAction( openVTE );
+
+	// Open a virtual terminal emulator
+	openVTEin = new QAction( QIcon::fromTheme( "utilities-terminal" ), "Open &VTE Here", this );
+	// openVTEin->setShortcuts( Settings->Shortcuts.Terminal );
+	connect( openVTEin, SIGNAL( triggered() ), this, SLOT( openTerminalIn() ) );
 
 	// Select All
 	QAction *selectAllAct = new QAction( "&Select All", this );
@@ -262,6 +267,14 @@ void NBFolderView::createAndSetupActions() {
 	groupsAct->setChecked( Settings->General.Grouping );
 	connect( groupsAct, SIGNAL( triggered() ), this, SIGNAL( toggleGroups() ) );
 
+	// Add bookmark
+	addBookMarkAct = new QAction( QIcon( ":/icons/bookmark.png" ), "Add &Bookmark", this );
+	addBookMarkAct->setShortcuts( Settings->Shortcuts.AddBookmark );
+
+	connect( addBookMarkAct, SIGNAL( triggered() ), this, SLOT( addBookMark() ) );
+	addAction( addBookMarkAct );
+
+	/* Add to SuperStart */
 	addToSuperStartAct = new QAction( QIcon( ":/icons/superstart.png" ), "Add to S&uperStart", this );
 	addToSuperStartAct->setShortcut( tr( "Ctrl+U" ) );
 
@@ -309,6 +322,12 @@ void NBFolderView::doOpenHome() {
 		qDebug() << "Opening dir:" << NBXdg::home().toLocal8Bit().data();
 
 	fsModel->goHome();
+};
+
+void NBFolderView::doOpenSS() {
+
+	qDebug() << "Opening SuperStart";
+	doOpen( "NB://SuperStart" );
 };
 
 void NBFolderView::loadHomeDir() {
@@ -894,7 +913,7 @@ void NBFolderView::doSendToTrash() {
 		superStart.sync();
 		fsModel->reload();
 
-		emit updateQuickFiles();
+		emit reloadSuperStart();
 
 		return;
 	}
@@ -1071,7 +1090,7 @@ void NBFolderView::doRename() {
 		superStart.sync();
 		fsModel->reload();
 
-		emit updateQuickFiles();
+		emit reloadSuperStart();
 
 		return;
 	}
@@ -1159,7 +1178,24 @@ void NBFolderView::openTerminal() {
 		commandList[ 3 ] = "/bin/bash";
 	}
 
-	qDebug( "Opening console at %s... [%s]", fsModel->currentDir().toLocal8Bit().data(), ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
+	qDebug( "Opening console at %s... %s", fsModel->currentDir().toLocal8Bit().data(), ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
+};
+
+void NBFolderView::openTerminalIn() {
+
+	QStringList commandList = getTerminal();
+	QString command = commandList.takeFirst();
+	QString folder = QFileInfo( fsModel->nodeInfo( getSelection()[ 0 ] ) ).absoluteFilePath();
+
+	if ( command == QString( "xterm" ) )
+		commandList[ 1 ] = QString( "cd %1 && /bin/bash" ).arg( termFormatString( folder ) );
+
+	else {
+		commandList[ 1 ] = folder;
+		commandList[ 3 ] = "/bin/bash";
+	}
+
+	qDebug( "Opening console at %s... %s", folder.toLocal8Bit().data(), ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
 };
 
 void NBFolderView::setFocus() {
@@ -1208,12 +1244,6 @@ void NBFolderView::extract( QString archive ) {
 
 void NBFolderView::updateActions() {
 
-	// QAction *peekAct, *moveAct, *copyAct, *pasteAct, *renameAct, *reloadAct, *trashAct, *delAct, *propertiesAct, *permissionsAct;
-	// QAction *actPrevDir, *actNextDir, *actParDir, *actHomeDir, *actGoHome, *showHideDotFiles, *openVTE;
-	// QAction *actNewDir, *actNewFile;
-	// QAction *sortByNameAct, *sortByTypeAct, *sortBySizeAct, *sortByDateAct;
-	// QAction *groupsAct;
-
 	if ( fsModel->modelDataType() == NBItemViewModel::SuperStart ) {
 
 		moveAct->setDisabled( true );
@@ -1251,6 +1281,42 @@ void NBFolderView::updateActions() {
 	}
 };
 
+void NBFolderView::addBookMark() {
+
+	QStringList order = bookmarkSettings.value( "Order" ).toStringList();
+
+	QModelIndexList selectedItems = getSelection();
+
+	if ( not selectedItems.count() ) {
+		QString cwd = fsModel->currentDir();
+		QString label = QFileInfo( cwd ).isRoot() ? "FileSystem" : baseName( cwd );
+
+		if (  not order.contains( cwd ) ) {
+			bookmarkSettings.setValue( QUrl::toPercentEncoding( cwd ), label );
+			order << cwd;
+			bookmarkSettings.setValue( "Order", order );
+		}
+
+		bookmarkSettings.sync();
+		emit reloadBookmarks();
+
+		return;
+	}
+
+	Q_FOREACH( QModelIndex idx, selectedItems ) {
+		QString name = idx.data().toString();
+		QString cwd = fsModel->currentDir();
+		if ( isDir( cwd + name ) and not order.contains( cwd + name ) ) {
+			bookmarkSettings.setValue( QUrl::toPercentEncoding( cwd + name ), name );
+			order << cwd + name;
+		}
+		bookmarkSettings.setValue( "Order", order );
+		bookmarkSettings.sync();
+	}
+
+	emit reloadBookmarks();
+};
+
 void NBFolderView::addToSuperStart() {
 
 	QSettings superStart( "NewBreeze", "SuperStart" );
@@ -1261,6 +1327,7 @@ void NBFolderView::addToSuperStart() {
 		QString cwd = fsModel->currentDir();
 		superStart.setValue( "Places/" + baseName( cwd ), cwd );
 		superStart.sync();
+		emit reloadSuperStart();
 
 		return;
 	}
@@ -1276,6 +1343,5 @@ void NBFolderView::addToSuperStart() {
 	}
 
 	superStart.sync();
-	emit updateQuickFiles();
+	emit reloadSuperStart();
 };
-
