@@ -1,8 +1,10 @@
 TEMPLATE = lib
 TARGET = MarkDownPreview4
 
-greaterThan( QT_MAJOR_VERSION, 4 ) {
-	error( "This plugin is meant for use with NewBreeze Qt4 version only. Use the plugin MarkDown with Qt5 version." );
+isEqual( QT_MAJOR_VERSION, 5 ) {
+	greaterThan( QT_MINOR_VERSION, 5 ) {
+		error( "This version of the is meant for Qt4, Qt 5.4 and below. Please use 'MarkDown' for Qt 5.5 and higher." )
+	}
 }
 
 # Common Sources
@@ -22,6 +24,11 @@ CONFIG += plugin
 # Webkit Support for WebWatch
 # ===========================
 QT += webkit
+
+isEqual( QT_MAJOR_VERSION, 5 ) {
+	TARGET = MarkDownPreview
+	QT += webkitwidgets
+}
 
 # Silent compilation
 # ==================

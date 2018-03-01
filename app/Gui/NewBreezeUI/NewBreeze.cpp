@@ -231,8 +231,8 @@ void NewBreeze::createAndSetupActions() {
 	connect( AddressBar, SIGNAL( openSearch() ), FilterWidget, SLOT( show() ) );
 
 	connect( AddressBar, SIGNAL( goBack() ), FolderView, SLOT( goBack() ) );
-	connect( AddressBar, SIGNAL( goHome() ), FolderView, SLOT( doOpenHome() ) );
-	connect( AddressBar, SIGNAL( openSuperStart() ), FolderView, SLOT( doOpenHome() ) );
+	connect( AddressBar, SIGNAL( goHome() ), FolderView, SLOT( loadHomeDir() ) );
+	connect( AddressBar, SIGNAL( openSuperStart() ), FolderView, SLOT( doOpenSS() ) );
 	connect( AddressBar, SIGNAL( goForward() ), FolderView, SLOT( goForward() ) );
 
 	connect( FilterWidget, SIGNAL( search( QString ) ), this, SLOT( filterFiles( QString ) ) );

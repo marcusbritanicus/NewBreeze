@@ -46,7 +46,7 @@ class Salsa20 {
 		 * \brief Constructs cypher with given key.
 		 * \param[in] key 256-bit key
 		 */
-		inline Salsa20( const uint8_t* key = nullptr );
+		inline Salsa20( const uint8_t* key = 0 );
 		Salsa20( const Salsa20& ) = default;
 		Salsa20( Salsa20&& ) = default;
 		~Salsa20() = default;
@@ -131,7 +131,7 @@ void Salsa20::setKey( const uint8_t* key ) {
 
 	static const char constants[] = "expand 32-byte k";
 
-	if( key == nullptr )
+	if( key == 0 )
 		return;
 
 	vector_[0] = convert( reinterpret_cast<const uint8_t*>( &constants[0] ) );
@@ -154,7 +154,7 @@ void Salsa20::setKey( const uint8_t* key ) {
 //----------------------------------------------------------------------------------
 void Salsa20::setIv( const uint8_t* iv ) {
 
-	if( iv == nullptr )
+	if( iv == 0 )
 		return;
 
 	vector_[6] = convert( &iv[0] );
@@ -217,7 +217,7 @@ void Salsa20::generateKeyStream( uint8_t output[BLOCK_SIZE] ) {
 //----------------------------------------------------------------------------------
 void Salsa20::processBlocks( const uint8_t* input, uint8_t* output, size_t numBlocks ) {
 
-	assert( input != nullptr && output != nullptr );
+	assert( input != 0 && output != 0 );
 
 	uint8_t keyStream[BLOCK_SIZE];
 
@@ -233,7 +233,7 @@ void Salsa20::processBlocks( const uint8_t* input, uint8_t* output, size_t numBl
 //----------------------------------------------------------------------------------
 void Salsa20::processBytes( const uint8_t* input, uint8_t* output, size_t numBytes ) {
 
-	assert( input != nullptr && output != nullptr );
+	assert( input != 0 && output != 0 );
 
 	uint8_t keyStream[BLOCK_SIZE];
 	size_t numBytesToProcess;

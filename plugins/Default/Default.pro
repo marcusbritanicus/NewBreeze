@@ -38,9 +38,16 @@ CONFIG += plugin
 isEqual(QT_MAJOR_VERSION, 4) {
 	QT += webkit
 }
-isEqual(QT_MAJOR_VERSION, 5) {
-	QT += webengine
-	QT += webenginewidgets
+
+isEqual( QT_MAJOR_VERSION, 5 ) {
+	lessThan(QT_MINOR_VERSION, 5) {
+		QT += webkit
+		QT += webkitwidgets
+	}
+	isEqual( QT_MINOR_VERSION, 5 ) | greaterThan( QT_MINOR_VERSION, 5 ) {
+		QT += webengine
+		QT += webenginewidgets
+	}
 }
 
 # Poppler-Qt4
@@ -128,9 +135,16 @@ isEqual( QT_MAJOR_VERISON, 4 ) {
 	HEADERS += WebWatch/NBWebWatch4.hpp
 	SOURCES += WebWatch/NBWebWatch4.cpp
 }
-isEqual( QT_MAJOR_VERISON, 4 ) {
-	HEADERS += WebWatch/NBWebWatch.hpp
-	SOURCES += WebWatch/NBWebWatch.cpp
+
+isEqual( QT_MAJOR_VERSION, 5 ) {
+	lessThan(QT_MINOR_VERSION, 5) {
+		HEADERS += WebWatch/NBWebWatch4.hpp
+		SOURCES += WebWatch/NBWebWatch4.cpp
+	}
+	isEqual( QT_MINOR_VERSION, 5 ) | greaterThan( QT_MINOR_VERSION, 5 ) {
+		HEADERS += WebWatch/NBWebWatch.hpp
+		SOURCES += WebWatch/NBWebWatch.cpp
+	}
 }
 
 unix {

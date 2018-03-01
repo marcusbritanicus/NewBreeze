@@ -314,9 +314,11 @@ SOURCES += Vault/Salsa20/NBSalsa20.cpp
 # Icon and stylesheet resources
 RESOURCES += NewBreeze.qrc ../data/data.qrc
 
-# C99/C++11 Support
-#QMAKE_CFLAGS += -std=c99
-#QMAKE_CXXFLAGS += -std=c++11
+# C99/C++11 Support for Qt5
+isEqual( QT_MAJOR_VERSION, 5 ) {
+	QMAKE_CFLAGS += -std=c99
+	QMAKE_CXXFLAGS += -std=c++11
+}
 
 # Enable warnings and threading support
 CONFIG += thread silent warn_off build_all
