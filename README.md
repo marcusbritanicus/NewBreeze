@@ -40,15 +40,17 @@ Some of its features are
 * To install, as root type: `make install`
 
 ### Dependencies:
-* Qt4/Qt5
-* zlib
-* liblzma
-* libbzip2
-* libarchive
-* xdg-utls
-* libpoppler-qt4/qt5
-* libpoppler-qt4-dev/libpoppler-qt5-dev (optional)
-* libdjvulibre-dev (optional)
+* Qt4/Qt5 (libqt4-dev, libqt4-dev-bin, qtbase5-dev, qtbase5-dev-tools)
+    * QtWebKit in case of Qt4 and upto Qt 5.4 (libqtwebkit-dev, libqt5webkit5-dev, qtwebkit5-dev)
+    * QtWebEngine Qt 5.5 onwards (qtwebengine5-dev)
+    * QScintilla (libqt5scintilla2-dev, libqscintilla2-qt5-dev)
+* zlib (zlib1g-dev)
+* liblzma (liblzma-dev)
+* libbzip2 (libbz2-dev)
+* libarchive (libarchive-dev)
+* xdg-utils
+* libpoppler-qt4/qt5 (libpoppler-qt4-dev, libpoppler-qt5-dev)
+* libdjvulibre-dev (libdjvulibre-dev)
 
 ### Known Bugs
 * Extended copy/move causes crashes. Disabled by default.

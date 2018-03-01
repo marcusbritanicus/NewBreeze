@@ -200,7 +200,7 @@ void NBDeviceManager::pollDevices() {
 	virtualFS << "sysfs" << "cgroup" << "cgroup2" << "proc" << "devtmpfs" << "devpts";
 	virtualFS << "tmpfs" << "securityfs" << "pstore" << "autofs" << "mqueue";
 	virtualFS << "debugfs" << "hugetlbfs" << "fusectl" << "fuse.gvfsd-fuse";
-	virtualFS << "binfmt_misc";
+	virtualFS << "binfmt_misc" << "configfs";
 
 	while( ( entry = getmntent( fp ) ) != NULL ) {
 		/* Remove virtual mount points: dev, sys, proc etc */
