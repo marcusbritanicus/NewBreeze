@@ -180,4 +180,7 @@ void NBMarkDownPreview::setCaller( QWidget *caller ) {
 	mParent = caller;
 };
 
-Q_EXPORT_PLUGIN2( MarkDownPreview, NBMarkDownPreview );
+#if QT_VERSION < 0x050000
+        Q_EXPORT_PLUGIN2( MarkDownPreview, NBMarkDownPreview );
+#endif
+
