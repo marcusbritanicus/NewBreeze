@@ -1,10 +1,10 @@
 /*
 	*
-	* NBWebWatch.hpp - NewBreeze HtmlPreviewWidget Classes
+	* NBWebWatch4.hpp - NewBreeze HtmlPreviewWidget Classes
 	*
 */
 
-#include "NBWebWatch.hpp"
+#include "NBWebWatch4.hpp"
 
 NBWebWatch::NBWebWatch( QString pth ) : QDialog() {
 
