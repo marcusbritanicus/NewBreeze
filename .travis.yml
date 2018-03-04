@@ -7,7 +7,7 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get -y install qtbase5-dev libz-dev zlib1g-dev liblz-dev libbz2-dev libarchive-dev xdg-utils libpoppler-qt5-dev libqt5scintilla2-dev libdjvulibre-dev
+  - sudo apt-get -y install qtbase5-dev libz-dev zlib1g-dev liblz-dev libbz2-dev libarchive-dev xdg-utils libpoppler-qt5-dev libqt5scintilla2-dev libdjvulibre-dev libqt5webkit5-dev
 
 script:
   - qmake -qt5 CONFIG+=release PREFIX=/usr
