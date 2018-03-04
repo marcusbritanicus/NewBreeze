@@ -13,7 +13,12 @@
 #include "NBImagePeek.hpp"
 #include "NBOdfOgle.hpp"
 #include "NBPdfPeep.hpp"
-#include "NBWebWatch.hpp"
+
+#if QT_VERSION >= 0x050500
+	#include "NBWebWatch.hpp"
+#else
+	#include "NBWebWatch4.hpp"
+#endif
 
 #include <QtPlugin>
 #include "Global.hpp"
