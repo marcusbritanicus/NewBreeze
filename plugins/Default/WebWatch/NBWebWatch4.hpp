@@ -7,7 +7,6 @@
 #pragma once
 
 #include "Global.hpp"
-#include <QtWebKit>
 
 class NBWebWatch : public QDialog {
 	Q_OBJECT

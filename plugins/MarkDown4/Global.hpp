@@ -14,3 +14,8 @@
 #include "NBPluginInterface.hpp"
 
 #include <fstream>
+
+#if QT_VERSION >= 0x050000
+	#include <QtWidgets>
+	#include <QtWebKitWidgets>
+#endif
