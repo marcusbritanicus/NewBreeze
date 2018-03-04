@@ -8,14 +8,11 @@
 
 // Qt Headers
 #include <QtGui>
+#include <QtWidgets>
 #include <QtWebEngine>
+#include <QtWebEngineWidgets>
 
 #include "newbreeze.hpp"
 #include "NBPluginInterface.hpp"
 
 #include <fstream>
-
-#if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-	#include <QtWebEngineWidgets>
-#endif
