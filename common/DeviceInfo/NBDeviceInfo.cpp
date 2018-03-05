@@ -207,7 +207,17 @@ void NBDeviceManager::pollDevices() {
 		if ( virtualFS.contains( entry->mnt_type ) )
 			continue;
 
+		/* AppImage fix */
+		if ( QString( entry->mnt_type ).contains( "AppImage" ) )
+			continue;
+
 		NBDeviceInfo info( new NBDeviceInfoPrivate( entry->mnt_fsname, entry->mnt_dir, entry->mnt_type ) );
+		/* Failsafe: ignore mounts with zero total size */
+		if ( not info.bytesTotal() ) {
+			qDebug() << info.displayName() << info.device() << info.mountPoint();
+			continue;
+		}
+
 		devicesList[ entry->mnt_dir ] = info;
 	};
 
