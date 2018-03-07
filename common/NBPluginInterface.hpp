@@ -11,7 +11,7 @@
 	* Note1:
 	* This PluginInterface can be used to enhance the NBFolderView class by providing
 	* a suitable context. For the context to be applicable, the plugin must return
-	* on of the FolderView interfaces for interface() and 'Enhancement' for type().
+	* one of the FolderView interfaces for interface() and 'Enhancement' for type().
 	* Otherwise 'context()' will be ignored and the plugin may not work.
 	*
 	* Note2:
@@ -22,9 +22,9 @@
 	*
 	* Note3:
 	* actions(...) and actionsTrigger(...) are meant to be equivalent functions. If
-	* provided the same conditions, will behave similarly. Instead of triggering an
-	* action named 'act', for an interface names 'iface' for listed 'nodes', then
-	* calling actionsTrigger( iface, act, nodes ) should give the same result.
+	* provided the same conditions, they behave similarly. Instead of triggering an
+	* action named 'act', for an interface named 'iface' for listed 'nodes', calling
+	* actionsTrigger( iface, act, nodes ) gives the same result.
 	*
 */
 
@@ -46,9 +46,9 @@ class PLUGIN_DLLSPEC NBPluginInterface {
 		/* Plugin Interface: Where will the plugin be used */
 		enum Interface {
 			AnyInterface			= 0xC5F4A6,			// Show for all interfaces
-			PreviewInterface,							// File Preview Enhancement (To be integrated from NBPreviewInterface)	> Peek (Ctrl+Return)
-			SideBarInterface,							// Alternative/Enhancement for sidebar									> No actions
+			PreviewInterface,							// File Preview Enhancements											> Peek (Ctrl+Return)
 			InfoBarInterface,							// Alternative for infobar												> No actions
+			TerminalInterface,							// Specialized Terminal plugin											> Open terminal (F4)
 			RenameInterface,							// Alternative/Enhancement for Rename									> Rename (F2)
 			MimeTypeInterface,							// Special handling of specific mimetypes								> 'Actions' Menu
 			CreateInterface,							// Creation of new types of nodes										> 'New' Menu
@@ -64,15 +64,15 @@ class PLUGIN_DLLSPEC NBPluginInterface {
 			Enhancement,								// Enhancement for the existing widget. Ex: EncFS Support for NewBreeze
 		};
 
-		/* Plugin context: When will the plugin be activated */
+		/* Plugin context: The plugin will be activated when */
 		enum Context {
-			File					= 0xD50BE8,			// Single File Selection
-			Dir,										// Single Folder Selection
-			Node,										// Single Selection ( File, Dir, FIFO, Socket, Chr, Block, etc... )
-			Files,										// Multiple File Selection
-			Dirs,    			 						// Multiple Folder Selection
-			Nodes,										// Multiple Selection ( File, Dir, FIFO, Socket, Chr, Block, etc... )
-			None										// There is no selection
+			File					= 0xD50BE8,			// a SINGLE file is selected
+			Dir,										// a SINGLE folder is selected
+			Node,										// a SINGLE node is selected ( File, Dir, FIFO, Socket, Chr, Block, etc... )
+			Files,										// MULTIPLE file are selected
+			Dirs,    			 						// MULTIPLE folder are selected
+			Nodes,										// MULTIPLE nodes are selected ( File, Dir, FIFO, Socket, Chr, Block, etc... )
+			None										// there is no selection
 		};
 
 		typedef QList<Interface> Interfaces;

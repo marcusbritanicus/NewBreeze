@@ -65,9 +65,9 @@ NBSideBarItem* NBSideBarGroup::item( int position ) {
 	return itemList.at( position );
 };
 
-int NBSideBarGroup::addItem( QString name, QString icon, QString target ) {
+int NBSideBarGroup::addItem( QString name, QString icon, QString target, int type ) {
 
-	NBSideBarItem *itm = new NBSideBarItem( name, icon, target, this );
+	NBSideBarItem *itm = new NBSideBarItem( name, icon, target, type, this );
 	connect( itm, SIGNAL( clicked( QString ) ), this, SIGNAL( clicked( QString ) ) );
 
 	itemsLayout->addWidget( itm );

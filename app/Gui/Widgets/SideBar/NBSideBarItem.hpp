@@ -15,7 +15,7 @@ class NBSideBarItem : public QLabel {
 
 	public:
 		NBSideBarItem( QWidget *parent );
-		NBSideBarItem( QString name, QString icon, QString target, QWidget *parent );
+		NBSideBarItem( QString name, QString icon, QString target, int type, QWidget *parent );
 
 		QString name();
 		void setName( QString );
@@ -26,15 +26,30 @@ class NBSideBarItem : public QLabel {
 		QString target();
 		void setTarget( QString );
 
+		int type();
+		void setType( int );
+
 		bool isHighlighted();
 		void setHighlighted( bool );
 
 		bool operator==( NBSideBarItem* );
 
+		enum Type {
+			Device = 0x761CD7,
+			Vfs,
+			Bookmark,
+			QuickFile,
+			Folders,
+			Applications,
+			Catalogs,
+			Trash
+		};
+
 	private:
 		QString mName;
 		QString mIcon;
 		QString mTarget;
+		int mType;
 
 		bool mHighlight;
 		bool mPressed;
@@ -51,6 +66,10 @@ class NBSideBarItem : public QLabel {
 		void mouseReleaseEvent( QMouseEvent *mrEvent );
 		void mousePressEvent( QMouseEvent *mpEvent );
 		void paintEvent( QPaintEvent *pEvent );
+
+	private Q_SLOTS:
+		void removeBookmark();
+		void removeQuickFile();
 
 	Q_SIGNALS:
 		void clicked();

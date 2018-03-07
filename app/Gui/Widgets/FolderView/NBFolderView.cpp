@@ -1327,6 +1327,7 @@ void NBFolderView::addToSuperStart() {
 		QString cwd = fsModel->currentDir();
 		superStart.setValue( "Places/" + baseName( cwd ), cwd );
 		superStart.sync();
+
 		emit reloadSuperStart();
 
 		return;

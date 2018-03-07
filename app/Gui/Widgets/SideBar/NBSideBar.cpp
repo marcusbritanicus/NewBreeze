@@ -33,13 +33,13 @@ NBSideBar::NBSideBar( QWidget *parent ) : QWidget( parent ) {
 
 void NBSideBar::populateSideBar() {
 
-	dirs = new NBSideBarItem( "Folders", ":/icons/show-folders.png", "NB://Folders", this );
+	dirs = new NBSideBarItem( "Folders", ":/icons/show-folders.png", "NB://Folders", NBSideBarItem::Folders, this );
 	connect( dirs, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 
-	apps = new NBSideBarItem( "Applications", ":/icons/applications.png", "NB://Applications", this );
+	apps = new NBSideBarItem( "Applications", ":/icons/applications.png", "NB://Applications", NBSideBarItem::Applications, this );
 	connect( apps, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 
-	ctlg = new NBSideBarItem( "Catalogs", ":/icons/catalogs.png", "NB://Catalogs", this );
+	ctlg = new NBSideBarItem( "Catalogs", ":/icons/catalogs.png", "NB://Catalogs", NBSideBarItem::Catalogs, this );
 	connect( ctlg, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 
 	drives = new NBSideBarGroup( "Devices", ":/icons/comp.png", this );
@@ -54,7 +54,7 @@ void NBSideBar::populateSideBar() {
 	quickFiles = new NBSideBarGroup( "Quick Files", ":/icons/bookmark.png", this );
 	connect( quickFiles, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 
-	trash = new NBSideBarItem( "Trash", ":/icons/trash.png", "NB://Trash", this );
+	trash = new NBSideBarItem( "Trash", ":/icons/trash.png", "NB://Trash", NBSideBarItem::Trash, this );
 	connect( trash, SIGNAL( clicked() ), this, SIGNAL( showTrash() ) );
 
 	QVBoxLayout *baseLayout = new QVBoxLayout();
@@ -92,7 +92,7 @@ void NBSideBar::reloadDevices() {
 	vfs->clear();
 
 	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDrives() ) {
-		int pos = drives->addItem( info.displayName(), ":/icons/" + info.deviceType() + ".png", info.mountPoint() );
+		int pos = drives->addItem( info.displayName(), ":/icons/" + info.deviceType() + ".png", info.mountPoint(), NBSideBarItem::Device );
 
 		/* Special tooltip hack */
 		int percent = 100 * info.bytesUsed() / info.bytesTotal();
@@ -100,7 +100,7 @@ void NBSideBar::reloadDevices() {
 	}
 
 	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allVirtualMounts() )
-		vfs->addItem( info.displayName(), ":/icons/encfs.png", info.mountPoint() );
+		vfs->addItem( info.displayName(), ":/icons/encfs.png", info.mountPoint(), NBSideBarItem::Vfs );
 
 	if ( drives->itemCount() )
 		drives->show();
@@ -120,7 +120,7 @@ void NBSideBar::reloadBookmarks() {
 	bookmarks->clear();
 
 	Q_FOREACH( NBBookmarkInfo info, NBBookmarkInfo::allBookmarks() )
-		bookmarks->addItem( info.displayLabel, NBIconManager::instance()->icon( "folder-favorites" ).at( 0 ), info.mountPoint );
+		bookmarks->addItem( info.displayLabel, NBIconManager::instance()->icon( "folder-favorites" ).at( 0 ), info.mountPoint, NBSideBarItem::Bookmark );
 
 	if ( bookmarks->itemCount() )
 		bookmarks->show();
@@ -137,7 +137,7 @@ void NBSideBar::reloadQuickFiles() {
 	qfList.beginGroup( "Files" );
 
 	Q_FOREACH( QString key, qfList.allKeys() )
-		quickFiles->addItem( key, NBIconManager::instance()->icon( "bookmarks" ).at( 0 ), qfList.value( key ).toString() );
+		quickFiles->addItem( key, NBIconManager::instance()->icon( "bookmarks" ).at( 0 ), qfList.value( key ).toString(), NBSideBarItem::QuickFile );
 
 	qfList.endGroup();
 

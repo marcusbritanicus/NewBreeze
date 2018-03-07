@@ -26,7 +26,7 @@
 			case QtWarningMsg: {
 				fprintf( nblog, "NewBreeze::Warning# %s\n", message.toLocal8Bit().data() );
 				fflush( nblog );
-				if ( QString( message ).contains( "X Error" ) )
+				if ( QString( message ).contains( "X Error" ) or QString( message ).contains( "libpng warning" ) )
 					break;
 				fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", message.toLocal8Bit().data() );
 				break;
@@ -66,7 +66,7 @@
 			case QtWarningMsg: {
 				fprintf( nblog, "NewBreeze::Warning# %s\n", message );
 				fflush( nblog );
-				if ( QString( message ).contains( "X Error" ) )
+				if ( QString( message ).contains( "X Error" ) or QString( message ).contains( "libpng warning" )  )
 					break;
 				fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", message );
 				break;

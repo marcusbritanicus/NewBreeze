@@ -16,11 +16,12 @@ NBSideBarItem::NBSideBarItem( QWidget *parent ) : QLabel( parent ) {
 	setCursor( Qt::PointingHandCursor );
 };
 
-NBSideBarItem::NBSideBarItem( QString name, QString icon, QString target, QWidget *parent ) : QLabel( parent ) {
+NBSideBarItem::NBSideBarItem( QString name, QString icon, QString target, int type, QWidget *parent ) : QLabel( parent ) {
 
 	mName = name;
 	mIcon = icon;
 	mTarget = target;
+	mType = type;
 
 	if ( isDir( mTarget ) and not mTarget.endsWith( "/" ) )
 		mTarget += "/";
@@ -96,6 +97,16 @@ void NBSideBarItem::setTarget( QString newTarget ) {
 
 	mTarget = newTarget;
 	setToolTip( mTarget );
+};
+
+int NBSideBarItem::type() {
+
+	return mType;
+};
+
+void NBSideBarItem::setType( int newtype ) {
+
+	mType = newtype;
 };
 
 bool NBSideBarItem::isHighlighted() {
@@ -242,6 +253,19 @@ void NBSideBarItem::mousePressEvent( QMouseEvent *mpEvent ) {
 			mPressed = true;
 	}
 
+	if ( mpEvent->button() == Qt::RightButton ) {
+		QMenu menu;
+		if ( mType == Bookmark ) {
+			menu.addAction( QIcon( ":/icons/delete.png" ), "&Remove Bookmark", this, SLOT( removeBookmark() ) );
+			menu.exec( mapToGlobal( mpEvent->pos() ) );
+		}
+
+		else if ( mType == QuickFile ) {
+			menu.addAction( QIcon( ":/icons/delete.png" ), "&Remove QuickFile", this, SLOT( removeQuickFile() ) );
+			menu.exec( mapToGlobal( mpEvent->pos() ) );
+		}
+	}
+
 	repaint();
 	mpEvent->accept();
 };
@@ -303,4 +327,20 @@ void NBSideBarItem::paintEvent( QPaintEvent *pEvent ) {
 
 	QLabel::paintEvent( pEvent );
 	pEvent->accept();
+};
+
+void NBSideBarItem::removeBookmark() {
+
+	bookmarkSettings.remove( QUrl::toPercentEncoding( mTarget ) );
+	QStringList order = bookmarkSettings.value( "Order" ).toStringList();
+	order.removeAll( mTarget );
+
+	bookmarkSettings.setValue( "Order", order );
+	bookmarkSettings.sync();
+
+	deleteLater();
+};
+
+void NBSideBarItem::removeQuickFile() {
+
 };
