@@ -798,28 +798,49 @@ void NewBreeze::changeViewMode( int mode ) {
 	QStringList viewModes = QStringList() << "Tiles" << "Icons" << "Details";
 	Settings->General.ViewMode = viewModes.at( mode );
 
-	QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-	sett.setValue( "NewBreeze/ViewMode", Settings->General.ViewMode );
+	/* For anything starting with NB:// */
+	if ( not FolderView->fsModel->isRealLocation() ) {
+		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", location );
+		sett.setValue( "NewBreeze/ViewMode", Settings->General.ViewMode );
+		sett.sync();
+	}
+
+	else {
+		QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/ViewMode", Settings->General.ViewMode );
+		sett.sync();
+	}
 
 	FolderView->updateViewMode();
 };
 
 void NewBreeze::switchToNextView() {
 
-	// if ( Settings->General.ViewMode == QString( "Tiles" ) )
+	if ( FolderView->IconView->viewMode() == QString( "Tiles" ) )
 		Settings->General.ViewMode = QString( "Icons" );
 
-	// else if ( Settings->General.ViewMode == QString( "Icons" ) )
-		// Settings->General.ViewMode = QString( "Details" );
+	else if ( FolderView->IconView->viewMode() == QString( "Icons" ) )
+		Settings->General.ViewMode = QString( "Details" );
 
-	// else
-		// Settings->General.ViewMode = QString( "Tiles" );
+	else
+		Settings->General.ViewMode = QString( "Tiles" );
 
 	FolderView->updateViewMode();
 
-	QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-	sett.setValue( "NewBreeze/ViewMode", Settings->General.ViewMode );
-	sett.sync();
+	if ( not FolderView->fsModel->isRealLocation() ) {
+		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", location );
+		sett.setValue( "NewBreeze/ViewMode", Settings->General.ViewMode );
+		sett.sync();
+	}
+
+	else {
+		QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/ViewMode", Settings->General.ViewMode );
+		sett.sync();
+	}
+
 };
 
 void NewBreeze::toggleGrouping() {

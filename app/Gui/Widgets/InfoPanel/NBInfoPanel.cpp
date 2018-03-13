@@ -113,11 +113,53 @@ void NBInfoPanel::updatePanel( QString rootPath, QModelIndexList selection ) {
 		}
 
 		else if ( selection.count() == 1 ) {
-			//
+			/* Drives */
+			if ( exists( selection.at( 0 ).data( Qt::UserRole + 2 ).toString() ) ) {
+				QMimeType mType = mimeDb.mimeTypeForFile( selection.at( 0 ).data( Qt::UserRole + 2 ).toString() );
+				setIcon( selection.at( 0 ).data( Qt::DecorationRole ).value<QIcon>() );
+				if ( selection.at( 0 ).data( Qt::UserRole + 2 ).toString() == "/" )
+					nameLbl->setText( "<b>/ (root)</b>" );
+				else
+					nameLbl->setText( "<b>" + baseName( selection.at( 0 ).data( Qt::UserRole + 2 ).toString() ) + "</b>" );
+
+				/* Size */
+				sizeLbl->setText( QString( "%1" ).arg( selection.at( 0 ).data( Qt::UserRole + 1 ).toString() ) );
+				mimeLbl->setText( mType.comment() );
+
+				/* Parent folder */
+				QString dn( dirName( selection.at( 0 ).data( Qt::UserRole + 2 ).toString() ) );
+				if ( dn == "/" )
+					pathLbl->setText( "/ (root)" );
+				else
+					pathLbl->setText( dn );
+
+				permLbl->setText( getPermissions( selection.at( 0 ).data( Qt::UserRole + 2 ).toString() ) );
+			}
+
+			/* Folders and Files */
+			else {
+				QMimeType mType = mimeDb.mimeTypeForFile( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() );
+				// setIcon( icon( NBIconManager::instance()->iconsForFile( mType.name(), selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) ) );
+				setIcon( selection.at( 0 ).data( Qt::DecorationRole ).value<QIcon>() );
+				nameLbl->setText( "<b>" + baseName( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) + "</b>" );
+
+				/* Size */
+				QString sizeTxt;
+				if ( isDir( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) )
+					sizeTxt = QString( "%1 items" ).arg( nChildren( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
+
+				else
+					sizeTxt = formatSize( getSize( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
+
+				sizeLbl->setText( sizeTxt );
+				mimeLbl->setText( mType.comment() );
+				pathLbl->setText( dirName( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
+				permLbl->setText( getPermissions( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
+			}
 		}
 
 		else {
-			//
+			// No multiple selection possible
 		}
 	}
 
@@ -145,11 +187,26 @@ void NBInfoPanel::updatePanel( QString rootPath, QModelIndexList selection ) {
 		}
 
 		else if ( selection.count() == 1 ) {
+			QMimeType mType = mimeDb.mimeTypeForFile( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() );
+			setIcon( selection.at( 0 ).data( Qt::DecorationRole ).value<QIcon>() );
+			nameLbl->setText( "<b>" + baseName( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) + "</b>" );
 
+			/* Size */
+			QString sizeTxt;
+			if ( isDir( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) )
+				sizeTxt = QString( "%1 items" ).arg( nChildren( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
+
+			else
+				sizeTxt = formatSize( getSize( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
+
+			sizeLbl->setText( sizeTxt );
+			mimeLbl->setText( mType.comment() );
+			pathLbl->setText( dirName( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
+			permLbl->setText( getPermissions( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) );
 		}
 
 		else {
-
+			// No multiple selection possible
 		}
 	}
 
@@ -208,7 +265,7 @@ void NBInfoPanel::updatePanel( QString rootPath, QModelIndexList selection ) {
 		else if ( selection.count() == 1 ) {
 			QMimeType mType = mimeDb.mimeTypeForFile( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() );
 			setIcon( icon( NBIconManager::instance()->iconsForFile( mType.name(), selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) ) );
-			nameLbl->setText( "<b>" + baseName( rootPath ) + "</b>" );
+			nameLbl->setText( "<b>" + selection.at( 0 ).data().toString() + "</b>" );
 
 			/* Size */
 			QString sizeTxt;

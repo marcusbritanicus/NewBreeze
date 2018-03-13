@@ -758,7 +758,11 @@ QString NBItemViewModel::nodePath( const QModelIndex idx ) const {
 
 QString NBItemViewModel::nodePath( const QString path ) const {
 
-	return nodePath( index( path ) );
+	QModelIndex idx = index( path );
+	if ( not idx.isValid() )
+		return mRootPath + path;
+
+	return nodePath( idx );
 };
 
 QFileInfo NBItemViewModel::nodeInfo( const QModelIndex idx ) const {
@@ -1105,6 +1109,9 @@ void NBItemViewModel::setupSuperStartData() {
 		data << info.displayName();
 		data << QString( "%1% used" ).arg( info.bytesUsed() * 100 / info.bytesTotal() );
 		data << info.mountPoint();
+
+		if ( info.mountPoint() == "/" )
+			data[ 3 ] = "FileSystem";
 
 		rootNode->addChild( new NBItemViewNode( data, "Computer  ", rootNode ) );
 		mChildNames << info.displayName();

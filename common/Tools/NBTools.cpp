@@ -17,7 +17,8 @@ QString dirName( QString path ) {
 	path = path.replace( "//", "/" ).replace( "/./", "/" );
 
 	char *dupPath = strdup( path.toLocal8Bit().constData() );
-	QString dirPth = QString::fromLocal8Bit( dirname( dupPath ) ) + "/";
+	QString dirPth = QString::fromLocal8Bit( dirname( dupPath ) );
+	dirPth += ( dirPth.endsWith( "/" ) ? "" : "/" );
 	free( dupPath );
 
 	return dirPth;

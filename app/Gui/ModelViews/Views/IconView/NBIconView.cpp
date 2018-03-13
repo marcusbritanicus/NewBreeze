@@ -120,6 +120,11 @@ void NBIconView::updateViewMode() {
 	return;
 };
 
+QString NBIconView::viewMode() {
+
+	return currentViewMode;
+};
+
 int NBIconView::categoryHeight() const {
 
 	return myCategoryHeight;
@@ -324,12 +329,24 @@ void NBIconView::reload() {
 		}
 	}
 
-	/* Change view mode according to the .desktop file */
-	QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
+	QString viewMode;
+	int iconSize;
 
-	/* We have set per-folder settings */
-	QString viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
-	int iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+	/* Change view mode and icon size according to the .desktop file */
+	if ( not cModel->isRealLocation() ) {
+		QString location = cModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", location );
+
+		viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
+		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+	}
+
+	else {
+		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
+
+		viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
+		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+	}
 
 	emit updateViewMode( viewMode );
 
@@ -668,7 +685,8 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 			/* Category arrow clicked */
 			if ( QRect( topLeft.x() + 4, topLeft.y() + 4, 16, 16 ).contains( mpEvent->pos() ) )
-				toggleFoldCategory( categoryAt( mpEvent->pos() ) );
+				if ( currentViewMode != "Details" )
+					toggleFoldCategory( categoryAt( mpEvent->pos() ) );
 
 			/* Repaint the viewport */
 			viewport()->repaint();
@@ -1812,7 +1830,6 @@ void NBIconView::calculateCategorizedIconsRects() const {
 		if ( cModel->modelDataType() == NBItemViewModel::SuperStart )
 			minY += catIdx * myGridSize.height() / 3;
 
-
 		int categoryWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
 		rectForCategory[ catIdx ] = QRect( minX, minY, categoryWidth, 24 );
 
@@ -1884,6 +1901,10 @@ void NBIconView::calculateCategorizedTilesRects() const {
 		int minX = myContentsMargins.left();
 		int minY = myContentsMargins.top() + catIdx * myCategoryHeight + catIdx * myCategorySpacing + totalRows * myGridSize.height();
 
+		/* Extra Spacing in SuperStart */
+		if ( cModel->modelDataType() == NBItemViewModel::SuperStart )
+			minY += catIdx * myGridSize.height() / 3;
+
 		int categoryWidth = viewport()->width() - myContentsMargins.left() - myContentsMargins.right();
 		rectForCategory[ catIdx ] = QRect( minX, minY, categoryWidth, 24 );
 
@@ -1897,8 +1918,9 @@ void NBIconView::calculateCategorizedTilesRects() const {
 			minY += myCategoryHeight;
 
 			totalRows++;
+			int limit = mList.count() >= itemsPerRow ? itemsPerRow - 1 : mList.count();
 
-			for( int lrow = 0; lrow < mList.count(); lrow++ ) {
+			for( int lrow = 0; lrow < limit; lrow++ ) {
 				int row = lrow / itemsPerRow;
 				int col = lrow % itemsPerRow;
 
@@ -1919,9 +1941,8 @@ void NBIconView::calculateCategorizedTilesRects() const {
 				prevRows++;
 
 			totalRows += prevRows;
-			int limit = mList.count() >= itemsPerRow ? itemsPerRow : mList.count();
 
-			for( int lrow = 0; lrow < limit; lrow++ ) {
+			for( int lrow = 0; lrow < mList.count(); lrow++ ) {
 				int row = lrow / itemsPerRow;
 				int col = lrow % itemsPerRow;
 
@@ -1957,18 +1978,28 @@ void NBIconView::calculateCategorizedDetailsRects() const {
 		// Minimum X and Y for Category Rectangle
 		int minY = myContentsMargins.top() + catIdx * myCategoryHeight + catIdx * myCategorySpacing + totalRows * myGridSize.height();
 
+		/* Extra Spacing in SuperStart */
+		if ( cModel->modelDataType() == NBItemViewModel::SuperStart )
+			minY += catIdx * myGridSize.height() / 3;
+
 		rectForCategory[ catIdx ] = QRect( catX, minY, catW, myCategoryHeight );
 
-		// Mimimum X and Y for indexes
-		minY += myCategoryHeight;
+		// We consider the space reserved for the category but not the indexes listed under it
+		if ( hiddenCategories.contains( cModel->category( mList.value( 0 ) ) ) )
+			continue;
 
-		prevRows = cModel->indexListCountForCategory( categoryList.at( catIdx ) );
-		totalRows += prevRows;
+		else {
+			// Mimimum X and Y for indexes
+			minY += myCategoryHeight;
 
-		for( int lrow = 0; lrow < mList.count(); lrow++ ) {
-			y = minY + lrow * myGridSize.height();
+			prevRows = cModel->indexListCountForCategory( categoryList.at( catIdx ) );
+			totalRows += prevRows;
 
-			rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
+			for( int lrow = 0; lrow < mList.count(); lrow++ ) {
+				y = minY + lrow * myGridSize.height();
+
+				rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
+			}
 		}
 	}
 

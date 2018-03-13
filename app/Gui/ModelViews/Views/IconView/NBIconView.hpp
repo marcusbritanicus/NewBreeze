@@ -26,6 +26,7 @@ class NBIconView : public QAbstractItemView {
 
 		// Update the view mode
 		void updateViewMode();
+		QString viewMode();
 
 		// Category drawing height : myCategoryHeight
 		int categoryHeight() const;
