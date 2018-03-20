@@ -5,13 +5,13 @@
 	* This the general plugin interface. Unlike the PreviewInterface, this plugin
 	* is meant to enhance the working of NewBreeze widgets directly, or provide a
 	* replacement for some widgets. Please note that replacements cannot be
-	* provided for all widgets, NBFolderView, NBAddressBar, NBProcessManager to name
+	* provided for all widgets, PBFolderView, PBAddressBar, PBProcessManager to name
 	* a few.
 	*
 	* Note1:
-	* This PluginInterface can be used to enhance the NBFolderView class by providing
+	* This PluginInterface can be used to enhance the PBFolderView class by providing
 	* a suitable context. For the context to be applicable, the plugin must return
-	* one of the FolderView interfaces for interface() and 'Enhancement' for type().
+	* on of the FolderView interfaces for interface() and 'Enhancement' for type().
 	* Otherwise 'context()' will be ignored and the plugin may not work.
 	*
 	* Note2:
@@ -22,9 +22,9 @@
 	*
 	* Note3:
 	* actions(...) and actionsTrigger(...) are meant to be equivalent functions. If
-	* provided the same conditions, they behave similarly. Instead of triggering an
-	* action named 'act', for an interface named 'iface' for listed 'nodes', calling
-	* actionsTrigger( iface, act, nodes ) gives the same result.
+	* provided the same conditions, will behave similarly. Instead of triggering an
+	* action named 'act', for an interface names 'iface' for listed 'nodes', then
+	* calling actionsTrigger( iface, act, nodes ) should give the same result.
 	*
 */
 

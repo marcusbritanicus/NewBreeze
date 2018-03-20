@@ -1,86 +1,23 @@
-NBAddressBar                                                                                                                          [ 2 of 2 ]
-	✓ Addressbar icons are not visible in GNOME/LxQt
-	✓ ViewMode updates are one-way: from buttons to views only; enable reverse.
+NewBreeze v3.0.0 Beta3
 
-NBProcessManager                                                                                                                      [ 4 of 4 ]
-	✓ NBIOProcess
-	✓ NBDeleteProcess
-	✗ NBPropertiesProcess
-	✗ Undo-Redo Sequences (Only for Copy and Move)
-
-NBIconProvider/NBIconManager                                                                                                          [ 3 of 3 ]
-	✓ Create a full icon provider class
-	✓ Provide icon strings for multiple sizes
-	✗ Integrate NBIconManager with newbreeze-common
-
-NBIconView                                                                                                                            [ 10 of 10 ]
-	✓ Fix the horrible selection model - Mouse click is not removed by the cursor keys
-	◐ Improve the selection model
-	  • Currently mouse-over on click selection is enabled.
+NBIconView                                                                                                                            [ 0 of 3 ]
+	□ Improve the selection model
+	  • Enable rectanlge rubberband selection
 	  • Change selection policy with model data type
-	✓ Rewrite cursor movements from scratch taking into account category folding
-	✗ Enable PageUp and PageDown navigation
-	✓ Enable per-folder folded category memory
-	✓ Category icons need to be added
-	✓ Mac style semi-folded categories
+	□ Enable PageUp and PageDown navigation
+	□ Add finesse to Mac style semi-folded categories
 	  • One click on category icon, partially folds it, clicking again expands it.
 	  • Double-clicking category, toggles folding
-	✓ CatalogView and its icons need to be fixed
-	✓ Add symbols to icons representing symlink, executables, system files etc for NBItemDelegate
-	◐ Fix drag-and-drop to take care of SuperStart
+	□ Fix drag-and-drop to take care of SuperStart
 
-NBItemViewModel                                                                                                                       [ 2 of 2 ]
-	✓ Read icon data directly from NBItemNode* rather than create it repeatedly.
-	✓ Use other functions from dirent.h, vis-a-vis, scandir, fnmatch, etc
+BugReporting                                                                                                                          [ 0 of 1 ]
+	□ Option for bug reporting - will be added as a general plugin
 
-NBFileSystemWatcher                                                                                                                   [ 4 of 4 ]
-	✓ Replace my buggy implementation of inotify with QFileSystemWatcher
-	✓ Fix the double trigger caused by node rename
-	✗ Use inode numbers obtained from stat(...) to identify renames
-	✗ Think of using inotify.hpp by Erik Zenker for NBFileSystemWatcher: uses boost-filesystem
+StartupWizard                                                                                                                         [ 0 of 1 ]
+	□ Startup Wizard to initiate basic settings
 
-NBFolderWidget                                                                                                                        [ 3 of 3 ]
-	✓ Extended copy/move support
-	✓ Add an option in Settings Dialog
-	✓ Preview Pane for files and folders
-
-Archives                                                                                                                              [ 6 of 6 ]
-	✗ Zip and tar preview: PeekPlugin using archivemount
-	✗ Writing archives will be done in NBProcessManager, show the percentage of data compressed.
-	✗ Extraction of archives to be done in NBProcessManager, show the percentage of data processed
-	✓ Use an external library to do the work - libarchive, liblzma, libz, libbz2
-	✗ Add support for .lz, .lzo, .uu
-	✓ Archive preview using Folder Flash
-
-Settings                                                                                                                              [ 2 of 2 ]
-	✗ Apply the settings to the existing windows immediately
-	✗ Enable fast icon theme loading
-
-SuperStart                                                                                                                            [ 1 of 1 ]
-	✓ Enable and refine SuperStart
-	  • SuperStart enabled, refinement is being done
-	  • SuperStart menu needs to be crafted
-
-BugReporting                                                                                                                          [ 1 of 1 ]
-	✗ Option for bug reporting after crash
-
-StartupWizard                                                                                                                         [ 1 of 1 ]
-	✗ Startup Wizard to initiate basic settings
-
-General                                                                                                                               [ 6 of 6 ]
-	✓ Accidental Delete Protection
-	✓ OS File Protection as Root
-		No OS node can be directly trashed or deleted. To delete/trash any OS node, an extra layer of protection will be applied.
-		A good example is entering a phrase to validate deletion.
-	✓ Plugin barrier as root
-	✓ Enhanced new file creation
-	✗ Add support for addition of terminal emulators
-	✓ Remove libmagic dependency. Its too slow
-
-NewBreeze Vault                                                                                                                       [ 1 of 1 ]
-	✓ Vault: A Single place to access all your private files and folders
-		  • This is the very first implementation, and is not very secure
-		  • NBCrypt plugin will be merged with NewBreeze app
+General                                                                                                                               [ 0 of 1 ]
+	□ Add support for addition of terminal emulators
 
 Note:
 	✍ - Work in progress

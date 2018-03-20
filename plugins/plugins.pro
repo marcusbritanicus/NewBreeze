@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS += Crypt Default TextEdit
+SUBDIRS += Crypt Default TextEdit TermPlugin
 
 isEqual( QT_MAJOR_VERSION, 5 ) {
 	lessThan(QT_MINOR_VERSION, 5) {

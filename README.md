@@ -1,4 +1,4 @@
-# NewBreeze
+# NewBreeze [![Build Status](https://travis-ci.org/marcusbritanicus/NewBreeze.svg?branch=master)](https://travis-ci.org/marcusbritanicus/NewBreeze)
 ## A fast and light-weight file manager based on Qt
 
 Chat with me at [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/newbreezefm/)

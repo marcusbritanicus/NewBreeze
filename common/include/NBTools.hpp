@@ -62,6 +62,3 @@ bool isArchiveAlt( QString mimeType );
 
 /* Convert the numberic size to human readable string */
 QString formatSize( qint64 );
-
-/* Terminal */
-QStringList getTerminal();

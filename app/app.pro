@@ -26,7 +26,7 @@ INCLUDEPATH += ../common/ ../common/include
 DEPENDPATH += ../common/ ../common/include
 
 # Source Paths
-INCLUDEPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs
+INCLUDEPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager Gui Gui/Dialogs
 INCLUDEPATH += Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BugCatcher Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
 INCLUDEPATH += Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
 INCLUDEPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
@@ -37,7 +37,7 @@ INCLUDEPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/Cus
 INCLUDEPATH += Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
 INCLUDEPATH += Gui/Widgets/TrashManager
 
-DEPENDPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/ProcessManager Gui Gui/Dialogs
+DEPENDPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager Gui Gui/Dialogs
 DEPENDPATH += Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BugCatcher Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
 DEPENDPATH += Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
 DEPENDPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
@@ -55,6 +55,7 @@ HEADERS += Core/DeleteManager/NBDeleteManager.hpp
 HEADERS += Core/FSWatcher/NBFileSystemWatcher.hpp
 HEADERS += Core/IconProvider/NBIconManager.hpp
 HEADERS += Core/Logger/NBLogger.hpp
+HEADERS += Core/Other/NBFunctions.hpp
 HEADERS += Core/ProcessManager/NBAbstractProcess.hpp
 HEADERS += Core/ProcessManager/NBDeleteProcess.hpp
 HEADERS += Core/ProcessManager/NBIOProcess.hpp
@@ -178,6 +179,7 @@ SOURCES += Core/DeleteManager/NBDeleteManager.cpp
 SOURCES += Core/FSWatcher/NBFileSystemWatcher.cpp
 SOURCES += Core/IconProvider/NBIconManager.cpp
 SOURCES += Core/Logger/NBLogger.cpp
+SOURCES += Core/Other/NBFunctions.cpp
 SOURCES += Core/ProcessManager/NBDeleteProcess.cpp
 SOURCES += Core/ProcessManager/NBIOProcess.cpp
 SOURCES += Core/ProcessManager/NBProcessManager.cpp

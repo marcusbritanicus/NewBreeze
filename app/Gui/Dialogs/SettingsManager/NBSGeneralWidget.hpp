@@ -7,6 +7,9 @@
 #pragma once
 
 #include "Global.hpp"
+#include "NBDialog.hpp"
+#include "NBButtons.hpp"
+#include "NBButton.hpp"
 
 class NBSGeneralWidget : public QWidget {
 	Q_OBJECT
@@ -38,6 +41,13 @@ class NBSGeneralWidget : public QWidget {
 		QCheckBox *imagePreviewCB;				// Show image previews?
 		QCheckBox *directIOCB;					// Direct Copy/Move
 
+		/* Terminal */
+		QGroupBox *termGB;
+		QCheckBox *pluginCB;					// Use Inbuilt Plugin?
+		QListWidget *termsLW;					// List of terminals detected/added
+		QPushButton *addBtn;					// Add a terminal
+		QPushButton *defaultBtn;				// Make this terminal default
+
 	private slots:
 		/*  */
 		void handlePerFolderChanged( bool );
@@ -51,10 +61,30 @@ class NBSGeneralWidget : public QWidget {
 		void handleShowSidePanelToggled( bool );
 		void handleSidePanelChoice();
 
-		/*  */
+		/* Others */
 		void handleFilterDirsChanged( bool );
 		void handleTrayIconChanged( bool );
 		void handleOpenWithToggled();
 		void handleCheckStateChanged( int );
 		void handleDirectIOChanged( bool );
+
+		/* Terminal */
+		void handleDefaultClicked();
+		void handleAddTermClicked();
+};
+
+class NBAddVTEDialog : public NBDialog {
+	Q_OBJECT
+
+	public :
+		NBAddVTEDialog( QWidget *parent );
+
+	private:
+		NBSegmentButton *btns;
+		QCheckBox *wDirCB;
+		QLineEdit *execLE, *workLE, *cmdLE;
+
+	private Q_SLOTS:
+		void addTerminal();
+		void handleCBPressed();
 };

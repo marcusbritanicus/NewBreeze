@@ -32,12 +32,18 @@ QHBoxLayout* NBSettingsManager::createBodyLayout() {
 	chooserWidget = new NBSSideBar( this );
 	connect( chooserWidget, SIGNAL( loadSettingsCategory( int ) ), this, SLOT( settingCategoryChosen( int ) ) );
 
+	QScrollArea *genScroll = new QScrollArea();
+	genScroll->setFrameShape( QFrame::NoFrame );
+	genScroll->setWidgetResizable( true );
+
 	NBSGeneralWidget *generalWidget = new NBSGeneralWidget( this );
+	genScroll->setWidget( generalWidget );
+
 	iconWidget = new NBIconThemeWidget( this );
 	styleWidget = new NBSStyleWidget( this );
 	keysWidget = new NBKeyBindingsWidget( this );
 
-	widgetLyt->addWidget( generalWidget );
+	widgetLyt->addWidget( genScroll );
 	widgetLyt->addWidget( iconWidget );
 	widgetLyt->addWidget( styleWidget );
 	widgetLyt->addWidget( new NBSPluginsWidget( this ) );

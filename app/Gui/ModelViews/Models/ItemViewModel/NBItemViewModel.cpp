@@ -820,7 +820,14 @@ void NBItemViewModel::setRootPath( QString path ) {
 	else if ( path.startsWith( "NB://Folders" ) ) {
 		mVirtualData = false;
 		mModelDataType = (quint64)NBItemViewModel::FileSystem;
-		mRootPath = prevFolder;
+
+		if ( not prevFolder.isEmpty() )
+			mRootPath = prevFolder;
+
+		else
+			mRootPath = Settings->Session.LastDir;
+
+		thumbnailer->createThumbnails( mRootPath );
 	}
 
 	else {

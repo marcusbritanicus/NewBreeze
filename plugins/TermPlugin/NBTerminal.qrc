@@ -1,0 +1,43 @@
+<!DOCTYPE RCC><RCC version="1.0">
+	<qresource>
+		<file>StyleSheets/PBTerminal.qss</file>
+		<file>StyleSheets/PBTitleBar.qss</file>
+		<file>StyleSheets/PBTabWidget.qss</file>
+		<file>StyleSheets/PBTabWidgetDD.qss</file>
+		<file>StyleSheets/QTermWidget.qss</file>
+
+		<file>data/kb-layouts/default.keytab</file>
+		<file>data/kb-layouts/linux.keytab</file>
+		<file>data/kb-layouts/macbook.keytab</file>
+		<file>data/kb-layouts/solaris.keytab</file>
+		<file>data/kb-layouts/vt420pc.keytab</file>
+		<file>data/kb-layouts/historic/vt100.keytab</file>
+		<file>data/kb-layouts/historic/x11r5.keytab</file>
+
+		<file>data/color-schemes/BlackOnLightYellow.schema</file>
+		<file>data/color-schemes/BlackOnRandomLight.colorscheme</file>
+		<file>data/color-schemes/BlackOnWhite.schema</file>
+		<file>data/color-schemes/DarkPastels.colorscheme</file>
+		<file>data/color-schemes/GreenOnBlack.colorscheme</file>
+		<file>data/color-schemes/historic/BlackOnLightColor.schema</file>
+		<file>data/color-schemes/historic/DarkPicture.schema</file>
+		<file>data/color-schemes/historic/Example.Schema</file>
+		<file>data/color-schemes/historic/GreenOnBlack.schema</file>
+		<file>data/color-schemes/historic/GreenTint_MC.schema</file>
+		<file>data/color-schemes/historic/GreenTint.schema</file>
+		<file>data/color-schemes/historic/LightPicture.schema</file>
+		<file>data/color-schemes/historic/Linux.schema</file>
+		<file>data/color-schemes/historic/README.default.Schema</file>
+		<file>data/color-schemes/historic/README.Schema</file>
+		<file>data/color-schemes/historic/syscolor.schema</file>
+		<file>data/color-schemes/historic/Transparent_darkbg.schema</file>
+		<file>data/color-schemes/historic/Transparent_lightbg.schema</file>
+		<file>data/color-schemes/historic/Transparent_MC.schema</file>
+		<file>data/color-schemes/historic/Transparent.schema</file>
+		<file>data/color-schemes/historic/vim.schema</file>
+		<file>data/color-schemes/historic/XTerm.schema</file>
+		<file>data/color-schemes/Linux.colorscheme</file>
+		<file>data/color-schemes/Transparent.colorscheme</file>
+		<file>data/color-schemes/WhiteOnBlack.schema</file>
+	</qresource>
+</RCC>

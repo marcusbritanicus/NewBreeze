@@ -404,30 +404,3 @@ QString formatSize( qint64 num ) {
 
 	return total;
 };
-
-QStringList getTerminal() {
-
-	QSettings sett;
-	if ( sett.value( "Terminals/nbterminal" ).toStringList().count() )
-		return sett.value( "Terminals/nbterminal" ).toStringList();
-
-	if ( sett.value( "Terminals/konsole" ).toStringList().count() )
-		return sett.value( "Terminals/konsole" ).toStringList();
-
-	if ( sett.value( "Terminals/gnome-terminal" ).toStringList().count() )
-		return sett.value( "Terminals/gnome-terminal" ).toStringList();
-
-	if ( sett.value( "Terminals/mate-terminal" ).toStringList().count() )
-		return sett.value( "Terminals/mate-terminal" ).toStringList();
-
-	if ( sett.value( "Terminals/xfce4-terminal" ).toStringList().count() )
-		return sett.value( "Terminals/xfce4-terminal" ).toStringList();
-
-	if ( sett.value( "Terminals/lxterminal" ).toStringList().count() )
-		return sett.value( "Terminals/lxterminal" ).toStringList();
-
-	if ( sett.value( "Terminals/xterm" ).toStringList().count() )
-		return sett.value( "Terminals/xterm" ).toStringList();
-
-	return QStringList();
-};

@@ -1,0 +1,21 @@
+QTabBar {
+	background: url(:/icons/bg.png);
+	color: white;
+	border: 2px solid white;
+}
+
+QTabBar::tab {
+	left: 1px;
+	max-height: 21px;
+	min-height: 21px;
+	background: rgba( 0, 0, 0, 0% );
+	border: 1px solid white;
+	padding: 2px;
+	border-top-width: 2px;
+	border-bottom-width: 2px;
+}
+
+QTabBar::tab:selected {
+	font-weight: bold;
+	color: #87CEFA;
+}

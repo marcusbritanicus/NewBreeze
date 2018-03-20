@@ -17,6 +17,7 @@
 #include "NBErrorsDialog.hpp"
 #include "NBEncFS.hpp"
 #include "NBFileDialog.hpp"
+#include "NBFunctions.hpp"
 #include "NBItemViewModel.hpp"
 #include "NBFolderFlash.hpp"
 #include "NBGuiWidgets.hpp"

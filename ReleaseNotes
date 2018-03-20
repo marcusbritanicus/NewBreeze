@@ -67,6 +67,11 @@ few changes in NewBreeze 3.
    - Archive creation and extraction is done via QtConcurrent::run(...) [Needs improvements]
    - Archive previews are now available, though it needs some improvements
 
+=> Terminals
+   - A Terminal plugin is added.
+   - Terminals can now be added in the settings.
+   - User can choose the terminal program.
+
 => SuperStart: A Super start to your day
    - All Drives are shown as you start NewBreeze.
    - Find all the important files and folders as soon as you start NewBreeze.

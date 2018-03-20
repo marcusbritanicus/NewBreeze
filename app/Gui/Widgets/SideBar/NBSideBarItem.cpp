@@ -331,6 +331,9 @@ void NBSideBarItem::paintEvent( QPaintEvent *pEvent ) {
 
 void NBSideBarItem::removeBookmark() {
 
+	if ( mTarget.endsWith( "/" ) )
+		mTarget.chop( 1 );
+
 	bookmarkSettings.remove( QUrl::toPercentEncoding( mTarget ) );
 	QStringList order = bookmarkSettings.value( "Order" ).toStringList();
 	order.removeAll( mTarget );

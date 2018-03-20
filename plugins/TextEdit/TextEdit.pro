@@ -81,5 +81,6 @@ unix {
 
 	INSTALLS += target
 
+	QMAKE_RPATHDIR += $$PREFIX/lib/newbreeze/
 	target.path = $$PREFIX/lib/newbreeze/plugins
 }

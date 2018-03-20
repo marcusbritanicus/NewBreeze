@@ -1168,34 +1168,97 @@ void NBFolderView::selectAll() {
 void NBFolderView::openTerminal() {
 
 	QStringList commandList = getTerminal();
-	QString command = commandList.takeFirst();
 
-	if ( command == QString( "xterm" ) )
-		commandList[ 1 ] = QString( "cd %1 && /bin/bash" ).arg( termFormatString( fsModel->currentDir() ) );
+	QString node;
+	if ( fsModel->isRealLocation() )
+		node = fsModel->currentDir();
 
-	else {
-		commandList[ 1 ] = fsModel->currentDir();
-		commandList[ 3 ] = "/bin/bash";
+	else
+		node = NBXdg::home();
+
+	if ( commandList.at( 0 ) == "Inbuilt" ) {
+		NBPluginManager *plMgr = NBPluginManager::instance();
+
+		QString node = fsModel->currentDir();
+		PluginList pList;
+
+		pList << plMgr->plugins( NBPluginInterface::TerminalInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, "inode/directory" );
+
+		if ( pList.count() ) {
+			NBPluginInterface *iface = pList.at( 0 );
+			iface->actionTrigger( NBPluginInterface::TerminalInterface, QString(), QStringList() << node );
+
+			qDebug( "Opening inbuilt term plugin at %s... [DONE]", node.toLocal8Bit().data() );
+			return;
+		}
+
+		else {
+			NBMessageDialog::error(
+				this,
+				"NewBreeze - Terminal",
+				"I'm unable to find the terminal plugin. Please install the NBTermPlugin to use Inbuilt terminal."
+			);
+
+			qDebug( "Terminal plugin not found. Unable to open the terminal" );
+		}
 	}
 
-	qDebug( "Opening console at %s... %s", fsModel->currentDir().toLocal8Bit().data(), ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
+	else {
+		QString command = commandList.takeFirst();
+
+		if ( command == QString( "xterm" ) )
+			commandList[ 1 ] = QString( "cd %1 && /bin/bash" ).arg( termFormatString( fsModel->currentDir() ) );
+
+		else {
+			commandList[ 1 ] = node;
+			commandList[ 3 ] = "/bin/bash";
+		}
+
+		qDebug( "Opening console at %s... %s", node.toLocal8Bit().data(), ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
+	}
 };
 
 void NBFolderView::openTerminalIn() {
 
 	QStringList commandList = getTerminal();
-	QString command = commandList.takeFirst();
 	QString folder = QFileInfo( fsModel->nodeInfo( getSelection()[ 0 ] ) ).absoluteFilePath();
 
-	if ( command == QString( "xterm" ) )
-		commandList[ 1 ] = QString( "cd %1 && /bin/bash" ).arg( termFormatString( folder ) );
+	if ( commandList.at( 0 ) == "Inbuilt" ) {
+		NBPluginManager *plMgr = NBPluginManager::instance();
+		PluginList pList = plMgr->plugins( NBPluginInterface::TerminalInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, "inode/directory" );
 
-	else {
-		commandList[ 1 ] = folder;
-		commandList[ 3 ] = "/bin/bash";
+		if ( pList.count() ) {
+			NBPluginInterface *iface = pList.at( 0 );
+			iface->actionTrigger( NBPluginInterface::TerminalInterface, QString(), QStringList() << folder );
+
+			qDebug( "Opening inbuilt term plugin at %s... [DONE]", folder.toLocal8Bit().data() );
+			return;
+		}
+
+		else {
+			NBMessageDialog::error(
+				this,
+				"NewBreeze - Terminal",
+				"I'm unable to find the terminal plugin. Please install the NBTermPlugin to use Inbuilt terminal."
+			);
+
+			qDebug( "Terminal plugin not found. Unable to open the terminal" );
+		}
 	}
 
-	qDebug( "Opening console at %s... %s", folder.toLocal8Bit().data(), ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
+	else {
+		QString command = commandList.takeFirst();
+
+		if ( command == QString( "xterm" ) )
+			commandList[ 1 ] = QString( "cd %1 && /bin/bash" ).arg( termFormatString( folder ) );
+
+		else {
+			commandList[ 1 ] = folder;
+			commandList[ 3 ] = "/bin/bash";
+		}
+
+		qDebug( "Opening console at %s... %s", folder.toLocal8Bit().data(), ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
+	}
 };
 
 void NBFolderView::setFocus() {

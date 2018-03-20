@@ -190,6 +190,9 @@ void NBStartup() {
 		}
 	}
 
+	if ( not settings.contains( "Terminals/Default" ) )
+		settings.setValue( "Terminals/Default", "Inbuilt" );
+
 	/*
 		*
 		* QFont Substitutions - DejaVu Sans Mono is used for addressbar, if not found use courier, or mono
