@@ -1,6 +1,6 @@
 /*
 	*
-	* NBStartUpWizard.cpp - Startup wizard header
+	* NBStartupWizard.cpp - Startup wizard header
 	*
 */
 
@@ -10,7 +10,7 @@ class NBStartupWizard : public QWizard {
 	Q_OBJECT
 
 	public:
-		NBStartupWizard( QWidget *parent = 0 );
+		NBStartupWizard();
 
 	private:
 		void createGui();
@@ -21,6 +21,7 @@ class NBStartupWizard : public QWizard {
 		QGroupBox *p2gb1;
 		QCommandLinkButton *p2btn1, *p2btn2, *p2btn3, *p2btn4;
 		QButtonGroup *p2btnGrp1;
+		QCheckBox *p2cb1;
 
 		QComboBox *p3cb1;
 		QSlider *p3sl1;
@@ -35,9 +36,25 @@ class NBStartupWizard : public QWizard {
 		QCheckBox *p6cb1;
 		QGroupBox *p6gb1;
 
+		QGroupBox *p7gb1;
+		QCommandLinkButton *p7btn1, *p7btn2;
+		QButtonGroup *p7btnGrp1;
+
+		QGroupBox *p8gb1;
+		QCommandLinkButton *p8btn1, *p8btn2;
+		QButtonGroup *p8btnGrp1;
+
+		QGroupBox *p9gb1;
+		QCommandLinkButton *p9btn1, *p9btn2;
+		QButtonGroup *p9btnGrp1;
+
+		QGroupBox *p10gb1;
+		QCheckBox *p10cb1;
+
 	protected:
 		void paintEvent( QPaintEvent *pEvent );
 
 	private Q_SLOTS:
 		void saveSettings();
+		void disableCancelOnLastPage( int );
 };

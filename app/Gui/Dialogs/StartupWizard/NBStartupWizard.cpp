@@ -1,12 +1,12 @@
 /*
 	*
-	* NBStartUpWizard.cpp - A simple startup wizard for NewBreeze
+	* NBStartupWizard.cpp - A simple startup wizard for NewBreeze
 	*
 */
 
 #include "NBStartupWizard.hpp"
 
-NBStartupWizard::NBStartupWizard( QWidget *parent ) : QWizard( parent ) {
+NBStartupWizard::NBStartupWizard() : QWizard() {
 
 	createGui();
 	setupConnections();
@@ -26,9 +26,9 @@ void NBStartupWizard::createGui() {
 
 	setButtonText( QWizard::CancelButton, "&Skip" );
 	setButtonText( QWizard::BackButton, "Go &Back" );
-	setButtonText( QWizard::NextButton, "&Continue" );
+	setButtonText( QWizard::NextButton, "Conti&nue" );
 
-	setPixmap( QWizard::LogoPixmap, QPixmap( "../../../icons/startup/nb3.png" ).scaled( 48, 48, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	setPixmap( QWizard::LogoPixmap, QPixmap( ":/icons/startup/nb3.png" ).scaled( 48, 48, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 
 	createPages();
 };
@@ -51,7 +51,7 @@ void NBStartupWizard::createPages() {
 	p1lbl1->setWordWrap( true );
 
 	QLabel *p1lbl2 = new QLabel( this );
-	p1lbl2->setPixmap( QPixmap( "../../../icons/startup/nb3.png" ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	p1lbl2->setPixmap( QPixmap( ":/icons/startup/nb3.png" ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 	p1lbl2->setAlignment( Qt::AlignCenter );
 	p1lbl2->setMinimumHeight( 256 );
 
@@ -86,6 +86,8 @@ void NBStartupWizard::createPages() {
 	p2lbl1->setWordWrap( true );
 
 	p2gb1 = new QGroupBox( "Yes, enable &grouping by default" );
+	p2gb1->setCheckable( true );
+	p2gb1->setChecked( true );
 
 	p2btn1 = new QCommandLinkButton( p2gb1 );
 	p2btn1->setCheckable( true );
@@ -95,7 +97,7 @@ void NBStartupWizard::createPages() {
 
 	p2btn2 = new QCommandLinkButton( p2gb1 );
 	p2btn2->setCheckable( true );
-	p2btn2->setChecked( false );
+	p2btn2->setChecked( true );
 	p2btn2->setText( "&Type" );
 	p2btn2->setDescription( "Files with the same extensions will be shown together." );
 
@@ -111,6 +113,9 @@ void NBStartupWizard::createPages() {
 	p2btn4->setText( "&Date" );
 	p2btn4->setDescription( "Files created around the same time will be shown together." );
 
+	p2cb1 = new QCheckBox( "&Remember settings of each folder separately (Per-folder view-settings)" );
+	p2cb1->setChecked( true );
+
 	QLabel *p2lbl2 = new QLabel(
 		"<small>Note that inside a group all the nodes will be sorted alphabetically, except for <tt>Size</tt> grouping where they will be sorted "
 		"by size. Also, in all the cases, directories will be shown at the beginning of the group, sorted alphabetically.</small>"
@@ -123,9 +128,8 @@ void NBStartupWizard::createPages() {
 	p2gb1Lyt->addWidget( p2btn3, 1, 0 );
 	p2gb1Lyt->addWidget( p2btn4, 1, 1 );
 	p2gb1Lyt->addWidget( p2lbl2, 2, 0, 1, 2 );
+	p2gb1Lyt->addWidget( p2cb1, 3, 0, 1, 2 );
 
-	p2gb1->setCheckable( true );
-	p2gb1->setChecked( false );
 	p2gb1->setLayout( p2gb1Lyt );
 
 	p2btnGrp1 = new QButtonGroup();
@@ -227,7 +231,7 @@ void NBStartupWizard::createPages() {
 	p4lbl1->setWordWrap( true );
 
 	p4cb1 = new QCheckBox( "Enable fi&ltering of folders along with files" );
-	p4cb1->setChecked( false );
+	p4cb1->setChecked( true );
 
 	QHBoxLayout *p4gb1Lyt = new QHBoxLayout();
 	p4gb1Lyt->addWidget( p4cb1 );
@@ -284,18 +288,18 @@ void NBStartupWizard::createPages() {
 
 	QWizardPage *page6 = new QWizardPage();
 	page6->setTitle( "File previews" );
-	page6->setSubTitle( "Do you want to ?" );
+	page6->setSubTitle( "Do you want to see a preview of images?" );
 
 	QLabel *p6lbl1 = new QLabel(
-		"<p>By default, NewBreeze shows an icon corresponding to the type of file in question However in some cases, "
+		"<p>By default, NewBreeze shows an icon corresponding to the type of file in question. However in some cases, "
 		"it is capable of showing the contents of the file, to a limited extent. These previews are called file thumbnails. "
 		"Currently NewBreeze can show the preview of only images. Preview of other files may be enables in the future.</p>"
 		"<p>Do you want to show image thumbnails by default?</p>"
 	);
 	p6lbl1->setWordWrap( true );
 
-	p6cb1 = new QCheckBox( "Show thumbnails of images in NewBreeze" );
-	p6cb1->setChecked( false );
+	p6cb1 = new QCheckBox( "Show &thumbnails of images in NewBreeze" );
+	p6cb1->setChecked( true );
 
 	QHBoxLayout *p6gb1Lyt = new QHBoxLayout();
 	p6gb1Lyt->addWidget( p6cb1 );
@@ -324,6 +328,193 @@ void NBStartupWizard::createPages() {
 	addPage( page6 );
 
 	//################################################################################
+	//                                    Page 07                                    #
+	//################################################################################
+
+	QWizardPage *page7 = new QWizardPage();
+	page7->setTitle( "Side Panel" );
+	page7->setSubTitle( "Which SidePanel would you like?" );
+
+	QLabel *p7lbl1 = new QLabel(
+		"A Side Panel is a quick way to access some locations, specially, external devices, HDD partitions, CD/DVD etc. "
+		"It can also show Catalogs, QuickFiles, Bookmarks and more.."
+	);
+	p7lbl1->setWordWrap( true );
+
+	p7gb1 = new QGroupBox( "Yes, enable the &SidePanel by default" );
+	p7gb1->setCheckable( true );
+	p7gb1->setChecked( true );
+
+	p7btn1 = new QCommandLinkButton( p7gb1 );
+	p7btn1->setCheckable( true );
+	p7btn1->setChecked( false );
+	p7btn1->setText( "&Modern SidePanel" );
+	p7btn1->setDescription( "A 48px side panel, showing Drives and Bookmarks using a popup menu" );
+
+	p7btn2 = new QCommandLinkButton( p7gb1 );
+	p7btn2->setCheckable( true );
+	p7btn2->setChecked( true );
+	p7btn2->setText( "Classic SideBar" );
+	p7btn2->setDescription( "A Mac Style SideBar showing Drives, Bookmarks and QuickFiles" );
+
+	QGridLayout *p7gb1Lyt = new QGridLayout();
+	p7gb1Lyt->addWidget( p7btn1, 0, 0 );
+	p7gb1Lyt->addWidget( p7btn2, 0, 1 );
+
+	p7gb1->setLayout( p7gb1Lyt );
+
+	p7btnGrp1 = new QButtonGroup();
+	p7btnGrp1->setExclusive( true );
+	p7btnGrp1->addButton( p7btn1, 0 );
+	p7btnGrp1->addButton( p7btn2, 1 );
+
+	QVBoxLayout *p7Lyt = new QVBoxLayout();
+	p7Lyt->addWidget( p7lbl1 );
+	p7Lyt->addWidget( p7gb1 );
+
+	page7->setLayout( p7Lyt );
+
+	addPage( page7 );
+
+	//################################################################################
+	//                                    Page 08                                    #
+	//################################################################################
+
+	QWizardPage *page8 = new QWizardPage();
+	page8->setTitle( "InfoBar vs InfoPanel" );
+	page8->setSubTitle( "Where do you want the details to be shown?" );
+
+	QLabel *p8lbl1 = new QLabel(
+		"A status bar is typically used to show details like, file size, permissions, modified date, etc. "
+		"InfoBar shows these details at the bottom of the window, while the InfoPanel shows it on the right. "
+		"Choose yours here!"
+	);
+	p8lbl1->setWordWrap( true );
+
+	p8gb1 = new QGroupBox( "InfoBar or InfoPanel" );
+	p8gb1->setCheckable( false );
+
+	p8btn1 = new QCommandLinkButton( p8gb1 );
+	p8btn1->setCheckable( true );
+	p8btn1->setChecked( true );
+	p8btn1->setText( "Info&Bar" );
+	p8btn1->setDescription( "Standard StatusBar showing file, folder or selection details at the bottom of the window." );
+
+	p8btn2 = new QCommandLinkButton( p8gb1 );
+	p8btn2->setCheckable( true );
+	p8btn2->setChecked( false );
+	p8btn2->setText( "Info&Panel" );
+	p8btn2->setDescription( "A panel showing file, folder or selection details at the right side of the window." );
+
+	QGridLayout *p8gb1Lyt = new QGridLayout();
+	p8gb1Lyt->addWidget( p8btn1, 0, 0 );
+	p8gb1Lyt->addWidget( p8btn2, 0, 1 );
+
+	p8gb1->setLayout( p8gb1Lyt );
+
+	p8btnGrp1 = new QButtonGroup();
+	p8btnGrp1->setExclusive( true );
+	p8btnGrp1->addButton( p8btn1, 0 );
+	p8btnGrp1->addButton( p8btn2, 1 );
+
+	QVBoxLayout *p8Lyt = new QVBoxLayout();
+	p8Lyt->addWidget( p8lbl1 );
+	p8Lyt->addWidget( p8gb1 );
+
+	page8->setLayout( p8Lyt );
+
+	addPage( page8 );
+
+	//################################################################################
+	//                                    Page 09                                    #
+	//################################################################################
+
+	QWizardPage *page9 = new QWizardPage();
+	page9->setTitle( "Startup Location" );
+	page9->setSubTitle( "What should NewBreeze show you when it starts?" );
+
+	QLabel *p9lbl1 = new QLabel(
+		"<p>When you open a file manager, it usually show you the home folder. With NB3 you have great alternatives: Catalogs or SuperStart. "
+		"While Catalogs is the NewBreeze equivalent of Libraries in Windows, SuperStart is a feature unique to NewBreeze alone.</p>"
+		"<p>Folders like WallPapers, Photos, and Images are usually scattered (some in home folder others in external drives). But it'd be great "
+		"to see them together without having to circumnavigate all the drives. You put them all in a Catalog and you'll find them together "
+		"anytime you want to see them.</p>"
+		"<p>Some file and folders are more accessed than others, and yet, it may not be suitable to put them in a particular Catalog. "
+		"Enter SuperStart: Put you frequently used files and folders into SuperStart and access them as soon as you start NewBreeze.</p>"
+	);
+	p9lbl1->setWordWrap( true );
+
+	p9gb1 = new QGroupBox( "&Start with a Special Location" );
+	p9gb1->setCheckable( true );
+	p9gb1->setChecked( true );
+
+	p9btn1 = new QCommandLinkButton( p9gb1 );
+	p9btn1->setCheckable( true );
+	p9btn1->setChecked( true );
+	p9btn1->setText( "&SuperStart" );
+	p9btn1->setDescription( "Access you most used files and folders the moment you start NewBreeze" );
+
+	p9btn2 = new QCommandLinkButton( p9gb1 );
+	p9btn2->setCheckable( true );
+	p9btn2->setChecked( false );
+	p9btn2->setText( "&Catalogs" );
+	p9btn2->setDescription( "Open NewBreeze to find similar folders in a single group" );
+
+	QGridLayout *p9gb1Lyt = new QGridLayout();
+	p9gb1Lyt->addWidget( p9btn1, 0, 0 );
+	p9gb1Lyt->addWidget( p9btn2, 0, 1 );
+
+	p9gb1->setLayout( p9gb1Lyt );
+
+	p9btnGrp1 = new QButtonGroup();
+	p9btnGrp1->setExclusive( true );
+	p9btnGrp1->addButton( p9btn1, 0 );
+	p9btnGrp1->addButton( p9btn2, 1 );
+
+	QVBoxLayout *p9Lyt = new QVBoxLayout();
+	p9Lyt->addWidget( p9lbl1 );
+	p9Lyt->addWidget( p9gb1 );
+
+	page9->setLayout( p9Lyt );
+
+	addPage( page9 );
+
+	//################################################################################
+	//                                    Page 10                                    #
+	//################################################################################
+
+	QWizardPage *page10 = new QWizardPage();
+	page10->setTitle( "Close to tray" );
+	page10->setSubTitle( "Do you want NewBreeze to stay in the SystemTray after closing?" );
+
+	QLabel *p10lbl1 = new QLabel(
+		"<p>Usually when you close the main window of an application, the program closes and memory is freed for other purposes. "
+		"However, a file manager is one of the most used programs in an OS and need to be loaded often. Instead of closing it "
+		"completely, we can close the main window and keep NewBreeze open in tray. This was it takes far much shorter time for it "
+		"start up again.</p>"
+		"<p>Do you want NewBreeze to stay in the SystemTray after close of the application?</p>"
+	);
+	p10lbl1->setWordWrap( true );
+
+	p10cb1 = new QCheckBox( "&Close to System Tray" );
+	p10cb1->setChecked( true );
+
+	QHBoxLayout *p10gb1Lyt = new QHBoxLayout();
+	p10gb1Lyt->addWidget( p10cb1 );
+
+	p10gb1 = new QGroupBox( "Tray Icon" );
+	p10gb1->setLayout( p10gb1Lyt );
+
+	QVBoxLayout *p10Lyt = new QVBoxLayout();
+	p10Lyt->addWidget( p10lbl1 );
+	p10Lyt->addWidget( new QLabel( " " ) );
+	p10Lyt->addWidget( p10gb1 );
+
+	page10->setLayout( p10Lyt );
+
+	addPage( page10 );
+
+	//################################################################################
 	//                                    EndPage                                    #
 	//################################################################################
 
@@ -333,30 +524,37 @@ void NBStartupWizard::createPages() {
 		"<center><h3>Thank you for choosing NewBreeze v3.0</h3></center>"
 	);
 
-	QLabel *pLlbl2 = new QLabel(
+	QLabel *pLlbl2 = new QLabel();
+	pLlbl2->setPixmap( QPixmap( ":/icons/startup/nb3.png" ).scaled( 64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	pLlbl2->setAlignment( Qt::AlignCenter );
+	pLlbl2->setMinimumHeight( 128 );
+
+	QLabel *pLlbl3 = new QLabel(
 		"<center><p>Hope your experience with NewBreeze is a pleasant one.</p><br style='line-height: 5%;'>"
 		"<p><a href = 'mailto:marcusbritanicus@gmail.com'>Drop in</a> a word of appreciation if you enjoyed the experience, and "
 		"feel free to distribute NewBreeze to all your family, friends and colleagues.</p><br style='line-height: 5%;'>"
 		"<p>If you stumbled across an annoying bug which ruined your time, do not hesitate to file a bug report "
 		"<a href = 'https://github.com/marcusbritanicus/NewBreeze/issues/new'>here</a>.</p></center>"
 	);
-	pLlbl2->setWordWrap( true );
-	pLlbl2->setOpenExternalLinks( true );
+	pLlbl3->setWordWrap( true );
+	pLlbl3->setOpenExternalLinks( true );
 
 	QGroupBox *pLgb1 = new QGroupBox();
 	pLgb1->setFixedWidth( 461 );
 	QVBoxLayout *pLgb1lyt = new QVBoxLayout();
-	pLgb1lyt->addWidget( pLlbl2 );
+	pLgb1lyt->addWidget( pLlbl3 );
 	pLgb1->setLayout( pLgb1lyt );
 
 	QVBoxLayout *pLlyt = new QVBoxLayout();
 	pLlyt->setAlignment( Qt::AlignCenter );
 	pLlyt->addWidget( pLlbl1 );
 	pLlyt->addStretch();
+	pLlyt->addWidget( pLlbl2 );
 	pLlyt->addWidget( pLgb1 );
 	pLlyt->addStretch();
 
 	pageL->setLayout( pLlyt );
+	pageL->setFinalPage( true );
 
 	addPage( pageL );
 };
@@ -369,8 +567,8 @@ void NBStartupWizard::setupConnections() {
 	@return None
 	*/
 
-	connect( p2gb1, SIGNAL(), this, SLOT( saveSettings() ) );
-	connect( p2btnGrp1, SIGNAL(), this, SLOT( saveSettings() ) );
+	connect( this, SIGNAL( currentIdChanged( int ) ), this, SLOT( disableCancelOnLastPage( int ) ) );
+	connect( this, SIGNAL( finished( int ) ), this, SLOT( saveSettings() ) );
 };
 
 void NBStartupWizard::setWindowProperties() {
@@ -399,6 +597,65 @@ void NBStartupWizard::setWindowProperties() {
 
 void NBStartupWizard::saveSettings() {
 
+	QSettings settings( "NewBreeze", "NewBreeze" );
+
+	/* Grouping */
+	settings.setValue( "Grouping", p2gb1->isChecked() );
+	if ( p2btnGrp1->checkedId() == -1 )
+		settings.setValue( "SortColumn", 2 );
+
+	else if ( p2btnGrp1->checkedId() < 3 )
+		settings.setValue( "SortColumn", p2btnGrp1->checkedId() );
+
+	else  // if ( p2btnGrp1->checkedId() == 0 )
+		settings.setValue( "SortColumn", 4 );
+
+	settings.setValue( "PerFolderViews", p2cb1->isChecked() );
+
+	/* ViewMode and Icon Size */
+	settings.setValue( "ViewMode", p3cb1->currentText() );
+	settings.setValue( "IconSize", QSize( p3sl1->value(), p3sl1->value() ) );
+
+	/* Folder Filtering */
+	settings.setValue( "FilterFolders", p4cb1->isChecked() );
+
+	/* Case-sensitive sorting */
+	settings.setValue( "SortCase", p5cb1->isChecked() );
+
+	/* Case-sensitive sorting */
+	settings.setValue( "ImagePreviews", p6cb1->isChecked() );
+
+	/* SidePanel */
+	settings.setValue( "SidePanel", p7gb1->isChecked() );
+	settings.setValue( "SidePanelType", p7btnGrp1->checkedId() );
+
+	/* InfoBar/InfoPanel */
+	if ( p8btnGrp1->checkedId() )
+		settings.setValue( "InfoPanel", true );
+	else
+		settings.setValue( "InfoPanel", false );
+
+	/* InfoBar/InfoPanel */
+	if ( p9gb1->isChecked() ) {
+		settings.setValue( "SpecialOpen", true );
+		if ( p9btnGrp1->checkedId() ) {
+			settings.setValue( "OpenWithCatalog", false );
+			settings.setValue( "SuperStart", true );
+		}
+	}
+
+	else {
+		settings.setValue( "SpecialOpen", false );
+		settings.setValue( "OpenWithCatalog", false );
+		settings.setValue( "SuperStart", false );
+	}
+
+	// /* TrayIcon */
+	settings.setValue( "TrayIcon", p10cb1->isChecked() );
+
+	/* Sync the settings */
+	settings.sync();
+
 	close();
 };
 
@@ -419,4 +676,13 @@ void NBStartupWizard::paintEvent( QPaintEvent *pEvent ) {
 	painter.end();
 
 	pEvent->accept();
+};
+
+void NBStartupWizard::disableCancelOnLastPage( int id ) {
+
+	if ( ( id >= 0 ) and page( id )->isFinalPage() )
+		button( QWizard::CancelButton )->setDisabled( true );
+
+	else
+		button( QWizard::CancelButton )->setEnabled( true );
 };

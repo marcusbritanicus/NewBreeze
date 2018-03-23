@@ -50,6 +50,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	connect( defaultGroupingCB, SIGNAL( toggled( bool ) ), this, SLOT( handleGroupingChanged( bool ) ) );
 
 	defaultSortCaseCB = new QCheckBox( "Enable c&ase sensitive file and folder sorting", this );
+	defaultSortCaseCB->setChecked( sett.value( "SortCase" ).toBool() );
 	connect( defaultSortCaseCB, SIGNAL( toggled( bool ) ), this, SLOT( handleSortCaseChanged( bool ) ) );
 
 	defaultSortClmnCB = new QComboBox( this );

@@ -397,7 +397,7 @@ void NBVfsIcon::showDevices() {
 		devView->addAction( wa );
 	};
 
-	closeTimer.start( 10000, this );
+	closeTimer.start( 1500, this );
 	devView->exec( mapToGlobal( QPoint( 49, 0 ) ) );
 };
 

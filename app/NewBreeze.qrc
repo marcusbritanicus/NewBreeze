@@ -112,6 +112,8 @@
 		<file>icons/encrypt.png</file>
 		<file>icons/key.png</file>
 
+		<file>icons/startup/nb3.png</file>
+
 		<file>README</file>
 
 		<file>../data/NBFSExtData.conf</file>

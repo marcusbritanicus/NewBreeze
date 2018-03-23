@@ -8,6 +8,7 @@
 #include "NBPluginManager.hpp"
 #include "NBMessageDialog.hpp"
 #include "NBBugReporter.hpp"
+#include "NBStartupWizard.hpp"
 
 void detectCrash() {
 
@@ -51,6 +52,17 @@ void NBStartup() {
 		*
 	*/
 	detectCrash();
+
+	/*
+		*
+		* StartupWizard
+		*
+	*/
+	if ( not exists( NBXdg::home() + ".config/NewBreeze/NewBreeze.conf" ) ) {
+		NBStartupWizard *startWiz = new NBStartupWizard();
+		startWiz->exec();
+		Settings->reload();
+	}
 
 	/*
 		*
