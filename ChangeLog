@@ -2,6 +2,9 @@ Version 3.0.0 Beta
 	- Feature: Inbuilt encryption support via NBVault
 	- Feature: Inbuilt desktop file editor
 	- Feature: Partial folding of categories
+	- Feature: Inbuilt terminal plugin, terminal choice
+	- Feature: NBInfoPanel gives details on the right side panel
+	- Improvements to NBSideBar
 	- Improvements to NBSidePanel
 	- Fixed NBIconView selection bugs
 	- Qt5 now preferred Qt version

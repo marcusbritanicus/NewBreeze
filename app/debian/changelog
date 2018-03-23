@@ -1,3 +1,13 @@
+newbreeze (3.0.0-beta3) unstable; urgency=medium
+
+  * Several bug fixes
+  * Added inbuilt terminal plugin support
+  * Added terminal choice settings
+  * Improvements to NBSideBar
+  * NBInfoPanel bug fixes
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Fri, 20 Mar 2018 23:17:00 +0530
+
 newbreeze (3.0.0-beta2) unstable; urgency=low
 
   * Feature: Inbuilt encryption support via NBVault
