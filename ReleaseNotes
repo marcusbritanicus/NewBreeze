@@ -88,3 +88,11 @@ few changes in NewBreeze 3.
    - NBCrypt Plugin is deprecated and a dummy will be installed in its place. (Will be removed in V3 stable release.)
    - Create a new ecrypted directory by pressing Ctrl+Shift+U.
    - Existing files/directories can be encrypted by choosing Actions > Encrypt in the context menu.
+
+=> Startup Wizard
+   - If you are using NewBreeze for the first time, the Startup Wizard shows.
+   - You can do some basic settings which are all accessible in NB Settings Dialog.
+   - Eventually the Startup Wizard will serve as a feature tour guide.
+
+=> BugReporter
+   - A very basic interface which creates a simple issue on the github issue page.

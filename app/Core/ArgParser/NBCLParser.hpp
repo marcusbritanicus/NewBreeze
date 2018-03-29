@@ -23,6 +23,7 @@ enum  optionIndex {
 	SETTINGS,
 	ABOUTNB,
 	LICENSE,
+	REPORTBUG,
 	FORCENEW,
 	NORMAL
 };

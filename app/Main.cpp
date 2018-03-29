@@ -32,6 +32,7 @@
 #include "NBMessageDialog.hpp"
 #include "AboutNB.hpp"
 #include "NBSettingsManager.hpp"
+#include "NBBugReporter.hpp"
 #include "NewBreezeTray.hpp"
 
 #include "NBLogger.hpp"
@@ -127,11 +128,20 @@ int main( int argc, char **argv ) {
 			return 0;
 		}
 
-		/* We want only the about dialog */
+		/* We want only the license dialog */
 		case LICENSE : {
 			qDebug() << "Showing NewBreeze License";
 			License *license = new License();
 			license->exec();
+
+			return 0;
+		}
+
+		/* We want only the bug report dialog */
+		case REPORTBUG : {
+			qDebug() << "Showing NewBreeze BugReporter";
+			NBBugReporter *bugreport = new NBBugReporter();
+			bugreport->exec();
 
 			return 0;
 		}

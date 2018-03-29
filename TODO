@@ -15,10 +15,10 @@ NBIconView                                                                      
 	✓ Fix drag-and-drop to take care of SuperStart
 
 BugReporting                                                                                                                          [ 0 of 1 ]
-	□ Option for bug reporting - will be added CLI option and menu option
+	✍ Option for bug reporting - will be added as CLI option and menu option to be added later
 
-StartupWizard                                                                                                                         [ 0 of 1 ]
-	□ Startup Wizard to initiate basic settings
+StartupWizard                                                                                                                         [ 1 of 1 ]
+	✓ Startup Wizard to initiate basic settings
 
 Note:
 	✍ - Work in progress

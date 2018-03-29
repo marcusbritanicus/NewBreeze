@@ -57,10 +57,13 @@ const option::Descriptor usage[] = {
     { SETTINGS,   0,   "s",    "settings",    Arg::None,        "    -s, --settings   Open the settings dialog." },
 
 	/* Print the about option */
-    { ABOUTNB,      0,   "a",    "about",     Arg::None,        "    -a, --about      Show the about NewBreeze dialog." },
+    { ABOUTNB,    0,   "a",    "about",       Arg::None,        "    -a, --about      Show the about NewBreeze dialog." },
 
 	/* Print the about option */
-    { LICENSE,      0,   "l",    "license",   Arg::None,        "    -l, --license    Show the NewBreeze License dialog." },
+    { LICENSE,    0,   "l",    "license",     Arg::None,        "    -l, --license    Show the NewBreeze License dialog." },
+
+	/* Print the bug report option */
+    { REPORTBUG,  0,   "b",    "reportbug",   Arg::None,        "    -b, --reportbug  Open the bug reporter dialog" },
 
 	/* Print the force-new option */
     { FORCENEW,   0,   "f",    "force-new",   Arg::None,        "    -f, --force-new  Kill the old server and start a new one." },
@@ -78,6 +81,7 @@ const option::Descriptor usage[] = {
                                                                 "    newbreeze --settings                   # Opens the settings dialog\n"
                                                                 "    newbreeze -a                           # Opens the about NB dialog\n"
                                                                 "    newbreeze --license                    # Opens the NB license dialog\n"
+                                                                "    newbreeze --REPORTBUG                  # Opens the NB REPORTBUGer dialog\n"
                                                                 "    newbreeze --force-new                  # Kills the existsing server and "
                                                                                                             "opens window at the last opened location\n"
                                                                 "    newbreeze --force-new /home/cosmos     # Kills the existsing server and "
@@ -184,6 +188,13 @@ int NBArgParser( int argc, char** argv ) {
 			fprintf( stdout, "Ignoring the %d extra arguments specified...\n", parse.optionsCount() + parse.nonOptionsCount() - 1 );
 
 		return LICENSE;
+	}
+
+	if ( options[ REPORTBUG ] ) {
+		if( argc > 1 )
+			fprintf( stdout, "Ignoring the %d extra arguments specified...\n", parse.optionsCount() + parse.nonOptionsCount() - 1 );
+
+		return REPORTBUG;
 	}
 
 	/* If there some other argument was given to @a --settings, ignore it, but print it to let the user know */

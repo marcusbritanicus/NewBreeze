@@ -482,7 +482,7 @@ QStringList sortCategoryList( QStringList& cList ) {
 		/* Date sort */
 		/* We convert all the String dates to QDates, sort them and then convert them back to String */
 		case 4: {
-			QStringList alphaDates = QStringList() << "Today" <<"This Week" << "Last Week" << "This Month" << "Last Month";
+			QStringList alphaDates = QStringList() << "Today" << "This Week" << "Last Week" << "This Month" << "Last Month";
 
 			QList<QDate> dList;
 			QStringList nList;

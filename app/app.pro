@@ -27,7 +27,7 @@ DEPENDPATH += ../common/ ../common/include
 
 # Source Paths
 INCLUDEPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager Gui Gui/Dialogs
-INCLUDEPATH += Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BugCatcher Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
+INCLUDEPATH += Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BugReporter Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
 INCLUDEPATH += Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
 INCLUDEPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
 INCLUDEPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTypeModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views Gui/ModelViews/Views/IconView
@@ -38,7 +38,7 @@ INCLUDEPATH += Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/ProcessMana
 INCLUDEPATH += Gui/Widgets/TrashManager
 
 DEPENDPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager Gui Gui/Dialogs
-DEPENDPATH += Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BugCatcher Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
+DEPENDPATH += Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BugReporter Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog Gui/Dialogs/FileDialog
 DEPENDPATH += Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
 DEPENDPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
 DEPENDPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTypeModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views Gui/ModelViews/Views/IconView
@@ -63,7 +63,7 @@ HEADERS += Core/ProcessManager/NBProcessManager.hpp
 HEADERS += Global.hpp
 HEADERS += Gui/Dialogs/AppEditor/NBAppEditorDialog.hpp
 HEADERS += Gui/Dialogs/Archive/NBArchiveDialog.hpp
-HEADERS += Gui/Dialogs/BugCatcher/NBBugReporter.hpp
+HEADERS += Gui/Dialogs/BugReporter/NBBugReporter.hpp
 HEADERS += Gui/Dialogs/ConfirmDeleteDialog/NBConfirmDeleteDialog.hpp
 HEADERS += Gui/Dialogs/Dialog/AboutNB.hpp
 HEADERS += Gui/Dialogs/Dialog/NBDialog.hpp
@@ -185,7 +185,7 @@ SOURCES += Core/ProcessManager/NBIOProcess.cpp
 SOURCES += Core/ProcessManager/NBProcessManager.cpp
 SOURCES += Gui/Dialogs/AppEditor/NBAppEditorDialog.cpp
 SOURCES += Gui/Dialogs/Archive/NBArchiveDialog.cpp
-SOURCES += Gui/Dialogs/BugCatcher/NBBugReporter.cpp
+SOURCES += Gui/Dialogs/BugReporter/NBBugReporter.cpp
 SOURCES += Gui/Dialogs/ConfirmDeleteDialog/NBConfirmDeleteDialog.cpp
 SOURCES += Gui/Dialogs/Dialog/AboutNB.cpp
 SOURCES += Gui/Dialogs/Dialog/NBDialog.cpp
