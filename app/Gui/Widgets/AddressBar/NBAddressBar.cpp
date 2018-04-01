@@ -197,7 +197,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	setFixedHeight( 28 );
 
 	QHBoxLayout *fLyt = new QHBoxLayout();
-	fLyt->setContentsMargins( QMargins( 3, 0, 0, 0 ) );
+	fLyt->setContentsMargins( QMargins( 3, 0, 3, 0 ) );
 
 	// Previous button
 
@@ -229,41 +229,6 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	// AddressWidget
 	addressWidget = new NBAddressWidget( this );
 
-	// View Modes
-	viewModes = new NBSegmentButton( this );
-	viewModes->setObjectName( "base" );
-
-	viewModes->setFocusPolicy( Qt::NoFocus );
-	viewModes->setCount( 3 );
-	viewModes->setSelectionBehavior( NBSegmentButton::SelectOne );
-
-	// Tiles
-	viewModes->setSegmentIcon( 0, icon( NBIconManager::instance()->icon( "view-list-details" ) ) );
-	viewModes->segment( 0 )->setFocusPolicy( Qt::NoFocus );
-
-	// Icons
-	viewModes->setSegmentIcon( 1, icon( NBIconManager::instance()->icon( "view-list-icons" ) ) );
-	viewModes->segment( 1 )->setFocusPolicy( Qt::NoFocus );
-
-	// Details
-	viewModes->setSegmentIcon( 2, icon( NBIconManager::instance()->icon( "view-list-text" ) ) );
-	viewModes->segment( 2 )->setFocusPolicy( Qt::NoFocus );
-
-	if ( Settings->General.ViewMode == "Tiles" ) {
-		viewModes->segment( 0 )->setChecked( true );
-		emit changeViewMode( 0 );
-	}
-
-	else if ( Settings->General.ViewMode == "Icons" ) {
-		viewModes->segment( 1 )->setChecked( true );
-		emit changeViewMode( 1 );
-	}
-
-	else {
-		viewModes->segment( 2 )->setChecked( true );
-		emit changeViewMode( 2 );
-	}
-
 	// FilterButton
 	filterBtn = new NBButton( icon( NBIconManager::instance()->icon( "edit-find" ) ) );
 	filterBtn->setObjectName( "base" );
@@ -272,6 +237,9 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	// Process Widget
 	mProcWidget = new NBProcessManagerMini( this );
 	mProcWidget->setObjectName( "base" );
+
+	// Menu Button
+	menuBtn = new NBMenuButton( this );
 
 	addressWidget->addressEdit->setFocusPolicy( Qt::ClickFocus );
 	addressWidget->crumbsBar->setFocusPolicy( Qt::NoFocus );
@@ -283,9 +251,9 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( filterBtn );
 	fLyt->addWidget( Separator::vertical() );
-	fLyt->addWidget( viewModes );
-	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( mProcWidget );
+	fLyt->addWidget( Separator::vertical() );
+	fLyt->addWidget( menuBtn );
 
 	QWidget *base = new QWidget( this );
 	base->setObjectName( "baseWidget" );
@@ -305,7 +273,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	connect( forwardBtn, SIGNAL( clicked() ), this, SIGNAL( goForward() ) );
 	connect( addressWidget, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
 	connect( filterBtn, SIGNAL( clicked() ), this, SIGNAL( openSearch() ) );
-	connect( viewModes, SIGNAL( clicked( int ) ), this, SIGNAL( changeViewMode( int ) ) );
+	connect( menuBtn, SIGNAL( changeViewMode( int ) ), this, SIGNAL( changeViewMode( int ) ) );
 };
 
 void NBAddressBar::updateNavigationButtons( bool bBtn, bool fBtn ) {
@@ -347,12 +315,5 @@ void NBAddressBar::showSearchButton() {
 
 void NBAddressBar::updateViewMode( QString mode ) {
 
-	if ( mode == "Tiles" )
-		viewModes->segment( 0 )->setChecked( true );
-
-	else if ( mode == "Icons" )
-		viewModes->segment( 1 )->setChecked( true );
-
-	else
-		viewModes->segment( 2 )->setChecked( true );
+	menuBtn->updateViewMode( mode );
 };

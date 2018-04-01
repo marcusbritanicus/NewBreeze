@@ -10,6 +10,7 @@
 
 #include "AboutNB.hpp"
 #include "NBAddressBar.hpp"
+#include "NBAppEditorDialog.hpp"
 #include "NBCustomActions.hpp"
 #include "NBFilterWidget.hpp"
 #include "NBFolderView.hpp"
@@ -24,7 +25,6 @@
 #include "NBSidePanel.hpp"
 #include "NBTerminal.hpp"
 #include "NBTrashManager.hpp"
-#include "NBAppEditorDialog.hpp"
 
 class NewBreeze : public QMainWindow {
 	Q_OBJECT

@@ -17,9 +17,12 @@
 		<file>icons/cancel.png</file>
 		<file>icons/catalogs-alt.png</file>
 		<file>icons/catalogs.png</file>
-		<file>icons/checkbox_checked.png</file>
-		<file>icons/checkbox_halfchecked.png</file>
-		<file>icons/checkbox_unchecked.png</file>
+		<file>icons/category-collapse.png</file>
+		<file>icons/category-expand.png</file>
+		<file>icons/checkbox-checked.png</file>
+		<file>icons/checkbox-hover.png</file>
+		<file>icons/checkbox-halfchecked.png</file>
+		<file>icons/checkbox-unchecked.png</file>
 		<file>icons/close.png</file>
 		<file>icons/comp.png</file>
 		<file>icons/compress.png</file>
@@ -58,6 +61,7 @@
 		<file>icons/list-add.png</file>
 		<file>icons/list-remove.png</file>
 		<file>icons/maximize.png</file>
+		<file>icons/menu.png</file>
 		<file>icons/minimize.png</file>
 		<file>icons/move.png</file>
 		<file>icons/network.png</file>
@@ -85,6 +89,7 @@
 		<file>icons/radiobutton_unchecked.png</file>
 		<file>icons/reload.png</file>
 		<file>icons/rename.png</file>
+		<file>icons/reportbug.png</file>
 		<file>icons/searchn.png</file>
 		<file>icons/search.png</file>
 		<file>icons/select1.png</file>

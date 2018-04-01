@@ -11,6 +11,7 @@
 #include "NBCrumbsBar.hpp"
 #include "NBButton.hpp"
 #include "NBButtons.hpp"
+#include "NBMenuButton.hpp"
 #include "NBProcessManagerUI.hpp"
 
 class NBToggleButton : public QWidget {
@@ -88,10 +89,10 @@ class NBAddressBar : public QWidget {
 
 	private:
 		NBButton *backBtn, *forwardBtn, *homeBtn, *ssBtn;
-		NBButton *settingsBtn, *filterBtn;
-		NBSegmentButton *viewModes;
+		NBButton *filterBtn;
 		NBAddressWidget *addressWidget;
 		NBProcessManagerMini *mProcWidget;
+		NBMenuButton *menuBtn;
 
 	public slots:
 		void focusAddressEdit();
