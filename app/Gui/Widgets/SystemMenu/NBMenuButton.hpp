@@ -16,6 +16,10 @@ class NBMenuButton : public QToolButton {
 	public:
 		/* A button */
 		NBMenuButton( QWidget *parent = NULL );
+		inline void updateAddress( QString url ) {
+
+			menu->updateAddress( url );
+		};
 
 	private:
 		NBSystemMenu *menu;
@@ -25,6 +29,27 @@ class NBMenuButton : public QToolButton {
 		void updateViewMode( QString );
 
 	Q_SIGNALS:
-		void openLocation( QString );
+		void newWindow();
+
+		void zoomIn();
+		void zoomOut();
+
+		void cut();
+		void copy();
+		void paste();
+
+		void openVTE();
+
 		void changeViewMode( int );
+
+		void sortByName();
+		void sortByType();
+		void sortBySize();
+		void sortByDate();
+		void toggleGrouping();
+
+		void showSettings();
+
+		void closeWindow();
+		void quit();
 };

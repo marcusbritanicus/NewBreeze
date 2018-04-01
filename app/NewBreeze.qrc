@@ -96,7 +96,10 @@
 		<file>icons/selectall.png</file>
 		<file>icons/shortcuts.png</file>
 		<file>icons/show-folders.png</file>
-		<file>icons/size.png</file>
+		<file>icons/sort-name.png</file>
+		<file>icons/sort-date.png</file>
+		<file>icons/sort-type.png</file>
+		<file>icons/sort-size.png</file>
 		<file>icons/stop.png</file>
 		<file>icons/superstart.png</file>
 		<file>icons/text.png</file>

@@ -342,6 +342,7 @@ void NBIconView::reload() {
 
 		viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
 		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+		Settings->General.SortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
 	}
 
 	else {
@@ -349,6 +350,7 @@ void NBIconView::reload() {
 
 		viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
 		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+		Settings->General.SortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
 	}
 
 	emit updateViewMode( viewMode );

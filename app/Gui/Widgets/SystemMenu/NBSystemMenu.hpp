@@ -1,12 +1,13 @@
 /*
 	*
-	* NBSideBarGroup.hpp - SideBarGruop class Header
+	* NBSystemMenu.hpp - NewBreeze Menu Class Header
 	*
 */
 
 #pragma once
 
 #include "Global.hpp"
+#include "NBBugReporter.hpp"
 
 class NBMenuItem : public QLabel {
 	Q_OBJECT
@@ -17,12 +18,26 @@ class NBMenuItem : public QLabel {
 		QString name();
 		QIcon icon();
 
+		void setCheckable( bool );
+
+		inline bool isChecked() {
+			return mChecked;
+		};
+
+		inline void setChecked( bool check ) {
+			mChecked = check;
+			repaint();
+		};
+
 	private:
 		QString mName;
 		QString mIcon;
 
 		bool mPressed;
 		bool mHover;
+
+		bool mChecked;
+		bool mCheckable;
 
 	protected:
 		void enterEvent( QEvent* );
@@ -34,6 +49,21 @@ class NBMenuItem : public QLabel {
 
 	Q_SIGNALS:
 		void clicked();
+};
+
+class NBMenuItemGroup : public QObject {
+	Q_OBJECT
+
+	public:
+		NBMenuItemGroup();
+		void addMenuItem( NBMenuItem *itm );
+
+	private:
+		QList<NBMenuItem*>mItems;
+		int mCurrent;
+
+	private Q_SLOTS:
+		void makeExclusive();
 };
 
 class NBMenuItemButton : public QToolButton {
@@ -56,16 +86,31 @@ class NBSystemMenu : public QWidget {
 	public:
 		NBSystemMenu( QWidget *parent );
 
+		inline void updateAddress( QString addr ) {
+
+			mAddress = addr;
+		};
+
 		void populateMenu();
 
 	public Q_SLOTS:
 		void exec( QPoint );
+		void viewModesClicked();
+
+		void reportBug();
+		void updateZoomIn();
+		void updateZoomOut();
 
 	private:
-		QList<NBMenuItem*> itemList;
-
-		QWidget *itemsBase;
 		QVBoxLayout *itemsLayout;
+
+		NBMenuItemButton *iconsBtn, *tilesBtn, *detailsBtn;
+		NBMenuItem *nSortBtn, *tSortBtn, *sSortBtn, *dSortBtn;
+		NBMenuItemCheck *groupCheck;
+
+		QLabel *zoomLbl;
+
+		QString mAddress;
 
 	protected:
 		void closeEvent( QCloseEvent *cEvent );
@@ -73,4 +118,28 @@ class NBSystemMenu : public QWidget {
 	Q_SIGNALS:
 		void clicked();
 		void closed();
+
+		void newWindow();
+
+		void zoomIn();
+		void zoomOut();
+
+		void cut();
+		void copy();
+		void paste();
+
+		void openVTE();
+
+		void changeViewMode( int );
+
+		void sortByName();
+		void sortByType();
+		void sortBySize();
+		void sortByDate();
+		void toggleGrouping();
+
+		void showSettings();
+
+		void closeWindow();
+		void quit();
 };

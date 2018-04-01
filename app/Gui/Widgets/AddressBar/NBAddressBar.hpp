@@ -85,8 +85,6 @@ class NBAddressBar : public QWidget {
 
 		void updateNavigationButtons( bool, bool );
 
-		int checkedAction();
-
 	private:
 		NBButton *backBtn, *forwardBtn, *homeBtn, *ssBtn;
 		NBButton *filterBtn;
@@ -100,15 +98,36 @@ class NBAddressBar : public QWidget {
 		void showSearchButton();
 		void hideSearchButton();
 
-		void updateViewMode( QString );
-
 	Q_SIGNALS:
 		void openLocation( QString );
 		void openSearch();
-		void changeViewMode( int );
 
 		void goBack();
 		void goHome();
 		void openSuperStart();
 		void goForward();
+
+		void newWindow();
+
+		void zoomIn();
+		void zoomOut();
+
+		void cut();
+		void copy();
+		void paste();
+
+		void openVTE();
+
+		void changeViewMode( int );
+
+		void sortByName();
+		void sortByType();
+		void sortBySize();
+		void sortByDate();
+		void toggleGrouping();
+
+		void showSettings();
+
+		void closeWindow();
+		void quit();
 };

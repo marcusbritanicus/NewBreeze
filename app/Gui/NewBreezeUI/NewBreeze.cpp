@@ -226,7 +226,6 @@ void NewBreeze::setWindowProperties() {
 
 void NewBreeze::createAndSetupActions() {
 
-	connect( AddressBar, SIGNAL( changeViewMode( int ) ), this, SLOT( changeViewMode( int ) ) );
 	connect( AddressBar, SIGNAL( openLocation( QString ) ), FolderView, SLOT( doOpen( QString ) ) );
 	connect( AddressBar, SIGNAL( openSearch() ), FilterWidget, SLOT( show() ) );
 
@@ -234,6 +233,30 @@ void NewBreeze::createAndSetupActions() {
 	connect( AddressBar, SIGNAL( goHome() ), FolderView, SLOT( loadHomeDir() ) );
 	connect( AddressBar, SIGNAL( openSuperStart() ), FolderView, SLOT( doOpenSS() ) );
 	connect( AddressBar, SIGNAL( goForward() ), FolderView, SLOT( goForward() ) );
+
+	connect( AddressBar, SIGNAL( newWindow() ), this, SLOT( newWindow() ) );
+
+	connect( AddressBar, SIGNAL( zoomIn() ), FolderView->IconView, SLOT( zoomIn() ) );
+	connect( AddressBar, SIGNAL( zoomOut() ), FolderView->IconView, SLOT( zoomOut() ) );
+
+	connect( AddressBar, SIGNAL( cut() ), FolderView, SLOT( prepareMove() ) );
+	connect( AddressBar, SIGNAL( copy() ), FolderView, SLOT( prepareCopy() ) );
+	connect( AddressBar, SIGNAL( paste() ), FolderView, SLOT( prepareIO() ) );
+
+	connect( AddressBar, SIGNAL( openVTE() ), FolderView, SLOT( openTerminal() ) );
+
+	connect( AddressBar, SIGNAL( changeViewMode( int ) ), this, SLOT( changeViewMode( int ) ) );
+
+	connect( AddressBar, SIGNAL( sortByName() ), FolderView, SLOT( sortByName() ) );
+	connect( AddressBar, SIGNAL( sortByType() ), FolderView, SLOT( sortByType() ) );
+	connect( AddressBar, SIGNAL( sortBySize() ), FolderView, SLOT( sortBySize() ) );
+	connect( AddressBar, SIGNAL( sortByDate() ), FolderView, SLOT( sortByDate() ) );
+	connect( AddressBar, SIGNAL( toggleGrouping() ), this, SLOT( toggleGrouping() ) );
+
+	connect( AddressBar, SIGNAL( showSettings() ), this, SLOT( showSettingsDialog() ) );
+
+	connect( AddressBar, SIGNAL( closeWindow() ), this, SLOT( close() ) );
+	connect( AddressBar, SIGNAL( quit() ), this, SLOT( quit() ) );
 
 	connect( FilterWidget, SIGNAL( search( QString ) ), this, SLOT( filterFiles( QString ) ) );
 	connect( FilterWidget, SIGNAL( shown() ), AddressBar, SLOT( hideSearchButton() ) );
@@ -264,9 +287,6 @@ void NewBreeze::createAndSetupActions() {
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( setBusyCursor() ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( setNormalCursor() ) );
-
-	/* Update View Modes on the UI */
-	connect( FolderView->IconView, SIGNAL( updateViewMode( QString ) ), AddressBar, SLOT( updateViewMode( QString ) ) );
 
 	/* Update GUI if terminal cwd changes */
 	connect( Terminal, SIGNAL( chdir( QString ) ), this, SLOT( chdirUI( QString ) ) );
@@ -845,17 +865,21 @@ void NewBreeze::switchToNextView() {
 
 void NewBreeze::toggleGrouping() {
 
-	if ( Settings->General.Grouping )
-		Settings->General.Grouping = false;
-
-	else
-		Settings->General.Grouping = true;
-
 	FolderView->fsModel->setCategorizationEnabled( Settings->General.Grouping );
 	FolderView->groupsAct->setChecked( Settings->General.Grouping );
 
-	QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-	sett.setValue( "NewBreeze/Grouping", Settings->General.Grouping );
+	if ( not FolderView->fsModel->isRealLocation() ) {
+		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", location );
+		sett.setValue( "NewBreeze/Grouping", not Settings->General.Grouping );
+		sett.sync();
+	}
+
+	else {
+		QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/Grouping", not Settings->General.Grouping );
+		sett.sync();
+	}
 };
 
 void NewBreeze::toggleSideBarVisible() {

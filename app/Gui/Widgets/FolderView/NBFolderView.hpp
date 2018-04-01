@@ -56,7 +56,6 @@ class NBFolderView : public QStackedWidget {
 		NBIconView *IconView;
 
 		NBItemViewModel *fsModel;
-		NBActionsMenu *customMenu;
 
 	private :
 		QModelIndex indexAt( QPoint );
@@ -66,6 +65,8 @@ class NBFolderView : public QStackedWidget {
 
 		QClipboard *clipBoard;
 		NBProcessManager *pMgr;
+
+		NBActionsMenu *customMenu;
 
 	public slots :
 		void goUp();

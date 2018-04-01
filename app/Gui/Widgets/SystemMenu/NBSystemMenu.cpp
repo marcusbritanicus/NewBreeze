@@ -1,6 +1,6 @@
 /*
 	*
-	* NBMenuButton.cpp - Alternate PushButton/ToolButton for NewBreeze
+	* NBSystemMenu.hpp - NewBreeze Menu Class
 	*
 */
 
@@ -13,6 +13,9 @@ NBMenuItem::NBMenuItem( QString name, QString icon, QWidget *parent ) : QLabel( 
 
 	mName = name;
 	mIcon = icon;
+
+	mChecked = false;
+	mCheckable = false;
 
 	setContentsMargins( 32, 0, 0, 0 );
 	setText( mName );
@@ -32,6 +35,13 @@ QString NBMenuItem::name() {
 QIcon NBMenuItem::icon() {
 
 	return QIcon( mIcon );
+};
+
+void NBMenuItem::setCheckable( bool checkable ) {
+
+	mCheckable = checkable;
+	if ( not checkable )
+		mChecked = false;
 };
 
 void NBMenuItem::enterEvent( QEvent *eEvent ) {
@@ -64,6 +74,14 @@ void NBMenuItem::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 	if ( mrEvent->button() == Qt::LeftButton ) {
 		mPressed = false;
 		emit clicked();
+
+		if ( mCheckable ) {
+			if ( mChecked )
+				mChecked = false;
+
+			else
+				mChecked = true;
+		}
 	}
 
 	repaint();
@@ -75,16 +93,10 @@ void NBMenuItem::paintEvent( QPaintEvent *pEvent ) {
 	QPainter painter( this );
 	painter.setPen( Qt::NoPen );
 
+	/* Pressed */
 	if ( mPressed ) {
 
 		painter.setBrush( palette().color( QPalette::Highlight ).darker( 110 ) );
-		painter.drawRect( QRect( 0, 0, width(), height() ) );
-	}
-
-	/* No hover */
-	else if ( not mHover ) {
-
-		painter.setBrush( palette().color( QPalette::Window ) );
 		painter.drawRect( QRect( 0, 0, width(), height() ) );
 	}
 
@@ -95,6 +107,20 @@ void NBMenuItem::paintEvent( QPaintEvent *pEvent ) {
 		painter.drawRect( QRect( 0, 0, width(), height() ) );
 	}
 
+	/* Otherwise */
+	else {
+		if ( mChecked ) {
+			painter.setBrush( palette().color( QPalette::Window ).darker( 110 ) );
+			painter.drawRect( QRect( 0, 0, width(), height() ) );
+		}
+
+		else {
+			painter.setBrush( palette().color( QPalette::Window ) );
+			painter.drawRect( QRect( 0, 0, width(), height() ) );
+		}
+	}
+
+
 	painter.drawPixmap( QRect( 4, 4, 20, 20 ), QIcon( mIcon ).pixmap( 20 ) );
 
 	painter.end();
@@ -103,11 +129,34 @@ void NBMenuItem::paintEvent( QPaintEvent *pEvent ) {
 	pEvent->accept();
 };
 
+NBMenuItemGroup::NBMenuItemGroup() {
+
+	mItems.clear();
+};
+
+void NBMenuItemGroup::addMenuItem( NBMenuItem *itm ) {
+
+	mItems << itm;
+	connect( itm, SIGNAL( clicked() ), this, SLOT( makeExclusive() ) );
+};
+
+void NBMenuItemGroup::makeExclusive() {
+
+	NBMenuItem *itm = qobject_cast<NBMenuItem*>( sender() );
+	Q_FOREACH( NBMenuItem *item, mItems ) {
+		if ( item != itm )
+			item->setChecked( false );
+	}
+};
+
 NBMenuItemButton::NBMenuItemButton( QString icon, QWidget *parent ) : QToolButton( parent ) {
 
 	setFixedSize( 28, 28 );
 	setIcon( QIcon( icon ) );
-	setStyleSheet( "QToolButton{ border: none; border-left: 1px solid lightgray; } QToolButton:hover{ background-color: #A1DFFF; } " );
+
+	setCheckable( true );
+
+	setStyleSheet( "QToolButton{ border: none; border-left: 1px solid lightgray; } QToolButton:hover{ background-color: #A1DFFF; } QToolButton:checked{ background: darkgray; }" );
 
 	setFocusPolicy( Qt::NoFocus );
 };
@@ -147,7 +196,7 @@ NBSystemMenu::NBSystemMenu( QWidget *parent ) : QWidget( parent ) {
 	itemsLayout->setContentsMargins( QMargins( 1, 1, 1, 1 ) );
 	itemsLayout->setSpacing( 0 );
 
-	itemsBase = new QWidget( this );
+	QWidget *itemsBase = new QWidget( this );
 	itemsBase->setObjectName( "menuBase" );
 	itemsBase->setStyleSheet( "QWidget#menuBase { border: 1px solid gray; border-radius: 2px; }" );
 	itemsBase->setLayout( itemsLayout );
@@ -169,14 +218,20 @@ void NBSystemMenu::populateMenu() {
 	/* NewWindow */
 	NBMenuItem *newWinItem = new NBMenuItem( "New Window", ":/icons/newwin.png", this );
 	connect( newWinItem, SIGNAL( clicked() ), this, SLOT( close() ) );
+	connect( newWinItem, SIGNAL( clicked() ), this, SIGNAL( newWindow() ) );
 
 	/* Zoom */
 	NBMenuItemButton *zOutBtn = new NBMenuItemButton( ":/icons/category-collapse.png", this );
-	zOutBtn->	setStyleSheet( "QToolButton{ border: none; } QToolButton:hover{ background-color: #A1DFFF } " );
-	NBMenuItemButton *zInBtn = new NBMenuItemButton( ":/icons/category-expand.png", this );
-	zInBtn->	setStyleSheet( "QToolButton{ border: none; } QToolButton:hover{ background-color: #A1DFFF } " );
+	zOutBtn->setStyleSheet( "QToolButton{ border: none; } QToolButton:hover{ background-color: #A1DFFF } " );
+	connect( zOutBtn, SIGNAL( clicked() ), this, SIGNAL( zoomOut() ) );
+	connect( zOutBtn, SIGNAL( clicked() ), this, SLOT( updateZoomOut() ) );
 
-	QLabel *zoomLbl = new QLabel( "  100%  " );
+	NBMenuItemButton *zInBtn = new NBMenuItemButton( ":/icons/category-expand.png", this );
+	zInBtn->setStyleSheet( "QToolButton{ border: none; } QToolButton:hover{ background-color: #A1DFFF } " );
+	connect( zInBtn, SIGNAL( clicked() ), this, SIGNAL( zoomIn() ) );
+	connect( zInBtn, SIGNAL( clicked() ), this, SLOT( updateZoomIn() ) );
+
+	zoomLbl = new QLabel( " 48px " );
 
 	QHBoxLayout *zLyt = new QHBoxLayout();
 	zLyt->setContentsMargins( 32, 0, 0, 0 );
@@ -189,8 +244,16 @@ void NBSystemMenu::populateMenu() {
 
 	/* Actions: Cut Copy Paste */
 	NBMenuItemButton *cutBtn = new NBMenuItemButton( ":/icons/cut.png", this );
+	connect( cutBtn, SIGNAL( clicked() ), this, SIGNAL( cut() ) );
+	connect( cutBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
+
 	NBMenuItemButton *copyBtn = new NBMenuItemButton( ":/icons/copy.png", this );
+	connect( copyBtn, SIGNAL( clicked() ), this, SIGNAL( copy() ) );
+	connect( copyBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
+
 	NBMenuItemButton *pasteBtn = new NBMenuItemButton( ":/icons/paste.png", this );
+	connect( pasteBtn, SIGNAL( clicked() ), this, SIGNAL( paste() ) );
+	connect( pasteBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
 
 	QHBoxLayout *aLyt = new QHBoxLayout();
 	aLyt->setContentsMargins( 32, 0, 0, 0 );
@@ -203,15 +266,21 @@ void NBSystemMenu::populateMenu() {
 
 	/* Terminal */
 	NBMenuItem *vteItem = new NBMenuItem( "Open Terminal", ":/icons/vte.png", this );
+	connect( vteItem, SIGNAL( clicked() ), this, SIGNAL( openVTE() ) );
 	connect( vteItem, SIGNAL( clicked() ), this, SLOT( close() ) );
 
 	/* View: Icons Tiles Details */
-	NBMenuItemButton *iconsBtn = new NBMenuItemButton( ":/icons/view-icon.png", this );
+	iconsBtn = new NBMenuItemButton( ":/icons/view-icon.png", this );
 	iconsBtn->setToolTip( "Icons View" );
-	NBMenuItemButton *tilesBtn = new NBMenuItemButton( ":/icons/view-list.png", this );
+	connect( iconsBtn, SIGNAL( clicked() ), this, SLOT( viewModesClicked() ) );
+
+	tilesBtn = new NBMenuItemButton( ":/icons/view-list.png", this );
 	tilesBtn->setToolTip( "Tiles View" );
-	NBMenuItemButton *detailsBtn = new NBMenuItemButton( ":/icons/view-details.png", this );
+	connect( tilesBtn, SIGNAL( clicked() ), this, SLOT( viewModesClicked() ) );
+
+	detailsBtn = new NBMenuItemButton( ":/icons/view-details.png", this );
 	detailsBtn->setToolTip( "Details View" );
+	connect( detailsBtn, SIGNAL( clicked() ), this, SLOT( viewModesClicked() ) );
 
 	QHBoxLayout *vLyt = new QHBoxLayout();
 	vLyt->setContentsMargins( 32, 0, 0, 0 );
@@ -222,8 +291,18 @@ void NBSystemMenu::populateMenu() {
 	vLyt->addWidget( tilesBtn );
 	vLyt->addWidget( detailsBtn );
 
+	QButtonGroup *viewGroup = new QButtonGroup();
+	viewGroup->addButton( iconsBtn );
+	viewGroup->addButton( tilesBtn );
+	viewGroup->addButton( detailsBtn );
+	viewGroup->setExclusive( true );
+
 	/* Sorting */
-	NBMenuItemCheck *groupCheck = new NBMenuItemCheck( "Show in Groups", this );
+	groupCheck = new NBMenuItemCheck( "Show in Groups", this );
+	groupCheck->setChecked( Settings->General.Grouping );
+	connect( groupCheck, SIGNAL( clicked() ), this, SLOT( close() ) );
+	connect( groupCheck, SIGNAL( clicked() ), this, SIGNAL( toggleGrouping() ) );
+
 	QHBoxLayout *sLyt = new QHBoxLayout();
 	sLyt->setContentsMargins( 32, 0, 0, 0 );
 	sLyt->setSpacing( 0 );
@@ -231,21 +310,22 @@ void NBSystemMenu::populateMenu() {
 	sLyt->addStretch();
 	sLyt->addWidget( groupCheck );
 
-	QPushButton *nSortBtn = new QPushButton( QIcon::fromTheme( "format-text-underline" ), "Name", this );
-	nSortBtn->setStyleSheet( "QPushButton{border: 0px;} QPushButton:hover{border: 0px; background: #A1DFFF}" );
-	nSortBtn->setFixedHeight( 28 );
+	nSortBtn = new NBMenuItem( "Name", ":/icons/sort-name.png", this );
+	nSortBtn->setCheckable( true );
+	connect( nSortBtn, SIGNAL( clicked() ), this, SIGNAL( sortByName() ) );
 
-	QPushButton *tSortBtn = new QPushButton( QIcon::fromTheme( "preferences-other" ), "Type", this );
-	tSortBtn->setStyleSheet( "QPushButton{border: 0px;} QPushButton:hover{border: 0px; background: #A1DFFF}" );
-	tSortBtn->setFixedHeight( 28 );
+	tSortBtn = new NBMenuItem( "Type", ":/icons/sort-type.png", this );
+	tSortBtn->setCheckable( true );
+	tSortBtn->setChecked( true );
+	connect( tSortBtn, SIGNAL( clicked() ), this, SIGNAL( sortByType() ) );
 
-	QPushButton *sSortBtn = new QPushButton( QIcon( ":/icons/size.png" ), "Size", this );
-	sSortBtn->setStyleSheet( "QPushButton{border: 0px;} QPushButton:hover{border: 0px; background: #A1DFFF}" );
-	sSortBtn->setFixedHeight( 28 );
+	sSortBtn = new NBMenuItem( "Size", ":/icons/sort-size.png", this );
+	sSortBtn->setCheckable( true );
+	connect( sSortBtn, SIGNAL( clicked() ), this, SIGNAL( sortBySize() ) );
 
-	QPushButton *dSortBtn = new QPushButton( QIcon::fromTheme( "office-calendar" ), "Date", this );
-	dSortBtn->setStyleSheet( "QPushButton{border: 0px;} QPushButton:hover{border: 0px; background: #A1DFFF}" );
-	dSortBtn->setFixedHeight( 28 );
+	dSortBtn = new NBMenuItem( "Date", ":/icons/sort-date.png", this );
+	dSortBtn->setCheckable( true );
+	connect( dSortBtn, SIGNAL( clicked() ), this, SIGNAL( sortByDate() ) );
 
 	QGridLayout *sBtnLyt = new QGridLayout();
 	sBtnLyt->setContentsMargins( 0, 0, 0, 0 );
@@ -255,18 +335,29 @@ void NBSystemMenu::populateMenu() {
 	sBtnLyt->addWidget( sSortBtn, 1, 0 );
 	sBtnLyt->addWidget( dSortBtn, 1, 1 );
 
+	NBMenuItemGroup *sortGroup = new NBMenuItemGroup();
+	sortGroup->addMenuItem( nSortBtn );
+	sortGroup->addMenuItem( tSortBtn );
+	sortGroup->addMenuItem( sSortBtn );
+	sortGroup->addMenuItem( dSortBtn );
+
 	/* Report Bug */
 	NBMenuItem *reportbugItem = new NBMenuItem( "Report Bug", ":/icons/reportbug.png", this );
+	connect( reportbugItem, SIGNAL( clicked() ), this, SLOT( reportBug() ) );
 	connect( reportbugItem, SIGNAL( clicked() ), this, SLOT( close() ) );
 
 	/* Settings */
 	NBMenuItem *settingsItem = new NBMenuItem( "Settings", ":/icons/exec.png", this );
 	connect( settingsItem, SIGNAL( clicked() ), this, SLOT( close() ) );
+	connect( settingsItem, SIGNAL( clicked() ), this, SIGNAL( showSettings() ) );
 
 	/* Close and Quit */
 	NBMenuItem *closeItem = new NBMenuItem( "Close Window", ":/icons/stop.png", this );
+	connect( closeItem, SIGNAL( clicked() ), this, SIGNAL( closeWindow() ) );
 	connect( closeItem, SIGNAL( clicked() ), this, SLOT( close() ) );
+
 	NBMenuItem *quitItem = new NBMenuItem( "Quit NewBreeze", ":/icons/close.png", this );
+	connect( quitItem, SIGNAL( clicked() ), this, SIGNAL( quit() ) );
 	connect( quitItem, SIGNAL( clicked() ), this, SLOT( close() ) );
 
 	/* Actual Items Layout */
@@ -293,7 +384,103 @@ void NBSystemMenu::populateMenu() {
 	itemsLayout->addStretch( 0 );
 };
 
+void NBSystemMenu::viewModesClicked() {
+
+	if ( qobject_cast<NBMenuItemButton*>( sender() ) == iconsBtn )
+		emit changeViewMode( 1 );
+
+	else if ( qobject_cast<NBMenuItemButton*>( sender() ) == tilesBtn )
+		emit changeViewMode( 0 );
+
+	else
+		emit changeViewMode( 2 );
+};
+
+void NBSystemMenu::reportBug() {
+
+	qDebug() << "Showing NewBreeze BugReporter";
+	NBBugReporter *bugreport = new NBBugReporter();
+	bugreport->exec();
+};
+
+void NBSystemMenu::updateZoomIn() {
+
+	int size = zoomLbl->text().simplified().replace( "px", "" ).toInt();
+	if ( size < 128 )
+		zoomLbl->setText( QString( " %1px " ).arg( size + 4 ) );
+
+	else
+		zoomLbl->setText( QString( " %1px " ).arg( 128 ) );
+};
+
+void NBSystemMenu::updateZoomOut() {
+
+	int size = zoomLbl->text().simplified().replace( "px", "" ).toInt();
+	if ( size > 16 )
+		zoomLbl->setText( QString( " %1px " ).arg( size - 4 ) );
+
+	else
+		zoomLbl->setText( QString( " %1px " ).arg( 16 ) );
+};
+
 void NBSystemMenu::exec( QPoint point ) {
+
+	QString viewMode;
+	int iconSize, sortColumn;
+	bool grouping;
+
+	if ( mAddress.startsWith( "NB://" ) ) {
+		QString location = mAddress.replace( "NB://", "" );
+		QSettings sett( "NewBreeze", location );
+
+		viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
+		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+		sortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
+		grouping = sett.value( "NewBreeze/Grouping", true ).toBool();
+	}
+
+	else {
+		QSettings sett( mAddress + ".directory", QSettings::NativeFormat );
+
+		viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
+		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+		sortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
+		grouping = sett.value( "NewBreeze/Grouping", true ).toBool();
+	}
+
+	/* Reset View Buttons */
+	iconsBtn->setChecked( false );
+	tilesBtn->setChecked( false );
+	detailsBtn->setChecked( false );
+	if ( viewMode == "Icons" )
+		iconsBtn->setChecked( true );
+
+	else if ( viewMode == "Tiles" )
+		tilesBtn->setChecked( true );
+
+	else
+		detailsBtn->setChecked( true );
+
+	zoomLbl->setText( QString( " %1px " ).arg( iconSize ) );
+
+	/* Reset Sort Buttons */
+	nSortBtn->setChecked( false );
+	sSortBtn->setChecked( false );
+	tSortBtn->setChecked( false );
+	dSortBtn->setChecked( false );
+	if ( sortColumn == 0 )
+		nSortBtn->setChecked( true );
+
+	else if ( sortColumn == 1 )
+		sSortBtn->setChecked( true );
+
+	else if ( sortColumn == 2 )
+		tSortBtn->setChecked( true );
+
+	else
+		dSortBtn->setChecked( true );
+
+	groupCheck->setChecked( grouping );
 
 	move( point );
 	show();

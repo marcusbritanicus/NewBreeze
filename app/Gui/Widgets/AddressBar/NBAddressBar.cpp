@@ -273,7 +273,23 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	connect( forwardBtn, SIGNAL( clicked() ), this, SIGNAL( goForward() ) );
 	connect( addressWidget, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
 	connect( filterBtn, SIGNAL( clicked() ), this, SIGNAL( openSearch() ) );
+
+	connect( menuBtn, SIGNAL( newWindow() ), this, SIGNAL( newWindow() ) );
+	connect( menuBtn, SIGNAL( zoomIn() ), this, SIGNAL( zoomIn() ) );
+	connect( menuBtn, SIGNAL( zoomOut() ), this, SIGNAL( zoomOut() ) );
+	connect( menuBtn, SIGNAL( cut() ), this, SIGNAL( cut() ) );
+	connect( menuBtn, SIGNAL( copy() ), this, SIGNAL( copy() ) );
+	connect( menuBtn, SIGNAL( paste() ), this, SIGNAL( paste() ) );
+	connect( menuBtn, SIGNAL( openVTE() ), this, SIGNAL( openVTE() ) );
 	connect( menuBtn, SIGNAL( changeViewMode( int ) ), this, SIGNAL( changeViewMode( int ) ) );
+	connect( menuBtn, SIGNAL( sortByName() ), this, SIGNAL( sortByName() ) );
+	connect( menuBtn, SIGNAL( sortByType() ), this, SIGNAL( sortByType() ) );
+	connect( menuBtn, SIGNAL( sortBySize() ), this, SIGNAL( sortBySize() ) );
+	connect( menuBtn, SIGNAL( sortByDate() ), this, SIGNAL( sortByDate() ) );
+	connect( menuBtn, SIGNAL( toggleGrouping() ), this, SIGNAL( toggleGrouping() ) );
+	connect( menuBtn, SIGNAL( showSettings() ), this, SIGNAL( showSettings() ) );
+	connect( menuBtn, SIGNAL( closeWindow() ), this, SIGNAL( closeWindow() ) );
+	connect( menuBtn, SIGNAL( quit() ), this, SIGNAL( quit() ) );
 };
 
 void NBAddressBar::updateNavigationButtons( bool bBtn, bool fBtn ) {
@@ -291,11 +307,8 @@ void NBAddressBar::setAddress( QString url ) {
 
 	addressWidget->addressEdit->setText( url );
 	addressWidget->crumbsBar->setCurrentDirectory( url );
-};
 
-int NBAddressBar::checkedAction() {
-
-	return 1;
+	menuBtn->updateAddress( url );
 };
 
 void NBAddressBar::focusAddressEdit() {
@@ -311,9 +324,4 @@ void NBAddressBar::hideSearchButton() {
 void NBAddressBar::showSearchButton() {
 
 	filterBtn->setIcon( icon( NBIconManager::instance()->icon( "edit-find" ) ) );
-};
-
-void NBAddressBar::updateViewMode( QString mode ) {
-
-	menuBtn->updateViewMode( mode );
 };

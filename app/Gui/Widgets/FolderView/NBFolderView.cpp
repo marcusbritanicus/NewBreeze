@@ -1120,8 +1120,18 @@ void NBFolderView::sortByName() {
 	else
 		fsModel->sort( 0, Qt::CaseInsensitive, false );
 
-	QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-	sett.setValue( "NewBreeze/SortColumn", 0 );
+	if ( not fsModel->isRealLocation() ) {
+		QString location = fsModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", location );
+		sett.setValue( "NewBreeze/SortColumn", 0 );
+		sett.sync();
+	}
+
+	else {
+		QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/SortColumn", 0 );
+		sett.sync();
+	}
 };
 
 void NBFolderView::sortBySize() {
@@ -1132,8 +1142,18 @@ void NBFolderView::sortBySize() {
 	else
 		fsModel->sort( 1, Qt::CaseInsensitive, false );
 
-	QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-	sett.setValue( "NewBreeze/SortColumn", 1 );
+	if ( not fsModel->isRealLocation() ) {
+		QString location = fsModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", location );
+		sett.setValue( "NewBreeze/SortColumn", 1 );
+		sett.sync();
+	}
+
+	else {
+		QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/SortColumn", 1 );
+		sett.sync();
+	}
 };
 
 void NBFolderView::sortByType() {
@@ -1144,8 +1164,18 @@ void NBFolderView::sortByType() {
 	else
 		fsModel->sort( 2, Qt::CaseInsensitive, false );
 
-	QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-	sett.setValue( "NewBreeze/SortColumn", 2 );
+	if ( not fsModel->isRealLocation() ) {
+		QString location = fsModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", location );
+		sett.setValue( "NewBreeze/SortColumn", 2 );
+		sett.sync();
+	}
+
+	else {
+		QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/SortColumn", 2 );
+		sett.sync();
+	}
 };
 
 void NBFolderView::sortByDate() {
@@ -1156,8 +1186,18 @@ void NBFolderView::sortByDate() {
 	else
 		fsModel->sort( 4, Qt::CaseInsensitive, false );
 
-	QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-	sett.setValue( "NewBreeze/SortColumn", 4 );
+	if ( not fsModel->isRealLocation() ) {
+		QString location = fsModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", location );
+		sett.setValue( "NewBreeze/SortColumn", 4 );
+		sett.sync();
+	}
+
+	else {
+		QSettings sett( fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/SortColumn", 4 );
+		sett.sync();
+	}
 };
 
 void NBFolderView::selectAll() {

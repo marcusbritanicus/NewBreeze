@@ -12,8 +12,6 @@ QSettings sett( "NewBreeze", "NewBreeze" );
 
 NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
-	QSettings sett( "NewBreeze", "NewBreeze" );
-
 	/* Grouping */
 
 	perFolderEnabled = new QGroupBox( "&Enabled per-folder view", this );
@@ -311,10 +309,8 @@ void NBSGeneralWidget::handleOpenWithToggled() {
 			Settings->setValue( "SpecialOpen", true );
 			Settings->General.SpecialOpen = true;
 
-			QSettings gSettings( "NewBreeze", "NewBreeze" );
-
-			Settings->General.OpenWithCatalog = gSettings.value( "OpenWithCatalog", false ).toBool();
-			Settings->General.SuperStart = gSettings.value( "SuperStart", false ).toBool();
+			Settings->General.OpenWithCatalog = sett.value( "OpenWithCatalog", false ).toBool();
+			Settings->General.SuperStart = sett.value( "SuperStart", false ).toBool();
 
 			openWithCatalogRB->setEnabled( true );
 			openWithSuperStartRB->setEnabled( true );
