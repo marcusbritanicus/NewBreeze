@@ -21,55 +21,55 @@ class NBIconView : public QAbstractItemView {
 	public:
 		NBIconView( NBItemViewModel*, QWidget *parent );
 
-		// Set the item model
+		/* Set the item model */
 		void setModel( QAbstractItemModel *model );
 
-		// Update the view mode
+		/* Update the view mode */
 		void updateViewMode();
 		QString viewMode();
 
-		// Category drawing height : myCategoryHeight
+		/* Category drawing height : myCategoryHeight */
 		int categoryHeight() const;
 		void setCategoryHeight( int );
 
-		// Icon Size for the indexes: myIconSize
+		/* Icon Size for the indexes: myIconSize */
 		QSize iconSize() const;
 		void setIconSize( QSize );
 		void setIconSize( int, int );
 
-		// Contents Margins
+		/* Contents Margins */
 		QMargins contentsMargins() const;
 		void setContentsMargins( QMargins );
 		void setContentsMargins( int, int, int, int );
 
-		// Inlay margins: myInlayMargins
+		/* Inlay margins: myInlayMargins */
 		QMargins inlayMargins() const;
 		void setInlayMargins( QMargins );
 		void setInlayMargins( int, int, int, int );
 
-		// Space between the categories: myCategorySpacing
+		/* Space between the categories: myCategorySpacing */
 		int categorySpacing() const;
 		void setCategorySpacing( int );
 
-		// Given the index, return the visual rect
+		/* Given the index, return the visual rect */
 		QRect visualRect( const QModelIndex &index ) const;
 
-		// Given the category index get the rectangle for it
+		/* Given the category index get the rectangle for it */
 		QRect categoryRect( int ) const;
 
-		// Given the index scroll the view
+		/* Given the index scroll the view */
 		void scrollTo( const QModelIndex &index, QAbstractItemView::ScrollHint );
 
-		// Get the index at a given point
+		/* Get the index at a given point */
 		QModelIndex indexAt( const QPoint &position ) const;
 
-		// Get the category at a given point
+		/* Get the category at a given point */
 		QString categoryAt( const QPoint &position ) const;
 
-		// Return the selected indexes
+		/* Return the selected indexes */
 		QModelIndexList selection();
 
-		// Is the index visible in the viewport?
+		/* Is the index visible in the viewport? */
 		bool isIndexVisible( QModelIndex ) const;
 
 	protected slots:
@@ -106,7 +106,7 @@ class NBIconView : public QAbstractItemView {
 		void keyPressEvent( QKeyEvent* );
 
 	private:
-		// Grid size for the indexes: myGridSizeMin, myGridSize
+		/* Grid size for the indexes: myGridSizeMin, myGridSize */
 		void computeGridSize( QSize );
 
 		QModelIndex moveCursorCategorized( QAbstractItemView::CursorAction cursorAction );
@@ -114,7 +114,7 @@ class NBIconView : public QAbstractItemView {
 
 		void setCategorySelected( QString, bool );
 
-		// Cursor Movement Helpers
+		/* Cursor Movement Helpers */
 		QModelIndex nextIndex();
 		QModelIndex prevIndex();
 		QModelIndex aboveIndex();
@@ -151,59 +151,63 @@ class NBIconView : public QAbstractItemView {
 		void toggleFoldCategory( QString );
 		bool canShowIndex( QModelIndex );
 
-		// Categorized Item Model
+		int expanderAt( QPoint );
+
+		/* Categorized Item Model */
 		NBItemViewModel *cModel;
 
-		// ViewMode
+		/* ViewMode */
 		mutable QString currentViewMode;
 
-		// Selection
+		/* Selection */
 		mutable QModelIndexList mSelectedIndexes;
 		mutable QStringList mSelectedCategories;
 		mutable QModelIndex mSelStartIdx;
 
-		// Icon rects
+		/* Icon rects */
 		mutable int idealHeight;
 		mutable QHash<int, QPoint> rectForRow;
 		mutable QHash<int, QRect> rectForCategory;
+		// int: category index, QRect: rectangle which expands the category
+		mutable QHash<int, QRect> expanderRects;
 		mutable bool hashIsDirty;
 
-		// Category Height
+		/* Category Height */
 		mutable int myCategoryHeight;
 
-		// Category Spacing
+		/* Category Spacing */
 		mutable int myCategorySpacing;
 
-		// Contents Margins
+		/* Contents Margins */
 		mutable QMargins myContentsMargins;
 
-		// Inlay Margins
+		/* Inlay Margins */
 		mutable QMargins myInlayMargins;
 
-		// Grid Size
+		/* Grid Size */
 		mutable QSize myGridSizeMin;
 		mutable QSize myGridSize;
 		mutable QSize myItemSize;
 
-		// Icon Size
+		/* Icon Size */
 		mutable QSize myIconSize;
 
-		// Persistent vertical column
+		/* Persistent vertical column */
 		mutable int persistentVCol;
 		mutable QPair<int, int> curIdx;
 
-		// Items per visual row
+		/* Items per visual row */
 		mutable int itemsPerRow;
 		mutable int numberOfRows;
 		mutable int padding;
 
-		// Category List
+		/* Category List */
 		mutable QStringList categoryList;
 
-		// Hidden Categories
+		/* Hidden Categories */
 		mutable QStringList hiddenCategories;
 
-		// Folded Categories
+		/* Folded Categories */
 		mutable QStringList foldedCategories;
 
 		QPoint dragStartPosition;

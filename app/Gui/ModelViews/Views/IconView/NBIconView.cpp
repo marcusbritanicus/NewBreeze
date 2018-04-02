@@ -497,10 +497,11 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		}
 	}
 
+	/* We paint the icons index-wise. */
 	for ( int row = 0; row < cModel->rowCount( rootIndex() ); row++ ) {
 		QModelIndex idx = cModel->index( row, 0, rootIndex() );
 		if ( not canShowIndex( idx ) ) {
-			/* If we have the category to which this index belongs, continue to next index */
+			/* If the category to which this index belongs is hidden, continue to next index */
 			if ( hiddenCategories.contains( cModel->category( idx ) ) )
 				continue;
 
@@ -658,6 +659,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 	/* Index at mouse position */
 	QModelIndex idx = indexAt( mpEvent->pos() );
+	int catIdx = expanderAt( mpEvent->pos() );
 
 	/* NoModifier/AltModifier pressed with the mouse */
 	if ( qApp->keyboardModifiers().testFlag( Qt::NoModifier ) or qApp->keyboardModifiers().testFlag( Qt::AltModifier ) ) {
@@ -687,14 +689,20 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 		else if ( categoryAt( mpEvent->pos() ).count() ) {
 			QRect rct = categoryRect( categoryList.indexOf( categoryAt( mpEvent->pos() ) ) );
 			QPoint topLeft = rct.topLeft();
+			QPoint topRight = rct.topRight();
 
 			/* Category arrow clicked */
-			if ( QRect( topLeft.x() + 4, topLeft.y() + 4, 16, 16 ).contains( mpEvent->pos() ) )
+			if ( QRect( topRight.x() - 20, topLeft.y() + 4, 16, 16 ).contains( mpEvent->pos() ) )
 				if ( currentViewMode != "Details" )
 					toggleFoldCategory( categoryAt( mpEvent->pos() ) );
 
 			/* Repaint the viewport */
 			viewport()->repaint();
+		}
+
+		/* We clicked on the Category expander */
+		else if ( catIdx > -1 ) {
+			toggleFoldCategory( categoryList.at( catIdx ) );
 		}
 
 		/* Click on empty space */
@@ -841,6 +849,14 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 
 		mmEvent->accept();
 		return;
+	}
+
+	else {
+		if ( expanderAt( mmEvent->pos() ) > -1 )
+			setCursor( Qt::PointingHandCursor );
+
+		else
+			setCursor( Qt::ArrowCursor );
 	}
 
 	viewport()->repaint();
@@ -1836,6 +1852,7 @@ void NBIconView::calculateRectsIfNecessary() const {
 
 	rectForRow.clear();
 	rectForCategory.clear();
+	expanderRects.clear();
 
 	if ( cModel->isCategorizationEnabled() )
 		calculateCategorizedRects();
@@ -1910,6 +1927,10 @@ void NBIconView::calculateCategorizedIconsRects() const {
 
 				rectForRow[ mList[ lrow ].row() ] = QPoint( x, y );
 			}
+
+			x = minX + ( limit % itemsPerRow ) * myGridSize.width();
+			y = minY + ( limit / itemsPerRow ) * myGridSize.height();
+			expanderRects[ cModel->categoryIndex( mList.value( 0 ) ) ] = QRect( x, y, myGridSize.width(), myGridSize.height() );
 		}
 
 		else {
@@ -2211,8 +2232,16 @@ void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const
 
 	QPixmap pix = cModel->pixmapForCategory( text, hiddenCategories.contains( text ) );
 	QPoint topLeft = rectangle.topLeft();
+	QPoint topRight = rectangle.topRight();
 
 	painter->drawPixmap( topLeft.x() + 4, topLeft.y() + 4, 16, 16, pix );
+
+	if ( foldedCategories.contains( text ) or hiddenCategories.contains( text ) )
+		painter->drawPixmap( topRight.x() - 20, topLeft.y() + 4, 16, 16, QIcon( ":/icons/category-expand.png" ).pixmap( 16 ) );
+
+	else
+		painter->drawPixmap( topRight.x() - 20, topLeft.y() + 4, 16, 16, QIcon( ":/icons/category-collapse.png" ).pixmap( 16 ) );
+
 	QFont categoryFont = qApp->font();
 	categoryFont.setBold( true );
 	painter->setFont( categoryFont );
@@ -2226,14 +2255,21 @@ void NBIconView::paintFolded( QPainter *painter, const QRect &rect, const QModel
 	painter->save();
 	int n = cModel->indexListCountForCategory( cModel->category( idx ) ) - itemsPerRow + 1;
 
-	QPixmap pix( ":/icons/plus.png" );
-	pix = pix.scaled( myGridSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+	QPixmap pix( ":/icons/category-more.png" );
+	pix = pix.scaledToHeight( myGridSize.height() * 0.75, Qt::SmoothTransformation );
 
-	QRect r = QRect( rect.x() + abs( rect.width() - pix.width() ) / 2, rect.y() + abs( rect.height() - pix.height() ) / 2, pix.width(), pix.height() );
-	painter->drawPixmap( r, pix );
+	painter->setPen( Qt::lightGray );
+	painter->drawRoundedRect( rect, 5, 5 );
+	painter->drawLine( rect.topRight() - QPoint( pix.width() * 2, 0 ), rect.bottomRight() - QPoint( pix.width() * 2, 0 ) );
 
+	QRect rpix( rect.topRight() - QPoint( pix.width() * 1.5, ( pix.height() - myGridSize.height() ) / 2 ), pix.size() );
+	painter->setPen( Qt::NoPen );
+	painter->drawPixmap( rpix, pix );
+
+	QRect rtext( rect.topLeft(), rect.bottomRight() - QPoint( pix.width() * 2, 0 ) );
 	painter->setPen( Qt::black );
-	painter->drawText( rect, Qt::AlignCenter | Qt::TextWordWrap, QString( "%1 more item%2" ).arg( n ).arg( n > 1 ? "s" : "" ) );
+	painter->drawText( rtext, Qt::AlignCenter | Qt::TextWordWrap, QString( "%1 more item%2" ).arg( n ).arg( n > 1 ? "s" : "" ) );
+
 	painter->restore();
 };
 
@@ -2379,39 +2415,78 @@ void NBIconView::showHideCategory( QString category ) {
 
 void NBIconView::toggleFoldCategory( QString category ) {
 
-	QSettings dirSett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
-	QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
-	QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+	if ( not cModel->isRealLocation() ) {
+		QString loc = cModel->currentDir().replace( "NB://", "" );
+		QSettings dirSett( "NewBreeze", loc );
+		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
 
-	/* If @category is hidden, show it folded */
-	if ( hiddenCategories.contains( category ) ) {
-		hidden.removeAll( category );
-		hiddenCategories.removeAll( category );
-		if ( cModel->indexListCountForCategory( category ) > itemsPerRow ) {
-			foldedCategories.append( category );
-			folded.append( category );
+		/* If @category is hidden, show it folded */
+		if ( hiddenCategories.contains( category ) ) {
+			hidden.removeAll( category );
+			hiddenCategories.removeAll( category );
+			if ( cModel->indexListCountForCategory( category ) > itemsPerRow ) {
+				foldedCategories.append( category );
+				folded.append( category );
+			}
 		}
-	}
 
-	else if ( foldedCategories.contains( category ) ) {
-		hiddenCategories.removeAll( category );
-		hidden.removeAll( category );
+		else if ( foldedCategories.contains( category ) ) {
+			hiddenCategories.removeAll( category );
+			hidden.removeAll( category );
 
-		foldedCategories.removeAll( category );
-		folded.removeAll( category );
-	}
-
-	else{
-		if ( cModel->indexListCountForCategory( category ) > itemsPerRow ) {
-			foldedCategories.append( category );
-			folded.append( category );
+			foldedCategories.removeAll( category );
+			folded.removeAll( category );
 		}
+
+		else{
+			if ( cModel->indexListCountForCategory( category ) > itemsPerRow ) {
+				foldedCategories.append( category );
+				folded.append( category );
+			}
+		}
+
+		folded.removeDuplicates();
+		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.sync();
 	}
 
-	folded.removeDuplicates();
-	dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
-	dirSett.setValue( "NewBreeze/FoldedCategories", folded );
-	dirSett.sync();
+	else {
+		QSettings dirSett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
+		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
+		/* If @category is hidden, show it folded */
+		if ( hiddenCategories.contains( category ) ) {
+			hidden.removeAll( category );
+			hiddenCategories.removeAll( category );
+			if ( cModel->indexListCountForCategory( category ) > itemsPerRow ) {
+				foldedCategories.append( category );
+				folded.append( category );
+			}
+		}
+
+		else if ( foldedCategories.contains( category ) ) {
+			hiddenCategories.removeAll( category );
+			hidden.removeAll( category );
+
+			foldedCategories.removeAll( category );
+			folded.removeAll( category );
+		}
+
+		else{
+			if ( cModel->indexListCountForCategory( category ) > itemsPerRow ) {
+				foldedCategories.append( category );
+				folded.append( category );
+			}
+		}
+
+		folded.removeDuplicates();
+		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.sync();
+	}
 
 	hashIsDirty = true;
 	calculateRectsIfNecessary();
@@ -2435,6 +2510,16 @@ bool NBIconView::canShowIndex( QModelIndex idx ) {
 
 	else
 		return true;
+};
+
+int NBIconView::expanderAt( QPoint pt ) {
+
+	Q_FOREACH( int key, expanderRects.keys() ) {
+		if ( expanderRects.value( key ).contains( pt ) )
+			return key;
+	}
+
+	return -1;
 };
 
 void NBIconView::currentChanged( const QModelIndex &cur, const QModelIndex &prev ) {
