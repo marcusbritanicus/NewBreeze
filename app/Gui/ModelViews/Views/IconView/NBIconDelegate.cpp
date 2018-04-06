@@ -66,8 +66,8 @@ void NBIconDelegate::paintIcons( QPainter *painter, const NBStyleOptionViewItem 
 		QRect textRect;
 		// Horizontal Centering, so don't bother
 		textRect.setX( optionRect.x() + padding );
-		// Original Y + Image Height + Image Padding Top + Text-Image Padding ( max = 3 )
-		textRect.setY( optionRect.y() + padding + qMin( 3, padding / 2 ) + iconSize.height() );
+		// Original Y + Image Height + Image Padding Top + Text-Image Padding ( fixed = 5 )
+		textRect.setY( optionRect.y() + padding + 5 + iconSize.height() );
 		// Left and Right Border
 		textRect.setSize( optionRect.size() - QSize( 2 * padding, qMin( 3, padding / 2 ) + padding + iconSize.height() ) );
 
@@ -159,7 +159,12 @@ void NBIconDelegate::paintIcons( QPainter *painter, const NBStyleOptionViewItem 
 		painter->setPen( option.palette.color( QPalette::Text ) );
 
 		// Draw Text
+		painter->save();
+		if ( option.state & QStyle::State_HasFocus )
+			painter->setFont( QFont( painter->font().family(), painter->font().pointSize(), QFont::Bold ) );
 		painter->drawText( textRect, Qt::AlignHCenter, text );
+
+		painter->restore();
 
 		// Draw the extra details
 		painter->setPen( option.palette.color( QPalette::ButtonText ) );
@@ -491,12 +496,12 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );
 				painter->setPen( Qt::gray );
-				painter->drawRoundedRect( x + 10, y + h / 4, w - 20, h / 2, 2.0, 2.0 );
+				painter->drawRoundedRect( x + 10, y, w - 20, h / 2, 2.0, 2.0 );
 				if ( used >= 90 )
 					painter->setBrush( Qt::darkRed );
 				else
 					painter->setBrush( Qt::darkGreen );
-				painter->drawRoundedRect( x + 10, y + h / 4, ( int )( ( w - 20. ) * used / 100 ), h / 2, 2.0, 2.0 );
+				painter->drawRoundedRect( x + 10, y, ( int )( ( w - 20. ) * used / 100 ), h / 2, 2.0, 2.0 );
 				painter->restore();
 			}
 			break;
@@ -604,6 +609,7 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			QString detail = index.data( Qt::UserRole + 1 ).toString();
 			painter->drawText( textRect, detail );
+			painter->drawRect( textRect  );
 			break;
 		}
 		case 3 : {

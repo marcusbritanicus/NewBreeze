@@ -9,6 +9,7 @@
 #include "NBFunctions.hpp"
 #include "NBPluginManager.hpp"
 #include "NBMessageDialog.hpp"
+#include "NBCategoryMenu.hpp"
 
 NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractItemView( parent ) {
 
@@ -512,7 +513,7 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 				if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
 					continue;
 
-				paintFolded( &painter, rect, idx );
+				paintExpander( &painter, rect, idx );
 			}
 			continue;
 		}
@@ -610,11 +611,19 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		option.palette = pltt;
 
 		NBIconDelegate *dlgt = qobject_cast<NBIconDelegate*>( itemDelegate() );
-		if ( currentViewMode == QString( "Icons" ) )
+		if ( currentViewMode == QString( "Icons" ) ) {
 			dlgt->paintIcons( &painter, option, idx );
+			/* Yet to be implemented */
+			if ( /* Settings->View.PaintOverlay and */ ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+				paintIconOverlay( &painter, rect );
+		}
 
-		else if ( currentViewMode == QString( "Tiles" ) )
+		else if ( currentViewMode == QString( "Tiles" ) ) {
 			dlgt->paintTiles( &painter, option, idx );
+			/* Yet to be implemented */
+			// if ( Settings->View.PaintOverlay )
+				// paintTilesOverlay( &painter, option.rect, );
+		}
 
 		else
 			dlgt->paintDetails( &painter, option, idx );
@@ -622,6 +631,111 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 
 	painter.end();
 	event->accept();
+};
+
+void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const {
+
+	painter->save();
+
+	QColor textColor = painter->pen().color();
+
+	QLinearGradient hLine( rectangle.topLeft(), rectangle.topRight() );
+	hLine.setColorAt( 0, textColor );
+	hLine.setColorAt( 1, Qt::transparent );
+
+	QBrush brush( hLine );
+	QPen hPen( brush, 1.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
+
+	painter->setPen( hPen );
+	painter->drawLine( rectangle.topLeft(), rectangle.topRight() );
+
+	painter->setPen( QPen( textColor ) );
+
+	QPixmap pix = cModel->pixmapForCategory( text, hiddenCategories.contains( text ) );
+	QPoint topLeft = rectangle.topLeft();
+	QPoint topRight = rectangle.topRight();
+
+	painter->drawPixmap( topLeft.x() + 4, topLeft.y() + 4, 16, 16, pix );
+
+	/* Category Menu prompt */
+	painter->drawPixmap( topRight.x() - 20, topLeft.y() + 4, 16, 16, QIcon( ":/icons/dot.png" ).pixmap( 16 ) );
+
+	/* We draw the '+' if the category is folded or hidden */
+	if ( foldedCategories.contains( text ) or hiddenCategories.contains( text ) )
+		painter->drawPixmap( topRight.x() - 36, topLeft.y() + 4, 16, 16, QIcon( ":/icons/category-expand.png" ).pixmap( 16 ) );
+
+	/* We have to draw the '-' only when the number of rows in a category is more than itemsPerRow */
+	else if ( cModel->indexListCountForCategory( text ) > itemsPerRow )
+		painter->drawPixmap( topRight.x() - 36, topLeft.y() + 4, 16, 16, QIcon( ":/icons/category-collapse.png" ).pixmap( 16 ) );
+
+	QFont categoryFont = qApp->font();
+	categoryFont.setBold( true );
+	painter->setFont( categoryFont );
+	painter->drawText( topLeft.x() + 24, topLeft.y(), rectangle.width() - 48, rectangle.height(), Qt::AlignVCenter, text );
+
+	painter->restore();
+};
+
+void NBIconView::paintExpander( QPainter *painter, const QRect &rect, const QModelIndex &idx ) {
+
+	painter->save();
+	int n = cModel->indexListCountForCategory( cModel->category( idx ) ) - itemsPerRow + 1;
+
+	int padding = ( int ) round( myIconSize.width() * 0.1 );
+
+	QPixmap pix( ":/icons/category-more.png" );
+	pix = pix.scaledToHeight( myGridSize.height() * 0.75, Qt::SmoothTransformation );
+
+	painter->setPen( Qt::lightGray );
+	painter->drawRoundedRect( rect.adjusted( padding / 2, padding / 2, -padding / 2, -padding / 2 ), 5, 5 );
+	painter->drawLine( rect.topRight() - QPoint( pix.width() * 2, -padding ), rect.bottomRight() - QPoint( pix.width() * 2, padding ) );
+
+	QRect rpix( rect.topRight() - QPoint( pix.width() * 1.5, ( pix.height() - myGridSize.height() ) / 2 ), pix.size() );
+	painter->setPen( Qt::NoPen );
+	painter->drawPixmap( rpix, pix );
+
+	QRect rtext( rect.topLeft(), rect.bottomRight() - QPoint( pix.width() * 2, 0 ) );
+	painter->setPen( Qt::black );
+	painter->drawText( rtext, Qt::AlignCenter | Qt::TextWordWrap, QString( "%1 more item%2" ).arg( n ).arg( n > 1 ? "s" : "" ) );
+
+	painter->restore();
+};
+
+void NBIconView::paintIconOverlay( QPainter *painter, const QRect &rect ) {
+
+	painter->save();
+	int iSize = myIconSize.width();
+	if ( iSize < 48 )
+		return;
+
+	int padding = ( int ) round( iSize * 0.1 );
+	QRectF oRect( rect );
+	oRect.adjust( padding / 2, padding / 2, -padding / 2, -padding / 2 );
+	oRect.setHeight( iSize + padding );
+
+	QPainterPath path;
+	path.setFillRule( Qt::WindingFill );
+	path.addRoundedRect( oRect, 3, 3 );
+	path.addRect( QRectF( QPoint( oRect.x(), oRect.y() + 10 ), QPoint( oRect.x() + oRect.width(), oRect.y() + iSize + padding ) ) );
+
+	painter->setPen( Qt::NoPen );
+	painter->setBrush( QColor( 60, 60, 60, 200 ) );
+	painter->drawPath( path );
+
+	painter->setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing, false );
+	painter->setPen( QPen( QColor( 200, 200, 200, 90 ), 0.5 ) );
+	painter->drawLine( oRect.x() + oRect.width() / 2, oRect.y(), oRect.x() + oRect.width() / 2, oRect.y() + oRect.height() );
+	painter->drawLine( oRect.x(), oRect.y() + oRect.height() / 2, oRect.x() + oRect.width(), oRect.y() + oRect.height() / 2 );
+	painter->setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing, true );
+
+	painter->setPen( Qt::white );
+	painter->setFont( QFont( "DejaVu Sans", 8, QFont::Bold ) );
+	painter->drawText( QRectF( oRect.x(), oRect.y(), oRect.width() / 2, oRect.height() / 2 ), Qt::AlignCenter, "Preview" );
+	painter->drawText( QRectF( oRect.x(), oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 ), Qt::AlignCenter, "Open" );
+	painter->drawText( QRectF( oRect.x() + oRect.width() / 2, oRect.y(), oRect.width() / 2, oRect.height() / 2 ), Qt::AlignCenter, "Actions" );
+	painter->drawText( QRectF( oRect.x() + oRect.width() / 2, oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 ), Qt::AlignCenter, "Actions" );
+
+	painter->restore();
 };
 
 void NBIconView::paintSelection( QPainter *painter, const QModelIndexList indexes ) const {
@@ -637,6 +751,7 @@ void NBIconView::paintSelection( QPainter *painter, const QModelIndexList indexe
 	painter->setBrush( bg );
 
 	QPainterPath path;
+	path.setFillRule( Qt::WindingFill );
 	Q_FOREACH( QModelIndex idx, indexes )
 		path.addRoundedRect( QRectF( viewportRectForRow( idx.row() ) ), 4, 4 );
 
@@ -688,13 +803,36 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 		/* Valid category */
 		else if ( categoryAt( mpEvent->pos() ).count() ) {
 			QRect rct = categoryRect( categoryList.indexOf( categoryAt( mpEvent->pos() ) ) );
+			QString catName = categoryAt( mpEvent->pos() );
 			QPoint topLeft = rct.topLeft();
 			QPoint topRight = rct.topRight();
 
-			/* Category arrow clicked */
-			if ( QRect( topRight.x() - 20, topLeft.y() + 4, 16, 16 ).contains( mpEvent->pos() ) )
-				if ( currentViewMode != "Details" )
-					toggleFoldCategory( categoryAt( mpEvent->pos() ) );
+			/* Category controls clicked */
+			if ( QRect( topRight.x() - 20, topLeft.y() + 4, 16, 16 ).contains( mpEvent->pos() ) ) {
+				// Show Category Menu
+				QModelIndexList list = cModel->indexListForCategory( catName );
+				NBCategoryMenu *catMenu = new NBCategoryMenu( catName, cModel->pixmapForCategory( catName ), cModel->currentDir(), list, this );
+				connect( catMenu, SIGNAL( showCategory( QString ) ), this, SLOT( showCategory( QString ) ) );
+				connect( catMenu, SIGNAL( foldCategory( QString ) ), this, SLOT( foldCategory( QString ) ) );
+				connect( catMenu, SIGNAL( hideCategory( QString ) ), this, SLOT( hideCategory( QString ) ) );
+				connect( catMenu, SIGNAL( selection( QString, bool ) ), this, SLOT( setCategorySelected( QString, bool ) ) );
+
+				catMenu->exec( mapToGlobal( mpEvent->pos() ) );
+			}
+
+			else if ( QRect( topRight.x() - 36, topLeft.y() + 4, 16, 16 ).contains( mpEvent->pos() ) ) {
+				/* If the category is hidden, show it */
+				if ( hiddenCategories.contains( catName ) )
+					showHideCategory( catName );
+
+				/* If the viewMode is not Details, fold it */
+				else if ( currentViewMode != "Details" )
+					toggleFoldCategory( catName );
+
+				/* If the viewMode is Details, hide it */
+				else
+					showHideCategory( catName );
+			}
 
 			/* Repaint the viewport */
 			viewport()->repaint();
@@ -857,10 +995,30 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 
 		else
 			setCursor( Qt::ArrowCursor );
+
+		QString ctg = categoryAt( mmEvent->pos() );
+		if ( ctg.count() ) {
+			QRect rct = categoryRect( categoryList.indexOf( ctg ) );
+			QPoint topLeft = rct.topLeft();
+			QPoint topRight = rct.topRight();
+
+			/* +/- Buttons */
+			if ( QRect( topRight.x() - 36, topLeft.y() + 4, 16, 16 ).contains( mmEvent->pos() ) ) {
+				if ( cModel->indexListCountForCategory( ctg ) > itemsPerRow )
+					QToolTip::showText( mapToGlobal( mmEvent->pos() ), "Click to fold/unfold", this, QRect(), 1500 );
+			}
+
+			else if ( QRect( topRight.x() - 20, topLeft.y() + 4, 16, 16 ).contains( mmEvent->pos() ) ) {
+				QToolTip::showText( mapToGlobal( mmEvent->pos() ), "Click to show category menu", this, QRect(), 1500 );
+			}
+		}
 	}
 
 	viewport()->repaint();
 	QAbstractItemView::mouseMoveEvent( mmEvent );
+};
+
+void NBIconView::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 };
 
 void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
@@ -1337,6 +1495,8 @@ void NBIconView::setCategorySelected( QString category, bool yes ) {
 		Q_FOREACH( QModelIndex idx, cModel->indexListForCategory( category ) )
 			mSelectedIndexes.removeAll( idx );
 	}
+
+	viewport()->repaint();
 };
 
 QModelIndex NBIconView::nextIndex() {
@@ -1844,9 +2004,18 @@ void NBIconView::calculateRectsIfNecessary() const {
 	if ( not hashIsDirty )
 		return;
 
-	QSettings sett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
-	hiddenCategories = sett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
-	foldedCategories = sett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+	if ( cModel->isRealLocation() ) {
+		QSettings sett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
+		hiddenCategories = sett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		foldedCategories = sett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+	}
+
+	else {
+		QString loc = cModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", loc );
+		hiddenCategories = sett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		foldedCategories = sett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+	}
 
 	computeRowsAndColumns();
 
@@ -2212,202 +2381,52 @@ QRect NBIconView::viewportRectForRow( int row ) const {
     return QRect( pt.x(), pt.y() - verticalScrollBar()->value(), myGridSize.width(), myGridSize.height() );
 };
 
-void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const {
-
-	painter->save();
-
-	QColor textColor = painter->pen().color();
-
-	QLinearGradient hLine( rectangle.topLeft(), rectangle.topRight() );
-	hLine.setColorAt( 0, textColor );
-	hLine.setColorAt( 1, Qt::transparent );
-
-	QBrush brush( hLine );
-	QPen hPen( brush, 1.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
-
-	painter->setPen( hPen );
-	painter->drawLine( rectangle.topLeft(), rectangle.topRight() );
-
-	painter->setPen( QPen( textColor ) );
-
-	QPixmap pix = cModel->pixmapForCategory( text, hiddenCategories.contains( text ) );
-	QPoint topLeft = rectangle.topLeft();
-	QPoint topRight = rectangle.topRight();
-
-	painter->drawPixmap( topLeft.x() + 4, topLeft.y() + 4, 16, 16, pix );
-
-	if ( foldedCategories.contains( text ) or hiddenCategories.contains( text ) )
-		painter->drawPixmap( topRight.x() - 20, topLeft.y() + 4, 16, 16, QIcon( ":/icons/category-expand.png" ).pixmap( 16 ) );
-
-	else
-		painter->drawPixmap( topRight.x() - 20, topLeft.y() + 4, 16, 16, QIcon( ":/icons/category-collapse.png" ).pixmap( 16 ) );
-
-	QFont categoryFont = qApp->font();
-	categoryFont.setBold( true );
-	painter->setFont( categoryFont );
-	painter->drawText( topLeft.x() + 24, topLeft.y(), rectangle.width() - 48, rectangle.height(), Qt::AlignVCenter, text );
-
-	painter->restore();
-};
-
-void NBIconView::paintFolded( QPainter *painter, const QRect &rect, const QModelIndex &idx ) {
-
-	painter->save();
-	int n = cModel->indexListCountForCategory( cModel->category( idx ) ) - itemsPerRow + 1;
-
-	QPixmap pix( ":/icons/category-more.png" );
-	pix = pix.scaledToHeight( myGridSize.height() * 0.75, Qt::SmoothTransformation );
-
-	painter->setPen( Qt::lightGray );
-	painter->drawRoundedRect( rect, 5, 5 );
-	painter->drawLine( rect.topRight() - QPoint( pix.width() * 2, 0 ), rect.bottomRight() - QPoint( pix.width() * 2, 0 ) );
-
-	QRect rpix( rect.topRight() - QPoint( pix.width() * 1.5, ( pix.height() - myGridSize.height() ) / 2 ), pix.size() );
-	painter->setPen( Qt::NoPen );
-	painter->drawPixmap( rpix, pix );
-
-	QRect rtext( rect.topLeft(), rect.bottomRight() - QPoint( pix.width() * 2, 0 ) );
-	painter->setPen( Qt::black );
-	painter->drawText( rtext, Qt::AlignCenter | Qt::TextWordWrap, QString( "%1 more item%2" ).arg( n ).arg( n > 1 ? "s" : "" ) );
-
-	painter->restore();
-};
-
-void NBIconView::zoomIn() {
-
-	if ( currentViewMode == QString( "Details" ) ) {
-		if ( myIconSize.width() >= 64 )
-			setIconSize( QSize( 64, 64 ) );
-
-		else
-			setIconSize( myIconSize + QSize( 4, 4 ) );
-	}
-
-	else {
-		if ( myIconSize.width() >= 128 )
-			setIconSize( QSize( 128, 128 ) );
-
-		else
-			setIconSize( myIconSize + QSize( 4, 4 ) );
-	}
-
-	if ( cModel->isRealLocation() ) {
-
-		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
-	}
-};
-
-void NBIconView::zoomOut() {
-
-	if ( myIconSize.width() <= 16 )
-		setIconSize( QSize( 16, 16 ) );
-
-	else
-		setIconSize( myIconSize - QSize( 4, 4 ) );
-
-	if ( cModel->isRealLocation() ) {
-
-		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
-	}
-};
-
-void NBIconView::emitCML() {
-
-	QAction *act = qobject_cast<QAction*>( sender() );
-
-	QStringList args = act->data().toStringList();
-	QString mtpt = args.takeLast();
-
-	if ( not mtpt.endsWith( "/" ) )
-		mtpt += "/";
-
-	if ( act->text().contains( "Copy" ) ) {
-
-		NBProcess::Progress *progress = new NBProcess::Progress;
-		progress->sourceDir = dirName( args.at( 0 ) );
-		progress->targetDir = mtpt;
-
-		QStringList srcList;
-		foreach( QString path, args )
-			srcList << path.replace( progress->sourceDir, "" );
-
-		progress->type = NBProcess::Copy;
-
-		NBIOProcess *proc = new NBIOProcess( srcList, progress );
-		NBProcessManager::instance()->addProcess( progress, proc );
-
-		progress->startTime = QTime::currentTime();
-
-		proc->start();
-	}
-
-	else if ( act->text().contains( "Move" ) ) {
-
-		NBProcess::Progress *progress = new NBProcess::Progress;
-		progress->sourceDir = dirName( args.at( 0 ) );
-		progress->targetDir = mtpt;
-
-		QStringList srcList;
-		foreach( QString path, args )
-			srcList << path.replace( progress->sourceDir, "" );
-
-		progress->type = NBProcess::Move;
-
-		NBIOProcess *proc = new NBIOProcess( srcList, progress );
-		NBProcessManager::instance()->addProcess( progress, proc );
-
-		progress->startTime = QTime::currentTime();
-
-		proc->start();
-	}
-
-	else {
-
-		QStringList errorNodes;
-		Q_FOREACH( QString path, args ) {
-			if ( symlink( path.toLocal8Bit().data(), ( mtpt + baseName( path ) ).toLocal8Bit().data() ) != 0 ) {
-				errorNodes << path;
-				qDebug() << "Failed to create link for:" << baseName( path );
-				qDebug() << "   " << strerror( errno );
-			}
-		}
-
-		if ( errorNodes.count() ) {
-			QString title = "NewBreeze - Error Creating links";
-			QString text = QString(
-				"Some errors were encountered while creating the symlinks you requested. "
-				"They are listed in the table below. Please check the debug messages to determine the cause of the errors."
-			);
-
-			NBErrorsDialog *errDlg = new NBErrorsDialog( title, text, errorNodes, this );
-			errDlg->exec();
-		}
-	}
-};
-
 void NBIconView::showHideCategory( QString category ) {
 
-	QSettings dirSett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
-	QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
-	QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+	if ( cModel->currentDir().startsWith( "NB://" ) ) {
+		QString loc = cModel->currentDir().replace( "NB://", "" );
+		QSettings dirSett( "NewBreeze", loc );
+		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
 
-	if ( hiddenCategories.contains( category ) ) {
-		hiddenCategories.removeAll( category );
-		hidden.removeAll( category );
-		folded.removeAll( category );
+		if ( hiddenCategories.contains( category ) ) {
+			hiddenCategories.removeAll( category );
+			hidden.removeAll( category );
+			folded.removeAll( category );
+		}
+
+		else{
+			hiddenCategories.append( category );
+			hidden.append( category );
+		}
+
+		hidden.removeDuplicates();
+		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.sync();
 	}
 
-	else{
-		hiddenCategories.append( category );
-		hidden.append( category );
-	}
+	else {
+		QSettings dirSett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
+		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
 
-	hidden.removeDuplicates();
-	dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
-	dirSett.setValue( "NewBreeze/FoldedCategories", folded );
-	dirSett.sync();
+		if ( hiddenCategories.contains( category ) ) {
+			hiddenCategories.removeAll( category );
+			hidden.removeAll( category );
+			folded.removeAll( category );
+		}
+
+		else{
+			hiddenCategories.append( category );
+			hidden.append( category );
+		}
+
+		hidden.removeDuplicates();
+		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.sync();
+	}
 
 	hashIsDirty = true;
 	calculateRectsIfNecessary();
@@ -2490,6 +2509,258 @@ void NBIconView::toggleFoldCategory( QString category ) {
 
 	hashIsDirty = true;
 	calculateRectsIfNecessary();
+};
+
+void NBIconView::showCategory( QString category ) {
+
+	if ( not cModel->isRealLocation() ) {
+		QString loc = cModel->currentDir().replace( "NB://", "" );
+		QSettings dirSett( "NewBreeze", loc );
+		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
+		hiddenCategories.removeAll( category );
+		foldedCategories.removeAll( category );
+		hidden.removeAll( category );
+		folded.removeAll( category );
+
+		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.sync();
+	}
+
+	else {
+		QSettings dirSett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
+		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
+		hiddenCategories.removeAll( category );
+		foldedCategories.removeAll( category );
+		hidden.removeAll( category );
+		folded.removeAll( category );
+
+		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.sync();
+	}
+
+	hashIsDirty = true;
+	calculateRectsIfNecessary();
+};
+
+void NBIconView::foldCategory( QString category ) {
+
+	if ( cModel->indexListCountForCategory( category ) < itemsPerRow )
+		return;
+
+	if ( not cModel->isRealLocation() ) {
+		QString loc = cModel->currentDir().replace( "NB://", "" );
+		QSettings dirSett( "NewBreeze", loc );
+		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
+		hiddenCategories.removeAll( category );
+		foldedCategories.removeAll( category );
+		hidden.removeAll( category );
+		folded.removeAll( category );
+
+		foldedCategories.append( category );
+		folded.append( category );
+
+		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.sync();
+	}
+
+	else {
+		QSettings dirSett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
+		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
+		hiddenCategories.removeAll( category );
+		foldedCategories.removeAll( category );
+		hidden.removeAll( category );
+		folded.removeAll( category );
+
+		foldedCategories.append( category );
+		folded.append( category );
+
+		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.sync();
+	}
+
+	hashIsDirty = true;
+	calculateRectsIfNecessary();
+};
+
+void NBIconView::hideCategory( QString category ) {
+
+	if ( not cModel->isRealLocation() ) {
+		QString loc = cModel->currentDir().replace( "NB://", "" );
+		QSettings dirSett( "NewBreeze", loc );
+		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
+		hiddenCategories.removeAll( category );
+		foldedCategories.removeAll( category );
+		hidden.removeAll( category );
+		folded.removeAll( category );
+
+		hiddenCategories.append( category );
+		hidden.append( category );
+
+		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.sync();
+	}
+
+	else {
+		QSettings dirSett( cModel->currentDir() + ".directory", QSettings::NativeFormat );
+		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
+		hiddenCategories.removeAll( category );
+		foldedCategories.removeAll( category );
+		hidden.removeAll( category );
+		folded.removeAll( category );
+
+		hiddenCategories.append( category );
+		hidden.append( category );
+
+		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.sync();
+	}
+
+	hashIsDirty = true;
+	calculateRectsIfNecessary();
+};
+
+void NBIconView::zoomIn() {
+
+	if ( currentViewMode == QString( "Details" ) ) {
+		if ( myIconSize.width() >= 64 )
+			setIconSize( QSize( 64, 64 ) );
+
+		else
+			setIconSize( myIconSize + QSize( 4, 4 ) );
+	}
+
+	else {
+		if ( myIconSize.width() >= 128 )
+			setIconSize( QSize( 128, 128 ) );
+
+		else
+			setIconSize( myIconSize + QSize( 4, 4 ) );
+	}
+
+	if ( cModel->isRealLocation() ) {
+
+		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+	}
+
+	else {
+		QString loc = cModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", loc );
+		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+	}
+};
+
+void NBIconView::zoomOut() {
+
+	if ( myIconSize.width() <= 16 )
+		setIconSize( QSize( 16, 16 ) );
+
+	else
+		setIconSize( myIconSize - QSize( 4, 4 ) );
+
+	if ( cModel->isRealLocation() ) {
+
+		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
+		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+	}
+
+	else {
+		QString loc = cModel->currentDir().replace( "NB://", "" );
+		QSettings sett( "NewBreeze", loc );
+		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+	}
+};
+
+void NBIconView::emitCML() {
+
+	QAction *act = qobject_cast<QAction*>( sender() );
+
+	QStringList args = act->data().toStringList();
+	QString mtpt = args.takeLast();
+
+	if ( not mtpt.endsWith( "/" ) )
+		mtpt += "/";
+
+	if ( act->text().contains( "Copy" ) ) {
+
+		NBProcess::Progress *progress = new NBProcess::Progress;
+		progress->sourceDir = dirName( args.at( 0 ) );
+		progress->targetDir = mtpt;
+
+		QStringList srcList;
+		foreach( QString path, args )
+			srcList << path.replace( progress->sourceDir, "" );
+
+		progress->type = NBProcess::Copy;
+
+		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBProcessManager::instance()->addProcess( progress, proc );
+
+		progress->startTime = QTime::currentTime();
+
+		proc->start();
+	}
+
+	else if ( act->text().contains( "Move" ) ) {
+
+		NBProcess::Progress *progress = new NBProcess::Progress;
+		progress->sourceDir = dirName( args.at( 0 ) );
+		progress->targetDir = mtpt;
+
+		QStringList srcList;
+		foreach( QString path, args )
+			srcList << path.replace( progress->sourceDir, "" );
+
+		progress->type = NBProcess::Move;
+
+		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBProcessManager::instance()->addProcess( progress, proc );
+
+		progress->startTime = QTime::currentTime();
+
+		proc->start();
+	}
+
+	else {
+
+		QStringList errorNodes;
+		Q_FOREACH( QString path, args ) {
+			if ( symlink( path.toLocal8Bit().data(), ( mtpt + baseName( path ) ).toLocal8Bit().data() ) != 0 ) {
+				errorNodes << path;
+				qDebug() << "Failed to create link for:" << baseName( path );
+				qDebug() << "   " << strerror( errno );
+			}
+		}
+
+		if ( errorNodes.count() ) {
+			QString title = "NewBreeze - Error Creating links";
+			QString text = QString(
+				"Some errors were encountered while creating the symlinks you requested. "
+				"They are listed in the table below. Please check the debug messages to determine the cause of the errors."
+			);
+
+			NBErrorsDialog *errDlg = new NBErrorsDialog( title, text, errorNodes, this );
+			errDlg->exec();
+		}
+	}
 };
 
 bool NBIconView::canShowIndex( QModelIndex idx ) {

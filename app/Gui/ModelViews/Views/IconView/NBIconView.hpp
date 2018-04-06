@@ -97,6 +97,7 @@ class NBIconView : public QAbstractItemView {
 
 		void mousePressEvent( QMouseEvent * );
 		void mouseMoveEvent( QMouseEvent * );
+		void mouseReleaseEvent( QMouseEvent * );
 		void mouseDoubleClickEvent( QMouseEvent * );
 
 		void dragEnterEvent( QDragEnterEvent* );
@@ -111,8 +112,6 @@ class NBIconView : public QAbstractItemView {
 
 		QModelIndex moveCursorCategorized( QAbstractItemView::CursorAction cursorAction );
 		QModelIndex moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction );
-
-		void setCategorySelected( QString, bool );
 
 		/* Cursor Movement Helpers */
 		QModelIndex nextIndex();
@@ -145,10 +144,9 @@ class NBIconView : public QAbstractItemView {
 
 		void paintCategory( QPainter *painter, const QRect &rectangle, const QString &text ) const;
 		void paintSelection( QPainter *painter, const QModelIndexList ) const;
-		void paintFolded( QPainter *painter, const QRect &rect, const QModelIndex &idx );
+		void paintExpander( QPainter *painter, const QRect &rect, const QModelIndex &idx );
+		void paintIconOverlay( QPainter *painter, const QRect &rect );
 
-		void showHideCategory( QString );
-		void toggleFoldCategory( QString );
 		bool canShowIndex( QModelIndex );
 
 		int expanderAt( QPoint );
@@ -213,6 +211,15 @@ class NBIconView : public QAbstractItemView {
 		QPoint dragStartPosition;
 
 	private slots:
+		void showHideCategory( QString );
+		void toggleFoldCategory( QString );
+
+		void setCategorySelected( QString, bool sel = true );
+
+		void showCategory( QString );
+		void foldCategory( QString );
+		void hideCategory( QString );
+
 		void zoomIn();
 		void zoomOut();
 

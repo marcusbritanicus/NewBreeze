@@ -1,21 +1,21 @@
 NewBreeze v3.0.0 Beta3
 
-General                                                                                                                               [ 1 of 2 ]
+General                                                                                                                               [ 2 of 2 ]
 	✓ Add support for addition of terminal emulators
-	✍ Add a menu like chromium and firefox
+	✓ Add a menu like chromium and firefox
 
-NBIconView                                                                                                                            [ 0 of 3 ]
+NBIconView                                                                                                                            [ 2 of 4 ]
 	□ Improve the selection model
 	  • Enable rectanlge rubberband selection
 	  • Change selection policy with model data type
 	□ Enable PageUp and PageDown navigation
-	□ Add finesse to Mac style semi-folded categories
+	◐ Add finesse to Mac style semi-folded categories
 	  • One click on category icon, partially folds it, clicking again expands it.
 	  • Double-clicking category, toggles folding
 	✓ Fix drag-and-drop to take care of SuperStart
 
-BugReporting                                                                                                                          [ 0 of 1 ]
-	✍ Option for bug reporting - will be added as CLI option and menu option to be added later
+BugReporting                                                                                                                          [ 1 of 1 ]
+	✓ Option for bug reporting - will be added as CLI option and menu option to be added later
 
 StartupWizard                                                                                                                         [ 1 of 1 ]
 	✓ Startup Wizard to initiate basic settings
@@ -25,4 +25,4 @@ Note:
 	□ - Work to be started
 	✓ - Work Completed
 	✗ - Not working on this
-	◐ - Partial Support
+	◐ - Partially complete
