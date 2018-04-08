@@ -318,3 +318,8 @@ QString NBDirectoryDialog::getDirectoryName( QWidget *parent, QString title, QSt
 	else
 		return QString();
 };
+
+void NBDirectoryDialog::open( QString path ) {
+
+	dirView->setCurrentBranch( path );
+};

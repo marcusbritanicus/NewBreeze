@@ -5,12 +5,7 @@
 */
 
 #include "NBCategoryMenu.hpp"
-#include "NBFolderView.hpp"
-#include "NBPluginInterface.hpp"
-#include "NBPluginManager.hpp"
-#include "NBGuiFunctions.hpp"
-#include "NBVaultDatabase.hpp"
-#include "NBVault.hpp"
+#include "NBPropertiesDialog.hpp"
 
 NBCategoryMenu::NBCategoryMenu( QString catName, QPixmap icon, QString wNode, QModelIndexList nodeList, QWidget *parent ) : QMenu( parent ) {
 
@@ -102,9 +97,14 @@ void NBCategoryMenu::manageSelection() {
 
 void NBCategoryMenu::showProperties() {
 
-	QMessageBox::information(
-		NULL,
-		"NewBreeze - Properties",
-		"This feature is under implementation. Please wait for the next commit."
-	);
+	QStringList paths;
+	foreach( QModelIndex idx, sNodes ) {
+		paths << mWorkNode + "/" + idx.data().toString();
+		qDebug() << mWorkNode + idx.data().toString();
+	}
+
+	bool terminate = false;
+
+	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, &terminate, this );
+	propsDlg->show();
 };

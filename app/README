@@ -46,6 +46,7 @@ Dependencies:
 
 Known Bugs
     - Extended copy/move causes crashes. Disabled by default.
+    - Reloading causes custom folder icons not to be rendered
 
 List of shortcuts
 +==============================================================+============================+

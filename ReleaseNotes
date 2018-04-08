@@ -30,8 +30,8 @@ few changes in NewBreeze 3.
    - Mac-style partial folding of categories is now enabled.
    - Fixed the small issue of mouse/cursor selection conflict.
    - Fixed the SegFault with cursor up and down movements.
-   # Currently has issues with cursorMovements. Will be fixed by v3-rc
-   # List View and Tiles view are currently disabled. Will be fixed by v3-beta3
+   - List View and Tiles view are fixed and working fine.
+   # Currently has issues with cursorMovements. Will be fixed by v3-rc.
 
 => UI
    - An elementary Accidental Delete Protection (ADP) has been added. However it is not mature enough for commercial use.

@@ -54,6 +54,7 @@ Some of its features are
 
 ### Known Bugs
 * Extended copy/move causes crashes. Disabled by default.
+* Reloading causes custom folder icons not to be rendered
 
 ### Upcoming
 * Any other feature you request for... :)
