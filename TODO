@@ -14,6 +14,9 @@ NBIconView                                                                      
 	  • Double-clicking category, toggles folding
 	✓ Fix drag-and-drop to take care of SuperStart
 
+NBDirTreeModel                                                                                                                        [ 0 of 1 ]
+	◐ Fix too many open QFileSystemWatcher instances
+
 BugReporting                                                                                                                          [ 1 of 1 ]
 	✓ Option for bug reporting - will be added as CLI option and menu option to be added later
 
