@@ -89,7 +89,7 @@ class NBFolderView : public QStackedWidget {
 		void showFolders();
 
 		void doRename();
-		void doPeek();
+		void doPeek( QModelIndex curIdx = QModelIndex() );
 		void doReload();
 		void doToggleHidden();
 		void move( QStringList, QString );

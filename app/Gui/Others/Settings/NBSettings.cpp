@@ -46,7 +46,9 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.FilterFolders = true;
 	defaultSettings->General.SuperStart = true;
 	defaultSettings->General.SpecialOpen = true;
-	defaultSettings->General.DirectIO = false;
+	defaultSettings->General.ExtendedIO = false;
+
+	defaultSettings->View.PaintOverlay = true;
 
 	defaultSettings->Special.ClosingDown = false;
 
@@ -161,8 +163,11 @@ NBSettings* NBSettings::instance() {
 	if ( gaKeys.contains( QString( "SpecialOpen" ) ) )
 		settings->General.SpecialOpen = gSettings.value( "SpecialOpen" ).toBool();
 
-	if ( gaKeys.contains( QString( "DirectIO" ) ) )
-		settings->General.DirectIO = gSettings.value( "DirectIO" ).toBool();
+	if ( gaKeys.contains( QString( "ExtendedIO" ) ) )
+		settings->General.ExtendedIO = gSettings.value( "ExtendedIO" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/PaintOverlay" ) ) )
+		settings->View.PaintOverlay = gSettings.value( "View/PaintOverlay" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		settings->Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
@@ -359,8 +364,11 @@ void NBSettings::reload() {
 	if ( gaKeys.contains( QString( "SpecialOpen" ) ) )
 		General.SpecialOpen = gSettings.value( "SpecialOpen" ).toBool();
 
-	if ( gaKeys.contains( QString( "DirectIO" ) ) )
-		General.DirectIO = gSettings.value( "DirectIO" ).toBool();
+	if ( gaKeys.contains( QString( "ExtendedIO" ) ) )
+		General.ExtendedIO = gSettings.value( "ExtendedIO" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/PaintOverlay" ) ) )
+		View.PaintOverlay = gSettings.value( "View/PaintOverlay" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();

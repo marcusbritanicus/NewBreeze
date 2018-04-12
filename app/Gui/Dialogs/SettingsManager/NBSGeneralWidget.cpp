@@ -129,14 +129,14 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	imagePreviewCB->setChecked( Settings->General.ImagePreviews );
 	connect( imagePreviewCB, SIGNAL( stateChanged( int ) ), this, SLOT( handleCheckStateChanged( int ) ) );
 
-	directIOCB = new QCheckBox( "Enable exten&ded IO" );
-	directIOCB->setChecked( Settings->General.DirectIO );
-	directIOCB->setToolTip(
+	extendedIOCB = new QCheckBox( "Enable exten&ded IO" );
+	extendedIOCB->setChecked( Settings->General.ExtendedIO );
+	extendedIOCB->setToolTip(
 		"Extended IO is a replacement for 'Copy/Move to' menu option. When enabled, "
 		"a dialog opens where you can choose the target directory to which you want "
 		"to copy/move."
 	);
-	connect( directIOCB, SIGNAL( toggled( bool ) ), this, SLOT( handleDirectIOChanged( bool ) ) );
+	connect( extendedIOCB, SIGNAL( toggled( bool ) ), this, SLOT( handleExtendedIOChanged( bool ) ) );
 
 	/* Terminal */
 	termGB = new QGroupBox( "Terminals", this );
@@ -178,7 +178,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	otherGBLyt->addWidget( openWithCB );
 	otherGBLyt->addLayout( rbLyt );
 	otherGBLyt->addWidget( imagePreviewCB );
-	otherGBLyt->addWidget( directIOCB );
+	otherGBLyt->addWidget( extendedIOCB );
 
 	QGroupBox *otherOptionsGB = new QGroupBox( "Other Options", this );
 	otherOptionsGB->setLayout( otherGBLyt );
@@ -367,10 +367,10 @@ void NBSGeneralWidget::handleCheckStateChanged( int state ) {
 	}
 };
 
-void NBSGeneralWidget::handleDirectIOChanged( bool enabled ) {
+void NBSGeneralWidget::handleExtendedIOChanged( bool enabled ) {
 
-	Settings->setValue( "DirectIO", enabled );
-	Settings->General.DirectIO = enabled;
+	Settings->setValue( "ExtendedIO", enabled );
+	Settings->General.ExtendedIO = enabled;
 };
 
 void NBSGeneralWidget::handleDefaultClicked() {

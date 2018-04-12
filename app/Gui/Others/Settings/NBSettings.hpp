@@ -40,8 +40,14 @@ class NBSettings {
 				bool FilterFolders;								// Filter folders while searching?
 				bool SuperStart;								// Use CombiView as Home
 				bool SpecialOpen;								// Use CombiView as Home
-				bool DirectIO;									// Use direct copy/move
+				bool ExtendedIO;								// Use direct copy/move
 		} General;
+
+		// View Settings
+		class ViewSettings {
+			public:
+				bool PaintOverlay;								// Paint QuickAccess overlays
+		} View;
 
 		// Special Settings
 		class SpecialSettings {

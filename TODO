@@ -4,11 +4,12 @@ General                                                                         
 	✓ Add support for addition of terminal emulators
 	✓ Add a menu like chromium and firefox
 
-NBIconView                                                                                                                            [ 2 of 4 ]
+NBIconView                                                                                                                            [ 2 of 5 ]
 	□ Improve the selection model
 	  • Enable rectanlge rubberband selection
 	  • Change selection policy with model data type
 	□ Enable PageUp and PageDown navigation
+	✍ IconOverlays for better access
 	◐ Add finesse to Mac style semi-folded categories
 	  • One click on category icon, partially folds it, clicking again expands it.
 	  • Double-clicking category, toggles folding

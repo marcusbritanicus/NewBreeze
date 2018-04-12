@@ -1,3 +1,10 @@
+newbreeze-plugins (3.0.0-rc1) unstable; urgency=low
+
+  * Qt5 > 5.5 uses QtWebEngine by default, others use QtWebKit
+  * Inbuilt terminal plugin added
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Thu, 12 April 2018 10:00:00 +0530
+
 newbreeze-plugins (3.0.0-beta2) unstable; urgency=low
 
   * NBTextEdit close-on-escape bug fixed

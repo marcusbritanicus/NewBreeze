@@ -48,6 +48,8 @@ bool NBFolderView::hasSelection() {
 
 void NBFolderView::createAndSetupActions() {
 
+	connect( IconView, SIGNAL( peek( QModelIndex ) ), this, SLOT( doPeek( QModelIndex ) ) );
+
 	connect( IconView, SIGNAL( open( QModelIndex ) ), this, SLOT( doOpen( QModelIndex ) ) );
 	connect( IconView, SIGNAL( open( QString ) ), this, SLOT( doOpen( QString ) ) );
 
@@ -634,9 +636,10 @@ void NBFolderView::showFolders() {
 	emit showStatusBar();
 };
 
-void NBFolderView::doPeek() {
+void NBFolderView::doPeek( QModelIndex curIndex ) {
 
-	QModelIndex curIndex = IconView->currentIndex();
+	if ( not curIndex.isValid() )
+		curIndex = IconView->currentIndex();
 
 	if ( !curIndex.isValid() ) {
 		emit showProperties();
@@ -748,7 +751,7 @@ void NBFolderView::prepareCopy() {
 
 	clipBoard->setMimeData( mData );
 
-	if ( Settings->General.DirectIO ) {
+	if ( Settings->General.ExtendedIO ) {
 		NBProcess::Progress *progress = new NBProcess::Progress;
 		progress->sourceDir = fsModel->currentDir();
 		progress->targetDir = NBDirectoryDialog::getDirectoryName( this, "NewBreeze - Choose target directory", fsModel->currentDir() );
@@ -787,7 +790,7 @@ void NBFolderView::prepareMove() {
 
 	clipBoard->setMimeData( mData );
 
-	if ( Settings->General.DirectIO ) {
+	if ( Settings->General.ExtendedIO ) {
 		NBProcess::Progress *progress = new NBProcess::Progress;
 		progress->sourceDir = fsModel->currentDir();
 		progress->targetDir = NBDirectoryDialog::getDirectoryName( this,"NewBreeze - Choose target directory", fsModel->currentDir() );

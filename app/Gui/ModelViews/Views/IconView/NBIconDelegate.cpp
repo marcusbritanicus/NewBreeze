@@ -20,8 +20,6 @@ void NBIconDelegate::paintIcons( QPainter *painter, const NBStyleOptionViewItem 
 
 		QRect optionRect( option.rect );
 
-		/* Font Mentrics for elided text */
-		QFontMetrics fm( qApp->font() );
 
 		/* Get icon size */
 		QSize iconSize( option.decorationSize );
@@ -71,8 +69,6 @@ void NBIconDelegate::paintIcons( QPainter *painter, const NBStyleOptionViewItem 
 		// Left and Right Border
 		textRect.setSize( optionRect.size() - QSize( 2 * padding, qMin( 3, padding / 2 ) + padding + iconSize.height() ) );
 
-		// Set elided text
-		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
 		if ( iconSize.width() <= 40 ) {
 			maxLines = 1;
 			textRect.adjust( 0, 3, 0, 0 );
@@ -162,6 +158,10 @@ void NBIconDelegate::paintIcons( QPainter *painter, const NBStyleOptionViewItem 
 		painter->save();
 		if ( option.state & QStyle::State_HasFocus )
 			painter->setFont( QFont( painter->font().family(), painter->font().pointSize(), QFont::Bold ) );
+
+		/* Font Mentrics for elided text */
+		QFontMetrics fm( painter->font() );
+		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
 		painter->drawText( textRect, Qt::AlignHCenter, text );
 
 		painter->restore();
@@ -187,9 +187,6 @@ void NBIconDelegate::paintTiles( QPainter *painter, const NBStyleOptionViewItem 
 		QFileInfo ftype = model->nodeInfo( index );
 
 		QRect optionRect( option.rect );
-
-		// Font Mentrics for elided text;
-		QFontMetrics fm( qApp->font() );
 
 		// Get icon size
 		QSize iconSize( option.decorationSize );
@@ -235,8 +232,6 @@ void NBIconDelegate::paintTiles( QPainter *painter, const NBStyleOptionViewItem 
 		// Original Width - Image Left Border - Image Width - Image Text Gap - Text Right Border
 		textRect.setSize( optionRect.size() - QSize( iconSize.width(), 0 ) - 3 * QSize( padding, 0 ) - QSize( 0, padding * 1.5 ) );
 
-		// Set elided text
-		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
 		if ( iconSize.height() < 30 ) {
 			maxLines = 1;
 		}
@@ -314,11 +309,21 @@ void NBIconDelegate::paintTiles( QPainter *painter, const NBStyleOptionViewItem 
 		painter->setPen( option.palette.color( QPalette::Text ) );
 
 		// Draw Text
+		painter->save();
+		if ( option.state & QStyle::State_HasFocus )
+			painter->setFont( QFont( painter->font().family(), painter->font().pointSize(), QFont::Bold ) );
+
+		/* Font Mentrics for elided text */
+		QFontMetrics fm( painter->font() );
+		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
+
 		if ( maxLines == 1 )
 			painter->drawText( textRect, Qt::AlignVCenter, text );
 
 		else
 			painter->drawText( textRect, text );
+
+		painter->restore();
 
 		// Draw the extra details
 		painter->setPen( option.palette.color( QPalette::ButtonText ) );
@@ -341,9 +346,6 @@ void NBIconDelegate::paintDetails( QPainter *painter, const NBStyleOptionViewIte
 		QFileInfo ftype = model->nodeInfo( index );
 
 		QRect optionRect( option.rect );
-
-		// Font Mentrics for elided text;
-		QFontMetrics fm( qApp->font() );
 
 		// Get icon size
 		QSize iconSize( option.decorationSize );
@@ -389,8 +391,6 @@ void NBIconDelegate::paintDetails( QPainter *painter, const NBStyleOptionViewIte
 		// Original Width - Image Left Border - Image Width - Image Text Gap -Text Right Border
 		textRect.setSize( optionRect.size() - QSize( iconSize.width(), 0 ) - 3 * QSize( padding, 0 ) - QSize( 350, 0 ) );
 
-		// Set elided text
-		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
 		QList<QRect> rectList;
 
 		// First detail
@@ -457,7 +457,16 @@ void NBIconDelegate::paintDetails( QPainter *painter, const NBStyleOptionViewIte
 		painter->setPen( option.palette.color( QPalette::Text ) );
 
 		// Draw Text
+		painter->save();
+		if ( option.state & QStyle::State_HasFocus )
+			painter->setFont( QFont( painter->font().family(), painter->font().pointSize(), QFont::Bold ) );
+
+		/* Font Mentrics for elided text */
+		QFontMetrics fm( painter->font() );
+		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
 		painter->drawText( textRect, Qt::AlignVCenter, text );
+
+		painter->restore();
 
 		// Draw the extra details
 		painter->setPen( option.palette.color( QPalette::ButtonText ) );
@@ -511,7 +520,26 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 			/* Two details */
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			QString detail = index.data( Qt::UserRole + 1 ).toString();
-			painter->drawText( textRect, Qt::AlignHCenter, detail );
+			if ( not detail.endsWith( "% used" ) )
+				painter->drawText( textRect, Qt::AlignHCenter, detail );
+
+			else {
+				int used = detail.replace( "% used", "" ).toInt();
+				int x = textRect.x();
+				int y = textRect.y();
+				int w = textRect.width();
+				int h = textRect.height();
+				painter->save();
+				painter->setRenderHint( QPainter::Antialiasing, false );
+				painter->setPen( Qt::gray );
+				painter->drawRoundedRect( x + 10, y, w - 20, QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				if ( used >= 90 )
+					painter->setBrush( Qt::darkRed );
+				else
+					painter->setBrush( Qt::darkGreen );
+				painter->drawRoundedRect( x + 10, y, ( int )( ( w - 20. ) * used / 100 ), QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->restore();
+			}
 
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			detail = index.data( Qt::UserRole + 3 ).toString();
@@ -525,7 +553,26 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 			/* Three details */
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			QString detail = index.data( Qt::UserRole + 1 ).toString();
-			painter->drawText( textRect, Qt::AlignHCenter, detail );
+			if ( not detail.endsWith( "% used" ) )
+				painter->drawText( textRect, Qt::AlignHCenter, detail );
+
+			else {
+				int used = detail.replace( "% used", "" ).toInt();
+				int x = textRect.x();
+				int y = textRect.y();
+				int w = textRect.width();
+				int h = textRect.height();
+				painter->save();
+				painter->setRenderHint( QPainter::Antialiasing, false );
+				painter->setPen( Qt::gray );
+				painter->drawRoundedRect( x + 10, y, w - 20, QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				if ( used >= 90 )
+					painter->setBrush( Qt::darkRed );
+				else
+					painter->setBrush( Qt::darkGreen );
+				painter->drawRoundedRect( x + 10, y, ( int )( ( w - 20. ) * used / 100 ), QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->restore();
+			}
 
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			detail = index.data( Qt::UserRole + 3 ).toString();
@@ -543,7 +590,26 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 			/* Four details */
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			QString detail = index.data( Qt::UserRole + 1 ).toString();
-			painter->drawText( textRect, Qt::AlignHCenter, detail );
+			if ( not detail.endsWith( "% used" ) )
+				painter->drawText( textRect, Qt::AlignHCenter, detail );
+
+			else {
+				int used = detail.replace( "% used", "" ).toInt();
+				int x = textRect.x();
+				int y = textRect.y();
+				int w = textRect.width();
+				int h = textRect.height();
+				painter->save();
+				painter->setRenderHint( QPainter::Antialiasing, false );
+				painter->setPen( Qt::gray );
+				painter->drawRoundedRect( x + 10, y, w - 20, QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				if ( used >= 90 )
+					painter->setBrush( Qt::darkRed );
+				else
+					painter->setBrush( Qt::darkGreen );
+				painter->drawRoundedRect( x + 10, y, ( int )( ( w - 20. ) * used / 100 ), QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->restore();
+			}
 
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			detail = index.data( Qt::UserRole + 3 ).toString();
@@ -565,7 +631,26 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 			/* Five details */
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			QString detail = index.data( Qt::UserRole + 1 ).toString();
-			painter->drawText( textRect, Qt::AlignHCenter, detail );
+			if ( not detail.endsWith( "% used" ) )
+				painter->drawText( textRect, Qt::AlignHCenter, detail );
+
+			else {
+				int used = detail.replace( "% used", "" ).toInt();
+				int x = textRect.x();
+				int y = textRect.y();
+				int w = textRect.width();
+				int h = textRect.height();
+				painter->save();
+				painter->setRenderHint( QPainter::Antialiasing, false );
+				painter->setPen( Qt::gray );
+				painter->drawRoundedRect( x + 10, y, w - 20, QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				if ( used >= 90 )
+					painter->setBrush( Qt::darkRed );
+				else
+					painter->setBrush( Qt::darkGreen );
+				painter->drawRoundedRect( x + 10, y, ( int )( ( w - 20. ) * used / 100 ), QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->restore();
+			}
 
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			detail = index.data( Qt::UserRole + 3 ).toString();
@@ -608,14 +693,56 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 		case 2 : {
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			QString detail = index.data( Qt::UserRole + 1 ).toString();
-			painter->drawText( textRect, detail );
-			painter->drawRect( textRect  );
+			if ( not detail.endsWith( "% used" ) )
+				painter->drawText( textRect, detail );
+
+			else {
+				int used = detail.replace( "% used", "" ).toInt();
+				int x = textRect.x();
+				int y = textRect.y();
+				int w = textRect.width();
+				int h = textRect.height();
+
+				painter->save();
+				painter->setRenderHint( QPainter::Antialiasing, false );
+				painter->setPen( Qt::gray );
+				painter->drawRoundedRect( x, y, w - 20, QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->setPen( Qt::NoPen );
+				if ( used >= 90 )
+					painter->setBrush( Qt::darkRed );
+				else
+					painter->setBrush( Qt::darkGreen );
+				painter->drawRoundedRect( x, y, ( int )( ( w - 20. ) * used / 100 ), QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->restore();
+			}
 			break;
 		}
+
 		case 3 : {
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			QString detail = index.data( Qt::UserRole + 1 ).toString();
-			painter->drawText( textRect, detail );
+			if ( not detail.endsWith( "% used" ) )
+				painter->drawText( textRect, detail );
+
+			else {
+				int used = detail.replace( "% used", "" ).toInt();
+				int x = textRect.x();
+				int y = textRect.y();
+				int w = textRect.width();
+				int h = textRect.height();
+
+				painter->save();
+				painter->setRenderHint( QPainter::Antialiasing, false );
+				painter->setPen( Qt::gray );
+				painter->drawRoundedRect( x, y, w - 20, QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->setPen( Qt::NoPen );
+				if ( used >= 90 )
+					painter->setBrush( Qt::darkRed );
+				else
+					painter->setBrush( Qt::darkGreen );
+				painter->drawRoundedRect( x, y, ( int )( ( w - 20. ) * used / 100 ), QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->restore();
+			}
 
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			detail = index.data( Qt::UserRole + 2 ).toString();
@@ -626,7 +753,28 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 		case 4 : {
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			QString detail = index.data( Qt::UserRole + 1 ).toString();
-			painter->drawText( textRect, detail );
+			if ( not detail.endsWith( "% used" ) )
+				painter->drawText( textRect, detail );
+
+			else {
+				int used = detail.replace( "% used", "" ).toInt();
+				int x = textRect.x();
+				int y = textRect.y();
+				int w = textRect.width();
+				int h = textRect.height();
+
+				painter->save();
+				painter->setRenderHint( QPainter::Antialiasing, false );
+				painter->setPen( Qt::gray );
+				painter->drawRoundedRect( x, y, w - 20, QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->setPen( Qt::NoPen );
+				if ( used >= 90 )
+					painter->setBrush( Qt::darkRed );
+				else
+					painter->setBrush( Qt::darkGreen );
+				painter->drawRoundedRect( x, y, ( int )( ( w - 20. ) * used / 100 ), QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->restore();
+			}
 
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			detail = index.data( Qt::UserRole + 3 ).toString();
@@ -641,7 +789,28 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 		case 5 : {
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			QString detail = index.data( Qt::UserRole + 1 ).toString();
-			painter->drawText( textRect, detail );
+			if ( not detail.endsWith( "% used" ) )
+				painter->drawText( textRect, detail );
+
+			else {
+				int used = detail.replace( "% used", "" ).toInt();
+				int x = textRect.x();
+				int y = textRect.y();
+				int w = textRect.width();
+				int h = textRect.height();
+
+				painter->save();
+				painter->setRenderHint( QPainter::Antialiasing, false );
+				painter->setPen( Qt::gray );
+				painter->drawRoundedRect( x, y, w - 20, QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->setPen( Qt::NoPen );
+				if ( used >= 90 )
+					painter->setBrush( Qt::darkRed );
+				else
+					painter->setBrush( Qt::darkGreen );
+				painter->drawRoundedRect( x, y, ( int )( ( w - 20. ) * used / 100 ), QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->restore();
+			}
 
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			detail = index.data( Qt::UserRole + 3 ).toString();
@@ -660,7 +829,28 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 		case 6 : {
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			QString detail = index.data( Qt::UserRole + 1 ).toString();
-			painter->drawText( textRect, detail );
+			if ( not detail.endsWith( "% used" ) )
+				painter->drawText( textRect, detail );
+
+			else {
+				int used = detail.replace( "% used", "" ).toInt();
+				int x = textRect.x();
+				int y = textRect.y();
+				int w = textRect.width();
+				int h = textRect.height();
+
+				painter->save();
+				painter->setRenderHint( QPainter::Antialiasing, false );
+				painter->setPen( Qt::gray );
+				painter->drawRoundedRect( x, y, w - 20, QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->setPen( Qt::NoPen );
+				if ( used >= 90 )
+					painter->setBrush( Qt::darkRed );
+				else
+					painter->setBrush( Qt::darkGreen );
+				painter->drawRoundedRect( x, y, ( int )( ( w - 20. ) * used / 100 ), QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+				painter->restore();
+			}
 
 			textRect.adjust( 0, lineSpacing + QFontInfo( qApp->font() ).pixelSize(), 0, 0 );
 			detail = index.data( Qt::UserRole + 3 ).toString();
@@ -698,18 +888,45 @@ void NBIconDelegate::paintExtraDetails( QPainter *painter, QList<QRect> &textRec
 
 	QRect textRect;
 
+	/* Size */
 	textRect = textRectList.at( 0 );
 	QString detail = index.data( Qt::UserRole + 1 ).toString();
-	painter->drawText( textRect, Qt::AlignCenter | Qt::TextWordWrap, detail );
+	if ( not detail.endsWith( "% used" ) )
+		painter->drawText( textRect, Qt::AlignCenter | Qt::TextWordWrap, detail );
 
+	else {
+		int used = detail.replace( "% used", "" ).toInt();
+		int x = textRect.x();
+		int y = textRect.y();
+		int w = textRect.width();
+		int h = textRect.height();
+
+		y = y + ( h - QFontInfo( qApp->font() ).pixelSize() ) / 2;
+
+		painter->save();
+		painter->setRenderHint( QPainter::Antialiasing, false );
+		painter->setPen( Qt::gray );
+		painter->drawRoundedRect( x, y, w - 20, QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+		painter->setPen( Qt::NoPen );
+		if ( used >= 90 )
+			painter->setBrush( Qt::darkRed );
+		else
+			painter->setBrush( Qt::darkGreen );
+		painter->drawRoundedRect( x, y, ( int )( ( w - 20. ) * used / 100 ), QFontInfo( qApp->font() ).pixelSize(), 2.0, 2.0 );
+		painter->restore();
+	}
+
+	/* Type */
 	textRect = textRectList.at( 1 );
 	detail = index.data( Qt::UserRole + 3 ).toString();
 	painter->drawText( textRect, Qt::AlignCenter | Qt::TextWordWrap, detail );
 
+	/* Date */
 	textRect = textRectList.at( 2 );
 	detail = index.data( Qt::UserRole + 4 ).toString();
 	painter->drawText( textRect, Qt::AlignCenter | Qt::TextWordWrap, detail );
 
+	/* Owner */
 	textRect = textRectList.at( 3 );
 	detail = index.data( Qt::UserRole + 6 ).toString();
 	painter->drawText( textRect, Qt::AlignCenter | Qt::TextWordWrap, detail );

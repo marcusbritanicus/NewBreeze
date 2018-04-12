@@ -25,22 +25,24 @@ few changes in NewBreeze 3.
    - Code cleanup for better performance.
    - NBItemViewModel provides upto 50% faster thumbnails loading for images.
 
-=> NBIconView( QAbstractItemModel )
+=> NBIconView( QAbstractItemView )
    - Per-folder views are now enabled. Each folder remembers its previous state ( size, grouping, list view, etc )
-   - Mac-style partial folding of categories is now enabled.
+   - Mac-style partial folding of categories is now enabled. (Double-click to hide, '-' button to fold, '+' button to unfold/unhide)
    - Fixed the small issue of mouse/cursor selection conflict.
    - Fixed the SegFault with cursor up and down movements.
    - List View and Tiles view are fixed and working fine.
-   # Currently has issues with cursorMovements. Will be fixed by v3-rc.
+   - Discontinuous cursor movements have been fixed.
+   - IconOverlays give quick access to Open, Peek and Node IO (cut, copy, paste) without right-click.
 
-=> UI
-   - An elementary Accidental Delete Protection (ADP) has been added. However it is not mature enough for commercial use.
+=> Properties
+   - An elementary Accidental Delete Protection (ADP) has been added. However it is not yet completely implemented.
    - ADP is rather buggy. It may not be advisable to enable it for all nodes.
 
 => NBAddressBar redesigned
    - NBBreadCrumbsBar is now called NBCrumbsBar.
    - It redesigned to make sure long paths do not run out of the widget.
    - The full path can be displayed using FlowLayout at anytime by pressing ▣
+   - A simple menu has been added
 
 => NBSidePanel and NBSideBar
    - NBSidePanel: Redesigned sidepanel with elegant menu listing the devices and bookmarks.

@@ -613,20 +613,23 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		NBIconDelegate *dlgt = qobject_cast<NBIconDelegate*>( itemDelegate() );
 		if ( currentViewMode == QString( "Icons" ) ) {
 			dlgt->paintIcons( &painter, option, idx );
-			/* Yet to be implemented */
-			if ( /* Settings->View.PaintOverlay and */ ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+			if ( Settings->View.PaintOverlay and ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
 				paintIconOverlay( &painter, rect );
 		}
 
 		else if ( currentViewMode == QString( "Tiles" ) ) {
 			dlgt->paintTiles( &painter, option, idx );
 			/* Yet to be implemented */
-			// if ( Settings->View.PaintOverlay )
+			// if ( Settings->View.PaintOverlay and ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
 				// paintTilesOverlay( &painter, option.rect, );
 		}
 
-		else
+		else {
 			dlgt->paintDetails( &painter, option, idx );
+			/* Yet to be implemented */
+			// if ( Settings->View.PaintOverlay and ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+				// paintTilesOverlay( &painter, option.rect, );
+		}
 	}
 
 	painter.end();
@@ -732,7 +735,7 @@ void NBIconView::paintIconOverlay( QPainter *painter, const QRect &rect ) {
 	painter->setFont( QFont( "DejaVu Sans", 8, QFont::Bold ) );
 	painter->drawText( QRectF( oRect.x(), oRect.y(), oRect.width() / 2, oRect.height() / 2 ), Qt::AlignCenter, "Preview" );
 	painter->drawText( QRectF( oRect.x(), oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 ), Qt::AlignCenter, "Open" );
-	painter->drawText( QRectF( oRect.x() + oRect.width() / 2, oRect.y(), oRect.width() / 2, oRect.height() / 2 ), Qt::AlignCenter, "Actions" );
+	painter->drawText( QRectF( oRect.x() + oRect.width() / 2, oRect.y(), oRect.width() / 2, oRect.height() / 2 ), Qt::AlignCenter, "Menu" );
 	painter->drawText( QRectF( oRect.x() + oRect.width() / 2, oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 ), Qt::AlignCenter, "Actions" );
 
 	painter->restore();
@@ -783,7 +786,37 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 		if ( idx.isValid() ) {
 			/* Index already selected, start the drag */
 			if ( mSelectedIndexes.contains( idx ) or selectionModel()->isSelected( idx ) ) {
-				dragStartPosition = mpEvent->pos();
+				int iSize = myIconSize.width();
+				if ( iSize < 48 )
+					return;
+
+				QRect rect = viewportRectForRow( idx.row() );
+				int padding = ( int ) round( iSize * 0.1 );
+
+				QRectF oRect( rect );
+				oRect.adjust( padding / 2, padding / 2, -padding / 2, -padding / 2 );
+				oRect.setHeight( iSize + padding );
+
+				QRectF peekRect( oRect.x(), oRect.y(), oRect.width() / 2, oRect.height() / 2 );
+				QRectF openRect( oRect.x(), oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 );
+				QRectF menuRect( oRect.x() + oRect.width() / 2, oRect.y(), oRect.width() / 2, oRect.height() / 2 );
+				QRectF actsRect( oRect.x() + oRect.width() / 2, oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 );
+
+				if ( peekRect.contains( mpEvent->pos() ) )
+					emit peek( idx );
+
+				else if ( openRect.contains( mpEvent->pos() ) )
+					emit open( idx );
+
+				else if ( menuRect.contains( mpEvent->pos() ) )
+					emit contextMenuRequested( mpEvent->pos() );
+
+				else if ( actsRect.contains( mpEvent->pos() ) )
+					emit contextMenuRequested( mpEvent->pos() );
+
+				else
+					dragStartPosition = mpEvent->pos();
+
 				return;
 			}
 
@@ -1019,6 +1052,8 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 };
 
 void NBIconView::mouseReleaseEvent( QMouseEvent *mrEvent ) {
+
+	QAbstractItemView::mousePressEvent( mrEvent );
 };
 
 void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {

@@ -22,7 +22,7 @@ NBIconViewRestricted::NBIconViewRestricted( NBItemViewModel *fsModel, QWidget *p
 
 void NBIconViewRestricted::mousePressEvent( QMouseEvent *mpEvent ) {
 
-	/* Disable all the mouse press events */
+	/* Disable all the special mouse press events */
 	QAbstractItemView::mousePressEvent( mpEvent );
 };
 

@@ -1,8 +1,8 @@
-newbreeze-common (3.0.0-beta3) unstable; urgency=medium
+newbreeze-common (3.0.0-rc1) unstable; urgency=medium
 
   * Removed getTerminal(...) from common
 
- -- Marcus Britanicus <marcusbritanicus@gmail.com>  Fri, 20 Mar 2018 23:17:00 +0530
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Thu, 12 April 2018 10:00:00 +0530
 
 newbreeze-common (3.0.0-beta2) unstable; urgency=medium
 
