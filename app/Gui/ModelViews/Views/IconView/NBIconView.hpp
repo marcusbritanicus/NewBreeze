@@ -232,6 +232,7 @@ class NBIconView : public QAbstractItemView {
 		void peek( QModelIndex );
 
 		void contextMenuRequested( QPoint );
+		void actionsMenuRequested( QPoint );
 
 		void copy( QStringList, QString );
 		void move( QStringList, QString );

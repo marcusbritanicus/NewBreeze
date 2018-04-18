@@ -54,6 +54,7 @@ void NBFolderView::createAndSetupActions() {
 	connect( IconView, SIGNAL( open( QString ) ), this, SLOT( doOpen( QString ) ) );
 
 	connect( IconView, SIGNAL( contextMenuRequested( QPoint ) ), this, SLOT( showContextMenu( QPoint ) ) );
+	connect( IconView, SIGNAL( actionsMenuRequested( QPoint ) ), this, SLOT( showActionsMenu( QPoint ) ) );
 
 	connect(
 		IconView->selectionModel(), SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ),

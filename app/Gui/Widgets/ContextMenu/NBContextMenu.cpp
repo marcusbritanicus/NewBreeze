@@ -885,3 +885,177 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		}
 	}
 };
+
+void NBFolderView::showActionsMenu( QPoint position ) {
+
+	QList<QModelIndex> selectedList = getSelection();
+	QMenu *menu = new QMenu( this );
+
+	switch( fsModel->modelDataType() ) {
+		case NBItemViewModel::SuperStart: {
+
+			/* No selections */
+			if ( not selectedList.count() ) {
+
+				menu->addAction( reloadAct );
+			}
+
+			/* Single selection */
+			else {
+				menu->addAction( peekAct );
+
+				QFileInfo fInfo( fsModel->nodeInfo( selectedList[ 0 ] ) );
+				QString file = termFormatString( fInfo.absoluteFilePath() );
+
+				if ( fInfo.isDir() ) {
+					QAction *openInNewWinAct = new QAction( QIcon( ":/icons/newwin.png" ), "Open in New &Window", this );
+					openInNewWinAct->setData( QVariant( fInfo.absoluteFilePath() ) );
+					connect( openInNewWinAct, SIGNAL( triggered() ), this, SLOT( doOpenInNewWindow() ) );
+					menu->addAction( openInNewWinAct );
+				}
+
+				NBOpenWithMenu *openWithMenu = new NBOpenWithMenu( ":/icons/openWith.png", "&Open With", this );
+				openWithMenu->setWorkingDirectory( "" );
+				openWithMenu->buildMenu( selectedList );
+
+				menu->addMenu( openWithMenu );
+				menu->addSeparator();
+
+				/* If the node is a folder */
+				if ( fInfo.isDir() ) {
+					/* Add to catalogs to menu */
+					NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
+					connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
+					menu->addMenu( addToCatalogMenu );
+					menu->addSeparator();
+					menu->addAction( openVTEin );
+					menu->addSeparator();
+				}
+
+				menu->addAction( renameAct );
+
+				menu->addSeparator();
+
+				trashAct->setText( "Remove from &SuperStart" );
+				menu->addAction( trashAct );
+
+				menu->addSeparator();
+				menu->addAction( propertiesAct );
+				menu->addAction( permissionsAct );
+			}
+
+			menu->exec( mapToGlobal( position ) );
+
+			return;
+		}
+
+		case NBItemViewModel::Applications: {
+			/* We should fix this later */
+
+			return;
+		}
+
+		case NBItemViewModel::Catalogs: {
+			/* We should fix this later */
+
+			return;
+		}
+
+		case NBItemViewModel::FileSystem: {
+			if ( selectedList.isEmpty() ) {
+				/* This cannot come up at all */
+			}
+
+			else if ( selectedList.count() == 1 ) {
+				menu->addAction( moveAct );
+				menu->addAction( copyAct );
+				menu->addSeparator();
+
+				QFileInfo fInfo( fsModel->nodeInfo( selectedList[ 0 ] ) );
+				QString file = termFormatString( fInfo.absoluteFilePath() );
+
+				// Add to Menu
+				QMenu *addToMenu = new QMenu( "Add to", this );
+
+				// Add this folder to catalog
+				NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
+				connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
+				addToMenu->addMenu( addToCatalogMenu );
+
+				// Custom Actions
+				customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
+				connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
+				connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
+
+				/* If the node is a folder */
+				if ( fInfo.isDir() ) {
+					/* Add to catalogs to menu */
+					NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
+					connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
+					addToMenu->addAction( addBookMarkAct );
+				}
+
+				/* We can add file or folder to SuperStart */
+				addToMenu->addAction( addToSuperStartAct );
+				menu->addMenu( addToMenu );
+				menu->addSeparator();
+
+				menu->addMenu( customMenu );
+				menu->addSeparator();
+
+				if ( fInfo.isDir() ) {
+					menu->addAction( openVTEin );
+					menu->addSeparator();
+				}
+
+				menu->addAction( renameAct );
+				menu->addSeparator();
+
+				trashAct->setText( "Move to trash" );
+				menu->addAction( trashAct );
+				menu->addAction( delAct );
+
+				menu->addSeparator();
+				menu->addAction( propertiesAct );
+				menu->addAction( permissionsAct );
+			}
+
+			else {
+				menu->addAction( moveAct );
+				menu->addAction( copyAct );
+				menu->addSeparator();
+
+				// Add to Menu
+				QMenu *addToMenu = new QMenu( "Add to", this );
+
+				// Add this folder to catalog
+				NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
+				connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
+
+				addToMenu->addMenu( addToCatalogMenu );
+				addToMenu->addAction( addBookMarkAct );
+				addToMenu->addAction( addToSuperStartAct );
+				menu->addSeparator();
+
+				// Custom Actions Menu
+				customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
+				connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
+				connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
+
+				menu->addMenu( customMenu );
+				menu->addSeparator();
+
+				trashAct->setText( "Move to trash" );
+				menu->addAction( trashAct );
+				menu->addAction( delAct );
+
+				menu->addSeparator();
+				menu->addAction( propertiesAct );
+				menu->addAction( permissionsAct );
+			}
+
+			menu->exec( mapToGlobal( position ) );
+			return;
+		}
+	}
+};

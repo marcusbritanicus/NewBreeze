@@ -108,6 +108,7 @@ class NBFolderView : public QStackedWidget {
 		void openTerminal();
 		void openTerminalIn();
 		void showContextMenu( QPoint );
+		void showActionsMenu( QPoint );
 
 		// Over-riding the setFocus() of QWidget
 		void setFocus();

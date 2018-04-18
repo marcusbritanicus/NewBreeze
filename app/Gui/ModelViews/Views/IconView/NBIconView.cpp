@@ -812,7 +812,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 					emit contextMenuRequested( mpEvent->pos() );
 
 				else if ( actsRect.contains( mpEvent->pos() ) )
-					emit contextMenuRequested( mpEvent->pos() );
+					emit actionsMenuRequested( mpEvent->pos() );
 
 				else
 					dragStartPosition = mpEvent->pos();
@@ -874,6 +874,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 		/* We clicked on the Category expander */
 		else if ( catIdx > -1 ) {
 			toggleFoldCategory( categoryList.at( catIdx ) );
+			return;
 		}
 
 		/* Click on empty space */
@@ -1053,7 +1054,7 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 
 void NBIconView::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 
-	QAbstractItemView::mousePressEvent( mrEvent );
+	mrEvent->accept();
 };
 
 void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
