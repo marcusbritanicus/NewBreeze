@@ -802,16 +802,16 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 				QRectF menuRect( oRect.x() + oRect.width() / 2, oRect.y(), oRect.width() / 2, oRect.height() / 2 );
 				QRectF actsRect( oRect.x() + oRect.width() / 2, oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 );
 
-				if ( peekRect.contains( mpEvent->pos() ) )
+				if ( Settings->View.PaintOverlay and peekRect.contains( mpEvent->pos() ) )
 					emit peek( idx );
 
-				else if ( openRect.contains( mpEvent->pos() ) )
+				else if ( Settings->View.PaintOverlay and openRect.contains( mpEvent->pos() ) )
 					emit open( idx );
 
-				else if ( menuRect.contains( mpEvent->pos() ) )
+				else if ( Settings->View.PaintOverlay and menuRect.contains( mpEvent->pos() ) )
 					emit contextMenuRequested( mpEvent->pos() );
 
-				else if ( actsRect.contains( mpEvent->pos() ) )
+				else if ( Settings->View.PaintOverlay and actsRect.contains( mpEvent->pos() ) )
 					emit actionsMenuRequested( mpEvent->pos() );
 
 				else

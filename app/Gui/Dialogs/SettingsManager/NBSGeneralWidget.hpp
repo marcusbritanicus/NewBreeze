@@ -39,7 +39,8 @@ class NBSGeneralWidget : public QWidget {
 		QRadioButton *openWithCatalogRB;		// Show home folder or catalogs?
 		QRadioButton *openWithSuperStartRB;		// Show home folder or catalogs?
 		QCheckBox *imagePreviewCB;				// Show image previews?
-		QCheckBox *extendedIOCB;					// Direct Copy/Move
+		QCheckBox *extendedIOCB;				// Direct Copy/Move?
+		QCheckBox *paintOverlayCB;				// Paint Icon Overlays?
 
 		/* Terminal */
 		QGroupBox *termGB;
@@ -67,6 +68,7 @@ class NBSGeneralWidget : public QWidget {
 		void handleOpenWithToggled();
 		void handleCheckStateChanged( int );
 		void handleExtendedIOChanged( bool );
+		void handlePaintOverlayChanged( bool );
 
 		/* Terminal */
 		void handleDefaultClicked();

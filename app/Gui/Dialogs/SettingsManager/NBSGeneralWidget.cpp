@@ -138,6 +138,13 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	);
 	connect( extendedIOCB, SIGNAL( toggled( bool ) ), this, SLOT( handleExtendedIOChanged( bool ) ) );
 
+	paintOverlayCB = new QCheckBox( "Enable IconOverlay" );
+	paintOverlayCB->setChecked( Settings->View.PaintOverlay );
+	paintOverlayCB->setToolTip(
+		"To quickly open or access the menu without double-click or right-click, enable this option."
+	);
+	connect( paintOverlayCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePaintOverlayChanged( bool ) ) );
+
 	/* Terminal */
 	termGB = new QGroupBox( "Terminals", this );
 
@@ -179,6 +186,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	otherGBLyt->addLayout( rbLyt );
 	otherGBLyt->addWidget( imagePreviewCB );
 	otherGBLyt->addWidget( extendedIOCB );
+	otherGBLyt->addWidget( paintOverlayCB );
 
 	QGroupBox *otherOptionsGB = new QGroupBox( "Other Options", this );
 	otherOptionsGB->setLayout( otherGBLyt );
@@ -371,6 +379,12 @@ void NBSGeneralWidget::handleExtendedIOChanged( bool enabled ) {
 
 	Settings->setValue( "ExtendedIO", enabled );
 	Settings->General.ExtendedIO = enabled;
+};
+
+void NBSGeneralWidget::handlePaintOverlayChanged( bool enabled ) {
+
+	Settings->setValue( "View/PaintOverlay", enabled );
+	Settings->View.PaintOverlay = enabled;
 };
 
 void NBSGeneralWidget::handleDefaultClicked() {
