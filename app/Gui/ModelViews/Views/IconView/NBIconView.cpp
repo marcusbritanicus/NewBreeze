@@ -1799,45 +1799,32 @@ QModelIndex NBIconView::lastIndex() {
 QModelIndex NBIconView::indexPageBelow() {
 
 	QModelIndex idx = currentIndex();
-	QScrollBar *bar = verticalScrollBar();
-	bar->setValue( bar->value() + bar->pageStep() );
 
-	QModelIndex nIdx;
-	for ( int row = idx.row(); row < cModel->rowCount( rootIndex() ); row++ ) {
-		QModelIndex idx = cModel->index( row, 0, rootIndex() );
-		if ( not canShowIndex( idx ) )
-			continue;
+	QRectF curRect = viewportRectForRow( idx.row() );
+	QPointF newPoint = curRect.topLeft() + QPointF( myGridSize.width() / 2, viewport()->height() );
 
-		QRect rect = viewportRectForRow( row );
-		if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
-			continue;
-
-		nIdx =  cModel->index( row, 0, rootIndex() );
-	}
-
-	QString cCategory = cModel->category( idx );
-	QModelIndexList cIdxList = cModel->indexListForCategory( cCategory );
-
-	/* Compute the number of rows in the current category */
-	int cRows = cIdxList.count() / itemsPerRow;
-	if ( cIdxList.count() % itemsPerRow )
-		cRows++;
-
-	/* Check which row are we in */
-	int cRow = ( 1 + cIdxList.indexOf( idx ) ) / itemsPerRow;
-	if ( ( 1 + cIdxList.indexOf( idx ) ) % itemsPerRow )
-		cRow++;
-
-	if ( ( cRow - 1 ) * itemsPerRow + persistentVCol < cIdxList.count() )
-		return cIdxList.at( ( cRow - 1 ) * itemsPerRow + persistentVCol );
+	if ( indexAt( newPoint.toPoint() ).isValid() )
+		return indexAt( newPoint.toPoint() );
 
 	else
-		return cIdxList.last();
+		return lastIndex();
 };
 
 QModelIndex NBIconView::indexPageAbove() {
 
-	return QModelIndex();
+	QModelIndex idx = currentIndex();
+
+	QRectF curRect = viewportRectForRow( idx.row() );
+	QPointF newPoint = curRect.topLeft() - QPointF( -myGridSize.width() / 2, viewport()->height() );
+
+	if ( indexAt( newPoint.toPoint() ).isValid() )
+		return indexAt( newPoint.toPoint() );
+
+	else if ( indexAt( QPoint( 0, -myCategoryHeight - myCategorySpacing ) + newPoint.toPoint() ).isValid() )
+		return indexAt( newPoint.toPoint() );
+
+	else
+		return firstIndex();
 };
 
 QModelIndex NBIconView::moveCursorNonCategorized( QAbstractItemView::CursorAction cursorAction ) {
