@@ -23,13 +23,6 @@ NBTreeBranch::NBTreeBranch( QString name, QIcon icon, NBTreeBranch *parent ) : Q
 	mPath = QString( name );
 	mIcon = icon;
 
-	// QFileSystemWatcher *watcher = new QFileSystemWatcher( this );
-
-	// if ( isReadable( mPath ) )
-		// watcher->addPath( mPath );
-
-	// connect( watcher, SIGNAL( directoryChanged( const QString& ) ), this, SLOT( explore() ) );
-
 	parentNode = parent;
 };
 

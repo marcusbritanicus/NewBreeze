@@ -1,10 +1,10 @@
 NewBreeze v3.0.0 RC2
 
-NBIconView                                                                                                                            [ 0 of 2 ]
+NBIconView                                                                                                                            [ 1 of 2 ]
 	□ Improve the selection model
 	  • Enable rectanlge rubberband selection
 	  • Change selection policy with model data type
-	□ Enable PageUp and PageDown navigation
+	✓ Enable PageUp and PageDown navigation
 
 NBDirTreeModel                                                                                                                        [ 0 of 1 ]
 	◐ Fix too many open QFileSystemWatcher instances

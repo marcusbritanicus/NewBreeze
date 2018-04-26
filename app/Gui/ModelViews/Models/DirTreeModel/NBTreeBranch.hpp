@@ -58,6 +58,8 @@ class NBTreeBranch : public QObject {
 		QStringList __nameFilters;
 		bool __showHidden;
 
+		QBasicTimer pollTimer;
+
 	public Q_SLOTS:
 		void explore();
 };

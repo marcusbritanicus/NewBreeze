@@ -26,8 +26,13 @@ inline static QString getDeviceTypeReal( QString dev, QString vfsType ) {
 	Q_FOREACH( QString disk, disks.entryList() ) {
 		QFileInfo info( disks.filePath( disk ) );
 		if ( info.symLinkTarget() == dev ) {
-			if ( info.absoluteFilePath().contains( "usb" ) )
-				return QString( "usb" );
+			if ( info.absoluteFilePath().contains( "usb" ) ) {
+				if ( info.absoluteFilePath().contains( "sdmmc" ) )
+					return QString( "mmc" );
+
+				else
+					return QString( "usb" );
+			}
 
 			else {
 				if ( vfsType.toLower().contains( "ntfs" ) )
