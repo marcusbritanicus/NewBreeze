@@ -14,7 +14,7 @@ Some of its features are
 * Folder, text, html, image, odt, and pdf quick preview
 * File Association support
 * Provides Categorized List, Icon and Details View
-* Sleek side panel showing drives and boomarks
+* Sleek side panel showing drives and bookmarks
 * Full drag and drop support
 * Applications, Catalog View and SuperStart
 * Auto update devices list
