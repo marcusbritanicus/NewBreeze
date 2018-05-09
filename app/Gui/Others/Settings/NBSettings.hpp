@@ -41,6 +41,7 @@ class NBSettings {
 				bool SuperStart;								// Use CombiView as Home
 				bool SpecialOpen;								// Use CombiView as Home
 				bool ExtendedIO;								// Use direct copy/move
+				bool LogDebug;									// Log debug messages
 		} General;
 
 		// View Settings

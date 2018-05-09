@@ -145,6 +145,11 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	);
 	connect( paintOverlayCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePaintOverlayChanged( bool ) ) );
 
+	logDebugCB = new QCheckBox( "Enable logging of debug messages" );
+	logDebugCB->setChecked( Settings->General.LogDebug );
+	logDebugCB->setToolTip( "Write the debug messages to the log file" );
+	connect( logDebugCB, SIGNAL( toggled( bool ) ), this, SLOT( handleLogDebugChanged( bool ) ) );
+
 	/* Terminal */
 	termGB = new QGroupBox( "Terminals", this );
 
@@ -187,6 +192,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	otherGBLyt->addWidget( imagePreviewCB );
 	otherGBLyt->addWidget( extendedIOCB );
 	otherGBLyt->addWidget( paintOverlayCB );
+	otherGBLyt->addWidget( logDebugCB );
 
 	QGroupBox *otherOptionsGB = new QGroupBox( "Other Options", this );
 	otherOptionsGB->setLayout( otherGBLyt );
@@ -385,6 +391,12 @@ void NBSGeneralWidget::handlePaintOverlayChanged( bool enabled ) {
 
 	Settings->setValue( "View/PaintOverlay", enabled );
 	Settings->View.PaintOverlay = enabled;
+};
+
+void NBSGeneralWidget::handleLogDebugChanged( bool enabled ) {
+
+	Settings->setValue( "General/LogDebug", enabled );
+	Settings->General.LogDebug = enabled;
 };
 
 void NBSGeneralWidget::handleDefaultClicked() {

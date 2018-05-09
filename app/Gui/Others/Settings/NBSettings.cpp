@@ -47,6 +47,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.SuperStart = true;
 	defaultSettings->General.SpecialOpen = true;
 	defaultSettings->General.ExtendedIO = false;
+	defaultSettings->General.LogDebug = true;
 
 	defaultSettings->View.PaintOverlay = true;
 
@@ -165,6 +166,9 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "ExtendedIO" ) ) )
 		settings->General.ExtendedIO = gSettings.value( "ExtendedIO" ).toBool();
+
+	if ( gaKeys.contains( QString( "LogDebug" ) ) )
+		settings->General.LogDebug = gSettings.value( "LogDebug" ).toBool();
 
 	if ( gaKeys.contains( QString( "View/PaintOverlay" ) ) )
 		settings->View.PaintOverlay = gSettings.value( "View/PaintOverlay" ).toBool();
@@ -366,6 +370,9 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "ExtendedIO" ) ) )
 		General.ExtendedIO = gSettings.value( "ExtendedIO" ).toBool();
+
+	if ( gaKeys.contains( QString( "LogDebug" ) ) )
+		General.LogDebug = gSettings.value( "LogDebug" ).toBool();
 
 	if ( gaKeys.contains( QString( "View/PaintOverlay" ) ) )
 		View.PaintOverlay = gSettings.value( "View/PaintOverlay" ).toBool();

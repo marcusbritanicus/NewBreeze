@@ -6,7 +6,7 @@ few changes in NewBreeze 3.
 
 => Qt5 Support
    - Qt5 is now the preferred version. Changes may or may not be backwards compatible.
-   - This release onwards Qt5 builds are supported. Use qmake to build using Qt5.
+   - This release onwards Qt5 builds are supported. Use qmake -qt5 to build using Qt5.
 
 => User interface rebuilt, integrating code from NewBreeze and NewBreezeUI
    - File/Folder filtering
@@ -32,7 +32,7 @@ few changes in NewBreeze 3.
    - Fixed the SegFault with cursor up and down movements.
    - List View and Tiles view are fixed and working fine.
    - Discontinuous cursor movements have been fixed.
-   - IconOverlays give quick access to Open, Peek and Node IO (cut, copy, paste) without right-click.
+   - IconOverlays give quick access to Open, Peek and Node IO Menu (cut, copy, paste) without right-click.
 
 => Properties
    - An elementary Accidental Delete Protection (ADP) has been added. However it is not yet completely implemented.
@@ -70,7 +70,7 @@ few changes in NewBreeze 3.
    - Archive previews are now available, though it needs some improvements
 
 => Terminals
-   - A Terminal plugin is added.
+   - An inbuilt terminal plugin is available.
    - Terminals can now be added in the settings.
    - User can choose the terminal program.
 
@@ -79,8 +79,8 @@ few changes in NewBreeze 3.
    - Find all the important files and folders as soon as you start NewBreeze.
    - Press Ctrl+U to add selected file(s)/folder(s) to SuperStart.
    - In SuperStart, press Delete to remove them, F2 change the display name.
-   - Note that changing display name does not rename the actual file on the hard drive.
-   - A context menu will be added later.
+     Note that changing display name does not rename the actual file on the hard drive.
+   - A basic context menu is available
 
 => NewBreeze Vault: Requires 'encfs'
    NOTE: This is work in progress. The first basic implementation is completed.

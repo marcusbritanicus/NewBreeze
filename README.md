@@ -53,8 +53,7 @@ Some of its features are
 * libdjvulibre-dev (libdjvulibre-dev)
 
 ### Known Bugs
-* Extended copy/move causes crashes. Disabled by default.
-* Reloading causes custom folder icons not to be rendered
+* Reloading causes custom folder icons not to be rendered in some cases
 
 ### Upcoming
 * Any other feature you request for... :)

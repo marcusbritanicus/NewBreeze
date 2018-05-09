@@ -41,6 +41,7 @@ class NBSGeneralWidget : public QWidget {
 		QCheckBox *imagePreviewCB;				// Show image previews?
 		QCheckBox *extendedIOCB;				// Direct Copy/Move?
 		QCheckBox *paintOverlayCB;				// Paint Icon Overlays?
+		QCheckBox *logDebugCB;					// Enable Debug Logging?
 
 		/* Terminal */
 		QGroupBox *termGB;
@@ -69,6 +70,7 @@ class NBSGeneralWidget : public QWidget {
 		void handleCheckStateChanged( int );
 		void handleExtendedIOChanged( bool );
 		void handlePaintOverlayChanged( bool );
+		void handleLogDebugChanged( bool );
 
 		/* Terminal */
 		void handleDefaultClicked();
