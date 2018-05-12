@@ -227,7 +227,7 @@ void NewBreeze::setWindowProperties() {
 void NewBreeze::createAndSetupActions() {
 
 	connect( AddressBar, SIGNAL( openLocation( QString ) ), FolderView, SLOT( doOpen( QString ) ) );
-	connect( AddressBar, SIGNAL( openSearch() ), FilterWidget, SLOT( show() ) );
+	connect( AddressBar, SIGNAL( openSearch() ), FilterWidget, SLOT( showHide() ) );
 
 	connect( AddressBar, SIGNAL( goBack() ), FolderView, SLOT( goBack() ) );
 	connect( AddressBar, SIGNAL( goHome() ), FolderView, SLOT( loadHomeDir() ) );
@@ -259,8 +259,8 @@ void NewBreeze::createAndSetupActions() {
 	connect( AddressBar, SIGNAL( quit() ), this, SLOT( quit() ) );
 
 	connect( FilterWidget, SIGNAL( search( QString ) ), this, SLOT( filterFiles( QString ) ) );
-	connect( FilterWidget, SIGNAL( shown() ), AddressBar, SLOT( hideSearchButton() ) );
-	connect( FilterWidget, SIGNAL( hidden() ), AddressBar, SLOT( showSearchButton() ) );
+	//connect( FilterWidget, SIGNAL( shown() ), AddressBar, SLOT( hideSearchButton() ) );
+	//connect( FilterWidget, SIGNAL( hidden() ), AddressBar, SLOT( showSearchButton() ) );
 	connect( FilterWidget, SIGNAL( hidden() ), this, SLOT( clearFilters() ) );
 
 	connect( FolderView, SIGNAL( showProperties() ), this, SLOT( showProperties() ) );

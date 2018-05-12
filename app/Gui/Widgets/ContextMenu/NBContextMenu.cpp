@@ -175,6 +175,11 @@ void NBActionsMenu::buildCustomActionsMenu() {
 			if ( terminal.at( 0 ) == QString( "xterm" ) )
 				terminal[ 1 ] = QString( "cd %1 && /bin/bash" ).arg( termFormatString( file ) );
 
+			else if ( terminal.at( 0 ) == QString( "Inbuilt" ) ) {
+				terminal.clear();
+				terminal << file << "/bin/bash";
+			}
+
 			else {
 				terminal[ 2 ] = file;
 				terminal[ 4 ] = "/bin/bash";

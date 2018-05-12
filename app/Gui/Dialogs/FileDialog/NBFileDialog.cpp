@@ -5,6 +5,7 @@
 */
 
 #include "NBFileDialog.hpp"
+#include "NBNewNodeDialog.hpp"
 
 NBFileDialog::NBFileDialog( QWidget *parent, QString wTitle, QString fLocation ) : QDialog( parent ) {
 
@@ -269,12 +270,17 @@ void NBDirectoryDialog::createGUI() {
 
 	dirView = new NBDirectoryView( this );
 
+	newFolderBtn = new QPushButton( QIcon::fromTheme( "folder-new" ), "New Folder", this );
+	connect( newFolderBtn, SIGNAL( clicked() ), this, SLOT( addFolder() ) );
+
 	QHBoxLayout *bodyLyt = new QHBoxLayout();
 	bodyLyt->addWidget( sidePanel );
 	bodyLyt->addWidget( dirView );
 
 	QHBoxLayout *btnsLyt = new QHBoxLayout();
 	btnsLyt->setContentsMargins( QMargins( 0, 5, 0, 0 ) );
+	btnsLyt->addWidget( newFolderBtn );
+	btnsLyt->addStretch();
 	btnsLyt->addWidget( dlgBtns );
 
 	QVBoxLayout *baseLyt = new QVBoxLayout();
@@ -322,4 +328,14 @@ QString NBDirectoryDialog::getDirectoryName( QWidget *parent, QString title, QSt
 void NBDirectoryDialog::open( QString path ) {
 
 	dirView->setCurrentBranch( path );
+};
+
+void NBDirectoryDialog::addFolder() {
+
+	QString folder = dirView->currentBranch();
+
+	NBNewNodeDialog *newFolder = new NBNewNodeDialog( "dir", QDir( folder ), QString(), this );
+	if ( newFolder->exec() == QDialog::Accepted ) {
+		dirView->setCurrentBranch( folder + "/" + newFolder->le->text() );
+	}
 };

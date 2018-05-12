@@ -10,11 +10,11 @@ QStringList getTerminal() {
 
 	QSettings sett( "NewBreeze", "NewBreeze" );
 
-	QString defTerm = sett.value( "Terminals/Default" ).toString();
+	QString defTerm = sett.value( "Terminals/Default", "Inbuilt" ).toString();
 
 	/* If we have an terminal plugin, and it is the default */
 	if ( defTerm == "Inbuilt" )
-		return QStringList() << "Inbuilt";
+		return QStringList() << defTerm;
 
 	/* We have set something else as the default terminal */
 	if ( sett.value( "Terminals/" + defTerm ).toStringList().count() )

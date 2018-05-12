@@ -413,6 +413,7 @@ void NBFolderView::doOpen( QString loc ) {
 	}
 
 	setCursor( QCursor( Qt::WaitCursor ) );
+	qApp->processEvents();
 
 	if ( isDir( loc ) ) {
 		qDebug() << "Opening dir:" << loc.toLocal8Bit().data();
@@ -714,7 +715,13 @@ void NBFolderView::doPeek( QModelIndex curIndex ) {
 void NBFolderView::doReload() {
 
 	qDebug() << "Reloading...";
+
+	setCursor( QCursor( Qt::WaitCursor ) );
+	qApp->processEvents();
+
 	fsModel->reload();
+
+	setCursor( QCursor( Qt::ArrowCursor ) );
 };
 
 void NBFolderView::doToggleHidden() {
@@ -729,7 +736,7 @@ void NBFolderView::doToggleHidden() {
 		Settings->General.ShowHidden = true;
 	}
 
-	fsModel->reload();
+	doReload();
 };
 
 void NBFolderView::prepareCopy() {
@@ -915,8 +922,8 @@ void NBFolderView::doSendToTrash() {
 		}
 
 		superStart.sync();
-		fsModel->reload();
 
+		doReload();
 		emit reloadSuperStart();
 
 		return;
@@ -1092,7 +1099,7 @@ void NBFolderView::doRename() {
 		}
 
 		superStart.sync();
-		fsModel->reload();
+		doReload();
 
 		emit reloadSuperStart();
 

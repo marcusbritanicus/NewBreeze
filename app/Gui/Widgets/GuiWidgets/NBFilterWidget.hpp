@@ -27,6 +27,8 @@ class NBFilterWidget : public QWidget {
 		void show();
 		void hide();
 
+		void showHide();
+
 	protected:
 		void keyPressEvent( QKeyEvent* );
 

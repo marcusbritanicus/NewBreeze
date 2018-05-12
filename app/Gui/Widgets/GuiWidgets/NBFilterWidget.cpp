@@ -72,6 +72,15 @@ void NBFilterWidget::hide() {
 	emit hidden();
 };
 
+void NBFilterWidget::showHide() {
+
+	if ( isVisible() )
+		hide();
+
+	else
+		show();
+};
+
 void NBFilterWidget::keyPressEvent( QKeyEvent *kEvent ) {
 
 	switch( kEvent->key() ) {

@@ -23,7 +23,7 @@ QString NBTermPlugin::version() {
 QList<QAction*> NBTermPlugin::actions( Interface, QStringList nodes ) {
 
 	if ( ( nodes.count() == 1 ) and isDir( nodes.at( 0 ) ) ) {
-		QAction *act = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), "&Peek", this );
+		QAction *act = new QAction( QIcon( ":/icons/terminal.png" ), "&Peek", this );
 
 		NBTerminal *term = new NBTerminal( nodes.at( 0 ) );
 		connect( act, SIGNAL( triggered() ), term, SLOT( showMaximized() ) );

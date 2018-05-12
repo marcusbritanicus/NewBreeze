@@ -132,7 +132,7 @@ void NBTrashDelegate::paint( QPainter *painter, const QStyleOptionViewItem &opti
 		painter->setPen( option.palette.color( QPalette::Text ) );
 
 		// Draw Text
-		painter->drawText( textRect, Qt::AlignHCenter, text );
+		painter->drawText( textRect, Qt::AlignVCenter, text );
 		paintExtraDetails( painter, rectList, index );
 
 		painter->restore();

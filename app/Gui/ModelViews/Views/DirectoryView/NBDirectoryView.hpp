@@ -8,8 +8,6 @@
 
 #include "Global.hpp"
 
-#include "NBDirTreeModel.hpp"
-
 class NBDirViewDelegate : public QStyledItemDelegate {
 	Q_OBJECT
 
@@ -29,5 +27,5 @@ class NBDirectoryView : public QTreeView {
 		void setCurrentBranch( QString );
 
 	private:
-		NBDirTreeModel *mdl;
+		QFileSystemModel *mdl;
 };

@@ -35,8 +35,17 @@ void NBDirViewDelegate::paint( QPainter* painter, const QStyleOptionViewItem &st
 NBDirectoryView::NBDirectoryView( QWidget *parent ) : QTreeView( parent ) {
 
 	// Model
-	mdl = new NBDirTreeModel();
+	mdl = new QFileSystemModel();
+	mdl->setFilter( QDir::Dirs | QDir::NoDotAndDotDot );
+	mdl->sort( 0, Qt::AscendingOrder );
+
+	setCurrentIndex( mdl->setRootPath( "/home/cosmos/" ) );
+
 	setModel( mdl );
+
+	// Hide Columns
+	for( int c = 1; c < mdl->columnCount(); c++ )
+		setColumnHidden( c, true );
 
 	// Internal Object Name
 	setObjectName( "mainList" );
@@ -58,17 +67,8 @@ void NBDirectoryView::setCurrentBranch( QString path ) {
 	if ( not exists( path ) or not isReadable( path ) )
 		return;
 
-	QStringList nodeList;
-	nodeList << path.split( "/", QString::SkipEmptyParts );
+	path += "/";
 
-	/* First Index is the root index, we expand it */
-	QModelIndex idx = mdl->index( 0, 0, QModelIndex() );
-	expand( idx );
-
-	Q_FOREACH( QString node, nodeList ) {
-		idx = mdl->index( node, idx );
-		expand( idx );
-	}
-
-	setCurrentIndex( idx );
+	setCurrentIndex( mdl->setRootPath( path ) );
+	expand( currentIndex() );
 };

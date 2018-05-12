@@ -292,7 +292,7 @@ void NBDirTreeModel::clearNameFilters() {
 
 void NBDirTreeModel::reload() {
 
-	// plantTree();
+	 tree->explore();
 };
 
 QString NBDirTreeModel::nodeName( const QModelIndex idx ) const {
