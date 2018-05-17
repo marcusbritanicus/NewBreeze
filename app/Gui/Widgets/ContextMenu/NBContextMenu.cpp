@@ -176,8 +176,20 @@ void NBActionsMenu::buildCustomActionsMenu() {
 				terminal[ 1 ] = QString( "cd %1 && /bin/bash" ).arg( termFormatString( file ) );
 
 			else if ( terminal.at( 0 ) == QString( "Inbuilt" ) ) {
-				terminal.clear();
-				terminal << file << "/bin/bash";
+				NBPluginManager *plMgr = NBPluginManager::instance();
+
+				PluginList pList;
+				pList << plMgr->plugins( NBPluginInterface::TerminalInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, "inode/directory" );
+
+				if ( pList.count() ) {
+					NBPluginInterface *iface = pList.at( 0 );
+
+					QAction *termAct = iface->actions( NBPluginInterface::TerminalInterface, QStringList() << file ).at( 0 );
+					//termAct->setText( name );
+					//addAction( termAct );
+
+					continue;
+				}
 			}
 
 			else {
@@ -482,7 +494,11 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 			connect( runAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 
 			QAction *runInTermAct = new QAction( QIcon( ":/icons/exec.png" ), "Execute in terminal", this );
-			runInTermAct->setData( QVariant( ( getTerminal().join( " " ).arg( workingDir ).arg( path ) ).split( " " ) ) );
+			QStringList term = getTerminal();
+			if ( term.at( 0 ) == "Inbuilt" )
+				runInTermAct->setData( QVariant( QStringList() << "Inbuilt" << workingDir << path ) );
+			else
+				runInTermAct->setData( QVariant( ( term.join( " " ).arg( workingDir ).arg( path ) ).split( " " ) ) );
 			connect( runInTermAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 
 			addSeparator();

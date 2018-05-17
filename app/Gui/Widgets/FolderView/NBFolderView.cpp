@@ -574,7 +574,20 @@ void NBFolderView::doOpenWith() {
 	QStringList cmdList = qobject_cast<QAction *>( sender() )->data().toStringList();
 	QString cmd = cmdList.takeFirst();
 
-	QProcess::startDetached( cmd, cmdList );
+	if ( not cmd.startsWith( "Inbuilt" ) ) {
+		QProcess::startDetached( cmd, cmdList );
+		return;
+	}
+
+	NBPluginManager *plMgr = NBPluginManager::instance();
+
+	PluginList pList;
+	pList << plMgr->plugins( NBPluginInterface::TerminalInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, "inode/directory" );
+
+	if ( pList.count() ) {
+		NBPluginInterface *iface = pList.at( 0 );
+		iface->actionTrigger( NBPluginInterface::TerminalInterface, QString(), cmdList );
+	}
 };
 
 void NBFolderView::doOpenInNewWindow() {
@@ -694,11 +707,8 @@ void NBFolderView::doPeek( QModelIndex curIndex ) {
 
 		if ( pList.count() ) {
 			NBPluginInterface *iface = pList.at( 0 );
-			// qDebug() << "Load plugin... [DONE]";
 			QAction *act = iface->actions( NBPluginInterface::PreviewInterface, QStringList() << node ).at( 0 );
-			// qDebug() << "Get action... [DONE]";
 			iface->actionTrigger( NBPluginInterface::PreviewInterface, act->text(), QStringList() << node );
-			// qDebug() << "Showing... [DONE]";
 
 			return;
 		}
