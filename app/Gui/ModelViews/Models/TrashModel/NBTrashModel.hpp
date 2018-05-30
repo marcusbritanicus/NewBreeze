@@ -119,14 +119,6 @@ class NBTrashModel : public QAbstractItemModel {
 	public slots:
 		void sort();
 
-	private slots:
-		void handleNodeCreated( QString );
-		void handleNodeChanged( QString );
-		void handleNodeDeleted( QString );
-
-		/* Perform the sorting again on a signal */
-		/* Just does sort( prevSort.column, prevSort.cs, prevSort.categorized ) */
-
 	Q_SIGNALS:
 		void trashLoading();
 		void trashLoaded();

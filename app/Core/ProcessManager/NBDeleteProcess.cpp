@@ -86,7 +86,7 @@ void NBDeleteProcess::deleteNode( QString path ) {
 	}
 
 	struct stat st;
-	if ( stat( ( mProgress->sourceDir + path ).toLocal8Bit().data(), &st ) != 0 ) {
+	if ( stat( ( path ).toLocal8Bit().data(), &st ) != 0 ) {
 		qDebug() << "Unable to stat:" << path;
 		errorNodes << path;
 
@@ -99,7 +99,7 @@ void NBDeleteProcess::deleteNode( QString path ) {
 			DIR* d_fh;
 			struct dirent* entry;
 
-			while ( ( d_fh = opendir( ( mProgress->sourceDir + path ).toLocal8Bit().data() ) ) == NULL ) {
+			while ( ( d_fh = opendir( ( path ).toLocal8Bit().data() ) ) == NULL ) {
 				qWarning() << "Couldn't open directory:" << path;
 				errorNodes << path;
 				return;
@@ -117,17 +117,17 @@ void NBDeleteProcess::deleteNode( QString path ) {
 
 						/* Recurse into that folder */
 						deleteNode( path + entry->d_name );
-						rmdir( ( mProgress->sourceDir + path + entry->d_name ).toLocal8Bit().data() );
+						rmdir( ( path + entry->d_name ).toLocal8Bit().data() );
 					}
 
 					else {
-						if ( unlink( ( mProgress->sourceDir + path + entry->d_name ).toLocal8Bit().data() ) != 0 )
+						if ( unlink( ( path + entry->d_name ).toLocal8Bit().data() ) != 0 )
 							errorNodes << path + entry->d_name;
 					}
 				}
 			}
 
-			if ( rmdir( ( mProgress->sourceDir + path ).toLocal8Bit().data() ) != 0 )
+			if ( rmdir( ( path ).toLocal8Bit().data() ) != 0 )
 				errorNodes << path;
 
 			closedir( d_fh );
@@ -135,7 +135,7 @@ void NBDeleteProcess::deleteNode( QString path ) {
 		}
 
 		default: {
-			if ( unlink( ( mProgress->sourceDir + path ).toLocal8Bit().data() ) != 0 )
+			if ( unlink( ( path ).toLocal8Bit().data() ) != 0 )
 				errorNodes << path;
 
 			break;
@@ -173,7 +173,7 @@ void NBDeleteProcess::trashNode( QString node ) {
 		newPath += delTime;
 
 	/* Try trashing it. If it fails, intimate the user */
-	if ( rename( ( mProgress->sourceDir + node ).toLocal8Bit().data(), newPath.toLocal8Bit().data() ) ) {
+	if ( rename( ( node ).toLocal8Bit().data(), newPath.toLocal8Bit().data() ) ) {
 		qDebug() << "Error" << errno << ": Failed to trash " << node << ":" << strerror( errno );
 		errorNodes << node;
 	}
@@ -293,10 +293,10 @@ void NBDeleteProcess::run() {
 
 	Q_FOREACH( QString path, sourceList ) {
 		if ( mProgress->type == NBProcess::Delete )
-			deleteNode( path );
+			deleteNode( mProgress->sourceDir + path );
 
 		else
-			trashNode( path );
+			trashNode( mProgress->sourceDir + path );
 	}
 
 	emit completed( errorNodes );

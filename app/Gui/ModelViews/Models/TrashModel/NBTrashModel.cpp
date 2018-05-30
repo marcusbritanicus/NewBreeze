@@ -31,9 +31,7 @@ bool NBTrashModel::isCategorizationEnabled() {
 	return mCategorizationEnabled;
 };
 
-void NBTrashModel::setCategorizationEnabled( bool enabled ) {
-
-	Q_UNUSED( enabled );
+void NBTrashModel::setCategorizationEnabled( bool ) {
 
 	mCategorizationEnabled = true;
 	// sort();
@@ -64,13 +62,12 @@ int NBTrashModel::categoryCount() const {
 	return rootNode->categoryCount();
 };
 
-int NBTrashModel::columnCount( const QModelIndex & parent ) const {
+int NBTrashModel::columnCount( const QModelIndex & ) const {
 
-	Q_UNUSED( parent );
 	return 4;
 };
 
-Qt::ItemFlags NBTrashModel::flags( const QModelIndex & index ) const {
+Qt::ItemFlags NBTrashModel::flags( const QModelIndex &index ) const {
 
 	if ( not index.isValid() )
 		return Qt::NoItemFlags;
@@ -87,15 +84,34 @@ QVariant NBTrashModel::data( const QModelIndex &index, int role ) const {
 	switch( role ) {
 
 		case Qt::DisplayRole: {
-			return node->name();
+			switch( index.column() ) {
+				case 0:
+					return node->name();
+
+				case 1:
+					return node->originalPath();
+
+				case 2:
+					return node->size();
+
+				case 3:
+					return node->deletionDate().toString( "MMM dd, yyyy hh:mm:ss" );
+			}
 		}
 
 		case Qt::DecorationRole: {
-			return node->icon();
+			if ( index.column() == 0 )
+				return node->icon();
+
+			else
+				return QVariant();
 		}
 
 		case Qt::TextAlignmentRole: {
 			if ( index.column() == 0 )
+				return ( 0x0001 | 0x0080 );
+
+			else if ( index.column() == 1 )
 				return ( 0x0001 | 0x0080 );
 
 			else if ( index.column() == 1 )
@@ -106,10 +122,12 @@ QVariant NBTrashModel::data( const QModelIndex &index, int role ) const {
 		}
 
 		case Qt::InitialSortOrderRole: {
+
 			return Qt::AscendingOrder;
 		}
 
 		case Qt::AccessibleTextRole: {
+
 			return node->data( index.column() );
 		}
 
@@ -121,30 +139,36 @@ QVariant NBTrashModel::data( const QModelIndex &index, int role ) const {
 
 		/* Original Location */
 		case Qt::UserRole + 1: {
+
 			return node->originalPath();
 		}
 
 		/* Size */
 		case Qt::UserRole + 2: {
+
 			return node->size();
 		}
 
 		/* Deletion Date */
 		case Qt::UserRole + 3: {
+
 			return node->deletionDate().toString( "MMM dd, yyyy hh:mm:ss" );
 		}
 
 		/* Trash Path */
 		case Qt::UserRole + 4: {
+
 			return node->trashPath();
 		}
 
 		/* Trash Info Path */
 		case Qt::UserRole + 5: {
+
 			return node->trashInfoPath();
 		}
 
 		default: {
+
 			return QVariant();
 		}
 	}
@@ -173,23 +197,17 @@ bool NBTrashModel::setData( const QModelIndex &index, QString value, int role ) 
 	return ok;
 };
 
-bool NBTrashModel::insertNode( QString nodeName ) {
-
-	Q_UNUSED( nodeName );
+bool NBTrashModel::insertNode( QString ) {
 
 	return true;
 };
 
-void NBTrashModel::updateNode( QString nodeName ) {
-
-	Q_UNUSED( nodeName );
+void NBTrashModel::updateNode( QString ) {
 
 	return;
 };
 
-bool NBTrashModel::removeNode( QString nodeName ) {
-
-	Q_UNUSED( nodeName );
+bool NBTrashModel::removeNode( QString ) {
 
 	return false;
 };
@@ -324,9 +342,7 @@ Qt::DropActions NBTrashModel::supportedDropActions() const {
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 };
 
-Qt::ItemFlags NBTrashModel::flags( const QModelIndex index ) const {
-
-	Q_UNUSED( index );
+Qt::ItemFlags NBTrashModel::flags( const QModelIndex ) const {
 
 	return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 };
@@ -338,17 +354,12 @@ QStringList NBTrashModel::mimeTypes() const {
 	return types;
 };
 
-bool NBTrashModel::filter( Filters filter ) {
-
-	Q_UNUSED( filter );
+bool NBTrashModel::filter( Filters ) {
 
 	return false;
 };
 
-void NBTrashModel::setFilter( Filters filter, bool on ) {
-
-	Q_UNUSED( filter );
-	Q_UNUSED( on );
+void NBTrashModel::setFilter( Filters, bool ) {
 
 	return;
 };
@@ -542,21 +553,6 @@ void NBTrashModel::recategorize() {
 		node->setCategory( getCategory( node->allData().at( 2 ) ) );
 
 	rootNode->updateCategories();
-};
-
-void NBTrashModel::handleNodeCreated( QString node ) {
-
-	insertNode( baseName( node ) );
-};
-
-void NBTrashModel::handleNodeChanged( QString node ) {
-
-	updateNode( baseName( node ) );
-};
-
-void NBTrashModel::handleNodeDeleted( QString node ) {
-
-	removeNode( baseName( node ) );
 };
 
 void NBTrashModel::sort() {

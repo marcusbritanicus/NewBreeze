@@ -71,6 +71,9 @@ void NBFolderView::createAndSetupActions() {
 	// DragDrop move
 	connect( IconView, SIGNAL( move( QStringList, QString ) ), this, SLOT( move( QStringList, QString ) ) );
 
+	// Update actions once the directory is loaded
+	connect( fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateActions() ) );
+
 	// Peek
 	peekAct = new QAction( QIcon( ":/icons/peek.png" ), "Pee&k", this );
 	peekAct->setShortcuts( Settings->Shortcuts.Peek );

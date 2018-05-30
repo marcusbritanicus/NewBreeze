@@ -281,12 +281,12 @@ void NewBreeze::createAndSetupActions() {
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateInfoBar() ) );
-	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), FolderView, SLOT( updateActions() ) );
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), SideBar, SLOT( highlight( QString ) ) );
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( setBusyCursor() ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( setNormalCursor() ) );
+	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ), FolderView, SLOT( updateActions() ) );
 
 	/* Update GUI if terminal cwd changes */
 	connect( Terminal, SIGNAL( chdir( QString ) ), this, SLOT( chdirUI( QString ) ) );

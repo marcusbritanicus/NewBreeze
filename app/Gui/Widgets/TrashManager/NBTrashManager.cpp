@@ -20,7 +20,7 @@ void NBTrashManager::setupGui() {
 	tModel = new NBTrashModel();
 
 	// Setup the view
-	TrashView = new NBTrashView( tModel );
+	TrashView = new NBTrashView( tModel, this );
 
 	// Buttons
 	restoreButtons = new NBSegmentButton( QStringList() << "&Restore" << "Restore &All", this );
@@ -207,7 +207,7 @@ void NBTrashManager::restoreAll() {
 
 	QModelIndexList selection;
 	for( int row = 0; row < tModel->rowCount(); row++ )
-		selection << tModel->index( row, 0 , TrashView->rootIndex() );
+		selection << tModel->index( row, 0, TrashView->rootIndex() );
 
 	tModel->restore( selection );
 
