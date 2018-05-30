@@ -1406,6 +1406,19 @@ void NBFolderView::updateActions() {
 		actNewFile->setEnabled( true );
 		actNewEncFS->setEnabled( true );
 	}
+
+	/* Grouping settings */
+	QString curDir = fsModel->currentDir();
+	if ( curDir.startsWith( "NB://" ) ) {
+		QString location = curDir.replace( "NB://", "" );
+		QSettings sett( "NewBreeze", location );
+		groupsAct->setChecked( sett.value( "NewBreeze/Grouping", true ).toBool() );
+	}
+
+	else {
+		QSettings sett( curDir + ".directory", QSettings::NativeFormat );
+		groupsAct->setChecked( sett.value( "NewBreeze/Grouping", true ).toBool() );
+	}
 };
 
 void NBFolderView::addBookMark() {

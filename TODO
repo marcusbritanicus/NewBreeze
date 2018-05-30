@@ -12,8 +12,11 @@ NBIconView                                                                      
 NBDirTreeModel                                                                                                                        [ 1 of 1 ]
 	◐ Fix too many open QFileSystemWatcher instances
 
-NBDirectoryView                                                                                                                       	[ 0 of 1 ]
-	✍ Option to create a new folder
+NBDirectoryView                                                                                                                       [ 1 of 1 ]
+	✓ Option to create a new folder
+
+NBContextMenu                                                                                                                         [ 1 of 1 ]
+	✓ Grouping checkbox does not work
 
 Note:
 	✍ - Work in progress

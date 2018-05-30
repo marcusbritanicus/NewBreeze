@@ -1,3 +1,10 @@
+newbreeze (3.0.0-rc2) unstable; urgency=medium
+
+  * Trash Manager now uses QTreeView class
+  * Inbuilt terminal bug fix
+  * Busy cursor while loading large folders
+  * Grouping option in Context Menu fixed
+
 newbreeze (3.0.0-rc1) unstable; urgency=medium
 
   * Feature: Added Menu

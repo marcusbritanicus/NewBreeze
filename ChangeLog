@@ -5,6 +5,10 @@ Version 3.0.0 RC
 	- Improvements to NBIconView
 	- BugFix: ExtendedIO partial bugfix
 	- Several minor bug fixes.
+	- Trash Manager now uses QTreeView class
+	- Inbuilt terminal bug fix
+	- Busy cursor while loading large folders
+	- Grouping option in Context Menu fixed
 
 Version 3.0.0 Beta
 	- Feature: Inbuilt encryption support via NBVault

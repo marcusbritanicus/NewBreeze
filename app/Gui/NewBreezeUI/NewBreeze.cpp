@@ -865,21 +865,25 @@ void NewBreeze::switchToNextView() {
 
 void NewBreeze::toggleGrouping() {
 
+	Settings->General.Grouping = not Settings->General.Grouping;
+
 	FolderView->fsModel->setCategorizationEnabled( Settings->General.Grouping );
 	FolderView->groupsAct->setChecked( Settings->General.Grouping );
 
 	if ( not FolderView->fsModel->isRealLocation() ) {
 		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
 		QSettings sett( "NewBreeze", location );
-		sett.setValue( "NewBreeze/Grouping", not Settings->General.Grouping );
+		sett.setValue( "NewBreeze/Grouping", Settings->General.Grouping );
 		sett.sync();
 	}
 
 	else {
 		QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/Grouping", not Settings->General.Grouping );
+		sett.setValue( "NewBreeze/Grouping", Settings->General.Grouping );
 		sett.sync();
 	}
+
+	FolderView->fsModel->reload();
 };
 
 void NewBreeze::toggleSideBarVisible() {

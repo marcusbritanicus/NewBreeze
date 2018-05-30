@@ -859,7 +859,7 @@ void NBItemViewModel::setRootPath( QString path ) {
 	prevSort.cs = sett.value( "NewBreeze/SortCase", Settings->General.SortCase ).toBool();
 	prevSort.categorized = sett.value( "NewBreeze/Grouping", Settings->General.Grouping ).toBool();
 	mCategorizationEnabled = prevSort.categorized;
-
+	Settings->General.Grouping = prevSort.categorized;
 	/* Delete the old node */
 	delete rootNode;
 
