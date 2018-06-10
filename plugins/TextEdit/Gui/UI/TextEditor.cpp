@@ -220,8 +220,8 @@ void TextEditor::setupConnections() {
 	connect( ed, SIGNAL( modificationChanged( bool ) ), this, SLOT( updateModStatus( bool ) ) );
 	connect( ed, SIGNAL( autoSaved() ), this, SLOT( handleAutoSaved() ) );
 
-	connect( ed, SIGNAL( cursorPositionChanged() ), this, SLOT( updateStatusBar() ) );
-	connect( ed, SIGNAL( blockCountChanged( int ) ), this, SLOT( updateStatusBar() ) );
+	connect( ed, SIGNAL( cursorPositionChanged( int, int ) ), this, SLOT( updateStatusBar( int, int ) ) );
+	// connect( ed, SIGNAL( blockCountChanged( int ) ), this, SLOT( updateStatusBar() ) );
 	connect( ed, SIGNAL( textChanged() ), this, SLOT( updateStatusBar() ) );
 	connect( ed, SIGNAL( selectionChanged() ), this, SLOT( updateStatusBar() ) );
 
@@ -281,7 +281,7 @@ void TextEditor::loadFile() {
 	ed->loadFile( filename );
 
 	updateModStatus( ed->isModified() );
-	updateStatusBar();
+	updateStatusBar( -1, -1 );
 };
 
 void TextEditor::saveFile() {
@@ -325,15 +325,20 @@ void TextEditor::updateModStatus( bool modified ) {
 	safetyLed->setSafe( not modified );
 };
 
-void TextEditor::updateStatusBar() {
+void TextEditor::updateStatusBar( int line, int idx ) {
 
-	int line = 0, idx = 0;
-	ed->getCursorPosition( &line, &idx );
+	if ( line == -1 or idx == -1 )
+		ed->getCursorPosition( &line, &idx );
 
 	lineCountLbl->setText( QString( "Line: %1/%2" ).arg( line + 1 ).arg( ed->lines() ) );
 	cursorPosLbl->setText( QString( "Pos: %1" ).arg( idx + 1 ) );
 	charCountLbl->setText( QString( "Chars: %1" ).arg( ed->charCount() ) );
 	selectionLbl->setText( QString( "Sel: %1" ).arg( ed->selectedText().count() ) );
+};
+
+void TextEditor::updateStatusBar() {
+
+	updateStatusBar( -1, -1 );
 };
 
 void TextEditor::updateToolBar() {

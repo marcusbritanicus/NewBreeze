@@ -72,6 +72,7 @@ class TextEditor : public QMainWindow {
 		void changeFont( QFont );
 
 		void updateModStatus( bool );
+		void updateStatusBar( int, int );
 		void updateStatusBar();
 		void updateToolBar();
 

@@ -17,28 +17,6 @@ inline QString findIn( QString what, QString where ) {
 	return QString();
 };
 
-inline QString dirName( QString path ) {
-
-	if ( path.endsWith( "/" ) )
-		path.chop( 1 );
-
-	return QString( dirname( strdup( path.toLocal8Bit().data() ) ) ) + "/";
-};
-
-inline QString baseName( QString path ) {
-
-	if ( path.endsWith( "/" ) )
-		path.chop( 1 );
-
-	return QString( basename( strdup( path.toLocal8Bit().data() ) ) );
-};
-
-NBAppFile::NBAppFile() {
-
-	mIsValid = false;
-	__type = QString( "Application" );
-};
-
 NBAppFile::NBAppFile( QString path ) {
 
 	mIsValid = false;
@@ -194,7 +172,8 @@ QString NBAppFile::filePath() const {
 int NBAppFile::compare( NBAppFile other ) const {
 
 	if ( __execArgs.at( 0 ) == other.execArgs().at( 0 ) )
-		return __grade - other.grade();
+		if ( __name == other.value( NBAppFile::Name ).toString() )
+			return __grade - other.grade();
 
 	return INT_MAX;
 };
@@ -329,49 +308,6 @@ bool NBAppFile::save() {
 	return true;
 };
 
-NBAppFile NBAppFile::merge( NBAppFile first, NBAppFile second ) {
-
-	QVariantList data;
-
-	QStringList mMimeTypes;
-	mMimeTypes << first.value( NBAppFile::MimeTypes ).toStringList() << second.value( NBAppFile::MimeTypes ).toStringList();
-
-	QStringList mCategories;
-	mCategories << first.value( NBAppFile::Categories ).toStringList() << second.value( NBAppFile::Categories ).toStringList();
-
-	bool firstDisplay = ( not first.value( NBAppFile::NoDisplay ).toBool() );
-	bool secondDisplay = ( not second.value( NBAppFile::NoDisplay ).toBool() );
-
-	QString desktopName = ( firstDisplay ? first.filePath() : ( secondDisplay ? second.filePath() : QString() ) );
-	if ( not( firstDisplay or secondDisplay ) )
-		desktopName = first.filePath();
-
-	data << desktopName;
-	data << first.value( NBAppFile::Name );
-	data << first.value( NBAppFile::Type );
-	data << first.value( NBAppFile::Exec );
-	data << first.value( NBAppFile::Icon );
-	data << mMimeTypes;
-	data << first.value( NBAppFile::WorkPath );
-	data << first.value( NBAppFile::TerminalMode );
-	data << mCategories;
-	data << first.value( NBAppFile::Comment );
-	data << ( first.value( NBAppFile::NoDisplay ).toBool() and second.value( NBAppFile::NoDisplay ).toBool() );
-	data << ( first.takesArgs() or second.takesArgs() );
-	data << ( first.multipleArgs() or second.multipleArgs() );
-	data << first.grade();
-
-	// LibreOffice Fix
-	if ( desktopName.toLower().contains( "libreoffice" ) ) {
-		data[ 0 ] = "libreoffice-startcenter.desktop";
-		data[ 1 ] = "LibreOffice";
-		data[ 3 ] = first.execArgs().at( 0 ) + " %U";
-		data[ 4 ] = first.execArgs().at( 0 ) + "-startcenter";
-	}
-
-	return NBAppFile( data );
-};
-
 bool NBAppFile::isValid() {
 
 	return mIsValid;
@@ -392,58 +328,6 @@ bool NBAppFile::operator==( const NBAppFile& other ) const {
 	truth &= ( grade() == other.grade() );
 
 	return truth;
-};
-
-NBAppFile::NBAppFile( QVariantList data ) {
-
-	mIsValid = false;
-
-	fileUrl = data[ 0 ].toString();
-
-	__name = data[ 1 ].toString();
-	__type = data[ 2 ].toString();
-	__exec = data[ 3 ].toString();
-	__icon = data[ 4 ].toString();
-	__mimeTypes = data[ 5 ].toStringList();
-	__workPath = data[ 6 ].toString();
-	__terminalMode = data[ 7 ].toBool();
-	__categories = data[ 8 ].toStringList();
-	__comment = data[ 9 ].toString();
-	__nodisplay = data[ 10 ].toBool();
-	__takesArgs = data[ 11 ].toBool();
-	__multipleFiles = data[ 12 ].toBool();
-	__grade = data[ 13 ].toInt();
-
-	QStringList args = __exec.split( " " );
-	foreach( QString arg, args ) {
-		if ( arg == "%f" or arg == "%u" ) {
-			__multipleFiles = false;
-			__takesArgs = true;
-			__execArgs << "<#NEWBREEZE-ARG-FILE#>";
-		}
-
-		else if ( arg == "%F" or arg == "%U" ) {
-			__multipleFiles = true;
-			__takesArgs = true;
-			__execArgs << "<#NEWBREEZE-ARG-FILES#>";
-		}
-
-		else if ( arg == "%i" ) {
-			if ( !__icon.isEmpty() )
-				__execArgs << "--icon" << __icon;
-		}
-
-		else if ( arg.contains( "\"%c\"" ) or arg.contains( "'%c'" ) or arg.contains( "%c" ) )
-			__execArgs << __name;
-
-		else if ( arg == "%k" )
-			__execArgs << QUrl( fileUrl ).toLocalFile();
-
-		else
-			__execArgs << arg;
-	}
-
-	mIsValid = true;
 };
 
 void NBAppFile::parseDesktopFile() {
@@ -647,7 +531,7 @@ void NBAppsList::removeDuplicates() {
 			else if ( thisApp.compare( other ) > 0 ) {
 				/*
 					*
-					* Since @other is deleted, we have more to compare @thisApp with
+					* Since @other is deleted, we have nothing more to compare @thisApp with
 					*
 				*/
 				__appsList.removeAt( __appsList.indexOf( other ) );

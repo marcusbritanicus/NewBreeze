@@ -102,21 +102,21 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 # Build Shared and Static
 # =======================
-CONFIG += shared_and_static build_all
+# CONFIG += shared_and_static build_all
 
 unix {
 	isEmpty(PREFIX) {
 		PREFIX = /usr
 	}
 
-	INSTALLS += target static header
+	INSTALLS += target header
 	target.path = $$PREFIX/lib/newbreeze
 
 	header.path = $$PREFIX/include/newbreeze
 	header.files = $$HEADERS include/newbreeze.hpp NBPluginInterface.hpp
 
-	static.path = $$PREFIX/lib/newbreeze
-	static.files = libnewbreeze-common.a
+	# static.path = $$PREFIX/lib/newbreeze
+	# static.files = libnewbreeze-common.a
 
 	lessThan(QT_MAJOR_VERSION, 4) {
 		static.path = $$PREFIX/lib/newbreeze

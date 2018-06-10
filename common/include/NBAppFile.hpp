@@ -27,8 +27,7 @@ class NBCOMMON_DLLSPEC NBAppFile {
 			NoDisplay
 		};
 
-		NBAppFile();
-		NBAppFile( QString );
+		NBAppFile( QString path = QString() );
 
 		// Value of various fields
 		QVariant value( NBAppFile::Fields ) const;
@@ -36,7 +35,7 @@ class NBCOMMON_DLLSPEC NBAppFile {
 		// Value of various fields
 		void setValue( NBAppFile::Fields, QVariant );
 
-		// Contains only the arguments, expanded wherever necessary accoring to fredesktop.org standards
+		// Contains only the arguments, expanded wherever necessary accoring to freedesktop.org standards
 		QStringList execArgs() const;
 
 		// Can handle multiple input files?
@@ -55,7 +54,6 @@ class NBCOMMON_DLLSPEC NBAppFile {
 		QString filePath() const;
 
 		// Compare this and other
-		// this.grade() - other.grade()
 		int compare( NBAppFile ) const;
 
 		// Category if this NBAppFile
@@ -67,9 +65,6 @@ class NBCOMMON_DLLSPEC NBAppFile {
 		// Save this desktop file
 		bool save();
 
-		// Merge two NBAppFiles
-		static NBAppFile merge( NBAppFile first, NBAppFile second );
-
 		// Does this instance contain vaild data?
 		bool isValid();
 
@@ -77,8 +72,6 @@ class NBCOMMON_DLLSPEC NBAppFile {
 		bool operator==( const NBAppFile& ) const;
 
 	private:
-		NBAppFile( QVariantList );
-
 		void parseDesktopFile();
 		void generateExecArgs();
 
