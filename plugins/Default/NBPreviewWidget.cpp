@@ -27,7 +27,7 @@ QList<QAction*> NBPreviewWidget::actions( Interface, QStringList nodes ) {
 		QString previewNode = nodes.at( 0 );
 		QMimeType mime = mimeDb.mimeTypeForFile( nodes.at( 0 ) );
 
-		QAction *act = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), "&Peek", this );
+		QAction *act = new QAction( QIcon( ":/icons/peek.png" ), "&Peek", this );
 
 		if ( mime == mimeDb.mimeTypeForFile( "file.odt" ) ) {
 			NBOdfOgle *peek = new NBOdfOgle( previewNode );

@@ -775,6 +775,8 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 		return;
 	}
 
+	QToolTip::showText( mpEvent->pos(), "Move the mouse over the files/folders you want to select, holding down the left button.", this );
+
 	/* Index at mouse position */
 	QModelIndex idx = indexAt( mpEvent->pos() );
 	int catIdx = expanderAt( mpEvent->pos() );
@@ -948,10 +950,6 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 		}
 	}
 
-	else {
-
-	}
-
 	/* Set the clicked index as the current index */
 	if( idx.isValid() ) {
 		setCurrentIndex( idx );
@@ -961,6 +959,8 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 };
 
 void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
+
+	QToolTip::hideText();
 
 	/* Left Mouse Button is pressed down */
 	if ( mmEvent->buttons() & Qt::LeftButton ) {

@@ -62,24 +62,24 @@ void AboutNB::createGui() {
 QWidget* AboutNB::createAboutNB() {
 
 	QString text = QString(
-		"<p>Built on top of the Powerful Qt GUI Toolkit, this file manager "	\
-		"is sleek, stylish and fast. Some of its features are</p>"				\
-		"<ul>"																	\
-		"	<li>Complete Qt4 and Qt5 Support</li>"								\
-		"	<li>Fast startup and browsing</li>"									\
-		"	<li>Folder, text, html, image and odt quick preview</li>"			\
-		"	<li>Plugin support to extend quick preview interface</li>"			\
-		"	<li>File Association support</li>"									\
-		"	<li>Multiple Views - Tiles, Icons and Details</li>"					\
-		"	<li>Sleek side panel showing drives and boomarks</li>"				\
-		"	<li>Full drag and drop support</li>"								\
-		"	<li>Applications and Catalog View</li>"								\
-		"   <li>Custom Folder Icons and Thumbnail Preview</li>"					\
-		"   <li>Mime-Icon Support</li>"											\
-		"   <li>BreadCrumbs Navigation</li>"									\
-		"   <li>Custom Actions</li>"											\
-		"   <li>Inline terminal</li>"											\
-		"</ul>"																	\
+		"<p>Built on top of the Powerful Qt GUI Toolkit, this file manager "			\
+		"is sleek, stylish and fast. Some of its features are</p>"						\
+		"<ul>"																			\
+		"	<li>Complete Qt4 and Qt5 Support</li>"										\
+		"	<li>Fast startup and browsing</li>"											\
+		"	<li>Folder, text, html, image, pdf, djvu and odt quick preview</li>"		\
+		"	<li>Plugin support to extend quick preview interface</li>"					\
+		"	<li>Inbuilt file/folder encryption support</li>"							\
+		"	<li>File Association and Mime-Icon support</li>"							\
+		"	<li>Multiple Views - Tiles, Icons and Details</li>"							\
+		"	<li>Sleek side panel showing drives and boomarks</li>"						\
+		"	<li>Full drag and drop support</li>"										\
+		"	<li>Applications and Catalog View</li>"										\
+		"   <li>Custom Folder Icons and Thumbnail Preview</li>"							\
+		"   <li>BreadCrumbs Navigation</li>"											\
+		"   <li>Custom Actions</li>"													\
+		"   <li>Inline and inbuilt terminal</li>"										\
+		"</ul>"																			\
 	);
 
 	QLabel *bodyLbl = new QLabel( this );

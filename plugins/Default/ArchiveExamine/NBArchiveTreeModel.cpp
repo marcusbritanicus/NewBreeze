@@ -14,6 +14,9 @@ NBArchiveTreeModel::NBArchiveTreeModel( QString path ) : QAbstractItemModel() {
 	/* Archive name and path */
 	archiveName = path;
 
+	/* NBArchive instance */
+	archive = new NBArchive( archiveName );
+
 	/* By default we don't show hidden files */
 	__showHidden = false;
 
@@ -57,7 +60,13 @@ Qt::ItemFlags NBArchiveTreeModel::flags( const QModelIndex &idx ) const {
 	if ( not idx.isValid() )
 		return Qt::NoItemFlags;
 
-	return Qt::ItemIsEnabled;
+	NBTreeBranch *node = static_cast<NBTreeBranch*>( idx.internalPointer() );
+
+	if ( hasBranches( idx ) )
+		return Qt::ItemIsEnabled;
+
+	else
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 };
 
 QVariant NBArchiveTreeModel::data( const QModelIndex &index, int role ) const {
@@ -259,7 +268,15 @@ QString NBArchiveTreeModel::nodePath( const QModelIndex idx ) const {
 	if ( not idx.isValid() )
 		return QString();
 
-	return idx.data( Qt::UserRole + 1 ).toString();
+	QString path = idx.data().toString();
+	QModelIndex par = parent( idx );
+
+	while ( par.isValid() ) {
+		path = par.data().toString() + "/" + path;
+		par = parent( par );
+	}
+
+	return path;
 };
 
 QFileInfo NBArchiveTreeModel::nodeInfo( const QModelIndex idx ) const {
@@ -268,6 +285,16 @@ QFileInfo NBArchiveTreeModel::nodeInfo( const QModelIndex idx ) const {
 		return QFileInfo();
 
 	return QFileInfo( idx.data( Qt::UserRole + 1 ).toString() );
+};
+
+bool NBArchiveTreeModel::extract( QString member ) const {
+
+	return not archive->extractMember( member );
+};
+
+bool NBArchiveTreeModel::extractAll() const {
+
+	return not archive->extract();
 };
 
 void NBArchiveTreeModel::growTree() {
@@ -288,20 +315,13 @@ void NBArchiveTreeModel::growTree() {
 	if ( ( r = archive_read_open_filename( a, archiveName.toLatin1().data(), 10240 ) ) )
 		return;
 
-	while ( r = archive_read_next_header( a, &entry ) != ARCHIVE_EOF ) {
-
-		if ( r < ARCHIVE_OK )
-			fprintf( stderr, "%s\n", archive_error_string( a ) );
-
-		if ( r < ARCHIVE_WARN )
-			return;
-
-		QString name;
-		name = QString::fromUtf8( archive_entry_pathname( entry ) );
-		int type = archive_entry_filetype( entry );
+	Q_FOREACH( ArchiveEntry *ae, archive->list() ) {
+		QString name = QString( ae->name );
+		int type = ae->type;
 
 		QStringList tokens = QStringList() << name.split( "/", QString::SkipEmptyParts );
-		tree->addBranch( new NBTreeBranch( tokens.value( 0 ), QIcon::fromTheme( "folder" ), tree ) );
+		QString iconName = ( ( type == AE_IFDIR ) ? "folder" : mimeDb.mimeTypeForFile( tokens.value( 0 ) ).iconName() );
+		tree->addBranch( new NBTreeBranch( tokens.value( 0 ), QIcon::fromTheme( iconName ), tree ) );
 		if ( tokens.size() == 1 )
 			continue;
 
@@ -312,12 +332,8 @@ void NBArchiveTreeModel::growTree() {
 			branch->addBranch( new NBTreeBranch( tokens.value( i ), QIcon::fromTheme( iconName ), branch ) );
 		}
 
-		archive_read_data_skip( a );
 		qApp->processEvents();
 	}
-
-	archive_read_close( a );
-	archive_read_free( a );
 
 	endResetModel();
 };

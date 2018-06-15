@@ -163,7 +163,6 @@ void NBIconManager::generateThemeDatabase() {
 	idb.clear();
 
 	/* Create our icon database */
-	int counter = 0;
 	Q_FOREACH( QString dir, themeDirs ) {
 		Q_FOREACH( QString file, listFiles( dir ) ) {
 			if ( not ( file.endsWith( ".png" ) or file.endsWith( ".svg" ) or file.endsWith( ".xpm" ) or file.endsWith( ".svgz" ) ) )
@@ -174,17 +173,13 @@ void NBIconManager::generateThemeDatabase() {
 			paths << file;
 
 			idb.setValue( base, paths );
-			counter++;
 		}
 	}
-
-	qDebug() << "Added" << counter << "icons to the database";
 
 	/* Clear our older mimetype database */
 	mdb.clear();
 
 	/* Create our mimetype database */
-	counter = 0;
 	Q_FOREACH( QMimeType mType, mimeDb.allMimeTypes() ) {
 		QString mIcon = mType.iconName();
 		QString gmIcon = mType.genericIconName();
@@ -205,14 +200,10 @@ void NBIconManager::generateThemeDatabase() {
 
 		else
 			mdb.setValue( mType.name(), QStringList() << ":/icons/unknown.png" );
-
-		counter++;
 	}
 
 	/* Sync our database */
 	mdb.sync();
-
-	qDebug() << "Added" << counter << "mimetypes to the database";
 
 	/* DJVU Fix */
 	mdb.setValue( "image/vnd.djvu+multipage", QStringList() << icon( "x-office-document" ) );

@@ -20,23 +20,33 @@ void NBArchiveExamine::createGUI() {
 	QVBoxLayout *widgetLyt = new QVBoxLayout();
 	QVBoxLayout *baseLyt = new QVBoxLayout();
 
-	QLabel *lbl = new QLabel( "<tt><b>" + path + "</b></tt>" );
+	QLabel *lbl = new QLabel( "<tt><b>" + baseName( path ) + "</b></tt>" );
 
 	QToolButton *openBtn = new QToolButton();
 	openBtn->setIcon( QIcon( ":/icons/maximize.png" ) );
 	openBtn->setAutoRaise( true );
 	openBtn->setFocusPolicy( Qt::NoFocus );
 
+	QToolButton *extractBtn = new QToolButton();
+	extractBtn->setIcon( QIcon( ":/icons/extract.png" ) );
+	extractBtn->setToolTip( "Extract selected members" );
+	extractBtn->setAutoRaise( true );
+	extractBtn->setFocusPolicy( Qt::NoFocus );
+
 	QWidget *baseWidget = new QWidget( this );
 	baseWidget->setObjectName( tr( "guiBase" ) );
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
+	connect( extractBtn, SIGNAL( clicked() ), this, SLOT( extractSelection() ) );
 
 	peekWidgetBase = new QTreeView( this );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
+	peekWidgetBase->setSelectionBehavior( QAbstractItemView::SelectRows );
+	peekWidgetBase->setSelectionMode( QAbstractItemView::ExtendedSelection );
 
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
+	lblBtnLyt->addWidget( extractBtn );
 	lblBtnLyt->addWidget( openBtn );
 
 	widgetLyt->addLayout( lblBtnLyt );
@@ -78,7 +88,8 @@ void NBArchiveExamine::openInExternal() {
 
 void NBArchiveExamine::loadArchive() {
 
-	peekWidgetBase->setModel( new NBArchiveTreeModel( path ) );
+	mdl = new NBArchiveTreeModel( path );
+	peekWidgetBase->setModel( mdl );
 };
 
 void NBArchiveExamine::keyPressEvent( QKeyEvent *keyEvent ) {
@@ -113,4 +124,18 @@ void NBArchiveExamine::paintEvent( QPaintEvent *pEvent ) {
 
 	painter->end();
 	pEvent->accept();
+};
+
+void NBArchiveExamine::extractSelection() {
+
+	QModelIndexList indexes = peekWidgetBase->selectionModel()->selectedIndexes();
+
+	if ( indexes.count() ) {
+		Q_FOREACH( QModelIndex idx,  )
+			mdl->extract( mdl->nodePath( idx ) );
+	}
+
+	else {
+		mdl->extractAll();
+	}
 };

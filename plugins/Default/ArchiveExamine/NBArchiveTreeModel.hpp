@@ -7,6 +7,7 @@
 #pragma once
 
 #include "NBTreeBranch.hpp"
+#include "NBArchive.hpp"
 
 class NBArchiveTreeModel : public QAbstractItemModel {
     Q_OBJECT
@@ -76,6 +77,9 @@ class NBArchiveTreeModel : public QAbstractItemModel {
 		QString nodePath( QString ) const;
 		QFileInfo nodeInfo( const QModelIndex ) const;
 
+		bool extract( QString ) const;
+		bool extractAll() const;
+
 		/* To halt the Info Gathering */
 		void terminateInfoGathering();
 
@@ -86,6 +90,7 @@ class NBArchiveTreeModel : public QAbstractItemModel {
 		NBTreeBranch *tree;
 
 		QString archiveName;
+		NBArchive *archive;
 
 		mutable struct loadStatus {
 			bool loading;

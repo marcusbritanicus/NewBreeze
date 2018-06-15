@@ -14,12 +14,14 @@ class NBArchiveExamine : public QDialog {
 
 	public :
 		NBArchiveExamine( QString path = QDir::homePath(), QWidget *parent = NULL );
-		QString path;
-		QTreeView *peekWidgetBase;
 
 	private :
 		void createGUI();
 		void setWindowProperties();
+
+		QString path;
+		QTreeView *peekWidgetBase;
+		NBArchiveTreeModel *mdl;
 
 	public slots:
 		int exec();
@@ -27,6 +29,8 @@ class NBArchiveExamine : public QDialog {
 	private slots :
 		void openInExternal();
 		void loadArchive();
+
+		void extractSelection();
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );
