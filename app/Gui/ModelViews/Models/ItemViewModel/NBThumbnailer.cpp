@@ -8,6 +8,7 @@
 #include "NBIconManager.hpp"
 
 static QList<QByteArray> supported = QImageReader::supportedImageFormats();
+static QStringList docformat = QStringList() << "odt" << "odp" << "ods" << "odg"; // To be added later: << "pdf" << "djv" << "djvu";
 
 static inline int isImage( const struct dirent* entry ) {
 
@@ -18,10 +19,40 @@ static inline int isImage( const struct dirent* entry ) {
 	return false;
 };
 
+static inline int isDocument( const struct dirent* entry ) {
+
+	QByteArray suffix = QFileInfo( entry->d_name ).suffix().toLower().toLocal8Bit();
+	if ( docformat.contains( suffix ) )
+		return true;
+
+	return false;
+};
+
 static inline QStringList imageFiles( QString path ) {
 
 	struct dirent **fileList;
 	int entries = scandir( path.toLocal8Bit().data(), &fileList, isImage, NULL );
+	if ( entries > 0 ) {
+		QStringList files;
+		for( int i = 0; i < entries; i++ ) {
+			/* Ignore . and .. */
+			struct dirent *entry = fileList[ i ];
+			if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
+				continue;
+
+			files << path + QString::fromLocal8Bit( entry->d_name );
+		}
+
+		return files;
+	}
+
+	return QStringList();
+};
+
+static inline QStringList documents( QString path ) {
+
+	struct dirent **fileList;
+	int entries = scandir( path.toLocal8Bit().data(), &fileList, isDocument, NULL );
 	if ( entries > 0 ) {
 		QStringList files;
 		for( int i = 0; i < entries; i++ ) {
@@ -79,6 +110,32 @@ void NBThumbnailer::run() {
 		else {
 			QFile::copy( ":/icons/image.png", hashPath );
 			qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default image.";
+		}
+	}
+
+	files = documents( mPath );
+	Q_FOREACH( QString file, files ) {
+
+		if ( mTerminate )
+			break;
+
+		/* If @path is non-existent */
+		if ( not exists( file ) )
+			continue;
+
+		/* Create a hash of the path */
+		QString hashPath = thumbsDir + MD5( file );
+
+		/* If the thumbnail is already formed */
+		if ( exists( hashPath ) )
+			continue;
+
+		/* Open as archive */
+		NBArchive *odf = new NBArchive( file );
+		odf->setDestination( "/tmp/NewBreeze_odf/" );
+		if ( not odf->extractMember( "Thumbnails/thumbnail.png" ) ) {
+			QFile::copy( "/tmp/NewBreeze_odf/Thumbnails/thumbnail.png", hashPath );
+			system( "rm -rf /tmp/NewBreeze_odf/*" );
 		}
 	}
 };

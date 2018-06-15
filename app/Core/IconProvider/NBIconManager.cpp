@@ -70,6 +70,11 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 		mName = mimeDb.mimeTypeForFile( file ).name();
 	}
 
+	/* This is an ODF file: if thumbnail exists, we return it otherwise a normal mime icons */
+	QStringList odf;
+	odf << "application/vnd.oasis.opendocument.text" << "application/vnd.oasis.opendocument.presentation";
+	odf << "application/vnd.oasis.opendocument.spreadsheet" << "application/vnd.oasis.opendocument.graphics";
+
 	/* If we have a directory */
 	if ( not mName.compare( "inode/directory" ) ) {				// QString.compare(...) returns 0 for a match
 
@@ -122,6 +127,13 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 				return mdb.value( mName ).toStringList();
 
 			return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+		}
+	}
+
+	else if ( odf.contains( mName ) ) {
+		if ( Settings->General.ImagePreviews ) {
+			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
+				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
 		}
 	}
 
