@@ -10,33 +10,23 @@ static QMimeDatabase mimeDb;
 
 NBArchive::NBArchive( QString archive ) {
 
-	archiveName = QString( archive );
+	readDone = false;
+	archiveName = QDir( archive ).absolutePath();
 };
 
 void NBArchive::updateInputFiles( QStringList inFiles ) {
 
-	inFiles.removeDuplicates();
-
-	QStringList tempList;
 	Q_FOREACH( QString file, inFiles ) {
 		if ( isDir( file ) )
-			tempList.append( recDirWalk( file ) );
+			inputList.append( recDirWalk( file ) );
 
 		else
-			tempList.append( file );
-	}
-
-	/* Convert full path to relative to workingDirectory */
-	Q_FOREACH( QString file, tempList ) {
-		QString newFn = file.replace( src, "" );
-		if ( newFn.startsWith( "/" ) )
-			newFn.remove( 0, 1 );
-		inputList.append( newFn );
+			inputList.append( file );
 	}
 
 	inputList.sort();
 	inputList.removeDuplicates();
-}
+};
 
 void NBArchive::setWorkingDir( QString wDir ) {
 
@@ -45,16 +35,19 @@ void NBArchive::setWorkingDir( QString wDir ) {
 
 void NBArchive::setDestination( QString path ) {
 
+	/*
+		*
+		* @p path will be a absolute.
+		* So QDir we construct will be home path
+		*
+	*/
+
 	dest = QString( path );
-	if ( not QFileInfo( dest ).exists() )
-		QDir::home().mkpath( path );
+	if ( not QFileInfo( QDir( dest ).absolutePath() ).exists() )
+		mkpath( path, 0755 );
 };
 
 void NBArchive::create() {
-
-	char srcDir[ 10240 ] = { 0 };
-	getcwd( srcDir, 10240 );
-	chdir( src.toLocal8Bit().data() );
 
 	QMimeType mime = mimeDb.mimeTypeForFile( archiveName );
 
@@ -100,8 +93,11 @@ void NBArchive::create() {
 
 	else {
 		struct archive *a;
+		struct archive_entry *entry;
 		struct stat st;
 		char buff[ 8192 ];
+		int len;
+		int fd;
 		int r;
 
 		a = archive_write_new();
@@ -111,32 +107,27 @@ void NBArchive::create() {
 		if ( r < ARCHIVE_OK )
 			qDebug() << "Cannot use the input filter/format.";
 
-		r = archive_write_open_filename( a, archiveName.toLatin1().data() );
+                r = archive_write_open_filename( a, archiveName.toUtf8().data() );
 		if ( r < ARCHIVE_OK )
 			qDebug() << "Unable to write file for writing.";
 
 		Q_FOREACH( QString file, inputList ) {
 			char *filename;
 			filename = new char[ file.count() + 1 ];
-			strcpy( filename, file.toLatin1().data() );
-
-			// qDebug() << file.toLocal8Bit().data() << exists( file );
+                        strcpy( filename, file.toUtf8().data() );
 
 			stat( filename, &st );
-			struct archive_entry *entry = archive_entry_new();
+			entry = archive_entry_new();
 			archive_entry_set_pathname( entry, filename );
 			archive_entry_set_size( entry, st.st_size );
 			archive_entry_set_filetype( entry, st.st_mode );
 			archive_entry_set_perm( entry, st.st_mode );
-			archive_entry_set_atime( entry, st.st_atime, 0 );
-			archive_entry_set_mtime( entry, st.st_mtime, 0 );
-			archive_entry_set_ctime( entry, st.st_ctime, 0 );
 
 			archive_write_header( a, entry );
 
 			// Perform the write
-			int fd = open( filename, O_RDONLY );
-			int len = read( fd, buff, sizeof( buff ) );
+			fd = open( filename, O_RDONLY );
+			len = read( fd, buff, sizeof( buff ) );
 			while ( len > 0 ) {
 				archive_write_data( a, buff, len );
 				len = read( fd, buff, sizeof( buff ) );
@@ -148,8 +139,6 @@ void NBArchive::create() {
 		archive_write_close( a );
 		archive_write_free( a );
 	}
-
-	chdir( srcDir );
 };
 
 int NBArchive::extract() {
@@ -200,7 +189,7 @@ int NBArchive::extract() {
 		// Change to the target directory
 		char srcDir[ 10240 ] = { 0 };
 		getcwd( srcDir, 10240 );
-		chdir( dest.toLatin1().data() );
+		chdir( dest.toUtf8().data() );
 
 		struct archive *a;
 		struct archive *ext;
@@ -225,7 +214,7 @@ int NBArchive::extract() {
 		archive_write_disk_set_options( ext, flags );
 		archive_write_disk_set_standard_lookup( ext );
 
-		if ( ( r = archive_read_open_filename( a, archiveName.toLatin1().data(), 10240 ) ) )
+		if ( ( r = archive_read_open_filename( a, archiveName.toUtf8().data(), 10240 ) ) )
 			return 1;
 
 		while ( true ) {
@@ -274,14 +263,154 @@ int NBArchive::extract() {
 	return 0;
 };
 
+int NBArchive::extractMember( QString memberName ) {
+
+	// Change to the target directory
+	char srcDir[ 10240 ] = { 0 };
+	getcwd( srcDir, 10240 );
+	chdir( dest.toUtf8().data() );
+
+	struct archive *a;
+	struct archive *ext;
+	struct archive_entry *entry;
+	int flags;
+	int r;
+
+	/* Select which attributes we want to restore. */
+	flags = ARCHIVE_EXTRACT_TIME;
+	flags |= ARCHIVE_EXTRACT_PERM;
+	flags |= ARCHIVE_EXTRACT_ACL;
+	flags |= ARCHIVE_EXTRACT_FFLAGS;
+	flags |= ARCHIVE_EXTRACT_OWNER;
+
+	// Source Archive
+	a = archive_read_new();
+	archive_read_support_format_all( a );
+	archive_read_support_filter_all( a );
+
+	// Structure to write files to disk
+	ext = archive_write_disk_new();
+	archive_write_disk_set_options( ext, flags );
+	archive_write_disk_set_standard_lookup( ext );
+
+	r = archive_read_open_filename( a, archiveName.toUtf8().data(), 10240 );
+	if ( r != ARCHIVE_OK ) {
+		qDebug() << "[ERROR]: Failed to open archive:" << archiveName;
+		return 1;
+	}
+
+	while ( true ) {
+		r = archive_read_next_header( a, &entry );
+		if ( r == ARCHIVE_EOF )
+			break;
+
+		if ( r < ARCHIVE_OK )
+			fprintf( stderr, "%s\n", archive_error_string( a ) );
+
+		if ( r < ARCHIVE_WARN )
+			return 1;
+
+		/* Perform extraction only if entry name matches the given name */
+		if ( memberName.compare( archive_entry_pathname( entry ) ) == 0 ) {
+
+			r = archive_write_header( ext, entry );
+			if ( r < ARCHIVE_OK )
+				fprintf( stderr, "%s\n", archive_error_string( ext ) );
+
+			else if ( archive_entry_size( entry ) > 0 ) {
+				r = copyData( a, ext );
+				if ( r < ARCHIVE_OK )
+					fprintf( stderr, "%s\n", archive_error_string( ext ) );
+
+				if ( r < ARCHIVE_WARN )
+					return 1;
+			}
+
+			r = archive_write_finish_entry( ext );
+			if ( r < ARCHIVE_OK )
+				fprintf( stderr, "%s\n", archive_error_string( ext ) );
+
+			if ( r < ARCHIVE_WARN )
+				return 1;
+
+			archive_read_close( a );
+			archive_read_free( a );
+
+			archive_write_close( ext );
+			archive_write_free( ext );
+
+			chdir( srcDir );
+
+			return 0;
+		}
+	}
+
+	archive_read_close( a );
+	archive_read_free( a );
+
+	archive_write_close( ext );
+	archive_write_free( ext );
+
+	chdir( srcDir );
+
+	qDebug() << "[Error]" << "File not found in the archive:" << memberName;
+
+	return 0;
+};
+
+ArchiveEntries NBArchive::list() {
+
+	QMimeType mime = mimeDb.mimeTypeForFile( archiveName );
+
+	struct archive *a;
+	struct archive_entry *entry;
+	int r;
+
+	// Source Archive
+	a = archive_read_new();
+	archive_read_support_format_all( a );
+	archive_read_support_filter_all( a );
+
+	if ( ( r = archive_read_open_filename( a, archiveName.toUtf8().data(), 10240 ) ) ) {
+		qDebug() << "[Error]" << archive_error_string( a );
+		readDone = true;
+		return ArchiveEntries();
+	}
+
+	while ( true ) {
+		r = archive_read_next_header( a, &entry );
+		if ( r == ARCHIVE_EOF )
+			break;
+
+		if ( r < ARCHIVE_OK )
+			qDebug() << archive_error_string( a );
+
+		ArchiveEntry *ae = new ArchiveEntry;
+		ae->name = archive_entry_pathname( entry );
+		ae->size = archive_entry_size( entry );
+		ae->type = archive_entry_filetype( entry );
+		ae->stat = ( struct stat* )archive_entry_stat( entry );
+
+		memberList << ae;
+	}
+
+	archive_read_close( a );
+	archive_read_free( a );
+
+	readDone = true;
+
+	return memberList;
+};
+
 int NBArchive::copyData( struct archive *ar, struct archive *aw ) {
 
+	int r;
 	const void *buff;
 	size_t size;
 	off_t offset;
 
 	while ( true ) {
-		int r = archive_read_data_block( ar, &buff, &size, &offset );
+		r = archive_read_data_block( ar, &buff, &size, &offset );
 		if ( r == ARCHIVE_EOF )
 			return ( ARCHIVE_OK );
 
