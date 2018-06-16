@@ -8,7 +8,7 @@
 #include "NBIconManager.hpp"
 
 static QList<QByteArray> supported = QImageReader::supportedImageFormats();
-static QStringList docformat = QStringList() << "odt" << "odp" << "ods" << "odg"; // To be added later: << "pdf" << "djv" << "djvu";
+static QStringList odfformat = QStringList() << "odt" << "odp" << "ods" << "odg";
 
 static inline int isImage( const struct dirent* entry ) {
 
@@ -19,7 +19,7 @@ static inline int isImage( const struct dirent* entry ) {
 	return false;
 };
 
-static inline int isDocument( const struct dirent* entry ) {
+static inline int isODF( const struct dirent* entry ) {
 
 	QByteArray suffix = QFileInfo( entry->d_name ).suffix().toLower().toLocal8Bit();
 	if ( docformat.contains( suffix ) )
@@ -49,10 +49,10 @@ static inline QStringList imageFiles( QString path ) {
 	return QStringList();
 };
 
-static inline QStringList documents( QString path ) {
+static inline QStringList odffiles( QString path ) {
 
 	struct dirent **fileList;
-	int entries = scandir( path.toLocal8Bit().data(), &fileList, isDocument, NULL );
+	int entries = scandir( path.toLocal8Bit().data(), &fileList, isODF, NULL );
 	if ( entries > 0 ) {
 		QStringList files;
 		for( int i = 0; i < entries; i++ ) {
@@ -113,7 +113,7 @@ void NBThumbnailer::run() {
 		}
 	}
 
-	files = documents( mPath );
+	files = odffiles( mPath );
 	Q_FOREACH( QString file, files ) {
 
 		if ( mTerminate )

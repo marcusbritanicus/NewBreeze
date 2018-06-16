@@ -131,7 +131,7 @@ void NBArchiveExamine::extractSelection() {
 	QModelIndexList indexes = peekWidgetBase->selectionModel()->selectedIndexes();
 
 	if ( indexes.count() ) {
-		Q_FOREACH( QModelIndex idx,  )
+		Q_FOREACH( QModelIndex idx, indexes )
 			mdl->extract( mdl->nodePath( idx ) );
 	}
 

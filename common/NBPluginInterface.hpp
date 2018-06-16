@@ -69,8 +69,8 @@ class PLUGIN_DLLSPEC NBPluginInterface {
 			File					= 0xD50BE8,			// a SINGLE file is selected
 			Dir,										// a SINGLE folder is selected
 			Node,										// a SINGLE node is selected ( File, Dir, FIFO, Socket, Chr, Block, etc... )
-			Files,										// MULTIPLE file are selected
-			Dirs,    			 						// MULTIPLE folder are selected
+			Files,										// MULTIPLE files are selected
+			Dirs,    			 						// MULTIPLE folders are selected
 			Nodes,										// MULTIPLE nodes are selected ( File, Dir, FIFO, Socket, Chr, Block, etc... )
 			None										// there is no selection
 		};
