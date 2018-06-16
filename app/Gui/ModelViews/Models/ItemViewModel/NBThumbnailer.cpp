@@ -22,7 +22,7 @@ static inline int isImage( const struct dirent* entry ) {
 static inline int isODF( const struct dirent* entry ) {
 
 	QByteArray suffix = QFileInfo( entry->d_name ).suffix().toLower().toLocal8Bit();
-	if ( odffiles.contains( suffix ) )
+	if ( odfformat.contains( suffix ) )
 		return true;
 
 	return false;
