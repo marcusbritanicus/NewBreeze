@@ -534,7 +534,7 @@ void NBStartupWizard::createPages() {
 		"<p><a href = 'mailto:marcusbritanicus@gmail.com'>Drop in</a> a word of appreciation if you enjoyed the experience, and "
 		"feel free to distribute NewBreeze to all your family, friends and colleagues.</p><br style='line-height: 5%;'>"
 		"<p>If you stumbled across an annoying bug which ruined your time, do not hesitate to file a bug report "
-		"<a href = 'https://github.com/marcusbritanicus/NewBreeze/issues/new'>here</a>.</p></center>"
+		"<a href = 'https://gitlab.com/marcusbritanicus/NewBreeze/issues/new'>here</a>.</p></center>"
 	);
 	pLlbl3->setWordWrap( true );
 	pLlbl3->setOpenExternalLinks( true );

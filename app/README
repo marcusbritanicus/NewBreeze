@@ -26,8 +26,8 @@ Please READ the ReleaseNotes for information on the new features
 
 Notes for compiling - linux:
     - Download the sources
-        - Git: git clone https://github.com/marcusbritanicus/NewBreeze NewBreeze-master
-        - Tar: wget https://github.com/marcusbritanicus/NewBreeze/archive/master.tar.gz && tar -xf master.tar.gz
+        - Git: git clone https://gitlab.com/marcusbritanicus/NewBreeze NewBreeze-master
+        - Tar: wget https://gitlab.com/marcusbritanicus/NewBreeze/-/archive/master/NewBreeze-master.tar.gz && tar -xf NewBreeze-master.tar.gz
     - Enter NewBreeze-master
     - Open the terminal and type: qmake && make
 

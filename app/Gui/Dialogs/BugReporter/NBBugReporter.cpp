@@ -1,6 +1,6 @@
 /*
 	*
-	* NBBugReporter.cpp - Report issues in Github using their REST api
+	* NBBugReporter.cpp - Report issues in GitLab using their REST api
 	*
 */
 
@@ -14,8 +14,16 @@ NBBugReporter::NBBugReporter() : NBDialog() {
 
 void NBBugReporter::createGUI() {
 
+	QLabel *tokenLbl = new QLabel( "&Authorization Token:" );
+	tokenLE = new QLineEdit( "gxGfKhkaYqGMf6XV35V9" );
+	tokenLE->setFont( QFont( "DejaVu Sans Mono", 10 ) );
+	tokenLE->setAlignment( Qt::AlignCenter );
+	tokenLE->setInputMask( "NNNNNNNNNNNNNNNNNNNN" );
+	tokenLbl->setBuddy( tokenLE );
+	connect( tokenLE, SIGNAL( textChanged( QString ) ), this, SLOT( enableSend() ) );
+
 	QLabel *titleLbl = new QLabel( "&Title:" );
-	titleLE = new QLineEdit();
+	titleLE = new QLineEdit( "Testing the BugReporter" );
 	titleLE->setFont( QFont( "DejaVu Sans Mono", 10 ) );
 	titleLbl->setBuddy( titleLE );
 	connect( titleLE, SIGNAL( textChanged( QString ) ), this, SLOT( enableSend() ) );
@@ -45,14 +53,16 @@ void NBBugReporter::createGUI() {
 	minIssTxtLbl->setStyleSheet( "background: transparent;" );
 
 	QGridLayout *lyt = new QGridLayout();
-	lyt->addWidget( titleLbl, 0, 0 );
-	lyt->addWidget( titleLE, 0, 1 );
-	lyt->addWidget( issueLbl, 1, 0 );
-	lyt->addWidget( issueTE, 2, 0, 1, 2 );
-	lyt->addLayout( btnLyt, 3, 0, 1, 2, Qt::AlignCenter );
+	lyt->addWidget( tokenLbl, 0, 0 );
+	lyt->addWidget( tokenLE, 0, 1 );
+	lyt->addWidget( titleLbl, 1, 0 );
+	lyt->addWidget( titleLE, 1, 1 );
+	lyt->addWidget( issueLbl, 2, 0 );
+	lyt->addWidget( issueTE, 3, 0, 1, 2 );
+	lyt->addLayout( btnLyt, 4, 0, 1, 2, Qt::AlignCenter );
 
-	lyt->addWidget( minTtlTxtLbl, 0, 1, Qt::AlignRight | Qt::AlignVCenter );
-	lyt->addWidget( minIssTxtLbl, 2, 0, 1, 2, Qt::AlignRight | Qt::AlignBottom );
+	lyt->addWidget( minTtlTxtLbl, 1, 1, Qt::AlignRight | Qt::AlignVCenter );
+	lyt->addWidget( minIssTxtLbl, 3, 0, 1, 2, Qt::AlignRight | Qt::AlignBottom );
 
 	setLayout( lyt );
 };
@@ -72,16 +82,41 @@ void NBBugReporter::setWindowProperties() {
 
 void NBBugReporter::sendReport() {
 
-	QStringList data;
-	data << titleLE->text();
-	data << issueTE->toPlainText();
+	QString token = tokenLE->text();
+	QString title = QString::fromLocal8Bit( QUrl::toPercentEncoding( titleLE->text() ) );
+	QString issue = QString::fromLocal8Bit( QUrl::toPercentEncoding( issueTE->toPlainText() ) );
 
-	NBGitHubAuthDialog *authDlg = new NBGitHubAuthDialog( data, this );
-	if( authDlg->exec() )
+	QString url( "https://gitlab.com/api/v4/projects/6894571/issues?title=%2&description=%3&assignee_ids=2417559&private_token=%1" );
+	QStringList args = QStringList() << "--request" << "POST" << url.arg( token ).arg( title ).arg( issue );
+
+	QProcess proc;
+	proc.start( "curl", args );
+	proc.waitForFinished( -1 );
+	QString output = QString::fromUtf8( proc.readAll() );
+
+	QRegExp rx( "https://gitlab.com/marcusbritanicus/NewBreeze/issues/[0-9]+" );
+	rx.indexIn( output );
+
+	if ( output.contains( "https://gitlab.com/marcusbritanicus/NewBreeze/issues/" ) ) {
+		NBMessageDialog::information(
+			this,
+			"NewBreeze3 - BugReporter",
+			QString( "<p>You have successfully submitted a bug report. You may check the status of your "
+			"bug report at %1.</p><p>Thank you for submitting the bug report...! "
+			"You just helped make NewBreeze3 better.</p>" ).arg( rx.cap( 0 ) );
+		);
 		accept();
+	}
 
-	else
+	else {
+		NBMessageDialog::information(
+			this,
+			"NewBreeze3 - BugReporter",
+			"<p>I am very sorry, but the bug report was not submitted properly. Please raise the issue at "
+			"https://github.com/marcusbritanicus/NewBreeze/issues/new</p>"
+		);
 		reject();
+	}
 };
 
 void NBBugReporter::enableSend() {
@@ -109,84 +144,4 @@ void NBBugReporter::enableSend() {
 
 	else
 		sendBtn->setEnabled( false );
-};
-
-NBGitHubAuthDialog::NBGitHubAuthDialog( QStringList data, QWidget *parent ) : NBDialog( parent ) {
-
-	mData << data;
-
-	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
-	setFixedWidth( 270 );
-
-	QLabel *title = new QLabel( "<h3>GitHub Authentication</h3>" );
-
-	QLabel *nameLbl = new QLabel( "User&name:" );
-	nameLE = new QLineEdit();
-	nameLbl->setBuddy( nameLE );
-
-	QLabel *passLbl = new QLabel( "User&pass:" );
-	passLE = new QLineEdit();
-	passLE->setEchoMode( QLineEdit::Password );
-	passLbl->setBuddy( passLE );
-
-	QPushButton *cancelBtn = new QPushButton( QIcon::fromTheme( "dialog-cancel" ), "&Cancel" );
-	connect( cancelBtn, SIGNAL( clicked() ), this, SLOT( reject() ) );
-
-	QPushButton *authBtn = new QPushButton( "&Authenticate" );
-	connect( authBtn, SIGNAL( clicked() ), this, SLOT( authenticate() ) );
-
-	QHBoxLayout *btnLyt = new QHBoxLayout();
-	btnLyt->addWidget( cancelBtn );
-	btnLyt->addStretch();
-	btnLyt->addWidget( authBtn );
-
-	QGridLayout *lyt = new QGridLayout();
-	lyt->addWidget( title, 0, 0, 1, 2, Qt::AlignCenter );
-	lyt->addWidget( nameLbl, 1, 0 );
-	lyt->addWidget( nameLE, 1, 1 );
-	lyt->addWidget( passLbl, 2, 0 );
-	lyt->addWidget( passLE, 2, 1 );
-	lyt->addLayout( btnLyt, 3, 0, 1, 2, Qt::AlignCenter );
-
-	setLayout( lyt );
-};
-
-void NBGitHubAuthDialog::authenticate() {
-
-	QProcess proc;
-	proc.setProcessChannelMode( QProcess::MergedChannels );
-
-	QStringList args;
-	args << "-u";
-	args << nameLE->text() + ":" + passLE->text();
-	args << "https://api.github.com/repos/marcusbritanicus/NewBreeze/issues";
-	args << "-XPOST";
-	args << "-H";
-	args << "Content-Type: application/json";
-	args << QString( "-d{\"title\": \"%1\", \"body\": \"%2\", \"assignees\": [ \"marcusbritanicus\" ]}" ).arg( mData.at( 0 ) ).arg( mData.at( 1 ) );
-
-	proc.start( "curl", args );
-	proc.waitForFinished();
-	QString output = QString::fromUtf8( proc.readAll() );
-
-	if ( output.contains( "https://api.github.com/repos/marcusbritanicus/NewBreeze/issues/" ) ) {
-		NBMessageDialog::information(
-			this,
-			"NewBreeze3 - BugReporter",
-			"<p>You have successfully submitted a bug report. You may check the status of your "
-			"bug report at https://github.com/marcusbritanicus/NewBreeze/issues/</p>"
-			"<p>Thank you for submitting the bug report...! You just helped maked NewBreeze3 better.</p>"
-		);
-		accept();
-	}
-
-	else {
-		NBMessageDialog::information(
-			this,
-			"NewBreeze3 - BugReporter",
-			"<p>I am very sorry, but the bug report was not submitted properly. Please raise the issue at "
-			"https://github.com/marcusbritanicus/NewBreeze/issues/new</p>"
-		);
-		reject();
-	}
 };

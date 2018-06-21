@@ -20,6 +20,7 @@ class NBBugReporter : public NBDialog {
 		void setWindowProperties();
 
 		QLineEdit *titleLE;
+		QLineEdit *tokenLE;
 		QPlainTextEdit *issueTE;
 
 		QLabel *minTtlTxtLbl, *minIssTxtLbl;
@@ -29,19 +30,4 @@ class NBBugReporter : public NBDialog {
 	public Q_SLOTS:
 		void sendReport();
 		void enableSend();
-};
-
-class NBGitHubAuthDialog : public NBDialog {
-	Q_OBJECT
-
-	public:
-		NBGitHubAuthDialog( QStringList data, QWidget *parent );
-
-	private:
-		QLineEdit *nameLE, *passLE;
-
-		QStringList mData;
-
-	public Q_SLOTS:
-		void authenticate();
 };

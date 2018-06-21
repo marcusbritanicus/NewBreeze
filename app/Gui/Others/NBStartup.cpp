@@ -12,7 +12,7 @@
 
 void detectCrash() {
 
-	/* We check for an ending good by reading the last 12 chars. */
+	/* We check for an ending good bye reading the last 12 chars. */
 	// QFile nblogf( logPath );
 	// if ( nblogf.open( QFile::ReadOnly ) ) {
 		// nblogf.seek( nblogf.size() - 12 );
@@ -23,24 +23,16 @@ void detectCrash() {
 				// 0,		/* Not a child of anything */
 				// "NewBreeze - Bug Report",
 				// "It seems to me that NewBreeze did not close properly the last time. If you were working on something very important at the time, "
-				// "I'm extremely sorry. I hope no data was lost. Would you like to report this on GitHub?"
+				// "I'm extremely sorry. I hope no data was lost. Would you like to report this on GitLab?"
 			// );
 
 			// if ( reply == QMessageBox::Yes ) {
 				// NBBugReporter *bugreport = NBBugReporter( this );
 				// bugreport->exec();
 			// }
-
-			// /*
-				// *
-				// * Creating an issue
-				// *
-				// * curl -i -u "user:passphrase" -d '{ "title": "Title", "body": "Body", "label": "Label" }' https://api.github.com/repos/marcusbritanicus/NewBreeze/issues
-				// * https://curl.haxx.se/libcurl/c/http-post.html
-				// *
-			// */
 		// }
 	// }
+
 	// nblogf.close();
 };
 

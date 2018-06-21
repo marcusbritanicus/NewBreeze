@@ -1,7 +1,7 @@
-# NewBreeze [![Build Status](https://travis-ci.org/marcusbritanicus/NewBreeze.svg?branch=master)](https://travis-ci.org/marcusbritanicus/NewBreeze)
+# NewBreeze
 ## A fast and light-weight file manager based on Qt
 
-Chat with me at [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/newbreezefm/)
+Chat with me at [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/newbreeze-fm/)
 
 ### Qt5 migration complete. Qt5 is now the preferred Qt version.
 
@@ -33,8 +33,8 @@ Some of its features are
 ### Notes for compiling - linux:
 
 * Download the sources
-   - Git: `git clone https://github.com/marcusbritanicus/NewBreeze NewBreeze-master`
-   - Tar: `wget https://github.com/marcusbritanicus/NewBreeze/archive/master.tar.gz && tar -xf master.tar.gz`
+   - Git: `git clone https://gitlab.com/marcusbritanicus/NewBreeze.git NewBreeze-master`
+   - Tar: `wget https://gitlab.com/marcusbritanicus/NewBreeze/-/archive/master/NewBreeze-master.tar.gz && tar -xf NewBreeze-master.tar.gz`
 * Enter `NewBreeze-master`
 * Open the terminal and type: `qmake && make`
 * To install, as root type: `make install`
