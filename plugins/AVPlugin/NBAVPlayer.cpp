@@ -254,12 +254,3 @@ void NBAVPlayer::paintEvent( QPaintEvent *pEvent ) {
 	painter->end();
 	pEvent->accept();
 };
-
-int main( int argc, char **argv ) {
-
-	QApplication app( argc, argv );
-	NBAVPlayer Gui( argv[ 1 ] );
-	Gui.show();
-
-	return 0;
-};

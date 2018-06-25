@@ -120,13 +120,24 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 	}
 
 	/* This is an image file */
-	else if ( mName.startsWith( "image/" ) ) {
+	else if ( mName.startsWith( "image/" ) or not mName.compare( "video/mng" ) ) {
 		if ( Settings->General.ImagePreviews ) {
 			/* DJVU issue comes only when we have to show previews */
 			if ( mName.contains( "djv" ) )
 				return mdb.value( mName ).toStringList();
 
 			return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+		}
+	}
+
+	/* This is an video file */
+	else if ( mName.startsWith( "video/" ) and mName.compare( "video/mng" ) ) {
+		if ( Settings->General.ImagePreviews ) {
+
+			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
+				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+
+			return mdb.value( mName ).toStringList();
 		}
 	}
 

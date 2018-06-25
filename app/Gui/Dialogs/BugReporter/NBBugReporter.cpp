@@ -103,7 +103,7 @@ void NBBugReporter::sendReport() {
 			"NewBreeze3 - BugReporter",
 			QString( "<p>You have successfully submitted a bug report. You may check the status of your "
 			"bug report at %1.</p><p>Thank you for submitting the bug report...! "
-			"You just helped make NewBreeze3 better.</p>" ).arg( rx.cap( 0 ) );
+			"You just helped make NewBreeze3 better.</p>" ).arg( rx.cap( 0 ) )
 		);
 		accept();
 	}

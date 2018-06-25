@@ -5,7 +5,7 @@
 */
 
 #include "NBThumbnailer.hpp"
-#include "NBIconManager.hpp"
+#include "NBPluginInterface.hpp"
 
 static QList<QByteArray> supported = QImageReader::supportedImageFormats();
 static QStringList odfformat = QStringList() << "odt" << "odp" << "ods" << "odg";
@@ -26,6 +26,12 @@ static inline int isODF( const struct dirent* entry ) {
 		return true;
 
 	return false;
+};
+
+static inline int isVideo( const struct dirent* entry ) {
+
+	QMimeType mt = mimeDb.mimeTypeForFile( entry->d_name );
+	return ( mt.name().startsWith( "video/" ) and mt.name().compare( "video/mng" ) );
 };
 
 static inline QStringList imageFiles( QString path ) {
@@ -70,6 +76,27 @@ static inline QStringList odffiles( QString path ) {
 	return QStringList();
 };
 
+static inline QStringList videoFiles( QString path ) {
+
+	struct dirent **fileList;
+	int entries = scandir( path.toLocal8Bit().data(), &fileList, isVideo, NULL );
+	if ( entries > 0 ) {
+		QStringList files;
+		for( int i = 0; i < entries; i++ ) {
+			/* Ignore . and .. */
+			struct dirent *entry = fileList[ i ];
+			if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
+				continue;
+
+			files << path + QString::fromLocal8Bit( entry->d_name );
+		}
+
+		return files;
+	}
+
+	return QStringList();
+};
+
 void NBThumbnailer::createThumbnails( QString path ) {
 
 	if ( isRunning() )
@@ -82,6 +109,8 @@ void NBThumbnailer::createThumbnails( QString path ) {
 };
 
 void NBThumbnailer::run() {
+
+	/* Image Files */
 
 	QStringList files = imageFiles( mPath );
 	Q_FOREACH( QString file, files ) {
@@ -109,9 +138,11 @@ void NBThumbnailer::run() {
 
 		else {
 			QFile::copy( ":/icons/image.png", hashPath );
-			qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default image.";
+			qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
 		}
 	}
+
+	/* ODf Files */
 
 	files = odffiles( mPath );
 	Q_FOREACH( QString file, files ) {
@@ -136,6 +167,42 @@ void NBThumbnailer::run() {
 		if ( not odf->extractMember( "Thumbnails/thumbnail.png" ) ) {
 			QFile::copy( "/tmp/NewBreeze_odf/Thumbnails/thumbnail.png", hashPath );
 			system( "rm -rf /tmp/NewBreeze_odf/*" );
+			emit updateNode( file );
+		}
+	}
+
+	/* Video Files */
+
+	QSettings nbpset( "NewBreeze", "Plugins" );
+	QString pluginSo;
+
+	Q_FOREACH( QString pth, nbpset.value( "PluginPaths" ).toStringList() ) {
+		if ( exists( pth + "/libVideoThumbs.so" ) )
+			pluginSo = QDir( pth ).absoluteFilePath( "libVideoThumbs.so" );
+	}
+
+	if ( pluginSo.count() ) {
+
+		QPluginLoader loader( pluginSo );
+		QObject *pObject = loader.instance();
+		if ( pObject ) {
+			NBPluginInterface *plugin = qobject_cast<NBPluginInterface*>( pObject );
+			files = videoFiles( mPath );
+			Q_FOREACH( QString file, files ) {
+				/* If @path is non-existent */
+				if ( not exists( file ) )
+					continue;
+
+				/* Create a hash of the path */
+				QString hashPath = thumbsDir + MD5( file );
+
+				/* If the thumbnail is already formed */
+				if ( exists( hashPath ) )
+					continue;
+
+				plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, QString(), QStringList() << file << hashPath );
+				emit updateNode( file );
+			}
 		}
 	}
 };

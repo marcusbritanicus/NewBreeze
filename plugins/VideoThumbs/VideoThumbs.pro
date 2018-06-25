@@ -1,12 +1,11 @@
 TEMPLATE = lib
-TARGET = AVPlugin4
+TARGET = VideoThumbs4
 
 # Common Sources
 INCLUDEPATH += ../../common/ ../../common/include .
 DEPENDPATH += ../../common/ ../../common/include .
 
-# VLC Support
-LIBS += -lvlc
+LIBS += -lffmpegthumbnailer
 
 # Same as NewBreeze version
 VERSION = "3.0.0"
@@ -15,12 +14,6 @@ VERSION = "3.0.0"
 # ===========
 CONFIG += plugin
 
-# Qt5 Support
-# ===========
-greaterThan(QT_MAJOR_VERSION, 4) {
-	QT += widgets
-}
-
 # LibNB3Common
 # ============
 isEqual( QT_MAJOR_VERSION, 4 ) {
@@ -28,6 +21,7 @@ isEqual( QT_MAJOR_VERSION, 4 ) {
 }
 
 isEqual( QT_MAJOR_VERSION, 5 ) {
+	QT += widgets
 	LIBS += -L../../common/ -lnewbreeze-common
 }
 
@@ -52,7 +46,7 @@ RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4
 UI_DIR      = $$BUILD_PREFIX/uic-plugins4
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-	TARGET		= AVPlugin
+	TARGET		= VideoThumbs
 	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5
 	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5
 	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5
@@ -60,13 +54,10 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 }
 
 # Headers
-HEADERS += Global.hpp
-HEADERS += NBAVPlayer.hpp
-HEADERS += NBAVPlugin.hpp
+HEADERS += NBVideoThumbsPlugin.hpp
 
 # Sources
-SOURCES += NBAVPlayer.cpp
-SOURCES += NBAVPlugin.cpp
+SOURCES += NBVideoThumbsPlugin.cpp
 
 unix {
 	isEmpty(PREFIX) {

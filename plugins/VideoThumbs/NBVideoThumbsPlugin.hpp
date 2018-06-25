@@ -1,21 +1,20 @@
 /*
 	*
-	* NBAVPlugin.hpp - NewBreeze PreviewWidget Class Header
+	* NBVideoThumbsPlugin.hpp - NewBreeze Video Thumbnailer Class
 	*
 */
 
 #pragma once
 
 #include "Global.hpp"
-#include "NBAVPlayer.hpp"
 #include "NBPluginInterface.hpp"
 
 #include <QtPlugin>
 
-class NBAVPlugin : public QObject, NBPluginInterface {
+class NBVideoThumbsPlugin : public QObject, NBPluginInterface {
 	Q_OBJECT
 	#if QT_VERSION >= 0x050000
-		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "AVPlugin.json" )
+		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "VideoThumbs.json" )
 	#endif
 	Q_INTERFACES( NBPluginInterface )
 
@@ -45,5 +44,5 @@ class NBAVPlugin : public QObject, NBPluginInterface {
 		void actionTrigger( Interface, QString, QStringList );
 
 		/* Store the called widget pointer */
-		 void setCaller( QWidget *caller );
+		void setCaller( QWidget *caller );
 };
