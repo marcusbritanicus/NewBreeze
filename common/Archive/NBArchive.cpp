@@ -407,7 +407,12 @@ int NBArchive::copyData( struct archive *ar, struct archive *aw ) {
 	int r;
 	const void *buff;
 	size_t size;
-	off_t offset;
+
+	#ifdef __LP64__
+		off_t offset;
+	#else
+		la_int64_t offset;
+	#endif
 
 	while ( true ) {
 		r = archive_read_data_block( ar, &buff, &size, &offset );

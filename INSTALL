@@ -7,35 +7,42 @@ Installation Instructions for NewBreeze v3.0.0
      The list of dependencies are given below. Please install them in your system as appropriate.
      The below methods assume you have a debian based system.
 
-     1] Qt4/Qt5 (libqt4-dev, libqt4-dev-bin, qtbase5-dev, qtbase5-dev-tools)
-        a] QtWebKit (libqtwebkit-dev, qtwebkit5-dev)
-        b] QtWebEngine (qtwebengine5-dev)
-        c] QScintilla ( libqscintilla2-dev, libqt5scintilla2-dev, libqscintilla2-qt5-dev)
-     3] zlib (zlib1g-dev)
-     4] liblzma (liblzma-dev)
-     5] libbzip2 (libbz2-dev)
-     6] libarchive (libarchive-dev)
-     7] xdg-utils (xdg-utils)
-     8] libpoppler-qt5 (libpoppler-qt5-dev)
-     9] libdjvulibre-dev (libdjvulibre-dev)
+      1] Qt4/Qt5 (libqt4-dev, libqt4-dev-bin, qtbase5-dev, qtbase5-dev-tools)
+         a] QtWebKit (libqtwebkit-dev, qtwebkit5-dev)
+         b] QtWebEngine (qtwebengine5-dev)
+         c] QScintilla ( libqscintilla2-dev, libqt5scintilla2-dev, libqscintilla2-qt4-dev)
+      2] zlib (zlib1g-dev)
+      3] liblzma (liblzma-dev)
+      4] libbzip2 (libbz2-dev)
+      5] libarchive (libarchive-dev)
+      6] xdg-utils (xdg-utils)
+      7] libpoppler-qt5 (libpoppler-qt5-dev)
+      8] libdjvulibre-dev (libdjvulibre-dev)
+      9] libffmpegthumbs-dev
+     10] libvlc-dev
 
-     The the following command (on Debian and Debian based systems) to install the above dependencies (with root previleges)
+     Type the following command (on Debian and Debian based systems) to install the above dependencies (with root previleges)
 
         Qt4:
-		    apt-get install libqt4-dev libqt4-dev-bin libqtwebkit-dev libqscintilla2-qt4-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
-							liblzma-dev libpoppler-qt4-dev libdjvulibre-dev
+		    apt-get install g++ libqt4-dev libqt4-dev-bin libqtwebkit-dev libqscintilla2-qt4-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
+							liblzma-dev libpoppler-qt4-dev libdjvulibre-dev libffmpegthumbs-dev libvlc-dev
 
-        Qt5 - 5.4 and below:
-		    apt-get install qtbase5-dev qtbase5-dev-tools libqt5webkit5-dev libqscintilla2-qt5-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
-							liblzma-dev libpoppler-qt5-dev libdjvulibre-dev
+        Qt5 - With WebKit:
+		    apt-get install g++ qtbase5-dev qtbase5-dev-tools libqt5webkit5-dev libqscintilla2-qt5-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
+							liblzma-dev libpoppler-qt5-dev libdjvulibre-dev libffmpegthumbs-dev libvlc-dev
 
-        Qt5 - 5.5 and above:
-		    apt-get install qtbase5-dev qtbase5-dev-tools qtwebengine5-dev libqscintilla2-qt5-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
-							liblzma-dev libpoppler-qt5-dev libdjvulibre-dev
+        Qt5 - With WebEngine:
+		    apt-get install g++ qtbase5-dev qtbase5-dev-tools qtwebengine5-dev libqscintilla2-qt5-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
+							liblzma-dev libpoppler-qt5-dev libdjvulibre-dev libffmpegthumbs-dev libvlc-dev
+
+	Note:
+		These are typical commands and by no means universal. In some cases libqscintilla2-qt5-dev may have to be replacef by libqt5scintilla2-dev (Ubuntu).
+		Again, in Ubuntu, till Qt 5.9.1 (Artful), webengine is unavailable, though various ppa's may give access to QtWebEngine. By default, *-xenial.pro
+		assumes you do not have access to QtWebEngine and will use QtWebKit.
 
   b] Installation locations
      You need to set the locations where you want to install newbreeze, and its plugins. By default, the prefix is /usr.
-     The newbreeze app is installed at /usr/bin/, libnewbreeze-common.so at /usr/lib/newbreeze, plugins at /usr/lib/newbreeze/plugins.
+     The newbreeze binary is installed at /usr/bin/, libnewbreeze-common.so at /usr/lib/newbreeze, plugins at /usr/lib/newbreeze/plugins.
      These are set in the respective .pro files. You'll have to edit the individual .pro files.
 
      NOTE: Please make note that we use RPATH to locate libnewbreeze-common.so. Setting improper values to $PREFIX, or in QMAKE_RPATHDIR
@@ -49,12 +56,17 @@ Installation Instructions for NewBreeze v3.0.0
 
          qmake -qt5
 
+     Or alternatively
+
+	     qmake -qt4
+
+	 for Qt4 builds
+
   b] Building
      In the terminal, type
 
-         make -j4
+         make -kj$(nproc)
 
-     Feel free to replace 4 in 'make -j4' with the number of cpu cores you have.
 
 3. Installation
 ===============
@@ -62,4 +74,4 @@ Installation Instructions for NewBreeze v3.0.0
 
          sudo make install
 
-     This will install NewBreeze, the plugins and all the include files in the location set during Stage 1
+     This will install NewBreeze, the plugins and all the include files (by default into /usr/bin, /usr/lib/newbreeze and /use/include/newbreeze)

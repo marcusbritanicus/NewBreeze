@@ -6,7 +6,11 @@
 
 #pragma once
 
+/* Only used for WebEngine */
 #include "Global.hpp"
+#include <QtWidgets>
+#include <QtWebEngine>
+#include <QtWebEngineWidgets>
 
 class NBWebWatch : public QDialog {
 	Q_OBJECT

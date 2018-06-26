@@ -7,6 +7,11 @@
 #pragma once
 
 #include "Global.hpp"
+#include <QtWebKit>
+
+#if QT_VERSION > 0x050000
+	#include <QtWebKitWidgets>
+#endif
 
 class NBWebWatch : public QDialog {
 	Q_OBJECT

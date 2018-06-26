@@ -13,7 +13,7 @@
 #include "NBImagePeek.hpp"
 #include "NBOdfOgle.hpp"
 #include "NBPdfPeep.hpp"
-#include "NBWebWatch.hpp"
+#include "NBWebWatch4.hpp"
 
 #include <QtPlugin>
 #include "Global.hpp"
