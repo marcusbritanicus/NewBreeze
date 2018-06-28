@@ -32,12 +32,8 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 		loc = QFileInfo( loc ).absoluteFilePath();
 
 	/* Open with SuperStart */
-	if ( Settings->General.SpecialOpen and Settings->General.SuperStart and loc.isEmpty() )
+	if ( Settings->General.SuperStart and loc.isEmpty() )
 		FolderView->doOpen( "NB://SuperStart" );
-
-	/* Open with Catalogs */
-	else if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog and loc.isEmpty() )
-		FolderView->doOpen( "NB://Catalogs" );
 
 	/* Load the a folder */
 	else if ( not loc.isEmpty() ) {
@@ -89,7 +85,7 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	}
 
 	/* Focus the CurrentWidget in FolderView */
-	FolderView->currentWidget()->setFocus();
+	FolderView->setFocus();
 
 	/* Window Properties */
 	setWindowProperties();
@@ -125,8 +121,8 @@ void NewBreeze::createGUI() {
 	ViewLayout->setSpacing( 0 );
 
 	/* One of the SidePanel's will be hidden automatically */
-	ViewLayout->addWidget( SidePanel );
 	ViewLayout->addWidget( SideBar );
+	ViewLayout->addWidget( SidePanel );
 
 	ViewLayout->addWidget( FolderView );
 	ViewLayout->addWidget( InfoPanel );
@@ -160,36 +156,36 @@ void NewBreeze::createGUI() {
 
 void NewBreeze::setupSidePanel() {
 
-	SidePanel = new NBSidePanel( this );
 	SideBar = new NBSideBar( this );
-
-	connect( SidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
-	connect( SidePanel, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
-	connect( SidePanel, SIGNAL( showApplications() ), this, SLOT( showApplications() ) );
-	connect( SidePanel, SIGNAL( showCatalogs() ), this, SLOT( showCatalogs() ) );
-	connect( SidePanel, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
+	SidePanel = new NBSidePanel( this );
 
 	connect( SideBar, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
+	connect( SideBar, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
+	connect( SideBar, SIGNAL( showApplications() ), this, SLOT( showApplications() ) );
+	connect( SideBar, SIGNAL( showCatalogs() ), this, SLOT( showCatalogs() ) );
 	connect( SideBar, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
+
+	connect( SidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
+	connect( SidePanel, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
 
 	/* If we are showing sidepanel */
 	if ( Settings->General.SidePanel ) {
 		/* Modern SideBar */
 		if ( Settings->General.SidePanelType == 0 ) {
-			SidePanel->show();
-			SideBar->hide();
+			SideBar->show();
+			SidePanel->hide();
 		}
 		/* Classic SidePanel */
 		else {
-			SidePanel->hide();
-			SideBar->show();
+			SideBar->hide();
+			SidePanel->show();
 		}
 	}
 
 	/* We are not showing the sidepanel at all */
 	else {
-		SideBar->hide();
 		SidePanel->hide();
+		SideBar->hide();
 	}
 };
 
@@ -273,16 +269,16 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( hideStatusBar() ), InfoBar, SLOT( hide() ) );
 	connect( FolderView, SIGNAL( showStatusBar() ), InfoBar, SLOT( show() ) );
 
-	connect( FolderView, SIGNAL( reloadSuperStart() ), SideBar, SLOT( reloadQuickFiles() ) );
-	connect( FolderView, SIGNAL( reloadBookmarks() ), SideBar, SLOT( reloadBookmarks() ) );
+	connect( FolderView, SIGNAL( reloadSuperStart() ), SidePanel, SLOT( populateSidePanel() ) );
+	connect( FolderView, SIGNAL( reloadBookmarks() ), SidePanel, SLOT( populateSidePanel() ) );
 
-	connect( FolderView, SIGNAL( reloadCatalogs() ), SidePanel, SLOT( flashCatalogs() ) );
-	connect( FolderView, SIGNAL( reloadBookmarks() ), SidePanel, SLOT( flashBookmarks() ) );
+	connect( FolderView, SIGNAL( reloadCatalogs() ), SideBar, SLOT( flashCatalogs() ) );
+	connect( FolderView, SIGNAL( reloadBookmarks() ), SideBar, SLOT( flashBookmarks() ) );
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateInfoBar() ) );
 
-	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), SideBar, SLOT( highlight( QString ) ) );
+	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), SidePanel, SLOT( highlight( QString ) ) );
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( setBusyCursor() ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( setNormalCursor() ) );
@@ -547,13 +543,13 @@ void NewBreeze::showSettingsDialog() {
 
 	/* Hack */
 	if ( Settings->General.SidePanelType == 0 ) {
-		SideBar->hide();			// Classic SideBar
-		SidePanel->show();			// Modern SideBar
+		SidePanel->hide();			// Classic SideBar
+		SideBar->show();			// Modern SideBar
 	}
 
 	else {
-		SideBar->show();			// Classic SideBar
-		SidePanel->hide();			// Modern SideBar
+		SidePanel->show();			// Classic SideBar
+		SideBar->hide();			// Modern SideBar
 	}
 
 	qApp->processEvents();
@@ -737,8 +733,8 @@ void NewBreeze::chdirUI( QString url ){
 
 void NewBreeze::showApplications() {
 
-	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
-		SidePanel->flashApplications();
+	if ( qobject_cast<NBSideBar*>( sender() ) != SideBar )
+		SideBar->flashApplications();
 
 	FolderView->doOpen( "NB://Applications" );
 	AddressBar->setAddress( "NB://Applications" );
@@ -746,8 +742,8 @@ void NewBreeze::showApplications() {
 
 void NewBreeze::showCatalogs() {
 
-	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
-		SidePanel->flashCatalogs();
+	if ( qobject_cast<NBSideBar*>( sender() ) != SideBar )
+		SideBar->flashCatalogs();
 
 	FolderView->doOpen( "NB://Catalogs" );
 	AddressBar->setAddress( "NB://Catalogs" );
@@ -755,8 +751,8 @@ void NewBreeze::showCatalogs() {
 
 void NewBreeze::showFolders() {
 
-	if ( qobject_cast<NBSidePanel*>( sender() ) != SidePanel )
-		SidePanel->flashFolders();
+	if ( qobject_cast<NBSideBar*>( sender() ) != SideBar )
+		SideBar->flashFolders();
 
 	FolderView->showFolders();
 };
@@ -805,7 +801,7 @@ void NewBreeze::openWithList() {
 	openWithMenu->setWorkingDirectory( FolderView->fsModel->currentDir() );
 	openWithMenu->buildMenu( FolderView->getSelection() );
 
-	QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>( FolderView->currentWidget() );
+	QAbstractItemView *itemView = qobject_cast<QAbstractItemView*>( FolderView->IconView );
 
 	QRect rect = itemView->visualRect( FolderView->getSelection().at( 0 ) );
 	QPoint pos( rect.x() + rect.width() / 2, rect.y() + rect.height() / 2 );
@@ -890,17 +886,6 @@ void NewBreeze::toggleSideBarVisible() {
 
 	/* Modern SideBar */
 	if ( Settings->General.SidePanelType == 0 ) {
-		if ( SidePanel->isVisible() )
-			SidePanel->hide();
-
-		else
-			SidePanel->show();
-
-		Settings->setValue( "SidePanel", SidePanel->isVisible() );
-	}
-
-	/* Classic SidePanel */
-	else {
 		if ( SideBar->isVisible() )
 			SideBar->hide();
 
@@ -908,6 +893,17 @@ void NewBreeze::toggleSideBarVisible() {
 			SideBar->show();
 
 		Settings->setValue( "SidePanel", SideBar->isVisible() );
+	}
+
+	/* Classic SidePanel */
+	else {
+		if ( SidePanel->isVisible() )
+			SidePanel->hide();
+
+		else
+			SidePanel->show();
+
+		Settings->setValue( "SidePanel", SidePanel->isVisible() );
 	}
 };
 

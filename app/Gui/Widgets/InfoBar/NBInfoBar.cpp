@@ -154,7 +154,6 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
 
 	if ( not exists( itemPath ) ) {
-		qDebug() << "updateInfoBarSingle(...)" << itemPath;
 		return;
 	}
 

@@ -20,7 +20,7 @@ NBFileDialog::NBFileDialog( QWidget *parent, QString wTitle, QString fLocation )
 
 void NBFileDialog::createGUI() {
 
-	sidePanel = new NBSideBar( this );
+	sidePanel = new NBSidePanel( this );
 
 	NBSegmentButton *dlgBtns = new NBSegmentButton( this );
 	dlgBtns->setCount( 2 );
@@ -250,7 +250,7 @@ NBDirectoryDialog::NBDirectoryDialog( QWidget *parent, QString wTitle, QString f
 
 void NBDirectoryDialog::createGUI() {
 
-	sidePanel = new NBSideBar( this );
+	sidePanel = new NBSidePanel( this );
 	connect( sidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( open( QString ) ) );
 
 	NBSegmentButton *dlgBtns = new NBSegmentButton( this );

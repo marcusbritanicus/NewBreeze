@@ -1,18 +1,18 @@
-NewBreeze v3.0.0 RC2
+NewBreeze v3.0.0 RC3
 
 NBArchive                                                                                                                             [ 1 of 1 ]
 	✓ Upgrade NBArchive class to enable extraction of a single member
 
 NBDefaultPlugin::ArchiveExamine                                                                                                       [ 1 of 1 ]
-	✓ Enable extraction of selected/all members
+	◐ Enable extraction of selected/all members
 
 NBVideoPlugin                                                                                                                         [ 1 of 1 ]
 	✓ Play video using libVLC interface for the peek interface
 
-NBItemViewModel                                                                                                                       [ 1 of 3 ]
+NBItemViewModel                                                                                                                       [ 2 of 3 ]
 	✓ Thumbnailing of ODF files
-	□ Thumbnailing of PDF and DjVu files
-	□ Thumbnailing of Video files via libVLC plugin
+	✍ Thumbnailing of PDF and DjVu files
+	✓ Thumbnailing of Video files via libffmpegthumbs
 
 NBLogger                                                                                                                              [ 1 of 1 ]
 	✓ Enable/Disable logging option.
@@ -31,6 +31,26 @@ NBDirectoryView                                                                 
 
 NBContextMenu                                                                                                                         [ 1 of 1 ]
 	✓ Grouping checkbox does not work
+
+NBStartupWizard                                                                                                                       [ 0 of 2 ]
+	□ Add IconOverlay, Default terminal, ExtendedIO, etc
+	□ Show StartupWizard when NewBreeze.conf has missing settings.
+
+NBSettingManager                                                                                                                      [ 1 of 2 ]
+	□ Extended Icon Preview options
+	  • Option for preview of Images
+	  • Option for preview of Videos
+	  • Option for preview of PDF/DjVu
+	✓ Remove Open with Catalogs option
+
+NBCatalogs                                                                                                                            [ 0 of 2 ]
+	□ Improve Catalogs support
+	□ Change Catalogs View to make it more intutive
+	  • Each type shows the contents of the folders added to it
+
+NBSideBar (Renamed to NBSidePanel)                                                                                                    [ 2 of 2 ]
+	✗ Improve the looks to make it similar to Ubuntu 18.04 Nautilus SideBar
+	✓ Improvements to NBSidePanel class
 
 Note:
 	✍ - Work in progress

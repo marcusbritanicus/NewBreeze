@@ -108,22 +108,9 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	showTrayIconCB->setChecked( Settings->General.TrayIcon );
 	connect( showTrayIconCB, SIGNAL( toggled( bool ) ), this, SLOT( handleTrayIconChanged( bool ) ) );
 
-	openWithCB = new QCheckBox( "Open with special location when NewBreeze starts?", this );
-	openWithCB->setChecked( sett.value( "SpecialOpen" ).toBool() );
+	openWithCB = new QCheckBox( "Open with SuperStart when NewBreeze starts?", this );
+	openWithCB->setChecked( sett.value( "SuperStart" ).toBool() );
 	connect( openWithCB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithToggled() ) );
-
-	openWithCatalogRB = new QRadioButton( "Open with Catalog &View", this );
-	openWithCatalogRB->setChecked( sett.value( "OpenWithCatalog" ).toBool() );
-	connect( openWithCatalogRB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithToggled() ) );
-
-	openWithSuperStartRB = new QRadioButton( "Open with S&uperStart", this );
-	openWithSuperStartRB->setChecked( sett.value( "SuperStart" ).toBool() );
-	connect( openWithSuperStartRB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithToggled() ) );
-
-	if ( not openWithCB->isChecked() ) {
-		openWithCatalogRB->setDisabled( true );
-		openWithSuperStartRB->setDisabled( true );
-	}
 
 	imagePreviewCB = new QCheckBox( "&Show Image Previews" );
 	imagePreviewCB->setChecked( Settings->General.ImagePreviews );
@@ -179,16 +166,10 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 	perFolderEnabled->setLayout( grpLyt );
 
-	QHBoxLayout *rbLyt = new QHBoxLayout();
-	rbLyt->setContentsMargins( QMargins( 20, 0, 0, 0 ) );
-	rbLyt->addWidget( openWithCatalogRB );
-	rbLyt->addWidget( openWithSuperStartRB );
-
 	QVBoxLayout *otherGBLyt = new QVBoxLayout();
 	otherGBLyt->addWidget( filterFoldersCB );
 	otherGBLyt->addWidget( showTrayIconCB );
 	otherGBLyt->addWidget( openWithCB );
-	otherGBLyt->addLayout( rbLyt );
 	otherGBLyt->addWidget( imagePreviewCB );
 	otherGBLyt->addWidget( extendedIOCB );
 	otherGBLyt->addWidget( paintOverlayCB );
@@ -320,42 +301,14 @@ void NBSGeneralWidget::handleOpenWithToggled() {
 
 	if ( qobject_cast<QCheckBox*>( sender() ) == openWithCB ) {
 		if ( openWithCB->isChecked() ) {
-			Settings->setValue( "SpecialOpen", true );
-			Settings->General.SpecialOpen = true;
-
-			Settings->General.OpenWithCatalog = sett.value( "OpenWithCatalog", false ).toBool();
-			Settings->General.SuperStart = sett.value( "SuperStart", false ).toBool();
-
-			openWithCatalogRB->setEnabled( true );
-			openWithSuperStartRB->setEnabled( true );
+			Settings->setValue( "SuperStart", true );
+			Settings->General.SuperStart = true;
 		}
 
 		else {
-			Settings->setValue( "SpecialOpen", false );
-			Settings->General.SpecialOpen = false;
-
-			Settings->General.OpenWithCatalog = false;
+			Settings->setValue( "SuperStart", false );
 			Settings->General.SuperStart = false;
-
-			openWithCatalogRB->setDisabled( true );
-			openWithSuperStartRB->setDisabled( true );
 		}
-	}
-
-	else if ( qobject_cast<QRadioButton*>( sender() ) == openWithCatalogRB ) {
-		Settings->setValue( "OpenWithCatalog", true );
-		Settings->setValue( "SuperStart", false );
-
-		Settings->General.OpenWithCatalog = true;
-		Settings->General.SuperStart = false;
-	}
-
-	else if ( qobject_cast<QRadioButton*>( sender() ) == openWithSuperStartRB ) {
-		Settings->setValue( "OpenWithCatalog", false );
-		Settings->setValue( "SuperStart", true );
-
-		Settings->General.OpenWithCatalog = false;
-		Settings->General.SuperStart = true;
 	}
 };
 

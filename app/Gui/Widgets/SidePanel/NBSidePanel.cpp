@@ -1,144 +1,164 @@
 /*
 	*
-	* NBSidePanel.cpp - The side panel showing mounted drives and bookmarks
+	* NBSidePanel.cpp - SideBar class for NewBreeze
 	*
 */
 
 #include "NBSidePanel.hpp"
+#include "NBGuiFunctions.hpp"
 
-/* Side Panel init */
-NBSidePanel::NBSidePanel( QWidget *parent ) : QWidget( parent ) {
+static const QString tooltipSkel = QString(
+	"%1"
+	"<table width = '100%' style = 'background-color: gray; font-size: 3pt;' CELLPADDING = 0 CELLSPACING = 0 >"
+	"	<tr>"
+	"		<td width = '%2%' style = 'background-color: %3;'></td>"
+	"		<td></td>"
+	"	</tr>"
+	"</table>"
+);
 
-	setFixedWidth( 48 );
-	setMouseTracking( true );
+NBSidePanel::NBSidePanel( QWidget *parent ) : QScrollArea( parent ) {
+
+	/* ScrollBar Settings */
+	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+
+	/* Auto-resize widget */
+	setWidgetResizable( true );
+
+	/* No Border and margins */
+	setStyleSheet( "QScrollArea{ border: none; border-right: 1px solid darkgray; }" );
+	setContentsMargins( QMargins() );
 
 	populateSidePanel();
+
+	/* Update devices list */
+	int mountsFD = open( "/proc/self/mounts", O_RDONLY, 0 );
+	QSocketNotifier *devWatcher = new QSocketNotifier( mountsFD, QSocketNotifier::Write );
+	connect( devWatcher, SIGNAL( activated( int ) ), this, SLOT( populateSidePanel() ) );
 };
 
 void NBSidePanel::populateSidePanel() {
 
-	/* The 'Folders' Label */
-	dirLbl = new NBFlashLabel( this );
-	dirLbl->setPixmap( QPixmap( ":/icons/show-folders.png" ).scaled( QSize( 32, 32 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	dirLbl->setFixedSize( QSize( 48, 48 ) );
-	dirLbl->setToolTip( "Show folders" );
-	connect( dirLbl, SIGNAL( clicked() ), this, SIGNAL( showFolders() ) );
+	// qDeleteAll( children() );
 
-	/* The 'Applications' Label */
-	appLbl = new NBFlashLabel( this );
-	appLbl->setPixmap( QPixmap( ":/icons/applications.png" ).scaled( QSize( 32, 32 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	appLbl->setFixedSize( QSize( 48, 48 ) );
-	appLbl->setToolTip( "Show Applications" );
-	connect( appLbl, SIGNAL( clicked() ), this, SIGNAL( showApplications() ) );
+	setFixedWidth( 150 );
 
-	/* The 'Catalogs' Label */
-	ctlLbl = new NBFlashLabel( this );
-	ctlLbl->setPixmap( QPixmap( ":/icons/catalogs.png" ).scaled( QSize( 32, 32 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	ctlLbl->setFixedSize( QSize( 48, 48 ) );
-	ctlLbl->setToolTip( "Show Catalogs" );
-	connect( ctlLbl, SIGNAL( clicked() ), this, SIGNAL( showCatalogs() ) );
+	scrollLyt = new QVBoxLayout();
+	scrollLyt->setContentsMargins( QMargins() );
+	scrollLyt->setSpacing( 0 );
 
-	/* The 'Devices' Label */
-	devIcon = new NBDevicesIcon( this );
-	connect( devIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
-	QAction *showDevicesAct = new QAction( QIcon( ":/icons/comp.png" ), "Show &Devices", devIcon );
-	showDevicesAct->setShortcut( tr( "Alt+D" ) );
-	connect( showDevicesAct, SIGNAL( triggered() ), devIcon, SLOT( showDevices() ) );
-	addAction( showDevicesAct );
+	devicesLabel = new NBSidePanelLabel( ":/icons/comp.png", "Devices", this );
+	connect( devicesLabel, SIGNAL( clicked() ), this, SLOT( populateSidePanel() ) );
+	scrollLyt->addWidget( devicesLabel );
+	loadDevices();
 
-	/* The 'VirtualFS Mounts' Label */
-	vfsIcon = new NBVfsIcon( this );
-	connect( vfsIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
-	QAction *showVfsAct = new QAction( QIcon( ":/icons/encfs.png" ), "Show &VFS", vfsIcon );
-	showVfsAct->setShortcut( tr( "Alt+V" ) );
-	connect( showVfsAct, SIGNAL( triggered() ), vfsIcon, SLOT( showDevices() ) );
-	addAction( showVfsAct );
+	catalogsLabel = new NBSidePanelLabel( ":/icons/catalogs.png", "Catalogs", this );
+	connect( catalogsLabel, SIGNAL( clicked() ), this, SIGNAL( driveClicked() ) );
+	scrollLyt->addWidget( catalogsLabel );
+	// loadCatalogs();
 
-	/* The 'Bookmarks' Label */
-	bmkIcon = new NBBookmarksIcon( this );
-	connect( bmkIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
-	QAction *showBookmarksAct = new QAction( QIcon( ":/icons/bookmark.png" ), "Show &Bookmarks", devIcon );
-	showBookmarksAct->setShortcut( tr( "Alt+B" ) );
-	connect( showBookmarksAct, SIGNAL( triggered() ), bmkIcon, SLOT( showBookmarks() ) );
-	addAction( showBookmarksAct );
+	bookmarksLabel = new NBSidePanelLabel( ":/icons/bookmark.png", "Bookmarks", this );
+	connect( bookmarksLabel, SIGNAL( clicked() ), this, SLOT( populateSidePanel() ) );
+	scrollLyt->addWidget( bookmarksLabel );
+	loadBookmarks();
 
-	/* The 'Trash' Label */
-	trashLabel = new NBTrashLabel( this );
-	trashLabel->setFixedSize( QSize( 47, 48 ) );
-	trashLabel->setToolTip( "Show TrashCan" );
+	quickFilesLabel = new NBSidePanelLabel( ":/icons/files.png", "Quick Files", this );
+	connect( quickFilesLabel, SIGNAL( clicked() ), this, SLOT( populateSidePanel() ) );
+	scrollLyt->addWidget( quickFilesLabel );
+	loadQuickFiles();
+
+	scrollLyt->addStretch();
+
+	trashLabel = new NBSidePanelLabel( ":/icons/trash.png", "Trash", this );
 	connect( trashLabel, SIGNAL( clicked() ), this, SIGNAL( showTrash() ) );
+	scrollLyt->addWidget( trashLabel );
 
-	/* No Margins */
-	setContentsMargins( QMargins() );
+	QWidget *scrollBase = new QWidget();
+	scrollBase->setLayout( scrollLyt );
 
-	/* Layout */
-	QVBoxLayout *baseLyt = new QVBoxLayout();
+	setWidget( scrollBase );
 
-	/* No margins or widget spacing */
-	baseLyt->setContentsMargins( QMargins() );
-	baseLyt->setSpacing( 0 );
-
-	/* Add the various icons */
-	baseLyt->addWidget( dirLbl );
-	baseLyt->addWidget( appLbl );
-	baseLyt->addWidget( ctlLbl );
-	baseLyt->addWidget( devIcon );
-	baseLyt->addWidget( vfsIcon );
-	baseLyt->addWidget( bmkIcon );
-	baseLyt->addStretch();
-	baseLyt->addWidget( trashLabel );
-
-	QWidget *base = new QWidget( this );
-	base->setObjectName( "base" );
-	base->setLayout( baseLyt );
-
-	QHBoxLayout *lyt = new QHBoxLayout();
-	lyt->setContentsMargins( QMargins() );
-	lyt->setSpacing( 0 );
-	lyt->addWidget( base );
-
-	setLayout( lyt );
-
-	/* Styling */
-	setStyleSheet( "#base{ border-right: 1px solid darkgray; }" );
+	// setLayout( scrollLyt );
 };
 
-void NBSidePanel::mousePressEvent( QMouseEvent *mEvent ) {
+void NBSidePanel::loadDevices() {
 
-	mEvent->accept();
+	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDrives() ) {
+		NBSidePanelItem *item = new NBSidePanelItem( info.displayName(), ":/icons/" + info.deviceType() + ".png", info.mountPoint(), NBSidePanelItem::Device, this );
+		connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+		scrollLyt->addWidget( item );
+
+		/* Special tooltip hack */
+		int percent = 100 * info.bytesUsed() / info.bytesTotal();
+		item->setToolTip( tooltipSkel.arg( info.mountPoint() ).arg( percent ).arg( percent < 90 ? "darkgreen" : "darkred" ) );
+	}
 };
 
-void NBSidePanel::mouseMoveEvent( QMouseEvent *mEvent ) {
+void NBSidePanel::loadCatalogs() {
 
-	mEvent->accept();
+	for( int i = 1; i <= 20; i++ ) {
+		NBSidePanelItem *item = new NBSidePanelItem( QString( "Catalog %1" ).arg( i ), ":/icons/catalogs.png", "NB://Catalogs", NBSidePanelItem::Catalogs, this );
+		connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+		item->setToolTip( QString( "Catalog %1" ).arg( i ) );
+		scrollLyt->addWidget( item );
+	}
+
+	return;
+
+	QSettings ctlList( "NewBreeze", "Catalogs" );
+	Q_FOREACH( QString key, ctlList.childKeys() ) {
+		if ( ctlList.value( key ).toStringList().count() ) {
+			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs", NBSidePanelItem::Catalogs, this );
+			connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+			item->setToolTip( key + " Catalog" );
+			scrollLyt->addWidget( item );
+		}
+	}
+
+	ctlList.beginGroup( "Custom" );
+	Q_FOREACH( QString key, ctlList.childKeys() ) {
+		if ( ctlList.value( key ).toStringList().count() ) {
+			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs", NBSidePanelItem::Catalogs, this );
+			connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+			item->setToolTip( key + " Catalog" );
+			scrollLyt->addWidget( item );
+		}
+	}
+	ctlList.endGroup();
 };
 
-void NBSidePanel::flashApplications() {
+void NBSidePanel::loadBookmarks() {
 
-	appLbl->flashLabel();
+	Q_FOREACH( NBBookmarkInfo info, NBBookmarkInfo::allBookmarks() ) {
+		NBSidePanelItem *item = new NBSidePanelItem( info.displayLabel, NBIconManager::instance()->icon( "folder-favorites" ).at( 0 ), info.mountPoint, NBSidePanelItem::Bookmark, this );
+		connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+		item->setToolTip( info.mountPoint );
+		scrollLyt->addWidget( item );
+	}
 };
 
-void NBSidePanel::flashCatalogs() {
+void NBSidePanel::loadQuickFiles() {
 
-	ctlLbl->flashLabel();
+	QSettings qfList( "NewBreeze", "SuperStart" );
+	qfList.beginGroup( "Files" );
+
+	Q_FOREACH( QString key, qfList.allKeys() ) {
+	NBSidePanelItem *item = new NBSidePanelItem( key, NBIconManager::instance()->icon( "bookmarks" ).at( 0 ), qfList.value( key ).toString(), NBSidePanelItem::QuickFile, this );
+		connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+		item->setToolTip( qfList.value( key ).toString() );
+		scrollLyt->addWidget( item );
+	}
+
+	qfList.endGroup();
 };
 
-void NBSidePanel::flashFolders() {
+void NBSidePanel::highlight( QString tgt ) {
 
-	dirLbl->flashLabel();
-};
+	Q_FOREACH( NBSidePanelItem *item, findChildren<NBSidePanelItem*>() ) {
+		if ( item->target() == tgt )
+			item->setHighlighted( true );
 
-void NBSidePanel::flashDevices() {
-
-	devIcon->flashLabel();
-};
-
-void NBSidePanel::flashVfs() {
-
-	vfsIcon->flashLabel();
-};
-
-void NBSidePanel::flashBookmarks() {
-
-	bmkIcon->flashLabel();
+		else
+			item->setHighlighted( false );
+	}
 };

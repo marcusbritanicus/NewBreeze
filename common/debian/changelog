@@ -1,3 +1,10 @@
+newbreeze-common (3.0.0-rc3) unstable; urgency=medium
+
+  * Improvements to NBAppFile class
+  * Upgrades to NBArchive to extract single member
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Thu, 12 April 2018 10:00:00 +0530
+
 newbreeze-common (3.0.0-rc1) unstable; urgency=medium
 
   * Removed getTerminal(...) from common

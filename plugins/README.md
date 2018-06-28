@@ -1,6 +1,6 @@
 # NBPluginInterface
 
-NewBreeze is quite easily extensible using plugins. I am trying to provide
+NewBreeze is quite easily extensible using plugins.
 
 This the general plugin interface. Unlike the PreviewInterface, this plugin
 is meant to enhance the working of NewBreeze widgets directly, or provide a
@@ -25,3 +25,4 @@ I have finished porting the NBPreviewInterface code to NBPluginInterface,
 I will be removing it in the next release: NewBreeze v3.0.0
 
 **NBPreviewInterface** is deprecated. Please do not use it to write plugins.
+**NBCrypt** is being removed in NB3-RC3. Inbuilt NBVault replaces it.

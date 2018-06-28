@@ -54,8 +54,8 @@ class NewBreeze : public QMainWindow {
 		void openFile( QString );
 
 		NBAddressBar *AddressBar;
-		NBSideBar *SideBar;
 		NBSidePanel *SidePanel;
+		NBSideBar *SideBar;
 		NBFolderView *FolderView;
 		NBTerminal *Terminal;
 		NBInfoBar *InfoBar;

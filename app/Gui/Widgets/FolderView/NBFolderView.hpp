@@ -35,7 +35,7 @@
 #include "NBVault.hpp"
 #include "NBVaultDatabase.hpp"
 
-class NBFolderView : public QStackedWidget {
+class NBFolderView : public QWidget {
 	Q_OBJECT
 
 	public :

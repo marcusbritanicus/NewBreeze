@@ -6,7 +6,7 @@
 
 #include "NBFolderView.hpp"
 
-NBFolderView::NBFolderView( QWidget *parent ) : QStackedWidget( parent ) {
+NBFolderView::NBFolderView( QWidget *parent ) : QWidget( parent ) {
 
 	// ClipBoard
 	clipBoard = QApplication::clipboard();
@@ -17,11 +17,14 @@ NBFolderView::NBFolderView( QWidget *parent ) : QStackedWidget( parent ) {
 
 	// Setup the views
 	IconView = new NBIconView( fsModel, this );
+	QHBoxLayout *baseLyt = new QHBoxLayout();
+	baseLyt->setContentsMargins( QMargins() );
+	baseLyt->setSpacing( 0 );
+	baseLyt->addWidget( IconView );
+	setLayout( baseLyt );
 
 	// Process Manager
 	pMgr = NBProcessManager::instance();
-
-	addWidget( IconView );
 
 	// Minimum Width - 700px
 	setMinimumWidth( 700 );
@@ -477,7 +480,7 @@ void NBFolderView::doOpen( QString loc ) {
 	}
 
 	setCursor( QCursor( Qt::ArrowCursor ) );
-	currentWidget()->setFocus();
+	setFocus();
 };
 
 void NBFolderView::doOpen( QModelIndex idx ) {
@@ -569,7 +572,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 		}
 	}
 
-	currentWidget()->setFocus();
+	setFocus();
 };
 
 void NBFolderView::doOpenWith() {
@@ -722,7 +725,7 @@ void NBFolderView::doPeek( QModelIndex curIndex ) {
 	NBCustomPeek *previewer = new NBCustomPeek( currentNode );
 	previewer->show();
 
-	currentWidget()->setFocus();
+	setFocus();
 };
 
 void NBFolderView::doReload() {
@@ -1123,7 +1126,7 @@ void NBFolderView::doRename() {
 	NBRenameDialog *renamer = new NBRenameDialog( curFile, QDir( fsModel->currentDir() ), this );
 	renamer->exec();
 
-	currentWidget()->setFocus();
+	setFocus();
 
 	if ( !renamer->canRename() ) {
 		qDebug() << "Renaming" << curFile << "[Canceled]";
@@ -1327,7 +1330,7 @@ void NBFolderView::openTerminalIn() {
 
 void NBFolderView::setFocus() {
 
-	currentWidget()->setFocus();
+	IconView->setFocus();
 };
 
 void NBFolderView::handleWatchDogBark( QString path ) {

@@ -35,9 +35,7 @@ class NBSGeneralWidget : public QWidget {
 		/* Others */
 		QCheckBox *filterFoldersCB;				// Should we filter folders while searching?
 		QCheckBox *showTrayIconCB;				// Show tray icon?
-		QCheckBox *openWithCB;					// Open with special locations?
-		QRadioButton *openWithCatalogRB;		// Show home folder or catalogs?
-		QRadioButton *openWithSuperStartRB;		// Show home folder or catalogs?
+		QCheckBox *openWithCB;					// Open with SuperStart?
 		QCheckBox *imagePreviewCB;				// Show image previews?
 		QCheckBox *extendedIOCB;				// Direct Copy/Move?
 		QCheckBox *paintOverlayCB;				// Paint Icon Overlays?

@@ -2,13 +2,19 @@ Version 3.0.0 RC
 	- Feature: Added Menu
 	- Feature: IconOverlay for quick controls
 	- Feature: Categories now have menu, better folding
+	- Feature: VideoThumbnailing enabled
+	- Feature: Video/Audio preview enabled
 	- Improvements to NBIconView
+	- Classes interchanged: NBSideBar <--> NBSidePanel
+	- Improvements to NBSidePanel
 	- BugFix: ExtendedIO partial bugfix
 	- Several minor bug fixes.
 	- Trash Manager now uses QTreeView class
 	- Inbuilt terminal bug fix
 	- Busy cursor while loading large folders
 	- Grouping option in Context Menu fixed
+	- Archive member extraction from ArchivePeek
+	- Migration from GitHub to GitLab
 
 Version 3.0.0 Beta
 	- Feature: Inbuilt encryption support via NBVault

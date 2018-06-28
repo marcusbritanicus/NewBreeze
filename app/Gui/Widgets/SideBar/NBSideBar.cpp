@@ -1,228 +1,144 @@
 /*
 	*
-	* NBSideBar.cpp - SideBar class for NewBreeze
+	* NBSideBar.cpp - The side bar showing mounted drives and bookmarks
 	*
 */
 
 #include "NBSideBar.hpp"
-#include "NBGuiFunctions.hpp"
 
-static const QString tooltipSkel = QString(
-	"%1"
-	"<table width = '100%' style = 'background-color: gray; font-size: 3pt;' CELLPADDING = 0 CELLSPACING = 0 >"
-	"	<tr>"
-	"		<td width = '%2%' style = 'background-color: %3;'></td>"
-	"		<td></td>"
-	"	</tr>"
-	"</table>"
-);
-
+/* Side Panel init */
 NBSideBar::NBSideBar( QWidget *parent ) : QWidget( parent ) {
 
-	populateSideBar();
+	setFixedWidth( 48 );
+	setMouseTracking( true );
 
-	reloadDevices();
-	reloadBookmarks();
-	reloadQuickFiles();
-
-	/* Update devices list */
-	int mountsFD = open( "/proc/self/mounts", O_RDONLY, 0 );
-	QSocketNotifier *devWatcher = new QSocketNotifier( mountsFD, QSocketNotifier::Write );
-	connect( devWatcher, SIGNAL( activated( int ) ), this, SLOT( reloadDevices() ) );
+	populateSidePanel();
 };
 
-void NBSideBar::populateSideBar() {
+void NBSideBar::populateSidePanel() {
 
-	dirs = new NBSideBarItem( "Folders", ":/icons/show-folders.png", "NB://Folders", NBSideBarItem::Folders, this );
-	connect( dirs, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	/* The 'Folders' Label */
+	dirLbl = new NBFlashLabel( this );
+	dirLbl->setPixmap( QPixmap( ":/icons/show-folders.png" ).scaled( QSize( 32, 32 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	dirLbl->setFixedSize( QSize( 48, 48 ) );
+	dirLbl->setToolTip( "Show folders" );
+	connect( dirLbl, SIGNAL( clicked() ), this, SIGNAL( showFolders() ) );
 
-	apps = new NBSideBarItem( "Applications", ":/icons/applications.png", "NB://Applications", NBSideBarItem::Applications, this );
-	connect( apps, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	/* The 'Applications' Label */
+	appLbl = new NBFlashLabel( this );
+	appLbl->setPixmap( QPixmap( ":/icons/applications.png" ).scaled( QSize( 32, 32 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	appLbl->setFixedSize( QSize( 48, 48 ) );
+	appLbl->setToolTip( "Show Applications" );
+	connect( appLbl, SIGNAL( clicked() ), this, SIGNAL( showApplications() ) );
 
-	ctlg = new NBSideBarItem( "Catalogs", ":/icons/catalogs.png", "NB://Catalogs", NBSideBarItem::Catalogs, this );
-	connect( ctlg, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	/* The 'Catalogs' Label */
+	ctlLbl = new NBFlashLabel( this );
+	ctlLbl->setPixmap( QPixmap( ":/icons/catalogs.png" ).scaled( QSize( 32, 32 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+	ctlLbl->setFixedSize( QSize( 48, 48 ) );
+	ctlLbl->setToolTip( "Show Catalogs" );
+	connect( ctlLbl, SIGNAL( clicked() ), this, SIGNAL( showCatalogs() ) );
 
-	drives = new NBSideBarGroup( "Devices", ":/icons/comp.png", this );
-	connect( drives, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	/* The 'Devices' Label */
+	devIcon = new NBDevicesIcon( this );
+	connect( devIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	QAction *showDevicesAct = new QAction( QIcon( ":/icons/comp.png" ), "Show &Devices", devIcon );
+	showDevicesAct->setShortcut( tr( "Alt+D" ) );
+	connect( showDevicesAct, SIGNAL( triggered() ), devIcon, SLOT( showDevices() ) );
+	addAction( showDevicesAct );
 
-	vfs = new NBSideBarGroup( "VFS Mounts", ":/icons/encfs.png", this );
-	connect( vfs, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	/* The 'VirtualFS Mounts' Label */
+	vfsIcon = new NBVfsIcon( this );
+	connect( vfsIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	QAction *showVfsAct = new QAction( QIcon( ":/icons/encfs.png" ), "Show &VFS", vfsIcon );
+	showVfsAct->setShortcut( tr( "Alt+V" ) );
+	connect( showVfsAct, SIGNAL( triggered() ), vfsIcon, SLOT( showDevices() ) );
+	addAction( showVfsAct );
 
-	bookmarks = new NBSideBarGroup( "Bookmarks", ":/icons/bookmark.png", this );
-	connect( bookmarks, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	/* The 'Bookmarks' Label */
+	bmkIcon = new NBBookmarksIcon( this );
+	connect( bmkIcon, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	QAction *showBookmarksAct = new QAction( QIcon( ":/icons/bookmark.png" ), "Show &Bookmarks", devIcon );
+	showBookmarksAct->setShortcut( tr( "Alt+B" ) );
+	connect( showBookmarksAct, SIGNAL( triggered() ), bmkIcon, SLOT( showBookmarks() ) );
+	addAction( showBookmarksAct );
 
-	quickFiles = new NBSideBarGroup( "Quick Files", ":/icons/bookmark.png", this );
-	connect( quickFiles, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
+	/* The 'Trash' Label */
+	trashLabel = new NBTrashLabel( this );
+	trashLabel->setFixedSize( QSize( 47, 48 ) );
+	trashLabel->setToolTip( "Show TrashCan" );
+	connect( trashLabel, SIGNAL( clicked() ), this, SIGNAL( showTrash() ) );
 
-	trash = new NBSideBarItem( "Trash", ":/icons/trash.png", "NB://Trash", NBSideBarItem::Trash, this );
-	connect( trash, SIGNAL( clicked() ), this, SIGNAL( showTrash() ) );
+	/* No Margins */
+	setContentsMargins( QMargins() );
 
-	QVBoxLayout *baseLayout = new QVBoxLayout();
-	baseLayout->setContentsMargins( QMargins( 0, 0, 0, 0 ) );
-	baseLayout->setSpacing( 10 );
+	/* Layout */
+	QVBoxLayout *baseLyt = new QVBoxLayout();
 
-	baseLayout->addWidget( dirs );
-	baseLayout->addWidget( apps );
-	baseLayout->addWidget( ctlg );
-	baseLayout->addWidget( drives );
-	baseLayout->addWidget( vfs );
-	baseLayout->addWidget( bookmarks );
-	baseLayout->addWidget( quickFiles );
-	baseLayout->addStretch();
-	baseLayout->addWidget( trash );
+	/* No margins or widget spacing */
+	baseLyt->setContentsMargins( QMargins() );
+	baseLyt->setSpacing( 0 );
+
+	/* Add the various icons */
+	baseLyt->addWidget( dirLbl );
+	baseLyt->addWidget( appLbl );
+	baseLyt->addWidget( ctlLbl );
+	baseLyt->addWidget( devIcon );
+	baseLyt->addWidget( vfsIcon );
+	baseLyt->addWidget( bmkIcon );
+	baseLyt->addStretch();
+	baseLyt->addWidget( trashLabel );
 
 	QWidget *base = new QWidget( this );
 	base->setObjectName( "base" );
-	base->setLayout( baseLayout );
+	base->setLayout( baseLyt );
 
-	QVBoxLayout *lyt = new QVBoxLayout();
-	lyt->setContentsMargins( QMargins( 1, 1, 1, 1 ) );
+	QHBoxLayout *lyt = new QHBoxLayout();
+	lyt->setContentsMargins( QMargins() );
 	lyt->setSpacing( 0 );
-
 	lyt->addWidget( base );
 
 	setLayout( lyt );
 
-	setFixedWidth( 150 );
+	/* Styling */
+	setStyleSheet( "#base{ border-right: 1px solid darkgray; }" );
 };
 
-void NBSideBar::reloadDevices() {
+void NBSideBar::mousePressEvent( QMouseEvent *mEvent ) {
 
-	drives->clear();
-	vfs->clear();
-
-	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allDrives() ) {
-		int pos = drives->addItem( info.displayName(), ":/icons/" + info.deviceType() + ".png", info.mountPoint(), NBSideBarItem::Device );
-
-		/* Special tooltip hack */
-		int percent = 100 * info.bytesUsed() / info.bytesTotal();
-		drives->item( pos )->setToolTip( tooltipSkel.arg( info.mountPoint() ).arg( percent ).arg( percent < 90 ? "darkgreen" : "darkred" ) );
-	}
-
-	Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allVirtualMounts() )
-		vfs->addItem( info.displayName(), ":/icons/encfs.png", info.mountPoint(), NBSideBarItem::Vfs );
-
-	if ( drives->itemCount() )
-		drives->show();
-
-	else
-		drives->hide();
-
-	if ( vfs->itemCount() )
-		vfs->show();
-
-	else
-		vfs->hide();
+	mEvent->accept();
 };
 
-void NBSideBar::reloadBookmarks() {
+void NBSideBar::mouseMoveEvent( QMouseEvent *mEvent ) {
 
-	bookmarks->clear();
-
-	Q_FOREACH( NBBookmarkInfo info, NBBookmarkInfo::allBookmarks() )
-		bookmarks->addItem( info.displayLabel, NBIconManager::instance()->icon( "folder-favorites" ).at( 0 ), info.mountPoint, NBSideBarItem::Bookmark );
-
-	if ( bookmarks->itemCount() )
-		bookmarks->show();
-
-	else
-		bookmarks->hide();
+	mEvent->accept();
 };
 
-void NBSideBar::reloadQuickFiles() {
+void NBSideBar::flashApplications() {
 
-	quickFiles->clear();
-
-	QSettings qfList( "NewBreeze", "SuperStart" );
-	qfList.beginGroup( "Files" );
-
-	Q_FOREACH( QString key, qfList.allKeys() )
-		quickFiles->addItem( key, NBIconManager::instance()->icon( "bookmarks" ).at( 0 ), qfList.value( key ).toString(), NBSideBarItem::QuickFile );
-
-	qfList.endGroup();
-
-	if ( quickFiles->itemCount() )
-		quickFiles->show();
-
-	else
-		quickFiles->hide();
+	appLbl->flashLabel();
 };
 
-void NBSideBar::highlight( QString tgt ) {
+void NBSideBar::flashCatalogs() {
 
-	drives->clearHighlights();
-	vfs->clearHighlights();
-	bookmarks->clearHighlights();
-
-	dirs->setHighlighted( false );
-	apps->setHighlighted( false );
-	ctlg->setHighlighted( false );
-
-	if ( tgt.startsWith( "NB://Applications" ) ) {
-
-		dirs->setHighlighted( false );
-		apps->setHighlighted( true );
-		ctlg->setHighlighted( false );
-
-		return;
-	}
-
-	if ( tgt.startsWith( "NB://Catalogs" ) ) {
-
-		dirs->setHighlighted( false );
-		apps->setHighlighted( false );
-		ctlg->setHighlighted( true );
-
-		return;
-	}
-
-	for( int i = 0; i < drives->itemCount(); i++ ) {
-
-		NBSideBarItem *item = drives->item( i );
-		if ( item->target() == tgt ) {
-			item->setHighlighted( true );
-			dirs->setHighlighted( false );
-			apps->setHighlighted( false );
-			ctlg->setHighlighted( false );
-			return;
-		}
-	}
-
-	for( int i = 0; i < vfs->itemCount(); i++ ) {
-
-		NBSideBarItem *item = vfs->item( i );
-		if ( item->target() == tgt ) {
-			item->setHighlighted( true );
-			dirs->setHighlighted( false );
-			apps->setHighlighted( false );
-			ctlg->setHighlighted( false );
-			return;
-		}
-	}
-
-	for( int i = 0; i < bookmarks->itemCount(); i++ ) {
-
-		NBSideBarItem *item = bookmarks->item( i );
-		if ( item->target() == tgt ) {
-			item->setHighlighted( true );
-			dirs->setHighlighted( false );
-			apps->setHighlighted( false );
-			ctlg->setHighlighted( false );
-			return;
-		}
-	}
-
-	dirs->setHighlighted( true );
+	ctlLbl->flashLabel();
 };
 
-void NBSideBar::paintEvent( QPaintEvent *pEvent ) {
+void NBSideBar::flashFolders() {
 
-	QPainter painter( this );
-	painter.setRenderHint( QPainter::HighQualityAntialiasing );
-	painter.setPen( Qt::darkGray );
+	dirLbl->flashLabel();
+};
 
-	painter.drawLine( rect().topRight(), rect().bottomRight() );
-	painter.end();
+void NBSideBar::flashDevices() {
 
-	pEvent->accept();
+	devIcon->flashLabel();
+};
+
+void NBSideBar::flashVfs() {
+
+	vfsIcon->flashLabel();
+};
+
+void NBSideBar::flashBookmarks() {
+
+	bmkIcon->flashLabel();
 };

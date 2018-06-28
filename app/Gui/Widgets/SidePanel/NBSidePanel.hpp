@@ -1,50 +1,47 @@
 /*
 	*
-	* NBSidePanel.hpp - NBSidePanel.cpp header
+	* NBSidePanel.hpp - SideBar class Header
 	*
 */
 
 #pragma once
 
 #include "Global.hpp"
-#include "NBFlashLabel.hpp"
-#include "NBDeviceView.hpp"
-#include "NBVfsView.hpp"
-#include "NBBookmarkView.hpp"
+#include "NBSidePanelItem.hpp"
 
-class NBSidePanel : public QWidget {
+#include "NBBookmarkInfo.hpp"
+#include "NBIconManager.hpp"
+
+#include "NBTrashModel.hpp"
+
+class NBSidePanel : public QScrollArea {
 	Q_OBJECT
 
-	public :
+	public:
 		NBSidePanel( QWidget *parent );
 
 	private:
+		NBSidePanelLabel *devicesLabel;
+		NBSidePanelLabel *catalogsLabel;
+		NBSidePanelLabel *bookmarksLabel;
+		NBSidePanelLabel *quickFilesLabel;
+		NBSidePanelLabel *trashLabel;
+
+		QVBoxLayout *scrollLyt;
+
+	public Q_SLOTS:
+		void loadDevices();
+		void loadCatalogs();
+		void loadBookmarks();
+		void loadQuickFiles();
+
+		void highlight( QString );
+
+	private Q_SLOTS:
 		void populateSidePanel();
 
-		NBFlashLabel *dirLbl, *appLbl, *ctlLbl;
-		NBTrashLabel *trashLabel;
-		NBDevicesIcon *devIcon;
-		NBVfsIcon *vfsIcon;
-		NBBookmarksIcon *bmkIcon;
-
-	protected :
-		void mousePressEvent( QMouseEvent *mEvent );
-		void mouseMoveEvent( QMouseEvent *mEvent );
-
-	public slots:
-		void flashApplications();
-		void flashCatalogs();
-		void flashFolders();
-		void flashDevices();
-		void flashVfs();
-		void flashBookmarks();
-
 	Q_SIGNALS:
-		void showFolders();
-		void showApplications();
-		void showCatalogs();
-
 		void showTrash();
 
-		void driveClicked( QString );
+		void driveClicked( QString text = "NB://Catalogs" );
 };

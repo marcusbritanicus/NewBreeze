@@ -11,7 +11,7 @@
 #include "NBButtons.hpp"
 #include "NBIconViewRestricted.hpp"
 #include "NBDirectoryView.hpp"
-#include "NBSideBar.hpp"
+#include "NBSidePanel.hpp"
 #include "NBDialog.hpp"
 #include "NBMessageDialog.hpp"
 #include "NBGuiWidgets.hpp"
@@ -40,7 +40,7 @@ class NBFileDialog : public QDialog {
 		NBItemViewModel *fsModel;
 
 		NBAddressWidget *addressBar;
-		NBSideBar *sidePanel;
+		NBSidePanel *sidePanel;
 
 		NBIconView *mainView;
 
@@ -76,7 +76,7 @@ class NBDirectoryDialog : public NBDialog {
 		void setWindowProperties();
 
 		NBAddressWidget *addressBar;
-		NBSideBar *sidePanel;
+		NBSidePanel *sidePanel;
 
 		NBDirectoryView *dirView;
 

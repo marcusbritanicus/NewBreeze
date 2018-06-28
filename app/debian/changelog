@@ -1,9 +1,13 @@
-newbreeze (3.0.0-rc2) unstable; urgency=medium
+newbreeze (3.0.0-rc3) unstable; urgency=medium
 
+  * Feature: VideoThumbnailing enabled
+  * Feature: Video/Audio preview enabled
   * Trash Manager now uses QTreeView class
   * Inbuilt terminal bug fix
   * Busy cursor while loading large folders
   * Grouping option in Context Menu fixed
+  * Classes interchanged: NBSideBar <--> NBSidePanel
+  * Improvements to NBSidePanel
 
 newbreeze (3.0.0-rc1) unstable; urgency=medium
 

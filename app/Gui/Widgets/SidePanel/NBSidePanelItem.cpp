@@ -1,22 +1,61 @@
 /*
 	*
-	* NBSideBarGroup.cpp - SideBarGruop class for NewBreeze
+	* NBSidePanelItem.cpp - SidePanelItem class for NewBreeze
 	*
 */
 
-#include "NBSideBarItem.hpp"
+#include "NBSidePanelItem.hpp"
 
-NBSideBarItem::NBSideBarItem( QWidget *parent ) : QLabel( parent ) {
+NBSidePanelLabel::NBSidePanelLabel( QString icon, QString name, QWidget *parent ) : QWidget( parent ) {
 
-	mHover = false;
-	mPressed = false;
-	mHighlight = false;
+	setFixedHeight( 32 );
+	setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
 
-	setFixedHeight( 20 );
+	mName = name;
+	mIcon = QIcon( icon ).pixmap( 24 );
+
 	setCursor( Qt::PointingHandCursor );
+	setAcceptDrops( false );
 };
 
-NBSideBarItem::NBSideBarItem( QString name, QString icon, QString target, int type, QWidget *parent ) : QLabel( parent ) {
+void NBSidePanelLabel::mouseReleaseEvent( QMouseEvent *mrEvent ) {
+
+	if ( mrEvent->button() == Qt::LeftButton )
+		emit clicked();
+
+	mrEvent->accept();
+};
+
+void NBSidePanelLabel::paintEvent( QPaintEvent *pEvent ) {
+
+	QPainter painter( this );
+	painter.setPen( Qt::NoPen );
+
+	/* Paint Icon */
+	QRect iconRect = QRect( 4, 4, 24, 24 );
+	painter.drawPixmap( iconRect, mIcon );
+
+	QRectF textRect = QRectF( 32, 0, width() - 32, 32 );
+	painter.setPen( palette().color( QPalette::WindowText ) );
+
+	QFont boldFont( font() );
+	boldFont.setBold( true );
+	painter.setFont( boldFont );
+
+	painter.drawText( textRect, Qt::AlignLeft | Qt::AlignVCenter, mName );
+
+	// painter.setPen( Qt::darkGray );
+	// painter.drawLine( rect().topRight(), rect().bottomRight() );
+
+	painter.end();
+
+	pEvent->accept();
+};
+
+NBSidePanelItem::NBSidePanelItem( QString name, QString icon, QString target, int type, QWidget *parent ) : QWidget( parent ) {
+
+	setFixedHeight( 20 );
+	setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
 
 	mName = name;
 	mIcon = icon;
@@ -26,95 +65,42 @@ NBSideBarItem::NBSideBarItem( QString name, QString icon, QString target, int ty
 	if ( isDir( mTarget ) and not mTarget.endsWith( "/" ) )
 		mTarget += "/";
 
-	if ( parent->objectName() == "SideBarGroup" ) {
-		setContentsMargins( 20, 0, 0, 0 );
-		setText( QString( "<img src='%1' height = 13 width = 13> %2" ).arg( mIcon ).arg( mName ) );
-	}
-
-	else {
-		setContentsMargins( 10, 0, 0, 0 );
-		setText( QString( "<img src='%1' height = 13 width = 13> <b>%2</b>" ).arg( mIcon ).arg( mName ) );
-	}
-
 	setToolTip( mTarget );
 
 	mHover = false;
 	mPressed = false;
 	mHighlight = false;
 
-	setFixedHeight( 20 );
 	setCursor( Qt::PointingHandCursor );
-
 	setAcceptDrops( true );
 };
 
-QString NBSideBarItem::name() {
+QString NBSidePanelItem::name() {
 
 	return mName;
 };
 
-void NBSideBarItem::setName( QString newName ) {
-
-	mName = newName;
-
-	if ( parent()->objectName() == "SideBarGroup" ) {
-		setContentsMargins( 20, 0, 0, 0 );
-		setText( QString( "<img src='%1' height = 13 width = 13> %2" ).arg( mIcon ).arg( mName ) );
-	}
-
-	else {
-		setContentsMargins( 10, 0, 0, 0 );
-		setText( QString( "<img src='%1' height = 13 width = 13> <b>%2</b>" ).arg( mIcon ).arg( mName ) );
-	}
-};
-
-QIcon NBSideBarItem::icon() {
+QIcon NBSidePanelItem::icon() {
 
 	return QIcon( mIcon );
 };
 
-void NBSideBarItem::setIcon( QString newIcon ) {
-
-	mIcon = newIcon;
-
-	if ( parent()->objectName() == "SideBarGroup" ) {
-		setContentsMargins( 20, 0, 0, 0 );
-		setText( QString( "<img src='%1' height = 13 width = 13> %2" ).arg( mIcon ).arg( mName ) );
-	}
-
-	else {
-		setContentsMargins( 10, 0, 0, 0 );
-		setText( QString( "<img src='%1' height = 13 width = 13> <b>%2</b>" ).arg( mIcon ).arg( mName ) );
-	}
-};
-
-QString NBSideBarItem::target() {
+QString NBSidePanelItem::target() {
 
 	return mTarget;
 };
 
-void NBSideBarItem::setTarget( QString newTarget ) {
-
-	mTarget = newTarget;
-	setToolTip( mTarget );
-};
-
-int NBSideBarItem::type() {
+int NBSidePanelItem::type() {
 
 	return mType;
 };
 
-void NBSideBarItem::setType( int newtype ) {
-
-	mType = newtype;
-};
-
-bool NBSideBarItem::isHighlighted() {
+bool NBSidePanelItem::isHighlighted() {
 
 	return mHighlight;
 };
 
-void NBSideBarItem::setHighlighted( bool hilite ) {
+void NBSidePanelItem::setHighlighted( bool hilite ) {
 
 	mHighlight = hilite;
 
@@ -131,12 +117,12 @@ void NBSideBarItem::setHighlighted( bool hilite ) {
 	repaint();
 };
 
-bool NBSideBarItem::operator==( NBSideBarItem* other ) {
+bool NBSidePanelItem::operator==( NBSidePanelItem* other ) {
 
 	return ( ( other->target() == mTarget ) and ( other->parent() == parent() ) );
 };
 
-void NBSideBarItem::enterEvent( QEvent *eEvent ) {
+void NBSidePanelItem::enterEvent( QEvent *eEvent ) {
 
 	mHover = true;
 	repaint();
@@ -144,7 +130,7 @@ void NBSideBarItem::enterEvent( QEvent *eEvent ) {
 	eEvent->accept();
 };
 
-void NBSideBarItem::leaveEvent( QEvent *lEvent ) {
+void NBSidePanelItem::leaveEvent( QEvent *lEvent ) {
 
 	mHover = false;
 	repaint();
@@ -152,12 +138,12 @@ void NBSideBarItem::leaveEvent( QEvent *lEvent ) {
 	lEvent->accept();
 };
 
-void NBSideBarItem::dragEnterEvent( QDragEnterEvent *deEvent ) {
+void NBSidePanelItem::dragEnterEvent( QDragEnterEvent *deEvent ) {
 
 	deEvent->acceptProposedAction();
 };
 
-void NBSideBarItem::dragMoveEvent( QDragMoveEvent *dmEvent ) {
+void NBSidePanelItem::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 
 	const QMimeData *mData = dmEvent->mimeData();
 	if ( not mData->hasUrls() ) {
@@ -188,7 +174,7 @@ void NBSideBarItem::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 	}
 };
 
-void NBSideBarItem::dropEvent( QDropEvent *dpEvent ) {
+void NBSidePanelItem::dropEvent( QDropEvent *dpEvent ) {
 
 	if ( not dpEvent->mimeData()->hasUrls() ) {
 		dpEvent->ignore();
@@ -245,7 +231,7 @@ void NBSideBarItem::dropEvent( QDropEvent *dpEvent ) {
 	dpEvent->accept();
 };
 
-void NBSideBarItem::mousePressEvent( QMouseEvent *mpEvent ) {
+void NBSidePanelItem::mousePressEvent( QMouseEvent *mpEvent ) {
 
 	if ( not mHighlight ) {
 
@@ -270,7 +256,7 @@ void NBSideBarItem::mousePressEvent( QMouseEvent *mpEvent ) {
 	mpEvent->accept();
 };
 
-void NBSideBarItem::mouseReleaseEvent( QMouseEvent *mrEvent ) {
+void NBSidePanelItem::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 
 	if ( not mHighlight ) {
 		if ( mrEvent->button() == Qt::LeftButton ) {
@@ -284,11 +270,12 @@ void NBSideBarItem::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 	mrEvent->accept();
 };
 
-void NBSideBarItem::paintEvent( QPaintEvent *pEvent ) {
+void NBSidePanelItem::paintEvent( QPaintEvent *pEvent ) {
 
 	QPainter painter( this );
 	painter.setPen( Qt::NoPen );
 
+	painter.save();
 	if ( mPressed ) {
 
 		painter.setBrush( palette().color( QPalette::Highlight ).darker( 110 ) );
@@ -322,14 +309,29 @@ void NBSideBarItem::paintEvent( QPaintEvent *pEvent ) {
 		painter.setBrush( palette().color( QPalette::Highlight ).darker( 125 ) );
 		painter.drawRect( QRect( 0, 0, width(), height() ) );
 	}
+	painter.restore();
+
+	/* Paint Icon */
+	QRect iconRect = QRect( 25, 2, 16, 16 );
+	painter.drawPixmap( iconRect, QPixmap( mIcon ).scaled( 16, 16 ) );
+
+	QRectF textRect = QRectF( 47, 0, width() - 47, 20 );
+
+	QFontMetrics fm( font() );
+	mName = fm.elidedText( mName, Qt::ElideRight, width() - 47 );
+
+	painter.setPen( palette().color( QPalette::WindowText ) );
+	painter.drawText( textRect, Qt::AlignLeft | Qt::AlignVCenter, mName );
+
+	// painter.setPen( Qt::darkGray );
+	// painter.drawLine( rect().topRight(), rect().bottomRight() );
 
 	painter.end();
 
-	QLabel::paintEvent( pEvent );
 	pEvent->accept();
 };
 
-void NBSideBarItem::removeBookmark() {
+void NBSidePanelItem::removeBookmark() {
 
 	if ( mTarget.endsWith( "/" ) )
 		mTarget.chop( 1 );
@@ -344,6 +346,11 @@ void NBSideBarItem::removeBookmark() {
 	deleteLater();
 };
 
-void NBSideBarItem::removeQuickFile() {
+void NBSidePanelItem::removeQuickFile() {
 
+	QSettings superStart( "NewBreeze", "SuperStart" );
+	superStart.remove( "Files/" + mName );
+	superStart.sync();
+
+	deleteLater();
 };
