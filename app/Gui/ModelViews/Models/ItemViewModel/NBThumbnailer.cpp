@@ -34,6 +34,24 @@ static inline int isVideo( const struct dirent* entry ) {
 	return ( mt.name().startsWith( "video/" ) and mt.name().compare( "video/mng" ) );
 };
 
+static inline int isPDF( const struct dirent* entry ) {
+
+	QByteArray suffix = QFileInfo( entry->d_name ).suffix().toLower().toLocal8Bit();
+	if ( suffix == "pdf" )
+		return true;
+
+	return false;
+};
+
+static inline int isDjVu( const struct dirent* entry ) {
+
+	QByteArray suffix = QFileInfo( entry->d_name ).suffix().toLower().toLocal8Bit();
+	if ( suffix == "djv" or suffix == "djvu" )
+		return true;
+
+	return false;
+};
+
 static inline QStringList imageFiles( QString path ) {
 
 	struct dirent **fileList;
@@ -97,6 +115,48 @@ static inline QStringList videoFiles( QString path ) {
 	return QStringList();
 };
 
+static inline QStringList pdfFiles( QString path ) {
+
+	struct dirent **fileList;
+	int entries = scandir( path.toLocal8Bit().data(), &fileList, isPDF, NULL );
+	if ( entries > 0 ) {
+		QStringList files;
+		for( int i = 0; i < entries; i++ ) {
+			/* Ignore . and .. */
+			struct dirent *entry = fileList[ i ];
+			if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
+				continue;
+
+			files << path + QString::fromLocal8Bit( entry->d_name );
+		}
+
+		return files;
+	}
+
+	return QStringList();
+};
+
+static inline QStringList djvuFiles( QString path ) {
+
+	struct dirent **fileList;
+	int entries = scandir( path.toLocal8Bit().data(), &fileList, isDjVu, NULL );
+	if ( entries > 0 ) {
+		QStringList files;
+		for( int i = 0; i < entries; i++ ) {
+			/* Ignore . and .. */
+			struct dirent *entry = fileList[ i ];
+			if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
+				continue;
+
+			files << path + QString::fromLocal8Bit( entry->d_name );
+		}
+
+		return files;
+	}
+
+	return QStringList();
+};
+
 void NBThumbnailer::createThumbnails( QString path ) {
 
 	if ( isRunning() )
@@ -111,74 +171,78 @@ void NBThumbnailer::createThumbnails( QString path ) {
 void NBThumbnailer::run() {
 
 	/* Image Files */
+	if ( Settings->View.ImagePreview ) {
+		QStringList files = imageFiles( mPath );
+		Q_FOREACH( QString file, files ) {
 
-	QStringList files = imageFiles( mPath );
-	Q_FOREACH( QString file, files ) {
+			if ( mTerminate )
+				break;
 
-		if ( mTerminate )
-			break;
+			/* If @path is non-existent */
+			if ( not exists( file ) )
+				continue;
 
-		/* If @path is non-existent */
-		if ( not exists( file ) )
-			continue;
+			/* Create a hash of the path */
+			QString hashPath = thumbsDir + MD5( file );
 
-		/* Create a hash of the path */
-		QString hashPath = thumbsDir + MD5( file );
+			/* If the thumbnail is already formed */
+			if ( exists( hashPath ) )
+				continue;
 
-		/* If the thumbnail is already formed */
-		if ( exists( hashPath ) )
-			continue;
+			/* Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/ */
+			QImage thumb = QImage( file ).scaled( 512, 512, Qt::KeepAspectRatio ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 
-		/* Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/ */
-		QImage thumb = QImage( file ).scaled( 512, 512, Qt::KeepAspectRatio ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+			if ( thumb.save( hashPath, "PNG", 0 ) ) {
+				emit updateNode( file );
+			}
 
-		if ( thumb.save( hashPath, "PNG", 0 ) ) {
-			emit updateNode( file );
-		}
+			else {
+				QFile::copy( ":/icons/image.png", hashPath );
+				qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
+			}
 
-		else {
-			QFile::copy( ":/icons/image.png", hashPath );
-			qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
-		}
-	}
-
-	/* ODf Files */
-
-	files = odffiles( mPath );
-	Q_FOREACH( QString file, files ) {
-
-		if ( mTerminate )
-			break;
-
-		/* If @path is non-existent */
-		if ( not exists( file ) )
-			continue;
-
-		/* Create a hash of the path */
-		QString hashPath = thumbsDir + MD5( file );
-
-		/* If the thumbnail is already formed */
-		if ( exists( hashPath ) )
-			continue;
-
-		/* Open as archive */
-		NBArchive *odf = new NBArchive( file );
-		odf->setDestination( "/tmp/NewBreeze_odf/" );
-		if ( not odf->extractMember( "Thumbnails/thumbnail.png" ) ) {
-			QFile::copy( "/tmp/NewBreeze_odf/Thumbnails/thumbnail.png", hashPath );
-			system( "rm -rf /tmp/NewBreeze_odf/*" );
-			emit updateNode( file );
+			qApp->processEvents();
 		}
 	}
 
-	/* Video Files */
+	/* ODF Files */
+	if ( Settings->View.OdfPreview ) {
+		Q_FOREACH( QString file, odffiles( mPath ) ) {
 
+			if ( mTerminate )
+				break;
+
+			/* If @path is non-existent */
+			if ( not exists( file ) )
+				continue;
+
+			/* Create a hash of the path */
+			QString hashPath = thumbsDir + MD5( file );
+
+			/* If the thumbnail is already formed */
+			if ( exists( hashPath ) )
+				continue;
+
+			/* Open as archive */
+			NBArchive *odf = new NBArchive( file );
+			odf->setDestination( "/tmp/NewBreeze_odf/" );
+			if ( not odf->extractMember( "Thumbnails/thumbnail.png" ) ) {
+				QFile::copy( "/tmp/NewBreeze_odf/Thumbnails/thumbnail.png", hashPath );
+				system( "rm -rf /tmp/NewBreeze_odf/*" );
+				emit updateNode( file );
+			}
+
+			qApp->processEvents();
+		}
+	}
+
+	/* Plugins based thumbnailers */
 	QSettings nbpset( "NewBreeze", "Plugins" );
 	QString pluginSo;
 
 	Q_FOREACH( QString pth, nbpset.value( "PluginPaths" ).toStringList() ) {
-		if ( exists( pth + "/libVideoThumbs.so" ) )
-			pluginSo = QDir( pth ).absoluteFilePath( "libVideoThumbs.so" );
+		if ( exists( pth + "/libThumbnailer.so" ) )
+			pluginSo = QDir( pth ).absoluteFilePath( "libThumbnailer.so" );
 	}
 
 	if ( pluginSo.count() ) {
@@ -187,21 +251,68 @@ void NBThumbnailer::run() {
 		QObject *pObject = loader.instance();
 		if ( pObject ) {
 			NBPluginInterface *plugin = qobject_cast<NBPluginInterface*>( pObject );
-			files = videoFiles( mPath );
-			Q_FOREACH( QString file, files ) {
-				/* If @path is non-existent */
-				if ( not exists( file ) )
-					continue;
 
-				/* Create a hash of the path */
-				QString hashPath = thumbsDir + MD5( file );
+			/* Video files */
+			if ( Settings->View.VideoPreview ) {
+				Q_FOREACH( QString file, videoFiles( mPath ) ) {
+					/* If @path is non-existent */
+					if ( not exists( file ) )
+						continue;
 
-				/* If the thumbnail is already formed */
-				if ( exists( hashPath ) )
-					continue;
+					/* Create a hash of the path */
+					QString hashPath = thumbsDir + MD5( file );
 
-				plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, QString(), QStringList() << file << hashPath );
-				emit updateNode( file );
+					/* If the thumbnail is already formed */
+					if ( exists( hashPath ) )
+						continue;
+
+					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "Video", QStringList() << file << hashPath );
+					emit updateNode( file );
+
+					qApp->processEvents();
+				}
+			}
+
+			/* PDF Files */
+			if ( Settings->View.PdfPreview ) {
+				Q_FOREACH( QString file, pdfFiles( mPath ) ) {
+					/* If @path is non-existent */
+					if ( not exists( file ) )
+						continue;
+
+					/* Create a hash of the path */
+					QString hashPath = thumbsDir + MD5( file );
+
+					/* If the thumbnail is already formed */
+					if ( exists( hashPath ) )
+						continue;
+
+					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "PDF", QStringList() << file << hashPath );
+					emit updateNode( file );
+
+					qApp->processEvents();
+				}
+			}
+
+			/* DjVu files */
+			if ( Settings->View.DjVuPreview ) {
+				Q_FOREACH( QString file, djvuFiles( mPath ) ) {
+					/* If @path is non-existent */
+					if ( not exists( file ) )
+						continue;
+
+					/* Create a hash of the path */
+					QString hashPath = thumbsDir + MD5( file );
+
+					/* If the thumbnail is already formed */
+					if ( exists( hashPath ) )
+						continue;
+
+					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "DjVu", QStringList() << file << hashPath );
+					emit updateNode( file );
+
+					qApp->processEvents();
+				}
 			}
 		}
 	}

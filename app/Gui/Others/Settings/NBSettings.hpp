@@ -48,6 +48,12 @@ class NBSettings {
 		class ViewSettings {
 			public:
 				bool PaintOverlay;								// Paint QuickAccess overlays
+				bool FilePreviews;								// File contents preview
+				bool ImagePreview;								// Show thumbnails of images
+				bool VideoPreview;								// Show video thumbnails
+				bool OdfPreview;								// Show ODF thumbnails
+				bool PdfPreview;								// Show PDF thumbnails
+				bool DjVuPreview;								// Show DjVu thumbnails
 		} View;
 
 		// Special Settings

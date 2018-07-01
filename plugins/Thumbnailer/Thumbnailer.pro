@@ -1,11 +1,5 @@
 TEMPLATE = lib
-TARGET = VideoThumbs4
-
-# Common Sources
-INCLUDEPATH += ../../common/ ../../common/include .
-DEPENDPATH += ../../common/ ../../common/include .
-
-LIBS += -lffmpegthumbnailer
+TARGET = Thumbnailer4
 
 # Same as NewBreeze version
 VERSION = "3.0.0"
@@ -13,6 +7,28 @@ VERSION = "3.0.0"
 # Plugin Mode
 # ===========
 CONFIG += plugin
+
+# Common Sources
+INCLUDEPATH += ../../common/ ../../common/include .
+DEPENDPATH += ../../common/ ../../common/include .
+
+# FFMpeg Support
+# ==============
+LIBS += -lffmpegthumbnailer -ldjvulibre
+
+# Poppler-Qt4
+# ===========
+lessThan( QT_MAJOR_VERSION, 5 ) {
+	INCLUDEPATH  += /usr/include/poppler/qt4
+	LIBS         += -L/usr/lib -lpoppler-qt4
+}
+
+# Poppler-Qt5
+# ===========
+greaterThan( QT_MAJOR_VERSION, 4 ) {
+	INCLUDEPATH  += /usr/include/poppler/qt5
+	LIBS         += -L/usr/lib -lpoppler-qt5
+}
 
 # LibNB3Common
 # ============
@@ -46,7 +62,7 @@ RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4
 UI_DIR      = $$BUILD_PREFIX/uic-plugins4
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-	TARGET		= VideoThumbs
+	TARGET		= Thumbnailer
 	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5
 	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5
 	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5
@@ -54,10 +70,10 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 }
 
 # Headers
-HEADERS += NBVideoThumbsPlugin.hpp
+HEADERS += NBThumbnailerPlugin.hpp
 
 # Sources
-SOURCES += NBVideoThumbsPlugin.cpp
+SOURCES += NBThumbnailerPlugin.cpp
 
 unix {
 	isEmpty(PREFIX) {
@@ -68,5 +84,8 @@ unix {
 
 	QMAKE_RPATHDIR += $$PREFIX/lib/newbreeze/
 
-	target.path = $$PREFIX/lib/newbreeze/plugins
+	target.path = $$PREFIX/lib/newbreeze/plugins4
+	greaterThan(QT_MAJOR_VERSION, 4) {
+		target.path = $$PREFIX/lib/newbreeze/plugins
+	}
 }

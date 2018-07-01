@@ -32,11 +32,18 @@ class NBSGeneralWidget : public QWidget {
 		QRadioButton *sidePanelRB;				// Show the Modern Side Panel
 		QRadioButton *sideBarRB;				// Show the Classic SideBar
 
+		/* File previews */
+		QGroupBox *filePreviewGB;				// Show image previews?
+		QCheckBox *imagePreviewCB;				// Show image thumbnails?
+		QCheckBox *pdfPreviewCB;				// Show pdf thumbnails?
+		QCheckBox *djvuPreviewCB;				// Show djvu thumbnails?
+		QCheckBox *odfPreviewCB;				// Show ODF thumbnails?
+		QCheckBox *videoPreviewCB;				// Show videos thumbnails?
+
 		/* Others */
 		QCheckBox *filterFoldersCB;				// Should we filter folders while searching?
 		QCheckBox *showTrayIconCB;				// Show tray icon?
 		QCheckBox *openWithCB;					// Open with SuperStart?
-		QCheckBox *imagePreviewCB;				// Show image previews?
 		QCheckBox *extendedIOCB;				// Direct Copy/Move?
 		QCheckBox *paintOverlayCB;				// Paint Icon Overlays?
 		QCheckBox *logDebugCB;					// Enable Debug Logging?
@@ -49,7 +56,7 @@ class NBSGeneralWidget : public QWidget {
 		QPushButton *defaultBtn;				// Make this terminal default
 
 	private slots:
-		/*  */
+		/* View */
 		void handlePerFolderChanged( bool );
 		void handleViewModeChanged( int );
 		void handleIconSizeChanged( int );
@@ -61,11 +68,13 @@ class NBSGeneralWidget : public QWidget {
 		void handleShowSidePanelToggled( bool );
 		void handleSidePanelChoice();
 
+		/* File Previews */
+		void handlePreviewsChanged();
+
 		/* Others */
 		void handleFilterDirsChanged( bool );
 		void handleTrayIconChanged( bool );
 		void handleOpenWithToggled();
-		void handleCheckStateChanged( int );
 		void handleExtendedIOChanged( bool );
 		void handlePaintOverlayChanged( bool );
 		void handleLogDebugChanged( bool );

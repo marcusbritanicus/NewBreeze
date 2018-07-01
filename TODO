@@ -11,7 +11,7 @@ NBVideoPlugin                                                                   
 
 NBItemViewModel                                                                                                                       [ 2 of 3 ]
 	✓ Thumbnailing of ODF files
-	✍ Thumbnailing of PDF and DjVu files
+	✓ Thumbnailing of PDF and DjVu files
 	✓ Thumbnailing of Video files via libffmpegthumbs
 
 NBLogger                                                                                                                              [ 1 of 1 ]
@@ -33,11 +33,12 @@ NBContextMenu                                                                   
 	✓ Grouping checkbox does not work
 
 NBStartupWizard                                                                                                                       [ 0 of 2 ]
-	□ Add IconOverlay, Default terminal, ExtendedIO, etc
-	□ Show StartupWizard when NewBreeze.conf has missing settings.
+	✍ Add IconOverlay, Default terminal, ExtendedIO, etc
+	✍ Show StartupWizard when NewBreeze.conf has missing settings.
+	✍ Remove Open with Catalogs option
 
-NBSettingManager                                                                                                                      [ 1 of 2 ]
-	□ Extended Icon Preview options
+NBSettingManager                                                                                                                      [ 2 of 2 ]
+	✓ Extended Icon Preview options
 	  • Option for preview of Images
 	  • Option for preview of Videos
 	  • Option for preview of PDF/DjVu

@@ -50,6 +50,12 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.LogDebug = true;
 
 	defaultSettings->View.PaintOverlay = true;
+	defaultSettings->View.FilePreviews = true;
+	defaultSettings->View.ImagePreview = true;
+	defaultSettings->View.VideoPreview = true;
+	defaultSettings->View.OdfPreview = true;
+	defaultSettings->View.PdfPreview = true;
+	defaultSettings->View.DjVuPreview = true;
 
 	defaultSettings->Special.ClosingDown = false;
 
@@ -172,6 +178,24 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "View/PaintOverlay" ) ) )
 		settings->View.PaintOverlay = gSettings.value( "View/PaintOverlay" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/FilePreviews" ) ) )
+		settings->View.FilePreviews = gSettings.value( "View/FilePreviews" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/ImagePreview" ) ) )
+		settings->View.ImagePreview = gSettings.value( "View/ImagePreview" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/VideoPreview" ) ) )
+		settings->View.VideoPreview = gSettings.value( "View/VideoPreview" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/OdfPreview" ) ) )
+		settings->View.OdfPreview = gSettings.value( "View/OdfPreview" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/PdfPreview" ) ) )
+		settings->View.PdfPreview = gSettings.value( "View/PdfPreview" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/DjVuPreview" ) ) )
+		settings->View.DjVuPreview = gSettings.value( "View/DjVuPreview" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		settings->Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
@@ -376,6 +400,24 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "View/PaintOverlay" ) ) )
 		View.PaintOverlay = gSettings.value( "View/PaintOverlay" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/FilePreviews" ) ) )
+		View.FilePreviews = gSettings.value( "View/FilePreviews" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/ImagePreview" ) ) )
+		View.ImagePreview = gSettings.value( "View/ImagePreview" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/VideoPreview" ) ) )
+		View.VideoPreview = gSettings.value( "View/VideoPreview" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/OdfPreview" ) ) )
+		View.OdfPreview = gSettings.value( "View/OdfPreview" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/PdfPreview" ) ) )
+		View.PdfPreview = gSettings.value( "View/PdfPreview" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/DjVuPreview" ) ) )
+		View.DjVuPreview = gSettings.value( "View/DjVuPreview" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();

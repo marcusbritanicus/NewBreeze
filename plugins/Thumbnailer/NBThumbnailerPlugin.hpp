@@ -1,6 +1,6 @@
 /*
 	*
-	* NBVideoThumbsPlugin.hpp - NewBreeze Video Thumbnailer Class
+	* NBThumbnailerPlugin.hpp - NewBreeze Video Thumbnailer Class
 	*
 */
 
@@ -11,10 +11,10 @@
 
 #include <QtPlugin>
 
-class NBVideoThumbsPlugin : public QObject, NBPluginInterface {
+class NBThumbnailerPlugin : public QObject, NBPluginInterface {
 	Q_OBJECT
 	#if QT_VERSION >= 0x050000
-		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "VideoThumbs.json" )
+		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "Thumbnailer.json" )
 	#endif
 	Q_INTERFACES( NBPluginInterface )
 
@@ -45,4 +45,9 @@ class NBVideoThumbsPlugin : public QObject, NBPluginInterface {
 
 		/* Store the called widget pointer */
 		void setCaller( QWidget *caller );
+
+	private:
+		void makeVideoThumbnail( QString, QString );
+		void makeDjVuThumbnail( QString, QString );
+		void makePdfThumbnail( QString, QString );
 };

@@ -45,6 +45,9 @@ PdfPage* PdfDocument::page( int pageNum ) const {
 void PdfDocument::loadPdf() {
 
 	mPdfDoc = Poppler::Document::load( mPdfPath );
+	if ( not mPdfDoc )
+		return;
+
 	mPdfDoc->setRenderHint( Poppler::Document::Antialiasing );
 	mPdfDoc->setRenderHint( Poppler::Document::TextAntialiasing );
 	mPdfDoc->setRenderHint( Poppler::Document::TextHinting );

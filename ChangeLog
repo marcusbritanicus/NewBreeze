@@ -3,7 +3,9 @@ Version 3.0.0 RC
 	- Feature: IconOverlay for quick controls
 	- Feature: Categories now have menu, better folding
 	- Feature: VideoThumbnailing enabled
+	- Feature: PDF/DjVu enabled
 	- Feature: Video/Audio preview enabled
+	- Feature: Selected file preview enabled
 	- Improvements to NBIconView
 	- Classes interchanged: NBSideBar <--> NBSidePanel
 	- Improvements to NBSidePanel

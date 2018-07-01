@@ -45,8 +45,8 @@ few changes in NewBreeze 3.
    - A simple menu has been added
 
 => NBSidePanel and NBSideBar
-   - NBSidePanel: Redesigned sidepanel with elegant menu listing the devices and bookmarks.
-   - NBSideBar: A mac-like side panel
+   - NBSideBar: Redesigned sidepanel with elegant menu listing the devices and bookmarks.
+   - NBSidePanel: A mac-like side panel
    - Devices ( or their tool tips ) show the space usage.
    - User can switch between classic and modern side panels from the
 
@@ -97,4 +97,4 @@ few changes in NewBreeze 3.
    - Eventually the Startup Wizard will serve as a feature tour guide.
 
 => BugReporter
-   - A very basic interface which creates a simple issue on the github issue page.
+   - A very basic interface which creates a simple issue on the gitlab issue page.

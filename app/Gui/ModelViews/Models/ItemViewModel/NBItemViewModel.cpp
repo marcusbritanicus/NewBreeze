@@ -1042,7 +1042,8 @@ void NBItemViewModel::setupModelData() {
 
 		case NBItemViewModel::FileSystem: {
 			setupFileSystemData();
-			thumbnailer->createThumbnails( mRootPath );
+			if ( Settings->View.FilePreviews )
+				thumbnailer->createThumbnails( mRootPath );
 			return;
 		}
 	}

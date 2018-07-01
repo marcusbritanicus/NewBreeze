@@ -77,5 +77,8 @@ unix {
 
 	QMAKE_RPATHDIR += $$PREFIX/lib/newbreeze/
 
-	target.path = $$PREFIX/lib/newbreeze/plugins
+	target.path = $$PREFIX/lib/newbreeze/plugins4
+	greaterThan(QT_MAJOR_VERSION, 4) {
+		target.path = $$PREFIX/lib/newbreeze/plugins
+	}
 }

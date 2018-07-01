@@ -76,6 +76,42 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 	showSidePanelGB->setLayout( sidePanelLyt );
 
+	/* Previews */
+
+	filePreviewGB = new QGroupBox( "&Show Image Previews" );
+	filePreviewGB->setCheckable( true );
+	filePreviewGB->setChecked( Settings->View.FilePreviews );
+	connect( filePreviewGB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
+
+	imagePreviewCB = new QCheckBox( "&Image files (.jpg .png .gif .svg .bmp etc)", this );
+	imagePreviewCB->setChecked( Settings->View.ImagePreview );
+	connect( imagePreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
+
+	pdfPreviewCB = new QCheckBox( "PDF files", this );
+	pdfPreviewCB->setChecked( Settings->View.PdfPreview );
+	connect( pdfPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
+
+	djvuPreviewCB = new QCheckBox( "D&jVu files", this );
+	djvuPreviewCB->setChecked( Settings->View.DjVuPreview );
+	connect( djvuPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
+
+	odfPreviewCB = new QCheckBox( "&ODF files (.odt .odg .odp .ods)", this );
+	odfPreviewCB->setChecked( Settings->View.OdfPreview );
+	connect( odfPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
+
+	videoPreviewCB = new QCheckBox( "Video files (.mp4 .avi .webm .mkv .flv etc)", this );
+	videoPreviewCB->setChecked( Settings->View.VideoPreview );
+	connect( videoPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
+
+	QVBoxLayout *previewLyt = new QVBoxLayout();
+	previewLyt->addWidget( imagePreviewCB );
+	previewLyt->addWidget( pdfPreviewCB );
+	previewLyt->addWidget( djvuPreviewCB );
+	previewLyt->addWidget( odfPreviewCB );
+	previewLyt->addWidget( videoPreviewCB );
+
+	filePreviewGB->setLayout( previewLyt );
+
 	/* Others */
 
 	filterFoldersCB = new QCheckBox( "&Filter folder and files", this );
@@ -111,10 +147,6 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	openWithCB = new QCheckBox( "Open with SuperStart when NewBreeze starts?", this );
 	openWithCB->setChecked( sett.value( "SuperStart" ).toBool() );
 	connect( openWithCB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithToggled() ) );
-
-	imagePreviewCB = new QCheckBox( "&Show Image Previews" );
-	imagePreviewCB->setChecked( Settings->General.ImagePreviews );
-	connect( imagePreviewCB, SIGNAL( stateChanged( int ) ), this, SLOT( handleCheckStateChanged( int ) ) );
 
 	extendedIOCB = new QCheckBox( "Enable exten&ded IO" );
 	extendedIOCB->setChecked( Settings->General.ExtendedIO );
@@ -170,7 +202,6 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	otherGBLyt->addWidget( filterFoldersCB );
 	otherGBLyt->addWidget( showTrayIconCB );
 	otherGBLyt->addWidget( openWithCB );
-	otherGBLyt->addWidget( imagePreviewCB );
 	otherGBLyt->addWidget( extendedIOCB );
 	otherGBLyt->addWidget( paintOverlayCB );
 	otherGBLyt->addWidget( logDebugCB );
@@ -192,6 +223,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	QVBoxLayout *lyt = new QVBoxLayout();
 	lyt->addWidget( perFolderEnabled );
 	lyt->addWidget( showSidePanelGB );
+	lyt->addWidget( filePreviewGB );
 	lyt->addWidget( otherOptionsGB );
 	lyt->addWidget( termGB );
 	lyt->addStretch();
@@ -291,6 +323,18 @@ void NBSGeneralWidget::handleSidePanelChoice() {
 		Settings->setValue( "SidePanelType", 1 );
 };
 
+void NBSGeneralWidget::handlePreviewsChanged() {
+
+	Settings->setValue( "View/FilePreviews", filePreviewGB->isChecked() );
+	Settings->setValue( "View/ImagePreview", imagePreviewCB->isChecked() );
+	Settings->setValue( "View/PdfPreview", pdfPreviewCB->isChecked() );
+	Settings->setValue( "View/DjVuPreview", djvuPreviewCB->isChecked() );
+	Settings->setValue( "View/OdfPreview", odfPreviewCB->isChecked() );
+	Settings->setValue( "View/VideoPreview", videoPreviewCB->isChecked() );
+
+	Settings->reload();
+};
+
 void NBSGeneralWidget::handleFilterDirsChanged( bool filterFolders ) {
 
 	Settings->setValue( "FilterFolders", filterFolders );
@@ -316,22 +360,6 @@ void NBSGeneralWidget::handleTrayIconChanged( bool value ) {
 
 	Settings->setValue( "TrayIcon", value );
 	Settings->General.TrayIcon = value;
-};
-
-void NBSGeneralWidget::handleCheckStateChanged( int state ) {
-
-	switch( state ) {
-		case Qt::Unchecked :
-			Settings->setValue( "ImagePreviews", false );
-			Settings->General.ImagePreviews = false;
-			break;
-
-		case Qt::PartiallyChecked :
-		case Qt::Checked :
-			Settings->setValue( "ImagePreviews", true );
-			Settings->General.ImagePreviews = true;
-			break;
-	}
 };
 
 void NBSGeneralWidget::handleExtendedIOChanged( bool enabled ) {

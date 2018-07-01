@@ -119,30 +119,41 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 		return ( hasIcon( icoStr ) ? QStringList() << icoStr : mdb.value( mName ).toStringList() );
 	}
 
+	/* This is an djvu file */
+	else if ( mName.contains( "djv" ) ) {
+		if ( Settings->View.FilePreviews and Settings->View.DjVuPreview ) {
+			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
+				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+		}
+	}
+
 	/* This is an image file */
 	else if ( mName.startsWith( "image/" ) or not mName.compare( "video/mng" ) ) {
-		if ( Settings->General.ImagePreviews ) {
-			/* DJVU issue comes only when we have to show previews */
-			if ( mName.contains( "djv" ) )
-				return mdb.value( mName ).toStringList();
-
-			return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+		if ( Settings->View.FilePreviews and Settings->View.ImagePreview ) {
+			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
+				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
 		}
 	}
 
 	/* This is an video file */
 	else if ( mName.startsWith( "video/" ) and mName.compare( "video/mng" ) ) {
-		if ( Settings->General.ImagePreviews ) {
-
+		if ( Settings->View.FilePreviews and Settings->View.VideoPreview ) {
 			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
 				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
-
-			return mdb.value( mName ).toStringList();
 		}
 	}
 
+	/* This is a ODF file */
 	else if ( odf.contains( mName ) ) {
-		if ( Settings->General.ImagePreviews ) {
+		if ( Settings->View.FilePreviews and Settings->View.OdfPreview ) {
+			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
+				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+		}
+	}
+
+	/* This is a pdf file */
+	else if ( mName.contains( "pdf" ) ) {
+		if ( Settings->View.FilePreviews and Settings->View.PdfPreview ) {
 			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
 				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
 		}
@@ -162,6 +173,8 @@ QStringList NBIconManager::icon( QString iName ) {
 };
 
 void NBIconManager::generateThemeDatabase() {
+
+	qDebug() << Settings->General.IconTheme;
 
 	/* List the theme inheritence */
 	QStringList themes;
