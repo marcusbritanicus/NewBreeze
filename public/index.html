@@ -9,6 +9,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
 	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Allura' rel='stylesheet'>
+	<link href='https://fonts.googleapis.com/css?family=Dosis' rel='stylesheet'>
+	<link href='https://fonts.googleapis.com/css?family=Delius' rel='stylesheet'>
 	<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
 	<link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
 
@@ -18,76 +21,89 @@
 <body>
 
 <section class="page-header">
-	<h1 class="project-name">NewBreeze</h1>
+	<h1 class="project-name">NewBreeze<sub><font face="Allura">v3</font></sub></h1>
 	<h2 class="project-tagline">Fast and light-weight file manager based on Qt ToolKit</h2>
-	<a href="https://github.com/marcusbritanicus/NewBreeze" class="btn">View on GitHub</a>
-	<a href="https://github.com/marcusbritanicus/NewBreeze/zipball/master" class="btn">Download .zip</a>
-	<a href="https://github.com/marcusbritanicus/NewBreeze/tarball/master" class="btn">Download .tar.gz</a>
+	<a href="https://gitlab.com/marcusbritanicus/NewBreeze" class="btn">View on GitLab</a>
+	<a href="https://gitlab.com/marcusbritanicus/NewBreeze/-/archive/master/NewBreeze-master.zip" class="btn">Download .zip</a>
+	<a href="https://gitlab.com/marcusbritanicus/NewBreeze/-/archive/master/NewBreeze-master.tar.bz2" class="btn">Download .tar.bz2</a>
 </section>
 
 <section class="main-content">
 	<p>Built on top of the Powerful Qt GUI Toolkit, this file manager is sleek, stylish and fast. Some of its features are</p>
 
 <ul>
-	<li>Fast startup and browsing</li>
-	<li>Folder, text, html and image quick preview</li>
+	<li>Fast startup and browsing
+	<li>Folder, text, html, image, odt, and pdf quick preview</li>
 	<li>File Association support</li>
-	<li>Provides List and Icon View</li>
-	<li>Lists the drives/boomarks in the sidebar</li>
+	<li>Provides Categorized List, Icon and Details View</li>
+	<li>Sleek side panel showing drives and bookmarks</li>
 	<li>Full drag and drop support</li>
-	<li>Bookmark Support</li>
+	<li>Applications, Catalog View and SuperStart</li>
 	<li>Auto update devices list</li>
 	<li>Custom Folder Icons and Thumbnail Preview</li>
 	<li>Complete mime-icon support</li>
 	<li>BreadCrumbs Navigation Bar</li>
-	<li>Inline terminal</li>
+	<li>Custom Actions and Inline terminal</li>
+	<li>SingleApplication Mode for resource sharing</li>
+	<li>Plugin System Support</li>
 </ul>
 
-<h2>Browse the Linux Source on <a href="https://github.com/marcusbritanicus/NewBreeze">GitHub</a></h2>
-
-<h3>Download debian packages (64 bit): <a href="debs/newbreeze_3.0.0a_amd64.deb">NewBreeze</a> and <a href="debs/newbreeze-plugins_3.0.0a_amd64.deb">NBPlugins</a></h3>
+<h3>
+	Download debian packages (
+		<span class="tooltip">64 bit
+			<span class="tooltiptext">Compiled on Debian Sid on July 04, 2018</span>
+		</span>):
+</h3>
+<ul>
+	<li><a href="debs/newbreeze_3.0.0-rc3_amd64.deb">NewBreeze</a></li>
+	<li><a href="debs/newbreeze-common_3.0.0-rc3_amd64.deb">NewBreeze Common</a></li>
+	<li><a href="debs/newbreeze-plugins_3.0.0-rc3_amd64.deb">NewBreeze Plugins</a></li>
+	<li><a href="debs/newbreeze-dev_3.0.0-rc3_amd64.deb">NewBreeze Dev</a></li>
+</ul>
 
 <h3>Notes for compiling - linux:</h3>
 <ul>
-	<li>Download and Extract the tar file</li>
-	<li>Go to NewBreeze</li>
-	<li>Please edit the $$PREFIX qmake variable to your choice</li>
-	<li>To  compile and install, the command prompt and type</li>
+	<li>Download the sources</li>
 	<ul>
-		<li><code>qmake &amp;&amp; make &amp;&amp; make install</code></li>
+		<li>Git: <code>git clone https://gitlab.com/marcusbritanicus/NewBreeze.git NewBreeze</code></li>
+		<li>Tar: <code>wget https://gitlab.com/marcusbritanicus/NewBreeze/-/archive/master/NewBreeze-master.tar.gz &amp;&amp; tar -xf NewBreeze-master.tar.gz</code></li>
+	</ul>
+	<li>Enter <code>NewBreeze</code></li>
+	<li>Please edit the $$PREFIX qmake variable in all the .pro files to your choice</li>
+	<li>To compile and install, in the terminal type</li>
+	<ul>
+		<li><code>qmake -qt5 &amp;&amp; make -j$(nproc) &amp;&amp; sudo make install</code></li>
 	</ul>
 </ul>
 
 <h3>Dependencies:</h3>
 <ul>
-	<li>Qt4/Qt5</li>
-	<li>libmagic and libmagic-dev</li>
-	<li>zlib</li>
-	<li>liblzma</li>
-	<li>libtar</li>
-	<li>libzip</li>
-	<li>libbz2</li>
-	<li>libpoppler-qt4/qt5</li>
+	<li>Qt4/Qt5 (libqt4-dev, libqt4-dev-bin, qtbase5-dev, qtbase5-dev-tools)</li>
+	<ul>
+		<li>QtWebKit in case of Qt4 and upto Qt 5.4 (libqtwebkit-dev, libqt5webkit5-dev, qtwebkit5-dev)</li>
+		<li>QtWebEngine Qt 5.5 onwards (qtwebengine5-dev)</li>
+		<li>QScintilla (libqt5scintilla2-dev, libqscintilla2-qt5-dev)</li>
+	</ul>
+	<li>zlib (zlib1g-dev)</li>
+	<li>liblzma (liblzma-dev)</li>
+	<li>libbzip2 (libbz2-dev)</li>
+	<li>libarchive (libarchive-dev)</li>
+	<li>xdg-utils</li>
+	<li>libpoppler-qt4/qt5 (libpoppler-qt4-dev, libpoppler-qt5-dev)</li>
+	<li>libdjvulibre-dev (libdjvulibre-dev)</li>
 </ul>
 
 <h3>Known Bugs</h3>
 <ul>
-	<li>SegmentationFault in <code>NBIconView::aboveIndex(...)</code>, <code>NBIconView::belowIndex(...)</code></li>
-	<li>No update of nodes in NBIconView which are being copied.</li>
-</ul>
-
-<h3>Upcoming</h3>
-<ul>
-	<li>Application Editor ( Desktop file editor )</li>
-	<li>Any other feature you request for... :)</li>
+	<li>Reloading causes custom folder icons not to be rendered in some cases</li>
 </ul>
 
 </section>
 
 <section class="site-footer">
 	<center>
-	<span class="site-footer-owner"><a href="https://github.com/marcusbritanicus/NewBreeze">NewBreeze</a> is maintained by <a href="https://github.com/marcusbritanicus">marcusbritanicus</a>.</span>
-	<span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the
+	<span class="site-footer-owner"><a href="https://gitlab.com/marcusbritanicus/NewBreeze">NewBreeze</a> is maintained by <a href="https://gitlab.com/marcusbritanicus">marcusbritanicus</a>.</span>
+	<span class="site-footer-credits">This page was originally generated by <a href="https://pages.github.com">GitHub Pages</a> using the
 		<a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
 	</center>
 </section>

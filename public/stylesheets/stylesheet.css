@@ -5,7 +5,7 @@
 body {
   padding: 0;
   margin: 0;
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
   font-size: 16px;
   line-height: 1.5;
   color: #606c71;
@@ -93,6 +93,7 @@ a.btn {
   color: #EBC79E;
   margin-top: 0;
   margin-bottom: 0.1rem;
+  font-family: Dosis;
 }
 
 @media screen and (min-width: 64em) {
@@ -114,6 +115,7 @@ a.btn {
   color: #EBC79E;
   margin-bottom: 2rem;
   font-weight: normal;
+  font-family: Delius;
 }
 
 @media screen and (min-width: 64em) {
@@ -284,4 +286,30 @@ a.btn {
 
 @media screen and (max-width: 42em) {
   .site-footer {
-    font-size: 0.9rem; } }
+    font-size: 0.9rem; }
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    min-width: 150px;
+    background: linear-gradient(120deg, #155799, #159957);
+    color: #FFE4C4;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    font-size: small;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: auto;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
