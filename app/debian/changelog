@@ -9,6 +9,8 @@ newbreeze (3.0.0-rc3) unstable; urgency=medium
   * Classes interchanged: NBSideBar <--> NBSidePanel
   * Improvements to NBSidePanel
 
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Tue, 3 Jul 2018 10:00:00 +0530
+
 newbreeze (3.0.0-rc1) unstable; urgency=medium
 
   * Feature: Added Menu
@@ -18,7 +20,7 @@ newbreeze (3.0.0-rc1) unstable; urgency=medium
   * BugFix: ExtendedIO partial bugfix
   * Several minor bug fixes.
 
- -- Marcus Britanicus <marcusbritanicus@gmail.com>  Thu, 12 April 2018 10:00:00 +0530
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Thu, 12 Apr 2018 10:00:00 +0530
 
 newbreeze (3.0.0-beta3) unstable; urgency=medium
 

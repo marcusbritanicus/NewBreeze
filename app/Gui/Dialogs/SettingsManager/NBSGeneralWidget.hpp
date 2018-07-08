@@ -50,7 +50,6 @@ class NBSGeneralWidget : public QWidget {
 
 		/* Terminal */
 		QGroupBox *termGB;
-		QCheckBox *pluginCB;					// Use Inbuilt Plugin?
 		QListWidget *termsLW;					// List of terminals detected/added
 		QPushButton *addBtn;					// Add a terminal
 		QPushButton *defaultBtn;				// Make this terminal default

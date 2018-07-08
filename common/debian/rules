@@ -23,6 +23,12 @@
 #override_dh_auto_configure:
 #	dh_auto_configure -- #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
 
+override_dh_auto_configure:
+	qmake -qt5
+
 override_dh_auto_build:
-	dh_auto_build
-	make staticlib
+	make -kj4
+	make -j4 staticlib
+
+override_dh_strip:
+	dh_strip -a

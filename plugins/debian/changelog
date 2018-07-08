@@ -4,14 +4,14 @@ newbreeze-plugins (3.0.0-rc3) unstable; urgency=low
   * New: VideoThumbs plugin
   * NBArchivePeek - Single member extraction
 
- -- Marcus Britanicus <marcusbritanicus@gmail.com>  Thu, 12 April 2018 10:00:00 +0530
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Tue, 3 Jul 2018 10:00:00 +0530
 
 newbreeze-plugins (3.0.0-rc1) unstable; urgency=low
 
   * Qt5 > 5.5 uses QtWebEngine by default, others use QtWebKit
   * Inbuilt terminal plugin added
 
- -- Marcus Britanicus <marcusbritanicus@gmail.com>  Thu, 12 April 2018 10:00:00 +0530
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Thu, 12 Apr 2018 10:00:00 +0530
 
 newbreeze-plugins (3.0.0-beta2) unstable; urgency=low
 

@@ -5,6 +5,7 @@
 */
 
 #include "Global.hpp"
+#include "NBSGeneralWidget.hpp"
 
 class NBStartupWizard : public QWizard {
 	Q_OBJECT
@@ -17,6 +18,8 @@ class NBStartupWizard : public QWizard {
 		void createPages();
 		void setupConnections();
 		void setWindowProperties();
+
+		void loadTerminals();
 
 		QGroupBox *p2gb1;
 		QCommandLinkButton *p2btn1, *p2btn2, *p2btn3, *p2btn4;
@@ -51,10 +54,20 @@ class NBStartupWizard : public QWizard {
 		QGroupBox *p10gb1;
 		QCheckBox *p10cb1;
 
+		QGroupBox *p11gb1;
+		QListWidget *p11lw1;
+		QToolButton *p11btn1;
+
+		QGroupBox *p12gb1;
+		QCheckBox *p12cb1;
+		QCheckBox *p12cb2;
+
 	protected:
 		void paintEvent( QPaintEvent *pEvent );
 
 	private Q_SLOTS:
 		void saveSettings();
 		void disableCancelOnLastPage( int );
+
+		void addNewTerminal();
 };

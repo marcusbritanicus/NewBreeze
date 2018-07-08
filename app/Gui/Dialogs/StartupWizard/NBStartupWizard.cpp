@@ -6,6 +6,8 @@
 
 #include "NBStartupWizard.hpp"
 
+static QSettings sett( "NewBreeze", "NewBreeze" );
+
 NBStartupWizard::NBStartupWizard() : QWizard() {
 
 	createGui();
@@ -434,7 +436,7 @@ void NBStartupWizard::createPages() {
 	page9->setSubTitle( "What should NewBreeze show you when it starts?" );
 
 	QLabel *p9lbl1 = new QLabel(
-		"<p>When you open a file manager, it usually show you the home folder. With NB3 you have great alternatives: Catalogs or SuperStart. "
+		"<p>When you open a file manager, it usually show you the home folder. With NB3 you have great alternatives: Home directory or SuperStart. "
 		"While Catalogs is the NewBreeze equivalent of Libraries in Windows, SuperStart is a feature unique to NewBreeze alone.</p>"
 		"<p>Folders like WallPapers, Photos, and Images are usually scattered (some in home folder others in external drives). But it'd be great "
 		"to see them together without having to circumnavigate all the drives. You put them all in a Catalog and you'll find them together "
@@ -444,9 +446,7 @@ void NBStartupWizard::createPages() {
 	);
 	p9lbl1->setWordWrap( true );
 
-	p9gb1 = new QGroupBox( "&Start with a Special Location" );
-	p9gb1->setCheckable( true );
-	p9gb1->setChecked( true );
+	p9gb1 = new QGroupBox( "&Default Start Location" );
 
 	p9btn1 = new QCommandLinkButton( p9gb1 );
 	p9btn1->setCheckable( true );
@@ -457,8 +457,8 @@ void NBStartupWizard::createPages() {
 	p9btn2 = new QCommandLinkButton( p9gb1 );
 	p9btn2->setCheckable( true );
 	p9btn2->setChecked( false );
-	p9btn2->setText( "&Catalogs" );
-	p9btn2->setDescription( "Open NewBreeze to find similar folders in a single group" );
+	p9btn2->setText( "&Home directory" );
+	p9btn2->setDescription( "Open NewBreeze to find the contents of your home folder listed" );
 
 	QGridLayout *p9gb1Lyt = new QGridLayout();
 	p9gb1Lyt->addWidget( p9btn1, 0, 0 );
@@ -513,6 +513,78 @@ void NBStartupWizard::createPages() {
 	page10->setLayout( p10Lyt );
 
 	addPage( page10 );
+
+	//################################################################################
+	//                                    Page 11                                    #
+	//################################################################################
+
+	QWizardPage *page11 = new QWizardPage();
+	page11->setTitle( "Terminals" );
+	page11->setSubTitle( "Which is your favorite terminal applicaiton?" );
+
+	QLabel *p11lbl1 = new QLabel(
+		"<p>Which browsing the file system it sometimes becomes necessary to open a terminal in the working directory. "
+		"There may be multiple terminal applications installed in your system</p>"
+		"<p>Which terminal application do you want to use?</p>"
+	);
+	p11lbl1->setWordWrap( true );
+
+	QGroupBox *p11gb1 = new QGroupBox( "Terminals" );
+
+	p11lw1 = new QListWidget( p11gb1 );
+	loadTerminals();
+
+	p11btn1	 = new QToolButton( p11gb1 );
+	p11btn1->setIcon( QIcon( ":/icons/list-add.png" ) );
+	p11btn1->setStyleSheet( "border: none; background-color: none;" );
+	p11btn1->setToolTip( "Add a terminal" );
+	connect( p11btn1, SIGNAL( clicked() ), this, SLOT( addNewTerminal() ) );
+
+	QGridLayout *p11gb1Lyt = new QGridLayout();
+	p11gb1Lyt->addWidget( p11lw1, 0, 0 );
+	p11gb1Lyt->addWidget( p11btn1, 0, 0, Qt::AlignRight | Qt::AlignBottom );
+
+	p11gb1->setLayout( p11gb1Lyt );
+
+	QVBoxLayout *p11Lyt = new QVBoxLayout();
+	p11Lyt->addWidget( p11lbl1 );
+	p11Lyt->addWidget( p11gb1 );
+
+	page11->setLayout( p11Lyt );
+
+	addPage( page11 );
+
+	//################################################################################
+	//                                    Page 12                                    #
+	//################################################################################
+
+	QWizardPage *page12 = new QWizardPage();
+	page12->setTitle( "NewBreeze Specials" );
+	page12->setSubTitle( "Some settings that makes NewBreeze a pleasure to use" );
+
+	QLabel *p12lbl1 = new QLabel(
+		"<p>IconOverlays and ExtendedIO are two of NewBreeze's premium features. IconOverlays enable you to perfrom "
+		"most actions thay require a right click without one. ExtendedIO helps you copy/move files/directories "
+		"to any other place without leaving the current folder.</p>"
+	);
+	p12lbl1->setWordWrap( true );
+
+	QGroupBox *p12gb1 = new QGroupBox( "NewBreeze Specials" );
+	p12cb1 = new QCheckBox( "Enable Icon&Overlays" );
+	p12cb2 = new QCheckBox( "Enable E&xtendedIO" );
+
+	QVBoxLayout *p12gb1Lyt = new QVBoxLayout();
+	p12gb1Lyt->addWidget( p12cb1 );
+	p12gb1Lyt->addWidget( p12cb2 );
+	p12gb1->setLayout( p12gb1Lyt );
+
+	QVBoxLayout *p12Lyt = new QVBoxLayout();
+	p12Lyt->addWidget( p12lbl1 );
+	p12Lyt->addWidget( p12gb1 );
+
+	page12->setLayout( p12Lyt );
+
+	addPage( page12 );
 
 	//################################################################################
 	//                                    EndPage                                    #
@@ -595,66 +667,134 @@ void NBStartupWizard::setWindowProperties() {
 	setWindowFlags( windowFlags() | Qt::FramelessWindowHint );
 };
 
-void NBStartupWizard::saveSettings() {
+void NBStartupWizard::loadTerminals() {
 
-	QSettings settings( "NewBreeze", "NewBreeze" );
+	QStringList terms = QStringList() << "Inbuilt";
 
-	/* Grouping */
-	settings.setValue( "Grouping", p2gb1->isChecked() );
-	if ( p2btnGrp1->checkedId() == -1 )
-		settings.setValue( "SortColumn", 2 );
+	/* NBTerminal */
+	QStringList paths = QString( getenv( "PATH" ) ).split( ":" );
+	Q_FOREACH( QString path, paths ) {
+		if ( QFileInfo( path + "/nbterminal" ).exists() ) {
+			QStringList termInfo = QStringList() << "nbterminal" << "--workdir" << "%1" << "-e" << "%2";
+			sett.setValue( "Terminals/nbterminal", QVariant( termInfo ) );
+			terms << "nbterminal";
+		}
 
-	else if ( p2btnGrp1->checkedId() < 3 )
-		settings.setValue( "SortColumn", p2btnGrp1->checkedId() );
+		/* QTerminal */
+		if ( QFileInfo( path + "/qterminal" ).exists() ) {
+			QStringList termInfo = QStringList() << "qterminal" << "--workdir" << "%1" << "-e" << "%2";
+			sett.setValue( "Terminals/qterminal", QVariant( termInfo ) );
+			terms << "qterminal";
+		}
 
-	else  // if ( p2btnGrp1->checkedId() == 0 )
-		settings.setValue( "SortColumn", 4 );
+		/* Konsole */
+		if ( QFileInfo( path + "/konsole" ).exists() ) {
+			QStringList termInfo = QStringList() << "konsole" << "--workdir" << "%1" << "-e" << "%2";
+			sett.setValue( "Terminals/konsole", QVariant( termInfo ) );
+			terms << "konsole";
+		}
 
-	settings.setValue( "PerFolderViews", p2cb1->isChecked() );
+		/* Gnome Terminal */
+		if ( QFileInfo( path + "/gnome-terminal" ).exists() ) {
+			QStringList termInfo = QStringList() << "gnome-terminal" << "--working-directory" << "%1" << "-x" << "%2";
+			sett.setValue( "Terminals/gnome-terminal", QVariant( termInfo ) );
+			terms << "gnome-terminal";
+		}
 
-	/* ViewMode and Icon Size */
-	settings.setValue( "ViewMode", p3cb1->currentText() );
-	settings.setValue( "IconSize", QSize( p3sl1->value(), p3sl1->value() ) );
+		/* Mate Terminal */
+		if ( QFileInfo( path + "/mate-terminal" ).exists() ) {
+			QStringList termInfo = QStringList() << "mate-terminal" << "--working-directory" << "%1" << "-x" << "%2";
+			sett.setValue( "Terminals/mate-terminal", QVariant( termInfo ) );
+			terms << "mate-terminal";
+		}
 
-	/* Folder Filtering */
-	settings.setValue( "FilterFolders", p4cb1->isChecked() );
+		/* XFCE4 Terminal */
+		if ( QFileInfo( path + "/xfce4-terminal" ).exists() ) {
+			QStringList termInfo = QStringList() << "xfce4-terminal" << "--working-directory" << "%1" << "-x" << "%2";
+			sett.setValue( "Terminals/xfce4-terminal", QVariant( termInfo ) );
+			terms << "xfce4-terminal";
+		}
 
-	/* Case-sensitive sorting */
-	settings.setValue( "SortCase", p5cb1->isChecked() );
+		/* LXTerminal */
+		if ( QFileInfo( path + "/lxterminal" ).exists() ) {
+			QStringList termInfo = QStringList() << "lxterminal" << "--working-directory" << "%1" << "-e" << "%2";
+			sett.setValue( "Terminals/lxterminal", QVariant( termInfo ) );
+			terms << "lxterminal";
+		}
 
-	/* Case-sensitive sorting */
-	settings.setValue( "ImagePreviews", p6cb1->isChecked() );
-
-	/* SidePanel */
-	settings.setValue( "SidePanel", p7gb1->isChecked() );
-	settings.setValue( "SidePanelType", p7btnGrp1->checkedId() );
-
-	/* InfoBar/InfoPanel */
-	if ( p8btnGrp1->checkedId() )
-		settings.setValue( "InfoPanel", true );
-	else
-		settings.setValue( "InfoPanel", false );
-
-	/* InfoBar/InfoPanel */
-	if ( p9gb1->isChecked() ) {
-		settings.setValue( "SpecialOpen", true );
-		if ( p9btnGrp1->checkedId() ) {
-			settings.setValue( "OpenWithCatalog", false );
-			settings.setValue( "SuperStart", true );
+		/* XTerm */
+		if ( QFileInfo( path + "/xterm" ).exists() ) {
+			sett.setValue( "Terminals/xterm", QVariant( QStringList() << "xterm" << "-e" << "cd %1 && %2" ) );
+			terms << "xterm";
 		}
 	}
 
-	else {
-		settings.setValue( "SpecialOpen", false );
-		settings.setValue( "OpenWithCatalog", false );
-		settings.setValue( "SuperStart", false );
+	p11lw1->addItems( terms );
+};
+
+void NBStartupWizard::saveSettings() {
+
+	/* Grouping */
+	sett.setValue( "Grouping", p2gb1->isChecked() );
+	if ( p2btnGrp1->checkedId() == -1 )
+		sett.setValue( "SortColumn", 2 );
+
+	else if ( p2btnGrp1->checkedId() < 3 )
+		sett.setValue( "SortColumn", p2btnGrp1->checkedId() );
+
+	else  // if ( p2btnGrp1->checkedId() == 0 )
+		sett.setValue( "SortColumn", 4 );
+
+	sett.setValue( "PerFolderViews", p2cb1->isChecked() );
+
+	/* ViewMode and Icon Size */
+	sett.setValue( "ViewMode", p3cb1->currentText() );
+	sett.setValue( "IconSize", QSize( p3sl1->value(), p3sl1->value() ) );
+
+	/* Folder Filtering */
+	sett.setValue( "FilterFolders", p4cb1->isChecked() );
+
+	/* Case-sensitive sorting */
+	sett.setValue( "SortCase", p5cb1->isChecked() );
+
+	/* Case-sensitive sorting */
+	sett.setValue( "ImagePreviews", p6cb1->isChecked() );
+
+	/* SidePanel */
+	sett.setValue( "SidePanel", p7gb1->isChecked() );
+	sett.setValue( "SidePanelType", p7btnGrp1->checkedId() );
+
+	/* InfoBar/InfoPanel */
+	if ( p8btnGrp1->checkedId() )
+		sett.setValue( "InfoPanel", true );
+	else
+		sett.setValue( "InfoPanel", false );
+
+	/* InfoBar/InfoPanel */
+	if ( p9btn1->isChecked() ) {
+		sett.setValue( "SpecialOpen", true );
+		sett.setValue( "OpenWithCatalog", false );
+		sett.setValue( "SuperStart", true );
 	}
 
-	// /* TrayIcon */
-	settings.setValue( "TrayIcon", p10cb1->isChecked() );
+	else {
+		sett.setValue( "SpecialOpen", false );
+		sett.setValue( "OpenWithCatalog", false );
+		sett.setValue( "SuperStart", false );
+	}
+
+	/* TrayIcon */
+	sett.setValue( "TrayIcon", p10cb1->isChecked() );
+
+	/* Terminals */
+	sett.setValue( "Terminals/Default", p11lw1->currentIndex().data() );
+
+	/* NB3 Specials */
+	sett.setValue( "IconOverlay", p12cb1->isChecked() );
+	sett.setValue( "ExtendedIO", p12cb2->isChecked() );
 
 	/* Sync the settings */
-	settings.sync();
+	sett.sync();
 
 	close();
 };
@@ -685,4 +825,21 @@ void NBStartupWizard::disableCancelOnLastPage( int id ) {
 
 	else
 		button( QWizard::CancelButton )->setEnabled( true );
+};
+
+void NBStartupWizard::addNewTerminal() {
+
+	NBAddVTEDialog *vteDlg = new NBAddVTEDialog( this );
+	vteDlg->exec();
+
+	/* Reload the detected terminals list */
+	p11lw1->clear();
+	QStringList terms = QStringList() << "Inbuilt";
+	Q_FOREACH( QString key, sett.allKeys() ) {
+		if ( key.startsWith( "Terminals/" ) and ( key != "Terminals/Default" ) ) {
+			terms << key.replace( "Terminals/", "" );
+		}
+	}
+	p11lw1->addItems( terms );
+	p11lw1->setCurrentRow( terms.indexOf( sett.value( "Terminals/Default", "Inbuilt" ).toString() ) );
 };
