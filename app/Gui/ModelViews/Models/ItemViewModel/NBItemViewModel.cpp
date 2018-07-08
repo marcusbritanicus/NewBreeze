@@ -1080,6 +1080,7 @@ void NBItemViewModel::setupFileSystemData() {
 			mChildNames << _nodeName;
 			mCategoryIconMap[ _category ] = data.at( 2 ).toString();
 			free( fileList[ i ] );
+			qApp->processEvents();
 		}
 		free( fileList );
 	}
@@ -1123,6 +1124,8 @@ void NBItemViewModel::setupSuperStartData() {
 
 		rootNode->addChild( new NBItemViewNode( data, "Computer  ", rootNode ) );
 		mChildNames << info.displayName();
+
+		qApp->processEvents();
 	};
 
 	/* Bookmarked Folders */
@@ -1137,6 +1140,8 @@ void NBItemViewModel::setupSuperStartData() {
 		data[ 3 ] = key;
 		rootNode->addChild( new NBItemViewNode( data, "Places  ", rootNode ) );
 		mChildNames << key;
+
+		qApp->processEvents();
 	}
 	superStart.endGroup();
 
@@ -1148,6 +1153,8 @@ void NBItemViewModel::setupSuperStartData() {
 		data[ 3 ] = key;
 		rootNode->addChild( new NBItemViewNode( data, "Files  ", rootNode ) );
 		mChildNames << key;
+
+		qApp->processEvents();
 	}
 	superStart.endGroup();
 
@@ -1192,6 +1199,8 @@ void NBItemViewModel::setupApplicationsData() {
 		data << app.filePath();																/* Qt::UserRole + 9 */
 
 		rootNode->addChild( new NBItemViewNode( data, app.category(), rootNode ) );
+
+		qApp->processEvents();
 	}
 	endResetModel();
 
@@ -1211,38 +1220,103 @@ void NBItemViewModel::setupCatalogData() {
 	QStringList dirs;
 
 	emit directoryLoading( mRootPath );
-
 	QSettings catalogsSettings( "NewBreeze", "Catalogs" );
-	/* Default Catalogs */
-	beginResetModel();
-	foreach( QString ctlg, catalogsSettings.childKeys() ) {
-		QStringList locations = catalogsSettings.value( ctlg ).toStringList();
+
+	if( mRootPath == "NB://Catalogs/" ) {
+		/* Default Catalogs */
+		beginResetModel();
+		foreach( QString ctlg, catalogsSettings.childKeys() ) {
+			QStringList locations = catalogsSettings.value( ctlg ).toStringList();
+			foreach( QString location, locations ) {
+				if ( not exists( location ) )
+					continue;
+
+				/* Get file list */
+				struct dirent **fileList;
+				lambdaUseFilterList << mNameFilters;
+				int numFiles = scandir( location.toStdString().c_str(), &fileList, scandirCallback, NULL );
+				lambdaUseFilterList.clear();
+
+				/* Add the files to the model */
+				if ( numFiles >= 0 ) {
+					for( int i = 0; i < numFiles; i++ ) {
+						QString _nodeName = QString::fromLocal8Bit( fileList[ i ]->d_name );
+						QVariantList data = quickDataGatherer->getQuickFileInfo( location + "/" + _nodeName );
+						rootNode->addChild( new NBItemViewNode( data, ctlg, rootNode ) );
+						mChildNames << _nodeName;
+						mCategoryIconMap[ ctlg ] = data.at( 2 ).toString();
+						free( fileList[ i ] );
+
+						qApp->processEvents();
+					}
+					free( fileList );
+				}
+			}
+		}
+
+		/* Custom Catalogs */
+		catalogsSettings.beginGroup( "Custom" );
+		foreach( QString ctlg, catalogsSettings.childKeys() ) {
+			QStringList locations = catalogsSettings.value( ctlg ).toStringList();
+			foreach( QString location, locations ) {
+				if ( not exists( location ) )
+					continue;
+
+				/* Get file list */
+				struct dirent **fileList;
+				lambdaUseFilterList << mNameFilters;
+				int numFiles = scandir( location.toStdString().c_str(), &fileList, scandirCallback, NULL );
+				lambdaUseFilterList.clear();
+
+				/* Add the files to the model */
+				if ( numFiles >= 0 ) {
+					for( int i = 0; i < numFiles; i++ ) {
+						QString _nodeName = QString::fromLocal8Bit( fileList[ i ]->d_name );
+						QVariantList data = quickDataGatherer->getQuickFileInfo( location + "/" + _nodeName );
+						rootNode->addChild( new NBItemViewNode( data, ctlg, rootNode ) );
+						mChildNames << _nodeName;
+						mCategoryIconMap[ ctlg ] = data.at( 2 ).toString();
+						free( fileList[ i ] );
+
+						qApp->processEvents();
+					}
+					free( fileList );
+				}
+			}
+		}
+		catalogsSettings.endGroup();
+	}
+
+	else {
+		QString key = mRootPath.replace( "NB://Catalogs/", "" );
+		QStringList locations = catalogsSettings.value( key ).toStringList();
 		foreach( QString location, locations ) {
 			if ( not exists( location ) )
 				continue;
 
-			QVariantList data = quickDataGatherer->getQuickFileInfo( location );
-			rootNode->addChild( new NBItemViewNode( data, ctlg, rootNode ) );
-			mChildNames << data.at( 3 ).toString();
-			dirs << location;
+			/* Get file list */
+			struct dirent **fileList;
+			lambdaUseFilterList << mNameFilters;
+			int numFiles = scandir( location.toStdString().c_str(), &fileList, scandirCallback, NULL );
+			lambdaUseFilterList.clear();
+
+			/* Add the files to the model */
+			if ( numFiles >= 0 ) {
+				for( int i = 0; i < numFiles; i++ ) {
+					QString _nodeName = QString::fromLocal8Bit( fileList[ i ]->d_name );
+					QVariantList data = quickDataGatherer->getQuickFileInfo( location + "/" + _nodeName );
+					rootNode->addChild( new NBItemViewNode( data, location, rootNode ) );
+					mChildNames << _nodeName;
+					mCategoryIconMap[ location ] = data.at( 2 ).toString();
+					free( fileList[ i ] );
+
+					qApp->processEvents();
+				}
+				free( fileList );
+			}
 		}
 	}
 
-	/* Custom Catalogs */
-	catalogsSettings.beginGroup( "Custom" );
-	foreach( QString ctlg, catalogsSettings.childKeys() ) {
-		QStringList locations = catalogsSettings.value( ctlg ).toStringList();
-		foreach( QString location, locations ) {
-			if ( not exists( location ) )
-				continue;
-
-			QVariantList data = quickDataGatherer->getQuickFileInfo( location );
-			rootNode->addChild( new NBItemViewNode( data, ctlg, rootNode ) );
-			mChildNames << data.at( 3 ).toString();
-			dirs << location;
-		}
-	}
-	catalogsSettings.endGroup();
 	endResetModel();
 
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );

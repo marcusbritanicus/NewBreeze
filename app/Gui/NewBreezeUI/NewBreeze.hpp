@@ -89,7 +89,7 @@ class NewBreeze : public QMainWindow {
 
 		void handleDriveUrl( QString );
 		void showApplications();
-		void showCatalogs();
+		void showCatalogs( QString url = QString() );
 		void showFolders();
 		void showTrash();
 

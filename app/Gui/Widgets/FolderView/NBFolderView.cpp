@@ -390,6 +390,7 @@ void NBFolderView::doOpen( QString loc ) {
 
 	if ( loc.startsWith( "NB://" ) ) {
 		setCursor( QCursor( Qt::WaitCursor ) );
+		qApp->processEvents();
 		fsModel->setRootPath( loc );
 		setCursor( QCursor( Qt::ArrowCursor ) );
 		return;

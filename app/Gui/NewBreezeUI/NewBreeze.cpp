@@ -713,7 +713,7 @@ void NewBreeze::handleDriveUrl( QString url ){
 		showApplications();
 
 	else if ( url.startsWith( "NB://Catalogs" ) )
-		showCatalogs();
+		showCatalogs( url );
 
 	else if ( url.startsWith( "NB://Folders" ) )
 		showFolders();
@@ -740,13 +740,13 @@ void NewBreeze::showApplications() {
 	AddressBar->setAddress( "NB://Applications" );
 };
 
-void NewBreeze::showCatalogs() {
+void NewBreeze::showCatalogs( QString url ) {
 
 	if ( qobject_cast<NBSideBar*>( sender() ) != SideBar )
 		SideBar->flashCatalogs();
 
-	FolderView->doOpen( "NB://Catalogs" );
-	AddressBar->setAddress( "NB://Catalogs" );
+	FolderView->doOpen( url );
+	AddressBar->setAddress( url );
 };
 
 void NewBreeze::showFolders() {

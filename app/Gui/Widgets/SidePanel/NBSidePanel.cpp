@@ -53,9 +53,9 @@ void NBSidePanel::populateSidePanel() {
 	loadDevices();
 
 	catalogsLabel = new NBSidePanelLabel( ":/icons/catalogs.png", "Catalogs", this );
-	connect( catalogsLabel, SIGNAL( clicked() ), this, SIGNAL( driveClicked() ) );
+	// connect( catalogsLabel, SIGNAL( clicked() ), this, SIGNAL( driveClicked() ) );
 	scrollLyt->addWidget( catalogsLabel );
-	// loadCatalogs();
+	loadCatalogs();
 
 	bookmarksLabel = new NBSidePanelLabel( ":/icons/bookmark.png", "Bookmarks", this );
 	connect( bookmarksLabel, SIGNAL( clicked() ), this, SLOT( populateSidePanel() ) );
@@ -96,19 +96,10 @@ void NBSidePanel::loadDevices() {
 
 void NBSidePanel::loadCatalogs() {
 
-	for( int i = 1; i <= 20; i++ ) {
-		NBSidePanelItem *item = new NBSidePanelItem( QString( "Catalog %1" ).arg( i ), ":/icons/catalogs.png", "NB://Catalogs", NBSidePanelItem::Catalogs, this );
-		connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
-		item->setToolTip( QString( "Catalog %1" ).arg( i ) );
-		scrollLyt->addWidget( item );
-	}
-
-	return;
-
 	QSettings ctlList( "NewBreeze", "Catalogs" );
 	Q_FOREACH( QString key, ctlList.childKeys() ) {
 		if ( ctlList.value( key ).toStringList().count() ) {
-			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs", NBSidePanelItem::Catalogs, this );
+			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs/" + key, NBSidePanelItem::Catalogs, this );
 			connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 			item->setToolTip( key + " Catalog" );
 			scrollLyt->addWidget( item );
@@ -118,7 +109,7 @@ void NBSidePanel::loadCatalogs() {
 	ctlList.beginGroup( "Custom" );
 	Q_FOREACH( QString key, ctlList.childKeys() ) {
 		if ( ctlList.value( key ).toStringList().count() ) {
-			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs", NBSidePanelItem::Catalogs, this );
+			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs/Custom/" + key, NBSidePanelItem::Catalogs, this );
 			connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 			item->setToolTip( key + " Catalog" );
 			scrollLyt->addWidget( item );
