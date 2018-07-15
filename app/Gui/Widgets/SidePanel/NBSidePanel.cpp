@@ -39,8 +39,6 @@ NBSidePanel::NBSidePanel( QWidget *parent ) : QScrollArea( parent ) {
 
 void NBSidePanel::populateSidePanel() {
 
-	// qDeleteAll( children() );
-
 	setFixedWidth( 150 );
 
 	scrollLyt = new QVBoxLayout();
@@ -77,8 +75,6 @@ void NBSidePanel::populateSidePanel() {
 	scrollBase->setLayout( scrollLyt );
 
 	setWidget( scrollBase );
-
-	// setLayout( scrollLyt );
 };
 
 void NBSidePanel::loadDevices() {

@@ -97,8 +97,8 @@ float PdfView::getResolution( int pageNo ) {
 };
 
 void PdfView::getCurrentPage() {
-	/* Fetch and store the rendering of the current page */
 
+	/* Fetch and store the rendering of the current page */
 	if ( PdfDoc->pages() <= 0 )
 		return;
 
@@ -123,6 +123,9 @@ void PdfView::getCurrentPage() {
 
 void PdfView::lookAround() {
 	/* We will be rendering 5 pages before and after the current page */
+
+	if ( PdfDoc->pages() <= 0 )
+		return;
 
 	if ( currentPage == -1 )
 		return;
@@ -149,7 +152,7 @@ void PdfView::lookAround() {
 void PdfView::paintEvent( QPaintEvent *pEvent ) {
 
 	/* If the document is not loaded, return */
-	if ( currentPage == -1 )
+	if ( currentPage == -1 or PdfDoc->pages() <= 0 )
 		return;
 
 	/* Init the painter */
@@ -167,7 +170,7 @@ void PdfView::paintEvent( QPaintEvent *pEvent ) {
 	painter.translate( 5, -h );
 	painter.drawImage( pageRects[ currentPage ], renderedImages[ currentPage ] );
 
-	/* If the  */
+	/* If the current page ends before the end of the current view */
 	if ( pageRects[ currentPage ].y() + height() < h + pageRects[ currentPage ].height() )
 		painter.drawImage( pageRects[ currentPage + 1 ], renderedImages[ currentPage + 1 ] );
 

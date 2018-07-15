@@ -45,8 +45,17 @@ PdfPage* PdfDocument::page( int pageNum ) const {
 void PdfDocument::loadPdf() {
 
 	mPdfDoc = Poppler::Document::load( mPdfPath );
-	if ( not mPdfDoc )
+
+	if ( not mPdfDoc ) {
+		emit pdfLoaded();
 		return;
+	}
+
+	else if ( mPdfDoc->isLocked() or mPdfDoc->isEncrypted() ) {
+		qDebug() << "Encrypted PDF; Returning.";
+		emit pdfLoaded();
+		return;
+	}
 
 	mPdfDoc->setRenderHint( Poppler::Document::Antialiasing );
 	mPdfDoc->setRenderHint( Poppler::Document::TextAntialiasing );

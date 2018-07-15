@@ -200,6 +200,11 @@ void NBThumbnailerPlugin::makePdfThumbnail( QString path, QString hashPath ) {
 		return;
 	}
 
+	else if ( mPdfDoc->isEncrypted() or mPdfDoc->isLocked() ) {
+		qDebug() << "Encrypted PDF; thumbnail not created:" << baseName( path ) << "Using default icon.";
+		return;
+	}
+
 	mPdfDoc->setRenderHint( Poppler::Document::Antialiasing );
 	mPdfDoc->setRenderHint( Poppler::Document::TextAntialiasing );
 	mPdfDoc->setRenderHint( Poppler::Document::TextHinting );

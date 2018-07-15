@@ -197,7 +197,6 @@ void NBThumbnailer::run() {
 			}
 
 			else {
-				QFile::copy( ":/icons/image.png", hashPath );
 				qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
 			}
 
