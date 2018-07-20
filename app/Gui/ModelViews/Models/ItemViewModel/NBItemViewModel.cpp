@@ -1075,8 +1075,6 @@ void NBItemViewModel::setupFileSystemData() {
 			mChildNames << _nodeName;
 			mCategoryIconMap[ _category ] = data.at( 2 ).toString();
 			free( fileList[ i ] );
-
-			qApp->processEvents();
 		}
 		free( fileList );
 	}
@@ -1117,8 +1115,6 @@ void NBItemViewModel::setupSuperStartData() {
 
 		rootNode->addChild( new NBItemViewNode( data, "Computer  ", rootNode ) );
 		mChildNames << info.displayName();
-
-		qApp->processEvents();
 	};
 
 	/* Bookmarked Folders */
@@ -1133,8 +1129,6 @@ void NBItemViewModel::setupSuperStartData() {
 		data[ 3 ] = key;
 		rootNode->addChild( new NBItemViewNode( data, "Places  ", rootNode ) );
 		mChildNames << key;
-
-		qApp->processEvents();
 	}
 	superStart.endGroup();
 
@@ -1146,8 +1140,6 @@ void NBItemViewModel::setupSuperStartData() {
 		data[ 3 ] = key;
 		rootNode->addChild( new NBItemViewNode( data, "Files  ", rootNode ) );
 		mChildNames << key;
-
-		qApp->processEvents();
 	}
 	superStart.endGroup();
 
@@ -1192,8 +1184,6 @@ void NBItemViewModel::setupApplicationsData() {
 		data << app.filePath();																/* Qt::UserRole + 9 */
 
 		rootNode->addChild( new NBItemViewNode( data, app.category(), rootNode ) );
-
-		qApp->processEvents();
 	}
 	endResetModel();
 
@@ -1239,8 +1229,6 @@ void NBItemViewModel::setupCatalogData() {
 						mChildNames << _nodeName;
 						mCategoryIconMap[ ctlg ] = data.at( 2 ).toString();
 						free( fileList[ i ] );
-
-						qApp->processEvents();
 					}
 					free( fileList );
 				}
@@ -1270,8 +1258,6 @@ void NBItemViewModel::setupCatalogData() {
 						mChildNames << _nodeName;
 						mCategoryIconMap[ ctlg ] = data.at( 2 ).toString();
 						free( fileList[ i ] );
-
-						qApp->processEvents();
 					}
 					free( fileList );
 				}
@@ -1302,8 +1288,6 @@ void NBItemViewModel::setupCatalogData() {
 					mChildNames << _nodeName;
 					mCategoryIconMap[ location ] = data.at( 2 ).toString();
 					free( fileList[ i ] );
-
-					qApp->processEvents();
 				}
 				free( fileList );
 			}
