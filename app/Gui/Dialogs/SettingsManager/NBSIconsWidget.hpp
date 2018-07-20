@@ -10,8 +10,7 @@
 #include "NBButton.hpp"
 #include "NBIconManager.hpp"
 
-class NBIconThemeChooserWidget;
-class NBIconThemeViewerWidget;
+class NBIconThemeView;
 
 class NBIconThemeWidget : public QWidget {
 	Q_OBJECT
@@ -21,31 +20,13 @@ class NBIconThemeWidget : public QWidget {
 
 	private:
 		void createGUI();
-		void updateListView();
 
-		NBIconThemeChooserWidget *iconThemesWidget;
-		NBIconThemeViewerWidget *folderViewWidget;
-};
-
-class NBIconThemeChooserWidget : public QWidget {
-	Q_OBJECT
-
-	public:
-		NBIconThemeChooserWidget( QWidget * );
-		void loadThemes();
-		QStringList themesList;
-
-	private:
-		int current;
-		NBButton *prevBtn, *nextBtn;
-		QComboBox *themeCB;
+		NBIconThemeView *iconViewWidget;
 
 	private slots:
-		void switchTheme( int );
-		void nextTheme();
-		void previousTheme();
+		void switchTheme( const QModelIndex& );
 
-	signals:
+	Q_SIGNALS:
 		void reloadIcons();
 };
 
@@ -67,16 +48,18 @@ class NBIconThemeModel: public QAbstractListModel {
 		QStringList themesList;
 		QMap<QString, QIcon> iconsMap;
 
-	private slots:
+	private Q_SLOTS:
 		void setupModel();
 };
 
-class NBIconThemeViewerWidget: public QListView {
+class NBIconThemeView: public QListView {
 	Q_OBJECT
 
 	public:
-		NBIconThemeViewerWidget( QWidget * );
+		NBIconThemeView( QWidget * );
 
-	Q_SIGNALS:
-		void setupModel();
+		void select( QString );
+
+	private:
+		NBIconThemeModel *model;
 };

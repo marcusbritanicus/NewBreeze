@@ -10,110 +10,30 @@
 NBIconThemeWidget::NBIconThemeWidget( QWidget *parent ) :QWidget( parent ) {
 
 	createGUI();
+
+	iconViewWidget->setFocus();
 };
 
 void NBIconThemeWidget::createGUI() {
 
-	iconThemesWidget = new NBIconThemeChooserWidget( this );
-	folderViewWidget = new NBIconThemeViewerWidget( this );
-
-	connect( iconThemesWidget, SIGNAL( reloadIcons() ), folderViewWidget, SIGNAL( setupModel() ) );
+	iconViewWidget = new NBIconThemeView( this );
+	iconViewWidget->select( Settings->General.IconTheme );
+	connect( iconViewWidget, SIGNAL( pressed( const QModelIndex& ) ), this, SLOT( switchTheme( const QModelIndex& ) ) );
 
 	QVBoxLayout *wLyt = new QVBoxLayout();
-	wLyt->addWidget( iconThemesWidget );
-	wLyt->addWidget( folderViewWidget );
+	wLyt->addWidget( new QLabel( "Choose the icon theme below." ) );
+	wLyt->addWidget( iconViewWidget );
 
 	setLayout( wLyt );
 };
 
-NBIconThemeChooserWidget::NBIconThemeChooserWidget( QWidget *parent ) : QWidget( parent ) {
+void NBIconThemeWidget::switchTheme( const QModelIndex &idx ) {
 
-	QHBoxLayout *wLyt = new QHBoxLayout();
+	QString theme = idx.data().toString();
 
-	prevBtn = new NBButton( QIcon::fromTheme( "arrow-left", QIcon( ":/icons/arrow-left.png" ) ), this );
-	prevBtn->setFocusPolicy( Qt::NoFocus );
-	prevBtn->setShortcut( tr( "Ctrl+P" ) );
+	QIcon::setThemeName( theme );
+	Settings->setValue( "IconTheme", theme );
 
-	nextBtn = new NBButton( QIcon::fromTheme( "arrow-right", QIcon( ":/icons/arrow-right.png" ) ), this );
-	nextBtn->setFocusPolicy( Qt::NoFocus );
-	nextBtn->setShortcut( tr( "Ctrl+N" ) );
-
-	themeCB = new QComboBox();
-	themeCB->setFocusPolicy( Qt::NoFocus );
-
-	loadThemes();
-
-	connect( prevBtn, SIGNAL( clicked() ), this, SLOT( previousTheme() ) );
-	connect( nextBtn, SIGNAL( clicked() ), this, SLOT( nextTheme() ) );
-	connect( themeCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( switchTheme( int ) ) );
-
-	wLyt->addStretch( 0 );
-	wLyt->addWidget( prevBtn );
-	wLyt->addWidget( themeCB );
-	wLyt->addWidget( nextBtn );
-	wLyt->addStretch( 0 );
-
-	setLayout( wLyt );
-};
-
-void NBIconThemeChooserWidget::loadThemes() {
-
-	themesList.clear();
-
-	QDir iconDir( "/usr/share/icons" );
-	iconDir.setFilter( QDir::Dirs );
-
-	foreach ( QString theme, iconDir.entryList() ) {
-		if ( QFileInfo( iconDir.filePath( theme ) ).exists() ) {
-			if ( QSettings( iconDir.filePath( theme + "/index.theme" ), QSettings::IniFormat ).value( "Icon Theme/Directories" ).toStringList().count() )
-				themesList << theme;
-		}
-	}
-
-	themeCB->addItems( themesList );
-	current = themesList.indexOf( Settings->General.IconTheme );
-	themeCB->setCurrentIndex( current );
-};
-
-void NBIconThemeChooserWidget::switchTheme( int idx ) {
-
-	current = idx;
-
-	QIcon::setThemeName( themesList[ current ] );
-	Settings->setValue( "IconTheme", themesList[ current ] );
-
-	emit reloadIcons();
-};
-
-void NBIconThemeChooserWidget::nextTheme() {
-
-	if ( current + 1 == themesList.count() ) {
-		current = 0;
-		themeCB->setCurrentIndex( current );
-	}
-	else {
-		current++;
-		themeCB->setCurrentIndex( current );
-	}
-
-	QIcon::setThemeName( themesList[ current ] );
-	Settings->setValue( "IconTheme", themesList[ current ] );
-	emit reloadIcons();
-};
-
-void NBIconThemeChooserWidget::previousTheme() {
-
-	if ( current == 0 ) {
-		current = themesList.count() - 1;
-		themeCB->setCurrentIndex( current );
-	}
-	else {
-		current--;
-		themeCB->setCurrentIndex( current );
-	}
-
-	QIcon::setThemeName( themesList[ current ] );
-	Settings->setValue( "IconTheme", themesList[ current ] );
 	emit reloadIcons();
 };
 
@@ -198,7 +118,7 @@ void NBIconThemeModel::setupModel() {
 	emit layoutChanged();
 };
 
-NBIconThemeViewerWidget::NBIconThemeViewerWidget( QWidget *parent ) : QListView( parent ) {
+NBIconThemeView::NBIconThemeView( QWidget *parent ) : QListView( parent ) {
 
 	// View, Sizes and Resize Modes
 	setViewMode( QListView::IconMode );
@@ -224,9 +144,18 @@ NBIconThemeViewerWidget::NBIconThemeViewerWidget( QWidget *parent ) : QListView(
 	// Uniform Item Sizes
 	setUniformItemSizes( true );
 
-	NBIconThemeModel *model = new NBIconThemeModel( this );
-	connect( this, SIGNAL( setupModel() ), model, SLOT( setupModel() ) );
+	model = new NBIconThemeModel( this );
 	connect( model, SIGNAL( layoutChanged() ), this, SLOT( update() ) );
 
 	setModel( model );
 };
+
+void NBIconThemeView::select( QString name ) {
+
+	for( int i = 0; i < model->rowCount(); i++ ) {
+		if ( model->index( i, 0, QModelIndex() ).data().toString() == name ) {
+			setCurrentIndex( model->index( i, 0, QModelIndex() ) );
+			break;
+		}
+	}
+}
