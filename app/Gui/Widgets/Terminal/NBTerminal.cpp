@@ -140,7 +140,8 @@ void NBTerminalWidget::handleCwdChange( QString fn ) {
 	QString cwd = QString::fromLocal8Bit( f.readAll() );
 	f.close();
 
-	cwd.chop( 1 );			// Remove the trailing "\n"
+	// Remove the trailing "\n"
+	cwd.chop( 1 );
 
 	/* If @oldcwd and @cwd are different */
 	if ( oldcwd.compare( cwd ) ) {

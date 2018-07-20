@@ -1279,7 +1279,8 @@ void NBFolderView::openTerminal() {
 
 		else {
 			commandList[ 1 ] = node;
-			commandList[ 3 ] = "/bin/bash";
+			commandList[ 2 ] = "";
+			commandList[ 3 ] = "";
 		}
 
 		qDebug( "Opening console at %s... %s", node.toLocal8Bit().data(), ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );
@@ -1322,7 +1323,8 @@ void NBFolderView::openTerminalIn() {
 
 		else {
 			commandList[ 1 ] = folder;
-			commandList[ 3 ] = "/bin/bash";
+			commandList[ 2 ] = "";
+			commandList[ 3 ] = "";
 		}
 
 		qDebug( "Opening console at %s... %s", folder.toLocal8Bit().data(), ( QProcess::startDetached( command, commandList ) ? "[DONE]" : "[FAILED]" ) );

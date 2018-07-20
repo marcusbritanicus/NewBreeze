@@ -28,7 +28,7 @@ NBTermWidget::NBTermWidget( QWidget *parent ) : QTermWidget( 0, parent ) {
 	setTerminalFont( settings.value( "Font" ).value<QFont>() );
 	setHistorySize( -1 );										// Infinte scroll back
 
-	setShellProgram( "/bin/bash" );
+	setShellProgram( settings.value( "Shell" ).toString() );
 
 	setMotionAfterPasting( 2 );
 	setFlowControlEnabled( true );
@@ -65,7 +65,7 @@ NBTermWidget::NBTermWidget( QString wDir, QWidget *parent ) : QTermWidget( 0, pa
 	setHistorySize( 10000 );										// Infinte scroll back
 
 	setWorkingDirectory( wDir );
-	setShellProgram( "/bin/bash" );
+	setShellProgram( settings.value( "Shell" ).toString() );
 
 	setMotionAfterPasting( 2 );
 	setFlowControlEnabled( true );
@@ -101,7 +101,7 @@ NBTermWidget::NBTermWidget( QString wDir, QString cmd, QWidget *parent ) : QTerm
 	setWorkingDirectory( wDir );
 	QStringList shArgs = QStringList() << "-l" << "-c" << cmd;			//.split( QRegExp( "\\s+" ), QString::SkipEmptyParts );
 
-	setShellProgram( "/bin/bash" );
+	setShellProgram( settings.value( "Shell" ).toString() );
 	if ( not cmd.isEmpty() )
 		setArgs( shArgs );
 

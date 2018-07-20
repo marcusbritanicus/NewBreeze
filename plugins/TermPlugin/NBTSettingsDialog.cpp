@@ -6,6 +6,7 @@
 
 #include "NBTSettingsDialog.hpp"
 #include "qtermwidget.h"
+#include "newbreeze.hpp"
 
 NBTSettingsDialog::NBTSettingsDialog() : QDialog() {
 
@@ -14,9 +15,14 @@ NBTSettingsDialog::NBTSettingsDialog() : QDialog() {
 
 void NBTSettingsDialog::createGUI() {
 
+	QLabel *shellLabel = new QLabel( "She&ll program" );
 	QLabel *comboLabel = new QLabel( "Color &Scheme" );
 	QLabel *dspinLabel = new QLabel( "Tr&ansparency" );
 	QLabel *fontLabel = new QLabel( "&Font" );
+
+	shellEdit = new QLineEdit( this );
+	shellEdit->setText( settings.value( "Shell", "/bin/bash" ).toString() );
+	connect( shellEdit, SIGNAL( textEdited( QString ) ), this, SLOT( saveShell( QString ) ) );
 
 	colorSchemesCombo = new QComboBox();
 	colorSchemesCombo->addItems( QTermWidget::availableColorSchemes() );
@@ -59,28 +65,39 @@ void NBTSettingsDialog::createGUI() {
 
 	QGridLayout *lyt = new QGridLayout();
 
-	lyt->addWidget( comboLabel, 0, 0 );
-	lyt->addWidget( colorSchemesCombo, 1, 0 );
+	lyt->addWidget( shellLabel, 0, 0 );
+	lyt->addWidget( shellEdit, 0, 1 );
 
-	lyt->addWidget( dspinLabel, 0, 1 );
-	lyt->addWidget( transparencySpin, 1, 1 );
+	lyt->addWidget( comboLabel, 1, 0 );
+	lyt->addWidget( colorSchemesCombo, 2, 0 );
+
+	lyt->addWidget( dspinLabel, 1, 1 );
+	lyt->addWidget( transparencySpin, 2, 1 );
 
 	QHBoxLayout *fLyt = new QHBoxLayout();
 	fLyt->addWidget( fontLabel );
 	fLyt->addStretch();
 	fLyt->addWidget( fontCombo );
 	fLyt->addWidget( fontSizeSpin );
-	lyt->addLayout( fLyt, 2, 0, 1, 2 );
+	lyt->addLayout( fLyt, 3, 0, 1, 2 );
 
-	lyt->addWidget( enableTransparencyCheck, 3, 0, Qt::AlignLeft );
-	lyt->addWidget( borderlessCheck, 4, 0, Qt::AlignLeft );
+	lyt->addWidget( enableTransparencyCheck, 4, 0, Qt::AlignLeft );
+	lyt->addWidget( borderlessCheck, 5, 0, Qt::AlignLeft );
 
-	lyt->addWidget( okBtn, 5, 1, Qt::AlignRight );
+	lyt->addWidget( okBtn, 6, 1, Qt::AlignRight );
 
 	setLayout( lyt );
 
 	setWindowTitle( "NBTerminal - Settings" );
 	setWindowIcon( QIcon( ":/icons/qterminal.png" ) );
+};
+
+void NBTSettingsDialog::saveShell( QString sh ) {
+
+	if ( exists( sh ) and isExecutable( sh ) ) {
+		settings.setValue( "Shell", sh );
+		settings.sync();
+	}
 };
 
 void NBTSettingsDialog::setColorScheme() {

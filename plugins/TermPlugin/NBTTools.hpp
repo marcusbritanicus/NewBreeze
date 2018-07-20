@@ -4,12 +4,9 @@
 	*
 */
 
-#ifndef NBTTOOLS_HPP
-#define NBTTOOLS_HPP
+#pragma once
 
 #include <QtCore>
 
 QString getStyleSheet( QString );
 const char* platform();
-
-#endif

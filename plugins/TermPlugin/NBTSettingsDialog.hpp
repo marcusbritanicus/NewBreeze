@@ -15,6 +15,7 @@ class NBTSettingsDialog : public QDialog {
 	public:
 		NBTSettingsDialog();
 
+		QLineEdit *shellEdit;
 		QComboBox *colorSchemesCombo;
 		QDoubleSpinBox *transparencySpin;
 		QFontComboBox *fontCombo;
@@ -26,6 +27,7 @@ class NBTSettingsDialog : public QDialog {
 		void createGUI();
 
 	private slots:
+		void saveShell( QString );
 		void setColorScheme();
 		void setFont( QFont font );
 		void setFont( int size );
