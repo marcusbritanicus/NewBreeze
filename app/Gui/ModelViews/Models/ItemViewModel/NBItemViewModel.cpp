@@ -1055,11 +1055,6 @@ void NBItemViewModel::setupFileSystemData() {
 	rootNode->clearChildren();
 	currentLoadStatus.loading = true;
 
-	/* These are useful only when we do not refresh or change into some directory. */
-	lastUpdatedNodes.clear();
-	lastUpdatedTimes.clear();
-	delayedUpdateList.clear();
-
 	emit directoryLoading( mRootPath );
 
 	beginResetModel();
@@ -1080,15 +1075,13 @@ void NBItemViewModel::setupFileSystemData() {
 			mChildNames << _nodeName;
 			mCategoryIconMap[ _category ] = data.at( 2 ).toString();
 			free( fileList[ i ] );
+
 			qApp->processEvents();
 		}
 		free( fileList );
 	}
 
 	endResetModel();
-
-	/* We make all the categories visible by default, except the saved ones */
-	QSettings dirSett( mRootPath + ".directory", QSettings::NativeFormat );
 
 	/* Sort the contents */
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );

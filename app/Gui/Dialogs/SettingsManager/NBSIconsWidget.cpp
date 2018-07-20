@@ -125,7 +125,7 @@ NBIconThemeModel::NBIconThemeModel( QObject *parent ) : QAbstractListModel( pare
 int NBIconThemeModel::rowCount( const QModelIndex &parent ) const {
 
 	if ( parent == QModelIndex() )
-		return mimeNameList.count();
+		return themesList.count();
 
 	else
 		return 0;
@@ -137,13 +137,13 @@ QVariant NBIconThemeModel::data( const QModelIndex &index, int role ) const {
 
 	switch( role ) {
 		case Qt::DisplayRole:
-			return mimeNameList.at( mimeIndex );
+			return themesList.at( mimeIndex );
 
 		case Qt::DecorationRole:
-			return mimeIconList.at( mimeIndex );
+			return iconsMap.value( themesList.at( mimeIndex ) );
 
 		case Qt::ToolTipRole :
-			return mimeTypeList.at( mimeIndex );
+			return themesList.at( mimeIndex );
 
 		default:
 			return QVariant();
@@ -152,29 +152,47 @@ QVariant NBIconThemeModel::data( const QModelIndex &index, int role ) const {
 
 void NBIconThemeModel::setupModel() {
 
-	mimeNameList.clear();
-	mimeIconList.clear();
-	mimeTypeList.clear();
+	themesList.clear();
 
 	beginResetModel();
 	QSettings mdb1( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) + "NewBreeze/mimetypes.db", QSettings::NativeFormat );
-	QSettings mdb2( ":/data/NBFSExtData.conf", QSettings::NativeFormat );
-	Q_FOREACH( QString ext, mdb2.allKeys() ) {
-		QString name = mdb2.value( ext ).toStringList().at( 0 );
-		QString mime = mdb2.value( ext ).toStringList().at( 1 );
-		if ( not mdb1.contains( mime ) )
-			continue;
+	QDir iconDir( "/usr/share/icons" );
+	iconDir.setFilter( QDir::Dirs );
 
-		QIcon ico;
-		Q_FOREACH( QString path, mdb1.value( mime ).toStringList() )
-			ico.addFile( path );
+	Q_FOREACH( QString theme, iconDir.entryList() ) {
+		if ( QFileInfo( iconDir.filePath( theme ) ).exists() ) {
+			if ( theme == "hicolor" or theme == "mono" )
+				continue;
 
-		mimeNameList << name;
-		mimeIconList << ico;
-		mimeTypeList << mime;
+			if ( QSettings( iconDir.filePath( theme + "/index.theme" ), QSettings::IniFormat ).value( "Icon Theme/Directories" ).toStringList().count() ) {
+				themesList << theme;
 
-		qApp->processEvents();
+				QIcon::setThemeName( theme );
+				QImage icon( QSize( 144, 96 ), QImage::Format_ARGB32 );
+				icon.fill( Qt::transparent );
+
+				QPainter painter( &icon );
+				painter.drawPixmap( QRect( 6, 6, 36, 36 ), QIcon::fromTheme( "application-x-executable" ).pixmap( 36 ) );
+				painter.drawPixmap( QRect( 54, 6, 36, 36 ), QIcon::fromTheme( "folder" ).pixmap( 36 ) );
+				painter.drawPixmap( QRect( 102, 6, 36, 36 ), QIcon::fromTheme( "x-office-document" ).pixmap( 36 ) );
+				painter.drawPixmap( QRect( 6, 48, 36, 36 ), QIcon::fromTheme( "folder-trash" ).pixmap( 36 ) );
+				painter.drawPixmap( QRect( 54, 48, 36, 36 ), QIcon::fromTheme( "system-help" ).pixmap( 36 ) );
+				painter.drawPixmap( QRect( 102, 48, 36, 36 ), QIcon::fromTheme( "preferences-system" ).pixmap( 36 ) );
+
+				painter.setPen( Qt::lightGray );
+				painter.drawRect( QRect( 0, 0, 143, 95 ) );
+
+				painter.end();
+
+				iconsMap[ theme ] = QIcon( QPixmap::fromImage( icon ) );
+
+				qApp->processEvents();
+			}
+		}
 	}
+
+	QIcon::fromTheme( Settings->General.IconTheme );
+
 	endResetModel();
 
 	emit layoutChanged();
@@ -184,8 +202,8 @@ NBIconThemeViewerWidget::NBIconThemeViewerWidget( QWidget *parent ) : QListView(
 
 	// View, Sizes and Resize Modes
 	setViewMode( QListView::IconMode );
-	setGridSize( QSize( 120, 96 ) );
-	setIconSize( QSize( 48, 48 ) );
+	setGridSize( QSize( 160, 128 ) );
+	setIconSize( QSize( 144, 96 ) );
 	setFlow( QListView::LeftToRight );
 
 	setSpacing( 9 );
@@ -196,7 +214,7 @@ NBIconThemeViewerWidget::NBIconThemeViewerWidget( QWidget *parent ) : QListView(
 	setDragDropMode( QAbstractItemView::NoDragDrop );
 
 	// Selection
-	setSelectionMode( QAbstractItemView::ExtendedSelection );
+	setSelectionMode( QAbstractItemView::SingleSelection );
 	setSelectionRectVisible( true );
 
 	// Wrapping

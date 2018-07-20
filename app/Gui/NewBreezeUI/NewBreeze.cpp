@@ -255,8 +255,6 @@ void NewBreeze::createAndSetupActions() {
 	connect( AddressBar, SIGNAL( quit() ), this, SLOT( quit() ) );
 
 	connect( FilterWidget, SIGNAL( search( QString ) ), this, SLOT( filterFiles( QString ) ) );
-	//connect( FilterWidget, SIGNAL( shown() ), AddressBar, SLOT( hideSearchButton() ) );
-	//connect( FilterWidget, SIGNAL( hidden() ), AddressBar, SLOT( showSearchButton() ) );
 	connect( FilterWidget, SIGNAL( hidden() ), this, SLOT( clearFilters() ) );
 
 	connect( FolderView, SIGNAL( showProperties() ), this, SLOT( showProperties() ) );

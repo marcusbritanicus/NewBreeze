@@ -64,9 +64,8 @@ class NBIconThemeModel: public QAbstractListModel {
 		};
 
 	private:
-		QStringList mimeNameList;
-		QList<QIcon> mimeIconList;
-		QStringList mimeTypeList;
+		QStringList themesList;
+		QMap<QString, QIcon> iconsMap;
 
 	private slots:
 		void setupModel();

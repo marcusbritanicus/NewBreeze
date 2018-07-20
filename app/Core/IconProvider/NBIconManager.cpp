@@ -174,8 +174,6 @@ QStringList NBIconManager::icon( QString iName ) {
 
 void NBIconManager::generateThemeDatabase() {
 
-	qDebug() << Settings->General.IconTheme;
-
 	/* List the theme inheritence */
 	QStringList themes;
 	themes << Settings->General.IconTheme;
