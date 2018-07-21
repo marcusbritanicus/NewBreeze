@@ -8,9 +8,6 @@
 
 #include "Global.hpp"
 
-typedef QMap<QString, QString> DeviceInfo;
-typedef QPair<QString, QString> BookMark;
-
 class NBIconManager {
 
 	public:

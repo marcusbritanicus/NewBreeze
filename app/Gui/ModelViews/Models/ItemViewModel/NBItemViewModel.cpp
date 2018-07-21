@@ -1117,7 +1117,7 @@ void NBItemViewModel::setupSuperStartData() {
 		mChildNames << info.displayName();
 	};
 
-	/* Bookmarked Folders */
+	/* Special Folders */
 	superStart.beginGroup( "Places" );
 	foreach( QString key, superStart.childKeys() ) {
 		QString location = superStart.value( key ).toString();
@@ -1132,7 +1132,7 @@ void NBItemViewModel::setupSuperStartData() {
 	}
 	superStart.endGroup();
 
-	/* Recent Applications */
+	/* Quick Files */
 	superStart.beginGroup( "Files" );
 	foreach( QString key, superStart.childKeys() ) {
 		QString path = superStart.value( key ).toString();

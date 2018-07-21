@@ -1453,9 +1453,10 @@ void NBFolderView::addBookMark() {
 		QString name = idx.data().toString();
 		QString cwd = fsModel->currentDir();
 		if ( isDir( cwd + name ) and not order.contains( cwd + name ) ) {
-			bookmarkSettings.setValue( QUrl::toPercentEncoding( cwd + name ), name );
-			order << cwd + name;
+			bookmarkSettings.setValue( QUrl::toPercentEncoding( cwd + name + "/" ), name );
+			order << cwd + name + "/";
 		}
+
 		bookmarkSettings.setValue( "Order", order );
 		bookmarkSettings.sync();
 	}
