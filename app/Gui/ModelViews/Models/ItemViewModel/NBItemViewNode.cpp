@@ -25,8 +25,6 @@ inline static QIcon getIcon( QString name, QString type ) {
 	}
 
 	else {
-		char *newPath[ PATH_MAX ] = { 0 };
-
 		QString path = QString::fromLocal8Bit( realpath( name.toLocal8Bit().constData(), NULL ) );
 		Q_FOREACH( QString icoStr, NBIconManager::instance()->iconsForFile( type, path ) ) {
 			QRegExp rx( "[0-9]+" );
@@ -66,7 +64,7 @@ NBItemViewNode::NBItemViewNode( QVariantList data, QString category, NBItemViewN
 		mIcon = getIcon( data.at( 10 ).toString(), QString( "inode/directory" ) );
 
 	else
-		mIcon = getIcon( data.at( 3 ).toString(), data.at( 6 ).toString() );
+		mIcon = getIcon( data.value( 10 ).toString(), data.at( 6 ).toString() );
 
 	parentNode = parent;
 };

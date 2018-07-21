@@ -800,7 +800,7 @@ void NBItemViewModel::setRootPath( QString path ) {
 	if ( path.startsWith( "/" ) )
 		prevFolder = path;
 
-	mRootPath = path;
+	mRootPath = ( path.endsWith( "/" ) ? path : path + "/" );
 
 	if ( path.startsWith( "NB://SuperStart" ) ) {
 		mVirtualData = true;
@@ -834,7 +834,6 @@ void NBItemViewModel::setRootPath( QString path ) {
 		mVirtualData = false;
 		mModelDataType = (quint64)NBItemViewModel::FileSystem;
 
-		mRootPath = ( path.endsWith( "/" ) ? path : path + "/" );
 		thumbnailer->createThumbnails( mRootPath );
 	}
 

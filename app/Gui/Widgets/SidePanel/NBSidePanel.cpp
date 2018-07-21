@@ -19,6 +19,11 @@ static const QString tooltipSkel = QString(
 
 NBSidePanel::NBSidePanel( QWidget *parent ) : QScrollArea( parent ) {
 
+	devices = 0;
+	catalogs = 0;
+	bookmarks = 0;
+	quickfiles = 0;
+
 	/* ScrollBar Settings */
 	setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
@@ -41,6 +46,11 @@ void NBSidePanel::populateSidePanel() {
 
 	setFixedWidth( 150 );
 
+	devices = 0;
+	catalogs = 0;
+	bookmarks = 0;
+	quickfiles = 0;
+
 	scrollLyt = new QVBoxLayout();
 	scrollLyt->setContentsMargins( QMargins() );
 	scrollLyt->setSpacing( 0 );
@@ -49,21 +59,29 @@ void NBSidePanel::populateSidePanel() {
 	connect( devicesLabel, SIGNAL( clicked() ), this, SLOT( populateSidePanel() ) );
 	scrollLyt->addWidget( devicesLabel );
 	loadDevices();
+	if ( not devices )
+		devicesLabel->hide();
 
 	catalogsLabel = new NBSidePanelLabel( ":/icons/catalogs.png", "Catalogs", this );
-	// connect( catalogsLabel, SIGNAL( clicked() ), this, SIGNAL( driveClicked() ) );
+	connect( catalogsLabel, SIGNAL( clicked() ), this, SLOT( populateSidePanel() ) );
 	scrollLyt->addWidget( catalogsLabel );
 	loadCatalogs();
+	if ( not catalogs )
+		catalogsLabel->hide();
 
 	bookmarksLabel = new NBSidePanelLabel( ":/icons/bookmark.png", "Bookmarks", this );
 	connect( bookmarksLabel, SIGNAL( clicked() ), this, SLOT( populateSidePanel() ) );
 	scrollLyt->addWidget( bookmarksLabel );
 	loadBookmarks();
+	if ( not bookmarks )
+		bookmarksLabel->hide();
 
 	quickFilesLabel = new NBSidePanelLabel( ":/icons/files.png", "Quick Files", this );
 	connect( quickFilesLabel, SIGNAL( clicked() ), this, SLOT( populateSidePanel() ) );
 	scrollLyt->addWidget( quickFilesLabel );
 	loadQuickFiles();
+	if ( not quickfiles )
+		quickFilesLabel->hide();
 
 	scrollLyt->addStretch();
 
@@ -87,6 +105,7 @@ void NBSidePanel::loadDevices() {
 		/* Special tooltip hack */
 		int percent = 100 * info.bytesUsed() / info.bytesTotal();
 		item->setToolTip( tooltipSkel.arg( info.mountPoint() ).arg( percent ).arg( percent < 90 ? "darkgreen" : "darkred" ) );
+		devices++;
 	}
 };
 
@@ -95,20 +114,22 @@ void NBSidePanel::loadCatalogs() {
 	QSettings ctlList( "NewBreeze", "Catalogs" );
 	Q_FOREACH( QString key, ctlList.childKeys() ) {
 		if ( ctlList.value( key ).toStringList().count() ) {
-			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs/" + key, NBSidePanelItem::Catalogs, this );
+			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs/" + key + "/", NBSidePanelItem::Catalogs, this );
 			connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 			item->setToolTip( key + " Catalog" );
 			scrollLyt->addWidget( item );
+			catalogs++;
 		}
 	}
 
 	ctlList.beginGroup( "Custom" );
 	Q_FOREACH( QString key, ctlList.childKeys() ) {
 		if ( ctlList.value( key ).toStringList().count() ) {
-			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs/Custom/" + key, NBSidePanelItem::Catalogs, this );
+			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs/Custom/" + key + "/", NBSidePanelItem::Catalogs, this );
 			connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 			item->setToolTip( key + " Catalog" );
 			scrollLyt->addWidget( item );
+			catalogs++;
 		}
 	}
 	ctlList.endGroup();
@@ -121,6 +142,7 @@ void NBSidePanel::loadBookmarks() {
 		connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 		item->setToolTip( info.mountPoint );
 		scrollLyt->addWidget( item );
+		bookmarks++;
 	}
 };
 
@@ -134,6 +156,7 @@ void NBSidePanel::loadQuickFiles() {
 		connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 		item->setToolTip( qfList.value( key ).toString() );
 		scrollLyt->addWidget( item );
+		quickfiles++;
 	}
 
 	qfList.endGroup();

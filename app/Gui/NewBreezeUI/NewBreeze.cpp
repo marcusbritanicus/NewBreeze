@@ -28,7 +28,7 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	createGUI();
 
 	/* Make sure we always have absolute paths */
-	if ( loc.count() )
+	if ( loc.count() and not loc.startsWith( "NB://" ) )
 		loc = QFileInfo( loc ).absoluteFilePath();
 
 	/* Open with SuperStart */
@@ -44,9 +44,9 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 			FolderView->doOpen( "NB://Applications" );
 
 		else if ( loc.startsWith( "NB://Catalogs" ) )
-			FolderView->doOpen( "NB://Catalogs" );
+			FolderView->doOpen( loc );
 
-		if ( isFile( loc ) ) {
+		else if ( isFile( loc ) ) {
 
 			/* This is a file, just open the file */
 			openFile( loc );

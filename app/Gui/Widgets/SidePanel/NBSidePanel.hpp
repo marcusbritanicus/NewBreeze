@@ -29,6 +29,11 @@ class NBSidePanel : public QScrollArea {
 
 		QVBoxLayout *scrollLyt;
 
+		int devices;
+		int catalogs;
+		int bookmarks;
+		int quickfiles;
+
 	public Q_SLOTS:
 		void loadDevices();
 		void loadCatalogs();
