@@ -67,10 +67,3 @@ class NBAddToCatalogMenu : public QMenu {
 	Q_SIGNALS:
 		void reloadCatalogs();
 };
-
-// class NBSuperStartMenu : public QMenu {
-	// Q_OBJECT
-
-	// public:
-		// NBSuperStartMenu();
-// };

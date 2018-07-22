@@ -612,31 +612,52 @@ void NBAddToCatalogMenu::addToCatalog() {
 
 void NBAddToCatalogMenu::addToNewCatalog() {
 
-	QAction *action = qobject_cast<QAction*>( sender() );
-	if ( not action )
-		return;
-
-	QString catalog = action->text().replace( "&", "" );
-
 	QSettings catalogsConf( "NewBreeze", "Catalogs" );
-	QStringList existing = catalogsConf.value( catalog ).toStringList();
 
-	if ( sNodes.count() ) {
-		foreach( QModelIndex idx, sNodes ) {
+	QString newCtlg = QInputDialog::getText(
+		this,
+		"NewBreeze - New Catalog",
+		"Enter the name of the new catalog"
+	);
+
+	if ( catalogsConf.childKeys().contains( newCtlg ) ) {
+		QStringList existing = catalogsConf.value( newCtlg ).toStringList();
+		Q_FOREACH( QModelIndex idx, sNodes ) {
 			QString node = QDir( workNode ).filePath( idx.data().toString() );
 			if ( isDir( node ) )
 				existing << node;
 		}
+
+		existing.removeDuplicates();
+		catalogsConf.setValue( newCtlg, existing );
 	}
 
 	else {
-		existing << workNode;
+		catalogsConf.beginGroup( "Custom" );
+		QStringList existing;
+
+		if ( catalogsConf.childKeys().contains( newCtlg ) ) {
+			existing = catalogsConf.value( newCtlg ).toStringList();
+			Q_FOREACH( QModelIndex idx, sNodes ) {
+				QString node = QDir( workNode ).filePath( idx.data().toString() );
+				if ( isDir( node ) )
+					existing << node;
+			}
+		}
+
+		else {
+			Q_FOREACH( QModelIndex idx, sNodes ) {
+				QString node = QDir( workNode ).filePath( idx.data().toString() );
+				if ( isDir( node ) )
+					existing << node;
+			}
+		}
+
+		existing.removeDuplicates();
+		catalogsConf.setValue( newCtlg, existing );
+
+		catalogsConf.endGroup();
 	}
-
-	existing.removeDuplicates();
-
-	catalogsConf.setValue( catalog, existing );
-	catalogsConf.sync();
 
 	emit reloadCatalogs();
 };

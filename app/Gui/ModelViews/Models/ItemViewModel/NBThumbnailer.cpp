@@ -95,7 +95,7 @@ void NBThumbnailer::run() {
 		Q_FOREACH( QString file, images ) {
 
 			if ( mTerminate )
-				break;
+				return;
 
 			/* If @path is non-existent */
 			if ( not exists( file ) )
@@ -111,15 +111,11 @@ void NBThumbnailer::run() {
 			/* Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/ */
 			QImage thumb = QImage( file ).scaled( 512, 512, Qt::KeepAspectRatio ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 
-			if ( thumb.save( hashPath, "PNG", 0 ) ) {
+			if ( thumb.save( hashPath, "PNG", 0 ) )
 				emit updateNode( file );
-			}
 
-			else {
+			else
 				qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
-			}
-
-			qApp->processEvents();
 		}
 	}
 
@@ -128,7 +124,7 @@ void NBThumbnailer::run() {
 		Q_FOREACH( QString file, documents ) {
 
 			if ( mTerminate )
-				break;
+				return;
 
 			/* If @path is non-existent */
 			if ( not exists( file ) )
@@ -149,8 +145,6 @@ void NBThumbnailer::run() {
 				system( "rm -rf /tmp/NewBreeze_odf/*" );
 				emit updateNode( file );
 			}
-
-			qApp->processEvents();
 		}
 	}
 
@@ -173,6 +167,9 @@ void NBThumbnailer::run() {
 			/* Video files */
 			if ( Settings->View.VideoPreview ) {
 				Q_FOREACH( QString file, videos ) {
+					if ( mTerminate )
+						return;
+
 					/* If @path is non-existent */
 					if ( not exists( file ) )
 						continue;
@@ -186,14 +183,15 @@ void NBThumbnailer::run() {
 
 					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "Video", QStringList() << file << hashPath );
 					emit updateNode( file );
-
-					qApp->processEvents();
 				}
 			}
 
 			/* PDF Files */
 			if ( Settings->View.PdfPreview ) {
 				Q_FOREACH( QString file, pdfs ) {
+					if ( mTerminate )
+						return;
+
 					/* If @path is non-existent */
 					if ( not exists( file ) )
 						continue;
@@ -207,14 +205,15 @@ void NBThumbnailer::run() {
 
 					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "PDF", QStringList() << file << hashPath );
 					emit updateNode( file );
-
-					qApp->processEvents();
 				}
 			}
 
 			/* DjVu files */
 			if ( Settings->View.DjVuPreview ) {
 				Q_FOREACH( QString file, djvus ) {
+					if ( mTerminate )
+						return;
+
 					/* If @path is non-existent */
 					if ( not exists( file ) )
 						continue;
@@ -228,8 +227,6 @@ void NBThumbnailer::run() {
 
 					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "DjVu", QStringList() << file << hashPath );
 					emit updateNode( file );
-
-					qApp->processEvents();
 				}
 			}
 		}

@@ -269,6 +269,7 @@ void NewBreeze::createAndSetupActions() {
 
 	connect( FolderView, SIGNAL( reloadSuperStart() ), SidePanel, SLOT( populateSidePanel() ) );
 	connect( FolderView, SIGNAL( reloadBookmarks() ), SidePanel, SLOT( populateSidePanel() ) );
+	connect( FolderView, SIGNAL( reloadCatalogs() ), SidePanel, SLOT( populateSidePanel() ) );
 
 	connect( FolderView, SIGNAL( reloadCatalogs() ), SideBar, SLOT( flashCatalogs() ) );
 	connect( FolderView, SIGNAL( reloadBookmarks() ), SideBar, SLOT( flashBookmarks() ) );

@@ -125,7 +125,7 @@ void NBSidePanel::loadCatalogs() {
 	ctlList.beginGroup( "Custom" );
 	Q_FOREACH( QString key, ctlList.childKeys() ) {
 		if ( ctlList.value( key ).toStringList().count() ) {
-			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs/Custom/" + key + "/", NBSidePanelItem::Catalogs, this );
+			NBSidePanelItem *item = new NBSidePanelItem( key, ":/icons/catalogs.png", "NB://Catalogs/" + key + "/", NBSidePanelItem::Catalogs, this );
 			connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 			item->setToolTip( key + " Catalog" );
 			scrollLyt->addWidget( item );

@@ -390,6 +390,12 @@ bool NBItemViewModel::removeNode( QString nodeName ) {
 
 void NBItemViewModel::nodeUpdated( QString nodeName ) {
 
+	if ( not exists( mRootPath + baseName( nodeName ) ) )
+		return;
+
+	if ( not mChildNames.contains( baseName( nodeName ) ) )
+		return;
+
 	NBItemViewNode *node = rootNode->child( baseName( nodeName ) );
 	node->updateIcon();
 
@@ -1276,6 +1282,12 @@ void NBItemViewModel::setupCatalogData() {
 
 	else {
 		QString key = QString( mRootPath ).replace( "NB://Catalogs/", "" );
+		if ( key.endsWith( "/" ) )
+			key.chop( 1 );
+
+		if ( not catalogsSettings.childKeys().contains( key ) )
+			key = "Custom/" + key;
+
 		QStringList locations = catalogsSettings.value( key ).toStringList();
 		foreach( QString location, locations ) {
 			if ( not exists( location ) )

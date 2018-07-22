@@ -2475,9 +2475,15 @@ void NBIconView::toggleFoldCategory( QString category ) {
 
 	if ( not cModel->isRealLocation() ) {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
-		QSettings dirSett( "NewBreeze", loc );
-		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
-		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+
+		if ( loc.endsWith( "/" ) )
+			loc.chop( 1 );
+
+		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+
+		QSettings dirSett( "NewBreeze", tokens.takeFirst() );
+		QStringList hidden = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", QStringList() ).toStringList();
 
 		/* If @category is hidden, show it folded */
 		if ( hiddenCategories.contains( category ) ) {
@@ -2505,8 +2511,8 @@ void NBIconView::toggleFoldCategory( QString category ) {
 		}
 
 		folded.removeDuplicates();
-		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
-		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.setValue( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", folded );
 		dirSett.sync();
 	}
 
@@ -2554,17 +2560,22 @@ void NBIconView::showCategory( QString category ) {
 
 	if ( not cModel->isRealLocation() ) {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
-		QSettings dirSett( "NewBreeze", loc );
-		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
-		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+		if ( loc.endsWith( "/" ) )
+			loc.chop( 1 );
+
+		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+
+		QSettings dirSett( "NewBreeze", tokens.takeFirst() );
+		QStringList hidden = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", QStringList() ).toStringList();
 
 		hiddenCategories.removeAll( category );
 		foldedCategories.removeAll( category );
 		hidden.removeAll( category );
 		folded.removeAll( category );
 
-		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
-		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.setValue( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", folded );
 		dirSett.sync();
 	}
 
@@ -2594,9 +2605,14 @@ void NBIconView::foldCategory( QString category ) {
 
 	if ( not cModel->isRealLocation() ) {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
-		QSettings dirSett( "NewBreeze", loc );
-		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
-		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+		if ( loc.endsWith( "/" ) )
+			loc.chop( 1 );
+
+		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+
+		QSettings dirSett( "NewBreeze", tokens.takeFirst() );
+		QStringList hidden = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", QStringList() ).toStringList();
 
 		hiddenCategories.removeAll( category );
 		foldedCategories.removeAll( category );
@@ -2606,8 +2622,8 @@ void NBIconView::foldCategory( QString category ) {
 		foldedCategories.append( category );
 		folded.append( category );
 
-		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
-		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.setValue( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", folded );
 		dirSett.sync();
 	}
 
@@ -2637,9 +2653,14 @@ void NBIconView::hideCategory( QString category ) {
 
 	if ( not cModel->isRealLocation() ) {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
-		QSettings dirSett( "NewBreeze", loc );
-		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
-		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+		if ( loc.endsWith( "/" ) )
+			loc.chop( 1 );
+
+		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+
+		QSettings dirSett( "NewBreeze", tokens.takeFirst() );
+		QStringList hidden = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", QStringList() ).toStringList();
 
 		hiddenCategories.removeAll( category );
 		foldedCategories.removeAll( category );
@@ -2649,8 +2670,8 @@ void NBIconView::hideCategory( QString category ) {
 		hiddenCategories.append( category );
 		hidden.append( category );
 
-		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
-		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.setValue( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", folded );
 		dirSett.sync();
 	}
 

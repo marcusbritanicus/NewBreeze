@@ -16,17 +16,39 @@ inline QWidget *getCrumbsHolder( QWidget *parent, QString path, QString cPath, c
 		crumbsLyt->setContentsMargins( QMargins() );
 		crumbsLyt->setSpacing( 0 );
 
-		/* We have only one crumb */
-		NBCrumb *specialCrumb = new NBCrumb( path, true );
-		QObject::connect( specialCrumb, SIGNAL( loadPath( QString ) ), parent, SIGNAL( openLocation( QString ) ) );
-		crumbsLyt->addWidget( specialCrumb );
+		QStringList tokens = QString( path ).replace( "NB://", "" ).split( "/", QString::SkipEmptyParts );
 
-		crumbsLyt->addStretch();
+		if ( tokens.count() == 2 ) {
+			/* We have two crumbs */
+			NBCrumb *crumb1 = new NBCrumb( "NB://" + tokens.at( 0 ), ( "NB://" + tokens.at( 0 ) + "/" == cPath ) );
+			QObject::connect( crumb1, SIGNAL( loadPath( QString ) ), parent, SIGNAL( openLocation( QString ) ) );
+			crumbsLyt->addWidget( crumb1 );
 
-		QWidget *crumbsHolder = new QWidget( parent );
-		crumbsHolder->setLayout( crumbsLyt );
+			NBCrumb *crumb2 = new NBCrumb( "NB://" + tokens.join( "/" ), ( "NB://" + tokens.join( "/" ) + "/" == cPath ) );
+			QObject::connect( crumb2, SIGNAL( loadPath( QString ) ), parent, SIGNAL( openLocation( QString ) ) );
+			crumbsLyt->addWidget( crumb2 );
 
-		return crumbsHolder;
+			crumbsLyt->addStretch();
+
+			QWidget *crumbsHolder = new QWidget( parent );
+			crumbsHolder->setLayout( crumbsLyt );
+
+			return crumbsHolder;
+		}
+
+		else {
+			/* We have one crumbs */
+			NBCrumb *specialCrumb = new NBCrumb( path, true );
+			QObject::connect( specialCrumb, SIGNAL( loadPath( QString ) ), parent, SIGNAL( openLocation( QString ) ) );
+			crumbsLyt->addWidget( specialCrumb );
+
+			crumbsLyt->addStretch();
+
+			QWidget *crumbsHolder = new QWidget( parent );
+			crumbsHolder->setLayout( crumbsLyt );
+
+			return crumbsHolder;
+		}
 	}
 
 	QList<NBCrumbsList> linesList;

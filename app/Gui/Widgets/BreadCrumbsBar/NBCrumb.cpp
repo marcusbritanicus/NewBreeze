@@ -111,6 +111,9 @@ void NBCrumb::showMenu() {
 
 		if ( sett.childKeys().count() ) {
 			foreach( QString dir, sett.childKeys() ) {
+				if ( not exists( dir ) )
+					continue;
+
 				QAction *act = new QAction( QIcon::fromTheme( "folder" ), baseName( dir ), this );
 				act->setData( sett.value( dir ) );
 				connect( act, SIGNAL( triggered() ), this, SLOT( onMenuItemClicked() ) );
@@ -123,6 +126,32 @@ void NBCrumb::showMenu() {
 			action->setDisabled( true );
 		}
 
+		sett.endGroup();
+	}
+
+	else if ( mPath.startsWith( "NB://Catalogs" ) ) {
+		QSettings sett( "NewBreeze", "Catalogs" );
+
+		Q_FOREACH( QString key, sett.childKeys() ) {
+			if ( not sett.value( key ).toStringList().count() )
+				continue;
+
+			QAction *act = new QAction( QIcon::fromTheme( "folder" ), key, this );
+			act->setData( "NB://Catalogs/" + key );
+			connect( act, SIGNAL( triggered() ), this, SLOT( onMenuItemClicked() ) );
+			menu->addAction( act );
+		}
+
+		sett.beginGroup( "Custom" );
+		Q_FOREACH( QString key, sett.childKeys() ) {
+			if ( not sett.value( key ).toStringList().count() )
+				continue;
+
+			QAction *act = new QAction( QIcon::fromTheme( "folder" ), key, this );
+			act->setData( "NB://Catalogs/" + key );
+			connect( act, SIGNAL( triggered() ), this, SLOT( onMenuItemClicked() ) );
+			menu->addAction( act );
+		}
 		sett.endGroup();
 	}
 
