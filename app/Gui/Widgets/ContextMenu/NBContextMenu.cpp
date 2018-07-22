@@ -711,8 +711,78 @@ void NBFolderView::showContextMenu( QPoint position ) {
 		}
 
 		case NBItemViewModel::Catalogs: {
-			/* We should fix this later */
+			if ( selectedList.isEmpty() ) {
 
+				menu->addAction( reloadAct );
+			}
+
+			else if ( selectedList.count() == 1 ) {
+				menu->addAction( peekAct );
+
+				QFileInfo fInfo( fsModel->nodeInfo( selectedList[ 0 ] ) );
+				QString file = termFormatString( fInfo.absoluteFilePath() );
+
+				if ( fInfo.isDir() ) {
+					QAction *openInNewWinAct = new QAction( QIcon( ":/icons/newwin.png" ), "Open in New &Window", this );
+					openInNewWinAct->setData( QVariant( fInfo.absoluteFilePath() ) );
+					connect( openInNewWinAct, SIGNAL( triggered() ), this, SLOT( doOpenInNewWindow() ) );
+					menu->addAction( openInNewWinAct );
+				}
+
+				NBOpenWithMenu *openWithMenu = new NBOpenWithMenu( ":/icons/openWith.png", "&Open With", this );
+				openWithMenu->setWorkingDirectory( fsModel->currentDir() );
+				openWithMenu->buildMenu( selectedList );
+
+				menu->addMenu( openWithMenu );
+				menu->addSeparator();
+
+				/* If the node is a folder */
+				if ( fInfo.isDir() ) {
+					menu->addAction( addBookMarkAct );
+				}
+
+				/* We can add file or folder to SuperStart */
+				menu->addAction( addToSuperStartAct );
+				menu->addSeparator();
+
+				if ( fInfo.isDir() ) {
+					menu->addAction( openVTEin );
+					menu->addSeparator();
+				}
+
+				menu->addMenu( customMenu );
+				menu->addSeparator();
+
+				menu->addSeparator();
+				menu->addAction( propertiesAct );
+				menu->addAction( permissionsAct );
+			}
+
+			else {
+				NBOpenWithMenu *openWithMenu = new NBOpenWithMenu( ":/icons/openWith.png", "&Open With", this );
+				openWithMenu->setWorkingDirectory( fsModel->currentDir() );
+				openWithMenu->buildMenu( selectedList );
+
+				// Custom Actions Menu
+				customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
+				connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
+				connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
+
+				menu->addMenu( openWithMenu );
+				menu->addSeparator();
+
+				menu->addAction( addToSuperStartAct );
+				menu->addSeparator();
+
+				menu->addMenu( customMenu );
+				menu->addSeparator();
+
+				menu->addSeparator();
+				menu->addAction( propertiesAct );
+				menu->addAction( permissionsAct );
+			}
+
+			menu->exec( mapToGlobal( position ) );
 			return;
 		}
 
@@ -985,6 +1055,7 @@ void NBFolderView::showActionsMenu( QPoint position ) {
 		case NBItemViewModel::FileSystem: {
 			if ( selectedList.isEmpty() ) {
 				/* This cannot come up at all */
+				qDebug() << "How are we here?";
 			}
 
 			else if ( selectedList.count() == 1 ) {

@@ -10,159 +10,79 @@
 static QList<QByteArray> supported = QImageReader::supportedImageFormats();
 static QStringList odfformat = QStringList() << "odt" << "odp" << "ods" << "odg";
 
-static inline int isImage( const struct dirent* entry ) {
-
-	QByteArray suffix = QFileInfo( entry->d_name ).suffix().toLower().toLocal8Bit();
-	if ( supported.contains( suffix ) )
-		return true;
-
-	return false;
-};
-
-static inline int isODF( const struct dirent* entry ) {
-
-	QByteArray suffix = QFileInfo( entry->d_name ).suffix().toLower().toLocal8Bit();
-	if ( odfformat.contains( suffix ) )
-		return true;
-
-	return false;
-};
-
-static inline int isVideo( const struct dirent* entry ) {
-
-	QMimeType mt = mimeDb.mimeTypeForFile( entry->d_name );
-	return ( mt.name().startsWith( "video/" ) and mt.name().compare( "video/mng" ) );
-};
-
-static inline int isPDF( const struct dirent* entry ) {
-
-	QByteArray suffix = QFileInfo( entry->d_name ).suffix().toLower().toLocal8Bit();
-	if ( suffix == "pdf" )
-		return true;
-
-	return false;
-};
-
-static inline int isDjVu( const struct dirent* entry ) {
-
-	QByteArray suffix = QFileInfo( entry->d_name ).suffix().toLower().toLocal8Bit();
-	if ( suffix == "djv" or suffix == "djvu" )
-		return true;
-
-	return false;
-};
-
-static inline QStringList imageFiles( QString path ) {
-
-	struct dirent **fileList;
-	int entries = scandir( path.toLocal8Bit().data(), &fileList, isImage, NULL );
-	if ( entries > 0 ) {
-		QStringList files;
-		for( int i = 0; i < entries; i++ ) {
-			/* Ignore . and .. */
-			struct dirent *entry = fileList[ i ];
-			if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
-				continue;
-
-			files << path + QString::fromLocal8Bit( entry->d_name );
-		}
-
-		return files;
-	}
-
-	return QStringList();
-};
-
-static inline QStringList odffiles( QString path ) {
-
-	struct dirent **fileList;
-	int entries = scandir( path.toLocal8Bit().data(), &fileList, isODF, NULL );
-	if ( entries > 0 ) {
-		QStringList files;
-		for( int i = 0; i < entries; i++ ) {
-			/* Ignore . and .. */
-			struct dirent *entry = fileList[ i ];
-			if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
-				continue;
-
-			files << path + QString::fromLocal8Bit( entry->d_name );
-		}
-
-		return files;
-	}
-
-	return QStringList();
-};
-
-static inline QStringList videoFiles( QString path ) {
-
-	struct dirent **fileList;
-	int entries = scandir( path.toLocal8Bit().data(), &fileList, isVideo, NULL );
-	if ( entries > 0 ) {
-		QStringList files;
-		for( int i = 0; i < entries; i++ ) {
-			/* Ignore . and .. */
-			struct dirent *entry = fileList[ i ];
-			if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
-				continue;
-
-			files << path + QString::fromLocal8Bit( entry->d_name );
-		}
-
-		return files;
-	}
-
-	return QStringList();
-};
-
-static inline QStringList pdfFiles( QString path ) {
-
-	struct dirent **fileList;
-	int entries = scandir( path.toLocal8Bit().data(), &fileList, isPDF, NULL );
-	if ( entries > 0 ) {
-		QStringList files;
-		for( int i = 0; i < entries; i++ ) {
-			/* Ignore . and .. */
-			struct dirent *entry = fileList[ i ];
-			if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
-				continue;
-
-			files << path + QString::fromLocal8Bit( entry->d_name );
-		}
-
-		return files;
-	}
-
-	return QStringList();
-};
-
-static inline QStringList djvuFiles( QString path ) {
-
-	struct dirent **fileList;
-	int entries = scandir( path.toLocal8Bit().data(), &fileList, isDjVu, NULL );
-	if ( entries > 0 ) {
-		QStringList files;
-		for( int i = 0; i < entries; i++ ) {
-			/* Ignore . and .. */
-			struct dirent *entry = fileList[ i ];
-			if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
-				continue;
-
-			files << path + QString::fromLocal8Bit( entry->d_name );
-		}
-
-		return files;
-	}
-
-	return QStringList();
-};
-
-void NBThumbnailer::createThumbnails( QString path ) {
+void NBThumbnailer::createThumbnails( QStringList nodes ) {
 
 	if ( isRunning() )
 		terminate();
 
-	mPath = QString( path );
+	images.clear();
+	documents.clear();
+	videos.clear();
+	pdfs.clear();
+	djvus.clear();
+
+	Q_FOREACH( QString node, nodes ) {
+		QString mime = mimeDb.mimeTypeForFile( node ).name();
+		if ( mime.startsWith( "image" ) and not mime.contains( "djv" ) ) {
+			if ( supported.contains( QFileInfo( node.toLower() ).suffix().toLocal8Bit() ) )
+				images << node;
+		}
+
+		else if ( odfformat.contains( QFileInfo( node.toLower() ).suffix() ) ) {
+			documents << node;
+		}
+
+		else if ( mime.startsWith( "video/" ) and mime.compare( "video/mng" ) ) {
+			videos << node;
+		}
+
+		else if ( mime.contains( "pdf" ) ) {
+			pdfs << node;
+		}
+
+		else if ( mime.contains( "djv" ) ) {
+			djvus << node;
+		}
+	}
+
+	mTerminate = false;
+	start();
+};
+
+void NBThumbnailer::createThumbnails( QString path, QStringList nodes ) {
+
+	if ( isRunning() )
+		terminate();
+
+	images.clear();
+	documents.clear();
+	videos.clear();
+	pdfs.clear();
+	djvus.clear();
+
+	Q_FOREACH( QString node, nodes ) {
+		QString mime = mimeDb.mimeTypeForFile( path + node ).name();
+		if ( mime.startsWith( "image" ) and not mime.contains( "djv" ) ) {
+			if ( supported.contains( QFileInfo( node.toLower() ).suffix().toLocal8Bit() ) )
+				images << path + node;
+		}
+
+		else if ( odfformat.contains( QFileInfo( node.toLower() ).suffix() ) ) {
+			documents << path + node;
+		}
+
+		else if ( mime.startsWith( "video/" ) and mime.compare( "video/mng" ) ) {
+			videos << path + node;
+		}
+
+		else if ( mime.contains( "pdf" ) ) {
+			pdfs << path + node;
+		}
+
+		else if ( mime.contains( "djv" ) ) {
+			djvus << path + node;
+		}
+	}
 
 	mTerminate = false;
 	start();
@@ -172,8 +92,7 @@ void NBThumbnailer::run() {
 
 	/* Image Files */
 	if ( Settings->View.ImagePreview ) {
-		QStringList files = imageFiles( mPath );
-		Q_FOREACH( QString file, files ) {
+		Q_FOREACH( QString file, images ) {
 
 			if ( mTerminate )
 				break;
@@ -206,7 +125,7 @@ void NBThumbnailer::run() {
 
 	/* ODF Files */
 	if ( Settings->View.OdfPreview ) {
-		Q_FOREACH( QString file, odffiles( mPath ) ) {
+		Q_FOREACH( QString file, documents ) {
 
 			if ( mTerminate )
 				break;
@@ -253,7 +172,7 @@ void NBThumbnailer::run() {
 
 			/* Video files */
 			if ( Settings->View.VideoPreview ) {
-				Q_FOREACH( QString file, videoFiles( mPath ) ) {
+				Q_FOREACH( QString file, videos ) {
 					/* If @path is non-existent */
 					if ( not exists( file ) )
 						continue;
@@ -274,7 +193,7 @@ void NBThumbnailer::run() {
 
 			/* PDF Files */
 			if ( Settings->View.PdfPreview ) {
-				Q_FOREACH( QString file, pdfFiles( mPath ) ) {
+				Q_FOREACH( QString file, pdfs ) {
 					/* If @path is non-existent */
 					if ( not exists( file ) )
 						continue;
@@ -295,7 +214,7 @@ void NBThumbnailer::run() {
 
 			/* DjVu files */
 			if ( Settings->View.DjVuPreview ) {
-				Q_FOREACH( QString file, djvuFiles( mPath ) ) {
+				Q_FOREACH( QString file, djvus ) {
 					/* If @path is non-existent */
 					if ( not exists( file ) )
 						continue;

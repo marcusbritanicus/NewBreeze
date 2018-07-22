@@ -17,7 +17,8 @@ class NBThumbnailer : public QThread {
 			mTerminate = false;
 		};
 
-		void createThumbnails( QString path );
+		void createThumbnails( QString path, QStringList nodes );
+		void createThumbnails( QStringList nodes );
 
 		inline void terminate() {
 
@@ -30,7 +31,12 @@ class NBThumbnailer : public QThread {
 
 	private:
 		bool mTerminate;
-		QString mPath;
+
+		QStringList images;
+		QStringList documents;
+		QStringList videos;
+		QStringList pdfs;
+		QStringList djvus;
 
 	Q_SIGNALS :
 		void updateNode( QString );

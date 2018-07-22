@@ -1482,12 +1482,13 @@ void NBFolderView::addToSuperStart() {
 
 	Q_FOREACH( QModelIndex idx, selectedItems ) {
 		QString name = idx.data().toString();
-		QString cwd = fsModel->currentDir();
-		if ( isDir( cwd + name ) )
-			superStart.setValue( "Places/" + name, cwd + name );
+		QString path = idx.data( Qt::UserRole + 7 ).toString();
 
-		else if ( isFile( cwd + name ) )
-			superStart.setValue( "Files/" + name, cwd + name );
+		if ( isDir( path ) )
+			superStart.setValue( "Places/" + name, path );
+
+		else if ( isFile( path ) )
+			superStart.setValue( "Files/" + name, path );
 	}
 
 	superStart.sync();

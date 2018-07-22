@@ -326,6 +326,12 @@ void NBIconView::reload() {
 			break;
 		}
 
+		case NBItemViewModel::Catalogs: {
+
+			setSelectionMode( QAbstractItemView::ExtendedSelection );
+			break;
+		}
+
 		default: {
 
 			setSelectionMode( QAbstractItemView::SingleSelection );
@@ -2035,9 +2041,14 @@ void NBIconView::calculateRectsIfNecessary() const {
 
 	else {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
-		QSettings sett( "NewBreeze", loc );
-		hiddenCategories = sett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
-		foldedCategories = sett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+		if ( loc.endsWith( "/" ) )
+			loc.chop( 1 );
+
+		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+
+		QSettings sett( "NewBreeze", tokens.takeFirst() );
+		hiddenCategories = sett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
+		foldedCategories = sett.value( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", QStringList() ).toStringList();
 	}
 
 	computeRowsAndColumns();
@@ -2408,9 +2419,14 @@ void NBIconView::showHideCategory( QString category ) {
 
 	if ( cModel->currentDir().startsWith( "NB://" ) ) {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
-		QSettings dirSett( "NewBreeze", loc );
-		QStringList hidden = dirSett.value( "NewBreeze/HiddenCategories", QStringList() ).toStringList();
-		QStringList folded = dirSett.value( "NewBreeze/FoldedCategories", QStringList() ).toStringList();
+		if ( loc.endsWith( "/" ) )
+			loc.chop( 1 );
+
+		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+
+		QSettings dirSett( "NewBreeze", tokens.takeFirst() );
+		QStringList hidden = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
+		QStringList folded = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", QStringList() ).toStringList();
 
 		if ( hiddenCategories.contains( category ) ) {
 			hiddenCategories.removeAll( category );
@@ -2424,8 +2440,8 @@ void NBIconView::showHideCategory( QString category ) {
 		}
 
 		hidden.removeDuplicates();
-		dirSett.setValue( "NewBreeze/HiddenCategories", hidden );
-		dirSett.setValue( "NewBreeze/FoldedCategories", folded );
+		dirSett.setValue( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", hidden );
+		dirSett.setValue( "NewBreeze/" + tokens.join( "/" ) + "/FoldedCategories", folded );
 		dirSett.sync();
 	}
 

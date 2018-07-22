@@ -247,7 +247,7 @@ void NBSidePanelItem::mousePressEvent( QMouseEvent *mpEvent ) {
 		}
 
 		else if ( mType == QuickFile ) {
-			menu.addAction( QIcon( ":/icons/delete.png" ), "&Remove QuickFile", this, SLOT( removeQuickFile() ) );
+			menu.addAction( QIcon( ":/icons/delete.png" ), "&Remove from Quick Files", this, SLOT( removeQuickFile() ) );
 			menu.exec( mapToGlobal( mpEvent->pos() ) );
 		}
 	}
@@ -318,13 +318,10 @@ void NBSidePanelItem::paintEvent( QPaintEvent *pEvent ) {
 	QRectF textRect = QRectF( 47, 0, width() - 47, 20 );
 
 	QFontMetrics fm( font() );
-	mName = fm.elidedText( mName, Qt::ElideRight, width() - 47 );
+	QString text = fm.elidedText( mName, Qt::ElideRight, width() - 47 );
 
 	painter.setPen( palette().color( QPalette::WindowText ) );
-	painter.drawText( textRect, Qt::AlignLeft | Qt::AlignVCenter, mName );
-
-	// painter.setPen( Qt::darkGray );
-	// painter.drawLine( rect().topRight(), rect().bottomRight() );
+	painter.drawText( textRect, Qt::AlignLeft | Qt::AlignVCenter, text );
 
 	painter.end();
 
@@ -349,6 +346,7 @@ void NBSidePanelItem::removeBookmark() {
 void NBSidePanelItem::removeQuickFile() {
 
 	QSettings superStart( "NewBreeze", "SuperStart" );
+	qDebug() << "Removing" << mName << "from SuperStart";
 	superStart.remove( "Files/" + mName );
 	superStart.sync();
 

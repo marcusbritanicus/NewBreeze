@@ -238,7 +238,7 @@ void NBItemViewNode::sort( int column, bool cs, bool categorized ) {
 
 void NBItemViewNode::updateIcon() {
 
-	mIcon = getIcon( nodeData.at( 3 ).toString(), nodeData.at( 6 ).toString() );
+	mIcon = getIcon( nodeData.at( 10 ).toString(), nodeData.at( 6 ).toString() );
 };
 
 void NBItemViewNode::updateCategories() {

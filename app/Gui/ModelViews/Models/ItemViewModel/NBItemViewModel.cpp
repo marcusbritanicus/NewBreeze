@@ -334,7 +334,7 @@ bool NBItemViewModel::insertNode( QString nodeName ) {
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 	endResetModel();
 
-	thumbnailer->createThumbnails( mRootPath );
+	thumbnailer->createThumbnails( mRootPath, QStringList() << nodeName );
 
 	return true;
 };
@@ -361,7 +361,7 @@ void NBItemViewModel::updateNode( QString nodeName ) {
 
 	sort( prevSort.column, prevSort.cs, prevSort.categorized );
 
-	thumbnailer->createThumbnails( mRootPath );
+	thumbnailer->createThumbnails( mRootPath, QStringList() << nodeName );
 };
 
 bool NBItemViewModel::removeNode( QString nodeName ) {
@@ -393,7 +393,7 @@ void NBItemViewModel::nodeUpdated( QString nodeName ) {
 	NBItemViewNode *node = rootNode->child( baseName( nodeName ) );
 	node->updateIcon();
 
-	emit dataChanged( index( nodeName ), index( nodeName ) );
+	emit dataChanged( index( baseName( nodeName ) ), index( baseName( nodeName ) ) );
 };
 
 QModelIndex NBItemViewModel::index( int row, int column, const QModelIndex &parent ) const {
@@ -826,15 +826,11 @@ void NBItemViewModel::setRootPath( QString path ) {
 
 		else
 			mRootPath = Settings->Session.LastDir;
-
-		thumbnailer->createThumbnails( mRootPath );
 	}
 
 	else {
 		mVirtualData = false;
 		mModelDataType = (quint64)NBItemViewModel::FileSystem;
-
-		thumbnailer->createThumbnails( mRootPath );
 	}
 
 	/* Navigation: If we are in the middle, remove all 'forawrd' roots */
@@ -1023,9 +1019,14 @@ QString NBItemViewModel::lastOpenedFolder() const {
 
 void NBItemViewModel::setupModelData() {
 
+	lastUpdatedNodes.clear();
+	lastUpdatedTimes.clear();
+
 	switch( mModelDataType ) {
 		case NBItemViewModel::SuperStart: {
 			setupSuperStartData();
+			if ( Settings->View.FilePreviews )
+				thumbnailer->createThumbnails( mChildPaths );
 			return;
 		}
 
@@ -1036,13 +1037,15 @@ void NBItemViewModel::setupModelData() {
 
 		case NBItemViewModel::Catalogs: {
 			setupCatalogData();
+			if ( Settings->View.FilePreviews )
+				thumbnailer->createThumbnails( mChildPaths );
 			return;
 		}
 
 		case NBItemViewModel::FileSystem: {
 			setupFileSystemData();
 			if ( Settings->View.FilePreviews )
-				thumbnailer->createThumbnails( mRootPath );
+				thumbnailer->createThumbnails( mRootPath, mChildNames );
 			return;
 		}
 	}
@@ -1093,6 +1096,7 @@ void NBItemViewModel::setupFileSystemData() {
 void NBItemViewModel::setupSuperStartData() {
 
 	mChildNames.clear();
+	mChildPaths.clear();
 	rootNode->clearChildren();
 	currentLoadStatus.loading = true;
 
@@ -1139,6 +1143,7 @@ void NBItemViewModel::setupSuperStartData() {
 		data[ 3 ] = key;
 		rootNode->addChild( new NBItemViewNode( data, "Files  ", rootNode ) );
 		mChildNames << key;
+		mChildPaths << path;
 	}
 	superStart.endGroup();
 
@@ -1154,6 +1159,7 @@ void NBItemViewModel::setupSuperStartData() {
 void NBItemViewModel::setupApplicationsData() {
 
 	mChildNames.clear();
+	mChildPaths.clear();
 	rootNode->clearChildren();
 	currentLoadStatus.loading = true;
 
@@ -1196,6 +1202,7 @@ void NBItemViewModel::setupApplicationsData() {
 void NBItemViewModel::setupCatalogData() {
 
 	mChildNames.clear();
+	mChildPaths.clear();
 	rootNode->clearChildren();
 	currentLoadStatus.loading = true;
 
@@ -1226,6 +1233,7 @@ void NBItemViewModel::setupCatalogData() {
 						QVariantList data = quickDataGatherer->getQuickFileInfo( location + "/" + _nodeName );
 						rootNode->addChild( new NBItemViewNode( data, ctlg, rootNode ) );
 						mChildNames << _nodeName;
+						mChildPaths << location + "/" + _nodeName;
 						mCategoryIconMap[ ctlg ] = data.at( 2 ).toString();
 						free( fileList[ i ] );
 					}
@@ -1255,6 +1263,7 @@ void NBItemViewModel::setupCatalogData() {
 						QVariantList data = quickDataGatherer->getQuickFileInfo( location + "/" + _nodeName );
 						rootNode->addChild( new NBItemViewNode( data, ctlg, rootNode ) );
 						mChildNames << _nodeName;
+						mChildPaths << location + "/" + _nodeName;
 						mCategoryIconMap[ ctlg ] = data.at( 2 ).toString();
 						free( fileList[ i ] );
 					}
@@ -1266,7 +1275,7 @@ void NBItemViewModel::setupCatalogData() {
 	}
 
 	else {
-		QString key = mRootPath.replace( "NB://Catalogs/", "" );
+		QString key = QString( mRootPath ).replace( "NB://Catalogs/", "" );
 		QStringList locations = catalogsSettings.value( key ).toStringList();
 		foreach( QString location, locations ) {
 			if ( not exists( location ) )
@@ -1285,6 +1294,7 @@ void NBItemViewModel::setupCatalogData() {
 					QVariantList data = quickDataGatherer->getQuickFileInfo( location + "/" + _nodeName );
 					rootNode->addChild( new NBItemViewNode( data, location, rootNode ) );
 					mChildNames << _nodeName;
+					mChildPaths << location + "/" + _nodeName;
 					mCategoryIconMap[ location ] = data.at( 2 ).toString();
 					free( fileList[ i ] );
 				}

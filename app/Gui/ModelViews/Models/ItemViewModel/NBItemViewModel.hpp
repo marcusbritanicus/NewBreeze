@@ -161,6 +161,7 @@ class NBItemViewModel : public QAbstractItemModel {
 
 		QString mRootPath;
 		QStringList mChildNames;
+		QStringList mChildPaths;
 
 		QHash<QString, QList<int> > categoryRowMap;
 		QHash<QString, bool> categoryVisibilityMap;
@@ -195,7 +196,6 @@ class NBItemViewModel : public QAbstractItemModel {
 		/* To manage the rapidly changing nodes */
 		mutable QStringList lastUpdatedNodes;
 		mutable QList<QTime> lastUpdatedTimes;
-		mutable QStringList delayedUpdateList;
 
 		NBQuickFileInfoGatherer *quickDataGatherer;
 		NBFileSystemWatcher *watcher;
