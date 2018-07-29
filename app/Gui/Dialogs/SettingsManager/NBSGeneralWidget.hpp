@@ -29,8 +29,8 @@ class NBSGeneralWidget : public QWidget {
 
 		/* SidePanel */
 		QGroupBox *showSidePanelGB;				// Show the SidePanel/SideBar?
-		QRadioButton *sidePanelRB;				// Show the Modern Side Panel
-		QRadioButton *sideBarRB;				// Show the Classic SideBar
+		QRadioButton *sideBarRB;				// Show the Modern SideBar
+		QRadioButton *sidePanelRB;				// Show the Classic SidePanel
 
 		/* File previews */
 		QGroupBox *filePreviewGB;				// Show image previews?

@@ -21,7 +21,6 @@
 #include "NBMessageDialog.hpp"
 #include "NBPropertiesDialog.hpp"
 #include "NBSettingsManager.hpp"
-#include "NBSideBar.hpp"
 #include "NBSidePanel.hpp"
 #include "NBTerminal.hpp"
 #include "NBTrashManager.hpp"
@@ -55,7 +54,6 @@ class NewBreeze : public QMainWindow {
 
 		NBAddressBar *AddressBar;
 		NBSidePanel *SidePanel;
-		NBSideBar *SideBar;
 		NBFolderView *FolderView;
 		NBTerminal *Terminal;
 		NBInfoBar *InfoBar;
@@ -90,7 +88,6 @@ class NewBreeze : public QMainWindow {
 		void handleDriveUrl( QString );
 		void showApplications();
 		void showCatalogs( QString url = QString() );
-		void showFolders();
 		void showTrash();
 
 		void chdirUI( QString );
@@ -105,7 +102,7 @@ class NewBreeze : public QMainWindow {
 		void changeViewMode( int );
 		void toggleGrouping();
 
-		void toggleSideBarVisible();
+		void toggleSidePanelVisible();
 		void toggleInfoPanel();
 		void showHideTermWidget();
 

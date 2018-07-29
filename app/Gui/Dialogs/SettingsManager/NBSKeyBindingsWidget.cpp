@@ -62,7 +62,7 @@ NBKeyBindingsWidget::NBKeyBindingsWidget( QWidget *parent ) : QWidget( parent ) 
 	keysLyt->addWidget( new QLabel( "Reload" ), 11, 0 );
 	keysLyt->addWidget( new QLabel( "Toggle Hidden Files" ), 12, 0 );
 	keysLyt->addWidget( new QLabel( "Select All" ), 13, 0 );
-	keysLyt->addWidget( new QLabel( "Toggle SideBar" ), 14, 0 );
+	keysLyt->addWidget( new QLabel( "Toggle SidePanel" ), 14, 0 );
 	keysLyt->addWidget( new QLabel( "Cut" ), 15, 0 );
 	keysLyt->addWidget( new QLabel( "Copy" ), 16, 0 );
 	keysLyt->addWidget( new QLabel( "Paste" ), 17, 0 );

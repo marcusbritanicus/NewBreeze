@@ -40,9 +40,6 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 		if ( loc.startsWith( "NB://SuperStart" ) )
 			FolderView->doOpen( "NB://SuperStart" );
 
-		else if ( loc.startsWith( "NB://Applications" ) )
-			FolderView->doOpen( "NB://Applications" );
-
 		else if ( loc.startsWith( "NB://Catalogs" ) )
 			FolderView->doOpen( loc );
 
@@ -120,8 +117,6 @@ void NewBreeze::createGUI() {
 	ViewLayout->setContentsMargins( QMargins() );
 	ViewLayout->setSpacing( 0 );
 
-	/* One of the SidePanel's will be hidden automatically */
-	ViewLayout->addWidget( SideBar );
 	ViewLayout->addWidget( SidePanel );
 
 	ViewLayout->addWidget( FolderView );
@@ -148,7 +143,6 @@ void NewBreeze::createGUI() {
 
 	AddressBar->setFocusPolicy( Qt::NoFocus );
 	SidePanel->setFocusPolicy( Qt::NoFocus );
-	SideBar->setFocusPolicy( Qt::NoFocus );
 	FolderView->setFocusPolicy( Qt::StrongFocus );
 
 	setFocusPolicy( Qt::NoFocus );
@@ -156,37 +150,17 @@ void NewBreeze::createGUI() {
 
 void NewBreeze::setupSidePanel() {
 
-	SideBar = new NBSideBar( this );
 	SidePanel = new NBSidePanel( this );
-
-	connect( SideBar, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
-	connect( SideBar, SIGNAL( showFolders() ), this, SLOT( showFolders() ) );
-	connect( SideBar, SIGNAL( showApplications() ), this, SLOT( showApplications() ) );
-	connect( SideBar, SIGNAL( showCatalogs() ), this, SLOT( showCatalogs() ) );
-	connect( SideBar, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
-
 	connect( SidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
 	connect( SidePanel, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
 
 	/* If we are showing sidepanel */
-	if ( Settings->General.SidePanel ) {
-		/* Modern SideBar */
-		if ( Settings->General.SidePanelType == 0 ) {
-			SideBar->show();
-			SidePanel->hide();
-		}
-		/* Classic SidePanel */
-		else {
-			SideBar->hide();
-			SidePanel->show();
-		}
-	}
+	if ( Settings->General.SidePanel )
+		SidePanel->show();
 
 	/* We are not showing the sidepanel at all */
-	else {
+	else
 		SidePanel->hide();
-		SideBar->hide();
-	}
 };
 
 void NewBreeze::setupInfoPanel() {
@@ -271,9 +245,6 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( reloadBookmarks() ), SidePanel, SLOT( populateSidePanel() ) );
 	connect( FolderView, SIGNAL( reloadCatalogs() ), SidePanel, SLOT( populateSidePanel() ) );
 
-	connect( FolderView, SIGNAL( reloadCatalogs() ), SideBar, SLOT( flashCatalogs() ) );
-	connect( FolderView, SIGNAL( reloadBookmarks() ), SideBar, SLOT( flashBookmarks() ) );
-
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateInfoBar() ) );
 
@@ -327,9 +298,9 @@ void NewBreeze::createAndSetupActions() {
 	connect( termWidgetAct, SIGNAL( triggered() ), this, SLOT( showHideTermWidget() ) );
 
 	// Show/Hide side bar
-	QAction *toggleSideBar = new QAction( "Toggle Sidebar", this );
-	toggleSideBar->setShortcuts( Settings->Shortcuts.ToggleSideBar );
-	connect( toggleSideBar, SIGNAL( triggered() ), this, SLOT( toggleSideBarVisible() ) );
+	QAction *toggleSidePanel = new QAction( "Toggle SidePanel", this );
+	toggleSidePanel->setShortcuts( Settings->Shortcuts.ToggleSideBar );
+	connect( toggleSidePanel, SIGNAL( triggered() ), this, SLOT( toggleSidePanelVisible() ) );
 
 	// Show/Hide info panel
 	QAction *toggleInfoPanelAct = new QAction( "Toggle InfoPanel", this );
@@ -341,20 +312,10 @@ void NewBreeze::createAndSetupActions() {
 	viewModeAct->setShortcuts( Settings->Shortcuts.ViewMode );
 	connect( viewModeAct, SIGNAL( triggered() ), this, SLOT( switchToNextView() ) );
 
-	// Show Application View
-	QAction *showApplicationsAct = new QAction( "show Applications", this );
-	showApplicationsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Alt+Shift+A" ) );
-	connect( showApplicationsAct, SIGNAL( triggered() ), this, SLOT( showApplications() ) );
-
 	// Show Catalog View
-	QAction *showCatalogsAct = new QAction( "show Catalogs", this );
+	QAction *showCatalogsAct = new QAction( "Show Catalogs", this );
 	showCatalogsAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Alt+Shift+C" ) );
 	connect( showCatalogsAct, SIGNAL( triggered() ), this, SLOT( showCatalogs() ) );
-
-	// Show Folder View
-	QAction *showFoldersAct = new QAction( "Toggle Catalogs", this );
-	showFoldersAct->setShortcuts( QList<QKeySequence>() << QKeySequence( "Alt+Shift+F" ) );
-	connect( showFoldersAct, SIGNAL( triggered() ), this, SLOT( showFolders() ) );
 
 	// Focus the search bar
 	QAction *focusSearchAct = new QAction( "Focus SearchBar", this );
@@ -374,12 +335,10 @@ void NewBreeze::createAndSetupActions() {
 	addAction( focusAddressBarAct );
 	addAction( newWindowAct );
 	addAction( termWidgetAct );
-	addAction( toggleSideBar );
+	addAction( toggleSidePanel );
 	addAction( toggleInfoPanelAct );
 	addAction( viewModeAct );
-	addAction( showApplicationsAct );
 	addAction( showCatalogsAct );
-	addAction( showFoldersAct );
 	addAction( focusSearchAct );
 	addAction( clearSearchAct );
 	addAction( aboutNBAct );
@@ -539,17 +498,6 @@ void NewBreeze::showSettingsDialog() {
 
 	NBSettingsManager *settingsMgr = new NBSettingsManager( this );
 	settingsMgr->exec();
-
-	/* Hack */
-	if ( Settings->General.SidePanelType == 0 ) {
-		SidePanel->hide();			// Classic SideBar
-		SideBar->show();			// Modern SideBar
-	}
-
-	else {
-		SidePanel->show();			// Classic SideBar
-		SideBar->hide();			// Modern SideBar
-	}
 
 	qApp->processEvents();
 };
@@ -714,9 +662,6 @@ void NewBreeze::handleDriveUrl( QString url ){
 	else if ( url.startsWith( "NB://Catalogs" ) )
 		showCatalogs( url );
 
-	else if ( url.startsWith( "NB://Folders" ) )
-		showFolders();
-
 	else
 		FolderView->doOpen( url );
 };
@@ -732,28 +677,14 @@ void NewBreeze::chdirUI( QString url ){
 
 void NewBreeze::showApplications() {
 
-	if ( qobject_cast<NBSideBar*>( sender() ) != SideBar )
-		SideBar->flashApplications();
-
 	FolderView->doOpen( "NB://Applications" );
 	AddressBar->setAddress( "NB://Applications" );
 };
 
 void NewBreeze::showCatalogs( QString url ) {
 
-	if ( qobject_cast<NBSideBar*>( sender() ) != SideBar )
-		SideBar->flashCatalogs();
-
 	FolderView->doOpen( url );
 	AddressBar->setAddress( url );
-};
-
-void NewBreeze::showFolders() {
-
-	if ( qobject_cast<NBSideBar*>( sender() ) != SideBar )
-		SideBar->flashFolders();
-
-	FolderView->showFolders();
 };
 
 void NewBreeze::showTrash() {
@@ -881,29 +812,15 @@ void NewBreeze::toggleGrouping() {
 	FolderView->fsModel->reload();
 };
 
-void NewBreeze::toggleSideBarVisible() {
+void NewBreeze::toggleSidePanelVisible() {
 
-	/* Modern SideBar */
-	if ( Settings->General.SidePanelType == 0 ) {
-		if ( SideBar->isVisible() )
-			SideBar->hide();
+	if ( SidePanel->isVisible() )
+		SidePanel->hide();
 
-		else
-			SideBar->show();
+	else
+		SidePanel->show();
 
-		Settings->setValue( "SidePanel", SideBar->isVisible() );
-	}
-
-	/* Classic SidePanel */
-	else {
-		if ( SidePanel->isVisible() )
-			SidePanel->hide();
-
-		else
-			SidePanel->show();
-
-		Settings->setValue( "SidePanel", SidePanel->isVisible() );
-	}
+	Settings->setValue( "SidePanel", SidePanel->isVisible() );
 };
 
 void NewBreeze::toggleInfoPanel() {

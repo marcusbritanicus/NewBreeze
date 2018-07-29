@@ -1,6 +1,6 @@
 /*
 	*
-	* NBSidePanel.hpp - SideBar class Header
+	* NBSidePanel.hpp - SidePanel class Header
 	*
 */
 

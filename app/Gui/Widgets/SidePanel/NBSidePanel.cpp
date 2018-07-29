@@ -1,6 +1,6 @@
 /*
 	*
-	* NBSidePanel.cpp - SideBar class for NewBreeze
+	* NBSidePanel.cpp - SidePanel class for NewBreeze
 	*
 */
 
@@ -152,7 +152,7 @@ void NBSidePanel::loadQuickFiles() {
 	qfList.beginGroup( "Files" );
 
 	Q_FOREACH( QString key, qfList.allKeys() ) {
-	NBSidePanelItem *item = new NBSidePanelItem( key, NBIconManager::instance()->icon( "bookmarks" ).at( 0 ), qfList.value( key ).toString(), NBSidePanelItem::QuickFile, this );
+		NBSidePanelItem *item = new NBSidePanelItem( key, NBIconManager::instance()->icon( "bookmarks" ).at( 0 ), qfList.value( key ).toString(), NBSidePanelItem::QuickFile, this );
 		connect( item, SIGNAL( clicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 		item->setToolTip( qfList.value( key ).toString() );
 		scrollLyt->addWidget( item );

@@ -38,6 +38,7 @@
 #include "NBLogger.hpp"
 #include "NBCLParser.hpp"
 #include "NBApplication.hpp"
+#include "NBStartupWizard.hpp"
 
 int main( int argc, char **argv ) {
 
@@ -142,6 +143,17 @@ int main( int argc, char **argv ) {
 			qDebug() << "Showing NewBreeze BugReporter";
 			NBBugReporter *bugreport = new NBBugReporter();
 			bugreport->exec();
+
+			return 0;
+		}
+
+		/* We want only the bug report dialog */
+		case STARTUP : {
+			qDebug() << "Showing NewBreeze Startup Wizard";
+
+			NBStartupWizard *startWiz = new NBStartupWizard();
+			startWiz->exec();
+			Settings->reload();
 
 			return 0;
 		}

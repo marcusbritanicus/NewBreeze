@@ -44,12 +44,12 @@ NBSettingManager                                                                
 	  • Option for preview of PDF/DjVu
 	✓ Remove Open with Catalogs option
 
-NBCatalogs                                                                                                                            [ 2 of 4 ]
+NBCatalogs                                                                                                                            [ 4 of 4 ]
 	✓ Improve Catalogs support
 	✓ Change Catalogs View to make it more intutive
 	  • Each type shows the contents of the folders added to it
-	□ Add a menu
-	□ Enable thumbnailing in Catalogs
+	✓ Add a menu
+	✓ Enable thumbnailing in Catalogs
 
 NBSideBar (Renamed to NBSidePanel)                                                                                                    [ 2 of 2 ]
 	✗ Improve the looks to make it similar to Ubuntu 18.04 Nautilus SideBar

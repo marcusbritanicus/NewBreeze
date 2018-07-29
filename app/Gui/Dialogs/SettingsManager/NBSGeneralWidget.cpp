@@ -62,17 +62,18 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	showSidePanelGB->setChecked( sett.value( "SidePanel" ).toBool() );
 	connect( showSidePanelGB, SIGNAL( toggled( bool ) ), this, SLOT( handleShowSidePanelToggled( bool ) ) );
 
-	sidePanelRB = new QRadioButton( "Use the modern side &panel" );
-	connect( sidePanelRB, SIGNAL( clicked() ), this, SLOT( handleSidePanelChoice() ) );
-	sidePanelRB->setChecked( sett.value( "SidePanelType" ).toInt() == 0 );
-
-	sideBarRB = new QRadioButton( "Use the classic side &bar" );
+	sideBarRB = new QRadioButton( "Use the modern side &bar" );
 	connect( sideBarRB, SIGNAL( clicked() ), this, SLOT( handleSidePanelChoice() ) );
-	sideBarRB->setChecked( sett.value( "SidePanelType" ).toInt() == 1 );
+	sideBarRB->setChecked( sett.value( "SidePanelType" ).toInt() == 0 );
+	sideBarRB->setDisabled( true );
+
+	sidePanelRB = new QRadioButton( "Use the classic side &panel" );
+	connect( sidePanelRB, SIGNAL( clicked() ), this, SLOT( handleSidePanelChoice() ) );
+	sidePanelRB->setChecked( sett.value( "SidePanelType" ).toInt() == 1 );
 
 	QVBoxLayout *sidePanelLyt = new QVBoxLayout();
-	sidePanelLyt->addWidget( sidePanelRB );
 	sidePanelLyt->addWidget( sideBarRB );
+	sidePanelLyt->addWidget( sidePanelRB );
 
 	showSidePanelGB->setLayout( sidePanelLyt );
 
@@ -316,7 +317,7 @@ void NBSGeneralWidget::handleShowSidePanelToggled( bool showPanel ) {
 void NBSGeneralWidget::handleSidePanelChoice() {
 	/* Modern: 0; Classic: 1 */
 
-	if ( qobject_cast<QRadioButton*>( sender() ) == sidePanelRB )
+	if ( qobject_cast<QRadioButton*>( sender() ) == sideBarRB )
 		Settings->setValue( "SidePanelType", 0 );
 
 	else

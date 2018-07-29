@@ -68,6 +68,9 @@ const option::Descriptor usage[] = {
 	/* Print the force-new option */
     { FORCENEW,   0,   "f",    "force-new",   Arg::None,        "    -f, --force-new  Kill the old server and start a new one." },
 
+	/* Print the force-new option */
+    { STARTUP,    0,   "",     "startup",     Arg::None,        "        --startup    Open the first-time startup dialog." },
+
     /* Print the meaning of [URL] */
     { UNKNOWN,    0,   "",     "",            Arg::None,        "\nArguments:\n"
                                                                 "    URL     \t Url of the path you want to open." },
@@ -79,9 +82,9 @@ const option::Descriptor usage[] = {
                                                                 "    newbreeze -t                           # Opens an instance in tray\n"
                                                                 "    newbreeze -s                           # Opens the settings dialog\n"
                                                                 "    newbreeze --settings                   # Opens the settings dialog\n"
-                                                                "    newbreeze -a                           # Opens the about NB dialog\n"
-                                                                "    newbreeze --license                    # Opens the NB license dialog\n"
-                                                                "    newbreeze --REPORTBUG                  # Opens the NB REPORTBUGer dialog\n"
+                                                                "    newbreeze -a                           # Opens the about NB Dialog\n"
+                                                                "    newbreeze --license                    # Opens the NB License dialog\n"
+                                                                "    newbreeze --reportbug                  # Opens the NB ReportBug dialog\n"
                                                                 "    newbreeze --force-new                  # Kills the existsing server and "
                                                                                                             "opens window at the last opened location\n"
                                                                 "    newbreeze --force-new /home/cosmos     # Kills the existsing server and "
@@ -197,11 +200,17 @@ int NBArgParser( int argc, char** argv ) {
 		return REPORTBUG;
 	}
 
-	/* If there some other argument was given to @a --settings, ignore it, but print it to let the user know */
 	else if ( options[ FORCENEW ] ) {
 		/* We were unable to open a new instance in the existing session. */
 		/* Forcing to start a new session */
 		return FORCENEW;
+	}
+
+	else if ( options[ STARTUP ] ) {
+		if( argc > 1 )
+			fprintf( stdout, "Ignoring the %d extra arguments specified...\n", parse.optionsCount() + parse.nonOptionsCount() - 1 );
+
+		return STARTUP;
 	}
 
 	else {

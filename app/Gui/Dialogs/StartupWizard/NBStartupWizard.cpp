@@ -352,6 +352,7 @@ void NBStartupWizard::createPages() {
 	p7btn1->setChecked( false );
 	p7btn1->setText( "&Modern SidePanel" );
 	p7btn1->setDescription( "A 48px side panel, showing Drives and Bookmarks using a popup menu" );
+	p7btn1->setDisabled( false );
 
 	p7btn2 = new QCommandLinkButton( p7gb1 );
 	p7btn2->setCheckable( true );

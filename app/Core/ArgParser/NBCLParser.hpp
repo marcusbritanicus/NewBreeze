@@ -25,6 +25,7 @@ enum  optionIndex {
 	LICENSE,
 	REPORTBUG,
 	FORCENEW,
+	STARTUP,
 	NORMAL
 };
 
