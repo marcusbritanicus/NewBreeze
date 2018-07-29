@@ -62,11 +62,7 @@ Qt::ItemFlags NBArchiveTreeModel::flags( const QModelIndex &idx ) const {
 
 	NBTreeBranch *node = static_cast<NBTreeBranch*>( idx.internalPointer() );
 
-	if ( hasBranches( idx ) )
-		return Qt::ItemIsEnabled;
-
-	else
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 };
 
 QVariant NBArchiveTreeModel::data( const QModelIndex &index, int role ) const {

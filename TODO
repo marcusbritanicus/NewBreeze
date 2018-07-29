@@ -32,9 +32,9 @@ NBDirectoryView                                                                 
 NBContextMenu                                                                                                                         [ 1 of 1 ]
 	✓ Grouping checkbox does not work
 
-NBStartupWizard                                                                                                                       [ 2 of 3 ]
+NBStartupWizard                                                                                                                       [ 3 of 3 ]
 	✓ Add IconOverlay, Default terminal, ExtendedIO, etc
-	✍ Show StartupWizard when NewBreeze.conf has missing settings.
+	✗ Show StartupWizard when NewBreeze.conf has missing settings.
 	✓ Remove Open with Catalogs option
 
 NBSettingManager                                                                                                                      [ 2 of 2 ]

@@ -26,8 +26,7 @@ typedef struct {
 	int type;
 
 	/* Stat equivalent */
-	struct stat *stat;
-
+	struct stat info;
 } ArchiveEntry;
 
 typedef QList<ArchiveEntry*> ArchiveEntries;
