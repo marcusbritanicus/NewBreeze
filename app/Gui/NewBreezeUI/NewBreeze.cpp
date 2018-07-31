@@ -226,6 +226,7 @@ void NewBreeze::createAndSetupActions() {
 	connect( AddressBar, SIGNAL( sortByType() ), FolderView, SLOT( sortByType() ) );
 	connect( AddressBar, SIGNAL( sortBySize() ), FolderView, SLOT( sortBySize() ) );
 	connect( AddressBar, SIGNAL( sortByDate() ), FolderView, SLOT( sortByDate() ) );
+	connect( AddressBar, SIGNAL( toggleHidden() ), FolderView, SLOT( doToggleHidden() ) );
 	connect( AddressBar, SIGNAL( toggleGrouping() ), this, SLOT( toggleGrouping() ) );
 
 	connect( AddressBar, SIGNAL( showSettings() ), this, SLOT( showSettingsDialog() ) );

@@ -286,6 +286,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	connect( menuBtn, SIGNAL( sortByType() ), this, SIGNAL( sortByType() ) );
 	connect( menuBtn, SIGNAL( sortBySize() ), this, SIGNAL( sortBySize() ) );
 	connect( menuBtn, SIGNAL( sortByDate() ), this, SIGNAL( sortByDate() ) );
+	connect( menuBtn, SIGNAL( toggleHidden() ), this, SIGNAL( toggleHidden() ) );
 	connect( menuBtn, SIGNAL( toggleGrouping() ), this, SIGNAL( toggleGrouping() ) );
 	connect( menuBtn, SIGNAL( showSettings() ), this, SIGNAL( showSettings() ) );
 	connect( menuBtn, SIGNAL( closeWindow() ), this, SIGNAL( closeWindow() ) );

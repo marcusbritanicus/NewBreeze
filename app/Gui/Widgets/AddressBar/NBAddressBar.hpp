@@ -124,6 +124,7 @@ class NBAddressBar : public QWidget {
 		void sortByType();
 		void sortBySize();
 		void sortByDate();
+		void toggleHidden();
 		void toggleGrouping();
 
 		void showSettings();

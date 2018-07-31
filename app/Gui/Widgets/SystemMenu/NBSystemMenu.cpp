@@ -455,7 +455,7 @@ void NBSystemMenu::exec( QPoint point ) {
 		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
 		sortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
 		grouping = sett.value( "NewBreeze/Grouping", true ).toBool();
-		hidden = sett.value( "NewBreeze/Grouping", false ).toBool();
+		hidden = sett.value( "NewBreeze/ShowHidden", false ).toBool();
 	}
 
 	/* Reset View Buttons */
