@@ -502,6 +502,7 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 				int y = textRect.y();
 				int w = textRect.width();
 				int h = textRect.height();
+
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );
 				painter->setPen( Qt::gray );
@@ -528,7 +529,6 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 				int x = textRect.x();
 				int y = textRect.y();
 				int w = textRect.width();
-				int h = textRect.height();
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );
 				painter->setPen( Qt::gray );
@@ -561,7 +561,6 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 				int x = textRect.x();
 				int y = textRect.y();
 				int w = textRect.width();
-				int h = textRect.height();
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );
 				painter->setPen( Qt::gray );
@@ -598,7 +597,6 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 				int x = textRect.x();
 				int y = textRect.y();
 				int w = textRect.width();
-				int h = textRect.height();
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );
 				painter->setPen( Qt::gray );
@@ -639,7 +637,6 @@ void NBIconDelegate::paintIconTextDetails( QPainter *painter, QRect &textRect, c
 				int x = textRect.x();
 				int y = textRect.y();
 				int w = textRect.width();
-				int h = textRect.height();
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );
 				painter->setPen( Qt::gray );
@@ -701,7 +698,6 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 				int x = textRect.x();
 				int y = textRect.y();
 				int w = textRect.width();
-				int h = textRect.height();
 
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );
@@ -729,7 +725,6 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 				int x = textRect.x();
 				int y = textRect.y();
 				int w = textRect.width();
-				int h = textRect.height();
 
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );
@@ -761,7 +756,6 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 				int x = textRect.x();
 				int y = textRect.y();
 				int w = textRect.width();
-				int h = textRect.height();
 
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );
@@ -797,7 +791,6 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 				int x = textRect.x();
 				int y = textRect.y();
 				int w = textRect.width();
-				int h = textRect.height();
 
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );
@@ -837,7 +830,6 @@ void NBIconDelegate::paintTileTextDetails( QPainter *painter, QRect &textRect, c
 				int x = textRect.x();
 				int y = textRect.y();
 				int w = textRect.width();
-				int h = textRect.height();
 
 				painter->save();
 				painter->setRenderHint( QPainter::Antialiasing, false );

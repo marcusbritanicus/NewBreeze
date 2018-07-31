@@ -4,7 +4,7 @@ NBArchive                                                                       
 	✓ Upgrade NBArchive class to enable extraction of a single member
 
 NBDefaultPlugin::ArchiveExamine                                                                                                       [ 1 of 1 ]
-	◐ Enable extraction of selected/all members
+	✓ Enable extraction of selected/all members
 
 NBVideoPlugin                                                                                                                         [ 1 of 1 ]
 	✓ Play video using libVLC interface for the peek interface

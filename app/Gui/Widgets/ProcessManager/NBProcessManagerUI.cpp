@@ -38,7 +38,7 @@ void NBProcessManagerUI::createGUI() {
 	baseLyt->setContentsMargins( QMargins( 5, 5, 5, 5 ) );
 
 	if ( pMgr->processCount() ) {
-		for ( quint64 i = pMgr->processCount() - 1; i >= 0; i-- ) {
+		for ( qint64 i = pMgr->processCount() - 1; i >= 0; i-- ) {
 
 			NBProcessWidget *procWidget = new NBProcessWidget( pMgr->progress( i ), pMgr->process( i ), this );
 			baseLyt->addWidget( procWidget );

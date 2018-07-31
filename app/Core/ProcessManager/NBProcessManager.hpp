@@ -10,7 +10,7 @@
 #include "NBAbstractProcess.hpp"
 #include "NBIOProcess.hpp"
 
-typedef QList<quint64> ProcessIDList;
+typedef QList<qint64> ProcessIDList;
 typedef QList<NBAbstractProcess*> ProcessList;
 typedef QList<NBProcess::Progress *> ProgressList;
 
@@ -22,7 +22,7 @@ class NBProcessManager : public QObject {
 		static NBProcessManager* instance();
 
 		/* Total number of processes */
-		quint64 processCount();
+		qint64 processCount();
 
 		/* All the processes */
 		ProcessList processes();
@@ -31,7 +31,7 @@ class NBProcessManager : public QObject {
 		ProgressList progresses();
 
 		/* Number of active processes */
-		quint64 activeProcessCount();
+		qint64 activeProcessCount();
 
 		/* All the processes */
 		ProcessList activeProcesses();
@@ -40,13 +40,13 @@ class NBProcessManager : public QObject {
 		ProgressList activeProgresses();
 
 		/* Add a process */
-		quint64 addProcess( NBProcess::Progress *progress, NBAbstractProcess * );
+		qint64 addProcess( NBProcess::Progress *progress, NBAbstractProcess * );
 
 		/* Get the process for a process ID */
-		NBAbstractProcess* process( quint64 );
+		NBAbstractProcess* process( qint64 );
 
 		/* Get the progress details for a process ID */
-		NBProcess::Progress* progress( quint64 );
+		NBProcess::Progress* progress( qint64 );
 
 	private:
 		NBProcessManager() : QObject() {
@@ -69,5 +69,5 @@ class NBProcessManager : public QObject {
 
 	Q_SIGNALS:
 		void processAdded( NBProcess::Progress*, NBAbstractProcess* );
-		void activeProcessCountChanged( quint64 );
+		void activeProcessCountChanged( qint64 );
 };

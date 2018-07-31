@@ -54,5 +54,5 @@ void NBMenuButton::showMenu() {
 	setStyleSheet( "QToolButton#menuBtn{ border: none; } QToolButton#menuBtn:hover { border: none; background-color: #A1DFFF; border-radius: 3px; }" );
 };
 
-void NBMenuButton::updateViewMode( QString mode ) {
+void NBMenuButton::updateViewMode( QString ) {
 };

@@ -204,7 +204,7 @@ void NBNewFileDialog::createFile() {
 	int index = cb->currentIndex();
 
 	/* Return value */
-	bool ret;
+	bool ret = false;
 
 	/* Suffix List */
 	QStringList suffixes = QStringList() << "" << ".odg" << ".odp" << ".ods" << ".odt" << ".html" << ".txt";

@@ -136,7 +136,7 @@ bool NBIOProcess::preIO() {
 	mProgress->progressText = QString( "Checking space requirements..." );
 	NBDeviceInfo tgtInfo = NBDeviceManager::deviceInfoForPath( mProgress->targetDir );
 
-	if ( tgtInfo.bytesAvailable() <= mProgress->totalBytes ) {
+	if ( tgtInfo.bytesAvailable() <= qint64( mProgress->totalBytes ) ) {
 
 		emit noSpace();
 
@@ -156,8 +156,6 @@ void NBIOProcess::processDirectory( QString path ) {
 		qWarning() << "Couldn't open directory:" << path;
 		return;
 	}
-
-	quint64 size = 0;
 
 	if ( not path.endsWith( "/" ) )
 		path += "/";
@@ -404,6 +402,7 @@ void NBIOProcess::run() {
 					qDebug() << "[Error]:" << strerror( errno );
 					errorNodes << node;
 				}
+				break;
 			}
 
 			case S_IFBLK:

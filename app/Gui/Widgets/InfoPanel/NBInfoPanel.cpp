@@ -44,8 +44,6 @@ inline static QString getPermissions( QString path ) {
 
 NBInfoPanel::NBInfoPanel( QWidget *parent ) :QWidget( parent ) {
 
-	setFixedWidth( 300 );
-
 	/* Basic Settings */
 	setContentsMargins( QMargins() );
 	setFocusPolicy( Qt::NoFocus );

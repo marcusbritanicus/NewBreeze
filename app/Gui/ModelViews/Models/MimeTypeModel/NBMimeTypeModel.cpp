@@ -122,7 +122,7 @@ QVariant NBMimeTypeModel::data( const QModelIndex &index, int role ) const {
 			return node->name();
 
 		case Qt::DecorationRole:
-			node->icon();
+			return node->icon();
 
 		case Qt::TextAlignmentRole:
 			return ( 0x0001 | 0x0080 );
@@ -342,6 +342,6 @@ void NBMimeTypeModel::updateAllNodes() {
 
 };
 
-void NBMimeTypeModel::saveInfo( QString root, QString entry, QStringList info ) {
+void NBMimeTypeModel::saveInfo( QString, QString, QStringList ) {
 
 };

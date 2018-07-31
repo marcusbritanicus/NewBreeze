@@ -6,6 +6,7 @@ Version 3.0.0 RC
 	- Feature: PDF/DjVu enabled
 	- Feature: Video/Audio preview enabled
 	- Feature: Selected file preview enabled
+	- Fixed most of the code causing warnings
 	- Improvements to NBIconView
 	- Classes interchanged: NBSideBar <--> NBSidePanel
 	- Improvements to NBSidePanel

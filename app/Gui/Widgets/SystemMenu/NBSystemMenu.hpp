@@ -107,6 +107,7 @@ class NBSystemMenu : public QWidget {
 		NBMenuItemButton *iconsBtn, *tilesBtn, *detailsBtn;
 		NBMenuItem *nSortBtn, *tSortBtn, *sSortBtn, *dSortBtn;
 		NBMenuItemCheck *groupCheck;
+		NBMenuItemCheck *hiddenCheck;
 
 		QLabel *zoomLbl;
 
@@ -137,6 +138,7 @@ class NBSystemMenu : public QWidget {
 		void sortBySize();
 		void sortByDate();
 		void toggleGrouping();
+		void toggleHidden();
 
 		void showSettings();
 

@@ -31,7 +31,7 @@ NBProcessManager* NBProcessManager::instance() {
 	return pMgr;
 };
 
-quint64 NBProcessManager::processCount() {
+qint64 NBProcessManager::processCount() {
 
 	return progressList.count();
 };
@@ -46,7 +46,7 @@ ProgressList NBProcessManager::progresses() {
 	return progressList;
 };
 
-quint64 NBProcessManager::activeProcessCount() {
+qint64 NBProcessManager::activeProcessCount() {
 
 	return progressList.count() - completedProcIDs.count();
 };
@@ -54,7 +54,7 @@ quint64 NBProcessManager::activeProcessCount() {
 ProcessList NBProcessManager::activeProcesses() {
 
 	ProcessList active;
-	for( quint64 i = 0; i < progressList.count(); i++ ) {
+	for( qint64 i = 0; i < progressList.count(); i++ ) {
 		if ( not completedProcIDs.contains( i ) )
 			active << processList.at( i );
 	}
@@ -65,7 +65,7 @@ ProcessList NBProcessManager::activeProcesses() {
 ProgressList NBProcessManager::activeProgresses() {
 
 	ProgressList active;
-	for( quint64 i = 0; i < progressList.count(); i++ ) {
+	for( qint64 i = 0; i < progressList.count(); i++ ) {
 		if ( not completedProcIDs.contains( i ) )
 			active << progressList.at( i );
 	}
@@ -73,7 +73,7 @@ ProgressList NBProcessManager::activeProgresses() {
 	return active;
 };
 
-quint64 NBProcessManager::addProcess( NBProcess::Progress *progress, NBAbstractProcess *proc ) {
+qint64 NBProcessManager::addProcess( NBProcess::Progress *progress, NBAbstractProcess *proc ) {
 
 	emit processAdded( progress, proc );
 	emit activeProcessCountChanged( processList.count() - completedProcIDs.count() + 1 );
@@ -89,7 +89,7 @@ quint64 NBProcessManager::addProcess( NBProcess::Progress *progress, NBAbstractP
 	return progressList.count() - 1;
 };
 
-NBProcess::Progress* NBProcessManager::progress( quint64 id ) {
+NBProcess::Progress* NBProcessManager::progress( qint64 id ) {
 
 	if ( id < 0 or id >= progressList.count() )
 		return NULL;
@@ -97,7 +97,7 @@ NBProcess::Progress* NBProcessManager::progress( quint64 id ) {
 	return progressList.at( id );
 };
 
-NBAbstractProcess* NBProcessManager::process( quint64 id ) {
+NBAbstractProcess* NBProcessManager::process( qint64 id ) {
 
 	if ( id < 0 or id >= processList.count() )
 		return NULL;
@@ -108,7 +108,7 @@ NBAbstractProcess* NBProcessManager::process( quint64 id ) {
 void NBProcessManager::handleProcessComplete() {
 
 	NBAbstractProcess *proc = qobject_cast<NBAbstractProcess*>( sender() );
-	quint64 id = processList.indexOf( proc );
+	qint64 id = processList.indexOf( proc );
 
 	if ( id == -1 )
 		return;

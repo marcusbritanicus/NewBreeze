@@ -133,4 +133,6 @@ void NBExtraCrumb::paintEvent( QPaintEvent *pEvent ) {
 	painter->restore();
 
 	painter->end();
+
+	pEvent->accept();
 };

@@ -297,6 +297,12 @@ void NBSystemMenu::populateMenu() {
 	viewGroup->addButton( detailsBtn );
 	viewGroup->setExclusive( true );
 
+	/* Show Hidden */
+	hiddenCheck = new NBMenuItemCheck( "Show Hidden", this );
+	hiddenCheck->setChecked( Settings->General.ShowHidden );
+	connect( hiddenCheck, SIGNAL( clicked() ), this, SLOT( close() ) );
+	connect( hiddenCheck, SIGNAL( clicked() ), this, SIGNAL( toggleHidden() ) );
+
 	/* Sorting */
 	groupCheck = new NBMenuItemCheck( "Show in Groups", this );
 	groupCheck->setChecked( Settings->General.Grouping );
@@ -369,6 +375,8 @@ void NBSystemMenu::populateMenu() {
 	itemsLayout->addWidget( Separator::horizontal( this ) );
 	itemsLayout->addWidget( vteItem );
 	itemsLayout->addWidget( Separator::horizontal( this ) );
+	itemsLayout->addWidget( hiddenCheck );
+	itemsLayout->addWidget( Separator::horizontal( this ) );
 	itemsLayout->addLayout( vLyt );
 	itemsLayout->addWidget( Separator::horizontal( this ) );
 	itemsLayout->addLayout( sLyt );
@@ -427,7 +435,7 @@ void NBSystemMenu::exec( QPoint point ) {
 
 	QString viewMode;
 	int iconSize, sortColumn;
-	bool grouping;
+	bool grouping, hidden;
 
 	if ( mAddress.startsWith( "NB://" ) ) {
 		QString location = mAddress.replace( "NB://", "" );
@@ -437,6 +445,7 @@ void NBSystemMenu::exec( QPoint point ) {
 		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
 		sortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
 		grouping = sett.value( "NewBreeze/Grouping", true ).toBool();
+		hidden = false;
 	}
 
 	else {
@@ -446,6 +455,7 @@ void NBSystemMenu::exec( QPoint point ) {
 		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
 		sortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
 		grouping = sett.value( "NewBreeze/Grouping", true ).toBool();
+		hidden = sett.value( "NewBreeze/Grouping", false ).toBool();
 	}
 
 	/* Reset View Buttons */
@@ -462,6 +472,7 @@ void NBSystemMenu::exec( QPoint point ) {
 		detailsBtn->setChecked( true );
 
 	zoomLbl->setText( QString( " %1px " ).arg( iconSize ) );
+	hiddenCheck->setChecked( hidden );
 
 	/* Reset Sort Buttons */
 	nSortBtn->setChecked( false );

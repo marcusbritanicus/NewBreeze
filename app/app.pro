@@ -312,8 +312,8 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 	QMAKE_CXXFLAGS += -std=c++11
 }
 
-# Enable warnings and threading support
-CONFIG += thread silent warn_off build_all
+# Disable warnings and enable threading support
+CONFIG += thread silent build_all
 
 # Disable Debug on Release
 # CONFIG(release):DEFINES += QT_NO_DEBUG_OUTPUT

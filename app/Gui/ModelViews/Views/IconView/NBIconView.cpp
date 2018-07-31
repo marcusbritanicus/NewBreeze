@@ -899,7 +899,6 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 	/* Shift Modifier */
 	else if ( qApp->keyboardModifiers() & Qt::ShiftModifier ) {
 		/* Current Index */
-		QModelIndex cIdx = currentIndex();
 
 		/* Valid index */
 		if ( idx.isValid() ) {
@@ -1543,8 +1542,6 @@ void NBIconView::setCategorySelected( QString category, bool yes ) {
 
 QModelIndex NBIconView::nextIndex() {
 
-	QModelIndex idx = currentIndex();
-
 	/* The next index is in the current category */
 	int nextIdx = curIdx.second + 1;
 	if ( nextIdx < cModel->indexListCountForCategory( curIdx.first ) ) {
@@ -1584,8 +1581,6 @@ QModelIndex NBIconView::nextIndex() {
 };
 
 QModelIndex NBIconView::prevIndex() {
-
-	QModelIndex idx = currentIndex();
 
 	/* The previous index is in the current category */
 	int prevIdx = curIdx.second - 1;
@@ -1688,8 +1683,6 @@ QModelIndex NBIconView::belowIndex() {
 };
 
 QModelIndex NBIconView::aboveIndex() {
-
-	QModelIndex idx = currentIndex();
 
 	/* The previous index is in the current category */
 	/* Note that if this category is folded, the next block will have already put the

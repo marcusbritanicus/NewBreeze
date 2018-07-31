@@ -58,6 +58,7 @@ class NewBreeze : public QMainWindow {
 		NBTerminal *Terminal;
 		NBInfoBar *InfoBar;
 		NBInfoPanel *InfoPanel;
+		QDockWidget *InfoDock;
 		NBFilterWidget *FilterWidget;
 
 		bool mTerminate;

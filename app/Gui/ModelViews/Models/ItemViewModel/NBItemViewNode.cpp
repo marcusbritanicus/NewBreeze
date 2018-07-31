@@ -228,7 +228,7 @@ int NBItemViewNode::row() {
 	return 0;
 };
 
-void NBItemViewNode::sort( int column, bool cs, bool categorized ) {
+void NBItemViewNode::sort( int, bool, bool categorized ) {
 
 	if ( categorized )
 		mCategoryList = sortCategoryList( mCategoryList );

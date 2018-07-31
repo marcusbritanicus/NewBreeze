@@ -120,7 +120,6 @@ void NewBreeze::createGUI() {
 	ViewLayout->addWidget( SidePanel );
 
 	ViewLayout->addWidget( FolderView );
-	ViewLayout->addWidget( InfoPanel );
 
 	QVBoxLayout *BaseLayout = new QVBoxLayout();
 	BaseLayout->setContentsMargins( QMargins( 0, 3, 0, 0 ) );
@@ -168,15 +167,21 @@ void NewBreeze::setupInfoPanel() {
 	/* Create the InfoPanel */
 	InfoPanel = new NBInfoPanel( this );
 
+	InfoDock = new QDockWidget( "Info Panel", this );
+	InfoDock->setFeatures( QDockWidget::NoDockWidgetFeatures );
+	InfoDock->setWidget( InfoPanel );
+
+	addDockWidget( Qt::RightDockWidgetArea, InfoDock );
+
 	/* Show infopanel and hide infobar */
 	if ( Settings->General.InfoPanel ) {
-		InfoPanel->show();
+		InfoDock->show();
 		InfoBar->hide();
 	}
 
 	/* Show infobar and hide infopanel */
 	else {
-		InfoPanel->hide();
+		InfoDock->hide();
 		InfoBar->show();
 	}
 
@@ -826,14 +831,14 @@ void NewBreeze::toggleSidePanelVisible() {
 void NewBreeze::toggleInfoPanel() {
 
 	if ( InfoPanel->isVisible() ) {
-		InfoPanel->hide();
+		InfoDock->hide();
 		InfoBar->show();
 
 		Settings->setValue( "InfoPanel", false );
 	}
 
 	else {
-		InfoPanel->show();
+		InfoDock->show();
 		InfoBar->hide();
 
 		Settings->setValue( "InfoPanel", true );

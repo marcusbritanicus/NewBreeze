@@ -760,6 +760,8 @@ QString NBItemViewModel::nodePath( const QModelIndex idx ) const {
 		case NBItemViewModel::FileSystem:
 			return idx.data( Qt::UserRole + 7 ).toString();
 	}
+
+	return idx.data( Qt::UserRole + 7 ).toString();
 };
 
 QString NBItemViewModel::nodePath( const QString path ) const {
@@ -794,6 +796,8 @@ QFileInfo NBItemViewModel::nodeInfo( const QModelIndex idx ) const {
 		case NBItemViewModel::FileSystem:
 			return QFileInfo( idx.data( Qt::UserRole + 7 ).toString() );
 	}
+
+	return QFileInfo( idx.data( Qt::UserRole + 7 ).toString() );
 };
 
 QString NBItemViewModel::rootPath() const {
@@ -1359,11 +1363,13 @@ QString NBItemViewModel::getCategory( QVariantList data ) {
 			if ( data.at( 1 ).toLongLong() < 104857600 )
 				return "Medium";
 			/* 100 MB - 1 GB */
-			if ( data.at( 1 ).toLongLong() < 1073741824 )
+			if ( data.at( 1 ).toLongLong() < 1073741824L )
 				return "Large";
-			/* 0 - 100 kB */
-			if ( data.at( 1 ).toLongLong() >= 1073741824 )
+			/* Above 1GB */
+			if ( data.at( 1 ).toLongLong() >= 1073741824L )
 				return "Massive";
+
+			return "";
 		}
 
 		/* Type Sorting */
@@ -1379,6 +1385,8 @@ QString NBItemViewModel::getCategory( QVariantList data ) {
 			if ( data.at( 0 ).toString() == "system" ) {
 				return "System Files";
 			}
+
+			return "";
 		}
 
 		case 4: {

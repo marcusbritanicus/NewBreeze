@@ -15,6 +15,13 @@
 			nblog = fopen( "/dev/null", "w" );
 
 		switch ( type ) {
+			case QtInfoMsg: {
+				fprintf( nblog, "NewBreeze::Debug# %s\n", message.toLocal8Bit().data() );
+				fflush( nblog );
+				fprintf( stderr, "\033[01;32mNewBreeze::Info# %s\n\033[00;00m", message.toLocal8Bit().data() );
+				break;
+			}
+
 			case QtDebugMsg: {
 				fprintf( nblog, "NewBreeze::Debug# %s\n", message.toLocal8Bit().data() );
 				fflush( nblog );

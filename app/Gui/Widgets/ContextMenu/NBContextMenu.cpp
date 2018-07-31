@@ -185,6 +185,7 @@ void NBActionsMenu::buildCustomActionsMenu() {
 					NBPluginInterface *iface = pList.at( 0 );
 
 					QAction *termAct = iface->actions( NBPluginInterface::TerminalInterface, QStringList() << file ).at( 0 );
+					Q_UNUSED( termAct );
 					//termAct->setText( name );
 					//addAction( termAct );
 
@@ -833,6 +834,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 				sortMenu->addAction( sortByDateAct );
 				sortMenu->addSeparator();
 				sortMenu->addAction( groupsAct );
+				groupsAct->setChecked( Settings->General.Grouping );
 
 				menu->addMenu( createNewMenu );
 				menu->addSeparator();
@@ -885,17 +887,6 @@ void NBFolderView::showContextMenu( QPoint position ) {
 				connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
 				connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
 
-				// File/directory sorting
-				QMenu *sortMenu = new QMenu( "&Sort by" );
-				sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
-
-				sortMenu->addAction( sortByNameAct );
-				sortMenu->addAction( sortBySizeAct );
-				sortMenu->addAction( sortByTypeAct );
-				sortMenu->addAction( sortByDateAct );
-				sortMenu->addSeparator();
-				sortMenu->addAction( groupsAct );
-
 				menu->addMenu( openWithMenu );
 				menu->addSeparator();
 
@@ -933,9 +924,6 @@ void NBFolderView::showContextMenu( QPoint position ) {
 				menu->addAction( delAct );
 
 				menu->addSeparator();
-				menu->addMenu( sortMenu );
-
-				menu->addSeparator();
 				menu->addAction( propertiesAct );
 				menu->addAction( permissionsAct );
 			}
@@ -953,17 +941,6 @@ void NBFolderView::showContextMenu( QPoint position ) {
 				customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
 				connect( customMenu, SIGNAL( extractArchive( QString ) ), this, SLOT( extract( QString ) ) );
 				connect( customMenu, SIGNAL( addToArchive( QStringList ) ), this, SLOT( compress( QStringList ) ) );
-
-				// File/directory sorting
-				QMenu *sortMenu = new QMenu( "&Sort by" );
-				sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
-
-				sortMenu->addAction( sortByNameAct );
-				sortMenu->addAction( sortBySizeAct );
-				sortMenu->addAction( sortByTypeAct );
-				sortMenu->addAction( sortByDateAct );
-				sortMenu->addSeparator();
-				sortMenu->addAction( groupsAct );
 
 				menu->addMenu( openWithMenu );
 				menu->addSeparator();
@@ -983,9 +960,6 @@ void NBFolderView::showContextMenu( QPoint position ) {
 				trashAct->setText( "Move to trash" );
 				menu->addAction( trashAct );
 				menu->addAction( delAct );
-
-				menu->addSeparator();
-				menu->addMenu( sortMenu );
 
 				menu->addSeparator();
 				menu->addAction( propertiesAct );

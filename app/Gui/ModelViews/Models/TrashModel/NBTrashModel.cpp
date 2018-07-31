@@ -97,6 +97,8 @@ QVariant NBTrashModel::data( const QModelIndex &index, int role ) const {
 				case 3:
 					return node->deletionDate().toString( "MMM dd, yyyy hh:mm:ss" );
 			}
+
+			return QString();
 		}
 
 		case Qt::DecorationRole: {

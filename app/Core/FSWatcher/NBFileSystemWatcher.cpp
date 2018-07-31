@@ -86,6 +86,7 @@ void NBFileSystemWatcher::startWatch( QString path ) {
 		qDebug() << "Watch failed!";
 		emit watchFailed();
 	}
+
 	watchPath = QString( path );
 
 	contents.clear();

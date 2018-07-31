@@ -834,7 +834,7 @@ void NBFolderView::prepareMove() {
 	}
 };
 
-void NBFolderView::copy( QStringList sources, QString tgt ) {
+void NBFolderView::copy( QStringList sources, QString ) {
 
 	if ( not sources.count() )
 		return;
@@ -857,7 +857,7 @@ void NBFolderView::copy( QStringList sources, QString tgt ) {
 	proc->start();
 };
 
-void NBFolderView::move( QStringList sources, QString tgt ) {
+void NBFolderView::move( QStringList sources, QString ) {
 
 	if ( not sources.count() )
 		return;
