@@ -36,6 +36,7 @@ NBMenuButton::NBMenuButton( QWidget *parent ) : QToolButton( parent ) {
 	connect( menu, SIGNAL( sortByType() ), this, SIGNAL( sortByType() ) );
 	connect( menu, SIGNAL( sortBySize() ), this, SIGNAL( sortBySize() ) );
 	connect( menu, SIGNAL( sortByDate() ), this, SIGNAL( sortByDate() ) );
+	connect( menu, SIGNAL( toggleHidden() ), this, SIGNAL( toggleHidden() ) );
 	connect( menu, SIGNAL( toggleGrouping() ), this, SIGNAL( toggleGrouping() ) );
 	connect( menu, SIGNAL( showSettings() ), this, SIGNAL( showSettings() ) );
 	connect( menu, SIGNAL( closeWindow() ), this, SIGNAL( closeWindow() ) );

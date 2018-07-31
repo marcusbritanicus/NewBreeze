@@ -46,6 +46,7 @@ class NBMenuButton : public QToolButton {
 		void sortByType();
 		void sortBySize();
 		void sortByDate();
+		void toggleHidden();
 		void toggleGrouping();
 
 		void showSettings();
