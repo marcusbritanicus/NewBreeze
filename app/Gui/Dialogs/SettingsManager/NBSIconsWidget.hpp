@@ -50,6 +50,8 @@ class NBIconThemeModel: public QAbstractListModel {
 
 	private Q_SLOTS:
 		void setupModel();
+
+	Q_SIGNALS:
 };
 
 class NBIconThemeView: public QListView {

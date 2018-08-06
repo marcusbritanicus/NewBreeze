@@ -50,19 +50,9 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 	}
 }
 
-# Poppler-Qt4
-# ===========
-lessThan( QT_MAJOR_VERSION, 5 ) {
-	INCLUDEPATH  += /usr/include/poppler/qt4
-	LIBS         += -L/usr/lib -lpoppler-qt4 -ldjvulibre
-}
-
-# Poppler-Qt5
-# ===========
-greaterThan( QT_MAJOR_VERSION, 4 ) {
-	INCLUDEPATH  += /usr/include/poppler/qt5
-	LIBS         += -L/usr/lib -lpoppler-qt5 -ldjvulibre
-}
+# MuPdf and DjVulibre Support
+# ===========================
+	LIBS         += -L/usr/lib -ldjvulibre -lmupdf -lmupdfthird -lharfbuzz -lfreetype -lz -ljpeg -lopenjp2 -ljbig2dec
 
 # C++11/C11 Support
 # =================
@@ -121,8 +111,8 @@ SOURCES += OdfOgle/styleinformation.cpp OdfOgle/styleparser.cpp
 
 ## PdfPeep
 ## =======
-HEADERS += PdfPeep/NBPdfPeep.hpp PdfPeep/PdfDocument.hpp PdfPeep/PdfView.hpp
-SOURCES += PdfPeep/NBPdfPeep.cpp PdfPeep/PdfDocument.cpp PdfPeep/PdfView.cpp
+HEADERS += PdfPeep/NBPdfPeep.hpp PdfPeep/PdfView.hpp PdfPeep/MuPdfDocument.hpp
+SOURCES += PdfPeep/NBPdfPeep.cpp PdfPeep/PdfView.cpp PdfPeep/MuPdfDocument.cpp
 
 ## WebWatch
 ## ========

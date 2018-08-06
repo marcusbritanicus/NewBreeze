@@ -6,40 +6,56 @@
 
 #pragma once
 
-#include "Global.hpp"
-#include "PdfDocument.hpp"
+#include <QtCore>
+#include <QtGui>
 
-class PdfView : public QAbstractScrollArea {
+#if QT_VERSION >= 0x050000
+	#include <QtWidgets>
+#endif
+
+#include "MuPdfDocument.hpp"
+
+class PdfView : public QScrollArea {
 	Q_OBJECT
 
 	public:
 		PdfView( QWidget *parent );
-		PdfView( QString, QWidget *parent );
 
-		void setPdfDocument( PdfDocument *Pdf );
-		void load( QString pdfPath );
-		QString pageText( int );
+		void setPdfDocument( MuPdfDocument *Pdf );
+
+		qreal zoom();
+		void setZoom( qreal );
 
 	private:
-		PdfDocument *PdfDoc;
+		MuPdfDocument *PdfDoc;
 		QHash<int, QImage> renderedImages;
-		QHash<int, QRect> pageRects;
+		QHash<int, QRectF> pageRects;
 
 		int currentPage;
-		QScrollBar *vScroll;
+		qreal mZoom;
 
 		void getCurrentPage();
-		void lookAround();
 
 		void reshapeView();
-		float getResolution( int );
 
-		void paintPage( int );
-		void paintRect( int );
+		bool isPageVisible( int pgNo );
 
 	public Q_SLOTS:
-		void slotZoomIn() {};
-		void slotZoomOut() {};
+		void slotZoomIn() {
+
+			if ( mZoom >= 4.0 )
+				return;
+
+			setZoom( mZoom + 0.1 );
+		};
+
+		void slotZoomOut() {
+
+			if ( mZoom <= 0.1 )
+				return;
+
+			setZoom( mZoom - 0.1 );
+		};
 
 	protected:
 		void paintEvent( QPaintEvent *pEvent );
@@ -47,20 +63,3 @@ class PdfView : public QAbstractScrollArea {
 		void resizeEvent( QResizeEvent *rEvent );
 		void wheelEvent( QWheelEvent *wEvent );
 };
-
-/*
-class PageRenderer : public QThread {
-	Q_OBJECT
-
-	public:
-		PageRenderer( QWidget *parent );
-
-		void render( PdfPages pages );
-
-	protected:
-		void run();
-
-	private:
-		PdfPages pageList;
-};
-*/

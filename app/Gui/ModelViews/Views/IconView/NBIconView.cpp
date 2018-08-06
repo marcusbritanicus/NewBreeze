@@ -69,7 +69,7 @@ NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractI
 	setStyleSheet( "#mainList{ border:none; }" );
 
 	/* Minimum Size */
-	setMinimumWidth( 640 );
+	setMinimumWidth( 320 );
 
 	/* Focus Policy */
 	setFocusPolicy( Qt::StrongFocus );
@@ -469,13 +469,15 @@ QModelIndexList NBIconView::selection() {
 
 bool NBIconView::isIndexVisible( QModelIndex idx ) const {
 
-	/* We consider the space reserved for the category but not the indexes listed under it */
-	if ( hiddenCategories.contains( cModel->category( idx ) ) )
-		return false;
+	if ( Settings->General.Grouping ) {
+		/* We consider the space reserved for the category but not the indexes listed under it */
+		if ( hiddenCategories.contains( cModel->category( idx ) ) )
+			return false;
 
-	/* If the index belongs to a folded category and the index position is greater than itemsPerRow - 1 */
-	if ( foldedCategories.contains( cModel->category( idx ) ) and cModel->indexInCategory( idx ) >= itemsPerRow - 1 )
-		return false;
+		/* If the index belongs to a folded category and the index position is greater than itemsPerRow - 1 */
+		if ( foldedCategories.contains( cModel->category( idx ) ) and cModel->indexInCategory( idx ) >= itemsPerRow - 1 )
+			return false;
+	}
 
 	QRect rect = viewportRectForRow( idx.row() );
 	if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )

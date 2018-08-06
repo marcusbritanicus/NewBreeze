@@ -14,11 +14,8 @@
 #include <libffmpegthumbnailer/filmstripfilter.h>
 #include <libdjvu/ddjvuapi.h>
 
-#if QT_VERSION >= 0x050000
-	#include <poppler-qt5.h>
-#else
-	#include <poppler-qt4.h>
-#endif
-
+extern "C" {
+	#include <mupdf/fitz.h>
+}
 
 #include "newbreeze.hpp"

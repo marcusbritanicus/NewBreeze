@@ -49,7 +49,7 @@ Some of its features are
 * libbzip2 (libbz2-dev)
 * libarchive (libarchive-dev)
 * xdg-utils
-* libpoppler-qt4/qt5 (libpoppler-qt4-dev, libpoppler-qt5-dev)
+* mupdf (libmupdf-dev)
 * libdjvulibre-dev (libdjvulibre-dev)
 
 ### Known Bugs

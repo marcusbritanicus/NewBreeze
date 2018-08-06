@@ -26,8 +26,8 @@ NBFolderView::NBFolderView( QWidget *parent ) : QWidget( parent ) {
 	// Process Manager
 	pMgr = NBProcessManager::instance();
 
-	// Minimum Width - 700px
-	setMinimumWidth( 700 );
+	// Minimum Width - 320px
+	setMinimumWidth( 320 );
 
 	// Init moveItems
 	moveItems = false;

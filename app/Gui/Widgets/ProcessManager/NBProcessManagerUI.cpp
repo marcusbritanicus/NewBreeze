@@ -110,7 +110,7 @@ NBProcessManagerMini::NBProcessManagerMini( QWidget *parent ) : QToolButton( par
 	if ( jobs )
 		timer.start( 1000, this );
 
-	connect( pMgr, SIGNAL( activeProcessCountChanged( quint64 ) ), this, SLOT( updateTimer() ) );
+	connect( pMgr, SIGNAL( activeProcessCountChanged( qint64 ) ), this, SLOT( updateTimer() ) );
 	connect( this, SIGNAL( clicked() ), this, SLOT( toggleProcessManager() ) );
 };
 

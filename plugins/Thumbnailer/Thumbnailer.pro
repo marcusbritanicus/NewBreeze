@@ -12,23 +12,13 @@ CONFIG += plugin
 INCLUDEPATH += ../../common/ ../../common/include .
 DEPENDPATH += ../../common/ ../../common/include .
 
-# FFMpeg Support
-# ==============
+# FFMpeg and DjVu Support
+# =======================
 LIBS += -lffmpegthumbnailer -ldjvulibre
 
-# Poppler-Qt4
-# ===========
-lessThan( QT_MAJOR_VERSION, 5 ) {
-	INCLUDEPATH  += /usr/include/poppler/qt4
-	LIBS         += -L/usr/lib -lpoppler-qt4
-}
-
-# Poppler-Qt5
-# ===========
-greaterThan( QT_MAJOR_VERSION, 4 ) {
-	INCLUDEPATH  += /usr/include/poppler/qt5
-	LIBS         += -L/usr/lib -lpoppler-qt5
-}
+# MuPDF Support
+# =============
+LIBS         += -L/usr/lib -lmupdf -lmupdfthird -lharfbuzz -lfreetype -lz -ljpeg -lopenjp2 -ljbig2dec
 
 # LibNB3Common
 # ============

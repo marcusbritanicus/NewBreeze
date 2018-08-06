@@ -11,6 +11,7 @@ NBIconThemeWidget::NBIconThemeWidget( QWidget *parent ) :QWidget( parent ) {
 
 	createGUI();
 
+	iconViewWidget->select( Settings->General.IconTheme );
 	iconViewWidget->setFocus();
 };
 
@@ -33,8 +34,6 @@ void NBIconThemeWidget::switchTheme( const QModelIndex &idx ) {
 
 	QIcon::setThemeName( theme );
 	Settings->setValue( "IconTheme", theme );
-
-	emit reloadIcons();
 };
 
 NBIconThemeModel::NBIconThemeModel( QObject *parent ) : QAbstractListModel( parent ) {

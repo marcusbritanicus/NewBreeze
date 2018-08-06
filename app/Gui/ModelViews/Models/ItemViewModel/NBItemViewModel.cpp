@@ -860,11 +860,17 @@ void NBItemViewModel::setRootPath( QString path ) {
 	/* Check per folder view settings */
 	// Settings->General.ShowHidden = sett.value( "NewBreeze/Hidden", false ).toBool();
 
-	prevSort.column = sett.value( "NewBreeze/SortColumn", Settings->General.SortColumn ).toInt();
-	prevSort.cs = sett.value( "NewBreeze/SortCase", Settings->General.SortCase ).toBool();
-	prevSort.categorized = sett.value( "NewBreeze/Grouping", Settings->General.Grouping ).toBool();
+	NBSettings *Default = NBSettings::defaultInstance();
+
+	prevSort.column = sett.value( "NewBreeze/SortColumn", Default->General.SortColumn ).toInt();
+	prevSort.cs = sett.value( "NewBreeze/SortCase", Default->General.SortCase ).toBool();
+	prevSort.categorized = sett.value( "NewBreeze/Grouping", Default->General.Grouping ).toBool();
 	mCategorizationEnabled = prevSort.categorized;
+
+	Settings->General.SortColumn = prevSort.column;
 	Settings->General.Grouping = prevSort.categorized;
+	Settings->General.ViewMode = sett.value( "NewBreeze/ViewMode", Default->General.ViewMode ).toString();
+
 	/* Delete the old node */
 	delete rootNode;
 

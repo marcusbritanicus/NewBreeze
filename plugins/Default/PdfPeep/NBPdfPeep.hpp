@@ -1,6 +1,6 @@
 /*
 	*
-	* NBPreviewWidget.hpp - NewBreeze PreviewWidget Class Header
+	* NBPdfPeep.hpp - NewBreeze PdfPeep Class Header
 	*
 */
 
@@ -14,7 +14,6 @@ class NBPdfPeep : public QDialog {
 
 	public :
 		NBPdfPeep( QString path = QDir::homePath() );
-		QString path;
 		PdfView *peekWidgetBase;
 
 	private :
@@ -23,6 +22,8 @@ class NBPdfPeep : public QDialog {
 
 		QVBoxLayout *pdfLyt;
 		QLabel *lbl;
+
+		QString path;
 
 	private slots :
 		void openInExternal();

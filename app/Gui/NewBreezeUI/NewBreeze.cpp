@@ -193,7 +193,7 @@ void NewBreeze::setWindowProperties() {
 	setWindowTitle( QString( "%1 - NewBreeze" ).arg( baseName( FolderView->fsModel->currentDir() ) ) );
 	setWindowIcon( QIcon( ":/icons/newbreeze.png" ) );
 
-	setMinimumSize( 900, 600 );
+	setMinimumHeight( 600 );
 
 	if ( not Settings->Session.Maximized )
 		setGeometry( Settings->Session.Geometry );
