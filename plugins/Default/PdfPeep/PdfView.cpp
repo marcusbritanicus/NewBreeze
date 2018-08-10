@@ -6,7 +6,7 @@
 
 #include "PdfView.hpp"
 
-PdfView::PdfView( QWidget *parent ) : QScrollArea( parent ) {
+PdfView::PdfView( QString path, QWidget *parent ) : QScrollArea( parent ) {
 
 	setWidgetResizable( true );
 	setAlignment( Qt::AlignCenter );
@@ -20,45 +20,15 @@ PdfView::PdfView( QWidget *parent ) : QScrollArea( parent ) {
 	currentPage = -1;
 	mZoom = 1.0;
 
-	QAction *zoomInAct = new QAction( this );
-	zoomInAct->setShortcut( QKeySequence( "Ctrl++" ) );
-	connect( zoomInAct, SIGNAL( triggered() ), this, SLOT( slotZoomIn() ) );
-	addAction( zoomInAct );
+	PdfDoc = new MuPdfDocument( path );
+	PdfDoc->loadDocument();
 
-	QAction *zoomOutAct = new QAction( this );
-	zoomOutAct->setShortcut( QKeySequence( "Ctrl+-" ) );
-	connect( zoomOutAct, SIGNAL( triggered() ), this, SLOT( slotZoomOut() ) );
-	addAction( zoomOutAct );
-};
-
-void PdfView::setPdfDocument( MuPdfDocument *Pdf ) {
-
-	PdfDoc = Pdf;
-	if ( Pdf->pageCount() > 0 )
+	if ( PdfDoc->pageCount() > 0 )
 		currentPage = 0;
 
 	setWindowTitle( "PdfView - " + PdfDoc->pdfName() );
 
 	reshapeView();
-};
-
-qreal PdfView::zoom() {
-
-	return mZoom;
-};
-
-void PdfView::setZoom( qreal zoom ) {
-
-	mZoom = zoom;
-	PdfDoc->setZoom( zoom );
-
-	renderedImages.clear();
-	pageRects.clear();
-
-	reshapeView();
-	getCurrentPage();
-
-	repaint();
 };
 
 void PdfView::getCurrentPage() {
@@ -70,6 +40,8 @@ void PdfView::getCurrentPage() {
 	QRectF viewRect = QRectF( QPointF( 0, verticalScrollBar()->value() ), viewport()->size() );
 
 	currentPage = 0;
+
+	/* Get the current page: maximum area => current page */
 	qreal area = 0;
 	for( int pg = 0; pg < PdfDoc->pageCount(); pg++ ) {
 		QRectF xRect = pageRects[ pg ].intersected( viewRect );
@@ -80,20 +52,28 @@ void PdfView::getCurrentPage() {
 		}
 	}
 
+	qreal width = viewport()->width() - style()->pixelMetric( QStyle::PM_ScrollBarExtent ) - 25;
+
 	/* Render the current page if not rendered already */
-	if ( not renderedImages.keys().contains( currentPage ) )
-		renderedImages[ currentPage ] = PdfDoc->renderPage( currentPage );
+	if ( renderedImages.value( currentPage ).isNull() )
+		renderedImages[ currentPage ] = PdfDoc->renderPageForWidth( currentPage, width );
 
-	for( int i = 1; i < 6; i++ ) {
-		if ( currentPage + i < PdfDoc->pageCount() ) {
-			if ( renderedImages.value( currentPage + i ).isNull() )
-				renderedImages[ currentPage + i ] = PdfDoc->renderPage( currentPage + i );
-		}
+	/* Render the next page if not rendered */
+	if ( currentPage + 1 < PdfDoc->pageCount() ) {
+		if ( renderedImages.value( currentPage + 1 ).isNull() )
+			renderedImages[ currentPage + 1 ] = PdfDoc->renderPageForWidth( currentPage + 1, width );
+	}
 
-		if ( currentPage - i >= 0 ) {
-			if ( renderedImages.value( currentPage - i ).isNull() )
-				renderedImages[ currentPage - i ] = PdfDoc->renderPage( currentPage - i );
-		}
+	/* Render the previous page if not rendered */
+	if ( currentPage - 1 >= 0 ) {
+		if ( renderedImages.value( currentPage - 1 ).isNull() )
+			renderedImages[ currentPage - 1 ] = PdfDoc->renderPageForWidth( currentPage - 1, width );
+	}
+
+	/* Render all other pages which are visible in the viewport */
+	for( int i = 0; i < PdfDoc->pageCount(); i++ ) {
+		if ( isPageVisible( i ) and renderedImages.value( i ).isNull() )
+			renderedImages[ i ] = PdfDoc->renderPageForWidth( i, width );
 	}
 };
 
@@ -103,18 +83,18 @@ void PdfView::reshapeView() {
 	renderedImages.clear();
 
 	int minHeight = 10;
-	int maxWidth = 0;
+	int maxWidth = viewport()->width() - style()->pixelMetric( QStyle::PM_ScrollBarExtent ) - 25;
 
 	verticalScrollBar()->setPageStep( height() / 4 * 3 );
 	verticalScrollBar()->setSingleStep( 30 );
 
 	for( int i = 0; i < PdfDoc->pageCount(); i++ ) {
 		QSizeF pageSize = PdfDoc->pageSize( i );
-		pageRects[ i ] = QRectF( QPointF( 0, minHeight ), pageSize );
 
-		maxWidth = ( pageSize.width() > maxWidth ? pageSize.width() : maxWidth );
+		qreal height = 1.0 * pageSize.height() * maxWidth / pageSize.width();
+		pageRects[ i ] = QRectF( QPointF( 0, minHeight ), QSizeF( maxWidth, height ) );
 
-		minHeight += ( int )( pageSize.height() );
+		minHeight += ( int )( height );
 		minHeight += 5;
 	}
 
@@ -122,11 +102,7 @@ void PdfView::reshapeView() {
 	widget()->setFixedSize( maxWidth + 20, minHeight );
 	viewport()->update();
 
-	if ( ( maxWidth + 20 ) < viewport()->width() )
-		horizontalScrollBar()->hide();
-
-	else
-		horizontalScrollBar()->show();
+	horizontalScrollBar()->hide();
 };
 
 bool PdfView::isPageVisible( int pgNo ) {
@@ -159,16 +135,14 @@ void PdfView::paintEvent( QPaintEvent *pEvent ) {
 	painter.translate( widget()->x() + 10, -h );
 	painter.drawImage( pageRects[ currentPage ], renderedImages[ currentPage ] );
 
-	for( int pg = 0; pg < PdfDoc->pageCount(); pg++ )
-		painter.drawImage( pageRects[ pg ], renderedImages[ pg ] );
+	for( int pg = 0; pg < PdfDoc->pageCount(); pg++ ) {
+		if ( isPageVisible( pg ) )
+			painter.drawImage( pageRects[ pg ], renderedImages[ pg ] );
+	}
 
 	/* Draw the current page rect */
 	painter.setPen( Qt::black );
-	if ( pageRects[ currentPage ].y() + pageRects[ currentPage ].height() - h < height() / 2 )
-		painter.drawRect( pageRects[ currentPage + 1 ] );
-
-	else
-		painter.drawRect( pageRects[ currentPage ] );
+	painter.drawRect( pageRects[ currentPage ] );
 
 	painter.end();
 
@@ -193,4 +167,48 @@ void PdfView::wheelEvent( QWheelEvent *wEvent ) {
 	 wEvent->accept();
 
 	 viewport()->repaint();
+};
+
+void PdfView::keyPressEvent( QKeyEvent *kEvent ) {
+
+	switch ( kEvent->key() ) {
+		case Qt::Key_Right: {
+
+			if ( currentPage + 1 < PdfDoc->pageCount() )
+				verticalScrollBar()->setValue( pageRects.value( currentPage + 1 ).top() - 5 );
+
+				break;
+		};
+
+		case Qt::Key_Left: {
+
+			if ( currentPage - 1 >= 0 )
+				verticalScrollBar()->setValue( pageRects.value( currentPage - 1 ).top() - 5 );
+
+			break;
+		};
+
+		case Qt::Key_Home: {
+
+			verticalScrollBar()->setValue( 0 );
+
+			break;
+		};
+
+		case Qt::Key_End: {
+
+			verticalScrollBar()->setValue( widget()->height() );
+
+			break;
+		};
+
+		default: {
+
+			QScrollArea::keyPressEvent( kEvent );
+			break;
+		};
+	}
+
+	viewport()->repaint();
+	kEvent->accept();
 };

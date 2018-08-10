@@ -35,37 +35,12 @@ class MuPdfDocument : public QObject {
 		QString pdfName() const;
 		QString pdfPath() const;
 
-		MuDocument* document() {
-
-			memcpy( mDocument->mCtx, mCtx, sizeof( fz_context ) );
-			memcpy( mDocument->mFzDoc, mFzDoc, sizeof( fz_document ) );
-
-			return mDocument;
-		};
-
-		fz_page* page( int pageNo ) const;
-
-		/* MuPdf Pages */
-		MuPages allPages() {
-
-			return mPageList;
-		};
-
 		int pageCount() const;
+
 		QSizeF pageSize( int pageNo ) const;
-
-		QImage renderPage( int );
-
-		QString pageText( int pageNo ) const;
-		QString text( int pageNo, QRectF ) const;
+		QImage renderPageForWidth( int, qreal );
 
 		qreal zoomForWidth( int pageNo, qreal width );
-		qreal zoomForHeight( int pageNo, qreal width );
-
-		void setZoom( qreal zoom ) {
-
-			mZoom = zoom;
-		};
 
 		bool isReady() const {
 

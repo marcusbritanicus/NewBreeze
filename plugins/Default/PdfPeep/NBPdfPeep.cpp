@@ -34,9 +34,8 @@ void NBPdfPeep::createGUI() {
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
-	peekWidgetBase = new PdfView( this );
+	peekWidgetBase = new PdfView( path, this );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
-	peekWidgetBase->setPdfDocument( new MuPdfDocument( path ) );
 
 	QWidget *pdfBase = new QWidget();
 	pdfLyt = new QVBoxLayout();

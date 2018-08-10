@@ -19,12 +19,7 @@ class PdfView : public QScrollArea {
 	Q_OBJECT
 
 	public:
-		PdfView( QWidget *parent );
-
-		void setPdfDocument( MuPdfDocument *Pdf );
-
-		qreal zoom();
-		void setZoom( qreal );
+		PdfView( QString path, QWidget *parent );
 
 	private:
 		MuPdfDocument *PdfDoc;
@@ -40,26 +35,14 @@ class PdfView : public QScrollArea {
 
 		bool isPageVisible( int pgNo );
 
-	public Q_SLOTS:
-		void slotZoomIn() {
-
-			if ( mZoom >= 4.0 )
-				return;
-
-			setZoom( mZoom + 0.1 );
-		};
-
-		void slotZoomOut() {
-
-			if ( mZoom <= 0.1 )
-				return;
-
-			setZoom( mZoom - 0.1 );
-		};
-
 	protected:
 		void paintEvent( QPaintEvent *pEvent );
 
 		void resizeEvent( QResizeEvent *rEvent );
 		void wheelEvent( QWheelEvent *wEvent );
+
+		void keyPressEvent( QKeyEvent *kEvent );
+
+	Q_SIGNALS:
+		void
 };

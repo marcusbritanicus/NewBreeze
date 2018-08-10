@@ -48,14 +48,6 @@ int MuPdfDocument::pageCount() const {
 	return mPages;
 };
 
-fz_page* MuPdfDocument::page( int pageNum ) const {
-
-	if ( pageNum >= mPages )
-		return 0;
-
-	return mPageList.at( pageNum );
-};
-
 QSizeF MuPdfDocument::pageSize( int pageNum ) const {
 
 	if ( pageNum >= mPages )
@@ -67,7 +59,7 @@ QSizeF MuPdfDocument::pageSize( int pageNum ) const {
 	return QSizeF( mZoom * ( rBox.x1 - rBox.x0 ), mZoom * ( rBox.y1 - rBox.y0 ) );
 };
 
-QImage MuPdfDocument::renderPage( int pgNo ) {
+QImage MuPdfDocument::renderPageForWidth( int pgNo, qreal width ) {
 
 	fz_irect iBox;
 	fz_rect rBox;
@@ -79,7 +71,7 @@ QImage MuPdfDocument::renderPage( int pgNo ) {
 
 	MuPage *pg = mPageList.at( pgNo );
 
-	qreal realZoom = pow( mZoom, 0.5 );
+	qreal realZoom = pow( zoomForWidth( pgNo, width ), 0.5 );
 
 	fz_rotate( &mMtx, 0 );
 	fz_scale( &mMtx, realZoom, realZoom );
@@ -112,34 +104,6 @@ QImage MuPdfDocument::renderPage( int pgNo ) {
 	return img;
 };
 
-QString MuPdfDocument::pageText( int pgNo ) const {
-
-    return text( pgNo, QRectF( QPointF( 0, 0 ), pageSize( pgNo ) ) );
-};
-
-QString MuPdfDocument::text( int pgNo, QRectF rect ) const{
-
-    QString ret;
-    fz_point a, b;
-    char *str;
-
-    MuPage *pg = mPageList.at( pgNo );
-    fz_stext_page *textPage = fz_new_stext_page_from_page( mCtx, pg, 0 );
-
-	a.x = rect.left();
-	a.y = rect.top();
-	b.x = rect.right();
-	b.y = rect.bottom();
-
-	str = fz_copy_selection( mCtx, textPage, a, b, 0);
-	ret = QString::fromUtf8( str );
-	free( str );
-
-	fz_drop_stext_page( mCtx, textPage );
-
-    return ret;
-};
-
 qreal MuPdfDocument::zoomForWidth( int pageNo, qreal width ) {
 
 	if ( pageNo >= mPages )
@@ -148,18 +112,7 @@ qreal MuPdfDocument::zoomForWidth( int pageNo, qreal width ) {
 	fz_rect rBox;
 	fz_bound_page( mCtx, mPageList.at( pageNo ), &rBox );
 
-	return 1.0 * ( rBox.x1 - rBox.x0 ) / width;
-};
-
-qreal MuPdfDocument::zoomForHeight( int pageNo, qreal height ) {
-
-	if ( pageNo >= mPages )
-		return 0.0;
-
-	fz_rect rBox;
-	fz_bound_page( mCtx, mPageList.at( pageNo ), &rBox );
-
-	return 1.0 * ( rBox.y1 - rBox.y0 ) / height;
+	return 1.0 * width / ( rBox.x1 - rBox.x0 );
 };
 
 void MuPdfDocument::loadDocument() {
