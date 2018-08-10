@@ -202,6 +202,12 @@ void PdfView::keyPressEvent( QKeyEvent *kEvent ) {
 			break;
 		};
 
+		case Qt::Key_Escape: {
+
+			emit closePreview();
+			break;
+		};
+
 		default: {
 
 			QScrollArea::keyPressEvent( kEvent );

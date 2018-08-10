@@ -44,5 +44,5 @@ class PdfView : public QScrollArea {
 		void keyPressEvent( QKeyEvent *kEvent );
 
 	Q_SIGNALS:
-		void
+		void closePreview();
 };

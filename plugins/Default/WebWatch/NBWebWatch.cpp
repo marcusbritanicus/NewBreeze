@@ -35,7 +35,6 @@ void NBWebWatch::createGUI() {
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
 	peekWidgetBase = new QWebEngineView();
-
 	peekWidgetBase->load( QUrl::fromLocalFile( path ) );
 
 	lblBtnLyt->addWidget( lbl );
@@ -75,15 +74,13 @@ void NBWebWatch::keyPressEvent( QKeyEvent *keyEvent ) {
 
 void NBWebWatch::changeEvent( QEvent *event ) {
 
-	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
-		hide();
-		event->accept();
-	}
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) )
+		close();
 
-	else {
-		QWidget::changeEvent( event );
-		event->accept();
-	}
+	else
+		QDialog::changeEvent( event );
+
+	event->accept();
 };
 
 void NBWebWatch::paintEvent( QPaintEvent *pEvent ) {

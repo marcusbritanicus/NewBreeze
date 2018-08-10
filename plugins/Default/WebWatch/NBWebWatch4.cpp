@@ -77,15 +77,13 @@ void NBWebWatch::keyPressEvent( QKeyEvent *keyEvent ) {
 
 void NBWebWatch::changeEvent( QEvent *event ) {
 
-	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
-		hide();
-		event->accept();
-	}
+	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) )
+		close();
 
-	else {
-		QWidget::changeEvent( event );
-		event->accept();
-	}
+	else
+		QDialog::changeEvent( event );
+
+	event->accept();
 };
 
 void NBWebWatch::paintEvent( QPaintEvent *pEvent ) {
