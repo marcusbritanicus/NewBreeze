@@ -159,6 +159,14 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 		}
 	}
 
+	/* This is a pdf file */
+	else if ( mName.contains( "epub" ) ) {
+		if ( Settings->View.FilePreviews and Settings->View.ePubPreview ) {
+			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
+				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+		}
+	}
+
 	return mdb.value( mName ).toStringList();
 };
 

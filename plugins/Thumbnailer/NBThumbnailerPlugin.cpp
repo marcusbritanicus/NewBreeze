@@ -58,6 +58,9 @@ QStringList NBThumbnailerPlugin::mimetypes() {
 
 		else if ( type.name().contains( "djvu" ) )
 			mimeList << type.name();
+
+		else if ( type.name().contains( "epub" ) )
+			mimeList << type.name();
 	}
 
 	mimeList.removeDuplicates();
@@ -75,6 +78,9 @@ void NBThumbnailerPlugin::actionTrigger( Interface, QString fileType, QStringLis
 
 	else if ( fileType == "DjVu" )
 		makeDjVuThumbnail( nodes.at( 0 ), nodes.at( 1 ) );
+
+	else if ( fileType == "ePub" )
+		makeEpubThumbnail( nodes.at( 0 ), nodes.at( 1 ) );
 
 	else if ( fileType == "PDF" )
 		makePdfThumbnail( nodes.at( 0 ), nodes.at( 1 ) );
@@ -191,6 +197,105 @@ void NBThumbnailerPlugin::makeDjVuThumbnail( QString path, QString hashPath ) {
 		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
 };
 
+void NBThumbnailerPlugin::makeEpubThumbnail( QString path, QString hashPath ) {
+
+	fz_context *mCtx;
+	fz_document *mFzDoc;
+
+	/* Create context */
+	mCtx = fz_new_context( NULL, NULL, FZ_STORE_UNLIMITED );
+	if ( not mCtx ) {
+		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
+		return;
+	}
+
+	/* Register the default file types to handle. */
+	fz_try( mCtx ) {
+		fz_register_document_handlers( mCtx );
+		mFzDoc = fz_open_document( mCtx, path.toUtf8().constData() );
+
+		/* Check if the document is encrypted */
+		if ( fz_needs_password( mCtx, mFzDoc ) ) {
+			fz_drop_context( mCtx );
+			fz_drop_document( mCtx, mFzDoc );
+			qDebug() << "Encrypted document:" << baseName( path ) << "Using default icon.";
+			return;
+		}
+
+		int mPages = fz_count_pages( mCtx, mFzDoc );
+		if ( not mPages ) {
+			fz_drop_context( mCtx );
+			fz_drop_document( mCtx, mFzDoc );
+			qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
+			return;
+		}
+
+		fz_page *page = fz_load_page( mCtx, mFzDoc, 0 );
+
+		fz_irect iBox;
+		fz_rect rBox;
+		fz_pixmap *image;
+		fz_colorspace *colorspace;
+		fz_matrix mMtx;
+
+		colorspace = fz_device_bgr( mCtx );
+		fz_bound_page( mCtx, page, &rBox );
+
+		int width = rBox.x1 - rBox.x0;
+		int height = rBox.x1 - rBox.x0;
+
+		qreal zoom;
+		if ( width > height )
+			zoom = pow( 128.0 / width, 0.5 );
+
+		else
+			zoom = pow( 128.0 / height, 0.5 );
+
+		fz_rotate( &mMtx, 0 );
+		fz_scale( &mMtx, zoom, zoom );
+
+		fz_round_rect( &iBox, fz_transform_rect( &rBox, &mMtx ) );
+		fz_rect_from_irect( &rBox, &iBox );
+
+		/* Necessary: otherwise only a part of the page is rendered */
+		iBox.x1 *= zoom;
+		iBox.y1 *= zoom;
+
+		image = fz_new_pixmap_with_bbox( mCtx, colorspace, &iBox, 0, 1 );
+		fz_clear_pixmap_with_value( mCtx, image, 0xff );
+		fz_device *dev = fz_new_draw_device_with_bbox( mCtx, &mMtx, image, &iBox );
+
+		fz_run_page( mCtx, page, dev, &mMtx, NULL );
+
+		QImage img = QImage( image->samples, ( iBox.x1 - iBox.x0 ), ( iBox.y1 - iBox.y0 ), QImage::Format_ARGB32 );
+
+		QImage thumb( 128, 128, QImage::Format_ARGB32 );
+		thumb.fill( Qt::transparent );
+
+		QPainter painter( &thumb );
+		painter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
+
+		painter.drawImage( QRect( ( 128 - img.width() ) / 2, ( 128 - img.height() ) / 2, img.width(), img.height() ), img );
+
+		painter.setPen( QPen( QColor( 44, 30, 85 ).lighter( 120 ), 3.0 ) );
+		painter.drawRoundedRect( QRectF( 54, 92, 64, 27 ), 5.0, 5.0 );
+		painter.setFont( QFont( "CMU Sans Serif", 14, QFont::Black ) );
+		painter.drawText( QRectF( 54, 92, 64, 30 ), Qt::AlignCenter, "EPUB" );
+
+		painter.end();
+
+		if ( not thumb.save( hashPath, "png", 0 ) )
+			qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
+	}
+
+	fz_catch( mCtx ) {
+		fz_drop_context( mCtx );
+		fz_drop_document( mCtx, mFzDoc );
+		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
+		return;
+	}
+};
+
 void NBThumbnailerPlugin::makePdfThumbnail( QString path, QString hashPath ) {
 
 	fz_context *mCtx;
@@ -232,7 +337,7 @@ void NBThumbnailerPlugin::makePdfThumbnail( QString path, QString hashPath ) {
 		fz_colorspace *colorspace;
 		fz_matrix mMtx;
 
-		colorspace = fz_device_rgb( mCtx );
+		colorspace = fz_device_bgr( mCtx );
 		fz_bound_page( mCtx, page, &rBox );
 
 		int width = rBox.x1 - rBox.x0;

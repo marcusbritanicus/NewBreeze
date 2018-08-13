@@ -67,7 +67,7 @@ QImage MuPdfDocument::renderPageForWidth( int pgNo, qreal width ) {
 	fz_colorspace *colorspace;
 	fz_matrix mMtx;
 
-    colorspace = fz_device_rgb( mCtx );
+	colorspace = fz_device_bgr( mCtx );
 
 	MuPage *pg = mPageList.at( pgNo );
 
@@ -99,6 +99,11 @@ QImage MuPdfDocument::renderPageForWidth( int pgNo, qreal width ) {
 		fz_drop_colorspace( mCtx, colorspace );
 		return QImage();
 	}
+
+	unsigned char *argb32 = new unsigned char[ ( iBox.x1 - iBox.x0 ) * ( iBox.y1 - iBox.y0 ) ];
+	unsigned char *rgba32 = image->samples;
+
+	size_t count = ( iBox.x1 - iBox.x0 ) * ( iBox.y1 - iBox.y0 );
 
 	QImage img = QImage( image->samples, ( iBox.x1 - iBox.x0 ), ( iBox.y1 - iBox.y0 ), QImage::Format_ARGB32 );
 	return img;

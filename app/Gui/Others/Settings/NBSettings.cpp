@@ -56,6 +56,7 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->View.OdfPreview = true;
 	defaultSettings->View.PdfPreview = true;
 	defaultSettings->View.DjVuPreview = true;
+	defaultSettings->View.ePubPreview = true;
 
 	defaultSettings->Special.ClosingDown = false;
 
@@ -196,6 +197,9 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "View/DjVuPreview" ) ) )
 		settings->View.DjVuPreview = gSettings.value( "View/DjVuPreview" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/ePubPreview" ) ) )
+		settings->View.ePubPreview = gSettings.value( "View/ePubPreview" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		settings->Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();
@@ -418,6 +422,9 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "View/DjVuPreview" ) ) )
 		View.DjVuPreview = gSettings.value( "View/DjVuPreview" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/ePubPreview" ) ) )
+		View.ePubPreview = gSettings.value( "View/ePubPreview" ).toBool();
 
 	if ( gaKeys.contains( QString( "Session/Geometry" ) ) )
 		Session.Geometry = gSettings.value( "Session/Geometry" ).toRect();

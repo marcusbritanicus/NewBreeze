@@ -46,6 +46,7 @@ Dependencies:
 
 Known Bugs
     - Reloading causes custom folder icons not to be rendered
+    - MuPDf does not render first page (perhaps also other) images in epub documents
 
 List of shortcuts
 +==============================================================+============================+

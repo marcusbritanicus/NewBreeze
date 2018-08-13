@@ -20,6 +20,7 @@ void NBThumbnailer::createThumbnails( QStringList nodes ) {
 	videos.clear();
 	pdfs.clear();
 	djvus.clear();
+	epubs.clear();
 
 	Q_FOREACH( QString node, nodes ) {
 		QString mime = mimeDb.mimeTypeForFile( node ).name();
@@ -43,6 +44,10 @@ void NBThumbnailer::createThumbnails( QStringList nodes ) {
 		else if ( mime.contains( "djv" ) ) {
 			djvus << node;
 		}
+
+		else if ( mime.contains( "epub" ) ) {
+			epubs << node;
+		}
 	}
 
 	mTerminate = false;
@@ -59,6 +64,7 @@ void NBThumbnailer::createThumbnails( QString path, QStringList nodes ) {
 	videos.clear();
 	pdfs.clear();
 	djvus.clear();
+	epubs.clear();
 
 	Q_FOREACH( QString node, nodes ) {
 		QString mime = mimeDb.mimeTypeForFile( path + node ).name();
@@ -81,6 +87,10 @@ void NBThumbnailer::createThumbnails( QString path, QStringList nodes ) {
 
 		else if ( mime.contains( "djv" ) ) {
 			djvus << path + node;
+		}
+
+		else if ( mime.contains( "epub" ) ) {
+			epubs << path + node;
 		}
 	}
 
@@ -226,6 +236,28 @@ void NBThumbnailer::run() {
 						continue;
 
 					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "DjVu", QStringList() << file << hashPath );
+					emit updateNode( file );
+				}
+			}
+
+			/* ePub files */
+			if ( Settings->View.ePubPreview ) {
+				Q_FOREACH( QString file, epubs ) {
+					if ( mTerminate )
+						return;
+
+					/* If @path is non-existent */
+					if ( not exists( file ) )
+						continue;
+
+					/* Create a hash of the path */
+					QString hashPath = thumbsDir + MD5( file );
+
+					/* If the thumbnail is already formed */
+					if ( exists( hashPath ) )
+						continue;
+
+					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "ePub", QStringList() << file << hashPath );
 					emit updateNode( file );
 				}
 			}

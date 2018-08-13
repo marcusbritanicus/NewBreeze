@@ -1,8 +1,8 @@
 TEMPLATE = subdirs
 
-SUBDIRS += AVPlugin Default TextEdit Thumbnailer
+SUBDIRS += AVPlugin Default TextEdit TermPlugin Thumbnailer
 
-Default.file = Default-xenial.pro
+Default.file = Default/Default-xenial.pro
 
 isEqual( QT_MAJOR_VERSION, 5 ) {
 	lessThan( QT_MINOR_VERSION, 9 ) {

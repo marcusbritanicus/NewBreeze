@@ -96,6 +96,10 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	djvuPreviewCB->setChecked( Settings->View.DjVuPreview );
 	connect( djvuPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
 
+	epubPreviewCB = new QCheckBox( "eP&ub files", this );
+	epubPreviewCB->setChecked( Settings->View.ePubPreview );
+	connect( epubPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
+
 	odfPreviewCB = new QCheckBox( "&ODF files (.odt .odg .odp .ods)", this );
 	odfPreviewCB->setChecked( Settings->View.OdfPreview );
 	connect( odfPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
@@ -108,6 +112,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	previewLyt->addWidget( imagePreviewCB );
 	previewLyt->addWidget( pdfPreviewCB );
 	previewLyt->addWidget( djvuPreviewCB );
+	previewLyt->addWidget( epubPreviewCB );
 	previewLyt->addWidget( odfPreviewCB );
 	previewLyt->addWidget( videoPreviewCB );
 
@@ -326,12 +331,14 @@ void NBSGeneralWidget::handleSidePanelChoice() {
 
 void NBSGeneralWidget::handlePreviewsChanged() {
 
-	Settings->setValue( "View/FilePreviews", filePreviewGB->isChecked() );
-	Settings->setValue( "View/ImagePreview", imagePreviewCB->isChecked() );
-	Settings->setValue( "View/PdfPreview", pdfPreviewCB->isChecked() );
-	Settings->setValue( "View/DjVuPreview", djvuPreviewCB->isChecked() );
-	Settings->setValue( "View/OdfPreview", odfPreviewCB->isChecked() );
-	Settings->setValue( "View/VideoPreview", videoPreviewCB->isChecked() );
+	sett.setValue( "View/FilePreviews", filePreviewGB->isChecked() );
+	sett.setValue( "View/ImagePreview", imagePreviewCB->isChecked() );
+	sett.setValue( "View/PdfPreview", pdfPreviewCB->isChecked() );
+	sett.setValue( "View/DjVuPreview", djvuPreviewCB->isChecked() );
+	sett.setValue( "View/OdfPreview", odfPreviewCB->isChecked() );
+	sett.setValue( "View/VideoPreview", videoPreviewCB->isChecked() );
+
+	sett.sync();
 
 	Settings->reload();
 };

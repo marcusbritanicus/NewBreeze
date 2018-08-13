@@ -49,5 +49,6 @@ class NBThumbnailerPlugin : public QObject, NBPluginInterface {
 	private:
 		void makeVideoThumbnail( QString, QString );
 		void makeDjVuThumbnail( QString, QString );
+		void makeEpubThumbnail( QString, QString );
 		void makePdfThumbnail( QString, QString );
 };

@@ -37,6 +37,7 @@ class NBSGeneralWidget : public QWidget {
 		QCheckBox *imagePreviewCB;				// Show image thumbnails?
 		QCheckBox *pdfPreviewCB;				// Show pdf thumbnails?
 		QCheckBox *djvuPreviewCB;				// Show djvu thumbnails?
+		QCheckBox *epubPreviewCB;				// Show epub thumbnails?
 		QCheckBox *odfPreviewCB;				// Show ODF thumbnails?
 		QCheckBox *videoPreviewCB;				// Show videos thumbnails?
 

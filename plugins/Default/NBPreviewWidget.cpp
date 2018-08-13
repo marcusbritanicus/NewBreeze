@@ -41,6 +41,12 @@ QList<QAction*> NBPreviewWidget::actions( Interface, QStringList nodes ) {
 			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
 		}
 
+		else if ( mime == mimeDb.mimeTypeForFile( "file.epub" ) ) {
+			NBPdfPeep *peek = new NBPdfPeep( previewNode );
+			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
+			connect( act, SIGNAL( triggered() ), peek, SLOT( exec() ) );
+		}
+
 		else if ( mime.name().contains( "djvu" ) ) {
 			NBDjvuDisplay *peek = new NBDjvuDisplay( previewNode );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
@@ -117,6 +123,10 @@ QStringList NBPreviewWidget::mimetypes() {
 	mimeList << mimeDb.mimeTypeForFile( "file.pdf" ).name();
 	mimeList << mimeDb.mimeTypeForFile( "file.pdf" ).aliases();
 
+	/* ePub mime type */
+	mimeList << mimeDb.mimeTypeForFile( "file.epub" ).name();
+	mimeList << mimeDb.mimeTypeForFile( "file.epub" ).aliases();
+
 	/* Html mime type */
 	mimeList << mimeDb.mimeTypeForFile( "file.html" ).name();
 	mimeList << mimeDb.mimeTypeForFile( "file.html" ).aliases();
@@ -151,6 +161,12 @@ void NBPreviewWidget::actionTrigger( Interface, QString, QStringList nodes ) {
 		}
 
 		else if ( mime == mimeDb.mimeTypeForFile( "file.pdf" ) ) {
+			NBPdfPeep *peek = new NBPdfPeep( nodes.at( 0 ) );
+			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
+			peek->exec();
+		}
+
+		else if ( mime == mimeDb.mimeTypeForFile( "file.epub" ) ) {
 			NBPdfPeep *peek = new NBPdfPeep( nodes.at( 0 ) );
 			peek->setWindowFlags( peek->windowFlags() | Qt::FramelessWindowHint );
 			peek->exec();

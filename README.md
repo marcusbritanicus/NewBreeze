@@ -54,6 +54,7 @@ Some of its features are
 
 ### Known Bugs
 * Reloading causes custom folder icons not to be rendered in some cases
+* MuPDf does not render first page (perhaps also other) images in epub documents
 
 ### Upcoming
 * Any other feature you request for... :)

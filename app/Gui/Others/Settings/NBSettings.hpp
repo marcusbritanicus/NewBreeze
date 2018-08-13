@@ -54,6 +54,7 @@ class NBSettings {
 				bool OdfPreview;								// Show ODF thumbnails
 				bool PdfPreview;								// Show PDF thumbnails
 				bool DjVuPreview;								// Show DjVu thumbnails
+				bool ePubPreview;								// Show ePub thumbnails
 		} View;
 
 		// Special Settings
