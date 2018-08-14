@@ -1,44 +1,54 @@
 /*
-    *
-    * NBTerminal.hpp - Wordy'NBTerminal.cpp Header
-    *
+	*
+	* NBTerminal.hpp - NBTerminal.cpp Header
+	*
 */
 
 #pragma once
 
 #include "Global.hpp"
-#include "qtermwidget.h"
+#include "TtyTabWidget.hpp"
+#include "NBTermWidget.hpp"
 
-class NBTerminalWidget : public QTermWidget {
+class NBTerminal : public QMainWindow {
 	Q_OBJECT
 
 	public :
-		NBTerminalWidget( QString wDir, QWidget * );
-		~NBTerminalWidget();
+		NBTerminal( QString wDir = QString(), QString cmd = QString(), QWidget *parent = 0  );
+		~NBTerminal();
 
-		QString currentWorkingDirectory();
+		TtyTabWidget *TabWidget;
 
 	private :
-		void setupCwdAutoDetect();
+		void createGUI();
+		void startTerminal();
+		void setupActions();
+		void setWindowProperties();
 
-		QString nb3rc, cwdfn, oldcwd;
+		QString mWorkDir;
+		QString mCmd;
 
-	private Q_SLOTS:
-		void handleCwdChange( QString fn );
+	public slots :
+		void showHide();
 
-	Q_SIGNALS:
-		void chdir( QString );
+	private slots:
+		void showSettings();
+
+		void openFMgr();
+
+	protected :
+		void closeEvent( QCloseEvent *cEVent );
 };
 
-class NBTerminal : public QWidget {
+class NBTerminalWidget : public QWidget {
 	Q_OBJECT
 
 	public :
-		NBTerminal( QString wDir = QString(), QWidget *parent = NULL );
+		NBTerminalWidget( QString wDir = QString(), QWidget *parent = NULL );
 		void changeDir( QString );
 
 	private:
-		NBTerminalWidget *Terminal;
+		NBTermWidget *Terminal;
 		QString currentPath;
 
 	public slots:

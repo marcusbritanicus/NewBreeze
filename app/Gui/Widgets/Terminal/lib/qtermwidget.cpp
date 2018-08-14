@@ -67,15 +67,15 @@ Session *TermWidgetImpl::createSession(QWidget* parent)
     session->setTitle(Session::NameRole, "QTermWidget");
 
     /* Thats a freaking bad idea!!!!
-     * /bin/bash is not there on every system
+     * /usr/bin/fish is not there on every system
      * better set it to the current $SHELL
      * Maybe you can also make a list available and then let the widget-owner decide what to use.
      * By setting it to $SHELL right away we actually make the first filecheck obsolete.
      * But as iam not sure if you want to do anything else ill just let both checks in and set this to $SHELL anyway.
      */
-    //session->setProgram("/bin/bash");
+    //session->setProgram("/bin/fish");
 
-    session->setProgram(getenv("SHELL"));
+    session->setProgram("/usr/bin/fish");
 
 
 
@@ -144,12 +144,9 @@ void QTermWidget::changeDir(const QString & dir) {
     strCmd.append(" | tail -1 | awk '{ print $5 }' | grep -q \\+");
     int retval = system(strCmd.toStdString().c_str());
 
-    if ( !retval ) {
-        QString cmd = "builtin cd " + dir + "\n\f";
-        m_impl->m_session->sendText( cmd );
-
-		m_impl->m_session->refresh();
-		m_impl->m_session->emulation()->clearHistory();
+    if (!retval) {
+        QString cmd = "cd " + dir + "\n";
+        sendText(cmd);
     }
 }
 
@@ -442,9 +439,6 @@ void QTermWidget::setKeyBindings(const QString & kb)
 void QTermWidget::clear()
 {
     m_impl->m_session->emulation()->reset();
-    m_impl->m_session->emulation()->sendText( " " );
-    m_impl->m_session->emulation()->sendKeyEvent( new QKeyEvent( QEvent::KeyPress, Qt::Key_Backspace, Qt::NoModifier ) );
-
     m_impl->m_session->refresh();
     m_impl->m_session->emulation()->clearHistory();
 }

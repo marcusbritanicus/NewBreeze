@@ -32,6 +32,7 @@
 #include "NBPropertiesDialog.hpp"
 #include "NBRenameDialog.hpp"
 #include "NBRunCmdDialog.hpp"
+#include "NBTerminal.hpp"
 #include "NBVault.hpp"
 #include "NBVaultDatabase.hpp"
 

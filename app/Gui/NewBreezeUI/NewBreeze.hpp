@@ -55,7 +55,7 @@ class NewBreeze : public QMainWindow {
 		NBAddressBar *AddressBar;
 		NBSidePanel *SidePanel;
 		NBFolderView *FolderView;
-		NBTerminal *Terminal;
+		NBTerminalWidget *Terminal;
 		NBInfoBar *InfoBar;
 		NBInfoPanel *InfoPanel;
 		QDockWidget *InfoDock;

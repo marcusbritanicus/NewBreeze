@@ -7,7 +7,7 @@
 #ifndef NBTSETTINGSDIALOG_HPP
 #define NBTSETTINGSDIALOG_HPP
 
-#include "Global.hpp"
+#include <Global.hpp>
 
 class NBTSettingsDialog : public QDialog {
 	Q_OBJECT

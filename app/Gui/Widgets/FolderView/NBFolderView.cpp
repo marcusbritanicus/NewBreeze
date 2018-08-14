@@ -586,15 +586,8 @@ void NBFolderView::doOpenWith() {
 		return;
 	}
 
-	NBPluginManager *plMgr = NBPluginManager::instance();
-
-	PluginList pList;
-	pList << plMgr->plugins( NBPluginInterface::TerminalInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, "inode/directory" );
-
-	if ( pList.count() ) {
-		NBPluginInterface *iface = pList.at( 0 );
-		iface->actionTrigger( NBPluginInterface::TerminalInterface, QString(), cmdList );
-	}
+	NBTerminal *term = new NBTerminal( cmdList.at( 0 ), cmdList.at( 1 ) );
+	term->showMaximized();
 };
 
 void NBFolderView::doOpenInNewWindow() {
@@ -1245,37 +1238,17 @@ void NBFolderView::openTerminal() {
 		node = NBXdg::home();
 
 	if ( commandList.at( 0 ) == "Inbuilt" ) {
-		NBPluginManager *plMgr = NBPluginManager::instance();
+		NBTerminal *term = new NBTerminal( node );
+		term->showMaximized();
 
-		QString node = fsModel->currentDir();
-		PluginList pList;
-
-		pList << plMgr->plugins( NBPluginInterface::TerminalInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, "inode/directory" );
-
-		if ( pList.count() ) {
-			NBPluginInterface *iface = pList.at( 0 );
-			iface->actionTrigger( NBPluginInterface::TerminalInterface, QString(), QStringList() << node );
-
-			qDebug( "Opening inbuilt term plugin at %s... [DONE]", node.toLocal8Bit().data() );
-			return;
-		}
-
-		else {
-			NBMessageDialog::error(
-				this,
-				"NewBreeze - Terminal",
-				"I'm unable to find the terminal plugin. Please install the NBTermPlugin to use Inbuilt terminal."
-			);
-
-			qDebug( "Terminal plugin not found. Unable to open the terminal" );
-		}
+		qDebug( "Opening terminal at %s... [Done]", node.toLocal8Bit().data() );
 	}
 
 	else {
 		QString command = commandList.takeFirst();
 
 		if ( command == QString( "xterm" ) )
-			commandList[ 1 ] = QString( "cd %1 && /bin/bash" ).arg( termFormatString( fsModel->currentDir() ) );
+			commandList[ 1 ] = QString( "cd %1 && /bin/bash" ).arg( termFormatString( node ) );
 
 		else {
 			commandList[ 1 ] = node;
@@ -1293,26 +1266,10 @@ void NBFolderView::openTerminalIn() {
 	QString folder = QFileInfo( fsModel->nodeInfo( getSelection()[ 0 ] ) ).absoluteFilePath();
 
 	if ( commandList.at( 0 ) == "Inbuilt" ) {
-		NBPluginManager *plMgr = NBPluginManager::instance();
-		PluginList pList = plMgr->plugins( NBPluginInterface::TerminalInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, "inode/directory" );
+		NBTerminal *term = new NBTerminal( folder );
+		term->showMaximized();
 
-		if ( pList.count() ) {
-			NBPluginInterface *iface = pList.at( 0 );
-			iface->actionTrigger( NBPluginInterface::TerminalInterface, QString(), QStringList() << folder );
-
-			qDebug( "Opening inbuilt term plugin at %s... [DONE]", folder.toLocal8Bit().data() );
-			return;
-		}
-
-		else {
-			NBMessageDialog::error(
-				this,
-				"NewBreeze - Terminal",
-				"I'm unable to find the terminal plugin. Please install the NBTermPlugin to use Inbuilt terminal."
-			);
-
-			qDebug( "Terminal plugin not found. Unable to open the terminal" );
-		}
+		qDebug( "Opening terminal at %s... [Done]", folder.toLocal8Bit().data() );
 	}
 
 	else {

@@ -4,8 +4,8 @@
     *
 */
 
-#include "TtyTabWidget.hpp"
-#include "NBTermWidget.hpp"
+#include <TtyTabWidget.hpp>
+#include <NBTermWidget.hpp>
 
 TtyTabWidget::TtyTabWidget( QWidget *parent, bool mode ) : QTabWidget( parent ) {
 
@@ -24,9 +24,19 @@ TtyTabWidget::TtyTabWidget( QWidget *parent, bool mode ) : QTabWidget( parent ) 
 	QLabel *iconLbl = new QLabel( this );
 	iconLbl->setPixmap( QIcon::fromTheme( "utilities-terminal" ).pixmap( 24 ) );
 
+	/* Quit button on top right corner */
+	QToolButton *quitBtn = new QToolButton( this );
+
+	quitBtn->setIcon( QIcon::fromTheme( "application-exit" ) );
+	quitBtn->setFocusPolicy( Qt::NoFocus );
+	quitBtn->setAutoRaise( true );
+	quitBtn->setShortcut( QKeySequence( "Ctrl+Shift+Q" ) );
+
+	connect( quitBtn, SIGNAL( clicked() ), parent, SLOT( close() ) );
+	setCornerWidget( quitBtn, Qt::TopRightCorner );
+
 	setTabPosition( QTabWidget::North );
 	setCornerWidget( iconLbl, Qt::TopLeftCorner );
-	setStyleSheet( getStyleSheet( "NBTabWidget" ) );
 };
 
 int TtyTabWidget::newTerminal() {

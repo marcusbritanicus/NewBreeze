@@ -8,6 +8,8 @@
 
 NBTermWidget::NBTermWidget( QWidget *parent ) : QTermWidget( 0, parent ) {
 
+	QSettings settings( "NewBreeze", "NBTerminal" );
+
 	if ( settings.value( "EnableTransparency" ).toBool() )
 		setTerminalOpacity( settings.value( "Opacity" ).toReal() );
 
@@ -23,10 +25,9 @@ NBTermWidget::NBTermWidget( QWidget *parent ) : QTermWidget( 0, parent ) {
 
 	setColorScheme( settings.value( "ColorScheme" ).toString() );
 	setScrollBarPosition( QTermWidget::ScrollBarRight );
-	setStyleSheet( getStyleSheet( "QTermWidget" ) );
 
 	setTerminalFont( settings.value( "Font" ).value<QFont>() );
-	setHistorySize( -1 );										// Infinte scroll back
+	setHistorySize( 10000 );										// Infinte scroll back
 
 	setShellProgram( settings.value( "Shell" ).toString() );
 
@@ -44,6 +45,8 @@ NBTermWidget::NBTermWidget( QWidget *parent ) : QTermWidget( 0, parent ) {
 
 NBTermWidget::NBTermWidget( QString wDir, QWidget *parent ) : QTermWidget( 0, parent ) {
 
+	QSettings settings( "NewBreeze", "NBTerminal" );
+
 	if ( settings.value( "EnableTransparency" ).toBool() )
 		setTerminalOpacity( settings.value( "Opacity" ).toReal() );
 
@@ -59,7 +62,6 @@ NBTermWidget::NBTermWidget( QString wDir, QWidget *parent ) : QTermWidget( 0, pa
 
 	setColorScheme( settings.value( "ColorScheme" ).toString() );
 	setScrollBarPosition( QTermWidget::ScrollBarRight );
-	setStyleSheet( getStyleSheet( "QTermWidget" ) );
 
 	setTerminalFont( settings.value( "Font" ).value<QFont>() );
 	setHistorySize( 10000 );										// Infinte scroll back
@@ -78,6 +80,8 @@ NBTermWidget::NBTermWidget( QString wDir, QWidget *parent ) : QTermWidget( 0, pa
 
 NBTermWidget::NBTermWidget( QString wDir, QString cmd, QWidget *parent ) : QTermWidget( 0, parent ) {
 
+	QSettings settings( "NewBreeze", "NBTerminal" );
+
 	if ( settings.value( "EnableTransparency" ).toBool() )
 		setTerminalOpacity( settings.value( "Opacity" ).toReal() );
 
@@ -93,13 +97,13 @@ NBTermWidget::NBTermWidget( QString wDir, QString cmd, QWidget *parent ) : QTerm
 
 	setColorScheme( settings.value( "ColorScheme" ).toString() );
 	setScrollBarPosition( QTermWidget::ScrollBarRight );
-	setStyleSheet( getStyleSheet( "QTermWidget" ) );
 
 	setTerminalFont( settings.value( "Font" ).value<QFont>() );
 	setHistorySize( 10000 );
 
 	setWorkingDirectory( wDir );
-	QStringList shArgs = QStringList() << "-l" << "-c" << cmd;			//.split( QRegExp( "\\s+" ), QString::SkipEmptyParts );
+	// Do not use interactive mode.
+	QStringList shArgs = QStringList() << "-l" << "-c" << cmd;
 
 	setShellProgram( settings.value( "Shell" ).toString() );
 	if ( not cmd.isEmpty() )
@@ -121,6 +125,8 @@ QString NBTermWidget::currentWorkingDirectory() {
 };
 
 void NBTermWidget::reloadSettings() {
+
+	QSettings settings( "NewBreeze", "NBTerminal" );
 
 	if ( settings.value( "EnableTransparency" ).toBool() )
 		setTerminalOpacity( settings.value( "Opacity" ).toReal() );

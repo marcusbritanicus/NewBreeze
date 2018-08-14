@@ -2636,6 +2636,7 @@ void TerminalDisplay::inputMethodEvent( QInputMethodEvent* event )
 
     event->accept();
 }
+
 QVariant TerminalDisplay::inputMethodQuery( Qt::InputMethodQuery query ) const
 {
     const QPoint cursorPos = _screenWindow ? _screenWindow->cursorPosition() : QPoint(0,0);

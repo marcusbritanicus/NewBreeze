@@ -10,6 +10,7 @@
 #include "NBPluginManager.hpp"
 #include "NBMessageDialog.hpp"
 #include "NBCategoryMenu.hpp"
+#include "NBTerminal.hpp"
 
 NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractItemView( parent ) {
 
@@ -1097,27 +1098,10 @@ void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 					else {
 						QStringList terminalList = getTerminal();
 						if ( terminalList.at( 0 ) == "Inbuilt" ) {
-							NBPluginManager *plMgr = NBPluginManager::instance();
-							PluginList pList;
-
-							pList << plMgr->plugins( NBPluginInterface::TerminalInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, "inode/directory" );
-
-							if ( pList.count() ) {
-								NBPluginInterface *iface = pList.at( 0 );
-								iface->actionTrigger( NBPluginInterface::TerminalInterface, QString(), QStringList() << NBXdg::home() << execList.at( 0 ) );
-								return;
-							}
-
-							else {
-								NBMessageDialog::error(
-									this,
-									"NewBreeze - Terminal",
-									"I'm unable to find the terminal plugin. Please install the NBTermPlugin to use Inbuilt terminal."
-								);
-
-								qDebug( "Terminal plugin not found. Unable to execute the application in the terminal." );
-							}
+							NBTerminal *term = new NBTerminal( NBXdg::home(), execList.at( 0 ) );
+							term->showMaximized();
 						}
+
 						else {
 							terminalList = terminalList.join( " " ).arg( QDir::homePath() ).arg( execList.at( 0 ) ).split( " " );
 							QProcess::startDetached( terminalList.takeFirst(), terminalList );
@@ -1335,27 +1319,10 @@ void NBIconView::keyPressEvent( QKeyEvent *kEvent ) {
 				else {
 					QStringList terminalList = getTerminal();
 					if ( terminalList.at( 0 ) == "Inbuilt" ) {
-						NBPluginManager *plMgr = NBPluginManager::instance();
-						PluginList pList;
-
-						pList << plMgr->plugins( NBPluginInterface::TerminalInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, "inode/directory" );
-
-						if ( pList.count() ) {
-							NBPluginInterface *iface = pList.at( 0 );
-							iface->actionTrigger( NBPluginInterface::TerminalInterface, QString(), QStringList() << NBXdg::home() << execList.at( 0 ) );
-							return;
-						}
-
-						else {
-							NBMessageDialog::error(
-								this,
-								"NewBreeze - Terminal",
-								"I'm unable to find the terminal plugin. Please install the NBTermPlugin to use Inbuilt terminal."
-							);
-
-							qDebug( "Terminal plugin not found. Unable to execute the application in the terminal." );
-						}
+						NBTerminal *term = new NBTerminal( NBXdg::home(), execList.at( 0 ) );
+						term->showMaximized();
 					}
+
 					else {
 						terminalList = terminalList.join( " " ).arg( QDir::homePath() ).arg( execList.at( 0 ) ).split( " " );
 						QProcess::startDetached( terminalList.takeFirst(), terminalList );

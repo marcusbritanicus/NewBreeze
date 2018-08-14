@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "Global.hpp"
-#include "qtermwidget.h"
+#include <Global.hpp>
+#include <qtermwidget.h>
 
 class NBTermWidget : public QTermWidget {
 	Q_OBJECT
@@ -21,6 +21,7 @@ class NBTermWidget : public QTermWidget {
 
 	private:
 		QString oldCWD;
+		QFileSystemWatcher *watcher = new QFileSystemWatcher();
 
 	private slots:
 		void reloadSettings();

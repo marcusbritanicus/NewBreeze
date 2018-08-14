@@ -7,7 +7,7 @@
 #ifndef TTYTABWIDGET_HPP
 #define TTYTABWIDGET_HPP
 
-#include "Global.hpp"
+#include <Global.hpp>
 
 class TtyTabWidget : public QTabWidget {
 	Q_OBJECT

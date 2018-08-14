@@ -1,12 +1,13 @@
 /*
     *
-    * * NBTSettingsDialog.cpp - QTermWidget reimplementation for NBTerminal
+    * * NBTSettingsDialogDialog.cpp - QTermWidget reimplementation for NBTerminal
     *
 */
 
-#include "NBTSettingsDialog.hpp"
-#include "qtermwidget.h"
-#include "newbreeze.hpp"
+#include <NBTSettingsDialog.hpp>
+#include <qtermwidget.h>
+
+QSettings settings( "NewBreeze", "NBTerminal" );
 
 NBTSettingsDialog::NBTSettingsDialog() : QDialog() {
 
@@ -22,6 +23,7 @@ void NBTSettingsDialog::createGUI() {
 
 	shellEdit = new QLineEdit( this );
 	shellEdit->setText( settings.value( "Shell", "/bin/bash" ).toString() );
+	shellLabel->setBuddy( shellEdit );
 	connect( shellEdit, SIGNAL( textEdited( QString ) ), this, SLOT( saveShell( QString ) ) );
 
 	colorSchemesCombo = new QComboBox();

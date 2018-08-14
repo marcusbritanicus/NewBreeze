@@ -104,7 +104,7 @@ void NewBreeze::createGUI() {
 	AddressBar = new NBAddressBar( this );
 	setupSidePanel();
 	FolderView = new NBFolderView( this );
-	Terminal = new NBTerminal( QString(), this );
+	Terminal = new NBTerminalWidget( QString(), this );
 	InfoBar = new NBInfoBar( this );
 	setupInfoPanel();
 	FilterWidget = new NBFilterWidget( FolderView );

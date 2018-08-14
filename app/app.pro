@@ -164,6 +164,9 @@ HEADERS += Gui/Widgets/Terminal/lib/TerminalDisplay.h
 HEADERS += Gui/Widgets/Terminal/lib/tools.h
 HEADERS += Gui/Widgets/Terminal/lib/Vt102Emulation.h
 HEADERS += Gui/Widgets/Terminal/NBTerminal.hpp
+HEADERS += Gui/Widgets/Terminal/NBTermWidget.hpp
+HEADERS += Gui/Widgets/Terminal/NBTSettingsDialog.hpp
+HEADERS += Gui/Widgets/Terminal/TtyTabWidget.hpp
 HEADERS += Gui/Widgets/TrashManager/NBTrashManager.hpp
 HEADERS += optionparser.hpp
 
@@ -275,6 +278,9 @@ SOURCES += Gui/Widgets/Terminal/lib/TerminalDisplay.cpp
 SOURCES += Gui/Widgets/Terminal/lib/tools.cpp
 SOURCES += Gui/Widgets/Terminal/lib/Vt102Emulation.cpp
 SOURCES += Gui/Widgets/Terminal/NBTerminal.cpp
+SOURCES += Gui/Widgets/Terminal/NBTermWidget.cpp
+SOURCES += Gui/Widgets/Terminal/NBTSettingsDialog.cpp
+SOURCES += Gui/Widgets/Terminal/TtyTabWidget.cpp
 SOURCES += Gui/Widgets/TrashManager/NBTrashManager.cpp
 SOURCES += Main.cpp
 

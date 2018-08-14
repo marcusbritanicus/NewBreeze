@@ -169,37 +169,6 @@ void NBActionsMenu::buildCustomActionsMenu() {
 		QStringList glob = actionSettings.value( "Glob" ).toStringList();
 		QString exec = actionSettings.value( "Exec" ).toString();
 
-		if ( exec.contains( "%term" ) ) {
-			QStringList terminal = getTerminal();
-			QString file = QDir( workingDir ).filePath( selection.at( 0 ).data().toString() );
-			if ( terminal.at( 0 ) == QString( "xterm" ) )
-				terminal[ 1 ] = QString( "cd %1 && /bin/bash" ).arg( termFormatString( file ) );
-
-			else if ( terminal.at( 0 ) == QString( "Inbuilt" ) ) {
-				NBPluginManager *plMgr = NBPluginManager::instance();
-
-				PluginList pList;
-				pList << plMgr->plugins( NBPluginInterface::TerminalInterface, NBPluginInterface::Enhancement, NBPluginInterface::Dir, "inode/directory" );
-
-				if ( pList.count() ) {
-					NBPluginInterface *iface = pList.at( 0 );
-
-					QAction *termAct = iface->actions( NBPluginInterface::TerminalInterface, QStringList() << file ).at( 0 );
-					Q_UNUSED( termAct );
-					//termAct->setText( name );
-					//addAction( termAct );
-
-					continue;
-				}
-			}
-
-			else {
-				terminal[ 2 ] = file;
-				terminal[ 4 ] = "/bin/bash";
-			}
-			exec.replace( "%term", terminal.join( " " ) );
-		}
-
 		QAction *customAction = new QAction( QIcon( ":/icons/openWith.png" ), name, this );
 		if ( ( exec.endsWith( "%f" ) or exec.endsWith( "%d" ) ) and selection.count() == 1 ) {
 			QString file = QDir( workingDir ).filePath( selection.at( 0 ).data().toString() );
