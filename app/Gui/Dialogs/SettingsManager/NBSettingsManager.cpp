@@ -60,15 +60,45 @@ QHBoxLayout* NBSettingsManager::createFooterLayout() {
 
 	QHBoxLayout *btnLyt = new QHBoxLayout();
 
-	NBButton *closeBtn = new NBButton( QIcon( ":/icons/close.png" ), "&Close", this );
+	NBButton *saveBtn = new NBButton( QIcon( ":/icons/ok.png" ), "&Save", this );
+	saveBtn->setToolTip( "Save the settings and exit" );
+	connect( saveBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
+
+	NBButton *closeBtn = new NBButton( QIcon( ":/icons/close.png" ), "&Cancel", this );
+	saveBtn->setToolTip( "Discard the settings and exit" );
+	connect( closeBtn, SIGNAL( clicked() ), this, SLOT( cancel() ) );
 
 	btnLyt->addStretch( 0 );
 	btnLyt->addWidget( closeBtn );
 	btnLyt->addStretch( 0 );
-
-	connect( closeBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
+	btnLyt->addWidget( saveBtn );
+	btnLyt->addStretch( 0 );
 
 	return btnLyt;
+};
+
+int NBSettingsManager::exec() {
+
+	QSettings sett( "NewBreeze", "NewBreeze" );
+
+	if ( QFileInfo( sett.fileName() + ".backup" ).exists() )
+		QFile::remove( sett.fileName() + ".backup" );
+
+	QFile::copy( sett.fileName(), sett.fileName() + ".backup" );
+
+	return NBDialog::exec();
+};
+
+void NBSettingsManager::cancel() {
+
+	QSettings sett( "NewBreeze", "NewBreeze" );
+
+	if ( QFileInfo( sett.fileName() ).exists() )
+		QFile::remove( sett.fileName() );
+
+	QFile::copy( sett.fileName() + ".backup", sett.fileName() );
+
+	close();
 };
 
 void NBSettingsManager::settingCategoryChosen( int row ) {
@@ -92,7 +122,7 @@ void NBSettingsManager::setWindowProperties() {
 
 	setWindowModality( Qt::ApplicationModal );
 
-	setFixedWidth( 810 );
+	setMinimumWidth( 810 );
 	setMinimumHeight( 550 );
 
 	QDesktopWidget dw;

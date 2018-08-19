@@ -257,6 +257,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 
 	QWidget *base = new QWidget( this );
 	base->setObjectName( "baseWidget" );
+	base->setStyleSheet( "#baseWidget{ border-bottom: 1px solid darkgray;}" );
 	base->setLayout( fLyt );
 
 	QHBoxLayout *bLyt = new QHBoxLayout();

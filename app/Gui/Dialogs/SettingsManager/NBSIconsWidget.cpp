@@ -18,7 +18,6 @@ NBIconThemeWidget::NBIconThemeWidget( QWidget *parent ) :QWidget( parent ) {
 void NBIconThemeWidget::createGUI() {
 
 	iconViewWidget = new NBIconThemeView( this );
-	iconViewWidget->select( Settings->General.IconTheme );
 	connect( iconViewWidget, SIGNAL( pressed( const QModelIndex& ) ), this, SLOT( switchTheme( const QModelIndex& ) ) );
 
 	QVBoxLayout *wLyt = new QVBoxLayout();
@@ -38,7 +37,7 @@ void NBIconThemeWidget::switchTheme( const QModelIndex &idx ) {
 
 NBIconThemeModel::NBIconThemeModel( QObject *parent ) : QAbstractListModel( parent ) {
 
-	QTimer::singleShot( 10, this, SLOT( setupModel() ) );
+	setupModel();
 };
 
 int NBIconThemeModel::rowCount( const QModelIndex &parent ) const {
@@ -110,8 +109,6 @@ void NBIconThemeModel::setupModel() {
 		}
 	}
 
-	QIcon::fromTheme( Settings->General.IconTheme );
-
 	endResetModel();
 
 	emit layoutChanged();
@@ -154,7 +151,8 @@ void NBIconThemeView::select( QString name ) {
 	for( int i = 0; i < model->rowCount(); i++ ) {
 		if ( model->index( i, 0, QModelIndex() ).data().toString() == name ) {
 			setCurrentIndex( model->index( i, 0, QModelIndex() ) );
+			selectionModel()->select( model->index( i, 0, QModelIndex() ), QItemSelectionModel::ClearAndSelect );
 			break;
 		}
 	}
-}
+};

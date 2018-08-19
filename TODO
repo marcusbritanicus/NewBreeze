@@ -51,9 +51,14 @@ NBCatalogs                                                                      
 	✓ Add a menu
 	✓ Enable thumbnailing in Catalogs
 
-NBSideBar (Renamed to NBSidePanel)                                                                                                    [ 2 of 2 ]
+NBSidePanel (Renamed from NBSideBar)                                                                                                  [ 2 of 2 ]
 	✗ Improve the looks to make it similar to Ubuntu 18.04 Nautilus SideBar
 	✓ Improvements to NBSidePanel class
+
+NBSideBar                                                                                                                             [ 0 of 1 ]
+	□ Rewriting of the whole class
+
+Suggestions                                                                                                                           [ 5 of 9 ]
 
 Note:
 	✍ - Work in progress

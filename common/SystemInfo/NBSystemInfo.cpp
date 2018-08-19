@@ -105,7 +105,7 @@ QString NBSystemIconTheme() {
 		}
 
 		case DesktopSession::XFCE : {
-			QStringList args = QStringList() << "-c" << "xsettings" << "-p" << "/Net/IconTheme/Name";
+			QStringList args = QStringList() << "-c" << "xsettings" << "-p" << "/Net/IconThemeName";
 			QProcess proc;
 			proc.start(  "xfconf-query", args, QProcess::ReadOnly );
 			proc.waitForFinished( -1 );
@@ -128,7 +128,7 @@ QString NBSystemIconTheme() {
 			proc.start(  "gsettings", args, QProcess::ReadOnly );
 			proc.waitForFinished( -1 );
 
-			return QString( proc.readAllStandardOutput() ).simplified();
+			return QString( proc.readAllStandardOutput() ).simplified().replace( "'", "" ).replace( "\"", "" );
 		}
 
 		case DesktopSession::MATE : {
@@ -137,7 +137,7 @@ QString NBSystemIconTheme() {
 			proc.start(  "gsettings", args, QProcess::ReadOnly );
 			proc.waitForFinished( -1 );
 
-			return QString( proc.readAllStandardOutput() ).simplified();
+			return QString( proc.readAllStandardOutput() ).simplified().replace( "'", "" ).replace( "\"", "" );
 		}
 
 		case DesktopSession::ENLIGHTENMENT : {

@@ -208,7 +208,10 @@ void NBDeviceManager::pollDevices() {
 			continue;
 
 		/* AppImage fix */
-		if ( QString( entry->mnt_type ).contains( "AppImage" ) )
+		bool yes = QString( entry->mnt_type ).contains( "AppImage" );
+		yes = yes or QString( entry->mnt_type ).startsWith( "fuse." );
+		yes = yes and QString( entry->mnt_dir ).startsWith( "/tmp/" );
+		if ( yes )
 			continue;
 
 		NBDeviceInfo info( new NBDeviceInfoPrivate( entry->mnt_fsname, entry->mnt_dir, entry->mnt_type ) );

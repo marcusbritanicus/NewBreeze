@@ -167,9 +167,9 @@ void NBStartupWizard::createPages() {
 
 	QLabel *p3lbl1 = new QLabel(
 		"<p>In NewBreeze, folder contents can be shown in three ways as Icons, Tiles or Details.</p>"
-		"<p>Icons mode is the standard way almost all file browsers display the folder contents: A prominent icon, below which is the name.</p>"
-		"<p>Tiles mode is reminiscent of MS Windows Style: A prominent icon, with the name and some details to the right of the icon.</p>"
-		"<p>Details mode shows all the inmportant information about the node in a single row.</p>"
+		"<p>Icons mode is the standard way almost all file browsers display the folder contents: A prominent icon, below which is the name. "
+		"Tiles mode is reminiscent of MS Windows Style: A prominent icon, with the name and some details to the right of the icon. "
+		"Details mode shows all the important information about the node in a single row.</p>"
 	);
 	p3lbl1->setWordWrap( true );
 
@@ -437,12 +437,9 @@ void NBStartupWizard::createPages() {
 	page9->setSubTitle( "What should NewBreeze show you when it starts?" );
 
 	QLabel *p9lbl1 = new QLabel(
-		"<p>When you open a file manager, it usually show you the home folder. With NB3 you have great alternatives: Home directory or SuperStart. "
+		"<p>When you open a file manager, it usually show you the home folder. With NB3 you have great alternative: SuperStart. "
 		"While Catalogs is the NewBreeze equivalent of Libraries in Windows, SuperStart is a feature unique to NewBreeze alone.</p>"
-		"<p>Folders like WallPapers, Photos, and Images are usually scattered (some in home folder others in external drives). But it'd be great "
-		"to see them together without having to circumnavigate all the drives. You put them all in a Catalog and you'll find them together "
-		"anytime you want to see them.</p>"
-		"<p>Some file and folders are more accessed than others, and yet, it may not be suitable to put them in a particular Catalog. "
+		"<p>Some file and folders are more accessed than others, and yet, it may not be suitable to put them in a particular location. "
 		"Enter SuperStart: Put you frequently used files and folders into SuperStart and access them as soon as you start NewBreeze.</p>"
 	);
 	p9lbl1->setWordWrap( true );

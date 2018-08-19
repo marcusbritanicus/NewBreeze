@@ -36,6 +36,10 @@ class NBSettingsManager : public NBDialog {
 		NBIconThemeWidget *iconWidget;
 		NBKeyBindingsWidget *keysWidget;
 
+	public slots:
+		int exec();
+		void cancel();
+
 	private slots:
 		void settingCategoryChosen( int );
 

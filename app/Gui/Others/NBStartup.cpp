@@ -10,40 +10,7 @@
 #include "NBBugReporter.hpp"
 #include "NBStartupWizard.hpp"
 
-void detectCrash() {
-
-	/* We check for an ending good bye reading the last 12 chars. */
-	// QFile nblogf( logPath );
-	// if ( nblogf.open( QFile::ReadOnly ) ) {
-		// nblogf.seek( nblogf.size() - 12 );
-
-		// QString goodbye = QString::fromLocal8Bit( nblogf.read( 12 ) );
-		// if ( not goodbye.contains( "Good Bye!" ) ) {
-			// int reply = NBMessageDialog::question(
-				// 0,		/* Not a child of anything */
-				// "NewBreeze - Bug Report",
-				// "It seems to me that NewBreeze did not close properly the last time. If you were working on something very important at the time, "
-				// "I'm extremely sorry. I hope no data was lost. Would you like to report this on GitLab?"
-			// );
-
-			// if ( reply == QMessageBox::Yes ) {
-				// NBBugReporter *bugreport = NBBugReporter( this );
-				// bugreport->exec();
-			// }
-		// }
-	// }
-
-	// nblogf.close();
-};
-
 void NBStartup() {
-
-	/*
-		*
-		* Crash Detector?
-		*
-	*/
-	detectCrash();
 
 	/*
 		*
@@ -75,6 +42,11 @@ void NBStartup() {
 		*
 	*/
 	QIcon::setThemeName( Settings->General.IconTheme );
+	QSettings sett( "NewBreeze", "NewBreeze" );
+	if ( sett.value( "IconTheme" ).toString().isNull() ) {
+		sett.setValue( "IconTheme", Settings->General.IconTheme );
+		sett.sync();
+	}
 
 	/*
 		*
@@ -194,8 +166,10 @@ void NBStartup() {
 		}
 	}
 
-	if ( not settings.contains( "Terminals/Default" ) )
+	if ( not settings.contains( "Terminals/Default" ) ) {
 		settings.setValue( "Terminals/Default", "Inbuilt" );
+		settings.sync();
+	}
 
 	/*
 		*

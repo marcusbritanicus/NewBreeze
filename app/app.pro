@@ -21,6 +21,12 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 
 LIBS += -larchive -lz
 
+if ( $$USE_MEDIAINFO ) {
+	DEFINES += UNICODE
+	INCLUDEPATH += $$system(pkg-config --cflags-only-I libmediainfo libzen)
+	LIBS += $$system(pkg-config --libs libmediainfo libzen)
+}
+
 # Common Sources
 INCLUDEPATH += ../common/ ../common/include
 DEPENDPATH += ../common/ ../common/include
@@ -34,7 +40,7 @@ INCLUDEPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTyp
 INCLUDEPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/ModelViews/Views/DirectoryView Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others
 INCLUDEPATH += Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
 INCLUDEPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets
-INCLUDEPATH += Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/ProcessManager Gui/Widgets/SidePanel Gui/Widgets/SystemMenu Gui/Widgets/Terminal
+INCLUDEPATH += Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/MediaInfo Gui/Widgets/ProcessManager Gui/Widgets/SidePanel Gui/Widgets/SystemMenu Gui/Widgets/Terminal
 INCLUDEPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager
 
 DEPENDPATH += . Core Core/ArgParser Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager Gui Gui/Dialogs
@@ -45,7 +51,7 @@ DEPENDPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeType
 DEPENDPATH += Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/ModelViews/Views/DirectoryView Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others
 DEPENDPATH += Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/Buttons
 DEPENDPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/CustomPeek Gui/Widgets/FolderFlash Gui/Widgets/FolderView Gui/Widgets/GuiWidgets
-DEPENDPATH += Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/ProcessManager Gui/Widgets/SidePanel Gui/Widgets/SystemMenu Gui/Widgets/Terminal
+DEPENDPATH += Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/MediaInfo Gui/Widgets/ProcessManager Gui/Widgets/SidePanel Gui/Widgets/SystemMenu Gui/Widgets/Terminal
 DEPENDPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager
 
 # Headers
@@ -128,6 +134,7 @@ HEADERS += Gui/Widgets/GuiWidgets/NBLabels.hpp
 HEADERS += Gui/Widgets/GuiWidgets/NBProgressBar.hpp
 HEADERS += Gui/Widgets/InfoBar/NBInfoBar.hpp
 HEADERS += Gui/Widgets/InfoPanel/NBInfoPanel.hpp
+HEADERS += Gui/Widgets/MediaInfo/NBMediaInfo.hpp
 HEADERS += Gui/Widgets/ProcessManager/NBProcessManagerUI.hpp
 HEADERS += Gui/Widgets/ProcessManager/NBProcessWidget.hpp
 HEADERS += Gui/Widgets/SidePanel/NBSidePanel.hpp
@@ -249,6 +256,7 @@ SOURCES += Gui/Widgets/GuiWidgets/NBLabels.cpp
 SOURCES += Gui/Widgets/GuiWidgets/NBProgressBar.cpp
 SOURCES += Gui/Widgets/InfoBar/NBInfoBar.cpp
 SOURCES += Gui/Widgets/InfoPanel/NBInfoPanel.cpp
+SOURCES += Gui/Widgets/MediaInfo/NBMediaInfo.cpp
 SOURCES += Gui/Widgets/ProcessManager/NBProcessManagerUI.cpp
 SOURCES += Gui/Widgets/ProcessManager/NBProcessWidget.cpp
 SOURCES += Gui/Widgets/SidePanel/NBSidePanel.cpp

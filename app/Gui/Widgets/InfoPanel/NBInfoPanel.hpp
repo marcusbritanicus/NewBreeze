@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Global.hpp"
+#include "NBMediaInfo.hpp"
 
 class NBInfoPanel : public QWidget {
 	Q_OBJECT
@@ -18,13 +19,17 @@ class NBInfoPanel : public QWidget {
 
 	private:
 		QLabel *iconLbl;
-		QLabel *infoLbl;
-
 		QLabel *nameLbl;
 		QLabel *sizeLbl;
 		QLabel *pathLbl;
 		QLabel *permLbl;
 		QLabel *mimeLbl;
+
+		QWidget *stretch;
+
+		#ifdef USE_MEDIAINFO
+			NBMediaInfoWidget *infoWidget;
+		#endif
 
 		void setIcon( QPixmap );
 		void setIcon( QIcon );

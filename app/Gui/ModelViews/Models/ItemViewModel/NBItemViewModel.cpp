@@ -615,6 +615,22 @@ QModelIndexList NBItemViewModel::categorySiblings( QModelIndex idx ) const {
 	return mList;
 };
 
+bool NBItemViewModel::showHidden() const {
+
+	return Settings->General.ShowHidden;
+};
+
+void NBItemViewModel::setShowHidden( bool ok ) {
+
+	/* We have set per-folder settings */
+	QSettings sett( mRootPath + ".directory", QSettings::NativeFormat );
+	sett.setValue( "NewBreeze/ShowHidden", ok );
+	sett.sync();
+
+	Settings->General.ShowHidden = ok;
+	setupModelData();
+};
+
 int NBItemViewModel::indexInCategory( QModelIndex idx ) const {
 
 	return indexListForCategory( category( idx ) ).indexOf( idx );
@@ -858,7 +874,7 @@ void NBItemViewModel::setRootPath( QString path ) {
 	QSettings sett( mRootPath + ".directory", QSettings::NativeFormat );
 
 	/* Check per folder view settings */
-	// Settings->General.ShowHidden = sett.value( "NewBreeze/Hidden", false ).toBool();
+	 Settings->General.ShowHidden = sett.value( "NewBreeze/Hidden", false ).toBool();
 
 	NBSettings *Default = NBSettings::defaultInstance();
 

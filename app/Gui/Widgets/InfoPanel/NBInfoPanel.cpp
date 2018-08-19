@@ -44,6 +44,10 @@ inline static QString getPermissions( QString path ) {
 
 NBInfoPanel::NBInfoPanel( QWidget *parent ) :QWidget( parent ) {
 
+	#ifdef USE_MEDIAINFO
+		infoWidget = new NBMediaInfoWidget( QString() );
+	#endif
+
 	/* Basic Settings */
 	setContentsMargins( QMargins() );
 	setFocusPolicy( Qt::NoFocus );
@@ -79,6 +83,10 @@ NBInfoPanel::NBInfoPanel( QWidget *parent ) :QWidget( parent ) {
 	mimeLbl->setWordWrap( true );
 	mimeLbl->setAlignment( Qt::AlignCenter );
 
+	stretch = new QWidget( this );
+	stretch->setFixedWidth( 0 );
+	stretch->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding ) );
+
 	/* Layouts */
 	QVBoxLayout *baseLyt = new QVBoxLayout();
 	baseLyt->setContentsMargins( QMargins() );
@@ -90,7 +98,13 @@ NBInfoPanel::NBInfoPanel( QWidget *parent ) :QWidget( parent ) {
 	baseLyt->addWidget( pathLbl );
 	baseLyt->addWidget( permLbl );
 	baseLyt->addWidget( mimeLbl );
-	baseLyt->addStretch( 0 );
+
+	#ifdef USE_MEDIAINFO
+		baseLyt->addWidget( infoWidget );
+		infoWidget->hide();
+	#endif
+
+	baseLyt->addWidget( stretch );
 
 	setLayout( baseLyt );
 };
@@ -137,7 +151,21 @@ void NBInfoPanel::updatePanel( QString rootPath, QModelIndexList selection ) {
 			/* Folders and Files */
 			else {
 				QMimeType mType = mimeDb.mimeTypeForFile( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() );
-				// setIcon( icon( NBIconManager::instance()->iconsForFile( mType.name(), selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) ) );
+
+				#ifdef USE_MEDIAINFO
+					if ( mType.name().startsWith( "audio" ) or mType.name().startsWith( "video" ) ) {
+						infoWidget->setFileName( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() );
+						infoWidget->show();
+						stretch->hide();
+					}
+
+					else {
+
+						infoWidget->hide();
+						stretch->show();
+					}
+				#endif
+
 				setIcon( selection.at( 0 ).data( Qt::DecorationRole ).value<QIcon>() );
 				nameLbl->setText( "<b>" + baseName( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) + "</b>" );
 
@@ -186,6 +214,21 @@ void NBInfoPanel::updatePanel( QString rootPath, QModelIndexList selection ) {
 
 		else if ( selection.count() == 1 ) {
 			QMimeType mType = mimeDb.mimeTypeForFile( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() );
+
+			#ifdef USE_MEDIAINFO
+				if ( mType.name().startsWith( "audio" ) or mType.name().startsWith( "video" ) ) {
+					infoWidget->setFileName( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() );
+					infoWidget->show();
+					stretch->hide();
+				}
+
+				else {
+
+					infoWidget->hide();
+					stretch->show();
+				}
+			#endif
+
 			setIcon( selection.at( 0 ).data( Qt::DecorationRole ).value<QIcon>() );
 			nameLbl->setText( "<b>" + baseName( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) + "</b>" );
 
@@ -262,6 +305,21 @@ void NBInfoPanel::updatePanel( QString rootPath, QModelIndexList selection ) {
 
 		else if ( selection.count() == 1 ) {
 			QMimeType mType = mimeDb.mimeTypeForFile( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() );
+
+			#ifdef USE_MEDIAINFO
+				if ( mType.name().startsWith( "audio" ) or mType.name().startsWith( "video" ) ) {
+					infoWidget->setFileName( selection.at( 0 ).data( Qt::UserRole + 7 ).toString() );
+					infoWidget->show();
+					stretch->hide();
+				}
+
+				else {
+
+					infoWidget->hide();
+					stretch->show();
+				}
+			#endif
+
 			setIcon( icon( NBIconManager::instance()->iconsForFile( mType.name(), selection.at( 0 ).data( Qt::UserRole + 7 ).toString() ) ) );
 			nameLbl->setText( "<b>" + selection.at( 0 ).data().toString() + "</b>" );
 

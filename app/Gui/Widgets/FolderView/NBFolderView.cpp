@@ -736,17 +736,8 @@ void NBFolderView::doReload() {
 
 void NBFolderView::doToggleHidden() {
 
-	if ( Settings->General.ShowHidden ) {
-		qDebug() << "Hiding dot files...";
-		Settings->General.ShowHidden = false;
-	}
-
-	else {
-		qDebug() << "Showing dot files...";
-		Settings->General.ShowHidden = true;
-	}
-
-	doReload();
+	qDebug() << ( Settings->General.ShowHidden ? "Hiding" : "Showing" ) << "hidden files/folders";
+	fsModel->setShowHidden( not Settings->General.ShowHidden );
 };
 
 void NBFolderView::prepareCopy() {

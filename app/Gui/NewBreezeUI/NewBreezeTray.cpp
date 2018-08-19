@@ -46,6 +46,60 @@ void NBTrayIcon::handleActivation( QSystemTrayIcon::ActivationReason reason ) {
 	};
 };
 
+void NBTrayIcon::processCompleted( NBProcess::Progress *proc ) {
+
+	switch( proc->type ) {
+		case NBProcess::Copy: {
+			showMessage(
+				"Copying finished",
+				QString( "Copying of selected nodes from %1 to %2 complete." ).arg( proc->sourceDir ).arg( proc->targetDir ),
+				QIcon( ":/icons/copy.png" ),
+				2000
+			);
+			break;
+		}
+
+		case NBProcess::Move: {
+			showMessage(
+				"Moving finished",
+				QString( "Moving of selected nodes from %1 to %2 complete." ).arg( proc->sourceDir ).arg( proc->targetDir ),
+				QIcon( ":/icons/move.png" ),
+				2000
+			);
+			break;
+		}
+
+		case NBProcess::Delete: {
+			showMessage(
+				"Deleting finished",
+				QString( "Deleting of selected nodes from %1 complete." ).arg( proc->sourceDir ),
+				QIcon( ":/icons/trash.png" ),
+				2000
+			);
+			break;
+		}
+
+		case NBProcess::Trash: {
+			showMessage(
+				"Deleting finished",
+				QString( "Nodes selected in %1 have been sent to trash." ).arg( proc->sourceDir ).arg( proc->targetDir ),
+				QIcon( ":/icons/trash.png" ),
+				2000
+			);
+			break;
+		}
+
+		case NBProcess::Properties: {
+			//showMessage(
+				//"Changing properties finished",
+				//QString( "Copying of selected nodes from %1." ).arg( proc->sourceDir ).arg( proc->targetDir ),
+				//2000
+			//);
+			break;
+		}
+	}
+};
+
 void NBTrayIcon::toggleVisible() {
 
 	bool visible = true;

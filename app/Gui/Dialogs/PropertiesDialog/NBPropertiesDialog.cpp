@@ -450,8 +450,8 @@ void NBPermissionsWidget::createGUI() {
 	QVBoxLayout *frameLyt = new QVBoxLayout();
 	frameLyt->setSpacing( 10 );
 	frameLyt->addLayout( permsLyt );
-	frameLyt->addWidget( smartExecCheck );
-	frameLyt->addWidget( carryCheck );
+	//frameLyt->addWidget( smartExecCheck );
+	//frameLyt->addWidget( carryCheck );
 	frameLyt->addWidget( delProtectCheck );
 
 	QWidget *permsFrame = new QWidget( this );

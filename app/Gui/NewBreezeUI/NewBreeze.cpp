@@ -122,11 +122,13 @@ void NewBreeze::createGUI() {
 	ViewLayout->addWidget( FolderView );
 
 	QVBoxLayout *BaseLayout = new QVBoxLayout();
-	BaseLayout->setContentsMargins( QMargins( 0, 3, 0, 0 ) );
+	BaseLayout->setContentsMargins( QMargins( 0, 0, 0, 0 ) );
 	BaseLayout->setSpacing( 0 );
 
-	BaseLayout->addWidget( AddressBar );
-	BaseLayout->addWidget( Spacer );
+	QToolBar *mainToolBar = addToolBar( "AddressBar" );
+	mainToolBar->setMovable( false );
+	mainToolBar->addWidget( AddressBar );
+
 	BaseLayout->addLayout( ViewLayout );
 	BaseLayout->addWidget( Terminal );
 	BaseLayout->addWidget( InfoBar );
@@ -167,7 +169,8 @@ void NewBreeze::setupInfoPanel() {
 	/* Create the InfoPanel */
 	InfoPanel = new NBInfoPanel( this );
 
-	InfoDock = new QDockWidget( "Info Panel", this );
+	InfoDock = new QDockWidget( "", this );
+	InfoDock->setTitleBarWidget( new QWidget() );
 	InfoDock->setFeatures( QDockWidget::NoDockWidgetFeatures );
 	InfoDock->setWidget( InfoPanel );
 

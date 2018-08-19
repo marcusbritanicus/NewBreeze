@@ -1,0 +1,21 @@
+NewBreeze v3.0.0 RC3
+
+□ Option previews in Settings Manager and Startup Wizard
+✓ Info Panel width should be adjustable => InfoPanel is now implemented as QDockWidget
+◐ MediaInfo to show MediaInfo in InfoPanel and InfoBar
+✓ Settings Manager to have two buttons: Apply and Close
+	=> Apply saves all changes.
+	=> Close closes the dialog, warning the user if there are any changes
+□ Extend support "Open folder with vlc" for other app like Audacious, Clementine etc.
+□ Create shortcut of folder and files - SymLinks?
+✗ There should be a limit to the items shown in FolderPeek.
+	=> Takes almost the same amount of calculation to count the number of nodes.
+✗ Stop showing number of items/size below folders/files => This does not affect the performance
+✓ After copy, delete, empty trash give a completion notification.
+
+Note:
+	✍ - Work in progress
+	□ - Work to be started
+	✓ - Work Completed
+	✗ - Not working on this
+	◐ - Partially complete

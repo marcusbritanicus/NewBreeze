@@ -303,6 +303,12 @@ void NBSystemMenu::populateMenu() {
 	connect( hiddenCheck, SIGNAL( clicked() ), this, SLOT( close() ) );
 	connect( hiddenCheck, SIGNAL( clicked() ), this, SIGNAL( toggleHidden() ) );
 
+	QHBoxLayout *hLyt = new QHBoxLayout();
+	hLyt->setContentsMargins( 10, 0, 0, 0 );
+	hLyt->setSpacing( 0 );
+	hLyt->addWidget( hiddenCheck );
+	hLyt->addStretch();
+
 	/* Sorting */
 	groupCheck = new NBMenuItemCheck( "Show in Groups", this );
 	groupCheck->setChecked( Settings->General.Grouping );
@@ -375,7 +381,7 @@ void NBSystemMenu::populateMenu() {
 	itemsLayout->addWidget( Separator::horizontal( this ) );
 	itemsLayout->addWidget( vteItem );
 	itemsLayout->addWidget( Separator::horizontal( this ) );
-	itemsLayout->addWidget( hiddenCheck );
+	itemsLayout->addLayout( hLyt );
 	itemsLayout->addWidget( Separator::horizontal( this ) );
 	itemsLayout->addLayout( vLyt );
 	itemsLayout->addWidget( Separator::horizontal( this ) );
@@ -455,7 +461,7 @@ void NBSystemMenu::exec( QPoint point ) {
 		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
 		sortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
 		grouping = sett.value( "NewBreeze/Grouping", true ).toBool();
-		hidden = sett.value( "NewBreeze/ShowHidden", false ).toBool();
+		hidden = Settings->General.ShowHidden;
 	}
 
 	/* Reset View Buttons */
