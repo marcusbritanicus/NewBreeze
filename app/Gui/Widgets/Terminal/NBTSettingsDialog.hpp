@@ -17,11 +17,8 @@ class NBTSettingsDialog : public QDialog {
 
 		QLineEdit *shellEdit;
 		QComboBox *colorSchemesCombo;
-		QDoubleSpinBox *transparencySpin;
 		QFontComboBox *fontCombo;
 		QSpinBox *fontSizeSpin;
-		QCheckBox *enableTransparencyCheck;
-		QCheckBox *borderlessCheck;
 
 	private:
 		void createGUI();
@@ -31,9 +28,6 @@ class NBTSettingsDialog : public QDialog {
 		void setColorScheme();
 		void setFont( QFont font );
 		void setFont( int size );
-		void setEnableTransparency();
-		void setTransparency();
-		void setBorderless();
 };
 
 #endif

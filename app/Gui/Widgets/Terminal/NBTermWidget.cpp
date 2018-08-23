@@ -9,9 +9,14 @@
 NBTermWidget::NBTermWidget( QWidget *parent ) : QTermWidget( 0, parent ) {
 
 	QSettings settings( "NewBreeze", "NBTerminal" );
+	if ( not exists( settings.fileName() ) ) {
+		settings.setValue( "Shell", "/bin/bash" );
+		settings.setValue( "ColorScheme", "WhiteOnBlack" );
+		settings.setValue( "Font", QFont( "monospace", 10 ) );
+		settings.setValue( "Session/ShowMaximized", true );
 
-	if ( settings.value( "EnableTransparency" ).toBool() )
-		setTerminalOpacity( settings.value( "Opacity" ).toReal() );
+		settings.sync();
+	}
 
 	/* Set the enivronment variable TERM as xterm */
 	QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
@@ -46,9 +51,14 @@ NBTermWidget::NBTermWidget( QWidget *parent ) : QTermWidget( 0, parent ) {
 NBTermWidget::NBTermWidget( QString wDir, QWidget *parent ) : QTermWidget( 0, parent ) {
 
 	QSettings settings( "NewBreeze", "NBTerminal" );
+	if ( not exists( settings.fileName() ) ) {
+		settings.setValue( "Shell", "/bin/bash" );
+		settings.setValue( "ColorScheme", "WhiteOnBlack" );
+		settings.setValue( "Font", QFont( "monospace", 10 ) );
+		settings.setValue( "Session/ShowMaximized", true );
 
-	if ( settings.value( "EnableTransparency" ).toBool() )
-		setTerminalOpacity( settings.value( "Opacity" ).toReal() );
+		settings.sync();
+	}
 
 	/* Set the enivronment variable TERM as xterm */
 	QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
@@ -81,9 +91,14 @@ NBTermWidget::NBTermWidget( QString wDir, QWidget *parent ) : QTermWidget( 0, pa
 NBTermWidget::NBTermWidget( QString wDir, QString cmd, QWidget *parent ) : QTermWidget( 0, parent ) {
 
 	QSettings settings( "NewBreeze", "NBTerminal" );
+	if ( not exists( settings.fileName() ) ) {
+		settings.setValue( "Shell", "/bin/bash" );
+		settings.setValue( "ColorScheme", "WhiteOnBlack" );
+		settings.setValue( "Font", QFont( "monospace", 10 ) );
+		settings.setValue( "Session/ShowMaximized", true );
 
-	if ( settings.value( "EnableTransparency" ).toBool() )
-		setTerminalOpacity( settings.value( "Opacity" ).toReal() );
+		settings.sync();
+	}
 
 	/* Set the enivronment variable TERM as xterm */
 	QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
@@ -127,12 +142,6 @@ QString NBTermWidget::currentWorkingDirectory() {
 void NBTermWidget::reloadSettings() {
 
 	QSettings settings( "NewBreeze", "NBTerminal" );
-
-	if ( settings.value( "EnableTransparency" ).toBool() )
-		setTerminalOpacity( settings.value( "Opacity" ).toReal() );
-
-	else
-		setTerminalOpacity( 1 );
 
 	setColorScheme( settings.value( "ColorScheme" ).toString() );
 	setTerminalFont( settings.value( "Font" ).value<QFont>() );

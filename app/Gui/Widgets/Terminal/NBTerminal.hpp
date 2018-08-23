@@ -28,9 +28,6 @@ class NBTerminal : public QMainWindow {
 		QString mWorkDir;
 		QString mCmd;
 
-	public slots :
-		void showHide();
-
 	private slots:
 		void showSettings();
 

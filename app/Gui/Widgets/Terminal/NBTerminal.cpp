@@ -10,6 +10,16 @@
 
 NBTerminal::NBTerminal( QString wDir, QString cmd, QWidget *parent ) : QMainWindow( parent ) {
 
+	QSettings settings( "NewBreeze", "NBTerminal" );
+	if ( not exists( settings.fileName() ) ) {
+		settings.setValue( "Shell", "/bin/bash" );
+		settings.setValue( "ColorScheme", "WhiteOnBlack" );
+		settings.setValue( "Font", QFont( "monospace", 10 ) );
+		settings.setValue( "Session/ShowMaximized", true );
+
+		settings.sync();
+	}
+
 	mWorkDir = QString( wDir );
 	mCmd = QString( cmd );
 
@@ -129,13 +139,6 @@ void NBTerminal::setupActions() {
 
 	connect( closeTabAct, SIGNAL( triggered() ), TabWidget, SLOT( closeTab() ) );
 	addAction( closeTabAct );
-
-	// Quit NBTerminal
-	// QAction *quitAct = new QAction( "&Quit", this );
-	// quitAct->setShortcuts( QList<QKeySequence>() << tr( "Ctrl+Shift+Q" ) );
-
-	// connect( quitAct, SIGNAL( triggered() ), this, SLOT( close() ) );
-	// addAction( quitAct );
 };
 
 void NBTerminal::setWindowProperties() {
@@ -147,41 +150,12 @@ void NBTerminal::setWindowProperties() {
 
 	setGeometry( settings.value( "Session/Geometry" ).toRect() );
 	setMinimumSize( 800, 600 );
-
-	/* No Title Bar */
-	if ( settings.value( "Borderless" ).toBool() )
-		setWindowFlags( Qt::Window | Qt::FramelessWindowHint );
-
-	/* Transparency */
-	if ( settings.value( "EnableTransparency" ).toBool() )
-		setAttribute( Qt::WA_TranslucentBackground );
-};
-
-void NBTerminal::showHide() {
-
-	if ( isVisible() )
-		hide();
-
-	else {
-	   show();
-	   activateWindow();
-	}
 };
 
 void NBTerminal::showSettings() {
 
 	NBTSettingsDialog *settingsDlg = new NBTSettingsDialog();
 	settingsDlg->exec();
-
-	QSettings settings( "NewBreeze", "NBTerminal" );
-
-	if ( settings.value( "Borderless" ).toBool() )
-		setWindowFlags( Qt::Window | Qt::FramelessWindowHint );
-
-	else
-		setWindowFlags( Qt::Window );
-
-	show();
 };
 
 void NBTerminal::openFMgr() {

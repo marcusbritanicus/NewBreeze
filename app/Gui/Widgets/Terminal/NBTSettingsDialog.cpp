@@ -18,7 +18,6 @@ void NBTSettingsDialog::createGUI() {
 
 	QLabel *shellLabel = new QLabel( "She&ll program" );
 	QLabel *comboLabel = new QLabel( "Color &Scheme" );
-	QLabel *dspinLabel = new QLabel( "Tr&ansparency" );
 	QLabel *fontLabel = new QLabel( "&Font" );
 
 	shellEdit = new QLineEdit( this );
@@ -30,12 +29,6 @@ void NBTSettingsDialog::createGUI() {
 	colorSchemesCombo->addItems( QTermWidget::availableColorSchemes() );
 	colorSchemesCombo->setCurrentIndex( QTermWidget::availableColorSchemes().indexOf( settings.value( "ColorScheme" ).toString() ) );
 	connect( colorSchemesCombo, SIGNAL( currentIndexChanged( int ) ), this, SLOT( setColorScheme() ) );
-
-	transparencySpin = new QDoubleSpinBox();
-	transparencySpin->setRange( 0.00, 1.00 );
-	transparencySpin->setSingleStep( 0.01 );
-	transparencySpin->setValue( 1 - settings.value( "Opacity" ).toReal() );
-	connect( transparencySpin, SIGNAL( valueChanged( double ) ), this, SLOT( setTransparency() ) );
 
 	fontCombo = new QFontComboBox();
 	QFont font = settings.value( "Font" ).value<QFont>();
@@ -49,17 +42,6 @@ void NBTSettingsDialog::createGUI() {
 	fontSizeSpin->setValue( settings.value( "Font" ).value<QFont>().pointSize() );
 	connect( fontSizeSpin, SIGNAL( valueChanged( int ) ), this, SLOT( setFont( int ) ) );
 
-	enableTransparencyCheck = new QCheckBox( "Enable &Transparency" );
-	enableTransparencyCheck->setChecked( settings.value( "EnableTransparency" ).toBool() );
-	connect( enableTransparencyCheck, SIGNAL( toggled( bool ) ), this, SLOT( setEnableTransparency() ) );
-
-	borderlessCheck = new QCheckBox( "&Hide Window Borders (Requires restart)" );
-	borderlessCheck->setChecked( settings.value( "Borderless" ).toBool() );
-	borderlessCheck->setToolTip( "Requires restart of all running terminal windows" );
-	connect( borderlessCheck, SIGNAL( toggled( bool ) ), this, SLOT( setBorderless() ) );
-
-	comboLabel->setBuddy( colorSchemesCombo );
-	dspinLabel->setBuddy( transparencySpin );
 	fontLabel->setBuddy( fontCombo );
 
 	QPushButton *okBtn = new QPushButton( QIcon::fromTheme( "dialog-close" ), tr( "&Close" ) );
@@ -73,9 +55,6 @@ void NBTSettingsDialog::createGUI() {
 	lyt->addWidget( comboLabel, 1, 0 );
 	lyt->addWidget( colorSchemesCombo, 2, 0 );
 
-	lyt->addWidget( dspinLabel, 1, 1 );
-	lyt->addWidget( transparencySpin, 2, 1 );
-
 	QHBoxLayout *fLyt = new QHBoxLayout();
 	fLyt->addWidget( fontLabel );
 	fLyt->addStretch();
@@ -83,10 +62,7 @@ void NBTSettingsDialog::createGUI() {
 	fLyt->addWidget( fontSizeSpin );
 	lyt->addLayout( fLyt, 3, 0, 1, 2 );
 
-	lyt->addWidget( enableTransparencyCheck, 4, 0, Qt::AlignLeft );
-	lyt->addWidget( borderlessCheck, 5, 0, Qt::AlignLeft );
-
-	lyt->addWidget( okBtn, 6, 1, Qt::AlignRight );
+	lyt->addWidget( okBtn, 4, 1, Qt::AlignRight );
 
 	setLayout( lyt );
 
@@ -123,24 +99,5 @@ void NBTSettingsDialog::setFont( int size ) {
 	font.setPointSize( size );
 
 	settings.setValue( "Font", font );
-	settings.sync();
-};
-
-void NBTSettingsDialog::setEnableTransparency() {
-
-	settings.setValue( "EnableTransparency", enableTransparencyCheck->isChecked() );
-	settings.sync();
-};
-
-void NBTSettingsDialog::setTransparency() {
-
-	qreal opacity = 1 - transparencySpin->value();
-	settings.setValue( "Opacity", opacity );
-	settings.sync();
-};
-
-void NBTSettingsDialog::setBorderless() {
-
-	settings.setValue( "Borderless", borderlessCheck->isChecked() );
 	settings.sync();
 };
