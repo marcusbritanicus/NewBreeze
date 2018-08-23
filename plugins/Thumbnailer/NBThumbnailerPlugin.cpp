@@ -311,21 +311,24 @@ void NBThumbnailerPlugin::makePdfThumbnail( QString path, QString hashPath ) {
 	/* Register the default file types to handle. */
 	fz_try( mCtx ) {
 		fz_register_document_handlers( mCtx );
-		mFzDoc = fz_open_document( mCtx, path.toUtf8().constData() );
 
-		/* Check if the document is encrypted */
-		if ( fz_needs_password( mCtx, mFzDoc ) ) {
-			fz_drop_context( mCtx );
-			fz_drop_document( mCtx, mFzDoc );
-			qDebug() << "Encrypted document:" << baseName( path ) << "Using default icon.";
-			return;
-		}
+		mFzDoc = fz_open_document( mCtx, path.toUtf8().constData() );
 
 		int mPages = fz_count_pages( mCtx, mFzDoc );
 		if ( not mPages ) {
-			fz_drop_context( mCtx );
 			fz_drop_document( mCtx, mFzDoc );
+			fz_drop_context( mCtx );
+
 			qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
+			return;
+		}
+
+		/* Check if the document is encrypted */
+		if ( fz_needs_password( mCtx, mFzDoc ) ) {
+			fz_drop_document( mCtx, mFzDoc );
+			fz_drop_context( mCtx );
+
+			qDebug() << "Encrypted document:" << baseName( path ) << "Using default icon.";
 			return;
 		}
 
@@ -388,8 +391,9 @@ void NBThumbnailerPlugin::makePdfThumbnail( QString path, QString hashPath ) {
 	}
 
 	fz_catch( mCtx ) {
-		fz_drop_context( mCtx );
 		fz_drop_document( mCtx, mFzDoc );
+		fz_drop_context( mCtx );
+
 		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
 		return;
 	}
