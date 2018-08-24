@@ -180,6 +180,8 @@ Q_SIGNALS:
     void activity();
     void silence();
 
+    void tryChdir();
+
 public slots:
     // Copy selection to clipboard
     void copyClipboard();

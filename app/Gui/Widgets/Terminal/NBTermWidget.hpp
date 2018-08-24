@@ -18,15 +18,21 @@ class NBTermWidget : public QTermWidget {
 		NBTermWidget( QString, QString, QWidget *parent = 0 );
 
 		QString currentWorkingDirectory();
+		void changeDir( const QString &dir );
 
 	private:
+		void init();
+
 		QString oldCWD;
-		QFileSystemWatcher *watcher = new QFileSystemWatcher();
+		QBasicTimer chTimer;
 
 	private slots:
 		void reloadSettings();
-		void handleFSWSignals( QString );
+		void tryChdir();
+
+	protected:
+		void timerEvent( QTimerEvent* );
 
 	Q_SIGNALS:
-		void chDir( QString );
+		void chdir( QString );
 };

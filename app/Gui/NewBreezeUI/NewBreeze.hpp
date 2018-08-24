@@ -63,6 +63,7 @@ class NewBreeze : public QMainWindow {
 
 		bool mTerminate;
 		bool mClosed;
+		bool mUpdateTerminal;
 
 	public Q_SLOTS:
 		void show();

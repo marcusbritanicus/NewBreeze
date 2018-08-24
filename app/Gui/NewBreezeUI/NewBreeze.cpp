@@ -24,6 +24,9 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	/* Closed flag */
 	mClosed = false;
 
+	/* Term update flag */
+	mUpdateTerminal = true;
+
 	/* Create the UI */
 	createGUI();
 
@@ -592,8 +595,13 @@ void NewBreeze::updateVarious( QString url ) {
 	setWindowTitle( QString( "%1 - NewBreeze" ).arg( baseName( url ) ) );
 	AddressBar->setAddress( url );
 
-	if ( not url.startsWith( "NB://" ) )
-		Terminal->changeDir( url );
+	if ( mUpdateTerminal ) {
+		if ( not url.startsWith( "NB://" ) )
+			Terminal->changeDir( url );
+
+		else
+			Terminal->changeDir( NBXdg::home() );
+	}
 };
 
 void NewBreeze::updateInfoBar() {
@@ -677,11 +685,14 @@ void NewBreeze::handleDriveUrl( QString url ){
 
 void NewBreeze::chdirUI( QString url ){
 
+	mUpdateTerminal = false;
+
 	/* Update the UI to show the cwd of the shell */
 	FolderView->doOpen( url );
 
 	/* Keep the focus on Terminal widget */
 	Terminal->setFocus();
+	mUpdateTerminal = true;
 };
 
 void NewBreeze::showApplications() {

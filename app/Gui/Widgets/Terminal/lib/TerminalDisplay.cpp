@@ -2541,6 +2541,9 @@ void TerminalDisplay::keyPressEvent( QKeyEvent* event )
 {
     bool emitKeyPressSignal = true;
 
+    if ( ( event->key() == Qt::Key_Enter ) or ( event->key() == Qt::Key_Return ) )
+		emit enterPressed();
+
     // Keyboard-based navigation
     if ( event->modifiers() == Qt::ShiftModifier )
     {
