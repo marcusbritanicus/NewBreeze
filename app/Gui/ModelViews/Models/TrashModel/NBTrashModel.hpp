@@ -49,7 +49,7 @@ class NBTrashModel : public QAbstractItemModel {
 
 		// Data editing
 		bool insertNode( QString name );
-		bool removeNode( QString name );
+		bool removeNode( QModelIndex idx );
 		void updateNode( QString name );
 
 		// Node Info

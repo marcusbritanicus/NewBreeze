@@ -209,9 +209,30 @@ void NBTrashModel::updateNode( QString ) {
 	return;
 };
 
-bool NBTrashModel::removeNode( QString ) {
+bool NBTrashModel::removeNode( QModelIndex idx ) {
 
-	return false;
+	QSettings trashInfo( "NewBreeze", "TrashInfo" );
+	NBTrashNode *node = static_cast<NBTrashNode*>( idx.internalPointer() );
+
+	if ( isDir( node->trashPath() ) ) {
+		if ( not removeDir( node->trashPath() ) )
+			return false;
+	}
+
+	else {
+		if ( not QFile::remove( node->trashPath() ) )
+			return false;
+	}
+
+	__childNames.removeOne( node->name() );
+
+	QFile::remove( node->trashInfoPath() );
+	trashInfo.remove( QUrl::toPercentEncoding( node->name() ) );
+	trashInfo.sync();
+
+	rootNode->removeChild( node );
+
+	return true;
 };
 
 QModelIndex NBTrashModel::index( int row, int column, const QModelIndex &parent ) const {
@@ -423,22 +444,10 @@ void NBTrashModel::restore( QModelIndexList toBeRestored ) {
 void NBTrashModel::removeFromDisk( QModelIndexList toBeDeleted ) {
 
 	QModelIndexList failed;
-	QSettings trashInfo( "NewBreeze", "TrashInfo" );
 
 	Q_FOREACH( QModelIndex idx, toBeDeleted ) {
-		NBTrashNode *node = static_cast<NBTrashNode*>( idx.internalPointer() );
-		__childNames.removeOne( node->name() );
-
-		if( remove( node->trashPath().toLocal8Bit().data() ) ) {
+		if ( not removeNode( idx ) )
 			failed << idx;
-			continue;
-		}
-
-		remove( node->trashInfoPath().toLocal8Bit().data() );
-		trashInfo.remove( QUrl::toPercentEncoding( node->name() ) );
-		trashInfo.sync();
-
-		rootNode->removeChild( node );
 	};
 
 	emit deleted( failed );
