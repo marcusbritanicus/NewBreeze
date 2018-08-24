@@ -147,8 +147,6 @@ class NBIconView : public QAbstractItemView {
 		void paintExpander( QPainter *painter, const QRect &rect, const QModelIndex &idx );
 		void paintIconOverlay( QPainter *painter, const QRect &rect );
 
-		bool canShowIndex( QModelIndex );
-
 		int expanderAt( QPoint );
 
 		/* Categorized Item Model */

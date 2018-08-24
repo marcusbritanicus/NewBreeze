@@ -510,20 +510,23 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 	/* We paint the icons index-wise. */
 	for ( int row = 0; row < cModel->rowCount( rootIndex() ); row++ ) {
 		QModelIndex idx = cModel->index( row, 0, rootIndex() );
-		if ( not canShowIndex( idx ) ) {
-			/* If the category to which this index belongs is hidden, continue to next index */
-			if ( hiddenCategories.contains( cModel->category( idx ) ) )
-				continue;
-
-			/* If the position of this index is the last in row of a folded category, paint a '+' */
-			if ( cModel->indexInCategory( idx ) == itemsPerRow - 1 ) {
-				QRect rect = viewportRectForRow( row - 1 );
-				rect.translate( myGridSize.width(), 0 );
-				if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
+		if ( not isIndexVisible( idx ) ) {
+			if ( cModel->isCategorizationEnabled() ) {
+				/* If the category to which this index belongs is hidden, continue to next index */
+				if ( hiddenCategories.contains( cModel->category( idx ) ) )
 					continue;
 
-				paintExpander( &painter, rect, idx );
+				/* If the position of this index is the last in row of a folded category, paint a '+' */
+				if ( cModel->indexInCategory( idx ) == itemsPerRow - 1 ) {
+					QRect rect = viewportRectForRow( row - 1 );
+					rect.translate( myGridSize.width(), 0 );
+					if ( !rect.isValid() || rect.bottom() < 0 || rect.y() > viewport()->height() )
+						continue;
+
+					paintExpander( &painter, rect, idx );
+				}
 			}
+
 			continue;
 		}
 
@@ -2783,26 +2786,6 @@ void NBIconView::emitCML() {
 			errDlg->exec();
 		}
 	}
-};
-
-bool NBIconView::canShowIndex( QModelIndex idx ) {
-
-	QString category( cModel->category( idx ) );
-
-	if ( hiddenCategories.contains( category ) )
-		return false;
-
-	else if ( foldedCategories.contains( category ) ) {
-		QModelIndexList mList = cModel->indexListForCategory( category );
-		if ( mList.indexOf( idx ) >= itemsPerRow - 1 )
-			return false;
-
-		else
-			return true;
-	}
-
-	else
-		return true;
 };
 
 int NBIconView::expanderAt( QPoint pt ) {
