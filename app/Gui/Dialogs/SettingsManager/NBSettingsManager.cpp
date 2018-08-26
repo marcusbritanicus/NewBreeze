@@ -79,24 +79,38 @@ QHBoxLayout* NBSettingsManager::createFooterLayout() {
 
 int NBSettingsManager::exec() {
 
+	/* Main Settings File */
 	QSettings sett( "NewBreeze", "NewBreeze" );
-
 	if ( QFileInfo( sett.fileName() + ".backup" ).exists() )
 		QFile::remove( sett.fileName() + ".backup" );
 
 	QFile::copy( sett.fileName(), sett.fileName() + ".backup" );
+
+	/* Plugins Settings File */
+	QSettings pSett( "NewBreeze", "NewBreeze" );
+	if ( QFileInfo( pSett.fileName() + ".backup" ).exists() )
+		QFile::remove( pSett.fileName() + ".backup" );
+
+	QFile::copy( pSett.fileName(), pSett.fileName() + ".backup" );
 
 	return NBDialog::exec();
 };
 
 void NBSettingsManager::cancel() {
 
+	/* Main Settings File */
 	QSettings sett( "NewBreeze", "NewBreeze" );
-
 	if ( QFileInfo( sett.fileName() ).exists() )
 		QFile::remove( sett.fileName() );
 
 	QFile::copy( sett.fileName() + ".backup", sett.fileName() );
+
+	/* Plugins Settings File */
+	QSettings pSett( "NewBreeze", "NewBreeze" );
+	if ( QFileInfo( pSett.fileName() ).exists() )
+		QFile::remove( pSett.fileName() );
+
+	QFile::copy( pSett.fileName() + ".backup", pSett.fileName() );
 
 	close();
 };

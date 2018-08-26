@@ -65,7 +65,6 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	sideBarRB = new QRadioButton( "Use the modern side &bar" );
 	connect( sideBarRB, SIGNAL( clicked() ), this, SLOT( handleSidePanelChoice() ) );
 	sideBarRB->setChecked( sett.value( "SidePanelType" ).toInt() == 0 );
-	sideBarRB->setDisabled( true );
 
 	sidePanelRB = new QRadioButton( "Use the classic side &panel" );
 	connect( sidePanelRB, SIGNAL( clicked() ), this, SLOT( handleSidePanelChoice() ) );

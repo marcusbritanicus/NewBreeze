@@ -6,8 +6,7 @@
 
 #include "NBPluginManager.hpp"
 
-QList<NBPluginInterface::Interface> developedInterfaces;
-
+QSettings nbsett( "NewBreeze", "Plugins" );
 NBPluginManager *NBPluginManager::pMgr = NULL;
 
 NBPluginManager* NBPluginManager::instance() {
@@ -85,28 +84,14 @@ void NBPluginManager::reloadPlugins() {
 	if ( not getuid() )
 		return;
 
-	reloadPeekPlugins();
-	reloadOtherPlugins();
-};
-
-void NBPluginManager::reloadPeekPlugins() {
-};
-
-void NBPluginManager::reloadOtherPlugins() {
-
-	QSettings nbsett( "NewBreeze", "Plugins" );
-
 	QStringList pluginPaths;
 	pluginPaths << nbsett.value( "PluginPaths", QStringList() << "./plugins" ).toStringList();
 
-	int parsed = 0;
-	int added = 0;
-
+	mPluginList.clear();
 	mPluginsHash.clear();
 	Q_FOREACH( QString path, pluginPaths ) {
 		QDir pPathDir( path );
 		Q_FOREACH( QString pluginSo, pPathDir.entryList( QStringList() << "*.so", QDir::Files, QDir::Name ) ) {
-			parsed++;
 			QPluginLoader loader( pPathDir.absoluteFilePath( pluginSo ) );
 			QObject *pObject = loader.instance();
 			if ( pObject ) {
@@ -115,7 +100,20 @@ void NBPluginManager::reloadOtherPlugins() {
 					continue;
 
 				mPluginList << plugin;
-				added++;
+
+				/* By default, all plugins are enabled */
+				bool enabled = nbsett.value( plugin->name() + "/Enabled", true ).toBool();
+				if ( not nbsett.contains( plugin->name() + "/Enabled" ) )
+					nbsett.setValue( plugin->name() + "/Enabled", true );
+
+				/* If this plugin is not enabled, we do not load the data corresponding to it. */
+				if ( not enabled ) {
+					continue;
+
+					/* Unload the plugin */
+					loader.unload();
+				}
+
 				Q_FOREACH( NBPluginInterface::Interface iface, plugin->interfaces() ) {
 					NBContextPluginHash cph = mPluginsHash.value( iface );
 					Q_FOREACH( NBPluginInterface::Context ctxt, plugin->contexts( iface ) ) {

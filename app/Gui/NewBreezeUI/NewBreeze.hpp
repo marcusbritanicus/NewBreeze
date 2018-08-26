@@ -21,6 +21,7 @@
 #include "NBMessageDialog.hpp"
 #include "NBPropertiesDialog.hpp"
 #include "NBSettingsManager.hpp"
+#include "NBSideBar.hpp"
 #include "NBSidePanel.hpp"
 #include "NBTerminal.hpp"
 #include "NBTrashManager.hpp"
@@ -54,6 +55,7 @@ class NewBreeze : public QMainWindow {
 
 		NBAddressBar *AddressBar;
 		NBSidePanel *SidePanel;
+		NBSideBar *SideBar;
 		NBFolderView *FolderView;
 		NBTerminalWidget *Terminal;
 		NBInfoBar *InfoBar;

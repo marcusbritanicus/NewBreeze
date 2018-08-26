@@ -11,7 +11,11 @@ void NBDirViewDelegate::paint( QPainter* painter, const QStyleOptionViewItem &st
 	if ( not idx.isValid() )
 		QStyledItemDelegate::paint( painter, styleOpts, idx );
 
-	QStyleOptionViewItemV4 newOpts( styleOpts );
+	#if QT_VERSION > 0x050000
+		QStyleOptionViewItem newOpts( styleOpts );
+	#else
+		QStyleOptionViewItemV4 newOpts( styleOpts );
+	#endif
 
 	QString path( idx.data( Qt::UserRole +1 ).toString() );
 	if ( isReadable( path ) and isWritable( path ) ) {

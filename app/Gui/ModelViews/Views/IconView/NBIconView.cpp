@@ -787,7 +787,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 		return;
 	}
 
-	QToolTip::showText( mpEvent->pos(), "Move the mouse over the files/folders you want to select, holding down the left button.", this );
+	toolTipTimer.start( 100, this );
 
 	/* Index at mouse position */
 	QModelIndex idx = indexAt( mpEvent->pos() );
@@ -1351,6 +1351,17 @@ void NBIconView::keyPressEvent( QKeyEvent *kEvent ) {
 
 	QAbstractItemView::keyPressEvent( kEvent );
 };
+
+void NBIconView::timerEvent( QTimerEvent *tEvent ) {
+
+	if ( tEvent->timerId() == toolTipTimer.timerId() ) {
+		toolTipTimer.stop();
+		if ( qApp->mouseButtons() & Qt::LeftButton )
+			QToolTip::showText( QCursor::pos(), "Move the mouse over the files/folders you want to select, holding down the left button.", this );
+	}
+
+	QAbstractItemView::timerEvent( tEvent );
+}
 
 void NBIconView::computeGridSize( QSize iconSize ) {
 

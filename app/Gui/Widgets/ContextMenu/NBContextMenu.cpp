@@ -249,7 +249,7 @@ void NBActionsMenu::compress() {
 
 	QStringList archiveList;
 	foreach( QModelIndex idx, selection )
-		archiveList << QDir( workingDir ).filePath( idx.data().toString() );
+		archiveList << idx.data().toString();
 
 	emit addToArchive( archiveList );
 };

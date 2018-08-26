@@ -106,6 +106,8 @@ class NBIconView : public QAbstractItemView {
 
 		void keyPressEvent( QKeyEvent* );
 
+		void timerEvent( QTimerEvent* );
+
 	private:
 		/* Grid size for the indexes: myGridSizeMin, myGridSize */
 		void computeGridSize( QSize );
@@ -207,6 +209,8 @@ class NBIconView : public QAbstractItemView {
 		mutable QStringList foldedCategories;
 
 		QPoint dragStartPosition;
+
+		QBasicTimer toolTipTimer;
 
 	private slots:
 		void showHideCategory( QString );

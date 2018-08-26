@@ -55,10 +55,11 @@ NBSidePanel (Renamed from NBSideBar)                                            
 	✗ Improve the looks to make it similar to Ubuntu 18.04 Nautilus SideBar
 	✓ Improvements to NBSidePanel class
 
-NBSideBar                                                                                                                             [ 0 of 1 ]
-	□ Rewriting of the whole class
+NBSideBar                                                                                                                             [ 1 of 1 ]
+	◐ Rewriting of the whole class
+	  • Drag and Drop is yet to be implemented
 
-Suggestions                                                                                                                           [ 5 of 9 ]
+Suggestions                                                                                                                           [ 7 of 10 ]
 
 Note:
 	✍ - Work in progress

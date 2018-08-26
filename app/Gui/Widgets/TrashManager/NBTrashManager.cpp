@@ -74,7 +74,7 @@ void NBTrashManager::setupGui() {
 void NBTrashManager::setDialogProperties() {
 
 	setDialogTitle( "NewBreeze Trash Manager" );
-	setDialogIcon( QIcon( ":/icons/newbreeze.png" ) );
+	setDialogIcon( QIcon( ":/icons/trash.png" ) );
 
 	setMinimumSize( QSize( 900, 600 ) );
 };

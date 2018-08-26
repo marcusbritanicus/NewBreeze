@@ -13,11 +13,29 @@ NBSPluginsWidget::NBSPluginsWidget( QWidget *parent ) : QWidget( parent ) {
 
 void NBSPluginsWidget::createGUI() {
 
+	// ListWidget for Plugins
+	pPluginsLW = new QListWidget( this );
+
+	/* Load the available Plugins */
+	NBPluginManager *pMgr = NBPluginManager::instance();
+	QSettings nbsett( "NewBreeze", "Plugins" );
+	Q_FOREACH( NBPluginInterface *plugin, pMgr->allPlugins() ) {
+		QListWidgetItem *itm = new QListWidgetItem( QString( "%1" ).arg( plugin->name() ), pPluginsLW );
+
+		if ( getuid() )
+			itm->setFlags( Qt::ItemIsEnabled | Qt::ItemIsUserCheckable );
+
+		else
+			itm->setFlags( Qt::ItemIsUserCheckable );
+
+		itm->setCheckState( nbsett.value( plugin->name() + "/Enabled", true ).toBool() ? Qt::Checked : Qt::Unchecked );
+		pPluginsLW->addItem( itm );
+	}
+
+	connect( pPluginsLW, SIGNAL( itemChanged( QListWidgetItem* ) ), this, SLOT( savePluginEnabled( QListWidgetItem* ) ) );
+
 	// ListWidget for Plugin Paths
 	pPathsLW = new QListWidget( this );
-
-	// Populating the pPathsLW
-	QSettings nbsett( "NewBreeze", "Plugins" );
 
 	QStringList pluginPaths;
 	if ( not nbsett.value( "PluginPaths" ).toStringList().count() )
@@ -41,6 +59,8 @@ void NBSPluginsWidget::createGUI() {
 	btnLyt->addStretch();
 
 	QVBoxLayout *baseLyt = new QVBoxLayout();
+	baseLyt->addWidget( new QLabel( "<p><large>Available plugins:</large></p>", this ) );
+	baseLyt->addWidget( pPluginsLW );
 	baseLyt->addWidget( new QLabel( "<p><large>Plugin search paths</large></p><p>NewBreeze will search the following paths for plugins:<p>", this ) );
 	baseLyt->addWidget( pPathsLW );
 	baseLyt->addLayout( btnLyt );
@@ -82,7 +102,7 @@ void NBSPluginsWidget::updateSettings() {
 	for( int i = 0; i < pPathsLW->count(); i++ )
 		paths << pPathsLW->item( i )->text();
 
-	QSettings nbsett( "NewBreeze", "NewBreeze" );
+	QSettings nbsett( "NewBreeze", "Plugins" );
 
 	QStringList pluginPaths;
 	if ( not paths.count() )
@@ -93,4 +113,11 @@ void NBSPluginsWidget::updateSettings() {
 
 	pPathsLW->clear();
 	pPathsLW->addItems( nbsett.value( "PluginPaths5" ).toStringList() );
+};
+
+void NBSPluginsWidget::savePluginEnabled( QListWidgetItem *itm ) {
+
+	QSettings nbsett( "NewBreeze", "Plugins" );
+	nbsett.setValue( itm->text() + "/Enabled", ( itm->checkState() == Qt::Unchecked ? false : true ) );
+	nbsett.sync();
 };

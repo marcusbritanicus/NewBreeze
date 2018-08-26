@@ -121,6 +121,7 @@ void NewBreeze::createGUI() {
 	ViewLayout->setSpacing( 0 );
 
 	ViewLayout->addWidget( SidePanel );
+	ViewLayout->addWidget( SideBar );
 
 	ViewLayout->addWidget( FolderView );
 
@@ -155,16 +156,24 @@ void NewBreeze::createGUI() {
 void NewBreeze::setupSidePanel() {
 
 	SidePanel = new NBSidePanel( this );
+	SidePanel->hide();
 	connect( SidePanel, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
 	connect( SidePanel, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
 
-	/* If we are showing sidepanel */
-	if ( Settings->General.SidePanel )
-		SidePanel->show();
+	SideBar = new NBSideBar( this );
+	SideBar->hide();
+	connect( SideBar, SIGNAL( driveClicked( QString ) ), this, SLOT( handleDriveUrl( QString ) ) );
+	connect( SideBar, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
 
-	/* We are not showing the sidepanel at all */
-	else
-		SidePanel->hide();
+	/* Showing Classic SidePanel */
+	if ( Settings->General.SidePanel ) {
+		if ( Settings->General.SidePanelType )
+			SidePanel->show();
+
+		/* Showing Modern SidePanel */
+		else
+			SideBar->show();
+	}
 };
 
 void NewBreeze::setupInfoPanel() {
@@ -256,6 +265,10 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( reloadSuperStart() ), SidePanel, SLOT( populateSidePanel() ) );
 	connect( FolderView, SIGNAL( reloadBookmarks() ), SidePanel, SLOT( populateSidePanel() ) );
 	connect( FolderView, SIGNAL( reloadCatalogs() ), SidePanel, SLOT( populateSidePanel() ) );
+
+	connect( FolderView, SIGNAL( reloadSuperStart() ), SideBar, SLOT( updateSideBar() ) );
+	connect( FolderView, SIGNAL( reloadBookmarks() ), SideBar, SLOT( updateSideBar() ) );
+	connect( FolderView, SIGNAL( reloadCatalogs() ), SideBar, SLOT( updateSideBar() ) );
 
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateInfoBar() ) );
@@ -510,6 +523,19 @@ void NewBreeze::showSettingsDialog() {
 
 	NBSettingsManager *settingsMgr = new NBSettingsManager( this );
 	settingsMgr->exec();
+
+	SidePanel->hide();
+	SideBar->hide();
+
+	if ( Settings->General.SidePanel ) {
+		if ( Settings->General.SidePanelType )
+			SidePanel->show();
+
+		else
+			SideBar->show();
+	}
+
+	NBPluginManager::instance()->reloadPlugins();
 
 	qApp->processEvents();
 };

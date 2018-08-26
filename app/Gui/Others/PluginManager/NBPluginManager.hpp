@@ -41,9 +41,6 @@ class NBPluginManager : public QObject {
 	private:
 		NBPluginManager();
 
-		void reloadPeekPlugins();
-		void reloadOtherPlugins();
-
 		/* Global Instance */
 		static NBPluginManager* pMgr;
 

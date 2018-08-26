@@ -20,6 +20,7 @@ class NBSPluginsWidget : public QWidget {
 	private:
 		void createGUI();
 
+		QListWidget *pPluginsLW;
 		QListWidget *pPathsLW;
 		NBSegmentButton *pathsBtn;
 
@@ -30,4 +31,5 @@ class NBSPluginsWidget : public QWidget {
 		void removePath();
 
 		void updateSettings();
+		void savePluginEnabled( QListWidgetItem *itm );
 };

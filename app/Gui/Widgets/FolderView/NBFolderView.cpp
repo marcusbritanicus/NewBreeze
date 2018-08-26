@@ -1314,7 +1314,7 @@ void NBFolderView::compress( QStringList archiveList ) {
 void NBFolderView::extract( QString archive ) {
 
 	QString dest = fsModel->nodePath( QFileInfo( archive ).baseName() );
-	// Create the dest folder if it does nor exist
+	// Create the dest folder if it does not exist
 	if ( not exists( dest ) )
 		QDir::current().mkdir( dest );
 
