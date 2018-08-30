@@ -68,3 +68,71 @@ class NBCOMMON_DLLSPEC NBArchive {
 		ArchiveEntries memberList;
 		bool readDone;
 };
+
+class NBArchiveThread : public QThread {
+	Q_OBJECT
+
+	public:
+		inline NBArchiveThread( QString name, QChar mode, QString wDir, QString dest, QStringList files ) : QThread() {
+
+			mName = name;
+			mMode = mode;
+
+			mDestDir = dest;
+			mWorkDir = wDir;
+
+			mFiles << files;
+		};
+
+	public Q_SLOTS:
+		inline void run() {
+
+			NBArchive *mArchive = new NBArchive( mName );
+
+			switch( mMode.toLatin1() ) {
+				// Compress
+				case 'c': {
+
+					mArchive->setWorkingDir( mWorkDir );
+					mArchive->updateInputFiles( mFiles );
+					mArchive->create();
+
+					return;
+				}
+
+				// Decompress
+				case 'd': {
+
+					mArchive->setDestination( mDestDir );
+					mArchive->extract();
+
+					return;
+				}
+
+				// Decompress Member
+				case 'm': {
+
+					mArchive->setDestination( mDestDir );
+					mArchive->extractMember( mFiles.at( 0 ) );
+
+					return;
+				}
+			}
+
+			emit complete( mName, mMode );
+		};
+
+	private:
+
+		QString mName;
+		QChar   mMode;
+
+		QString mWorkDir;
+		QString mDestDir;
+
+		QStringList mFiles;
+
+	Q_SIGNALS:
+		/* complete( ArchiveName, ArchiveMode (c|d) */
+		void complete( QString, QChar );
+};

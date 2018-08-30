@@ -270,6 +270,8 @@ void NewBreeze::createAndSetupActions() {
 	connect( FolderView, SIGNAL( reloadBookmarks() ), SideBar, SLOT( updateSideBar() ) );
 	connect( FolderView, SIGNAL( reloadCatalogs() ), SideBar, SLOT( updateSideBar() ) );
 
+	connect( FolderView, SIGNAL( reloadCatalogs() ), SideBar, SLOT( updateSideBar() ) );
+
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateVarious( QString ) ) );
 	connect( FolderView->fsModel, SIGNAL( directoryLoading( QString ) ), this, SLOT( updateInfoBar() ) );
 

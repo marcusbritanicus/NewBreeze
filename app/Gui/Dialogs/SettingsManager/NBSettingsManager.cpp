@@ -42,12 +42,14 @@ QHBoxLayout* NBSettingsManager::createBodyLayout() {
 	iconWidget = new NBIconThemeWidget( this );
 	styleWidget = new NBSStyleWidget( this );
 	keysWidget = new NBKeyBindingsWidget( this );
+	termWidget = new NBSTerminalWidget( this );
 
 	widgetLyt->addWidget( genScroll );
 	widgetLyt->addWidget( iconWidget );
 	widgetLyt->addWidget( styleWidget );
 	widgetLyt->addWidget( new NBSPluginsWidget( this ) );
 	widgetLyt->addWidget( keysWidget );
+	widgetLyt->addWidget( termWidget );
 
 	splitLyt->addWidget( chooserWidget );
 	splitLyt->addWidget( Separator::vertical( this ) );

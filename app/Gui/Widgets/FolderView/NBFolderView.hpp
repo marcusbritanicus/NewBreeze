@@ -134,6 +134,8 @@ class NBFolderView : public QWidget {
 		void newTab( QString );
 		void selectionChanged( const QItemSelection&, const QItemSelection& );
 
+		void archiveDone( QString, QChar );
+
 		void showProperties();
 		void showPermissions();
 

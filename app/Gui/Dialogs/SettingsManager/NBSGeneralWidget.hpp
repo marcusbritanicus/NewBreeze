@@ -49,12 +49,6 @@ class NBSGeneralWidget : public QWidget {
 		QCheckBox *paintOverlayCB;				// Paint Icon Overlays?
 		QCheckBox *logDebugCB;					// Enable Debug Logging?
 
-		/* Terminal */
-		QGroupBox *termGB;
-		QListWidget *termsLW;					// List of terminals detected/added
-		QPushButton *addBtn;					// Add a terminal
-		QPushButton *defaultBtn;				// Make this terminal default
-
 	private slots:
 		/* View */
 		void handlePerFolderChanged( bool );
@@ -78,24 +72,4 @@ class NBSGeneralWidget : public QWidget {
 		void handleExtendedIOChanged( bool );
 		void handlePaintOverlayChanged( bool );
 		void handleLogDebugChanged( bool );
-
-		/* Terminal */
-		void handleDefaultClicked();
-		void handleAddTermClicked();
-};
-
-class NBAddVTEDialog : public NBDialog {
-	Q_OBJECT
-
-	public :
-		NBAddVTEDialog( QWidget *parent );
-
-	private:
-		NBSegmentButton *btns;
-		QCheckBox *wDirCB;
-		QLineEdit *execLE, *workLE, *cmdLE;
-
-	private Q_SLOTS:
-		void addTerminal();
-		void handleCBPressed();
 };

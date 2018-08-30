@@ -11,6 +11,9 @@ NBTrayIcon::NBTrayIcon() : QSystemTrayIcon() {
 	setIcon( QIcon( ":/icons/newbreeze.png" ) );
 	connect( this, SIGNAL( activated( QSystemTrayIcon::ActivationReason ) ), this, SLOT( handleActivation( QSystemTrayIcon::ActivationReason ) ) );
 
+	NBProcessManager *pMgr = NBProcessManager::instance();
+	connect( pMgr, SIGNAL( processCompleted( NBProcess::Progress* ) ), this, SLOT( processCompleted( NBProcess::Progress* ) ) );
+
 	QMenu *menu = new QMenu( "TrayMenu" );
 	menu->addAction( QIcon( ":/icons/newbreeze.png" ), "New &Window", this, SIGNAL( newWindow() ) );
 	menu->addAction( "&Toggle Visible Windows", this, SLOT( toggleVisible() ) );
@@ -54,7 +57,7 @@ void NBTrayIcon::processCompleted( NBProcess::Progress *proc ) {
 				"Copying finished",
 				QString( "Copying of selected nodes from %1 to %2 complete." ).arg( proc->sourceDir ).arg( proc->targetDir ),
 				QIcon( ":/icons/copy.png" ),
-				2000
+				5000
 			);
 			break;
 		}
@@ -64,7 +67,7 @@ void NBTrayIcon::processCompleted( NBProcess::Progress *proc ) {
 				"Moving finished",
 				QString( "Moving of selected nodes from %1 to %2 complete." ).arg( proc->sourceDir ).arg( proc->targetDir ),
 				QIcon( ":/icons/move.png" ),
-				2000
+				5000
 			);
 			break;
 		}
@@ -74,7 +77,7 @@ void NBTrayIcon::processCompleted( NBProcess::Progress *proc ) {
 				"Deleting finished",
 				QString( "Deleting of selected nodes from %1 complete." ).arg( proc->sourceDir ),
 				QIcon( ":/icons/trash.png" ),
-				2000
+				5000
 			);
 			break;
 		}
@@ -84,7 +87,7 @@ void NBTrayIcon::processCompleted( NBProcess::Progress *proc ) {
 				"Deleting finished",
 				QString( "Nodes selected in %1 have been sent to trash." ).arg( proc->sourceDir ).arg( proc->targetDir ),
 				QIcon( ":/icons/trash.png" ),
-				2000
+				5000
 			);
 			break;
 		}

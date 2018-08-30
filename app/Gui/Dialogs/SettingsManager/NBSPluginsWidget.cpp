@@ -61,7 +61,7 @@ void NBSPluginsWidget::createGUI() {
 	QVBoxLayout *baseLyt = new QVBoxLayout();
 	baseLyt->addWidget( new QLabel( "<p><large>Available plugins:</large></p>", this ) );
 	baseLyt->addWidget( pPluginsLW );
-	baseLyt->addWidget( new QLabel( "<p><large>Plugin search paths</large></p><p>NewBreeze will search the following paths for plugins:<p>", this ) );
+	baseLyt->addWidget( new QLabel( "<p><large>Plugin search paths</large><br>NewBreeze will search the following paths for plugins:</p>", this ) );
 	baseLyt->addWidget( pPathsLW );
 	baseLyt->addLayout( btnLyt );
 

@@ -6,14 +6,14 @@
 
 #include "NBArchiveDialog.hpp"
 
-NBArchive* NBArchiveDialog::newArchive( QWidget *parent ) {
+QString NBArchiveDialog::newArchive( QWidget *parent ) {
 
 	NBArchiveDialog *dlg = new NBArchiveDialog( parent );
 	if ( dlg->exec() == QDialog::Accepted )
 		return dlg->archive();
 
 	else
-		return NULL;
+		return QString();
 };
 
 NBArchiveDialog::NBArchiveDialog( QWidget *parent ) : NBDialog( parent ) {
@@ -106,7 +106,7 @@ void NBArchiveDialog::createGUI() {
 	setLayout( baseLyt );
 };
 
-NBArchive* NBArchiveDialog::archive() {
+QString NBArchiveDialog::archive() {
 
 	if ( filename.isEmpty() )
 		return NULL;
@@ -115,7 +115,7 @@ NBArchive* NBArchiveDialog::archive() {
 	if ( not filename.endsWith( format ) )
 		archiveName += format;
 
-	return new NBArchive( QDir( location ).filePath( archiveName ) );
+	return QDir( location ).filePath( archiveName );
 };
 
 void NBArchiveDialog::updateFileName( QString fn ) {

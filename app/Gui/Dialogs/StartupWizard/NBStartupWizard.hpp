@@ -5,7 +5,7 @@
 */
 
 #include "Global.hpp"
-#include "NBSGeneralWidget.hpp"
+#include "NBSTerminalWidget.hpp"
 
 class NBStartupWizard : public QWizard {
 	Q_OBJECT

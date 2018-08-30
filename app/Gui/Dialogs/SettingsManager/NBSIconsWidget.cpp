@@ -111,6 +111,9 @@ void NBIconThemeModel::setupModel() {
 
 	endResetModel();
 
+	/* Hack: To restore the Icon Theme which is changed above */
+	QIcon::setThemeName( Settings->General.IconTheme );
+
 	emit layoutChanged();
 };
 

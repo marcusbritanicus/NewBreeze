@@ -912,33 +912,7 @@ void NBItemViewModel::goBack() {
 
 	if ( canGoBack() ) {
 		curIndex--;
-
-		mRootPath = oldRoots.at( curIndex );
-
-		if ( mRootPath.startsWith( "NB://SuperStart" ) ) {
-			mVirtualData = true;
-			mModelDataType = (quint64)NBItemViewModel::SuperStart;
-		}
-
-		else if ( mRootPath.startsWith( "NB://Applications" ) ) {
-			mVirtualData = true;
-			mModelDataType = (quint64)NBItemViewModel::Applications;
-		}
-
-		else if ( mRootPath.startsWith( "NB://Catalogs" ) ) {
-			mVirtualData = true;
-			mModelDataType = (quint64)NBItemViewModel::Catalogs;
-		}
-
-		else {
-			mVirtualData = false;
-			mModelDataType = (quint64)NBItemViewModel::FileSystem;
-		}
-
-		delete rootNode;
-		rootNode = new NBItemViewNode( quickDataGatherer->getQuickFileInfo( mRootPath ), "" );
-
-		setupModelData();
+		setRootPath( oldRoots.at( curIndex ) );
 	}
 };
 
@@ -946,33 +920,7 @@ void NBItemViewModel::goForward() {
 
 	if ( canGoForward() ) {
 		curIndex++;
-
-		mRootPath = oldRoots.at( curIndex );
-
-		if ( mRootPath.startsWith( "NB://SuperStart" ) ) {
-			mVirtualData = true;
-			mModelDataType = (quint64)NBItemViewModel::SuperStart;
-		}
-
-		else if ( mRootPath.startsWith( "NB://Applications" ) ) {
-			mVirtualData = true;
-			mModelDataType = (quint64)NBItemViewModel::Applications;
-		}
-
-		else if ( mRootPath.startsWith( "NB://Catalogs" ) ) {
-			mVirtualData = true;
-			mModelDataType = (quint64)NBItemViewModel::Catalogs;
-		}
-
-		else {
-			mVirtualData = false;
-			mModelDataType = (quint64)NBItemViewModel::FileSystem;
-		}
-
-		delete rootNode;
-		rootNode = new NBItemViewNode( quickDataGatherer->getQuickFileInfo( mRootPath ), "" );
-
-		setupModelData();
+		setRootPath( oldRoots.at( curIndex ) );
 	}
 };
 
@@ -981,6 +929,7 @@ void NBItemViewModel::goUp() {
 	if ( canGoUp() ) {
 		QString newRoot = mRootPath.section( "/", 0, -3 );
 		newRoot = ( newRoot.endsWith( "/" ) ? newRoot : newRoot + "/" );
+
 		setRootPath( newRoot );
 	}
 };

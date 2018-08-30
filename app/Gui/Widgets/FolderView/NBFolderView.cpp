@@ -1302,25 +1302,36 @@ void NBFolderView::handleWatchDogBark( QString path ) {
 
 void NBFolderView::compress( QStringList archiveList ) {
 
-	NBArchive *arc = NBArchiveDialog::newArchive( this );
-	if ( arc == NULL )
-		return;
+	QString arcName = NBArchiveDialog::newArchive( this );
 
-	arc->setWorkingDir( fsModel->currentDir() );
-	arc->updateInputFiles( archiveList );
-	QtConcurrent::run( arc, &NBArchive::create );
+	/* Show a GUI message when work is done */
+	QMessageBox *msg = new QMessageBox( this );
+	msg->setIcon( QMessageBox::Information );
+	msg->setWindowTitle( "NewBreeze | NBArchive" );
+	msg->setText(  QString( "The creation of the archive, <tt>%1</tt>, is complete." ).arg( baseName( arcName ) ) );
+	msg->addButton( QMessageBox::Ok );
+
+	NBArchiveThread *thread = new NBArchiveThread( arcName, 'c', fsModel->currentDir(), QString(), archiveList );
+	connect( thread, SIGNAL( finished() ), msg, SLOT( show() ) );
+
+	thread->start();
 };
 
 void NBFolderView::extract( QString archive ) {
 
 	QString dest = fsModel->nodePath( QFileInfo( archive ).baseName() );
-	// Create the dest folder if it does not exist
-	if ( not exists( dest ) )
-		QDir::current().mkdir( dest );
 
-	NBArchive arc( archive );
-	arc.setDestination( dest );
-	QtConcurrent::run( arc, &NBArchive::extract );
+	/* Show a GUI message when work is done */
+	QMessageBox *msg = new QMessageBox( this );
+	msg->setIcon( QMessageBox::Information );
+	msg->setWindowTitle( "NewBreeze | NBArchive" );
+	msg->setText(  QString( "The extraction of the archive, <tt>%1</tt>, is complete." ).arg( baseName( archive ) ) );
+	msg->addButton( QMessageBox::Ok );
+
+	NBArchiveThread *thread = new NBArchiveThread( archive, 'd', QString(), dest, QStringList() );
+	connect( thread, SIGNAL( finished() ), msg, SLOT( show() ) );
+
+	thread->start();
 };
 
 void NBFolderView::updateActions() {

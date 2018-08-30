@@ -15,7 +15,7 @@ class NBArchiveDialog : public NBDialog {
 	Q_OBJECT
 
 	public:
-		static NBArchive* newArchive( QWidget * );
+		static QString newArchive( QWidget * );
 
 	private:
 		NBArchiveDialog( QWidget* );
@@ -23,7 +23,7 @@ class NBArchiveDialog : public NBDialog {
 
 		QString filename, location, format;
 		QLineEdit *locationLE;
-		NBArchive *archive();
+		QString archive();
 
 	private Q_SLOTS:
 		void updateFileName( QString );

@@ -12,8 +12,9 @@
 #include "NBSGeneralWidget.hpp"
 #include "NBSIconsWidget.hpp"
 #include "NBSKeyBindingsWidget.hpp"
-#include "NBSStyleWidget.hpp"
 #include "NBSSideBar.hpp"
+#include "NBSStyleWidget.hpp"
+#include "NBSTerminalWidget.hpp"
 
 class NBSettingsManager : public NBDialog {
 	Q_OBJECT
@@ -35,6 +36,7 @@ class NBSettingsManager : public NBDialog {
 		NBSStyleWidget *styleWidget;
 		NBIconThemeWidget *iconWidget;
 		NBKeyBindingsWidget *keysWidget;
+		NBSTerminalWidget *termWidget;
 
 	public slots:
 		int exec();
