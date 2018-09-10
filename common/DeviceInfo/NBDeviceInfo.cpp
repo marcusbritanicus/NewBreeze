@@ -165,24 +165,31 @@ NBDeviceInfo NBDeviceManager::deviceInfoForPath( QString path ) {
 	if ( isDir( path ) and not path.endsWith( "/" ) )
 		path += "/";
 
-	if ( devicesList.keys().contains( path ) )
-		return devicesList.value( path );
+	/* Make our path absolute */
+	if ( QFileInfo( path ).isRelative() )
+		path = QFileInfo( path ).absolutePath();
 
-	int bestMatch = path.size();
-	NBDeviceInfo bestDevice;
+	if ( QFileInfo( path ).isRoot() )
+		return devicesList.value( "/" );
 
-	Q_FOREACH( QString mt, devicesList.keys() ) {
-		if ( not path.startsWith( mt ) )
-			continue;
+	QString cmpPath = path;
 
-		int match = path.compare( mt );
-		if ( ( match > 0 ) and ( match < bestMatch ) ) {
-			bestMatch = match;
-			bestDevice = devicesList.value( mt );
+	while ( true ) {
+		/* If we have reached the root directory: This is a mount point. */
+		if ( cmpPath == "/" )
+			return devicesList.value( "/" );
+
+		Q_FOREACH( NBDeviceInfo info, devicesList.values() ) {
+			if ( info.mountPoint() == cmpPath )
+				return info;
 		}
+
+		/* Our previously set path is not a mount point. So check if its parent is. */
+		cmpPath = dirName( cmpPath );
 	}
 
-	return bestDevice;
+	/* Should not come here at all */
+	return devicesList.value( "/" );
 };
 
 void NBDeviceManager::pollDevices() {

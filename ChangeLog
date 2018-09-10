@@ -11,6 +11,7 @@ Version 3.0.0 RC
 	- Classes interchanged: NBSideBar <--> NBSidePanel
 	- Improvements to NBSidePanel
 	- BugFix: ExtendedIO partial bugfix
+	- BugFix: NBDeviceInfo critical bugfix
 	- Several minor bug fixes.
 	- Trash Manager now uses QTreeView class
 	- Inbuilt terminal bug fix
