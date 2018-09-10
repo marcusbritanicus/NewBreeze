@@ -12,17 +12,12 @@ void NBOpenWithDelegate::paint( QPainter *painter, const QStyleOptionViewItem &o
 		QItemDelegate::paint( painter, option, index );
 
 	else {
-		// const NBApplicationsModel *model = static_cast<const NBApplicationsModel*>( index.model() );
-
 		QRect optionRect( option.rect );
-
-		// Font Mentrics for elided text;
-		QFontMetrics fm( qApp->font() );
 
 		// Get icon size
 		QSize iconSize( option.decorationSize );
-
 		QString text = index.data( Qt::DisplayRole ).toString();
+
 		QPixmap icon;
 		if ( option.state & QStyle::State_Selected )
 			icon = index.data( Qt::DecorationRole ).value<QIcon>().pixmap( iconSize, QIcon::Selected );
@@ -38,65 +33,36 @@ void NBOpenWithDelegate::paint( QPainter *painter, const QStyleOptionViewItem &o
 
 		QSize iSize( icon.size() );
 
+		/*
+			*
+			* In this case, we need to center the image horizontally and vertically.
+			* The text is rendered vertically centered
+			* +------------------------------------------------------------------------------------------------------+
+			* | +----+                                                                                               |
+			* | |icon| This is the text                                                                              |
+			* | +----+                                                                                               |
+			* +------------------------------------------------------------------------------------------------------+
+			*
+		*/
+
+		int padding = ( optionRect.height() - iconSize.width() ) / 2;
+
+		// Icon padding
+		QRect iconRect;
+		// Original X + Image Left Border + Width to make center the icon
+		iconRect.setX( optionRect.x() + padding + ( iconSize.width() - iSize.width() ) / 2 );
+		// Original Y + Height to make the image center of the icon rectangle
+		iconRect.setY( optionRect.y() + ( optionRect.height() - iSize.height() ) / 2 );
+		// Icon Size
+		iconRect.setSize( iSize );
+
 		QRect textRect;
- 		// Original X + Image Left Border + Image Width + Image-Text Gap
-		textRect.setX( optionRect.x() + 3 + iconSize.width() + 5 );
+		// Original X + Image Width + Image-padding
+		textRect.setX( optionRect.x() + iconSize.width() + 2 * padding );
 		// Vertical Centering, so don't bother
 		textRect.setY( optionRect.y() );
 		// Original Width - Image Left Border - Image Width - Image Text Gap -Text Right Border
-		textRect.setSize( optionRect.size() - QSize( 3, 0 ) - QSize( iconSize.width(), 0 ) - QSize( 5, 0 ) - QSize( 3, 0 ) );
-
-		// Set elided text
-		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
-
-		int padding = ( int ) round( iconSize.width() * 0.1 );
-		QRect iconRect;
-		if ( iSize.width() > iSize.height() ) {
-			/*
-				*
-				* In this case, we need to center the image vertically.
-				* So we add a small padding along the x-axis.
-				*
-			*/
-
-			// Original X + Image Left Border
-			iconRect.setX( optionRect.x() + 2 );
-			// Original Y + Height to make the image center of the selection rectangle
-			iconRect.setY( optionRect.y() + ( optionRect.height() - iSize.height() ) / 2 );
-			// Icon Size
-			iconRect.setSize( iSize );
-		}
-
-		else if ( iSize.height() > iSize.width() ) {
-			/*
-				*
-				* Here, we need to center the image horizontally.
-				* We have no padding on top
-				*
-			*/
-
-			// Original X + Width to make the image center of the image rectangle
-			iconRect.setX( optionRect.x() + ( iconSize.width() - iSize.width() ) / 2 + 2 );
-			// Original Y + Image Top Border
-			iconRect.setY( optionRect.y() + 1 );
-			// Icon Size
-			iconRect.setSize( iSize );
-		}
-
-		else {
-			/*
-				*
-				* Here, we need to center the image horizontally and vertically
-				*
-			*/
-
-			// Original X + Width to make the image center of the image rectangle
-			iconRect.setX( optionRect.x() + ( iconSize.width() - iSize.width() ) / 2 + 2 );
-			// Original Y + Height to make the image center of the image rectangle
-			iconRect.setY( optionRect.y() + ( optionRect.height() - iSize.height() ) / 2 );
-			// Icon Size
-			iconRect.setSize( iSize );
-		}
+		textRect.setSize( optionRect.size() - QSize( iconSize.width(), 0 ) - 3 * QSize( padding, 0 ) );
 
 		painter->save();
 
@@ -117,8 +83,8 @@ void NBOpenWithDelegate::paint( QPainter *painter, const QStyleOptionViewItem &o
 		else
 			painter->setBrush( QBrush( Qt::transparent ) );
 
-		// Paint Background
-		painter->drawRoundedRect( optionRect, 7, 7 );
+		/* Selection rectangle */
+		painter->drawRoundedRect( optionRect.adjusted( padding / 2, padding / 2, -padding / 2, -padding / 2 ), 3, 3 );
 		painter->restore();
 
 		painter->save();
@@ -148,6 +114,12 @@ void NBOpenWithDelegate::paint( QPainter *painter, const QStyleOptionViewItem &o
 		painter->setPen( option.palette.color( QPalette::Text ) );
 
 		// Draw Text
+		if ( option.state & QStyle::State_HasFocus )
+			painter->setFont( QFont( painter->font().family(), painter->font().pointSize(), QFont::Bold ) );
+
+		/* Font Mentrics for elided text */
+		QFontMetrics fm( painter->font() );
+		text = fm.elidedText( text, Qt::ElideRight, textRect.width() );
 		painter->drawText( textRect, Qt::AlignVCenter, text );
 
 		painter->restore();
