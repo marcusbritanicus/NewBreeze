@@ -108,55 +108,6 @@ void NBLineEdit::paintEvent( QPaintEvent *pEvent ) {
 	pEvent->accept();
 };
 
-NBDriveInfo::NBDriveInfo( NBDeviceInfo dInfo, QWidget *parent ) : QWidget ( parent ) {
-
-	quint64 usedSize = dInfo.bytesUsed();
-	quint64 freeSize = dInfo.bytesAvailable();
-	quint64 totalSize = dInfo.bytesTotal();
-
-	percent = 100.0 * usedSize / totalSize;
-
-	name = dInfo.displayName();
-	disk = dInfo.device();
-	icon = getDevType( dInfo );
-	info = QString( "%1 free of %2 (%3% used)" ).arg( formatSize( freeSize ) ).arg( formatSize( totalSize ) ).arg( percent, 0, 'f', 2 );
-
-	setFixedHeight( 64 );
-};
-
-void NBDriveInfo::paintEvent( QPaintEvent *pEvent ) {
-
-	QPainter painter( this );
-	painter.setRenderHints( QPainter::HighQualityAntialiasing | QPainter::Antialiasing | QPainter::TextAntialiasing );
-
-	painter.save();
-	painter.drawPixmap( QRect( 8, 8, 48, 48 ), QPixmap( icon ).scaled( QSize( 64, 64 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-	painter.drawText( QRect( 74, 0, width(), height() ), Qt::AlignLeft | Qt::AlignVCenter, QString( "%1 (%2)\n%3" ).arg( name ).arg( disk ).arg( info ) );
-	painter.restore();
-
-	painter.save();
-	painter.setPen( Qt::darkGray );
-	painter.setBrush( Qt::gray );
-	painter.drawEllipse( QPointF( width() - 32.0, 32.0 ), 32.0, 32.0 );
-	painter.restore();
-
-	painter.save();
-	qreal radius = 32 * sqrt( percent / 100 );
-	painter.setPen( Qt::NoPen );
-	painter.setBrush( percent / 100 < .9 ? Qt::darkGreen : Qt::darkRed );
-	painter.drawEllipse( QPointF( width() - 32.0, 32.0 ), radius, radius );
-	painter.restore();
-
-	painter.save();
-	painter.setPen( Qt::white );
-	painter.setFont( QFont( font().family(), font().pointSize(), QFont::Bold ) );
-	painter.drawText( QRect( width() - 64, 0, 64, 64 ), Qt::AlignCenter, QString( "%1%" ).arg( percent, 0, 'f', 2 ) );
-	painter.restore();
-
-	painter.end();
-	pEvent->accept();
-};
-
 QWidget* Separator::vertical( QWidget *parent ) {
 
 	return new Separator( Separator::Vertical, parent );

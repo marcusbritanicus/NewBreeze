@@ -21,6 +21,7 @@ void NBThumbnailer::createThumbnails( QStringList nodes ) {
 	pdfs.clear();
 	djvus.clear();
 	epubs.clear();
+	cbzs.clear();
 
 	Q_FOREACH( QString node, nodes ) {
 		QString mime = mimeDb.mimeTypeForFile( node ).name();
@@ -48,6 +49,10 @@ void NBThumbnailer::createThumbnails( QStringList nodes ) {
 		else if ( mime.contains( "epub" ) ) {
 			epubs << node;
 		}
+
+		else if ( mime.contains( "comicbook" ) ) {
+			cbzs << node;
+		}
 	}
 
 	mTerminate = false;
@@ -65,6 +70,7 @@ void NBThumbnailer::createThumbnails( QString path, QStringList nodes ) {
 	pdfs.clear();
 	djvus.clear();
 	epubs.clear();
+	cbzs.clear();
 
 	Q_FOREACH( QString node, nodes ) {
 		QString mime = mimeDb.mimeTypeForFile( path + node ).name();
@@ -90,6 +96,10 @@ void NBThumbnailer::createThumbnails( QString path, QStringList nodes ) {
 		}
 
 		else if ( mime.contains( "epub" ) ) {
+			epubs << path + node;
+		}
+
+		else if ( mime.contains( "comicbook" ) ) {
 			epubs << path + node;
 		}
 	}
@@ -196,28 +206,6 @@ void NBThumbnailer::run() {
 				}
 			}
 
-			/* PDF Files */
-			if ( Settings->View.PdfPreview ) {
-				Q_FOREACH( QString file, pdfs ) {
-					if ( mTerminate )
-						return;
-
-					/* If @path is non-existent */
-					if ( not exists( file ) )
-						continue;
-
-					/* Create a hash of the path */
-					QString hashPath = thumbsDir + MD5( file );
-
-					/* If the thumbnail is already formed */
-					if ( exists( hashPath ) )
-						continue;
-
-					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "PDF", QStringList() << file << hashPath );
-					emit updateNode( file );
-				}
-			}
-
 			/* DjVu files */
 			if ( Settings->View.DjVuPreview ) {
 				Q_FOREACH( QString file, djvus ) {
@@ -236,6 +224,44 @@ void NBThumbnailer::run() {
 						continue;
 
 					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "DjVu", QStringList() << file << hashPath );
+					emit updateNode( file );
+				}
+			}
+
+			loader.unload();
+		}
+	}
+
+	Q_FOREACH( QString pth, nbpset.value( "PluginPaths" ).toStringList() ) {
+		if ( exists( pth + "/libPdfPlugin.so" ) )
+			pluginSo = QDir( pth ).absoluteFilePath( "libPdfPlugin.so" );
+	}
+
+	if ( pluginSo.count() ) {
+
+		QPluginLoader loader( pluginSo );
+		QObject *pObject = loader.instance();
+		if ( pObject ) {
+			NBPluginInterface *plugin = qobject_cast<NBPluginInterface*>( pObject );
+
+			/* PDF Files */
+			if ( Settings->View.PdfPreview ) {
+				Q_FOREACH( QString file, pdfs ) {
+					if ( mTerminate )
+						return;
+
+					/* If @path is non-existent */
+					if ( not exists( file ) )
+						continue;
+
+					/* Create a hash of the path */
+					QString hashPath = thumbsDir + MD5( file );
+
+					/* If the thumbnail is already formed */
+					if ( exists( hashPath ) )
+						continue;
+
+					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "PDF", QStringList() << file << hashPath );
 					emit updateNode( file );
 				}
 			}
@@ -261,6 +287,30 @@ void NBThumbnailer::run() {
 					emit updateNode( file );
 				}
 			}
+
+			/* ePub files */
+			if ( Settings->View.ePubPreview ) {
+				Q_FOREACH( QString file, cbzs ) {
+					if ( mTerminate )
+						return;
+
+					/* If @path is non-existent */
+					if ( not exists( file ) )
+						continue;
+
+					/* Create a hash of the path */
+					QString hashPath = thumbsDir + MD5( file );
+
+					/* If the thumbnail is already formed */
+					if ( exists( hashPath ) )
+						continue;
+
+					plugin->actionTrigger( NBPluginInterface::MimeTypeInterface, "CBZ", QStringList() << file << hashPath );
+					emit updateNode( file );
+				}
+			}
+
+			loader.unload();
 		}
 	}
 };

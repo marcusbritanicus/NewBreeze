@@ -686,10 +686,9 @@ void NBFolderView::doPeek( QModelIndex curIndex ) {
 	/* For directories we use the inbuild previewer */
 	if ( isDir( currentNode ) ) {
 		qDebug() << "Previewing folder:" << currentNode.toLocal8Bit().data();
-		NBFolderFlash *previewer = new NBFolderFlash( currentNode );
 
-		connect( previewer, SIGNAL( loadFolder( QString ) ), this, SLOT( doOpen( QString ) ) );
-		previewer->show();
+		NBPropertiesDialog *props = new NBPropertiesDialog( QStringList() << currentNode, NBPropertiesDialog::Preview, this );
+		props->show();
 
 		return;
 	}
@@ -716,8 +715,8 @@ void NBFolderView::doPeek( QModelIndex curIndex ) {
 
 	// Custom Peeking
 	qDebug() << "Previewing file:" << currentNode.toLocal8Bit().data();
-	NBCustomPeek *previewer = new NBCustomPeek( currentNode );
-	previewer->show();
+	NBPropertiesDialog *props = new NBPropertiesDialog( QStringList() << currentNode, NBPropertiesDialog::Preview, this );
+	props->show();
 
 	setFocus();
 };

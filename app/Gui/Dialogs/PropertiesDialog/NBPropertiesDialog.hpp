@@ -7,138 +7,40 @@
 #pragma once
 
 #include "Global.hpp"
-#include "NBDialog.hpp"
-#include "NBGuiWidgets.hpp"
-#include "NBLabels.hpp"
-#include "NBIconManager.hpp"
-#include "NBFileDialog.hpp"
 
-#if QT_VERSION >= 0x050000
-	#include <QtConcurrent>
-#endif
+#include "NBPSideBar.hpp"
+#include "NBDefaultsWidget.hpp"
+#include "NBDetailsWidget.hpp"
+#include "NBPropsWidget.hpp"
+#include "NBPermsWidget.hpp"
+#include "NBPreviewWidget.hpp"
 
-class NBPropertiesBase: public QWidget {
-	Q_OBJECT
-
-	public:
-		NBPropertiesBase( QStringList, QWidget * );
-		void setNewIcon( QString );
-
-	private:
-		NBClickLabel *iconLabel;
-		QLabel *infoLabel;
-		QStringList pathsList;
-
-	Q_SIGNALS:
-		void setDirIcon();
-};
-
-class NBPropertiesWidget: public QWidget {
-    Q_OBJECT
-
-	public:
-		NBPropertiesWidget( QStringList, bool *term, QWidget * );
-		~NBPropertiesWidget();
-
-	private:
-		void createGUI();
-		void setWidgetProperties();
-
-		bool *terminate;
-
-	public slots:
-		void update();
-
-	private:
-		void folderProperties( QStringList paths );
-		void recurseProperties( QString path );
-
-		QString sizeTypeStr;
-		QLabel *sizeTypeLabel;
-
-		QLabel *timeLabel;
-
-		QStringList pathsList;
-
-		QFuture<void> thread;
-
-		qint64 files;
-		qint64 folders;
-		qint64 totalSize;
-
-		QDateTime ctimeMin, mtimeMin, atimeMin;
-		QDateTime ctimeMax, mtimeMax, atimeMax;
-
-	Q_SIGNALS:
-		void updateSignal();
-};
-
-class NBPermissionsWidget: public QWidget {
-    Q_OBJECT
-
-	public:
-		NBPermissionsWidget( QStringList, QWidget * );
-
-	private:
-		void createGUI();
-		void setWidgetProperties();
-		void readPermissions();
-
-		NBClickLabel *iconLabel;
-
-		QStringList pathsList;
-
-		QCheckBox *uReadCheck, *uWritCheck, *uExecCheck;
-		QCheckBox *gReadCheck, *gWritCheck, *gExecCheck;
-		QCheckBox *oReadCheck, *oWritCheck, *oExecCheck;
-
-		QCheckBox *smartExecCheck;
-		QCheckBox *carryCheck;
-		QCheckBox *delProtectCheck;
-
-	private slots:
-		void applyPermissions();
-		void applyTo( const char*, QFile::Permissions );
-		void applyProtection();
-
-		void setReadAll();
-		void setWriteOwner();
-		void setExecOwner();
-};
-
-void smartExecutable( QString );
-
-/*
-	*
-	* We want a independent, non modal dialog showing properties,
-	*
-*/
 class NBPropertiesDialog: public NBDialog {
 	Q_OBJECT
 
-
 	public:
-		Q_ENUMS( PropertiesTab )
-
 		enum PropertiesTab {
 			Properties  = 0x00,
 			Permissions = 0x01,
-			OpenWith    = 0x02
+			Defaults    = 0x02,
+			Preview     = 0x03,
+			Details     = 0x04
 		};
 
-		NBPropertiesDialog( QStringList paths, PropertiesTab tab, bool *term, QWidget *parent = 0 );
+		NBPropertiesDialog( QStringList paths, PropertiesTab tab, QWidget *parent = 0 );
+		~NBPropertiesDialog();
 
 	private:
 		QStackedWidget *stack;
-		QTabBar *tabs;
 
-		NBPropertiesBase *propsB;
+		NBPSideBar *tabs;
 		NBPropertiesWidget *propsW;
 		NBPermissionsWidget *permsW;
+		NBDefaultsWidget *defaultsW;
+		NBPreviewWidget *previewW;
+		NBDetailsWidget *detailsW;
 
 		QStringList pathsList;
 
-	private slots:
-		void switchToTab( int  );
-		void setDirIcon();
+		bool mTerminate;
 };

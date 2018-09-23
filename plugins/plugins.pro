@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS += AVPlugin Default TextEdit Thumbnailer
+SUBDIRS += AVPlugin Default PdfPlugin TextEdit Thumbnailer
 
 isEqual( QT_MAJOR_VERSION, 5 ) {
 	lessThan( QT_MINOR_VERSION, 5 ) {

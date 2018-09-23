@@ -1,4 +1,4 @@
-#Maintainer: 
+#Maintainer:
 
 pkgname=newbreeze-git
 pkgver=r270.d799c4e
@@ -6,8 +6,8 @@ pkgrel=1
 pkgdesc="A fast and light-weight file manager based on Qt"
 arch=('x86_64')
 url="https://gitlab.com/marcusbritanicus/NewBreeze"
-license=('GPL')
-depends=( 'djvulibre' 'poppler-qt5' 'ffmpegthumbnailer' 'qt5-webengine' 'qt5-base' 'qscintilla-qt5' 'mupdf' )
+license=('GPL3')
+depends=( 'djvulibre' 'poppler-qt5' 'ffmpegthumbnailer' 'qt5-webengine' 'qt5-base' 'qscintilla-qt5' 'mupdf' 'libmediainfo' 'libarchive', 'encfs' )
 makedepends=('git' )
 provides=('newbreeze')
 conflicts=('newbreeze')
@@ -25,7 +25,7 @@ prepare() {
 
 build() {
   cd build
-  qmake-qt5 ../$pkgname PREFIX=/usr
+  qmake-qt5 ../$pkgname PREFIX=/usr DEFINES+=USE_MEDIAINFO
   make
 }
 
@@ -33,4 +33,3 @@ package() {
   cd build
   make INSTALL_ROOT="$pkgdir" install
 }
-

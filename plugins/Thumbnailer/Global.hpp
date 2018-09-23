@@ -14,8 +14,4 @@
 #include <libffmpegthumbnailer/filmstripfilter.h>
 #include <libdjvu/ddjvuapi.h>
 
-extern "C" {
-	#include <mupdf/fitz.h>
-}
-
 #include "newbreeze.hpp"

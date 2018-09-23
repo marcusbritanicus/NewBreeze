@@ -25,16 +25,14 @@ NBAppsList NBAppEngine::appsForMimeType( QMimeType mimeType ) {
 	QStringList mimeList = QStringList() << mimeType.name() << mimeType.allAncestors();
 
 	Q_FOREACH( NBAppFile app, appsList.toQList() ) {
-		Q_FOREACH( QString mime, mimeList ) {
-			if ( app.value( NBAppFile::MimeTypes ).toStringList().contains( mime ) ) {
-				if ( ( app.value( NBAppFile::Type ).toString() == "Application" ) and ( not app.value( NBAppFile::NoDisplay ).toBool() ) ) {
-					if ( not appsForMimeList.contains( app ) ) {
-						appsForMimeList << app;
-					}
-				}
-			}
+		QSet<QString> set1 = mimeList.toSet();
+		if ( app.value( NBAppFile::MimeTypes ).toStringList().toSet().intersects( set1 ) ) {
+			if ( ( app.value( NBAppFile::Type ).toString() == "Application" ) and ( not app.value( NBAppFile::NoDisplay ).toBool() ) )
+					appsForMimeList << app;
 		}
 	}
+
+	appsForMimeList.removeDuplicates();
 
 	QString defaultName = NBXdg::xdgDefaultApp( mimeType.name() );
 	for( int i = 0; i < appsForMimeList.count(); i++ ) {

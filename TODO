@@ -59,7 +59,16 @@ NBSideBar                                                                       
 	◐ Rewriting of the whole class
 	  • Drag and Drop is yet to be implemented
 
-Suggestions                                                                                                                           [ 7 of 10 ]
+NBPropertiesDialog                                                                                                                    [ 1 of 3 ]
+	◐ Redesign of UI: Usable state - Defaults yet to be done
+	✍ Recursive application of properties
+	✍ Accidental Delete Protection
+
+NBPdfPlugin                                                                                                                           [ 0 of 2 ]
+	□ Include MuPDF sources in the build tree
+	□ Integrate all PDF capabilities into single plugin
+
+Suggestions                                                                                                                           [ 8 of 11 ]
 
 Note:
 	✍ - Work in progress

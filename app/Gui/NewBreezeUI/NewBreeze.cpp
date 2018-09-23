@@ -675,7 +675,7 @@ void NewBreeze::showProperties() {
 	}
 
 	else {
-		NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, &mTerminate, this );
+		NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, this );
 		propsDlg->show();
 	}
 };
@@ -692,7 +692,7 @@ void NewBreeze::showPermissions() {
 		foreach( QModelIndex idx, selectedList )
 			paths << FolderView->fsModel->nodePath( idx );
 
-	NBPropertiesDialog *permsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Permissions, &mTerminate, this );
+	NBPropertiesDialog *permsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Permissions, this );
 	permsDlg->show();
 };
 

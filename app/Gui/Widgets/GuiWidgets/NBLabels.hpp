@@ -13,7 +13,7 @@ class NBClickLabel : public QLabel {
 
 	public:
 		NBClickLabel( QPixmap icon = QPixmap(), QWidget *parent = NULL );
-		NBClickLabel( QString icon = QString(), QWidget *parent = NULL );
+		NBClickLabel( QString text = QString(), QWidget *parent = NULL );
 
 		void setClickable( bool );
 

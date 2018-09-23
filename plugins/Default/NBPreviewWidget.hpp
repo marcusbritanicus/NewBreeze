@@ -12,7 +12,6 @@
 #include "NBDjvuDisplay.hpp"
 #include "NBImagePeek.hpp"
 #include "NBOdfOgle.hpp"
-#include "NBPdfPeep.hpp"
 #include "NBWebWatch.hpp"
 
 #include <QtPlugin>

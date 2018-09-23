@@ -5,8 +5,8 @@ TARGET = DefaultPeekPlugins4
 INCLUDEPATH += ../../common/ ../../common/include
 DEPENDPATH += ../../common/ ../../common/include
 
-DEPENDPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle PdfPeep PdfPeep/libPdf WebWatch
-INCLUDEPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle PdfPeep PdfPeep/libPdf WebWatch
+DEPENDPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle WebWatch
+INCLUDEPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle WebWatch
 
 isEqual( QT_MAJOR_VERSION, 4 ) {
 	LIBS += -L../../common/ -lnewbreeze-common4
@@ -50,9 +50,9 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 	}
 }
 
-# MuPdf and DjVulibre Support
-# ===========================
-	LIBS         += -L/usr/lib -ldjvulibre -lmupdf -lmupdfthird -lharfbuzz -lfreetype -lz -ljpeg -lopenjp2 -ljbig2dec
+# DjVulibre Support
+# =================
+	LIBS         += -L/usr/lib -ldjvulibre
 
 # C++11/C11 Support
 # =================
@@ -108,11 +108,6 @@ HEADERS += OdfOgle/converter.h OdfOgle/docmargin.h OdfOgle/document.h OdfOgle/fo
 HEADERS += OdfOgle/kzip.h OdfOgle/NBOdfOgle.hpp OdfOgle/styleinformation.h OdfOgle/styleparser.h
 SOURCES += OdfOgle/converter.cpp OdfOgle/docmargin.cpp OdfOgle/document.cpp OdfOgle/formatproperty.cpp OdfOgle/kzip.cpp OdfOgle/NBOdfOgle.cpp
 SOURCES += OdfOgle/styleinformation.cpp OdfOgle/styleparser.cpp
-
-## PdfPeep
-## =======
-HEADERS += PdfPeep/NBPdfPeep.hpp PdfPeep/PdfView.hpp PdfPeep/MuPdfDocument.hpp
-SOURCES += PdfPeep/NBPdfPeep.cpp PdfPeep/PdfView.cpp PdfPeep/MuPdfDocument.cpp
 
 ## WebWatch
 ## ========

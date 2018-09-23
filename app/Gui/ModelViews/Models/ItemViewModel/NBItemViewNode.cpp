@@ -155,9 +155,9 @@ QVariant NBItemViewNode::data( int column, bool special ) const {
 		* If we want normal data, then we can choose columns 0 to 6, internally 3 onwards
 		*
 		* [
-		* 	dir/file/system			0
-		*   rawsize					1
-		*   iconstr					2
+		* 	dir/file/system			0         \
+		*   rawsize					1         |==> Special Data
+		*   iconstr					2         /
 		*   name = 0				3
 		*   size = 1				4
 		*   type = 2				5

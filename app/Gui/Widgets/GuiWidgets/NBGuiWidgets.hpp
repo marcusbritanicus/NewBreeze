@@ -19,23 +19,6 @@ class NBLineEdit : public QLineEdit {
 		void paintEvent( QPaintEvent * );
 };
 
-class NBDriveInfo : public QWidget {
-	Q_OBJECT
-
-	public:
-		NBDriveInfo( NBDeviceInfo, QWidget * );
-
-	private:
-		QString name;
-		QString disk;
-		QString info;
-		QString icon;
-		float percent;
-
-	protected:
-		virtual void paintEvent( QPaintEvent * );
-};
-
 class Separator : public QWidget {
 	Q_OBJECT
 

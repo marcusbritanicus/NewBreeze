@@ -38,6 +38,7 @@ class NBThumbnailer : public QThread {
 		QStringList pdfs;
 		QStringList djvus;
 		QStringList epubs;
+		QStringList cbzs;
 
 	Q_SIGNALS :
 		void updateNode( QString );

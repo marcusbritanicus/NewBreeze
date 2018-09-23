@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS += AVPlugin Default TextEdit Thumbnailer
+SUBDIRS += AVPlugin Default PdfPlugin TextEdit Thumbnailer
 
 Default.file = Default/Default-xenial.pro
 

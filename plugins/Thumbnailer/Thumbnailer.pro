@@ -16,10 +16,6 @@ DEPENDPATH += ../../common/ ../../common/include .
 # =======================
 LIBS += -lffmpegthumbnailer -ldjvulibre
 
-# MuPDF Support
-# =============
-LIBS         += -L/usr/lib -lmupdf -lmupdfthird -lharfbuzz -lfreetype -lz -ljpeg -lopenjp2 -ljbig2dec
-
 # LibNB3Common
 # ============
 isEqual( QT_MAJOR_VERSION, 4 ) {

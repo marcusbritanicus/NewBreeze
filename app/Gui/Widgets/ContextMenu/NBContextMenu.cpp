@@ -417,7 +417,8 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 		}
 
 		NBAppEngine *engine = NBAppEngine::instance();
-		NBAppsList apps = engine->appsForMimeType( mimeDb.mimeTypeForFile( path ) );
+		QMimeType mimeType = mimeDb.mimeTypeForFile( path );
+		NBAppsList apps = engine->appsForMimeType( mimeType );
 		Q_FOREACH( NBAppFile app, apps.toQList() ) {
 			QString name = app.value( NBAppFile::Name ).toString();
 			QStringList exec = app.execArgs();
@@ -448,13 +449,41 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 			addAction( openWithAct );
 		}
 
-		// Open with vlc
-		if ( isDir( path ) ) {
-			QAction *openWithVLCAct = new QAction( QIcon::fromTheme( "vlc" ), "Open with &VLC", this );
-			openWithVLCAct->setData( QVariant( QStringList() << "vlc" << path ) );
-			connect( openWithVLCAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
+		// Open with user selected apps
+		QSettings appSett( "NewBreeze", "MimeApps" );
+		QStringList userApps = appSett.value( mimeType.name().replace( "/", "-" ) ).toStringList();
+		if ( userApps.count() )
 			addSeparator();
-			addAction( openWithVLCAct );
+
+		Q_FOREACH( QString desktop, userApps ) {
+			NBAppFile app( desktop );
+			QString name = app.value( NBAppFile::Name ).toString();
+			QStringList exec = app.execArgs();
+			QString iconStr = app.value( NBAppFile::Icon ).toString();
+
+			// '::icon(...)' means @icon is an externally defined function
+			QIcon progIcon = ::icon( NBIconManager::instance()->icon( iconStr ) );
+
+			// Prepare @v exec
+			if ( app.takesArgs() )
+				if ( app.multipleArgs() ) {
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
+					exec.removeAt( idx );
+					exec.insert( idx, path );
+				}
+
+				else {
+					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
+					exec.removeAt( idx );
+					exec.insert( idx, path );
+				}
+			else
+				exec << path;
+
+			QAction *openWithAct = new QAction( progIcon, name, this );
+			openWithAct->setData( QVariant( QStringList() << exec ) );
+			connect( openWithAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
+			addAction( openWithAct );
 		}
 
 		// Execute and Execute in terminal
@@ -993,10 +1022,6 @@ void NBFolderView::showActionsMenu( QPoint position ) {
 
 				trashAct->setText( "Remove from &SuperStart" );
 				menu->addAction( trashAct );
-
-				menu->addSeparator();
-				menu->addAction( propertiesAct );
-				menu->addAction( permissionsAct );
 			}
 
 			menu->exec( mapToGlobal( position ) );
@@ -1030,13 +1055,10 @@ void NBFolderView::showActionsMenu( QPoint position ) {
 				QFileInfo fInfo( fsModel->nodeInfo( selectedList[ 0 ] ) );
 				QString file = termFormatString( fInfo.absoluteFilePath() );
 
-				// Add to Menu
-				QMenu *addToMenu = new QMenu( "Add to", this );
-
 				// Add this folder to catalog
 				NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 				connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
-				addToMenu->addMenu( addToCatalogMenu );
+				menu->addMenu( addToCatalogMenu );
 
 				// Custom Actions
 				customMenu = new NBActionsMenu( selectedList, fsModel->currentDir(), this );
@@ -1048,12 +1070,11 @@ void NBFolderView::showActionsMenu( QPoint position ) {
 					/* Add to catalogs to menu */
 					NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 					connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
-					addToMenu->addAction( addBookMarkAct );
+					menu->addAction( addBookMarkAct );
 				}
 
 				/* We can add file or folder to SuperStart */
-				addToMenu->addAction( addToSuperStartAct );
-				menu->addMenu( addToMenu );
+				menu->addAction( addToSuperStartAct );
 				menu->addSeparator();
 
 				menu->addMenu( customMenu );
@@ -1070,10 +1091,6 @@ void NBFolderView::showActionsMenu( QPoint position ) {
 				trashAct->setText( "Move to trash" );
 				menu->addAction( trashAct );
 				menu->addAction( delAct );
-
-				menu->addSeparator();
-				menu->addAction( propertiesAct );
-				menu->addAction( permissionsAct );
 			}
 
 			else {
@@ -1081,16 +1098,13 @@ void NBFolderView::showActionsMenu( QPoint position ) {
 				menu->addAction( copyAct );
 				menu->addSeparator();
 
-				// Add to Menu
-				QMenu *addToMenu = new QMenu( "Add to", this );
-
 				// Add this folder to catalog
 				NBAddToCatalogMenu *addToCatalogMenu = new NBAddToCatalogMenu( fsModel->currentDir(), selectedList, this );
 				connect( addToCatalogMenu, SIGNAL( reloadCatalogs() ), this, SIGNAL( reloadCatalogs() ) );
 
-				addToMenu->addMenu( addToCatalogMenu );
-				addToMenu->addAction( addBookMarkAct );
-				addToMenu->addAction( addToSuperStartAct );
+				menu->addMenu( addToCatalogMenu );
+				menu->addAction( addBookMarkAct );
+				menu->addAction( addToSuperStartAct );
 				menu->addSeparator();
 
 				// Custom Actions Menu
@@ -1104,10 +1118,6 @@ void NBFolderView::showActionsMenu( QPoint position ) {
 				trashAct->setText( "Move to trash" );
 				menu->addAction( trashAct );
 				menu->addAction( delAct );
-
-				menu->addSeparator();
-				menu->addAction( propertiesAct );
-				menu->addAction( permissionsAct );
 			}
 
 			menu->exec( mapToGlobal( position ) );

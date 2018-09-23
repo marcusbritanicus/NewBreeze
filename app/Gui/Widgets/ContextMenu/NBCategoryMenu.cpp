@@ -103,8 +103,6 @@ void NBCategoryMenu::showProperties() {
 		qDebug() << mWorkNode + idx.data().toString();
 	}
 
-	bool terminate = false;
-
-	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, &terminate, this );
+	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, this );
 	propsDlg->show();
 };
