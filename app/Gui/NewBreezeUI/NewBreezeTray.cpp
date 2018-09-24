@@ -85,7 +85,7 @@ void NBTrayIcon::processCompleted( NBProcess::Progress *proc ) {
 		case NBProcess::Trash: {
 			showMessage(
 				"Deleting finished",
-				QString( "Nodes selected in %1 have been sent to trash." ).arg( proc->sourceDir ).arg( proc->targetDir ),
+				QString( "Nodes selected in %1 have been sent to trash." ).arg( proc->sourceDir ),
 				QIcon( ":/icons/trash.png" ),
 				5000
 			);

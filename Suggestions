@@ -7,14 +7,16 @@ NewBreeze v3.0.0 RC3
 	=> Apply saves all changes.
 	=> Close closes the dialog, warning the user if there are any changes
 ✓ Extend support "Open folder with vlc" for other app like Audacious, Clementine etc.
-□ Create shortcut of folder and files - SymLinks?
-□ Remember icon size of each view mode separately.
+✗ Create shortcut of folder and files - SymLinks?
+	=> I still have no idea, why we require symlinks, or how the ui is supposed to be.
+✓ Remember icon size of each view mode separately.
 ✗ There should be a limit to the items shown in FolderFlash.
 	=> Takes almost the same amount of calculation to count the number of nodes.
 	=> FolderFlash now uses the default QListView/QFileSystemModel to show folder contents
 ✗ Stop showing number of items/size below folders/files => This does not affect the performance.
 ✓ After copy, delete, empty trash, archive IO give a completion notification.
 ✓ Show the available list of plugins, and an option to enable and disable them.
+✓ Auto mounting of devices through DBus/UDisks2 interface.
 
 Note:
 	✍ - Work in progress

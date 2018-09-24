@@ -14,7 +14,7 @@ class NBSideBarMenu : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBSideBarMenu( QString icon, QString name, QWidget *parent );
+		NBSideBarMenu( QString icon, QString name, bool autoClose = false, QWidget *parent = 0 );
 
 	private:
 		QString mName;
@@ -22,6 +22,8 @@ class NBSideBarMenu : public QWidget {
 
 		int mHeight;
 		int mWidth;
+
+		bool mAutoClose;
 
 		void buildMenu();
 
@@ -31,6 +33,7 @@ class NBSideBarMenu : public QWidget {
 		QVBoxLayout *addQuickFileEntries();
 
 		QFontMetrics *fm;
+		QBasicTimer menuCloseTimer;
 
 	public Q_SLOTS:
 		void show( QPoint );
@@ -40,6 +43,8 @@ class NBSideBarMenu : public QWidget {
 		void mousePressEvent( QMouseEvent *mpEvent );
 
 		void paintEvent( QPaintEvent* );
+
+		void timerEvent( QTimerEvent * );
 
 	Q_SIGNALS:
 		void driveClicked( QString );

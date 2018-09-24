@@ -184,7 +184,7 @@ void NBIconManager::generateThemeDatabase() {
 
 	/* List the theme inheritence */
 	QStringList themes;
-	themes << Settings->General.IconTheme;
+	themes << Settings->View.IconTheme;
 	QSettings index( iconThemePath + themes[ 0 ] + "/index.theme", QSettings::NativeFormat );
 	themes << index.value( "Icon Theme/Inherits" ).toStringList();
 

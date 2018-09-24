@@ -8,7 +8,6 @@
 
 #include <QtGui>
 #include <QtNetwork>
-#include <QtSql>
 
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>

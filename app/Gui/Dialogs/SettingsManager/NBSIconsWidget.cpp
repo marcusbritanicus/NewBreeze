@@ -11,7 +11,7 @@ NBIconThemeWidget::NBIconThemeWidget( QWidget *parent ) :QWidget( parent ) {
 
 	createGUI();
 
-	iconViewWidget->select( Settings->General.IconTheme );
+	iconViewWidget->select( Settings->View.IconTheme );
 	iconViewWidget->setFocus();
 };
 
@@ -112,7 +112,7 @@ void NBIconThemeModel::setupModel() {
 	endResetModel();
 
 	/* Hack: To restore the Icon Theme which is changed above */
-	QIcon::setThemeName( Settings->General.IconTheme );
+	QIcon::setThemeName( Settings->View.IconTheme );
 
 	emit layoutChanged();
 };

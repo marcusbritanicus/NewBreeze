@@ -21,14 +21,14 @@ NBSideBarEntry::NBSideBarEntry( QString icon, QString name, QWidget *parent ) : 
 	setPixmap( QIcon( icon ).pixmap( 24 ) );
 
 	setCursor( Qt::PointingHandCursor );
-	setAcceptDrops( false );
+	setAcceptDrops( true );
 
 	connect( this, SIGNAL( clicked() ), SLOT( showMenu() ) );
 };
 
-void NBSideBarEntry::showMenu() {
+void NBSideBarEntry::showMenu( bool autoClose ) {
 
-	NBSideBarMenu *menu = new NBSideBarMenu( mIconStr, mName, this );
+	NBSideBarMenu *menu = new NBSideBarMenu( mIconStr, mName, autoClose, this );
 	connect( menu, SIGNAL( driveClicked( QString ) ), this, SIGNAL( driveClicked( QString ) ) );
 
 	menu->show( mapToGlobal( QPoint( 0, 0 ) ) );
@@ -42,6 +42,42 @@ void NBSideBarEntry::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 		emit clicked();
 
 	mrEvent->accept();
+};
+
+void NBSideBarEntry::dragEnterEvent( QDragEnterEvent *deEvent ) {
+
+	deEvent->acceptProposedAction();
+	menuTimer.start( 150, this );
+};
+
+void NBSideBarEntry::dragMoveEvent( QDragMoveEvent *dmEvent ) {
+
+	const QMimeData *mData = dmEvent->mimeData();
+	if ( not mData->hasUrls() ) {
+		dmEvent->ignore();
+		return;
+	}
+
+	dmEvent->setDropAction( Qt::IgnoreAction );
+	dmEvent->accept();
+};
+
+void NBSideBarEntry::dropEvent( QDropEvent *dpEvent ) {
+
+	dpEvent->ignore();
+	return;
+};
+
+void NBSideBarEntry::timerEvent( QTimerEvent *teEvent ) {
+
+	if ( teEvent->timerId() == menuTimer.timerId() ) {
+		menuTimer.stop();
+		if ( rect().contains( mapFromGlobal( QCursor::pos() ) ) )
+			showMenu( true );
+	}
+
+	QLabel::timerEvent( teEvent );
+	teEvent->accept();
 };
 
 /* NBSideBarTrashEntry */

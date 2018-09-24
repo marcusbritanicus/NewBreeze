@@ -5,6 +5,7 @@
 */
 
 #include "Global.hpp"
+#include "NBAutoMount.hpp"
 #include "NBPluginManager.hpp"
 #include "NBMessageDialog.hpp"
 #include "NBBugReporter.hpp"
@@ -25,6 +26,14 @@ void NBStartup() {
 
 	/*
 		*
+		* AutoMount service
+		*
+	*/
+	if ( Settings->General.AutoMount )
+		NBAutoMount::instance()->start();
+
+	/*
+		*
 		* Check if thumbDir exists. Otherwise try to create it.
 		*
 	*/
@@ -41,10 +50,10 @@ void NBStartup() {
 		* Set the Icon Theme
 		*
 	*/
-	QIcon::setThemeName( Settings->General.IconTheme );
+	QIcon::setThemeName( Settings->View.IconTheme );
 	QSettings sett( "NewBreeze", "NewBreeze" );
 	if ( sett.value( "IconTheme" ).toString().isNull() ) {
-		sett.setValue( "IconTheme", Settings->General.IconTheme );
+		sett.setValue( "IconTheme", Settings->View.IconTheme );
 		sett.sync();
 	}
 
@@ -53,7 +62,7 @@ void NBStartup() {
 		* Application style
 		*
 	*/
-	qApp->setStyle( QStyleFactory::create( Settings->General.Style ) );
+	qApp->setStyle( QStyleFactory::create( Settings->View.Style ) );
 
 	/*
 		*

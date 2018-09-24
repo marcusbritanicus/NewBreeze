@@ -22,17 +22,12 @@ class NBSettings {
 		// General Settings
 		class GeneralSettings {
 			public:
-				QString Style;									// Gui theme
-				QString ViewMode;								// Icons, Tiles or Details
-				QString IconTheme;								// Icon Theme
-				bool ImagePreviews;								// Show image previews?
 				bool TrayIcon;									// Minimize to tray?
 				bool OpenWithCatalog;							// Show catalog on NB Open?
 				bool SidePanel;									// Show sidepanel?
 				int SidePanelType;								// Show classic or modern?
 				bool InfoPanel;									// Show infopanel?
 				bool ShowHidden;								// Show Hidden files and folders?
-				QSize IconSize;									// Default Icon Size
 				int SortColumn;									// Default Sort Column
 				bool SortCase;									// Is sorting case sensitive
 				bool Grouping;									// Enable grouping?
@@ -42,11 +37,20 @@ class NBSettings {
 				bool SpecialOpen;								// Use CombiView as Home
 				bool ExtendedIO;								// Use direct copy/move
 				bool LogDebug;									// Log debug messages
+				bool AutoMount;									// Auto Mount Volumes
 		} General;
 
 		// View Settings
 		class ViewSettings {
 			public:
+				QString Style;									// Gui theme
+				QString ViewMode;								// Icons, Tiles or Details
+				QString IconTheme;								// Icon Theme
+
+				QSize IconsImageSize;							// Default Icon Size
+				QSize TilesImageSize;							// Default Icon Size
+				QSize DetailsImageSize;							// Default Icon Size
+
 				bool PaintOverlay;								// Paint QuickAccess overlays
 				bool FilePreviews;								// File contents preview
 				bool ImagePreview;								// Show thumbnails of images

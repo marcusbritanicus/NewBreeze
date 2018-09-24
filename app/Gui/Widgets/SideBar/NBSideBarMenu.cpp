@@ -19,12 +19,14 @@ static const QString tooltipSkel = QString(
 );
 
 /* NBSideBarMenu */
-NBSideBarMenu::NBSideBarMenu( QString icon, QString name, QWidget *parent ) : QWidget( parent ) {
+NBSideBarMenu::NBSideBarMenu( QString icon, QString name, bool autoClose, QWidget *parent ) : QWidget( parent ) {
 
 	setMaximumWidth( 120 + 32 + 4 );
 
 	mName = name;
 	mIcon = QIcon( icon ).pixmap( 24 );
+
+	mAutoClose = autoClose;
 
 	/* SideBar width + MenuEntry Icon width */
 	mWidth = 0;
@@ -209,6 +211,8 @@ void NBSideBarMenu::show( QPoint point ) {
 	move( point );
 	QWidget::show();
 
+	menuCloseTimer.start( 250, this );
+
 	QEventLoop loop;
 	connect( this, SIGNAL( closed() ), &loop, SLOT( quit() ) );
 
@@ -246,6 +250,21 @@ void NBSideBarMenu::paintEvent( QPaintEvent *pEvent ) {
 	painter.end();
 
 	pEvent->accept();
+};
+
+void NBSideBarMenu::timerEvent( QTimerEvent *teEvent ) {
+
+	if ( teEvent->timerId() == menuCloseTimer.timerId() ) {
+		QPoint cPos = mapFromGlobal( QCursor::pos() );
+		bool good = rect().contains( cPos );
+		bool bad = QRect( QPoint( 0, 37 ), QPoint( 31, rect().bottom() ) ).contains( cPos );
+		if ( bad or not good ) {
+			close();
+		}
+	}
+
+	QWidget::timerEvent( teEvent );
+	teEvent->accept();
 };
 
 /* NBSideBarMenuEntry */
@@ -378,6 +397,8 @@ void NBSideBarMenuEntry::dropEvent( QDropEvent *dpEvent ) {
 	proc->start();
 
 	dpEvent->accept();
+
+	emit clicked();
 };
 
 void NBSideBarMenuEntry::mousePressEvent( QMouseEvent *mpEvent ) {
@@ -405,13 +426,13 @@ void NBSideBarMenuEntry::mousePressEvent( QMouseEvent *mpEvent ) {
 void NBSideBarMenuEntry::mouseReleaseEvent( QMouseEvent *mrEvent ) {
 
 	if ( mrEvent->button() == Qt::LeftButton ) {
-		mPressed = false;
-
-		///* Event a drop event can cause a mouseReleaseEvent */
-		//if ( mPressed ) {
+		/* A drop event can cause a mouseReleaseEvent */
+		if ( mPressed ) {
 			emit clicked( mTarget );
 			emit clicked();
-		//}
+		}
+
+		mPressed = false;
 	}
 
 	repaint();

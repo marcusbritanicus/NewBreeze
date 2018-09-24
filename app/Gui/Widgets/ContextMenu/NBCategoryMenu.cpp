@@ -98,10 +98,8 @@ void NBCategoryMenu::manageSelection() {
 void NBCategoryMenu::showProperties() {
 
 	QStringList paths;
-	foreach( QModelIndex idx, sNodes ) {
+	foreach( QModelIndex idx, sNodes )
 		paths << mWorkNode + "/" + idx.data().toString();
-		qDebug() << mWorkNode + idx.data().toString();
-	}
 
 	NBPropertiesDialog *propsDlg = new NBPropertiesDialog( paths, NBPropertiesDialog::Properties, this );
 	propsDlg->show();

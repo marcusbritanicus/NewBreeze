@@ -34,18 +34,13 @@
 #include <QStringList>
 #include <QWidget>
 
-#if defined NBPLUGIN
-	#define PLUGIN_DLLSPEC Q_DECL_EXPORT
-#else
-	#define PLUGIN_DLLSPEC Q_DECL_IMPORT
-#endif
-
-class PLUGIN_DLLSPEC NBPluginInterface {
+class NBPluginInterface {
 
 	public:
 		/* Plugin Interface: Where will the plugin be used */
 		enum Interface {
 			AnyInterface			= 0xC5F4A6,			// Show for all interfaces
+			GeneralInterface,							// General Enhancements													> UDisks2 automount
 			PreviewInterface,							// File Preview Enhancements											> Peek (Ctrl+Return)
 			InfoBarInterface,							// Alternative for infobar												> No actions
 			TerminalInterface,							// Specialized Terminal plugin											> Open terminal (F4)
@@ -60,7 +55,7 @@ class PLUGIN_DLLSPEC NBPluginInterface {
 
 		/* Plugin Type: How does the plugin work */
 		enum Type {
-			Alternative				= 0x65F8E4,			// Alternative for the existing widget. Ex: Classic sidebar instead of NBSidePanel
+			Alternative				= 0x65F8E4,			// Alternative for the existing widget. Ex: UDisks2 AutoMount support
 			Enhancement,								// Enhancement for the existing widget. Ex: EncFS Support for NewBreeze
 		};
 

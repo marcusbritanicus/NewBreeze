@@ -9,19 +9,21 @@ NBDefaultPlugin::ArchiveExamine                                                 
 NBVideoPlugin                                                                                                                         [ 1 of 1 ]
 	✓ Play video using libVLC interface for the peek interface
 
-NBItemViewModel                                                                                                                       [ 3 of 3 ]
+NBItemViewModel                                                                                                                       [ 4 of 4 ]
 	✓ Thumbnailing of ODF files
 	✓ Thumbnailing of PDF and DjVu files
 	✓ Thumbnailing of Video files via libffmpegthumbs
+	✓ Thumbnailing of ePub files
 
 NBLogger                                                                                                                              [ 1 of 1 ]
 	✓ Enable/Disable logging option.
 
-NBIconView                                                                                                                            [ 2 of 2 ]
+NBIconView                                                                                                                            [ 3 of 3 ]
 	✗ Improve the selection model
 	  • Enable rectanlge rubberband selection
 	  • Change selection policy with model data type
 	✓ Enable PageUp and PageDown navigation
+	✓ Bug fixes in selections, drag-n-drop
 
 NBDirTreeModel                                                                                                                        [ 1 of 1 ]
 	◐ Fix too many open QFileSystemWatcher instances
@@ -68,7 +70,7 @@ NBPdfPlugin                                                                     
 	✓ Include MuPDF sources in the build tree
 	✓ Integrate all PDF capabilities into single plugin
 
-Suggestions                                                                                                                           [ 9 of 11 ]
+Suggestions                                                                                                                           [ 12 of 12 ]
 
 Note:
 	✍ - Work in progress

@@ -15,7 +15,7 @@
 NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractItemView( parent ) {
 
 	/* Current folder viewMode */
-	currentViewMode = Settings->General.ViewMode;
+	currentViewMode = Settings->View.ViewMode;
 
 	/* Icon rects */
 	idealHeight = 0;
@@ -56,7 +56,14 @@ NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractI
 	setModel( cModel );
 
 	/* Icon Size */
-	setIconSize( Settings->General.IconSize );
+	if ( Settings->View.ViewMode == "Icons" )
+		setIconSize( Settings->View.IconsImageSize );
+
+	else if ( Settings->View.ViewMode == "Tiles" )
+		setIconSize( Settings->View.TilesImageSize );
+
+	else
+		setIconSize( Settings->View.DetailsImageSize );
 
 	/* Default Selection Rules */
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
@@ -119,8 +126,15 @@ void NBIconView::setModel( QAbstractItemModel *model ) {
 
 void NBIconView::updateViewMode() {
 
-	currentViewMode = Settings->General.ViewMode;
-	computeGridSize( Settings->General.IconSize );
+	currentViewMode = Settings->View.ViewMode;
+	if ( Settings->View.ViewMode == "Icons" )
+		setIconSize( Settings->View.IconsImageSize );
+
+	else if ( Settings->View.ViewMode == "Tiles" )
+		setIconSize( Settings->View.TilesImageSize );
+
+	else
+		setIconSize( Settings->View.DetailsImageSize );
 
 	return;
 };
@@ -348,16 +362,34 @@ void NBIconView::reload() {
 		QString location = cModel->currentDir().replace( "NB://", "" );
 		QSettings sett( "NewBreeze", location );
 
-		viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
-		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+		viewMode = sett.value( "NewBreeze/ViewMode", Settings->View.ViewMode ).toString();
+
+		if ( viewMode == "Icons" )
+			iconSize = sett.value( "NewBreeze/IconsImageSize", Settings->View.IconsImageSize.width() ).toInt();
+
+		else if ( viewMode == "Icons" )
+			iconSize = sett.value( "NewBreeze/TilesImageSize", Settings->View.TilesImageSize.width() ).toInt();
+
+		else
+			iconSize = sett.value( "NewBreeze/DetailsImageSize", Settings->View.DetailsImageSize.width() ).toInt();
+
 		Settings->General.SortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
 	}
 
 	else {
 		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
 
-		viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
-		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+		viewMode = sett.value( "NewBreeze/ViewMode", Settings->View.ViewMode ).toString();
+
+		if ( viewMode == "Icons" )
+			iconSize = sett.value( "NewBreeze/IconsImageSize", Settings->View.IconsImageSize.width() ).toInt();
+
+		else if ( viewMode == "Icons" )
+			iconSize = sett.value( "NewBreeze/TilesImageSize", Settings->View.TilesImageSize.width() ).toInt();
+
+		else
+			iconSize = sett.value( "NewBreeze/DetailsImageSize", Settings->View.DetailsImageSize.width() ).toInt();
+
 		Settings->General.SortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
 	}
 
@@ -941,7 +973,13 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 	else if ( qApp->keyboardModifiers() & Qt::ControlModifier ) {
 		/* Valid index */
 		if ( idx.isValid() ) {
-			if ( mSelectedIndexes.contains( idx ) )
+			/* Make this the current index, without selecting it */
+			selectionModel()->setCurrentIndex( idx, QItemSelectionModel::NoUpdate );
+
+			if ( selectionModel()->isSelected( idx ) )
+				selectionModel()->select( idx, QItemSelectionModel::Deselect );
+
+			else if ( mSelectedIndexes.contains( idx ) )
 				mSelectedIndexes.removeAll( idx );
 
 			else
@@ -962,8 +1000,10 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 	}
 
 	/* Set the clicked index as the current index */
-	if( idx.isValid() ) {
-		setCurrentIndex( idx );
+	else {
+		if( idx.isValid() ) {
+			setCurrentIndex( idx );
+		}
 	}
 
 	mpEvent->accept();
@@ -1215,7 +1255,12 @@ void NBIconView::dragMoveEvent( QDragMoveEvent *dmEvent ) {
 void NBIconView::dropEvent( QDropEvent *dpEvent ) {
 
 	QModelIndex idx = indexAt( dpEvent->pos() );
-	QString mtpt = cModel->nodePath( idx );
+	QString mtpt;
+	if ( not idx.isValid() )
+		mtpt = cModel->currentDir();
+
+	else
+		mtpt = cModel->nodePath( idx );
 
 	if ( not isDir( mtpt ) ) {
 		dpEvent->ignore();
@@ -2694,13 +2739,15 @@ void NBIconView::zoomIn() {
 	if ( cModel->isRealLocation() ) {
 
 		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/" + Settings->View.ViewMode + "ImageSize", myIconSize.width() );
+		sett.sync();
 	}
 
 	else {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
 		QSettings sett( "NewBreeze", loc );
-		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/" + Settings->View.ViewMode + "ImageSize", myIconSize.width() );
+		sett.sync();
 	}
 };
 
@@ -2715,13 +2762,15 @@ void NBIconView::zoomOut() {
 	if ( cModel->isRealLocation() ) {
 
 		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/" + Settings->View.ViewMode + "ImageSize", myIconSize.width() );
+		sett.sync();
 	}
 
 	else {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
 		QSettings sett( "NewBreeze", loc );
-		sett.setValue( "NewBreeze/IconSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/" + Settings->View.ViewMode + "ImageSize", myIconSize.width() );
+		sett.sync();
 	}
 };
 

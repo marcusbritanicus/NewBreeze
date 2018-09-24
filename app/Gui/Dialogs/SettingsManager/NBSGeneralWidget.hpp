@@ -48,6 +48,7 @@ class NBSGeneralWidget : public QWidget {
 		QCheckBox *extendedIOCB;				// Direct Copy/Move?
 		QCheckBox *paintOverlayCB;				// Paint Icon Overlays?
 		QCheckBox *logDebugCB;					// Enable Debug Logging?
+		QCheckBox *enableAutoMountCB;				// Enable auto mount volumes?
 
 	private slots:
 		/* View */
@@ -72,4 +73,5 @@ class NBSGeneralWidget : public QWidget {
 		void handleExtendedIOChanged( bool );
 		void handlePaintOverlayChanged( bool );
 		void handleLogDebugChanged( bool );
+		void handleAutoMountChanged( bool );
 };

@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 	TARGET = newbreeze3
 }
 
-QT += network sql
+QT += network dbus
 greaterThan(QT_MAJOR_VERSION, 4) {
 	QT += widgets
 	QT += concurrent
@@ -32,8 +32,8 @@ INCLUDEPATH += ../common/ ../common/include
 DEPENDPATH += ../common/ ../common/include
 
 # Source Paths
-INCLUDEPATH += . Core Core/ArgParser Core/BookmarkInfo Core/Circle Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager Gui
-INCLUDEPATH += Gui/Dialogs Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BookmarkEditor Gui/Dialogs/BugReporter Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
+INCLUDEPATH += . Core/ArgParser Core/AutoMount Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager
+INCLUDEPATH +=  Gui/Dialogs Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BookmarkEditor Gui/Dialogs/BugReporter Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
 INCLUDEPATH += Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
 INCLUDEPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
 INCLUDEPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTypeModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
@@ -44,7 +44,7 @@ INCLUDEPATH += Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiW
 INCLUDEPATH += Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/SystemMenu Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
 INCLUDEPATH += Gui/Widgets/TrashManager
 
-DEPENDPATH += . Core Core/ArgParser Core/BookmarkInfo Core/Circle Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager Gui
+DEPENDPATH += . Core/ArgParser Core/AutoMount Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager
 DEPENDPATH += Gui/Dialogs Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BookmarkEditor Gui/Dialogs/BugReporter Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
 DEPENDPATH += Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
 DEPENDPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
@@ -58,6 +58,8 @@ DEPENDPATH += Gui/Widgets/TrashManager
 
 # Headers
 HEADERS += Core/ArgParser/NBCLParser.hpp
+HEADERS += Core/AutoMount/NBAutoMount.hpp
+HEADERS += Core/AutoMount/udisks2.h
 HEADERS += Core/BookmarkInfo/NBBookmarkInfo.hpp
 HEADERS += Core/DeleteManager/NBDeleteManager.hpp
 HEADERS += Core/FSWatcher/NBFileSystemWatcher.hpp
@@ -189,6 +191,8 @@ HEADERS += optionparser.hpp
 
 # Sources
 SOURCES += Core/ArgParser/NBCLParser.cpp
+SOURCES += Core/AutoMount/NBAutoMount.cpp
+SOURCES += Core/AutoMount/udisks2.cpp
 SOURCES += Core/BookmarkInfo/NBBookmarkInfo.cpp
 SOURCES += Core/DeleteManager/NBDeleteManager.cpp
 SOURCES += Core/FSWatcher/NBFileSystemWatcher.cpp

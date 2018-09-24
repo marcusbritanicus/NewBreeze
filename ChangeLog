@@ -3,18 +3,24 @@ Version 3.0.0 RC
 	- Feature: IconOverlay for quick controls
 	- Feature: Categories now have menu, better folding
 	- Feature: VideoThumbnailing enabled
-	- Feature: PDF/DjVu enabled
+	- Feature: PDF/DjVu/ePub/ODF thumbnailing enabled
 	- Feature: Video/Audio preview enabled
 	- Feature: Selected file preview enabled
+	- Feature: AutoMount of volumes
+	- Feature: Add user apps to Open With menu
+	- Feature: Inbuilt terminal
+	- Inbuilt pdf support using mupdf
+	- NBPropertiesDialog redesigned
+	- NBCustomPeek integrated into NBPropertiesDialog
 	- Fixed most of the code causing warnings
 	- Improvements to NBIconView
-	- Classes interchanged: NBSideBar <--> NBSidePanel
-	- Improvements to NBSidePanel
+	- NBSidePanel and NBSideBar redesigned
 	- BugFix: ExtendedIO partial bugfix
 	- BugFix: NBDeviceInfo critical bugfix
-	- Several minor bug fixes.
+	- BugFix: NBIconView bugfixes
+	- Several other major/minor bug fixes.
 	- Trash Manager now uses QTreeView class
-	- Inbuilt terminal bug fix
+	- Inbuilt terminal bug fix and improvements
 	- Busy cursor while loading large folders
 	- Grouping option in Context Menu fixed
 	- Archive member extraction from ArchivePeek

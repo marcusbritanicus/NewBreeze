@@ -447,8 +447,17 @@ void NBSystemMenu::exec( QPoint point ) {
 		QString location = mAddress.replace( "NB://", "" );
 		QSettings sett( "NewBreeze", location );
 
-		viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
-		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+		viewMode = sett.value( "NewBreeze/ViewMode", Settings->View.ViewMode ).toString();
+
+		if ( viewMode == "Icons" )
+			iconSize = sett.value( "NewBreeze/IconsImageSize", Settings->View.IconsImageSize.width() ).toInt();
+
+		else if ( viewMode == "Icons" )
+			iconSize = sett.value( "NewBreeze/TilesImageSize", Settings->View.TilesImageSize.width() ).toInt();
+
+		else
+			iconSize = sett.value( "NewBreeze/DetailsImageSize", Settings->View.DetailsImageSize.width() ).toInt();
+
 		sortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
 		grouping = sett.value( "NewBreeze/Grouping", true ).toBool();
 		hidden = false;
@@ -457,8 +466,17 @@ void NBSystemMenu::exec( QPoint point ) {
 	else {
 		QSettings sett( mAddress + ".directory", QSettings::NativeFormat );
 
-		viewMode = sett.value( "NewBreeze/ViewMode", Settings->General.ViewMode ).toString();
-		iconSize = sett.value( "NewBreeze/IconSize", Settings->General.IconSize.width() ).toInt();
+		viewMode = sett.value( "NewBreeze/ViewMode", Settings->View.ViewMode ).toString();
+
+		if ( viewMode == "Icons" )
+			iconSize = sett.value( "NewBreeze/IconsImageSize", Settings->View.IconsImageSize.width() ).toInt();
+
+		else if ( viewMode == "Icons" )
+			iconSize = sett.value( "NewBreeze/TilesImageSize", Settings->View.TilesImageSize.width() ).toInt();
+
+		else
+			iconSize = sett.value( "NewBreeze/DetailsImageSize", Settings->View.DetailsImageSize.width() ).toInt();
+
 		sortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
 		grouping = sett.value( "NewBreeze/Grouping", true ).toBool();
 		hidden = Settings->General.ShowHidden;

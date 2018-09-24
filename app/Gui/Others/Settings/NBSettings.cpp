@@ -28,17 +28,12 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings = new NBSettings();
 	defaultSettings->init = true;
 
-	defaultSettings->General.Style = QString( "Default" );
-	defaultSettings->General.ViewMode = QString( "Icons" );
-	defaultSettings->General.IconTheme = NBSystemIconTheme();
-	defaultSettings->General.ImagePreviews = true;
 	defaultSettings->General.TrayIcon = true;
 	defaultSettings->General.OpenWithCatalog = false;
 	defaultSettings->General.SidePanel = true;
 	defaultSettings->General.SidePanelType = 1;
 	defaultSettings->General.InfoPanel = false;
 	defaultSettings->General.ShowHidden = false;
-	defaultSettings->General.IconSize = QSize( 48, 48 );
 	defaultSettings->General.SortColumn = 2;
 	defaultSettings->General.SortCase = false;
 	defaultSettings->General.Grouping = true;
@@ -48,6 +43,14 @@ NBSettings* NBSettings::defaultInstance() {
 	defaultSettings->General.SpecialOpen = true;
 	defaultSettings->General.ExtendedIO = false;
 	defaultSettings->General.LogDebug = true;
+	defaultSettings->General.AutoMount = false;
+
+	defaultSettings->View.Style = QString( "Default" );
+	defaultSettings->View.ViewMode = QString( "Icons" );
+	defaultSettings->View.IconTheme = NBSystemIconTheme();
+	defaultSettings->View.IconsImageSize = QSize( 48, 48 );
+	defaultSettings->View.TilesImageSize = QSize( 48, 48 );
+	defaultSettings->View.DetailsImageSize = QSize( 24, 24 );
 
 	defaultSettings->View.PaintOverlay = true;
 	defaultSettings->View.FilePreviews = true;
@@ -117,18 +120,6 @@ NBSettings* NBSettings::instance() {
 	QStringList gaKeys = gSettings.allKeys();
 	QStringList saKeys = sSettings.allKeys();
 
-	if ( gaKeys.contains( QString( "Style" ) ) )
-		settings->General.Style = gSettings.value( "Style" ).toString();
-
-	if ( gaKeys.contains( QString( "ViewMode" ) ) )
-		settings->General.ViewMode = gSettings.value( "ViewMode" ).toString();
-
-	if ( gaKeys.contains( QString( "IconTheme" ) ) )
-		settings->General.IconTheme = gSettings.value( "IconTheme" ).toString();
-
-	if ( gaKeys.contains( QString( "ImagePreviews" ) ) )
-		settings->General.ImagePreviews = gSettings.value( "ImagePreviews" ).toBool();
-
 	if ( gaKeys.contains( QString( "TrayIcon" ) ) )
 		settings->General.TrayIcon = gSettings.value( "TrayIcon" ).toBool();
 
@@ -143,9 +134,6 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "ShowHidden" ) ) )
 		settings->General.ShowHidden = gSettings.value( "ShowHidden" ).toBool();
-
-	if ( gaKeys.contains( QString( "IconSize" ) ) )
-		settings->General.IconSize = gSettings.value( "IconSize" ).toSize();
 
 	if ( gaKeys.contains( QString( "SortColumn" ) ) )
 		settings->General.SortColumn = gSettings.value( "SortColumn" ).toInt();
@@ -176,6 +164,27 @@ NBSettings* NBSettings::instance() {
 
 	if ( gaKeys.contains( QString( "LogDebug" ) ) )
 		settings->General.LogDebug = gSettings.value( "LogDebug" ).toBool();
+
+	if ( gaKeys.contains( QString( "AutoMount" ) ) )
+		settings->General.AutoMount = gSettings.value( "AutoMount" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/Style" ) ) )
+		settings->View.Style = gSettings.value( "View/Style" ).toString();
+
+	if ( gaKeys.contains( QString( "View/ViewMode" ) ) )
+		settings->View.ViewMode = gSettings.value( "View/ViewMode" ).toString();
+
+	if ( gaKeys.contains( QString( "IconTheme" ) ) )
+		settings->View.IconTheme = gSettings.value( "IconTheme" ).toString();
+
+	if ( gaKeys.contains( QString( "View/IconsImageSize" ) ) )
+		settings->View.IconsImageSize = gSettings.value( "View/IconsImageSize" ).toSize();
+
+	if ( gaKeys.contains( QString( "View/TilesImageSize" ) ) )
+		settings->View.TilesImageSize = gSettings.value( "View/TilesImageSize" ).toSize();
+
+	if ( gaKeys.contains( QString( "View/DetailsImageSize" ) ) )
+		settings->View.DetailsImageSize = gSettings.value( "View/DetailsImageSize" ).toSize();
 
 	if ( gaKeys.contains( QString( "View/PaintOverlay" ) ) )
 		settings->View.PaintOverlay = gSettings.value( "View/PaintOverlay" ).toBool();
@@ -342,18 +351,6 @@ void NBSettings::reload() {
 	QStringList gaKeys = gSettings.allKeys();
 	QStringList saKeys = sSettings.allKeys();
 
-	if ( gaKeys.contains( QString( "Style" ) ) )
-		General.Style = gSettings.value( "Style" ).toString();
-
-	if ( gaKeys.contains( QString( "ViewMode" ) ) )
-		General.ViewMode = gSettings.value( "ViewMode" ).toString();
-
-	if ( gaKeys.contains( QString( "IconTheme" ) ) )
-		General.IconTheme = gSettings.value( "IconTheme" ).toString();
-
-	if ( gaKeys.contains( QString( "ImagePreviews" ) ) )
-		General.ImagePreviews = gSettings.value( "ImagePreviews" ).toBool();
-
 	if ( gaKeys.contains( QString( "TrayIcon" ) ) )
 		General.TrayIcon = gSettings.value( "TrayIcon" ).toBool();
 
@@ -368,9 +365,6 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "ShowHidden" ) ) )
 		General.ShowHidden = gSettings.value( "ShowHidden" ).toBool();
-
-	if ( gaKeys.contains( QString( "IconSize" ) ) )
-		General.IconSize = gSettings.value( "IconSize" ).toSize();
 
 	if ( gaKeys.contains( QString( "SortColumn" ) ) )
 		General.SortColumn = gSettings.value( "SortColumn" ).toInt();
@@ -401,6 +395,27 @@ void NBSettings::reload() {
 
 	if ( gaKeys.contains( QString( "LogDebug" ) ) )
 		General.LogDebug = gSettings.value( "LogDebug" ).toBool();
+
+	if ( gaKeys.contains( QString( "AutoMount" ) ) )
+		General.AutoMount = gSettings.value( "AutoMount" ).toBool();
+
+	if ( gaKeys.contains( QString( "View/Style" ) ) )
+		View.Style = gSettings.value( "View/Style" ).toString();
+
+	if ( gaKeys.contains( QString( "View/ViewMode" ) ) )
+		View.ViewMode = gSettings.value( "View/ViewMode" ).toString();
+
+	if ( gaKeys.contains( QString( "IconTheme" ) ) )
+		View.IconTheme = gSettings.value( "IconTheme" ).toString();
+
+	if ( gaKeys.contains( QString( "View/IconsImageSize" ) ) )
+		View.IconsImageSize = gSettings.value( "View/IconsImageSize" ).toSize();
+
+	if ( gaKeys.contains( QString( "View/TilesImageSize" ) ) )
+		View.TilesImageSize = gSettings.value( "View/TilesImageSize" ).toSize();
+
+	if ( gaKeys.contains( QString( "View/DetailsImageSize" ) ) )
+		View.DetailsImageSize = gSettings.value( "View/DetailsImageSize" ).toSize();
 
 	if ( gaKeys.contains( QString( "View/PaintOverlay" ) ) )
 		View.PaintOverlay = gSettings.value( "View/PaintOverlay" ).toBool();

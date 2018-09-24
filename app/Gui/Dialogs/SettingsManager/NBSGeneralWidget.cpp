@@ -174,6 +174,11 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	logDebugCB->setToolTip( "Write the debug messages to the log file" );
 	connect( logDebugCB, SIGNAL( toggled( bool ) ), this, SLOT( handleLogDebugChanged( bool ) ) );
 
+	enableAutoMountCB = new QCheckBox( "Enable auto mounting of volumes" );
+	enableAutoMountCB->setChecked( Settings->General.AutoMount );
+	enableAutoMountCB->setToolTip( "Write the debug messages to the log file" );
+	connect( enableAutoMountCB, SIGNAL( toggled( bool ) ), this, SLOT( handleAutoMountChanged( bool ) ) );
+
 	QVBoxLayout *grpLyt = new QVBoxLayout( this );
 	grpLyt->addLayout( comboBoxLyt1 );
 	grpLyt->addLayout( comboBoxLyt2 );
@@ -190,6 +195,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	otherGBLyt->addWidget( extendedIOCB );
 	otherGBLyt->addWidget( paintOverlayCB );
 	otherGBLyt->addWidget( logDebugCB );
+	otherGBLyt->addWidget( enableAutoMountCB );
 
 	QGroupBox *otherOptionsGB = new QGroupBox( "Other Options", this );
 	otherOptionsGB->setLayout( otherGBLyt );
@@ -213,14 +219,29 @@ void NBSGeneralWidget::handlePerFolderChanged( bool perFolder ) {
 void NBSGeneralWidget::handleViewModeChanged( int ) {
 
 	Settings->setValue( "ViewMode", defaultViewModeCB->currentText() );
-	Settings->General.ViewMode = defaultViewModeCB->currentText();
+	Settings->View.ViewMode = defaultViewModeCB->currentText();
+
+	if ( Settings->View.ViewMode == "Icons" )
+		defaultIconSizeS->setValue( Settings->View.IconsImageSize.width() );
+
+	else if ( Settings->View.ViewMode == "Tiles" )
+		defaultIconSizeS->setValue( Settings->View.TilesImageSize.width() );
+
+	else
+		defaultIconSizeS->setValue( Settings->View.DetailsImageSize.width() );
 };
 
 void NBSGeneralWidget::handleIconSizeChanged( int ) {
 
 	int iconSize = defaultIconSizeS->value();
-	Settings->setValue( "IconSize", QSize( iconSize, iconSize ) );
-	Settings->General.IconSize = QSize( iconSize, iconSize );
+	if ( Settings->View.ViewMode == "Icons" )
+		Settings->setValue( "View/IconsImageSize", QSize( iconSize, iconSize ) );
+
+	else if ( Settings->View.ViewMode == "Tiles" )
+		Settings->setValue( "View/TilesImageSize", QSize( iconSize, iconSize ) );
+
+	else
+		Settings->setValue( "View/DetailsImageSize", QSize( iconSize, iconSize ) );
 
 	iconSizeL->setText( QString( "%1 px" ).arg( iconSize ) );
 };
@@ -351,6 +372,12 @@ void NBSGeneralWidget::handlePaintOverlayChanged( bool enabled ) {
 
 void NBSGeneralWidget::handleLogDebugChanged( bool enabled ) {
 
-	Settings->setValue( "General/LogDebug", enabled );
+	Settings->setValue( "LogDebug", enabled );
 	Settings->General.LogDebug = enabled;
+};
+
+void NBSGeneralWidget::handleAutoMountChanged( bool enabled ) {
+
+	Settings->setValue( "AutoMount", enabled );
+	Settings->General.AutoMount = enabled;
 };

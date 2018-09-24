@@ -22,11 +22,19 @@ class NBSideBarEntry : public QLabel {
 		QString mIconStr;
 		QPixmap mIcon;
 
+		QBasicTimer menuTimer;
+
 	public Q_SLOTS:
-		void showMenu();
+		virtual void showMenu( bool autoClose = false );
 
 	protected:
 		void mouseReleaseEvent( QMouseEvent *mrEvent );
+
+		void dragEnterEvent( QDragEnterEvent* );
+		void dragMoveEvent( QDragMoveEvent* );
+		void dropEvent( QDropEvent* );
+
+		void timerEvent( QTimerEvent * );
 
 	Q_SIGNALS:
 		void clicked();
@@ -42,6 +50,9 @@ class NBSideBarTrashEntry : public NBSideBarEntry {
 	private:
 		QString mName;
 		QPixmap mIcon;
+
+	public Q_SLOTS:
+		void showMenu() {};
 
 	protected:
 		void dragEnterEvent( QDragEnterEvent* );

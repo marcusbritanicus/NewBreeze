@@ -7,7 +7,7 @@ INCLUDEPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash
 DEPENDPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
 
 LIBS += -larchive -lbz2 -llzma -lz
-DEFINES += COMMON
+DEFINES += COMMON NBPLUGIN
 
 # Headers
 # =======

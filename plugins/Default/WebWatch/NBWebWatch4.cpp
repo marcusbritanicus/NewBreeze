@@ -29,10 +29,17 @@ void NBWebWatch::createGUI() {
 	openBtn->setAutoRaise( true );
 	openBtn->setFocusPolicy( Qt::NoFocus );
 
+	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
+
+	QToolButton *closeBtn = new QToolButton();
+	closeBtn->setIcon( QIcon( ":/icons/delete.png" ) );
+	closeBtn->setAutoRaise( true );
+	closeBtn->setFocusPolicy( Qt::NoFocus );
+
+	connect( closeBtn, SIGNAL( clicked() ), this, SLOT( close() ) );
+
 	QWidget *baseWidget = new QWidget();
 	baseWidget->setObjectName( tr( "guiBase" ) );
-
-	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
 	peekWidgetBase = new QWebView();
 	peekWidgetBase->setRenderHints( QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing );
@@ -43,6 +50,7 @@ void NBWebWatch::createGUI() {
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
 	lblBtnLyt->addWidget( openBtn );
+	lblBtnLyt->addWidget( closeBtn );
 
 	widgetLyt->addLayout( lblBtnLyt );
 	widgetLyt->addWidget( peekWidgetBase );

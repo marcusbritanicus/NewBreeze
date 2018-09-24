@@ -871,21 +871,43 @@ void NBItemViewModel::setRootPath( QString path ) {
 	chdir( mRootPath.toLocal8Bit().constData() );
 
 	/* We have set per-folder settings */
-	QSettings sett( mRootPath + ".directory", QSettings::NativeFormat );
+	if ( Settings->General.PerFolderViews ) {
+		if ( not mVirtualData ) {
+			QSettings sett( mRootPath + ".directory", QSettings::NativeFormat );
 
-	/* Check per folder view settings */
-	 Settings->General.ShowHidden = sett.value( "NewBreeze/Hidden", false ).toBool();
+			/* Check per folder view settings */
+			Settings->General.ShowHidden = sett.value( "NewBreeze/Hidden", false ).toBool();
 
-	NBSettings *Default = NBSettings::defaultInstance();
+			NBSettings *Default = NBSettings::defaultInstance();
 
-	prevSort.column = sett.value( "NewBreeze/SortColumn", Default->General.SortColumn ).toInt();
-	prevSort.cs = sett.value( "NewBreeze/SortCase", Default->General.SortCase ).toBool();
-	prevSort.categorized = sett.value( "NewBreeze/Grouping", Default->General.Grouping ).toBool();
-	mCategorizationEnabled = prevSort.categorized;
+			prevSort.column = sett.value( "NewBreeze/SortColumn", Default->General.SortColumn ).toInt();
+			prevSort.cs = sett.value( "NewBreeze/SortCase", Default->General.SortCase ).toBool();
+			prevSort.categorized = sett.value( "NewBreeze/Grouping", Default->General.Grouping ).toBool();
+			mCategorizationEnabled = prevSort.categorized;
 
-	Settings->General.SortColumn = prevSort.column;
-	Settings->General.Grouping = prevSort.categorized;
-	Settings->General.ViewMode = sett.value( "NewBreeze/ViewMode", Default->General.ViewMode ).toString();
+			Settings->General.SortColumn = prevSort.column;
+			Settings->General.Grouping = prevSort.categorized;
+			Settings->View.ViewMode = sett.value( "NewBreeze/ViewMode", Default->View.ViewMode ).toString();
+		}
+
+		else {
+			QSettings sett( "NewBreeze", QString( mRootPath ).replace( "NB://", "" ) );
+
+			/* Check per folder view settings */
+			Settings->General.ShowHidden = sett.value( "NewBreeze/Hidden", false ).toBool();
+
+			NBSettings *Default = NBSettings::defaultInstance();
+
+			prevSort.column = sett.value( "NewBreeze/SortColumn", Default->General.SortColumn ).toInt();
+			prevSort.cs = sett.value( "NewBreeze/SortCase", Default->General.SortCase ).toBool();
+			prevSort.categorized = sett.value( "NewBreeze/Grouping", Default->General.Grouping ).toBool();
+			mCategorizationEnabled = prevSort.categorized;
+
+			Settings->General.SortColumn = prevSort.column;
+			Settings->General.Grouping = prevSort.categorized;
+			Settings->View.ViewMode = sett.value( "NewBreeze/ViewMode", Default->View.ViewMode ).toString();
+		}
+	}
 
 	/* Delete the old node */
 	delete rootNode;
