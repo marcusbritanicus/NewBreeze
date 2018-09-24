@@ -6,7 +6,7 @@ NewBreeze v3.0.0 RC3
 ✓ Settings Manager to have two buttons: Apply and Close
 	=> Apply saves all changes.
 	=> Close closes the dialog, warning the user if there are any changes
-✍ Extend support "Open folder with vlc" for other app like Audacious, Clementine etc.
+✓ Extend support "Open folder with vlc" for other app like Audacious, Clementine etc.
 □ Create shortcut of folder and files - SymLinks?
 □ Remember icon size of each view mode separately.
 ✗ There should be a limit to the items shown in FolderFlash.

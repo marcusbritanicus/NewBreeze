@@ -6,6 +6,28 @@
 
 #include "NBPermsWidget.hpp"
 
+static bool canBeExec( QString path ) {
+
+	struct stat statbuf;
+	if ( stat( path.toLocal8Bit().data(), &statbuf ) != 0 )
+		return false;
+
+	QMimeType m = mimeDb.mimeTypeForFile( path );
+	if ( m.name() == "application/x-executable" )
+		return true;
+
+	else if ( m.name() == "application/x-sharedlib" )
+		return true;
+
+	else if ( m.allAncestors().contains( "application/x-executable" ) )
+		return true;
+
+	else
+		return false;
+
+	return false;
+};
+
 NBPermissionsWidget::NBPermissionsWidget( QStringList paths, QWidget *parent ) : QWidget( parent ) {
 
 	pathsList << paths;
@@ -48,8 +70,6 @@ void NBPermissionsWidget::createGUI() {
 	owCB = new QCheckBox( "Write", this );
 	oxCB = new QCheckBox( "Execute", this );
 
-	smartExecCB = new QCheckBox( "Smart Executable", this );
-
 	recursiveBtn = new QPushButton( "Apply recursively", this );
 
 	QGridLayout *gridLyt = new QGridLayout();
@@ -80,7 +100,6 @@ void NBPermissionsWidget::createGUI() {
 	gridLyt->addWidget( new QLabel( "  " ), 6, 0 );
 
 	QHBoxLayout *btnLyt = new QHBoxLayout();
-	btnLyt->addWidget( smartExecCB );
 	btnLyt->addStretch();
 	btnLyt->addWidget( recursiveBtn );
 
@@ -106,6 +125,8 @@ void NBPermissionsWidget::setupConnections() {
 	connect( orCB, SIGNAL( toggled( bool ) ), SLOT( addOR() ) );
 	connect( owCB, SIGNAL( toggled( bool ) ), SLOT( addOW() ) );
 	connect( oxCB, SIGNAL( toggled( bool ) ), SLOT( addOX() ) );
+
+	connect( recursiveBtn, SIGNAL( clicked() ), this, SLOT( applyRecursive() ) );
 };
 
 void NBPermissionsWidget::readPermissions() {
@@ -268,6 +289,10 @@ void NBPermissionsWidget::addUX() {
 		perms = ( checked ? perms | QFile::ExeUser : perms ^ QFile::ExeUser );
 		perms = ( checked ? perms | QFile::ExeOwner : perms ^ QFile::ExeOwner );
 
+		/* Smart Executable */
+		if ( isDir( path ) and urCB->isChecked() and not checked )
+			perms = perms | QFile::ExeUser | QFile::ExeOwner;
+
 		QFile( path ).setPermissions( perms );
 	}
 };
@@ -300,6 +325,10 @@ void NBPermissionsWidget::addGX() {
 	Q_FOREACH( QString path, pathsList ) {
 		QFile::Permissions perms = QFileInfo( path ).permissions();
 		perms = ( checked ? perms | QFile::ExeGroup : perms ^ QFile::ExeGroup );
+
+		/* Smart Executable */
+		if ( isDir( path ) and grCB->isChecked() and not checked )
+			perms = perms | QFile::ExeGroup;
 
 		QFile( path ).setPermissions( perms );
 	}
@@ -334,12 +363,69 @@ void NBPermissionsWidget::addOX() {
 		QFile::Permissions perms = QFileInfo( path ).permissions();
 		perms = ( checked ? perms | QFile::ExeOther : perms ^ QFile::ExeOther );
 
+		/* Smart Executable */
+		if ( isDir( path ) and orCB->isChecked() and not checked )
+			perms = perms | QFile::ExeOther;
+
 		QFile( path ).setPermissions( perms );
 	}
 };
 
 void NBPermissionsWidget::applyRecursive() {
 
-	QFile::Permissions perms = 0;
+	// Directory/Executable Permissions
+	QFile::Permissions dxPerms = 0;
 
+	if ( urCB->checkState() ) dxPerms |= QFile::ReadOwner | QFile::ReadUser;
+	if ( uwCB->checkState() ) dxPerms |= QFile::WriteOwner | QFile::WriteUser;
+	if ( uxCB->checkState() ) dxPerms |= QFile::ExeOwner | QFile::ExeUser;
+
+	if ( grCB->checkState() ) dxPerms |= QFile::ReadGroup;
+	if ( gwCB->checkState() ) dxPerms |= QFile::WriteGroup;
+	if ( gxCB->checkState() ) dxPerms |= QFile::ExeGroup;
+
+	if ( orCB->checkState() ) dxPerms |= QFile::ReadOther;
+	if ( owCB->checkState() ) dxPerms |= QFile::WriteOther;
+	if ( oxCB->checkState() ) dxPerms |= QFile::ExeOther;
+
+	// File Permissions: No execute permissions
+	QFile::Permissions fPerms = 0;
+	if ( urCB->checkState() ) fPerms |= QFile::ReadOwner;
+	if ( uwCB->checkState() ) fPerms |= QFile::WriteOwner;
+
+	if ( grCB->checkState() ) fPerms |= QFile::ReadGroup;
+	if ( gwCB->checkState() ) fPerms |= QFile::WriteGroup;
+
+	if ( orCB->checkState() ) fPerms |= QFile::ReadOther;
+	if ( owCB->checkState() ) fPerms |= QFile::WriteOther;
+
+	Q_FOREACH( QString path, pathsList ) {
+		QDirIterator it( path, QDir::AllEntries | QDir::System | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::Hidden, QDirIterator::Subdirectories );
+		while ( it.hasNext() ) {
+			it.next();
+
+			// Directory
+			if ( it.fileInfo().isDir() ) {
+				if ( it.filePath() == path )
+					continue;
+
+				QFile( it.filePath() ).setPermissions( dxPerms );
+			}
+
+			// Files
+			else if ( it.fileInfo().isFile() ) {
+				// Python, Shell Scripts, etc
+				if ( canBeExec( it.filePath() ) )
+					QFile( it.filePath() ).setPermissions( dxPerms );
+
+				/* Normal */
+				else
+					QFile( it.filePath() ).setPermissions( fPerms );
+			}
+
+			else {
+				// Do nothing
+			}
+		}
+	}
 };

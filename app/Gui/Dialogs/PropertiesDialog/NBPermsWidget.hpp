@@ -33,7 +33,6 @@ class NBPermissionsWidget: public QWidget {
 		QCheckBox *orCB, *owCB, *oxCB;		// Other
 
 		QPushButton *recursiveBtn;
-		QCheckBox *smartExecCB;
 
 	private slots:
 		void addUR();
