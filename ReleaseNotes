@@ -14,16 +14,17 @@ few changes in NewBreeze 3.
 => NBIconManager
     - NBIconManager now replaces old NBIconProvider
     - NBIconManager supports different icons for different sizes.
-    - Very fast loading of icons
+    - Very fast loading of icons and thumbnails
 
 => NBFileSystemWatcher( QFileSystemWatcher )
     - NBFileSystemWatcher was earlier rewritten with a cleaner code based on the inotify-example.c from http://www.lanedo.com/users/amorgado/fanotify/inotify-example.c
-    - The above code was buggy and hence has been replaced with enhanced subclass of QFileSystemWatcher.
+    - The above code was buggy and hence has been replaced with enhanced subclass of QFileSystemWatcher. This is fairly stable.
 
 => NBItemViewModel( QAbsractItemModel )
    - Formerly NBFileSystemModel, now it models Applications, Catalogs, and the FileSystem
    - Code cleanup for better performance.
    - NBItemViewModel provides upto 50% faster thumbnails loading for images.
+   - Thumbnailing is faster and is done concurrently using QThreads.
 
 => NBIconView( QAbstractItemView )
    - Per-folder views are now enabled. Each folder remembers its previous state ( size, grouping, list view, etc )
@@ -35,8 +36,8 @@ few changes in NewBreeze 3.
    - IconOverlays give quick access to Open, Peek and Node IO Menu (cut, copy, paste) without right-click.
 
 => Properties
-   - An elementary Accidental Delete Protection (ADP) has been added. However it is not yet completely implemented.
-   - ADP is rather buggy. It may not be advisable to enable it for all nodes.
+   - There are plans of implementing an elementary Accidental Delete Protection (ADP) feature.
+   - This implementation is tied to NB3 only. This means that ADP does not use any linux/posix api for APD.
 
 => NBAddressBar redesigned
    - NBBreadCrumbsBar is now called NBCrumbsBar.
@@ -61,6 +62,16 @@ few changes in NewBreeze 3.
    - All plugins are updated to use the standard NBPluginInteface.
    - NBPluginInterface can be used easily to extend Preview support for NewBreeze.
    - Defaults Plugins will now be shipped with NewBreeze rather than as a separate repo.
+   - Following file type are supported for previews:
+     > Audio/Video via libvlc
+     > Archives via libarchive
+     > DjVu via djvulibre
+     > Images supported by Qt
+     > Odt, natively (bad rendering)
+     > html files via webkit
+     > Markdown via marked.js
+     > Pdf using MuPDF
+     > Text files
 
 => NBArchive extended
    - NBArchive is now rebuilt using libarchive for archive processing
@@ -73,6 +84,7 @@ few changes in NewBreeze 3.
    - An inbuilt terminal plugin is available.
    - Terminals can now be added in the settings.
    - User can choose the terminal program.
+   - The default shell can be set for the inbuilt terminal
 
 => SuperStart: A Super start to your day
    - All Drives are shown as you start NewBreeze.
