@@ -23,6 +23,7 @@ NBAutoMount::NBAutoMount() : QObject() {
 
 	UDI = new UDisks2();
 	init = true;
+	running = false;
 };
 
 NBAutoMount::~NBAutoMount() {
