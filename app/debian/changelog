@@ -1,3 +1,13 @@
+newbreeze (3.0.0-rc4) unstable; urgency=medium
+
+  * Enhances: Properties dialog redesigned
+  * Drag-n-Drop support for NBSide bar and bug fix
+  * Improvements to NBSidePanel
+  * Automounting of attached devices
+  * Optional libmediainfo support for a/v files
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Wed, 26 Sep 2018 22:00:00 +0530
+
 newbreeze (3.0.0-rc3) unstable; urgency=medium
 
   * Feature: VideoThumbnailing enabled

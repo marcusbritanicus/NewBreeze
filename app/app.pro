@@ -389,7 +389,7 @@ unix {
 	desktop.files = ../data/newbreeze.desktop
 
 	icons.path = $$PREFIX/share/icons/hicolor/256x256/apps/
-	icons.files = icons/newbreeze.png
+	icons.files = ../icons/newbreeze.png
 
 	data.path = $$PREFIX/share/newbreeze/
 	data.files = README ../Changelog ../ReleaseNotes

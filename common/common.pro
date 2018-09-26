@@ -3,11 +3,13 @@ TARGET = newbreeze-common4
 
 VERSION = 3.0.0
 
+QT -= gui
+
 INCLUDEPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
 DEPENDPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
 
 LIBS += -larchive -lbz2 -llzma -lz
-DEFINES += COMMON NBPLUGIN
+DEFINES += COMMON
 
 # Headers
 # =======

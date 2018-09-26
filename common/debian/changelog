@@ -1,10 +1,16 @@
+newbreeze-common (3.0.0-rc4) unstable; urgency=medium
+
+  * NBAppEngine minor bugfix
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Wed, 26 Sep 2018 22:00:00 +0530
+
 newbreeze-common (3.0.0-rc3) unstable; urgency=medium
 
   * NBDeviceInfo::deviceInfoForPath(...) major bugfix
 
  -- Marcus Britanicus <marcusbritanicus@gmail.com>  Mon, 10 Sep 2018 12:00:00 +0530
 
-newbreeze-common (3.0.0-rc3) unstable; urgency=medium
+newbreeze-common (3.0.0-rc2) unstable; urgency=medium
 
   * Improvements to NBAppFile class
   * Upgrades to NBArchive to extract single member
