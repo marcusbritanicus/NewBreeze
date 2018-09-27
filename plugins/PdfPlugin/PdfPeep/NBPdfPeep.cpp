@@ -34,8 +34,18 @@ void NBPdfPeep::createGUI() {
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
-	peekWidgetBase = new PdfView( path, this );
+	QSettings plugins( "NewBreeze", "Plugins" );
+	/* 0 -> MuPdf; 1 -> Poppler*/
+	int backend = plugins.value( "PdfPlugin/Backend", 0 ).toInt();
+
+	peekWidgetBase = new PdfView( this );
+
+	peekWidgetBase->setViewMode( PdfView::FitPageToWidth );
+	peekWidgetBase->setLayoutMode( PdfView::Continuous );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
+
+	peekWidgetBase->loadPdfDocument( path, ( backend ? PdfView::PopplerRenderBackend : PdfView::MuPdfRenderBackend ) );
+
 	connect( peekWidgetBase, SIGNAL( closePreview() ), this, SLOT( close() ) );
 
 	QWidget *pdfBase = new QWidget();

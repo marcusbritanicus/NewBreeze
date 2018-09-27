@@ -96,8 +96,10 @@ void NBPluginManager::reloadPlugins() {
 			QObject *pObject = loader.instance();
 			if ( pObject ) {
 				NBPluginInterface *plugin = qobject_cast<NBPluginInterface*>( pObject );
-				if ( not plugin )
+				if ( not plugin ) {
+					qDebug() << pluginSo << loader.errorString();
 					continue;
+				}
 
 				mPluginList << plugin;
 
@@ -108,10 +110,10 @@ void NBPluginManager::reloadPlugins() {
 
 				/* If this plugin is not enabled, we do not load the data corresponding to it. */
 				if ( not enabled ) {
-					continue;
-
 					/* Unload the plugin */
 					loader.unload();
+
+					continue;
 				}
 
 				Q_FOREACH( NBPluginInterface::Interface iface, plugin->interfaces() ) {
@@ -126,6 +128,10 @@ void NBPluginManager::reloadPlugins() {
 
 					mPluginsHash[ iface ] = cph;
 				}
+			}
+
+			else {
+				qDebug() << pluginSo << loader.errorString();
 			}
 		}
 	}

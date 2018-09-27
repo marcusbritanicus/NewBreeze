@@ -18,7 +18,7 @@ DEPENDPATH += ../../common/ ../../common/include
 # MuPDF locations
 # ===============
 INCLUDEPATH += mupdf/source/cbz mupdf/source/fitz mupdf/source/gprf mupdf/source/html mupdf/source/pdf mupdf/source/svg mupdf/source/xps mupdf/mujs
-INCLUDEPATH += /usr/include/freetype2 /usr/include/harfbuzz /usr/include/openjpeg-2.3
+INCLUDEPATH += /usr/include/freetype2 /usr/include/harfbuzz
 DEPENDPATH += mupdf/source/cbz mupdf/source/fitz mupdf/source/gprf mupdf/source/html mupdf/source/pdf mupdf/source/svg mupdf/source/xps mupdf/mujs
 
 # MuPDF and PdfPeep
@@ -28,12 +28,24 @@ DEPENDPATH += mupdf/include/ PdfPeep
 
 # cflags and defines
 # ==================
-QMAKE_CFLAGS += -ffunction-sections -fdata-sections -pipe -O2 -fomit-frame-pointer -fPIC
+QMAKE_CFLAGS += -ffunction-sections -fdata-sections -pipe -O2 -fomit-frame-pointer -fPIC $$system( pkg-config --cflags libopenjp2 )
 DEFINES += NDEBUG JBIG_NO_MEMENTO TOFU NOCJK SHARE_JPEG NO_ICC HAVE_LIBCRYPTO
 
 # LIBS
 # ====
 LIBS         += -L/usr/lib -lharfbuzz -lfreetype -lz -ljpeg -lopenjp2 -ljbig2dec
+
+# Poppler
+# =======
+equals( QT_MAJOR_VERSION, 4 ) {
+	INCLUDEPATH  += /usr/include/poppler/qt4
+	LIBS += -lpoppler-qt4
+}
+
+equals( QT_MAJOR_VERSION, 5 ) {
+	INCLUDEPATH  += /usr/include/poppler/qt5
+	LIBS += -lpoppler-qt5
+}
 
 # Silent and No warning
 # =====================
@@ -80,12 +92,15 @@ HEADERS += Global.hpp
 HEADERS += NBPdfPlugin.hpp
 HEADERS += PdfPeep/MuPdfDocument.hpp
 HEADERS += PdfPeep/NBPdfPeep.hpp
+HEADERS += PdfPeep/PdfDocument.hpp
 HEADERS += PdfPeep/PdfView.hpp
+HEADERS += PdfPeep/PopplerDocument.hpp
 
 SOURCES += NBPdfPlugin.cpp
 SOURCES += PdfPeep/MuPdfDocument.cpp
 SOURCES += PdfPeep/NBPdfPeep.cpp
 SOURCES += PdfPeep/PdfView.cpp
+SOURCES += PdfPeep/PopplerDocument.cpp
 
 # Silent compilation
 # ==================
