@@ -848,17 +848,19 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 				QRectF menuRect( oRect.x() + oRect.width() / 2, oRect.y(), oRect.width() / 2, oRect.height() / 2 );
 				QRectF actsRect( oRect.x() + oRect.width() / 2, oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 );
 
-				if ( Settings->View.PaintOverlay and peekRect.contains( mpEvent->pos() ) )
-					emit peek( idx );
+				if ( Settings->View.PaintOverlay ) {
+					if ( peekRect.contains( mpEvent->pos() ) )
+						emit peek( idx );
 
-				else if ( Settings->View.PaintOverlay and openRect.contains( mpEvent->pos() ) )
-					emit open( idx );
+					else if ( openRect.contains( mpEvent->pos() ) )
+						emit open( idx );
 
-				else if ( Settings->View.PaintOverlay and menuRect.contains( mpEvent->pos() ) )
-					emit contextMenuRequested( mpEvent->pos() );
+					else if ( menuRect.contains( mpEvent->pos() ) )
+						emit contextMenuRequested( mpEvent->pos() );
 
-				else if ( Settings->View.PaintOverlay and actsRect.contains( mpEvent->pos() ) )
-					emit actionsMenuRequested( mpEvent->pos() );
+					else if ( actsRect.contains( mpEvent->pos() ) )
+						emit actionsMenuRequested( mpEvent->pos() );
+				}
 
 				else
 					dragStartPosition = mpEvent->pos();
@@ -873,6 +875,11 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 				mSelectedIndexes << idx;
 				mSelStartIdx = idx;
+
+				selectionModel()->setCurrentIndex( idx, QItemSelectionModel::NoUpdate );
+				mSelectedIndexes << idx;
+
+				viewport()->repaint();
 			}
 
 			/* Repaint the viewport */
@@ -940,6 +947,9 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 
 		/* Valid index */
 		if ( idx.isValid() ) {
+			/* Set the clicked index as current */
+			selectionModel()->setCurrentIndex( idx, QItemSelectionModel::NoUpdate );
+
 			/* Forward selection */
 			if ( mSelStartIdx.row() < idx.row() ) {
 				mSelectedIndexes.clear();
