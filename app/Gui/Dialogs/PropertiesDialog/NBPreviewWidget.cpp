@@ -90,7 +90,7 @@ NBPreviewWidget::NBPreviewWidget( QStringList paths, QWidget *parent ) : QWidget
 
 	/* Not possible */
 	else {
-		QLabel *lbl = new QLabel( "Cannot preview this filetype natively." );
+		QLabel *lbl = new QLabel( "NewBreeze cannot preview this filetype natively. You might be able to preview this file using a plugin." );
 		lbl->setWordWrap( true);
 		lbl->setAlignment( Qt::AlignCenter );
 

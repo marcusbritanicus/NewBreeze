@@ -1,6 +1,6 @@
 /*
 	*
-	* NBPropertiesDialog.hpp - NBPropertiesDialog.cpp header
+	* NBPropsWidget.hpp - NBPropsWidget.cpp header
 	*
 */
 
@@ -16,16 +16,17 @@ class NBPropertiesWidget: public QWidget {
     Q_OBJECT
 
 	public:
-		NBPropertiesWidget( QStringList, bool *term, QWidget * );
+		NBPropertiesWidget( QStringList, QWidget * );
 		~NBPropertiesWidget();
+
+	public Q_SLOTS:
+		void refreshSize();
 
 	private:
 		void createGUI();
 		void setWidgetProperties();
 
 		void update();
-
-		bool *terminate;
 
 		QLabel *nameLbl;
 		NBClickLabel *iconLbl;
@@ -39,6 +40,7 @@ class NBPropertiesWidget: public QWidget {
 		QLabel *cDateLbl;
 
 		NBDriveInfo *dInfo;
+		NBSizeRunner *runner;
 
 		QStringList pathsList;
 
@@ -51,26 +53,31 @@ class NBSizeRunner : public QThread {
 	Q_OBJECT
 
 	public:
-		NBSizeRunner( QStringList paths, bool *terminate ) : QThread() {
+		NBSizeRunner( QStringList paths ) : QThread() {
 
 			files = 0;
 			folders = 0;
 			totalSize = 0;
 
 			mPaths << paths;
-			mTerminate = terminate;
+			mTerminate = false;
 		};
 
-		void stop();
+		void stop() {
 
-		void recurseProperties( QString path );
+			mTerminate = true;
+		};
+
+	protected:
 		void run();
 
 	private:
 		QStringList mPaths;
-		bool *mTerminate;
+		bool mTerminate;
 
 		qint64 files, folders, totalSize;
+
+		void recurseProperties( QString path );
 
 	Q_SIGNALS:
 		void currentCount( qint64, qint64, qint64 );

@@ -1,6 +1,6 @@
 /*
 	*
-	* NBPropertiesDialog.cpp - Properties of the selected object
+	* NBPermsWidget.cpp - Show Permissions of the selected object(s)
 	*
 */
 

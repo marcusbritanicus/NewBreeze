@@ -43,4 +43,7 @@ class NBPropertiesDialog: public NBDialog {
 		QStringList pathsList;
 
 		bool mTerminate;
+
+	public Q_SLOTS:
+		void show();
 };

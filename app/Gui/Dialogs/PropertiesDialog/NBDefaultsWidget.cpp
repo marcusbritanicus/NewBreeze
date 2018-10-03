@@ -54,6 +54,20 @@ NBDefaultsWidget::NBDefaultsWidget( QStringList paths, QWidget *parent ) : QWidg
 	btnLyt->addWidget( addBtn );
 	btnLyt->addWidget( delBtn );
 
+	lyt->addStretch();
+	lyt->addWidget( defLbl );
+	lyt->addWidget( defaultCB );
+	lyt->addWidget( otherLbl );
+	lyt->addWidget( appList );
+	lyt->addLayout( btnLyt );
+	lyt->addStretch();
+
+	setLayout( lyt );
+};
+
+void NBDefaultsWidget::refreshDefaults() {
+
+	/* Get defaults */
 	NBAppsList appsList = NBAppEngine::instance()->appsForMimeType( mimeType );
 	Q_FOREACH( NBAppFile app, appsList.toQList() ) {
 		QIcon appIcon = QIcon::fromTheme( app.value( NBAppFile::Icon ).toString(), QIcon( app.value( NBAppFile::Icon ).toString() ) );
@@ -84,16 +98,6 @@ NBDefaultsWidget::NBDefaultsWidget( QStringList paths, QWidget *parent ) : QWidg
 	}
 
 	connect( defaultCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( makeDefault( int ) ) );
-
-	lyt->addStretch();
-	lyt->addWidget( defLbl );
-	lyt->addWidget( defaultCB );
-	lyt->addWidget( otherLbl );
-	lyt->addWidget( appList );
-	lyt->addLayout( btnLyt );
-	lyt->addStretch();
-
-	setLayout( lyt );
 };
 
 void NBDefaultsWidget::addApplication() {

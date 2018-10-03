@@ -1,6 +1,6 @@
 /*
 	*
-	* NBPropertiesDialog.cpp - Properties of the selected object
+	* NBPropsWidget.cpp - Show the node properties of the selected object(s)
 	*
 */
 
@@ -8,17 +8,19 @@
 #include "NBIconManager.hpp"
 #include "NBGuiFunctions.hpp"
 
-NBPropertiesWidget::NBPropertiesWidget( QStringList paths, bool *term, QWidget *parent ) : QWidget( parent ) {
+NBPropertiesWidget::NBPropertiesWidget( QStringList paths, QWidget *parent ) : QWidget( parent ) {
 
 	pathsList << paths;
-	terminate = term;
-
 	createGUI();
+
+	runner = 0;
 };
 
 NBPropertiesWidget::~NBPropertiesWidget() {
 
-	*terminate = true;
+	runner->stop();
+
+	delete runner;
 };
 
 void NBPropertiesWidget::createGUI() {
@@ -82,8 +84,14 @@ void NBPropertiesWidget::createGUI() {
 	setLayout( baseLyt );
 
 	update();
+};
 
-	NBSizeRunner *runner = new NBSizeRunner( pathsList, terminate );
+void NBPropertiesWidget::refreshSize() {
+
+	if ( runner and runner->isRunning() )
+		runner->stop();
+
+	runner = new NBSizeRunner( pathsList );
 	connect( runner, SIGNAL( currentCount( qint64, qint64, qint64 ) ), this, SLOT( update( qint64, qint64, qint64 ) ) );
 
 	runner->start();
@@ -247,7 +255,6 @@ void NBPropertiesWidget::update( qint64 files, qint64 folders, qint64 totalSize 
 	contLbl->setText( contentsStr );
 };
 
-
 void NBPropertiesWidget::changeDirIcon() {
 
 	/* We don't work with multiple selection */
@@ -294,7 +301,7 @@ void NBSizeRunner::run() {
 	totalSize = 0;
 
 	Q_FOREACH( QString path, mPaths ) {
-		if ( *mTerminate )
+		if ( mTerminate )
 			return;
 
 		if ( isDir( path ) ) {
@@ -308,13 +315,14 @@ void NBSizeRunner::run() {
 	}
 
 	emit currentCount( files, folders, totalSize );
+	mTerminate = false;
 };
 
 void NBSizeRunner::recurseProperties( QString path ) {
 
 	QDirIterator it( path, QDir::AllEntries | QDir::System | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::Hidden, QDirIterator::Subdirectories );
 	while ( it.hasNext() ) {
-		if ( *mTerminate )
+		if ( mTerminate )
 			return;
 
 		it.next();

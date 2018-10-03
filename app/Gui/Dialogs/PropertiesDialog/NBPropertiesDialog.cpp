@@ -8,12 +8,11 @@
 
 NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab, QWidget *parent ) : NBDialog( parent ) {
 
-	mTerminate = false;
 	pathsList << paths;
 
 	tabs = new NBPSideBar( this );
 
-	propsW = new NBPropertiesWidget( paths, &mTerminate, this );
+	propsW = new NBPropertiesWidget( paths, this );
 	permsW = new NBPermissionsWidget( paths, this );
 	defaultsW = new NBDefaultsWidget( paths, this );
 	previewW = new NBPreviewWidget( paths, this );
@@ -42,5 +41,14 @@ NBPropertiesDialog::NBPropertiesDialog( QStringList paths, PropertiesTab tab, QW
 
 NBPropertiesDialog::~NBPropertiesDialog() {
 
-	mTerminate = true;
+	delete propsW;
 }
+
+void NBPropertiesDialog::show() {
+
+	NBDialog::show();
+	qApp->processEvents();
+
+	propsW->refreshSize();
+	defaultsW->refreshDefaults();
+};

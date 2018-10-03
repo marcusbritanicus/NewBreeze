@@ -19,6 +19,9 @@ class NBDefaultsWidget : public QWidget {
 	public:
 		NBDefaultsWidget( QStringList paths, QWidget* );
 
+	public Q_SLOTS:
+		void refreshDefaults();
+
 	private:
 		QComboBox *defaultCB;
 		QListWidget *appList;
