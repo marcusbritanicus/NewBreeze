@@ -12,6 +12,7 @@
 #include "NBFileInfoGatherer.hpp"
 #include "NBFileSystemWatcher.hpp"
 #include "NBThumbnailer.hpp"
+#include "NBProcessManager.hpp"
 
 class NBItemViewModel : public QAbstractItemModel {
     Q_OBJECT
@@ -208,6 +209,8 @@ class NBItemViewModel : public QAbstractItemModel {
 		void loadHome();
 
 		void nodeUpdated( QString );
+
+		void deleteComplete( NBProcess::Progress*, NBAbstractProcess* );
 
 	Q_SIGNALS:
 		void directoryLoading( QString );

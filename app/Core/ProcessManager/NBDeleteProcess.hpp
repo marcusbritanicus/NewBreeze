@@ -33,6 +33,12 @@ class NBDeleteProcess : public NBAbstractProcess {
 		// Perform the undo
 		void undo();
 
+		// Nodes
+		QStringList nodes() {
+
+			return sourceList;
+		};
+
 	protected:
 		void run();
 

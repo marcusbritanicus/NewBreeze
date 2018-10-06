@@ -71,4 +71,5 @@ class NBProcessManager : public QObject {
 		void processAdded( NBProcess::Progress*, NBAbstractProcess* );
 		void activeProcessCountChanged( qint64 );
 		void processCompleted( NBProcess::Progress* );
+		void processCompleted( NBProcess::Progress*, NBAbstractProcess* );
 };

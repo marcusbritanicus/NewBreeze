@@ -95,6 +95,8 @@ class NBAbstractProcess : public QThread {
 		virtual void pause() = 0;
 		virtual void resume() = 0;
 
+		virtual QStringList nodes() = 0;
+
 		virtual bool canUndo() = 0;
 		virtual void undo() = 0;
 

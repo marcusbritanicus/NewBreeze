@@ -76,6 +76,11 @@ NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent
 	connect( watcher, SIGNAL( nodeRenamed( QString, QString ) ), this, SLOT( handleNodeRenamed( QString, QString ) ) );
 	connect( watcher, SIGNAL( watchPathDeleted() ), this, SLOT( loadHome() ) );
 
+	connect(
+		NBProcessManager::instance(), SIGNAL( processCompleted( NBProcess::Progress*, NBAbstractProcess* ) ),
+		this, SLOT( deleteComplete( NBProcess::Progress*, NBAbstractProcess* ) )
+	);
+
 	thumbnailer = new NBThumbnailer();
 	connect( thumbnailer, SIGNAL( updateNode( QString ) ), this, SLOT( nodeUpdated( QString ) ) );
 };
@@ -400,6 +405,15 @@ void NBItemViewModel::nodeUpdated( QString nodeName ) {
 	node->updateIcon();
 
 	emit dataChanged( index( baseName( nodeName ) ), index( baseName( nodeName ) ) );
+};
+
+void NBItemViewModel::deleteComplete( NBProcess::Progress *progress, NBAbstractProcess *process ) {
+
+	if ( ( progress->type != NBProcess::Delete ) and ( progress->type != NBProcess::Trash ) )
+		return;
+
+	Q_FOREACH( QString node, process->nodes() )
+		removeNode( node );
 };
 
 QModelIndex NBItemViewModel::index( int row, int column, const QModelIndex &parent ) const {
@@ -1071,7 +1085,7 @@ void NBItemViewModel::setupFileSystemData() {
 	lambdaUseFilterList.clear();
 
 	/* Add the files to the model */
-	if ( numFiles >= 0 ) {
+	if ( numFiles > 0 ) {
 		for( int i = 0; i < numFiles; i++ ) {
 			QString _nodeName = QString::fromLocal8Bit( fileList[ i ]->d_name );
 			QVariantList data = quickDataGatherer->getQuickFileInfo( mRootPath + _nodeName );

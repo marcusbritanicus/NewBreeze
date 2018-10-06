@@ -24,9 +24,6 @@ inline QStringList entries( QString mPath ) {
 			if ( ( nodeName.compare( "." ) == 0 ) or ( nodeName.compare( ".." ) == 0 ) )
 				continue;
 
-			if ( not Settings->General.ShowHidden and nodeName.startsWith( "." ) )
-				continue;
-
 			/* Show Hidden */
 			if ( ent->d_type == DT_DIR )
 				contents << mPath + nodeName + "/";
@@ -47,17 +44,11 @@ inline QPair<QStringList, QStringList> difference( QStringList oldList, QStringL
 
 	QPair<QStringList, QStringList> pair;
 
-	/* Items in first list not found in second: deleted */
-	Q_FOREACH( QString itm, oldList ) {
-		if ( not newList.contains( itm ) )
-			pair.first << itm;
-	}
+	QSet<QString> s1 = oldList.toSet();
+	QSet<QString> s2 = newList.toSet();
 
-	/* Items in second list not found in first: created */
-	Q_FOREACH( QString itm, newList ) {
-		if ( not oldList.contains( itm ) )
-			pair.second << itm;
-	}
+	pair.first = ( s1 - s2 ).toList();
+	pair.second = ( s2 - s1 ).toList();
 
 	return pair;
 };

@@ -118,4 +118,5 @@ void NBProcessManager::handleProcessComplete() {
 
 	emit activeProcessCountChanged( processList.count() - completedProcIDs.count() );
 	emit processCompleted( progressList.at( id ) );
+	emit processCompleted( progressList.at( id ), processList.at( id ) );
 };
