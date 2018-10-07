@@ -33,6 +33,7 @@ class NBPermissionsWidget: public QWidget {
 		QCheckBox *orCB, *owCB, *oxCB;		// Other
 
 		QPushButton *recursiveBtn;
+		QCheckBox *protectCB;
 
 	private slots:
 		void addUR();
@@ -48,4 +49,5 @@ class NBPermissionsWidget: public QWidget {
 		void addOX();
 
 		void applyRecursive();
+		void setProtection( bool );
 };

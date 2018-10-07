@@ -70,7 +70,10 @@ void NBPermissionsWidget::createGUI() {
 	owCB = new QCheckBox( "Write", this );
 	oxCB = new QCheckBox( "Execute", this );
 
+	protectCB = new QCheckBox( "Protect from accidental delete", this );
+
 	recursiveBtn = new QPushButton( "Apply recursively", this );
+	recursiveBtn->setToolTip( "Apply the above permissions recursively to files/sub-folders." );
 
 	QGridLayout *gridLyt = new QGridLayout();
 	gridLyt->setContentsMargins( 10, 5, 10, 5 );
@@ -100,6 +103,7 @@ void NBPermissionsWidget::createGUI() {
 	gridLyt->addWidget( new QLabel( "  " ), 6, 0 );
 
 	QHBoxLayout *btnLyt = new QHBoxLayout();
+	btnLyt->addWidget( protectCB );
 	btnLyt->addStretch();
 	btnLyt->addWidget( recursiveBtn );
 
@@ -127,6 +131,7 @@ void NBPermissionsWidget::setupConnections() {
 	connect( oxCB, SIGNAL( toggled( bool ) ), SLOT( addOX() ) );
 
 	connect( recursiveBtn, SIGNAL( clicked() ), this, SLOT( applyRecursive() ) );
+	connect( protectCB, SIGNAL( toggled( bool ) ), this, SLOT( setProtection( bool ) ) );
 };
 
 void NBPermissionsWidget::readPermissions() {
@@ -134,8 +139,15 @@ void NBPermissionsWidget::readPermissions() {
 	QString uname = QFileInfo( pathsList.at( 0 ) ).owner();
 	QString gname = QFileInfo( pathsList.at( 0 ) ).group();
 
+	/* Check if we have protection set */
+	QSettings nbSettings( "NewBreeze", "NewBreeze" );
+	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
+
+	int pCount = 0;			/* Protected nodes count */
+
 	short UR = 0, UW = 0, UE = 0, GR = 0, GW = 0, GE = 0, OR = 0, OW = 0, OE = 0;
 	int folders = 0, files = 0;
+
 	Q_FOREACH( QString path, pathsList ) {
 		QFile::Permissions perms = QFile::permissions( path );
 
@@ -162,10 +174,26 @@ void NBPermissionsWidget::readPermissions() {
 
 		else
 			files++;
+
+		if ( safeNodes.contains( path ) )
+			pCount++;
 	}
 
 	uNameLbl->setText( uname );
 	gNameLbl->setText( gname );
+
+	if ( pCount == 0 )
+		protectCB->setCheckState( Qt::Unchecked );
+
+	else if ( pCount == pathsList.count() )
+		protectCB->setCheckState( Qt::Checked );
+
+	else
+		protectCB->setCheckState( Qt::PartiallyChecked );
+
+	/* Apply recursively makes no sense for files */
+	if ( not folders )
+		recursiveBtn->setDisabled( true );
 
 	if ( pathsList.count() == 1 )
 		nameLbl->setText( "<b>" + QFileInfo( pathsList.at( 0 ) ).fileName() + "</b>" );
@@ -428,4 +456,26 @@ void NBPermissionsWidget::applyRecursive() {
 			}
 		}
 	}
+};
+
+void NBPermissionsWidget::setProtection( bool protect ) {
+
+	/* Paritally checked: Keep them as it is */
+	if ( protectCB->checkState() == Qt::PartiallyChecked )
+		return;
+
+	/* Check if we have protection set */
+	QSettings nbSettings( "NewBreeze", "NewBreeze" );
+	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
+
+	Q_FOREACH( QString path, pathsList ) {
+		if ( protect )
+			safeNodes.append( path );
+
+		else
+			safeNodes.removeAll( path );
+	}
+
+	safeNodes.removeDuplicates();
+	nbSettings.setValue( "ProtectedNodes", safeNodes );
 };
