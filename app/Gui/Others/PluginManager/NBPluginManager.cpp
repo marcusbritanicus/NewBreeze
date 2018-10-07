@@ -5,6 +5,7 @@
 */
 
 #include "NBPluginManager.hpp"
+#include "NBFunctions.hpp"
 
 QSettings nbsett( "NewBreeze", "Plugins" );
 NBPluginManager *NBPluginManager::pMgr = NULL;
@@ -86,6 +87,9 @@ void NBPluginManager::reloadPlugins() {
 
 	QStringList pluginPaths;
 	pluginPaths << nbsett.value( "PluginPaths", QStringList() << "./plugins" ).toStringList();
+	QString appImagePath = getAppImagePath();
+	if ( appImagePath.count() )
+		pluginPaths << appImagePath + "/usr/lib/newbreeze/plugins/";
 
 	mPluginList.clear();
 	mPluginsHash.clear();

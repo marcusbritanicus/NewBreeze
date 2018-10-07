@@ -56,6 +56,9 @@ class NBWebWatch : public QDialog {
 
 class NBMarkDownPreview : public QObject, NBPluginInterface {
 	Q_OBJECT
+	#if QT_VERSION >= 0x050000
+		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "MarkDownPreview5.json" )
+	#endif
 	Q_INTERFACES( NBPluginInterface )
 
 	public:
