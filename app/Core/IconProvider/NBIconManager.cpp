@@ -81,9 +81,17 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 		if ( not file.endsWith( "/" ) )
 			file += "/";
 
-		/* User defined directory icon from @path/.directory */
+		/* User defined directory icon from @path/.directory NewBreeze icons */
 		QSettings settPath( QDir( file ).filePath( ".directory" ), QSettings::NativeFormat );
-		QString icoStr = settPath.value( "Desktop Entry/Icon" ).toString();
+		QString icoStr = settPath.value( "NewBreeze/Icon" ).toString();
+		if ( hasIcon( icoStr ) )
+			return icon( icoStr );
+
+		else if ( exists( icoStr ) )
+			return QStringList() << icoStr;
+
+		/* User defined directory icon from @path/.directory Global Icons */
+		icoStr = settPath.value( "Desktop Entry/Icon" ).toString();
 		if ( hasIcon( icoStr ) )
 			return icon( icoStr );
 

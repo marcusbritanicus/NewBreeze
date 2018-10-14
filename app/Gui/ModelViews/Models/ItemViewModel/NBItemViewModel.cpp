@@ -972,14 +972,7 @@ void NBItemViewModel::goUp() {
 
 void NBItemViewModel::goHome() {
 
-	if ( Settings->General.SpecialOpen and Settings->General.SuperStart )
-		setRootPath( "NB://SuperStart" );
-
-	else if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog )
-		setRootPath( "NB://Catalogs" );
-
-	else
-		setRootPath( QDir::homePath() );
+	setRootPath( QDir::homePath() );
 };
 
 bool NBItemViewModel::canGoBack() const {

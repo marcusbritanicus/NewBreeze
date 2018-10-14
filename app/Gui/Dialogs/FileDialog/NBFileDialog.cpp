@@ -53,16 +53,19 @@ void NBFileDialog::createGUI() {
 	/* Back */
 	naviBtn->setSegmentIcon( 0, QIcon::fromTheme( "arrow-left", QIcon( ":/icons/arrow-left.png" ) ) );
 	naviBtn->segment( 0 )->setFocusPolicy( Qt::NoFocus );
+	naviBtn->segment( 0 )->setShortcut( Settings->Shortcuts.GoLeft.at( 0 ) );
 	connect( naviBtn->segment( 0 ), SIGNAL( clicked() ), fsModel, SLOT( goBack() ) );
 
 	/* Home */
 	naviBtn->setSegmentIcon( 1, QIcon::fromTheme( "go-home", QIcon( ":/icons/home.png" ) ) );
 	naviBtn->segment( 1 )->setFocusPolicy( Qt::NoFocus );
+	naviBtn->segment( 1 )->setShortcut( Settings->Shortcuts.GoHome.at( 0 ) );
 	connect( naviBtn->segment( 1 ), SIGNAL( clicked() ), fsModel, SLOT( goHome() ) );
 
 	/* Next */
 	naviBtn->setSegmentIcon( 2, QIcon::fromTheme( "arrow-right", QIcon( ":/icons/arrow-right.png" ) ) );
 	naviBtn->segment( 2 )->setFocusPolicy( Qt::NoFocus );
+	naviBtn->segment( 2 )->setShortcut( Settings->Shortcuts.GoRight.at( 0 ) );
 	connect( naviBtn->segment( 2 ), SIGNAL( clicked() ), fsModel, SLOT( goForward() ) );
 
 	QHBoxLayout *addrLyt = new QHBoxLayout();
@@ -111,6 +114,13 @@ void NBFileDialog::createAndSetupActions() {
 	connect( fsModel, SIGNAL( directoryLoaded( QString ) ), this, SLOT( updateToolBar() ) );
 
 	connect( filtersCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( resetFilters() ) );
+
+	// Up
+	QAction *actParDir = new QAction( QIcon( ":/icons/up.png" ), "&Up", this );
+	actParDir->setShortcuts( Settings->Shortcuts.GoUp );
+
+	connect( actParDir, SIGNAL( triggered() ), fsModel, SLOT( goUp() ) );
+	addAction( actParDir );
 };
 
 void NBFileDialog::setNameFilters( QStringList filters, QString filter ) {

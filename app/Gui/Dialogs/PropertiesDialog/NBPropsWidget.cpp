@@ -282,15 +282,9 @@ void NBPropertiesWidget::changeDirIcon() {
 	if ( not iconName.isEmpty() ) {
 		iconLbl->setPixmap( icon( QStringList() << iconName ).pixmap( 36 ) );
 
-		QFile file( pathsList.at( 0 ) + "/.directory" );
-		if ( not file.open( QFile::WriteOnly ) ) {
-			QMessageBox::warning( this, "Error", "Unable to set icon" );
-			return;
-		}
-
-		file.write( QString( "[Desktop Entry]\nIcon=%1" ).arg( iconName ).toUtf8() );
-		file.flush();
-		file.close();
+		QSettings dSett( pathsList.at( 0 ) + "/.directory", QSettings::NativeFormat );
+		dSett.setValue( "NewBreeze/Icon", iconName );
+		dSett.sync();
 	}
 };
 

@@ -699,7 +699,7 @@ void NewBreeze::showPermissions() {
 void NewBreeze::handleDriveUrl( QString url ){
 
 	if ( url.startsWith( "NB://SuperStart" ) )
-		FolderView->fsModel->goHome();
+		FolderView->fsModel->setRootPath( url );
 
 	if ( url.startsWith( "NB://Applications" ) )
 		showApplications();

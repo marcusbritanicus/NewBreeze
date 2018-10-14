@@ -28,7 +28,9 @@ DEPENDPATH += mupdf/include/ PdfPeep
 
 # cflags and defines
 # ==================
-QMAKE_CFLAGS += -ffunction-sections -fdata-sections -pipe -O2 -fomit-frame-pointer -fPIC $$system( pkg-config --cflags libopenjp2 )
+QMAKE_CFLAGS += -ffunction-sections -fdata-sections -pipe -O2 -fomit-frame-pointer -fPIC -fno-dce -fno-dse -fno-tree-dce -fno-tree-dse
+QMAKE_CFLAGS += $$system( pkg-config --cflags libopenjp2 )					# openJP2
+QMAKE_CPPFLAGS += -fPIC -fno-dce -fno-dse -fno-tree-dce -fno-tree-dse
 DEFINES += NDEBUG JBIG_NO_MEMENTO TOFU NOCJK SHARE_JPEG NO_ICC HAVE_LIBCRYPTO
 
 # LIBS

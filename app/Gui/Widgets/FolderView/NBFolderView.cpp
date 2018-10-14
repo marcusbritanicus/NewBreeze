@@ -321,16 +321,20 @@ void NBFolderView::goForward() {
 
 void NBFolderView::doOpenHome() {
 
-	if ( Settings->General.SpecialOpen and Settings->General.SuperStart )
+	if ( Settings->General.SpecialOpen and Settings->General.SuperStart ) {
 		qDebug() << "Opening SuperStart";
+		fsModel->setRootPath( "NB://SuperStart" );
+	}
 
-	else if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog )
+	else if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog ) {
 		qDebug() << "Opening Catalogs";
+		fsModel->setRootPath( "NB://Catalogs" );
+	}
 
-	else
+	else {
 		qDebug() << "Opening dir:" << NBXdg::home().toLocal8Bit().data();
-
-	fsModel->goHome();
+		fsModel->goHome();
+	}
 };
 
 void NBFolderView::doOpenSS() {
