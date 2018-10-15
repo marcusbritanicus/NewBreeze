@@ -189,5 +189,5 @@ void NBMarkDownPreview::setCaller( QWidget *caller ) {
 };
 
 #if QT_VERSION < 0x050000
-        Q_EXPORT_PLUGIN2( MarkDownPreview, NBMarkDownPreview );
+	Q_EXPORT_PLUGIN2( MarkDownPreview, NBMarkDownPreview );
 #endif
