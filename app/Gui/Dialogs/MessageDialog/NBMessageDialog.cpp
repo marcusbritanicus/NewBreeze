@@ -14,6 +14,7 @@ int NBMessageDialog::information( QWidget *parent, QString title, QString text )
 	mbox->setText( text );
 	mbox->setStandardButtons( QMessageBox::Ok );
 	mbox->setEscapeButton( QMessageBox::Ok );
+	mbox->setAttribute( Qt::WA_DeleteOnClose );
 
 	return mbox->exec();
 };
@@ -27,6 +28,7 @@ int NBMessageDialog::question( QWidget *parent, QString title, QString text ) {
 	mbox->setStandardButtons( QMessageBox::Yes | QMessageBox::No );
 	mbox->setDefaultButton( QMessageBox::No );
 	mbox->setEscapeButton( QMessageBox::No );
+	mbox->setAttribute( Qt::WA_DeleteOnClose );
 
 	return mbox->exec();
 };
@@ -39,6 +41,7 @@ int NBMessageDialog::warning( QWidget *parent, QString title, QString text ) {
 	mbox->setText( text );
 	mbox->setStandardButtons( QMessageBox::Ok );
 	mbox->setEscapeButton( QMessageBox::Ok );
+	mbox->setAttribute( Qt::WA_DeleteOnClose );
 
 	return mbox->exec();
 };
@@ -51,6 +54,7 @@ int NBMessageDialog::error( QWidget *parent, QString title, QString text ) {
 	mbox->setText( text );
 	mbox->setStandardButtons( QMessageBox::Ok );
 	mbox->setEscapeButton( QMessageBox::Ok );
+	mbox->setAttribute( Qt::WA_DeleteOnClose );
 
 	return mbox->exec();
 };
@@ -63,6 +67,7 @@ int NBMessageDialog::critical( QWidget *parent, QString title, QString text ) {
 	mbox->setText( text );
 	mbox->setStandardButtons( QMessageBox::Ok );
 	mbox->setEscapeButton( QMessageBox::Ok );
+	mbox->setAttribute( Qt::WA_DeleteOnClose );
 
 	return mbox->exec();
 };

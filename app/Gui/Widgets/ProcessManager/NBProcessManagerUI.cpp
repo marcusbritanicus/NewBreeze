@@ -89,6 +89,34 @@ void NBProcessManagerUI::addProcess( NBProcess::Progress* progress, NBAbstractPr
 	baseLyt->insertWidget( 0, procWidget );
 };
 
+void NBProcessManagerUI::closeEvent( QCloseEvent *cEvent ) {
+
+	if ( Settings->Special.ClosingDown and NBProcessManager::instance()->activeProcessCount() ) {
+		int reply = NBMessageDialog::question(
+			this,
+			"NewBreeze | Process Manager",
+			"There are active processes going on. If you close this dialog, they will be cancelled. Do you want to close this dialog?"
+		);
+
+		if ( reply == QMessageBox::Yes ) {
+			/* Cancel all active processes */
+			Q_FOREACH( NBAbstractProcess *proc, NBProcessManager::instance()->activeProcesses() )
+				proc->cancel();
+
+			cEvent->accept();
+			qApp->quit();
+			return;
+		}
+
+		else {
+			cEvent->ignore();
+			return;
+		}
+	}
+
+	cEvent->accept();
+};
+
 NBProcessManagerMini::NBProcessManagerMini( QWidget *parent ) : QToolButton( parent ) {
 
 	/* Local instances for the ProcessManagers */

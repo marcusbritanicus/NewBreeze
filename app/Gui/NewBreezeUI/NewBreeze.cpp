@@ -112,7 +112,7 @@ void NewBreeze::createGUI() {
 	setupInfoPanel();
 	FilterWidget = new NBFilterWidget( FolderView );
 
-	QWidget *Spacer = new QWidget();
+	QWidget *Spacer = new QWidget( this );
 	Spacer->setFixedHeight( 3 );
 	Spacer->setStyleSheet( "border-bottom: 1px solid darkgray;" );
 
@@ -919,7 +919,16 @@ void NewBreeze::quit() {
 
 	fclose( nblog );
 
-	qApp->quit();
+	// If there are background IO processes, bring them to front
+	if ( NBProcessManager::instance()->activeProcessCount() ) {
+		NBProcessManagerUI::instance()->show();
+		qApp->setQuitOnLastWindowClosed( true );
+
+		Settings->Special.ClosingDown = true;
+	}
+
+	else
+		qApp->quit();
 };
 
 void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
@@ -947,5 +956,5 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 	cEvent->accept();
 
 	mClosed = true;
-	qDebug( "Good Bye!" );
+	qDebug() << "Good Bye!";
 };

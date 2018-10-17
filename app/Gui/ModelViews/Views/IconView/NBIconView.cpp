@@ -1293,6 +1293,7 @@ void NBIconView::dropEvent( QDropEvent *dpEvent ) {
 			args << mtpt;
 
 			QMenu *menu = new QMenu( this );
+			menu->setAttribute( Qt::WA_DeleteOnClose );
 
 			QAction *mvAct = new QAction( QIcon::fromTheme( "go-jump" ), QString( "&Move Here" ), this );
 			mvAct->setData( QVariant( args ) );

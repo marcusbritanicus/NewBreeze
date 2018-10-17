@@ -241,6 +241,7 @@ void NBSidePanelItem::mousePressEvent( QMouseEvent *mpEvent ) {
 
 	if ( mpEvent->button() == Qt::RightButton ) {
 		QMenu menu;
+		menu.setAttribute( Qt::WA_DeleteOnClose );
 		if ( mType == Bookmark ) {
 			menu.addAction( QIcon( ":/icons/delete.png" ), "&Remove Bookmark", this, SLOT( removeBookmark() ) );
 			menu.exec( mapToGlobal( mpEvent->pos() ) );

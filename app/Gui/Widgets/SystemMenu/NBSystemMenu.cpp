@@ -191,6 +191,7 @@ NBSystemMenu::NBSystemMenu( QWidget *parent ) : QWidget( parent ) {
 	setMinimumHeight( 48 );
 
 	setWindowFlags( Qt::Popup );
+	setAttribute( Qt::WA_DeleteOnClose );
 
 	itemsLayout = new QVBoxLayout();
 	itemsLayout->setContentsMargins( QMargins( 1, 1, 1, 1 ) );

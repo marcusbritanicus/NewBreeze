@@ -89,7 +89,7 @@ void NBSidePanel::populateSidePanel() {
 	connect( trashLabel, SIGNAL( clicked() ), this, SIGNAL( showTrash() ) );
 	scrollLyt->addWidget( trashLabel );
 
-	QWidget *scrollBase = new QWidget();
+	QWidget *scrollBase = new QWidget( this );
 	scrollBase->setLayout( scrollLyt );
 
 	setWidget( scrollBase );

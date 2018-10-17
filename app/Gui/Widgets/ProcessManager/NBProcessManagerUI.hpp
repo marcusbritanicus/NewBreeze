@@ -39,6 +39,9 @@ class NBProcessManagerUI : public NBDialog {
 
 	private Q_SLOTS:
 		void addProcess( NBProcess::Progress*, NBAbstractProcess* );
+
+	protected :
+		void closeEvent( QCloseEvent *cEvent );
 };
 
 class NBProcessManagerMini : public QToolButton {

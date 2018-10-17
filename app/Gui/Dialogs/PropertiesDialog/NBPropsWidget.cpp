@@ -33,7 +33,7 @@ void NBPropertiesWidget::createGUI() {
 	iconLbl->setStyleSheet( "border: 1px solid gray; border-radius: 3px;" );
 	connect( iconLbl, SIGNAL( clicked() ), this, SLOT( changeDirIcon() ) );
 
-	QWidget *sep1 = new QWidget();
+	QWidget *sep1 = new QWidget( this );
 	sep1->setFixedHeight( 1 );
 	sep1->setStyleSheet( "background-color: gray;" );
 
@@ -41,7 +41,7 @@ void NBPropertiesWidget::createGUI() {
 	typeLbl = new QLabel();
 	contLbl = new QLabel();
 
-	QWidget *sep2 = new QWidget();
+	QWidget *sep2 = new QWidget( this );
 	sep2->setFixedHeight( 1 );
 	sep2->setStyleSheet( "background-color: gray;" );
 

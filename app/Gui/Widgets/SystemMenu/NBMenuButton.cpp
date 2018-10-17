@@ -19,10 +19,19 @@ NBMenuButton::NBMenuButton( QWidget *parent ) : QToolButton( parent ) {
 	/* Button Size */
 	setFixedSize( 28, 28 );
 
+	/* Click to show menu */
+	connect( this, SIGNAL( clicked() ), this, SLOT( showMenu() ) );
+
 	/* No Borders */
 	setStyleSheet( "QToolButton#menuBtn{ border: none; } QToolButton#menuBtn:hover { border: none; background-color: #A1DFFF; border-radius: 3px; }" );
+};
 
-	menu = new NBSystemMenu( this );
+void NBMenuButton::showMenu() {
+
+	setStyleSheet( "QToolButton#menuBtn{ background-color: darkgray; border: none; border-radius: 3px; }" );
+
+	NBSystemMenu *menu = new NBSystemMenu( this );
+	QPoint point = mapToGlobal( rect().bottomRight() - QPoint( menu->width(), 0 ) );
 
 	connect( menu, SIGNAL( newWindow() ), this, SIGNAL( newWindow() ) );
 	connect( menu, SIGNAL( zoomIn() ), this, SIGNAL( zoomIn() ) );
@@ -42,18 +51,7 @@ NBMenuButton::NBMenuButton( QWidget *parent ) : QToolButton( parent ) {
 	connect( menu, SIGNAL( closeWindow() ), this, SIGNAL( closeWindow() ) );
 	connect( menu, SIGNAL( quit() ), this, SIGNAL( quit() ) );
 
-	connect( this, SIGNAL( clicked() ), this, SLOT( showMenu() ) );
-};
-
-void NBMenuButton::showMenu() {
-
-	setStyleSheet( "QToolButton#menuBtn{ background-color: darkgray; border: none; border-radius: 3px; }" );
-
-	QPoint point = mapToGlobal( rect().bottomRight() - QPoint( menu->width(), 0 ) );
 	menu->exec( point );
 
 	setStyleSheet( "QToolButton#menuBtn{ border: none; } QToolButton#menuBtn:hover { border: none; background-color: #A1DFFF; border-radius: 3px; }" );
-};
-
-void NBMenuButton::updateViewMode( QString ) {
 };

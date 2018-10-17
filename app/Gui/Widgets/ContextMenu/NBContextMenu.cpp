@@ -519,6 +519,8 @@ NBAddToCatalogMenu::NBAddToCatalogMenu( QString wNode, QModelIndexList nodeList,
 	setTitle( "Add to Catalo&g" );
 	setIcon( QIcon( ":/icons/catalogs.png" ) );
 
+	setAttribute( Qt::WA_DeleteOnClose );
+
 	workNode = QString( wNode );
 	sNodes << nodeList;
 
@@ -665,6 +667,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 	QList<QModelIndex> selectedList = getSelection();
 	QMenu *menu = new QMenu( this );
+	menu->setAttribute( Qt::WA_DeleteOnClose );
 
 	switch( fsModel->modelDataType() ) {
 		case NBItemViewModel::SuperStart: {
@@ -811,6 +814,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 				// Create a new file/directory
 				QMenu *createNewMenu = new QMenu( "Create &New" );
+				createNewMenu->setAttribute( Qt::WA_DeleteOnClose );
 				createNewMenu->setIcon( QIcon::fromTheme( "archive-insert" ) );
 
 				createNewMenu->addAction( actNewDir );
@@ -824,6 +828,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 
 				// File/directory sorting
 				QMenu *sortMenu = new QMenu( "&Sort by" );
+				sortMenu->setAttribute( Qt::WA_DeleteOnClose );
 				sortMenu->setIcon( QIcon::fromTheme( "view-sort-ascending" ) );
 
 				sortMenu->addAction( sortByNameAct );
@@ -974,6 +979,7 @@ void NBFolderView::showActionsMenu( QPoint position ) {
 
 	QList<QModelIndex> selectedList = getSelection();
 	QMenu *menu = new QMenu( this );
+	menu->setAttribute( Qt::WA_DeleteOnClose );
 
 	switch( fsModel->modelDataType() ) {
 		case NBItemViewModel::SuperStart: {

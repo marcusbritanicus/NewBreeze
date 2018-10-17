@@ -36,7 +36,7 @@ NBSideBar::NBSideBar( QWidget *parent ) : QWidget( parent ) {
 	entryLyt->addStretch();
 	entryLyt->addWidget( trashEntry );
 
-	QWidget *base = new QWidget();
+	QWidget *base = new QWidget( this );
 	base->setObjectName( "base" );
 	base->setLayout( entryLyt );
 

@@ -1452,7 +1452,7 @@ void NBItemViewModel::handleNodeChanged( QString node ) {
 	if ( baseName( node ).startsWith( "." ) )
 		return;
 
-	if ( dirName( node ) == currentDir() ) {
+	if ( dirName( node ) == mRootPath ) {
 		qint64 idx = lastUpdatedNodes.indexOf( node );
 		if ( idx == -1 ) {
 			updateNode( baseName( node ) );
@@ -1463,7 +1463,7 @@ void NBItemViewModel::handleNodeChanged( QString node ) {
 		/* To handle copying or moving, or any continually changing node */
 		else {
 			/* Past update was more than ten second ago */
-			if ( lastUpdatedTimes.at( idx ).secsTo( QTime::currentTime() ) > 10000 ) {
+			if ( lastUpdatedTimes.at( idx ).secsTo( QTime::currentTime() ) > 1000 ) {
 				lastUpdatedTimes.replace( idx, QTime::currentTime() );
 				updateNode( baseName( node ) );
 			}

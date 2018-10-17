@@ -14,7 +14,7 @@ NBCategoryMenu::NBCategoryMenu( QString catName, QPixmap icon, QString wNode, QM
 	sNodes << nodeList;
 
 	QWidgetAction *title = new QWidgetAction( this );
-	QWidget *actBase = new QWidget();
+	QWidget *actBase = new QWidget( this );
 
 	QLabel *pix = new QLabel();
 	pix->setFixedSize( 20, 20 );

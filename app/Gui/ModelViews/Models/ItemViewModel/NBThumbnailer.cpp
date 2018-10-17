@@ -12,16 +12,21 @@ static QStringList odfformat = QStringList() << "odt" << "odp" << "ods" << "odg"
 
 void NBThumbnailer::createThumbnails( QStringList nodes ) {
 
-	if ( isRunning() )
-		terminate();
+	/* If its not running, clear previous data */
+	if ( not isRunning() ) {
+		images.clear();
+		documents.clear();
+		videos.clear();
+		pdfs.clear();
+		djvus.clear();
+		epubs.clear();
+		cbzs.clear();
+	}
 
-	images.clear();
-	documents.clear();
-	videos.clear();
-	pdfs.clear();
-	djvus.clear();
-	epubs.clear();
-	cbzs.clear();
+	/* If running, terminate; don't clear nodes */
+	else {
+		terminate();
+	}
 
 	Q_FOREACH( QString node, nodes ) {
 		QString mime = mimeDb.mimeTypeForFile( node ).name();

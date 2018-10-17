@@ -18,15 +18,11 @@ class NBMenuButton : public QToolButton {
 		NBMenuButton( QWidget *parent = NULL );
 		inline void updateAddress( QString url ) {
 
-			menu->updateAddress( url );
+			//menu->updateAddress( url );
 		};
-
-	private:
-		NBSystemMenu *menu;
 
 	public Q_SLOTS:
 		void showMenu();
-		void updateViewMode( QString );
 
 	Q_SIGNALS:
 		void newWindow();

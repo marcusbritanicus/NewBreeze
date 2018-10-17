@@ -64,6 +64,10 @@ void NBIOProcess::cancel() {
 
 	mProgress->state = NBProcess::Canceled;
 	mCanceled = true;
+
+	qDebug() << "Cancelled";
+
+	emit canceled( errorNodes );
 };
 
 void NBIOProcess::pause() {

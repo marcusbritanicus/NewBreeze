@@ -48,7 +48,7 @@ void NBTerminal::createGUI() {
 	lyt->addWidget( TabWidget );
 
 	/* Base Widget */
-	QWidget *widget = new QWidget();
+	QWidget *widget = new QWidget( this );
 	widget->setObjectName( "base" );
 	widget->setLayout( lyt );
 

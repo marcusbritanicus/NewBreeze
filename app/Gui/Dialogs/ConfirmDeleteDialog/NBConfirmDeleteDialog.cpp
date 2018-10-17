@@ -18,6 +18,8 @@ NBConfirmDeleteDialog::NBConfirmDeleteDialog( QString src, QStringList paths, bo
 
 void NBConfirmDeleteDialog::setupGUI( bool permanent ) {
 
+	setAttribute( Qt::WA_DeleteOnClose );
+
 	QVBoxLayout *dlgLyt = new QVBoxLayout();
 	QHBoxLayout *msgLyt = new QHBoxLayout();
 	QHBoxLayout *btnLyt = new QHBoxLayout();

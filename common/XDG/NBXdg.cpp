@@ -75,7 +75,7 @@ QString NBXdg::userDir( NBXdg::XdgUserDir pathEnum ) {
 				return NBXdg::home() + QString( "/.local/share/" );
 
 			else
-				return xdgDataHome;
+				return xdgDataHome + "/";
 		};
 
 		case NBXdg::XDG_CONFIG_HOME : {
@@ -84,7 +84,7 @@ QString NBXdg::userDir( NBXdg::XdgUserDir pathEnum ) {
 				return NBXdg::home() + QString( "/.config/" );
 
 			else
-				return xdgConfigHome;
+				return xdgConfigHome + "/";
 		};
 
 		case NBXdg::XDG_CACHE_HOME : {
@@ -93,7 +93,7 @@ QString NBXdg::userDir( NBXdg::XdgUserDir pathEnum ) {
 				return NBXdg::home() + QString( "/.cache/" );
 
 			else
-				return xdgCacheHome;
+				return xdgCacheHome + "/";
 		};
 	};
 
