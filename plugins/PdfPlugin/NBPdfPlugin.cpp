@@ -116,39 +116,84 @@ void NBPdfPlugin::setCaller( QWidget *caller ) {
 
 void NBPdfPlugin::makeThumbnail( QString path, QString hashPath ) {
 
+	if ( getSize( path ) == 0 ) {
+
+		qDebug() << "Empty document.";
+		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
+		return;
+	}
+
 	fz_context *mCtx;
 	fz_document *mFzDoc;
 
 	/* Create context */
 	mCtx = fz_new_context( NULL, NULL, FZ_STORE_UNLIMITED );
 	if ( not mCtx ) {
+
 		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
 		return;
 	}
 
 	/* Register the default file types to handle. */
-	fz_try( mCtx ) {
+	fz_try( mCtx ){
+
 		fz_register_document_handlers( mCtx );
+	}
 
+	fz_catch( mCtx ) {
+
+		fz_drop_context( mCtx );
+
+		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
+		return;
+	}
+
+	/* Open the document. */
+	fz_try( mCtx ) {
 		mFzDoc = fz_open_document( mCtx, path.toUtf8().constData() );
+	}
 
+	fz_catch( mCtx ) {
+
+		fz_drop_context( mCtx );
+
+		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
+		return;
+	}
+
+	/* Count the number of pages. */
+	fz_try( mCtx ) {
 		int mPages = fz_count_pages( mCtx, mFzDoc );
 		if ( not mPages ) {
+
 			fz_drop_document( mCtx, mFzDoc );
 			fz_drop_context( mCtx );
 
 			qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
 			return;
 		}
+	}
 
-		/* Check if the document is encrypted */
-		if ( fz_needs_password( mCtx, mFzDoc ) ) {
-			fz_drop_document( mCtx, mFzDoc );
-			fz_drop_context( mCtx );
+	fz_catch( mCtx ) {
 
-			qDebug() << "Encrypted document:" << baseName( path ) << "Using default icon.";
-			return;
-		}
+		fz_drop_document( mCtx, mFzDoc );
+		fz_drop_context( mCtx );
+
+		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
+		return;
+	}
+
+	/* Check if the document is encrypted */
+	if ( fz_needs_password( mCtx, mFzDoc ) ) {
+
+		fz_drop_document( mCtx, mFzDoc );
+		fz_drop_context( mCtx );
+
+		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
+		return;
+	}
+
+	fz_try( mCtx ) {
 
 		fz_page *page = fz_load_page( mCtx, mFzDoc, 0 );
 
@@ -220,14 +265,21 @@ void NBPdfPlugin::makeThumbnail( QString path, QString hashPath ) {
 
 		painter.end();
 
+		fz_drop_device( mCtx, dev );
+		fz_drop_pixmap( mCtx, image );
+		fz_drop_page( mCtx, page );
+
 		if ( not thumb.save( hashPath, "png", 0 ) )
 			qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
 	}
 
-	fz_catch( mCtx ) {
+	fz_always( mCtx ) {
+
 		fz_drop_document( mCtx, mFzDoc );
 		fz_drop_context( mCtx );
+	}
 
+	fz_catch( mCtx ) {
 		qDebug() << "Failed to create thumbnail:" << baseName( path ) << "Using default icon.";
 		return;
 	}
