@@ -832,23 +832,25 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 		if ( idx.isValid() ) {
 			/* Index already selected, start the drag */
 			if ( mSelectedIndexes.contains( idx ) or selectionModel()->isSelected( idx ) ) {
-				int iSize = myIconSize.width();
-				if ( iSize < 48 )
-					return;
-
-				QRect rect = viewportRectForRow( idx.row() );
-				int padding = ( int ) round( iSize * 0.1 );
-
-				QRectF oRect( rect );
-				oRect.adjust( padding / 2, padding / 2, -padding / 2, -padding / 2 );
-				oRect.setHeight( iSize + padding );
-
-				QRectF peekRect( oRect.x(), oRect.y(), oRect.width() / 2, oRect.height() / 2 );
-				QRectF openRect( oRect.x(), oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 );
-				QRectF menuRect( oRect.x() + oRect.width() / 2, oRect.y(), oRect.width() / 2, oRect.height() / 2 );
-				QRectF actsRect( oRect.x() + oRect.width() / 2, oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 );
 
 				if ( Settings->View.PaintOverlay ) {
+
+					int iSize = myIconSize.width();
+					if ( iSize < 48 )
+						return;
+
+					QRect rect = viewportRectForRow( idx.row() );
+					int padding = ( int ) round( iSize * 0.1 );
+
+					QRectF oRect( rect );
+					oRect.adjust( padding / 2, padding / 2, -padding / 2, -padding / 2 );
+					oRect.setHeight( iSize + padding );
+
+					QRectF peekRect( oRect.x(), oRect.y(), oRect.width() / 2, oRect.height() / 2 );
+					QRectF openRect( oRect.x(), oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 );
+					QRectF menuRect( oRect.x() + oRect.width() / 2, oRect.y(), oRect.width() / 2, oRect.height() / 2 );
+					QRectF actsRect( oRect.x() + oRect.width() / 2, oRect.y() + oRect.height() / 2, oRect.width() / 2, oRect.height() / 2 );
+
 					if ( peekRect.contains( mpEvent->pos() ) )
 						emit peek( idx );
 
@@ -876,8 +878,8 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 				mSelectedIndexes << idx;
 				mSelStartIdx = idx;
 
-				selectionModel()->setCurrentIndex( idx, QItemSelectionModel::NoUpdate );
-				mSelectedIndexes << idx;
+				selectionModel()->setCurrentIndex( idx, QItemSelectionModel::ClearAndSelect );
+				//mSelectedIndexes << idx;
 
 				viewport()->repaint();
 			}
