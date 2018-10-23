@@ -1,7 +1,8 @@
 NewBreeze v3.0.0 RC3
 
-NBArchive                                                                                                                             [ 1 of 1 ]
+NBArchive                                                                                                                             [ 1 of 2 ]
 	✓ Upgrade NBArchive class to enable extraction of a single member
+	✍ Upgrade NBArchive to support more algorithms
 
 NBDefaultPlugin::ArchiveExamine                                                                                                       [ 1 of 1 ]
 	✓ Enable extraction of selected/all members
@@ -71,6 +72,9 @@ NBPropertiesDialog                                                              
 NBPdfPlugin                                                                                                                           [ 2 of 2 ]
 	✓ Include MuPDF sources in the build tree
 	✓ Integrate all PDF capabilities into single plugin
+
+Cut-Paste across multiple windows                                                                                                     [ 0 of 1 ]
+	✍ State inconsistency
 
 Suggestions                                                                                                                           [ 12 of 12 ]
 

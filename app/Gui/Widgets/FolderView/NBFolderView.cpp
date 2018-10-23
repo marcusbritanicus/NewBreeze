@@ -6,6 +6,9 @@
 
 #include "NBFolderView.hpp"
 
+// Init moveItems
+bool NBFolderView::moveItems = false;
+
 NBFolderView::NBFolderView( QWidget *parent ) : QWidget( parent ) {
 
 	// ClipBoard
@@ -28,9 +31,6 @@ NBFolderView::NBFolderView( QWidget *parent ) : QWidget( parent ) {
 
 	// Minimum Width - 320px
 	setMinimumWidth( 320 );
-
-	// Init moveItems
-	moveItems = false;
 
 	// Create and setup actions like copy, move, rename, etc, etc
 	createAndSetupActions();

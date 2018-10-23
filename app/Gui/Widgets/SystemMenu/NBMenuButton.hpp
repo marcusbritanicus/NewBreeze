@@ -16,10 +16,6 @@ class NBMenuButton : public QToolButton {
 	public:
 		/* A button */
 		NBMenuButton( QWidget *parent = NULL );
-		inline void updateAddress( QString url ) {
-
-			//menu->updateAddress( url );
-		};
 
 	public Q_SLOTS:
 		void showMenu();

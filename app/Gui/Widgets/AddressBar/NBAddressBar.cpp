@@ -309,8 +309,6 @@ void NBAddressBar::setAddress( QString url ) {
 
 	addressWidget->addressEdit->setText( url );
 	addressWidget->crumbsBar->setCurrentDirectory( url );
-
-	menuBtn->updateAddress( url );
 };
 
 void NBAddressBar::focusAddressEdit() {

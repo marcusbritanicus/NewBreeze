@@ -60,7 +60,7 @@ class NBFolderView : public QWidget {
 		QModelIndex indexAt( QPoint );
 		void createAndSetupActions();
 
-		bool moveItems;
+		static bool moveItems;
 
 		QClipboard *clipBoard;
 		NBProcessManager *pMgr;
