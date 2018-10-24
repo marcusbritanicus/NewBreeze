@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "common.hpp"
+// LibArchive
+#include <archive.h>
+#include <archive_entry.h>
 
-#include "NBTools.hpp"
-#include "NBLibBZip2.hpp"
-#include "NBLibGZip.hpp"
-#include "NBLibLzma.hpp"
-#include "NBLibLzma2.hpp"
+// Qt Headers
+#include "common.hpp"
+#include <QtCore>
 
 typedef struct {
 
@@ -31,7 +31,8 @@ typedef struct {
 
 typedef QList<ArchiveEntry*> ArchiveEntries;
 
-class NBCOMMON_DLLSPEC NBArchive {
+class NBCOMMON_DLLSPEC NBArchive : public QThread {
+	Q_OBJECT
 
 	public:
 		NBArchive( QString );
@@ -42,22 +43,52 @@ class NBCOMMON_DLLSPEC NBArchive {
 		void setDestination( QString );
 
 		/* Create an archive */
-		void create();
+		void createArchive();
 
 		/* Extract the archive */
-		int extract();
+		void extractArchive();
 
 		/* Extract a named member of the archive */
-		int extractMember( QString );
+		void extractMember( QString );
 
-		ArchiveEntries list();
+		/* List the contetns of the archive */
+		ArchiveEntries listArchive();
+
+		/* Exit status */
+		int exitStatus();
 
 	private:
+		enum Mode {
+			None				= 0xF650E7,
+			Single,
+			Container
+		};
+
+		enum Job {
+			NoJob				= 0x25CEE9,
+			CreateArchive,
+			ExtractArchive,
+			ExtractMember,
+			ListArchive
+		};
+
 		/* Internal worker for copying data */
 		int copyData( struct archive *ar, struct archive *aw );
 
 		/* Set the archive filter format based on extensions */
-		int setFilterFormat( struct archive *ar, QMimeType mType );
+		void setFilterFormat( QMimeType mType );
+
+		/* Create an archive - Internal Worker */
+		bool doCreateArchive();
+
+		/* Extract the archive - Internal Worker */
+		bool doExtractArchive();
+
+		/* Extract a named member of the archive - Internal Worker */
+		bool doExtractMember( QString );
+
+		int mArchiveFilter;
+		int mArchiveFormat;
 
 		QString archiveName;
 
@@ -67,72 +98,24 @@ class NBCOMMON_DLLSPEC NBArchive {
 
 		ArchiveEntries memberList;
 		bool readDone;
-};
+		int archiveType;
 
-class NBArchiveThread : public QThread {
-	Q_OBJECT
+		/* What job are we doing? */
+		int mJob;
 
-	public:
-		inline NBArchiveThread( QString name, QChar mode, QString wDir, QString dest, QStringList files ) : QThread() {
+		/* Is the job running? */
+		bool isRunning;
 
-			mName = name;
-			mMode = mode;
+		/* Exit status */
+		int mExitStatus;
 
-			mDestDir = dest;
-			mWorkDir = wDir;
+		/* Member to be extracted */
+		QString extractedMember;
 
-			mFiles << files;
-		};
-
-	public Q_SLOTS:
-		inline void run() {
-
-			NBArchive *mArchive = new NBArchive( mName );
-
-			switch( mMode.toLatin1() ) {
-				// Compress
-				case 'c': {
-
-					mArchive->setWorkingDir( mWorkDir );
-					mArchive->updateInputFiles( mFiles );
-					mArchive->create();
-
-					return;
-				}
-
-				// Decompress
-				case 'd': {
-
-					mArchive->setDestination( mDestDir );
-					mArchive->extract();
-
-					return;
-				}
-
-				// Decompress Member
-				case 'm': {
-
-					mArchive->setDestination( mDestDir );
-					mArchive->extractMember( mFiles.at( 0 ) );
-
-					return;
-				}
-			}
-
-			emit complete( mName, mMode );
-		};
-
-	private:
-
-		QString mName;
-		QChar   mMode;
-
-		QString mWorkDir;
-		QString mDestDir;
-
-		QStringList mFiles;
+	protected:
+		void run();
 
 	Q_SIGNALS:
-		/* complete( ArchiveName, ArchiveMode (c|d) */
-		void complete( QString, QChar );
+		void jobComplete();
+		void jobFailed();
 };

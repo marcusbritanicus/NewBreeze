@@ -1314,10 +1314,14 @@ void NBFolderView::compress( QStringList archiveList ) {
 	msg->setText(  QString( "The creation of the archive, <tt>%1</tt>, is complete." ).arg( baseName( arcName ) ) );
 	msg->addButton( QMessageBox::Ok );
 
-	NBArchiveThread *thread = new NBArchiveThread( arcName, 'c', fsModel->currentDir(), QString(), archiveList );
-	connect( thread, SIGNAL( finished() ), msg, SLOT( show() ) );
+	NBArchive *arc = new NBArchive( arcName );
+	arc->updateInputFiles( archiveList );
+	arc->setWorkingDir( fsModel->currentDir() );
 
-	thread->start();
+	connect( arc, SIGNAL( jobComplete() ), msg, SLOT( show() ) );
+	connect( arc, SIGNAL( jobFailed() ), this, SLOT( archiveJob() ) );
+
+	arc->createArchive();
 };
 
 void NBFolderView::extract( QString archive ) {
@@ -1328,13 +1332,16 @@ void NBFolderView::extract( QString archive ) {
 	QMessageBox *msg = new QMessageBox( this );
 	msg->setIcon( QMessageBox::Information );
 	msg->setWindowTitle( "NewBreeze | NBArchive" );
-	msg->setText(  QString( "The extraction of the archive, <tt>%1</tt>, is complete." ).arg( baseName( archive ) ) );
+	msg->setText(  QString( "Extraction of the archive, <tt>%1</tt>, is complete." ).arg( baseName( archive ) ) );
 	msg->addButton( QMessageBox::Ok );
 
-	NBArchiveThread *thread = new NBArchiveThread( archive, 'd', QString(), dest, QStringList() );
-	connect( thread, SIGNAL( finished() ), msg, SLOT( show() ) );
+	NBArchive *arc = new NBArchive( archive );
+	arc->setDestination( dest );
 
-	thread->start();
+	connect( arc, SIGNAL( jobComplete() ), msg, SLOT( show() ) );
+	connect( arc, SIGNAL( jobFailed() ), this, SLOT( archiveJob() ) );
+
+	arc->extractArchive();
 };
 
 void NBFolderView::updateActions() {

@@ -21,7 +21,7 @@ Description: Qt based lightweight and fast file manager
 
 Package: newbreeze-common
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, lzop
 Description: Qt based lightweight and fast file manager
  Built on top of the Powerful Qt4/Qt5 GUI Toolkit, NewBreeze is sleek,
  stylish and fast with some amazing features.

@@ -77,6 +77,7 @@ void NBDefaultsWidget::refreshDefaults() {
 
 		QListWidgetItem *item = new QListWidgetItem( appIcon, appName, appList );
 		item->setFlags( Qt::ItemIsEnabled );
+		item->setData( Qt::UserRole + 1, app.desktopFileName() );
 		appList->addItem( item );
 	}
 
@@ -93,6 +94,7 @@ void NBDefaultsWidget::refreshDefaults() {
 		defaultCB->addItem( appIcon, appName );
 
 		QListWidgetItem *item = new QListWidgetItem( appIcon, appName, appList );
+		item->setFlags( Qt::ItemIsEnabled );
 		item->setData( Qt::UserRole + 1, appFile.desktopFileName() );
 		appList->addItem( item );
 	}
@@ -151,7 +153,7 @@ void NBDefaultsWidget::removeApplication() {
 void NBDefaultsWidget::makeDefault( int idx ) {
 
 	QListWidgetItem *itm = appList->item( idx );
-	NBAppEngine::setApplicationAsDefault( itm->data( Qt::UserRole + 9 ).toString(), mimeType.name() );
+	NBAppEngine::setApplicationAsDefault( itm->data( Qt::UserRole + 1 ).toString(), mimeType.name() );
 };
 
 NBAppSelector::NBAppSelector( QWidget *parent ) : NBDialog( parent ) {

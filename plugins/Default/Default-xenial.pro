@@ -5,8 +5,8 @@ TARGET = DefaultPeekPlugins4
 INCLUDEPATH += ../../common/ ../../common/include
 DEPENDPATH += ../../common/ ../../common/include
 
-DEPENDPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle WebWatch
-INCLUDEPATH += . ArchiveExamine DjvuDisplay ImagePeek OdfOgle WebWatch
+DEPENDPATH += . DjvuDisplay ImagePeek OdfOgle WebWatch
+INCLUDEPATH += . DjvuDisplay ImagePeek OdfOgle WebWatch
 
 isEqual( QT_MAJOR_VERSION, 4 ) {
 	LIBS += -L../../common/ -lnewbreeze-common4
@@ -86,11 +86,6 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 # ========= #
 #  SOURCES  #
 # ========= #
-
-## ArchiveExamine
-## ==============
-HEADERS += ArchiveExamine/NBArchiveExamine.hpp ArchiveExamine/NBArchiveTreeModel.hpp ArchiveExamine/NBTreeBranch.hpp
-SOURCES += ArchiveExamine/NBArchiveExamine.cpp ArchiveExamine/NBArchiveTreeModel.cpp ArchiveExamine/NBTreeBranch.cpp
 
 ## DjvuDisplay
 ## ===========

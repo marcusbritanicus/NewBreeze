@@ -5,6 +5,7 @@
 */
 
 #include "NBPreviewWidget.hpp"
+#include "NBArchiveTreeModel.hpp"
 
 NBPreviewWidget::NBPreviewWidget( QStringList paths, QWidget *parent ) : QWidget( parent ) {
 
@@ -27,6 +28,12 @@ NBPreviewWidget::NBPreviewWidget( QStringList paths, QWidget *parent ) : QWidget
 
 	QMimeType mType = mimeDb.mimeTypeForFile( paths.at( 0 ) );
 	QVBoxLayout *lyt = new QVBoxLayout();
+
+	QStringList mimeList;
+
+	mimeList << "application/x-7z-compressed" << "application/x-ar" << "application/x-cpio" << "application/x-rar" << "application/x-tar";
+	mimeList << "application/x-compressed-tar" << "application/x-bzip-compressed-tar" << "application/x-lzma-compressed-tar" << "application/x-xz-compressed-tar";
+	mimeList << "application/zip" << "application/x-cd-image";
 
 	/* GIF/MNG */
 	if ( mType.name().contains( "gif" ) or mType.name().contains( "mng" ) ) {
@@ -80,6 +87,23 @@ NBPreviewWidget::NBPreviewWidget( QStringList paths, QWidget *parent ) : QWidget
 		QFileSystemModel *fsm = new QFileSystemModel( view );
 		view->setModel( fsm );
 		view->setRootIndex( fsm->setRootPath( paths.at( 0 ) ) );
+
+		QLabel *lbl = new QLabel( "Contents of <b>" + baseName( paths.at( 0 ) ) + "</b>:" );
+		lbl->setWordWrap( true );
+
+		lyt->addWidget( lbl );
+		lyt->addWidget( view );
+	}
+
+	/* Archvie */
+	else if ( mimeList.contains( mType.name() ) ) {
+		QTreeView *view = new QTreeView( this );
+		view->setObjectName( tr( "previewBase" ) );
+		view->setSelectionBehavior( QAbstractItemView::SelectRows );
+		view->setSelectionMode( QAbstractItemView::ExtendedSelection );
+
+		NBArchiveTreeModel *fsm = new NBArchiveTreeModel( paths.at( 0 ) );
+		view->setModel( fsm );
 
 		QLabel *lbl = new QLabel( "Contents of <b>" + baseName( paths.at( 0 ) ) + "</b>:" );
 		lbl->setWordWrap( true );

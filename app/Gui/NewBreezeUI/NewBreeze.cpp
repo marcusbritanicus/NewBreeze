@@ -309,6 +309,11 @@ void NewBreeze::createAndSetupActions() {
 	showSettingsAct->setShortcuts( Settings->Shortcuts.Settings );
 	connect( showSettingsAct, SIGNAL( triggered() ), this, SLOT( showSettingsDialog() ) );
 
+	// Show settings
+	QAction *fileBugReportAct = new QAction( this );
+	fileBugReportAct->setShortcuts( QList<QKeySequence>() << tr( "Ctrl+Shift+B" ) );
+	connect( fileBugReportAct, SIGNAL( triggered() ), this, SLOT( fileBugReport() ) );
+
 	// Focus AddressBar
 	QAction *focusAddressBarAct = new QAction( this );
 	focusAddressBarAct->setShortcuts( Settings->Shortcuts.FocusAddressBar );
@@ -363,6 +368,7 @@ void NewBreeze::createAndSetupActions() {
 	addAction( newWindowAct );
 	addAction( termWidgetAct );
 	addAction( toggleSidePanel );
+	addAction( fileBugReportAct );
 	addAction( toggleInfoPanelAct );
 	addAction( viewModeAct );
 	addAction( showCatalogsAct );
@@ -546,6 +552,13 @@ void NewBreeze::showCustomActionsDialog() {
 
 	NBCustomActions *customActions = new NBCustomActions();
 	customActions->exec();
+};
+
+void NewBreeze::fileBugReport() {
+
+	qDebug() << "Showing NewBreeze BugReporter";
+	NBBugReporter *bugreport = new NBBugReporter();
+	bugreport->exec();
 };
 
 void NewBreeze::newWindow( QString location ) {

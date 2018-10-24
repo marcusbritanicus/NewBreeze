@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Global.hpp"
+#include "NBArchive.hpp"
 #include "NBArchiveDialog.hpp"
 #include "NBConfirmDeleteDialog.hpp"
 #include "NBContextMenu.hpp"
@@ -126,6 +127,19 @@ class NBFolderView : public QWidget {
 		void updateActions();
 		void addBookMark();
 		void addToSuperStart();
+
+		void archiveJob() {
+
+			QMessageBox::information(
+				this,
+				"NewBreeze | NBArchive",
+				QString(
+					"NewBreeze encountered some issue while working with the archive. "
+					"If you are consistently facing issues with creation and extraction of archives, "
+					"please open a bug report by going to <b>NewBreeze Menu</b> and selecting <b>Report Bug</b>"
+				)
+			);
+		};
 
 	Q_SIGNALS :
 		void newWindow( QString );

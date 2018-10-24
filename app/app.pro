@@ -19,7 +19,7 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 	LIBS +=  -L../common/ -lnewbreeze-common
 }
 
-LIBS += -larchive -lz
+LIBS += -larchive -lz -llz
 
 if ( $$USE_MEDIAINFO ) {
 	DEFINES += UNICODE
@@ -35,23 +35,23 @@ DEPENDPATH += ../common/ ../common/include
 INCLUDEPATH += . Core/ArgParser Core/AutoMount Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager
 INCLUDEPATH +=  Gui/Dialogs Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BookmarkEditor Gui/Dialogs/BugReporter Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
 INCLUDEPATH += Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
-INCLUDEPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
-INCLUDEPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTypeModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
-INCLUDEPATH += Gui/ModelViews/Views/DirectoryView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/NewBreezeUI
-INCLUDEPATH += Gui/NewBreezeUI/Application Gui/Others Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar
-INCLUDEPATH += Gui/Widgets/BreadCrumbsBar Gui/Widgets/build Gui/Widgets/build/moc Gui/Widgets/build/objs Gui/Widgets/Buttons Gui/Widgets/ContextMenu
+INCLUDEPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/ArchiveModel
+INCLUDEPATH +=  Gui/ModelViews/Models/DirTreeModel Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTypeModel Gui/ModelViews/Models/TrashModel
+INCLUDEPATH += Gui/ModelViews/Views Gui/ModelViews/Views/DirectoryView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView
+INCLUDEPATH += Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets
+INCLUDEPATH += Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/build Gui/Widgets/build/moc Gui/Widgets/build/objs Gui/Widgets/Buttons Gui/Widgets/ContextMenu
 INCLUDEPATH += Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/MediaInfo
 INCLUDEPATH += Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/SystemMenu Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
 INCLUDEPATH += Gui/Widgets/TrashManager
 
 DEPENDPATH += . Core/ArgParser Core/AutoMount Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager
-DEPENDPATH += Gui/Dialogs Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BookmarkEditor Gui/Dialogs/BugReporter Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
+DEPENDPATH +=  Gui/Dialogs Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BookmarkEditor Gui/Dialogs/BugReporter Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
 DEPENDPATH += Gui/Dialogs/FileDialog Gui/Dialogs/IOErrorsDialog Gui/Dialogs/MessageDialog Gui/Dialogs/NewNodeDialog Gui/Dialogs/PropertiesDialog Gui/Dialogs/RenameDialog
-DEPENDPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/DirTreeModel
-DEPENDPATH += Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTypeModel Gui/ModelViews/Models/TrashModel Gui/ModelViews/Views
-DEPENDPATH += Gui/ModelViews/Views/DirectoryView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView Gui/NewBreezeUI
-DEPENDPATH += Gui/NewBreezeUI/Application Gui/Others Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets Gui/Widgets/AddressBar
-DEPENDPATH += Gui/Widgets/BreadCrumbsBar Gui/Widgets/build Gui/Widgets/build/moc Gui/Widgets/build/objs Gui/Widgets/Buttons Gui/Widgets/ContextMenu
+DEPENDPATH += Gui/Dialogs/RunCmdDialog Gui/Dialogs/SettingsManager Gui/Dialogs/StartupWizard Gui/ModelViews Gui/ModelViews/Models Gui/ModelViews/Models/ArchiveModel
+DEPENDPATH +=  Gui/ModelViews/Models/DirTreeModel Gui/ModelViews/Models/ItemViewModel Gui/ModelViews/Models/MimeTypeModel Gui/ModelViews/Models/TrashModel
+DEPENDPATH += Gui/ModelViews/Views Gui/ModelViews/Views/DirectoryView Gui/ModelViews/Views/IconView Gui/ModelViews/Views/OpenWithView Gui/ModelViews/Views/TrashView
+DEPENDPATH += Gui/NewBreezeUI Gui/NewBreezeUI/Application Gui/Others Gui/Others/GuiFunctions Gui/Others/PluginManager Gui/Others/Settings Gui/Widgets
+DEPENDPATH += Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/build Gui/Widgets/build/moc Gui/Widgets/build/objs Gui/Widgets/Buttons Gui/Widgets/ContextMenu
 DEPENDPATH += Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/InfoPanel Gui/Widgets/MediaInfo
 DEPENDPATH += Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/SystemMenu Gui/Widgets/Terminal Gui/Widgets/Terminal/lib
 DEPENDPATH += Gui/Widgets/TrashManager
@@ -101,6 +101,8 @@ HEADERS += Gui/Dialogs/SettingsManager/NBSTerminalWidget.hpp
 HEADERS += Gui/Dialogs/SettingsManager/qkeysequencewidget.h
 HEADERS += Gui/Dialogs/SettingsManager/qkeysequencewidget_p.h
 HEADERS += Gui/Dialogs/StartupWizard/NBStartupWizard.hpp
+HEADERS += Gui/ModelViews/Models/ArchiveModel/NBArchiveTreeModel.hpp
+HEADERS += Gui/ModelViews/Models/ArchiveModel/NBTreeBranch.hpp
 HEADERS += Gui/ModelViews/Models/ItemViewModel/NBFileInfoGatherer.hpp
 HEADERS += Gui/ModelViews/Models/ItemViewModel/NBItemViewModel.hpp
 HEADERS += Gui/ModelViews/Models/ItemViewModel/NBItemViewNode.hpp
@@ -231,6 +233,8 @@ SOURCES += Gui/Dialogs/SettingsManager/NBSStyleWidget.cpp
 SOURCES += Gui/Dialogs/SettingsManager/NBSTerminalWidget.cpp
 SOURCES += Gui/Dialogs/SettingsManager/qkeysequencewidget.cpp
 SOURCES += Gui/Dialogs/StartupWizard/NBStartupWizard.cpp
+SOURCES += Gui/ModelViews/Models/ArchiveModel/NBArchiveTreeModel.cpp
+SOURCES += Gui/ModelViews/Models/ArchiveModel/NBTreeBranch.cpp
 SOURCES += Gui/ModelViews/Models/ItemViewModel/NBFileInfoGatherer.cpp
 SOURCES += Gui/ModelViews/Models/ItemViewModel/NBItemViewModel.cpp
 SOURCES += Gui/ModelViews/Models/ItemViewModel/NBItemViewNode.cpp

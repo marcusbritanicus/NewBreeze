@@ -11,6 +11,7 @@
 #include "AboutNB.hpp"
 #include "NBAddressBar.hpp"
 #include "NBAppEditorDialog.hpp"
+#include "NBBugReporter.hpp"
 #include "NBCustomActions.hpp"
 #include "NBFilterWidget.hpp"
 #include "NBFolderView.hpp"
@@ -78,6 +79,8 @@ class NewBreeze : public QMainWindow {
 		void showInfoDlg();
 		void showSettingsDialog();
 		void showCustomActionsDialog();
+
+		void fileBugReport();
 
 		void newWindow( QString path = QString() );
 

@@ -165,7 +165,8 @@ void NBThumbnailer::run() {
 			/* Open as archive */
 			NBArchive *odf = new NBArchive( file );
 			odf->setDestination( "/tmp/NewBreeze_odf/" );
-			if ( not odf->extractMember( "Thumbnails/thumbnail.png" ) ) {
+			odf->extractMember( "Thumbnails/thumbnail.png" );
+			if ( not odf->exitStatus() ) {
 				QFile::copy( "/tmp/NewBreeze_odf/Thumbnails/thumbnail.png", hashPath );
 				system( "rm -rf /tmp/NewBreeze_odf/*" );
 				emit updateNode( file );

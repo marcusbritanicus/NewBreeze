@@ -14,29 +14,32 @@ DEFINES += COMMON
 # Headers
 # =======
 HEADERS += include/common.hpp
-HEADERS += NBPluginInterface.hpp
 HEADERS += include/NBAppEngine.hpp
 HEADERS += include/NBAppFile.hpp
 HEADERS += include/NBArchive.hpp
+HEADERS += include/NBBZip2.hpp
 HEADERS += include/NBDeviceInfo.hpp
-HEADERS += include/NBLibBZip2.hpp
-HEADERS += include/NBLibGZip.hpp
-HEADERS += include/NBLibLzma.hpp
-HEADERS += include/NBLibLzma2.hpp
+HEADERS += include/NBGZip.hpp
+HEADERS += include/NBLZip.hpp
+HEADERS += include/NBLzma2.hpp
+HEADERS += include/NBLzma.hpp
 HEADERS += include/NBSystemInfo.hpp
 HEADERS += include/NBTools.hpp
 HEADERS += include/NBXdg.hpp
+HEADERS += include/newbreeze.hpp
 HEADERS += include/SimpleCrypt.hpp
 
 # Sources
 # =======
 SOURCES += AppFile/NBAppEngine.cpp
 SOURCES += AppFile/NBAppFile.cpp
+SOURCES += Archive/lz4io.c
 SOURCES += Archive/NBArchive.cpp
-SOURCES += Archive/NBLibBZip2.cpp
-SOURCES += Archive/NBLibGZip.cpp
-SOURCES += Archive/NBLibLzma.cpp
-SOURCES += Archive/NBLibLzma2.cpp
+SOURCES += Archive/NBBZip2.cpp
+SOURCES += Archive/NBGZip.cpp
+SOURCES += Archive/NBLZip.cpp
+SOURCES += Archive/NBLzma2.cpp
+SOURCES += Archive/NBLzma.cpp
 SOURCES += DeviceInfo/NBDeviceInfo.cpp
 SOURCES += DeviceInfo/NBDeviceInfoUnix.cpp
 SOURCES += SimpleCrypt/SimpleCrypt.cpp

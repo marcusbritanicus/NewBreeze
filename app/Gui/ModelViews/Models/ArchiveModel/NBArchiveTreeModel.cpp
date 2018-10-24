@@ -285,12 +285,18 @@ QFileInfo NBArchiveTreeModel::nodeInfo( const QModelIndex idx ) const {
 
 bool NBArchiveTreeModel::extract( QString member ) const {
 
-	return not archive->extractMember( member );
+	archive->extractMember( member );
+	archive->wait();
+
+	return ( archive->exitStatus() ? false : true );
 };
 
 bool NBArchiveTreeModel::extractAll() const {
 
-	return not archive->extract();
+	archive->extractArchive();
+	archive->wait();
+
+	return ( archive->exitStatus() ? false : true );
 };
 
 void NBArchiveTreeModel::growTree() {
@@ -311,7 +317,7 @@ void NBArchiveTreeModel::growTree() {
 	if ( ( r = archive_read_open_filename( a, archiveName.toLatin1().data(), 10240 ) ) )
 		return;
 
-	Q_FOREACH( ArchiveEntry *ae, archive->list() ) {
+	Q_FOREACH( ArchiveEntry *ae, archive->listArchive() ) {
 		QString name = QString( ae->name );
 		int type = ae->type;
 

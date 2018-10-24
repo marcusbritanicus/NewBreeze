@@ -59,13 +59,13 @@ NBSidePanel (Renamed from NBSideBar)                                            
 	✓ Improvements to NBSidePanel class
 
 NBSideBar                                                                                                                             [ 1 of 1 ]
-	◐ Rewriting of the whole class
-	  • Drag and Drop is yet to be implemented
+	✓ Rewriting of the whole class
+	  • Drag and Drop implementation complete
 
 NBPropertiesDialog                                                                                                                    [ 3 of 3 ]
-	◐ Redesign of UI: Usable state, following remain
+	✓ Redesign of UI: Usable state, following remain
 	   ✓ Recursive application of properties
-	  ✍ Accidental Delete Protection
+	   ✓ Accidental Delete Protection
 	✓ Quering of Defaults takes too long
 	✓ NBSizeRunner slows down the showing of the UI
 
@@ -73,8 +73,8 @@ NBPdfPlugin                                                                     
 	✓ Include MuPDF sources in the build tree
 	✓ Integrate all PDF capabilities into single plugin
 
-Cut-Paste across multiple windows                                                                                                     [ 0 of 1 ]
-	✍ State inconsistency
+Cut-Paste across multiple windows                                                                                                     [ 1 of 1 ]
+	✓ State inconsistency
 
 Suggestions                                                                                                                           [ 12 of 12 ]
 
