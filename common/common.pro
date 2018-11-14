@@ -33,7 +33,7 @@ HEADERS += include/SimpleCrypt.hpp
 # =======
 SOURCES += AppFile/NBAppEngine.cpp
 SOURCES += AppFile/NBAppFile.cpp
-SOURCES += Archive/lz4io.c
+SOURCES += Archive/lz4dec.c
 SOURCES += Archive/NBArchive.cpp
 SOURCES += Archive/NBBZip2.cpp
 SOURCES += Archive/NBGZip.cpp

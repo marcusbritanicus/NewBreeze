@@ -14,7 +14,7 @@
 #include "NBTools.hpp"
 
 extern "C" {
-	#include "lz4io.h"
+	#include "lz4dec.h"
 }
 
 static QMimeDatabase mimeDb;
@@ -406,7 +406,8 @@ bool NBArchive::doExtractArchive() {
 				dest = dirName( dest )  + QString( "(%1) - " ).arg( i ) + baseName( dest );
 			}
 
-			return LZ4IO_decompressFilename( archiveName.toLocal8Bit().constData(), dest.toLocal8Bit().constData() ) ? false : true;
+			unlz4( archiveName.toLocal8Bit().constData(), dest.toLocal8Bit().constData(), NULL );
+			return true;
 		}
 
 		else if ( mType == mimeDb.mimeTypeForFile( "file.gz" ) ) {
