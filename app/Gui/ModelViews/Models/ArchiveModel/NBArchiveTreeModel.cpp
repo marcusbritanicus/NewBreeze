@@ -60,8 +60,6 @@ Qt::ItemFlags NBArchiveTreeModel::flags( const QModelIndex &idx ) const {
 	if ( not idx.isValid() )
 		return Qt::NoItemFlags;
 
-	NBTreeBranch *node = static_cast<NBTreeBranch*>( idx.internalPointer() );
-
 	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 };
 
@@ -304,7 +302,6 @@ void NBArchiveTreeModel::growTree() {
 	beginResetModel();
 
 	struct archive *a;
-	struct archive_entry *entry;
 	int r;
 
 	// Source Archive

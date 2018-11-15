@@ -360,32 +360,28 @@ bool isImage( QString path ) {
 
 bool isArchive( QString path ) {
 
-	return isArchiveAlt( getMimeType( path ) );
+	QStringList archiveMimes;
+	archiveMimes << "application/vnd.ms-cab-compressed" << "application/x-7z-compressed" << "application/x-7z-compressed-tar" << "application/x-ace";
+	archiveMimes << "application/x-alz" << "application/x-ar" << "application/x-arj" << "application/x-bzip" << "application/x-bzip2";
+	archiveMimes << "application/x-bzip-compressed-tar" << "application/x-cbr" << "application/x-cbz" << "application/x-cd-image";
+	archiveMimes << "application/x-compress" << "application/x-compressed-tar" << "application/x-cpio" << "application/x-deb" << "application/x-ear";
+	archiveMimes << "application/x-gzip" << "application/x-java-archive" << "application/x-lha" << "application/x-lzip";
+	archiveMimes << "application/x-lzip-compressed-tar" << "application/x-lzma" << "application/x-lzma-compressed-tar" << "application/x-lzop";
+	archiveMimes << "application/x-lzop-compressed-tar" << "application/x-ms-dos-executable" << "application/x-rar" << "application/x-rpm";
+	archiveMimes << "application/x-rzip" << "application/x-stuffit" << "application/x-tar" << "application/x-tarz" << "application/x-war";
+	archiveMimes << "application/x-xz" << "application/x-xz-compressed-tar" << "application/x-zoo" << "application/zip";
+
+	return archiveMimes.contains( getMimeType( path ) );
 }
 
-bool isArchiveAlt( QString mimeType ) {
+bool isContainerArchive( QString mimeType ) {
 
 	QStringList archiveMimes;
-	archiveMimes << "application/x-7z-compressed" << "application/x-ace" << "application/x-alz"
-				<< "application/x-ar" << "application/x-arj" << "application/x-stuffit"
-				<< "application/x-bzip" << "application/x-bzip2" << "application/vnd.ms-cab-compressed"
-				<< "application/x-cbr" << "application/x-cbz" << "application/x-cpio"
-				<< "application/x-deb" << "application/x-ear" << "application/x-ms-dos-executable"
-				<< "application/x-gzip" << "application/x-cd-image" << "application/x-java-archive"
-				<< "application/x-lha" << "application/x-lha" << "application/x-lzip"
-				<< "application/x-lzma" << "application/x-lzop" << "application/x-rar"
-				<< "application/x-rpm" << "application/x-rzip" << "application/x-stuffit"
-				<< "application/x-tar" << "application/x-compressed-tar"
-				 << "application/x-bzip-compressed-tar" << "application/x-lzip-compressed-tar"
-				<< "application/x-lzma-compressed-tar" << "application/x-lzop-compressed-tar"
-				<< "application/x-7z-compressed-tar" << "application/x-xz-compressed-tar"
-				<< "application/x-tarz" << "application/x-tarz" << "application/x-compressed-tar"
-				<< "application/x-xz-compressed-tar" << "application/x-lzip-compressed-tar"
-				<< "application/x-lzma-compressed-tar" << "application/x-lzop-compressed-tar"
-				<< "application/x-war" << "application/x-xz" << "application/x-gzip"
-				<< "application/x-compress" << "application/zip" << "application/x-zoo";
+	archiveMimes << "application/x-bzip" << "application/x-bzip2" << "application/x-cbr" << "application/x-cbz" << "application/x-compress";
+	archiveMimes << "application/x-gzip" << "application/x-lha" << "application/x-lzip" << "application/x-lzma" << "application/x-lzop";
+	archiveMimes << "application/x-ms-dos-executable" << "application/x-rzip" << "application/x-xz";
 
-	return archiveMimes.contains( mimeType );
+	return not archiveMimes.contains( mimeType );
 };
 
 QString formatSize( qint64 num ) {

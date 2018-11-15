@@ -25,7 +25,9 @@
 	*
 */
 
-// Local Headers
+#ifdef HAVE_LZLIB
+
+// System headers
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -38,6 +40,8 @@
 #include <unistd.h>
 #include <utime.h>
 #include <sys/stat.h>
+
+// Local Headers
 #include "NBLZip.hpp"
 
 #ifndef O_BINARY
@@ -233,3 +237,4 @@ int NBLZip::writeblock( const int fd, const uint8_t * const buf, const int size 
 	}
 	return sz;
 };
+#endif

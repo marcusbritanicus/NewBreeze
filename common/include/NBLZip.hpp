@@ -8,6 +8,8 @@
 
 #include <QtCore>
 #include <fstream>
+
+#ifdef HAVE_LZLIB
 #include <lzlib.h>
 
 class NBLZip {
@@ -23,3 +25,4 @@ class NBLZip {
 		int readblock( const int fd, uint8_t * const buf, const int size );
 		int writeblock( const int fd, const uint8_t * const buf, const int size );
 };
+#endif

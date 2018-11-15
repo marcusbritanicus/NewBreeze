@@ -58,7 +58,7 @@ bool isText( QString path );
 bool isExec( QString path );
 bool isImage( QString path );
 bool isArchive( QString path );
-bool isArchiveAlt( QString mimeType );
+bool isContainerArchive( QString mimeType );
 
 /* Convert the numberic size to human readable string */
 QString formatSize( qint64 );

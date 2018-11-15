@@ -1336,7 +1336,8 @@ void NBFolderView::extract( QString archive ) {
 	msg->addButton( QMessageBox::Ok );
 
 	NBArchive *arc = new NBArchive( archive );
-	arc->setDestination( dest );
+	if ( isContainerArchive( archive ) )
+		arc->setDestination( dest );
 
 	connect( arc, SIGNAL( jobComplete() ), msg, SLOT( show() ) );
 	connect( arc, SIGNAL( jobFailed() ), this, SLOT( archiveJob() ) );

@@ -8,8 +8,12 @@ QT -= gui
 INCLUDEPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
 DEPENDPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
 
-LIBS += -larchive -lbz2 -llzma -lz
+LIBS += -larchive -lbz2 -llzma
 DEFINES += COMMON
+
+if ( $$HAVE_LZLIB ) {
+	LIBS +=  -lz
+}
 
 # Headers
 # =======

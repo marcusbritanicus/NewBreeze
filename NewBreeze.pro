@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 
-SUBDIRS += app common plugins
+SUBDIRS += common app plugins
+CONFIG += ordered
 
 app.depends = common
-plugins.depends common
+plugins.depends = common

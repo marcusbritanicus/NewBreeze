@@ -139,6 +139,9 @@ void NBArchive::setDestination( QString path ) {
 		*
 	*/
 
+	/* This is a very bad idea. There are archive types which we cannot handle: ex .zoo .alz .egg etc */
+	/* Even for these archives, we end up making destination folders */
+
 	dest = QString( path );
 	if ( not QFileInfo( QDir( dest ).absolutePath() ).exists() )
 		mkpath( path, 0755 );
@@ -273,7 +276,7 @@ bool NBArchive::doExtractArchive() {
 
 		if ( mType == mimeDb.mimeTypeForFile( "file.lz" ) ) {
 			/* LZip Extractor */
-
+			#ifdef HAVE_LZLIB
 			dest = archiveName;
 			dest.chop( 3 );
 
@@ -289,6 +292,10 @@ bool NBArchive::doExtractArchive() {
 
 			NBLZip *lzExt = new NBLZip( archiveName, dest );
 			return lzExt->extract();
+			#else
+				qDebug() << "LZip extractor not found";
+				return false;
+			#endif
 		}
 
 		else if ( mType == mimeDb.mimeTypeForFile( "file.uu" ) ) {
