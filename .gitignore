@@ -1,3 +1,5 @@
 lib*.so*
 .qmake.stash
 Makefile
+newbreeze3
+.directory

@@ -2,7 +2,7 @@ NewBreeze v3.0.0 RC3
 
 NBArchive                                                                                                                             [ 1 of 2 ]
 	✓ Upgrade NBArchive class to enable extraction of a single member
-	✍ Upgrade NBArchive to support more algorithms
+	✓ Upgrade NBArchive to support more algorithms
 
 NBDefaultPlugin::ArchiveExamine                                                                                                       [ 1 of 1 ]
 	✓ Enable extraction of selected/all members

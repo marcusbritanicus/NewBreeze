@@ -13,7 +13,8 @@ NewBreeze v3.0.0 RC3
 ✗ There should be a limit to the items shown in FolderFlash.
 	=> Takes almost the same amount of calculation to count the number of nodes.
 	=> FolderFlash now uses the default QListView/QFileSystemModel to show folder contents
-✗ Stop showing number of items/size below folders/files => This does not affect the performance.
+✗ Stop showing number of items/size below folders/files
+	=> This does not affect the performance.
 ✓ After copy, delete, empty trash, archive IO give a completion notification.
 ✓ Show the available list of plugins, and an option to enable and disable them.
 ✓ Auto mounting of devices through DBus/UDisks2 interface.
