@@ -21,7 +21,7 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 
 LIBS += -larchive -lz -llz
 
-if ( $$USE_MEDIAINFO ) {
+contains ( DEFINES, HAVE_LZLIB ) {
 	DEFINES += UNICODE
 	INCLUDEPATH += $$system(pkg-config --cflags-only-I libmediainfo libzen)
 	LIBS += $$system(pkg-config --libs libmediainfo libzen)
