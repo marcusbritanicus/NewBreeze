@@ -19,12 +19,16 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 	LIBS +=  -L../common/ -lnewbreeze-common
 }
 
-LIBS += -larchive -lz -llz
+LIBS += -larchive -lbz2 -llzma -lz
 
-contains ( DEFINES, HAVE_LZLIB ) {
+contains ( DEFINES, USE_MEDIAINFO ) {
 	DEFINES += UNICODE
 	INCLUDEPATH += $$system(pkg-config --cflags-only-I libmediainfo libzen)
 	LIBS += $$system(pkg-config --libs libmediainfo libzen)
+}
+
+contains ( DEFINES, HAVE_LZLIB ) {
+	LIBS += -llz
 }
 
 # Common Sources

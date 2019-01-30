@@ -41,6 +41,7 @@ class NBCOMMON_DLLSPEC NBArchive : public QThread {
 		void updateInputFiles( QStringList );
 		void setWorkingDir( QString );
 		void setDestination( QString );
+		void waitForFinished();
 
 		/* Create an archive */
 		void createArchive();

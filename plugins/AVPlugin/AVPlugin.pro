@@ -46,17 +46,17 @@ isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc-plugins4
-OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins4
-RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4
-UI_DIR      = $$BUILD_PREFIX/uic-plugins4
+MOC_DIR 	= $$BUILD_PREFIX/moc-plugins4/AVPlugin
+OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins4/AVPlugin
+RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4/AVPlugin
+UI_DIR      = $$BUILD_PREFIX/uic-plugins4/AVPlugin
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 	TARGET		= AVPlugin
-	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5
-	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5
-	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5
-	UI_DIR      = $$BUILD_PREFIX/uic-plugins5
+	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5/AVPlugin
+	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5/AVPlugin
+	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5/AVPlugin
+	UI_DIR      = $$BUILD_PREFIX/uic-plugins5/AVPlugin
 }
 
 # Headers

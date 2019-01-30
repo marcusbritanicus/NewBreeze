@@ -41,10 +41,10 @@ isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc-plugins
-OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins
-RCC_DIR		= $$BUILD_PREFIX/qrc-plugins
-UI_DIR      = $$BUILD_PREFIX/uic-plugins
+MOC_DIR 	= $$BUILD_PREFIX/moc-plugins4/Markdown
+OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins4/Markdown
+RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4/Markdown
+UI_DIR      = $$BUILD_PREFIX/uic-plugins4/Markdown
 
 # Input
 HEADERS += NBMarkDownPreviewWidget.hpp

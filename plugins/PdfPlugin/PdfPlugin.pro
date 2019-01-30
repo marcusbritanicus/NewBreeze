@@ -115,17 +115,17 @@ isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc-plugins4
-OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins4
-RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4
-UI_DIR      = $$BUILD_PREFIX/uic-plugins4
+MOC_DIR 	= $$BUILD_PREFIX/moc-plugins4/PdfPlugin
+OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins4/PdfPlugin
+RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4/PdfPlugin
+UI_DIR      = $$BUILD_PREFIX/uic-plugins4/PdfPlugin
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 	TARGET = PdfPlugin
-	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5
-	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5
-	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5
-	UI_DIR      = $$BUILD_PREFIX/uic-plugins5
+	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5/PdfPlugin
+	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5/PdfPlugin
+	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5/PdfPlugin
+	UI_DIR      = $$BUILD_PREFIX/uic-plugins5/PdfPlugin
 }
 
 unix {

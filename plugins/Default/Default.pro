@@ -70,17 +70,17 @@ isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc-plugins4
-OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins4
-RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4
-UI_DIR      = $$BUILD_PREFIX/uic-plugins4
+MOC_DIR 	= $$BUILD_PREFIX/moc-plugins4/Default
+OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins4/Default
+RCC_DIR		= $$BUILD_PREFIX/qrc-plugins4/Default
+UI_DIR      = $$BUILD_PREFIX/uic-plugins4/Default
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 	TARGET = DefaultPeekPlugins
-	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5
-	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5
-	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5
-	UI_DIR      = $$BUILD_PREFIX/uic-plugins5
+	MOC_DIR 	= $$BUILD_PREFIX/moc-plugins5/Default
+	OBJECTS_DIR = $$BUILD_PREFIX/obj-plugins5/Default
+	RCC_DIR		= $$BUILD_PREFIX/qrc-plugins5/Default
+	UI_DIR      = $$BUILD_PREFIX/uic-plugins5/Default
 }
 
 # ========= #
