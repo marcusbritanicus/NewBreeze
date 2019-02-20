@@ -65,12 +65,6 @@
 	#include "QCryptographicHash5.hpp"
 #endif
 
-#if QT_VERSION < 0x050400
-	#include "QStorageInfo.hpp"
-#else
-	#include <QStorageInfo>
-#endif
-
 #if defined COMMON
 	#define NBCOMMON_DLLSPEC Q_DECL_EXPORT
 #else

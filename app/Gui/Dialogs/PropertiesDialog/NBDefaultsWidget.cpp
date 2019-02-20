@@ -125,6 +125,9 @@ void NBDefaultsWidget::addApplication() {
 	QSettings appsSett( "NewBreeze", "MimeApps" );
 	QStringList apps = appsSett.value( mimeType.name().replace( "/", "-" ) ).toStringList();
 	apps << appFile.desktopFileName();
+	apps.removeDuplicates();
+	appsSett.setValue( mimeType.name().replace( "/", "-" ), apps );
+	appsSett.sync();
 };
 
 void NBDefaultsWidget::removeApplication() {
