@@ -30,39 +30,43 @@ Some of its features are
 
 ### Please READ the ReleaseNotes for information on the new features
 
-### Notes for compiling - linux:
+### Notes for compiling (Qt5) - linux:
 
 * Download the sources
-   - Git: `git clone https://gitlab.com/marcusbritanicus/NewBreeze.git NewBreeze-master`
-   - Tar: `wget https://gitlab.com/marcusbritanicus/NewBreeze/-/archive/master/NewBreeze-master.tar.gz && tar -xf NewBreeze-master.tar.gz`
+  * Git: `git clone https://gitlab.com/marcusbritanicus/NewBreeze.git NewBreeze-master`
+  * Tar: `wget https://gitlab.com/marcusbritanicus/NewBreeze/-/archive/master/NewBreeze-master.tar.gz && tar -xf NewBreeze-master.tar.gz`
 * Enter `NewBreeze-master`
-* Open the terminal and type: `qmake && make`
+* Open the terminal and type: `qmake -qt5 && make`
 * To install, as root type: `make install`
 
 ### Dependencies:
 * Qt4/Qt5 (libqt4-dev, libqt4-dev-bin, qtbase5-dev, qtbase5-dev-tools)
-    * QtWebKit in case of Qt4 and upto Qt 5.4 (libqtwebkit-dev, libqt5webkit5-dev, qtwebkit5-dev)
-    * QtWebEngine Qt 5.5 onwards (qtwebengine5-dev)
-    * QScintilla (libqt5scintilla2-dev, libqscintilla2-qt5-dev)
+  * QtWebKit in case of Qt4 and upto Qt 5.4 (libqtwebkit-dev, libqt5webkit5-dev, qtwebkit5-dev)
+  * QtWebEngine Qt 5.5 onwards (qtwebengine5-dev)
+  * QScintilla (libqt5scintilla2-dev, libqscintilla2-qt5-dev)
 * zlib (zlib1g-dev)
 * liblzma (liblzma-dev)
 * libbzip2 (libbz2-dev)
 * libarchive (libarchive-dev)
 * xdg-utils
 * libdjvulibre-dev (libdjvulibre-dev)
+* ffmpegthumbnailer (libffmpegthumbnailer-dev)
+* poppler (libpoppler-qt5-dev, libpoppler-qt4-dev)
+* jbig2 (libjbig2dec0-dev)
+* vlc (libvlc-dev)
 
 ## My System Info
- - OS:					Debian Sid
- - Qt:					Qt5 5.11.2
- - QScintilla:			2.10.4
- - LibArchive:			3.2.2
- - LibLzma: 			5.2.2
- - LibBz2:				1.0.6
- - zlib:				1.2.11
- - liblz (lzip):		1.10
- - lzop (binary):		1.03
- - libdjvulibre:		3.5.27.1
- - mediainfo:			18.08.1
+* OS:					Debian Sid
+* Qt:					Qt5 5.11.2
+* QScintilla:			2.10.4
+* LibArchive:			3.2.2
+* LibLzma: 			5.2.2
+* LibBz2:				1.0.6
+* zlib:				1.2.11
+* liblz (lzip):		1.10
+* lzop (binary):		1.03
+* libdjvulibre:		3.5.27.1
+* mediainfo:			18.08.1
 
 ### Known Bugs
 * Reloading causes custom folder icons not to be rendered in some cases

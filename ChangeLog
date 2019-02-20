@@ -9,6 +9,9 @@ Version 3.0.0 RC
 	- Feature: AutoMount of volumes
 	- Feature: Add user apps to Open With menu
 	- Feature: Inbuilt terminal
+	- Markdown library changed to cmark
+	- Markdown preview using QTextBrowser
+	- LibArchive support extended to lzip, lz4, lrzip
 	- Inbuilt pdf support using mupdf
 	- NBPropertiesDialog redesigned
 	- NBCustomPeek integrated into NBPropertiesDialog

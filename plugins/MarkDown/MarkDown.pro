@@ -6,7 +6,7 @@ INCLUDEPATH += ../../common/ ../../common/include
 DEPENDPATH += ../../common/ ../../common/include
 
 DEPENDPATH += .
-INCLUDEPATH += .
+INCLUDEPATH += . cmark
 
 # Same as NewBreeze version
 VERSION = "3.0.0"
@@ -15,16 +15,10 @@ VERSION = "3.0.0"
 # ===========
 CONFIG += plugin
 
-# Webkit Support for WebWatch
-# ===========================
-QT += webengine
-
 # Qt5 Support
 # ===========
 greaterThan(QT_MAJOR_VERSION, 4) {
 	QT += widgets
-	QT += webenginewidgets
-	QT += webchannel
 }
 
 # Silent compilation
@@ -55,8 +49,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 HEADERS += NBMarkDownPreviewWidget.hpp
 
 SOURCES += NBMarkDownPreviewWidget.cpp
-
-RESOURCES += markdown.qrc
+SOURCES += cmark/*.c
 
 unix {
 	isEmpty(PREFIX) {

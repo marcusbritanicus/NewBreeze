@@ -8,56 +8,18 @@
 
 #include "Global.hpp"
 
-class Document : public QObject {
-	Q_OBJECT
-
-    Q_PROPERTY(QString text MEMBER mText NOTIFY textChanged FINAL)
-	public:
-		Document( QString path ) {
-
-			QFile f( path );
-			f.open( QFile::ReadOnly );
-
-			mText = QString::fromLocal8Bit( f.readAll() );
-			f.close();
-
-			emit textChanged( mText );
-		};
-
-	private:
-		QString mText;
-
-	Q_SIGNALS:
-		void textChanged( const QString &text );
-};
-
-class MarkedPage : public QWebEnginePage {
-	Q_OBJECT
-
-	public:
-		explicit MarkedPage( QObject *parent = NULL ) : QWebEnginePage( parent ) {};
-
-	protected:
-		bool acceptNavigationRequest( const QUrl &url, NavigationType, bool ) {
-			if ( url.scheme() == QString( "qrc" ) )
-				return true;
-
-			return false;
-		};
-};
-
-class NBWebWatch : public QDialog {
+class NBMarkDownView : public QDialog {
 	Q_OBJECT
 
 	public :
-		NBWebWatch( QString path = QDir::homePath(), QWidget *parent = 0 );
+		NBMarkDownView( QString path, QWidget *parent = 0 );
 
 	private :
 		void createGUI();
 		void setWindowProperties();
 
 		QString path;
-		QWebEngineView *peekWidgetBase;
+		QTextBrowser *peekWidgetBase;
 
 	private slots :
 		void loadDocument();

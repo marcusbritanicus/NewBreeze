@@ -1,3 +1,10 @@
+newbreeze-plugins (3.0.0-rc6) unstable; urgency=medium
+
+  * Markdown library changed to cmark
+  * Markdown preview using QTextBrowser
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Wed, 20 Feb 2019 12:00:00 +0530
+
 newbreeze-plugins (3.0.0-rc5) unstable; urgency=medium
 
   * Various small bug fixes

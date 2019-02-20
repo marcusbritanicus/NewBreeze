@@ -5,8 +5,9 @@
 */
 
 #include "NBMarkDownPreviewWidget.hpp"
+#include "cmark.h"
 
-NBWebWatch::NBWebWatch( QString pth, QWidget *parent ) : QDialog( parent ) {
+NBMarkDownView::NBMarkDownView( QString pth, QWidget *parent ) : QDialog( parent ) {
 
 	path = QString( pth );
 
@@ -18,7 +19,7 @@ NBWebWatch::NBWebWatch( QString pth, QWidget *parent ) : QDialog( parent ) {
 	peekWidgetBase->setFocus();
 };
 
-void NBWebWatch::createGUI() {
+void NBMarkDownView::createGUI() {
 
 	QHBoxLayout *lblBtnLyt = new QHBoxLayout();
 	QVBoxLayout *widgetLyt = new QVBoxLayout();
@@ -43,7 +44,7 @@ void NBWebWatch::createGUI() {
 	QWidget *baseWidget = new QWidget();
 	baseWidget->setObjectName( tr( "guiBase" ) );
 
-	peekWidgetBase = new QWebEngineView();
+	peekWidgetBase = new QTextBrowser();
 	peekWidgetBase->setFont( QFont( "sans", 10 ) );
 
 	lblBtnLyt->addWidget( lbl );
@@ -62,7 +63,7 @@ void NBWebWatch::createGUI() {
 	peekWidgetBase->setFocus();
 };
 
-void NBWebWatch::setWindowProperties() {
+void NBMarkDownView::setWindowProperties() {
 
 	setFixedSize( 1024, 640 );
 
@@ -73,7 +74,7 @@ void NBWebWatch::setWindowProperties() {
 	setGeometry( hpos, vpos, 1024, 640 );
 };
 
-void NBWebWatch::keyPressEvent( QKeyEvent *keyEvent ) {
+void NBMarkDownView::keyPressEvent( QKeyEvent *keyEvent ) {
 
 	if ( keyEvent->key() == Qt::Key_Escape )
 		close();
@@ -82,7 +83,7 @@ void NBWebWatch::keyPressEvent( QKeyEvent *keyEvent ) {
 		QWidget::keyPressEvent( keyEvent );
 };
 
-void NBWebWatch::changeEvent( QEvent *event ) {
+void NBMarkDownView::changeEvent( QEvent *event ) {
 
 	if ( ( event->type() == QEvent::ActivationChange ) and ( !isActiveWindow() ) ) {
 		hide();
@@ -95,7 +96,7 @@ void NBWebWatch::changeEvent( QEvent *event ) {
 	}
 };
 
-void NBWebWatch::paintEvent( QPaintEvent *pEvent ) {
+void NBMarkDownView::paintEvent( QPaintEvent *pEvent ) {
 
 	QWidget::paintEvent( pEvent );
 	QPainter *painter = new QPainter( this );
@@ -107,19 +108,21 @@ void NBWebWatch::paintEvent( QPaintEvent *pEvent ) {
 	pEvent->accept();
 };
 
-void NBWebWatch::loadDocument() {
+void NBMarkDownView::loadDocument() {
 
-	Document *doc = new Document( path );
-	peekWidgetBase->setPage( new MarkedPage( peekWidgetBase ) );
+	peekWidgetBase->setFont( QFont( "Courier 10 Pitch", 10 ) );
 
-	QWebChannel *channel = new QWebChannel( this );
-	channel->registerObject( QStringLiteral( "content" ), doc );
-	peekWidgetBase->page()->setWebChannel( channel );
+	QFile file( path );
+	if ( not file.open( QFile::ReadOnly ) ) {
+		peekWidgetBase->setHtml( QString( "<center><h3>File not found: %1</h3></center>" ).arg( path ) );
+		return;
+	}
 
-	peekWidgetBase->load( QUrl( "qrc:/index.html" ) );
+	peekWidgetBase->setHtml( cmark_markdown_to_html( file.readAll().constData(), file.size(), 0 ) );
+	file.close();
 };
 
-void NBWebWatch::openInExternal() {
+void NBMarkDownView::openInExternal() {
 
 	QProcess::startDetached( "xdg-open " + path );
 	close();
@@ -143,7 +146,7 @@ QList<QAction*> NBMarkDownPreview::actions( Interface, QStringList nodes ) {
 	if ( ( nodes.count() == 1 ) and isFile( nodes.at( 0 ) ) ) {
 		QAction *act = new QAction( QIcon( ":/icons/emblem-unmounted.png" ), "&Peek", this );
 
-		NBWebWatch *mdview = new NBWebWatch( nodes.at( 0 ) );
+		NBMarkDownView *mdview = new NBMarkDownView( nodes.at( 0 ) );
 		mdview->setWindowFlags( mdview->windowFlags() | Qt::FramelessWindowHint );
 		connect( act, SIGNAL( triggered() ), mdview, SLOT( exec() ) );
 
@@ -181,7 +184,7 @@ QStringList NBMarkDownPreview::mimetypes() {
 void NBMarkDownPreview::actionTrigger( Interface, QString, QStringList nodes ) {
 
 	if ( ( nodes.count() == 1 ) and isFile( nodes.at( 0 ) ) ) {
-		NBWebWatch *mdview = new NBWebWatch( nodes.at( 0 ) );
+		NBMarkDownView *mdview = new NBMarkDownView( nodes.at( 0 ) );
 		mdview->setWindowFlags( mdview->windowFlags() | Qt::FramelessWindowHint );
 		mdview->exec();
 	}

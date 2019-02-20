@@ -1,3 +1,9 @@
+newbreeze-plugins (3.0.0-rc6) unstable; urgency=medium
+
+  * LibArchive support extended to lzip, lz4, lrzip
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Wed, 20 Feb 2019 12:00:00 +0530
+
 newbreeze-common (3.0.0-rc5) unstable; urgency=medium
 
   * Various small bug fixes
