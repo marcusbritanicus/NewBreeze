@@ -20,20 +20,21 @@ Installation Instructions for NewBreeze v3.0.0
       8] libdjvulibre-dev (libdjvulibre-dev)
       9] libffmpegthumbs-dev
      10] libvlc-dev
+     11] libexif-dev
 
      Type the following command (on Debian and Debian based systems) to install the above dependencies (with root previleges)
 
         Qt4:
 		    apt-get install g++ libqt4-dev libqt4-dev-bin libqtwebkit-dev libqscintilla2-qt4-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
-							liblzma-dev libmupdf-dev libdjvulibre-dev libffmpegthumbs-dev libvlc-dev
+							liblzma-dev libmupdf-dev libdjvulibre-dev libffmpegthumbs-dev libvlc-dev libexif-dev
 
         Qt5 - With WebKit:
 		    apt-get install g++ qtbase5-dev qtbase5-dev-tools libqt5webkit5-dev libqscintilla2-qt5-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
-							liblzma-dev libmupdf-dev libdjvulibre-dev libffmpegthumbs-dev libvlc-dev
+							liblzma-dev libmupdf-dev libdjvulibre-dev libffmpegthumbs-dev libvlc-dev libexif-dev
 
         Qt5 - With WebEngine:
 		    apt-get install g++ qtbase5-dev qtbase5-dev-tools qtwebengine5-dev libqscintilla2-qt5-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
-							liblzma-dev libmupdf-dev libdjvulibre-dev libffmpegthumbs-dev libvlc-dev
+							liblzma-dev libmupdf-dev libdjvulibre-dev libffmpegthumbs-dev libvlc-dev libexif-dev
 
 	Note:
 		These are typical commands and by no means universal. In some cases libqscintilla2-qt5-dev may have to be replacef by libqt5scintilla2-dev (Ubuntu).

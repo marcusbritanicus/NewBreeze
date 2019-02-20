@@ -54,19 +54,21 @@ Some of its features are
 * poppler (libpoppler-qt5-dev, libpoppler-qt4-dev)
 * jbig2 (libjbig2dec0-dev)
 * vlc (libvlc-dev)
+* libexif (libexif-dev)
 
 ## My System Info
-* OS:					Debian Sid
-* Qt:					Qt5 5.11.2
-* QScintilla:			2.10.4
-* LibArchive:			3.2.2
+* OS:				Debian Sid
+* Qt:				Qt5 5.11.2
+* QScintilla:		2.10.4
+* LibArchive:		3.2.2
 * LibLzma: 			5.2.2
-* LibBz2:				1.0.6
+* LibBz2:			1.0.6
 * zlib:				1.2.11
 * liblz (lzip):		1.10
-* lzop (binary):		1.03
+* lzop (binary):	1.03
 * libdjvulibre:		3.5.27.1
-* mediainfo:			18.08.1
+* mediainfo:		18.08.1
+* libexif:			0.6.21-5
 
 ### Known Bugs
 * Reloading causes custom folder icons not to be rendered in some cases

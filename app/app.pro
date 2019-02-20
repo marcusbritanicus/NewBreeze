@@ -19,7 +19,7 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 	LIBS +=  -L../common/ -lnewbreeze-common
 }
 
-LIBS += -larchive -lbz2 -llzma -lz
+LIBS += -larchive -lbz2 -llzma -lz -lexif
 
 contains ( DEFINES, USE_MEDIAINFO ) {
 	DEFINES += UNICODE

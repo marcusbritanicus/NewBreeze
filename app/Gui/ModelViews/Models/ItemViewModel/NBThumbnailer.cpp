@@ -4,11 +4,52 @@
 	*
 */
 
+#include <libexif/exif-loader.h>
+
 #include "NBThumbnailer.hpp"
 #include "NBPluginInterface.hpp"
 
 static QList<QByteArray> supported = QImageReader::supportedImageFormats();
 static QStringList odfformat = QStringList() << "odt" << "odp" << "ods" << "odg";
+
+inline static bool saveExifThumbnail( QString path, QString hashPath ) {
+
+	ExifLoader* exif_loader = exif_loader_new();
+
+	QFile jpeg( path );
+	if ( jpeg.open( QFile::ReadOnly ) ) {
+		while ( true ) {
+			QByteArray exif = jpeg.read( 4096 );
+			if ( exif_loader_write( exif_loader, ( unsigned char* )exif.data(), exif.size() ) == 0 )
+				break;
+		}
+
+		ExifData* exif_data = exif_loader_get_data( exif_loader );
+		exif_loader_unref( exif_loader );
+
+		if ( exif_data ) {
+			// If an embedded thumbnail is available, load it
+			if ( exif_data->data ) {
+				QImage thumbnail;
+				thumbnail.loadFromData( exif_data->data, exif_data->size );
+				exif_data_unref( exif_data );
+				return thumbnail.save( hashPath, "JPG" );
+			}
+
+			else {
+
+				exif_data_unref( exif_data );
+				return false;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	return false;
+};
 
 void NBThumbnailer::createThumbnails( QStringList nodes ) {
 
@@ -126,6 +167,10 @@ void NBThumbnailer::run() {
 			if ( not exists( file ) )
 				continue;
 
+			/* Do not generate thumbnails for files in the thumbnail directory */
+			if ( dirName( file ) == thumbsDir )
+				continue;
+
 			/* Create a hash of the path */
 			QString hashPath = thumbsDir + MD5( file );
 
@@ -133,14 +178,23 @@ void NBThumbnailer::run() {
 			if ( exists( hashPath ) )
 				continue;
 
-			/* Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/ */
-			QImage thumb = QImage( file ).scaled( 512, 512, Qt::KeepAspectRatio ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+			/* Do we need to save them? */
+			if ( saveExifThumbnail( file, hashPath ) ) {
 
-			if ( thumb.save( hashPath, "PNG", 0 ) )
 				emit updateNode( file );
+			}
 
-			else
-				qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
+			else {
+				qDebug() << "Using traditional scaling:" << baseName( file );
+				/* Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/ */
+				QImage thumb = QImage( file ).scaled( 512, 512, Qt::KeepAspectRatio ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+
+				if ( thumb.save( hashPath, "PNG", 0 ) )
+					emit updateNode( file );
+
+				else
+					qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
+			}
 		}
 	}
 
