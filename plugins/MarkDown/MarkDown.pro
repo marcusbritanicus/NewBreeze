@@ -47,9 +47,28 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 # Input
 HEADERS += NBMarkDownPreviewWidget.hpp
-
 SOURCES += NBMarkDownPreviewWidget.cpp
-SOURCES += cmark/*.c
+
+# CMark Sources
+SOURCES += cmark/blocks.c
+SOURCES += cmark/buffer.c
+SOURCES += cmark/cmark.c
+SOURCES += cmark/cmark_ctype.c
+SOURCES += cmark/commonmark.c
+SOURCES += cmark/houdini_href_e.c
+SOURCES += cmark/houdini_html_e.c
+SOURCES += cmark/houdini_html_u.c
+SOURCES += cmark/html.c
+SOURCES += cmark/inlines.c
+SOURCES += cmark/iterator.c
+SOURCES += cmark/latex.c
+SOURCES += cmark/man.c
+SOURCES += cmark/node.c
+SOURCES += cmark/references.c
+SOURCES += cmark/render.c
+SOURCES += cmark/scanners.c
+SOURCES += cmark/utf8.c
+SOURCES += cmark/xml.c
 
 unix {
 	isEmpty(PREFIX) {

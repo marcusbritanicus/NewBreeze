@@ -9,6 +9,8 @@
 #include "NBThumbnailer.hpp"
 #include "NBPluginInterface.hpp"
 
+#include "Epeg.h"
+
 static QList<QByteArray> supported = QImageReader::supportedImageFormats();
 static QStringList odfformat = QStringList() << "odt" << "odp" << "ods" << "odg";
 
@@ -178,6 +180,11 @@ void NBThumbnailer::run() {
 			if ( exists( hashPath ) )
 				continue;
 
+			// if ( saveJpegThumb( file.toLocal8Bit().constData(), hashPath.toLocal8Bit().constData() ) ) {
+
+				// emit updateNode( file );
+			// }
+
 			/* Do we need to save them? */
 			if ( saveExifThumbnail( file, hashPath ) ) {
 
@@ -185,15 +192,25 @@ void NBThumbnailer::run() {
 			}
 
 			else {
-				qDebug() << "Using traditional scaling:" << baseName( file );
+				qDebug() << "Using inbuilt scaling:" << baseName( file );
 				/* Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/ */
-				QImage thumb = QImage( file ).scaled( 512, 512, Qt::KeepAspectRatio ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+				QImage thumb = QImage( file ).scaled( 512, 512, Qt::KeepAspectRatio, Qt::FastTransformation ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 
-				if ( thumb.save( hashPath, "PNG", 0 ) )
-					emit updateNode( file );
+				if ( file.endsWith( "jpg" ) or file.endsWith( "jpeg" ) ) {
+					if ( thumb.save( hashPath, "JPG" ) )
+						emit updateNode( file );
 
-				else
-					qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
+					else
+						qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
+				}
+
+				else {
+					if ( thumb.save( hashPath, "PNG", 0 ) )
+						emit updateNode( file );
+
+					else
+						qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
+				}
 			}
 		}
 	}
