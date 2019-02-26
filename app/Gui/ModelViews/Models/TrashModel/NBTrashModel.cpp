@@ -215,21 +215,29 @@ bool NBTrashModel::removeNode( QModelIndex idx ) {
 	NBTrashNode *node = static_cast<NBTrashNode*>( idx.internalPointer() );
 
 	if ( isDir( node->trashPath() ) ) {
-		if ( not removeDir( node->trashPath() ) )
+		qDebug() << "Deleting dir:" << node->name() << node->trashPath();
+		if ( not removeDir( node->trashPath() ) ) {
+			qDebug() << "Failed to remove dir:" << node->trashPath();
 			return false;
+		}
 	}
 
 	else {
-		if ( not QFile::remove( node->trashPath() ) )
+		qDebug() << "Deleting file:" << node->trashPath();
+		if ( not QFile::remove( node->trashPath() ) ) {
+			qDebug() << "Failed to remove file:" << node->name() << node->trashPath();
 			return false;
+		}
 	}
 
 	__childNames.removeOne( node->name() );
+	qDebug() << "[i]" << node->name() << "in __childNames? (should be false) :"  << __childNames.contains( node->name() );
 
-	QFile::remove( node->trashInfoPath() );
+	qDebug() << "Removing trashInfo for" << node->name() << "(should be true)" << QFile::remove( node->trashInfoPath() );
 	trashInfo.remove( QUrl::toPercentEncoding( node->name() ) );
 	trashInfo.sync();
 
+	qDebug() << "[i] Removing" << node->name() << "from viewport.";
 	rootNode->removeChild( node );
 
 	return true;
