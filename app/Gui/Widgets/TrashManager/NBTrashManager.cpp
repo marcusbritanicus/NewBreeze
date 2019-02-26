@@ -248,5 +248,6 @@ void NBTrashManager::emptyTrash() {
 		tModel->removeFromDisk( selection );
 	}
 
+	tModel->reload();
 	updateButtons();
 };
