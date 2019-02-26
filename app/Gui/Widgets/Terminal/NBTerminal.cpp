@@ -186,6 +186,8 @@ NBTerminalWidget::NBTerminalWidget( QString wDir, QWidget *parent ) : QWidget( p
 	else
 		currentPath = QString( wDir );
 
+	putenv( "HISTFILE=/dev/null" );
+
 	QVBoxLayout *lyt = new QVBoxLayout();
 	lyt->setContentsMargins( QMargins( 2, 0, 2, 0 ) );
 	lyt->setSpacing( 0 );
@@ -193,10 +195,6 @@ NBTerminalWidget::NBTerminalWidget( QString wDir, QWidget *parent ) : QWidget( p
 
 	lyt->addWidget( Terminal );
 	setLayout( lyt );
-
-	setFocusPolicy( Qt::NoFocus );
-	setAttribute( Qt::WA_TranslucentBackground );
-	Terminal->setTerminalOpacity( 0.9 );
 
 	connect( Terminal, SIGNAL( finished() ), this, SLOT( openNewTerminal() ) );
 	connect( Terminal, SIGNAL( chdir( QString ) ), SIGNAL( chdir( QString ) ) );
