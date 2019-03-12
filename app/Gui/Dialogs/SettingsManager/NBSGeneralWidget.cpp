@@ -8,67 +8,73 @@
 #include "NBMessageDialog.hpp"
 #include "NBFunctions.hpp"
 
-static QSettings sett( "NewBreeze", "NewBreeze" );
-
 NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 	/* Grouping */
 
 	perFolderEnabled = new QGroupBox( "&Enabled per-folder view", this );
 	perFolderEnabled->setCheckable( true );
-	perFolderEnabled->setChecked( sett.value( "PerFolderViews" ).toBool() );
+	perFolderEnabled->setChecked( Settings->value( "PerFolderViews", NBSettings::GlobalScope ) );
 	connect( perFolderEnabled, SIGNAL( toggled( bool ) ), this, SLOT( handlePerFolderChanged( bool ) ) );
 
 	defaultViewModeCB = new QComboBox( this );
 	defaultViewModeCB->addItems( QStringList() << "Icons" << "Tiles" << "Details" );
-	if ( sett.value( "ViewMode" ).toString().isEmpty() or sett.value( "ViewMode" ).toString() == "Icons" )
-		defaultViewModeCB->setCurrentIndex( 0 );
-
-	else if ( sett.value( "ViewMode" ).toString() == "Tiles" )
-		defaultViewModeCB->setCurrentIndex( 1 );
-
-	else
-		defaultViewModeCB->setCurrentIndex( 2 );
-
-	connect( defaultViewModeCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( handleViewModeChanged( int ) ) );
 
 	iconSizeL = new QLabel( this );
-	iconSizeL->setText( QString( "%1 px" ).arg( sett.value( "IconSize" ).toSize().width() ) );
 
 	defaultIconSizeS = new QSlider( Qt::Horizontal, this );
 	defaultIconSizeS->setTickPosition( QSlider::TicksBelow );
 	defaultIconSizeS->setRange( 16, 128 );
 	defaultIconSizeS->setTickInterval( 16 );
 	defaultIconSizeS->setSingleStep( 16 );
-	defaultIconSizeS->setValue( sett.value( "IconSize" ).toSize().width() );
+
+	if ( ( QString )Settings->value( "View/ViewMode", NBSettings::GlobalScope ) == "Icons" ) {
+		defaultViewModeCB->setCurrentIndex( 0 );
+		iconSizeL->setText( QString( "%1 px" ).arg( ( ( QSize )Settings->value( "IconsImageSize", NBSettings::GlobalScope ) ).width() ) );
+		defaultIconSizeS->setValue( QSize( Settings->value( "View/IconsImageSize", NBSettings::GlobalScope ) ).width() );
+	}
+
+	else if ( ( QString )Settings->value( "View/ViewMode", NBSettings::GlobalScope ) == "Tiles" ) {
+		defaultViewModeCB->setCurrentIndex( 1 );
+		iconSizeL->setText( QString( "%1 px" ).arg( ( ( QSize )Settings->value( "View/TilesImageSize", NBSettings::GlobalScope ) ).width() ) );
+		defaultIconSizeS->setValue( QSize( Settings->value( "View/TilesImageSize", NBSettings::GlobalScope ) ).width() );
+	}
+
+	else {
+		defaultViewModeCB->setCurrentIndex( 2 );
+		iconSizeL->setText( QString( "%1 px" ).arg( ( ( QSize )Settings->value( "View/DetailsImageSize", NBSettings::GlobalScope ) ).width() ) );
+		defaultIconSizeS->setValue( QSize( Settings->value( "View/DetailsImageSize", NBSettings::GlobalScope ) ).width() );
+	}
+
+	connect( defaultViewModeCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( handleViewModeChanged( int ) ) );
 	connect( defaultIconSizeS, SIGNAL( valueChanged( int ) ), this, SLOT( handleIconSizeChanged( int ) ) );
 
 	defaultGroupingCB = new QCheckBox( "&Group files and folders by default", this );
-	defaultGroupingCB->setChecked( sett.value( "Grouping" ).toBool() );
+	defaultGroupingCB->setChecked( Settings->value( "Grouping", NBSettings::GlobalScope ) );
 	connect( defaultGroupingCB, SIGNAL( toggled( bool ) ), this, SLOT( handleGroupingChanged( bool ) ) );
 
 	defaultSortCaseCB = new QCheckBox( "Enable c&ase sensitive file and folder sorting", this );
-	defaultSortCaseCB->setChecked( sett.value( "SortCase" ).toBool() );
+	defaultSortCaseCB->setChecked( Settings->value( "SortCase", NBSettings::GlobalScope ) );
 	connect( defaultSortCaseCB, SIGNAL( toggled( bool ) ), this, SLOT( handleSortCaseChanged( bool ) ) );
 
 	defaultSortClmnCB = new QComboBox( this );
 	defaultSortClmnCB->addItems( QStringList() << "Name" << "Size" << "Type" << "Date" );
-	defaultSortClmnCB->setCurrentIndex( sett.value( "SortColumn" ).toInt() == 3 ? 4 : sett.value( "SortColumn" ).toInt() );
+	defaultSortClmnCB->setCurrentIndex( ( int )Settings->value( "SortColumn", NBSettings::GlobalScope ) == 3 ? 4 : ( int )Settings->value( "SortColumn", NBSettings::GlobalScope ) );
 	connect( defaultSortClmnCB, SIGNAL( currentIndexChanged( int ) ), this, SLOT( handleSortColumnChanged( int ) ) );
 
 	/* Side Panel */
 	showSidePanelGB = new QGroupBox( "Show SidePanel", this );
 	showSidePanelGB->setCheckable( true );
-	showSidePanelGB->setChecked( sett.value( "SidePanel" ).toBool() );
+	showSidePanelGB->setChecked( Settings->value( "SidePanel", NBSettings::GlobalScope ) );
 	connect( showSidePanelGB, SIGNAL( toggled( bool ) ), this, SLOT( handleShowSidePanelToggled( bool ) ) );
 
 	sideBarRB = new QRadioButton( "Use the modern side &bar" );
 	connect( sideBarRB, SIGNAL( clicked() ), this, SLOT( handleSidePanelChoice() ) );
-	sideBarRB->setChecked( sett.value( "SidePanelType" ).toInt() == 0 );
+	sideBarRB->setChecked( ( int )Settings->value( "SidePanelType", NBSettings::GlobalScope ) == 0 );
 
 	sidePanelRB = new QRadioButton( "Use the classic side &panel" );
 	connect( sidePanelRB, SIGNAL( clicked() ), this, SLOT( handleSidePanelChoice() ) );
-	sidePanelRB->setChecked( sett.value( "SidePanelType" ).toInt() == 1 );
+	sidePanelRB->setChecked( ( int )Settings->value( "SidePanelType", NBSettings::GlobalScope ) == 1 );
 
 	QVBoxLayout *sidePanelLyt = new QVBoxLayout();
 	sidePanelLyt->addWidget( sideBarRB );
@@ -80,31 +86,31 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 	filePreviewGB = new QGroupBox( "&Show Image Previews" );
 	filePreviewGB->setCheckable( true );
-	filePreviewGB->setChecked( Settings->View.FilePreviews );
+	filePreviewGB->setChecked( Settings->value( "View/FilePreviews", NBSettings::GlobalScope ) );
 	connect( filePreviewGB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
 
 	imagePreviewCB = new QCheckBox( "&Image files (.jpg .png .gif .svg .bmp etc)", this );
-	imagePreviewCB->setChecked( Settings->View.ImagePreview );
+	imagePreviewCB->setChecked( Settings->value( "View/ImagePreview", NBSettings::GlobalScope ) );
 	connect( imagePreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
 
 	pdfPreviewCB = new QCheckBox( "PDF files", this );
-	pdfPreviewCB->setChecked( Settings->View.PdfPreview );
+	pdfPreviewCB->setChecked( Settings->value( "View/PdfPreview", NBSettings::GlobalScope ) );
 	connect( pdfPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
 
 	djvuPreviewCB = new QCheckBox( "D&jVu files", this );
-	djvuPreviewCB->setChecked( Settings->View.DjVuPreview );
+	djvuPreviewCB->setChecked( Settings->value( "View/DjVuPreview", NBSettings::GlobalScope ) );
 	connect( djvuPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
 
 	epubPreviewCB = new QCheckBox( "eP&ub files", this );
-	epubPreviewCB->setChecked( Settings->View.ePubPreview );
+	epubPreviewCB->setChecked( Settings->value( "View/ePubPreview", NBSettings::GlobalScope ) );
 	connect( epubPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
 
 	odfPreviewCB = new QCheckBox( "&ODF files (.odt .odg .odp .ods)", this );
-	odfPreviewCB->setChecked( Settings->View.OdfPreview );
+	odfPreviewCB->setChecked( Settings->value( "View/OdfPreview", NBSettings::GlobalScope ) );
 	connect( odfPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
 
 	videoPreviewCB = new QCheckBox( "Video files (.mp4 .avi .webm .mkv .flv etc)", this );
-	videoPreviewCB->setChecked( Settings->View.VideoPreview );
+	videoPreviewCB->setChecked( Settings->value( "View/VideoPreview", NBSettings::GlobalScope ) );
 	connect( videoPreviewCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePreviewsChanged() ) );
 
 	QVBoxLayout *previewLyt = new QVBoxLayout();
@@ -120,7 +126,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	/* Others */
 
 	filterFoldersCB = new QCheckBox( "&Filter folder and files", this );
-	filterFoldersCB->setChecked( sett.value( "FilterFolders" ).toBool() );
+	filterFoldersCB->setChecked( Settings->value( "FilterFolders", NBSettings::GlobalScope ) );
 	connect( filterFoldersCB, SIGNAL( toggled( bool ) ), this, SLOT( handleFilterDirsChanged( bool ) ) );
 
 	QHBoxLayout *comboBoxLyt1 = new QHBoxLayout();
@@ -146,15 +152,15 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	comboBoxLyt3->addWidget( defaultSortClmnCB );
 
 	showTrayIconCB = new QCheckBox( "&Minimize to tray" );
-	showTrayIconCB->setChecked( Settings->General.TrayIcon );
+	showTrayIconCB->setChecked( Settings->value( "TrayIcon", NBSettings::GlobalScope ) );
 	connect( showTrayIconCB, SIGNAL( toggled( bool ) ), this, SLOT( handleTrayIconChanged( bool ) ) );
 
 	openWithCB = new QCheckBox( "Open with SuperStart when NewBreeze starts?", this );
-	openWithCB->setChecked( sett.value( "SuperStart" ).toBool() );
+	openWithCB->setChecked( Settings->value( "SuperStart", NBSettings::GlobalScope ) );
 	connect( openWithCB, SIGNAL( toggled( bool ) ), this, SLOT( handleOpenWithToggled() ) );
 
 	extendedIOCB = new QCheckBox( "Enable exten&ded IO" );
-	extendedIOCB->setChecked( Settings->General.ExtendedIO );
+	extendedIOCB->setChecked( Settings->value( "ExtendedIO", NBSettings::GlobalScope ) );
 	extendedIOCB->setToolTip(
 		"Extended IO is a replacement for 'Copy/Move to' menu option. When enabled, "
 		"a dialog opens where you can choose the target directory to which you want "
@@ -163,19 +169,19 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 	connect( extendedIOCB, SIGNAL( toggled( bool ) ), this, SLOT( handleExtendedIOChanged( bool ) ) );
 
 	paintOverlayCB = new QCheckBox( "Enable IconOverlay" );
-	paintOverlayCB->setChecked( Settings->View.PaintOverlay );
+	paintOverlayCB->setChecked( Settings->value( "View/PaintOverlay", NBSettings::GlobalScope ) );
 	paintOverlayCB->setToolTip(
 		"To quickly open or access the menu without double-click or right-click, enable this option."
 	);
 	connect( paintOverlayCB, SIGNAL( toggled( bool ) ), this, SLOT( handlePaintOverlayChanged( bool ) ) );
 
 	logDebugCB = new QCheckBox( "Enable logging of debug messages" );
-	logDebugCB->setChecked( Settings->General.LogDebug );
+	logDebugCB->setChecked( Settings->value( "LogDebug", NBSettings::GlobalScope ) );
 	logDebugCB->setToolTip( "Write the debug messages to the log file" );
 	connect( logDebugCB, SIGNAL( toggled( bool ) ), this, SLOT( handleLogDebugChanged( bool ) ) );
 
 	enableAutoMountCB = new QCheckBox( "Enable auto mounting of volumes" );
-	enableAutoMountCB->setChecked( Settings->General.AutoMount );
+	enableAutoMountCB->setChecked( Settings->value( "AutoMount", NBSettings::GlobalScope ) );
 	enableAutoMountCB->setToolTip( "Write the debug messages to the log file" );
 	connect( enableAutoMountCB, SIGNAL( toggled( bool ) ), this, SLOT( handleAutoMountChanged( bool ) ) );
 
@@ -212,172 +218,145 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 void NBSGeneralWidget::handlePerFolderChanged( bool perFolder ) {
 
-	Settings->setValue( "PerFolderViews", perFolder );
-	Settings->General.PerFolderViews = perFolder;
+	Settings->setValue( "PerFolderViews", perFolder, NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handleViewModeChanged( int ) {
 
-	Settings->setValue( "ViewMode", defaultViewModeCB->currentText() );
-	Settings->View.ViewMode = defaultViewModeCB->currentText();
+	Settings->setValue( "View/ViewMode", defaultViewModeCB->currentText(), NBSettings::GlobalScope );
 
-	if ( Settings->View.ViewMode == "Icons" )
-		defaultIconSizeS->setValue( Settings->View.IconsImageSize.width() );
+	if ( ( QString )Settings->value( "View/ViewMode", NBSettings::GlobalScope ) == "Icons" )
+		defaultIconSizeS->setValue( QSize( Settings->value( "View/IconsImageSize", NBSettings::GlobalScope ) ).width() );
 
-	else if ( Settings->View.ViewMode == "Tiles" )
-		defaultIconSizeS->setValue( Settings->View.TilesImageSize.width() );
+	else if ( ( QString )Settings->value( "View/ViewMode", NBSettings::GlobalScope ) == "Tiles" )
+		defaultIconSizeS->setValue( ( ( QSize )Settings->value( "View/TilesImageSize", NBSettings::GlobalScope ) ).width() );
 
 	else
-		defaultIconSizeS->setValue( Settings->View.DetailsImageSize.width() );
+		defaultIconSizeS->setValue( ( ( QSize )Settings->value( "View/DetailsImageSize", NBSettings::GlobalScope ) ).width() );
 };
 
 void NBSGeneralWidget::handleIconSizeChanged( int ) {
 
 	int iconSize = defaultIconSizeS->value();
-	if ( Settings->View.ViewMode == "Icons" )
-		Settings->setValue( "View/IconsImageSize", QSize( iconSize, iconSize ) );
+	if ( ( QString )Settings->value( "View/ViewMode", NBSettings::GlobalScope ) == "Icons" )
+		Settings->setValue( "View/IconsImageSize", QSize( iconSize, iconSize ), NBSettings::GlobalScope );
 
-	else if ( Settings->View.ViewMode == "Tiles" )
-		Settings->setValue( "View/TilesImageSize", QSize( iconSize, iconSize ) );
+	else if ( ( QString )Settings->value( "View/ViewMode", NBSettings::GlobalScope ) == "Tiles" )
+		Settings->setValue( "View/TilesImageSize", QSize( iconSize, iconSize ), NBSettings::GlobalScope );
 
 	else
-		Settings->setValue( "View/DetailsImageSize", QSize( iconSize, iconSize ) );
+		Settings->setValue( "View/DetailsImageSize", QSize( iconSize, iconSize ), NBSettings::GlobalScope );
 
 	iconSizeL->setText( QString( "%1 px" ).arg( iconSize ) );
 };
 
 void NBSGeneralWidget::handleGroupingChanged( bool grouping ) {
 
-	Settings->setValue( "Grouping", grouping );
-	Settings->General.Grouping = grouping;
+	Settings->setValue( "Grouping", grouping, NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handleSortCaseChanged( bool sortCase ) {
 
-	Settings->setValue( "SortCase", sortCase );
-	Settings->General.SortCase = sortCase;
+	Settings->setValue( "SortCase", sortCase, NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handleSortColumnChanged( int sortColumn ) {
 
 	switch( sortColumn ) {
 		case 0: {
-			Settings->setValue( "SortColumn", 0 );
-			Settings->General.SortColumn = 0;
+			Settings->setValue( "SortColumn", 0, NBSettings::GlobalScope );
 			break;
 		}
 
 		case 1:{
-			Settings->setValue( "SortColumn", 1 );
-			Settings->General.SortColumn = 1;
+			Settings->setValue( "SortColumn", 1, NBSettings::GlobalScope );
 			break;
 		}
 
 		case 2:{
-			Settings->setValue( "SortColumn", 2 );
-			Settings->General.SortColumn = 2;
+			Settings->setValue( "SortColumn", 2, NBSettings::GlobalScope );
 			break;
 		}
 
 		case 3:{
-			Settings->setValue( "SortColumn", 4 );
-			Settings->General.SortColumn = 4;
+			Settings->setValue( "SortColumn", 4, NBSettings::GlobalScope );
 			break;
 		}
 
 		default: {
-			if ( Settings->General.Grouping ) {
-				Settings->setValue( "SortColumn", 2 );
-				Settings->General.SortColumn = 2;
-			}
+			if ( Settings->value( "Grouping", NBSettings::GlobalScope ) )
+				Settings->setValue( "SortColumn", 2, NBSettings::GlobalScope );
 
-			else {
-				Settings->setValue( "SortColumn", 0 );
-				Settings->General.SortColumn = 0;
-			}
+			else
+				Settings->setValue( "SortColumn", 0, NBSettings::GlobalScope );
+
 			break;
 		}
 	}
-
 };
 
 void NBSGeneralWidget::handleShowSidePanelToggled( bool showPanel ) {
 
-	Settings->setValue( "SidePanel", showPanel );
-	Settings->General.SidePanel = showPanel;
+	Settings->setValue( "SidePanel", showPanel, NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handleSidePanelChoice() {
 	/* Modern: 0; Classic: 1 */
 
 	if ( qobject_cast<QRadioButton*>( sender() ) == sideBarRB )
-		Settings->setValue( "SidePanelType", 0 );
+		Settings->setValue( "SidePanelType", 0, NBSettings::GlobalScope );
 
 	else
-		Settings->setValue( "SidePanelType", 1 );
+		Settings->setValue( "SidePanelType", 1, NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handlePreviewsChanged() {
 
-	sett.setValue( "View/FilePreviews", filePreviewGB->isChecked() );
-	sett.setValue( "View/ImagePreview", imagePreviewCB->isChecked() );
-	sett.setValue( "View/PdfPreview", pdfPreviewCB->isChecked() );
-	sett.setValue( "View/DjVuPreview", djvuPreviewCB->isChecked() );
-	sett.setValue( "View/OdfPreview", odfPreviewCB->isChecked() );
-	sett.setValue( "View/VideoPreview", videoPreviewCB->isChecked() );
-
-	sett.sync();
-
-	Settings->reload();
+	Settings->setValue( "View/FilePreviews", filePreviewGB->isChecked(), NBSettings::GlobalScope );
+	Settings->setValue( "View/ImagePreview", imagePreviewCB->isChecked(), NBSettings::GlobalScope );
+	Settings->setValue( "View/PdfPreview", pdfPreviewCB->isChecked(), NBSettings::GlobalScope );
+	Settings->setValue( "View/DjVuPreview", djvuPreviewCB->isChecked(), NBSettings::GlobalScope );
+	Settings->setValue( "View/OdfPreview", odfPreviewCB->isChecked(), NBSettings::GlobalScope );
+	Settings->setValue( "View/VideoPreview", videoPreviewCB->isChecked(), NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handleFilterDirsChanged( bool filterFolders ) {
 
-	Settings->setValue( "FilterFolders", filterFolders );
-	Settings->General.FilterFolders = filterFolders;
+	Settings->setValue( "FilterFolders", filterFolders, NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handleOpenWithToggled() {
 
 	if ( qobject_cast<QCheckBox*>( sender() ) == openWithCB ) {
-		if ( openWithCB->isChecked() ) {
-			Settings->setValue( "SuperStart", true );
-			Settings->General.SuperStart = true;
-		}
+		if ( openWithCB->isChecked() )
+			Settings->setValue( "SuperStart", true, NBSettings::GlobalScope );
 
-		else {
-			Settings->setValue( "SuperStart", false );
-			Settings->General.SuperStart = false;
-		}
+		else
+			Settings->setValue( "SuperStart", false, NBSettings::GlobalScope );
 	}
 };
 
 void NBSGeneralWidget::handleTrayIconChanged( bool value ) {
 
-	Settings->setValue( "TrayIcon", value );
-	Settings->General.TrayIcon = value;
+	Settings->setValue( "TrayIcon", value, NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handleExtendedIOChanged( bool enabled ) {
 
-	Settings->setValue( "ExtendedIO", enabled );
-	Settings->General.ExtendedIO = enabled;
+	Settings->setValue( "ExtendedIO", enabled, NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handlePaintOverlayChanged( bool enabled ) {
 
-	Settings->setValue( "View/PaintOverlay", enabled );
-	Settings->View.PaintOverlay = enabled;
+	Settings->setValue( "View/PaintOverlay", enabled, NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handleLogDebugChanged( bool enabled ) {
 
-	Settings->setValue( "LogDebug", enabled );
-	Settings->General.LogDebug = enabled;
+	Settings->setValue( "LogDebug", enabled, NBSettings::GlobalScope );
 };
 
 void NBSGeneralWidget::handleAutoMountChanged( bool enabled ) {
 
-	Settings->setValue( "AutoMount", enabled );
-	Settings->General.AutoMount = enabled;
+	Settings->setValue( "AutoMount", enabled, NBSettings::GlobalScope );
 };

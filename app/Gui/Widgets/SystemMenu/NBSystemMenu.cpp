@@ -300,7 +300,7 @@ void NBSystemMenu::populateMenu() {
 
 	/* Show Hidden */
 	hiddenCheck = new NBMenuItemCheck( "Show Hidden", this );
-	hiddenCheck->setChecked( Settings->General.ShowHidden );
+	hiddenCheck->setChecked( Settings->value( "ShowHidden" ) );
 	connect( hiddenCheck, SIGNAL( clicked() ), this, SLOT( close() ) );
 	connect( hiddenCheck, SIGNAL( clicked() ), this, SIGNAL( toggleHidden() ) );
 
@@ -312,7 +312,7 @@ void NBSystemMenu::populateMenu() {
 
 	/* Sorting */
 	groupCheck = new NBMenuItemCheck( "Show in Groups", this );
-	groupCheck->setChecked( Settings->General.Grouping );
+	groupCheck->setChecked( Settings->value( "Grouping" ) );
 	connect( groupCheck, SIGNAL( clicked() ), this, SLOT( close() ) );
 	connect( groupCheck, SIGNAL( clicked() ), this, SIGNAL( toggleGrouping() ) );
 
@@ -446,41 +446,39 @@ void NBSystemMenu::exec( QPoint point ) {
 
 	if ( mAddress.startsWith( "NB://" ) ) {
 		QString location = mAddress.replace( "NB://", "" );
-		QSettings sett( "NewBreeze", location );
 
-		viewMode = sett.value( "NewBreeze/ViewMode", Settings->View.ViewMode ).toString();
+		viewMode = QString( Settings->value( "View/ViewMode" ) );
+		NBSettings::Scope scope = ( location == "SuperStart" ? NBSettings::SuperStart : NBSettings::Catalogs );
 
 		if ( viewMode == "Icons" )
-			iconSize = sett.value( "NewBreeze/IconsImageSize", Settings->View.IconsImageSize.width() ).toInt();
+			iconSize = QSize( Settings->value( "View/IconImageSize", scope ) ).width();
 
-		else if ( viewMode == "Icons" )
-			iconSize = sett.value( "NewBreeze/TilesImageSize", Settings->View.TilesImageSize.width() ).toInt();
+		else if ( viewMode == "Tiles" )
+			iconSize = QSize( Settings->value( "View/TilesImageSize", scope ) ).width();
 
 		else
-			iconSize = sett.value( "NewBreeze/DetailsImageSize", Settings->View.DetailsImageSize.width() ).toInt();
+			iconSize = QSize( Settings->value( "View/DetailsImageSize", scope ) ).width();
 
-		sortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
-		grouping = sett.value( "NewBreeze/Grouping", true ).toBool();
+		sortColumn = Settings->value( "NewBreeze/SortColumn" );
+		grouping = Settings->value( "NewBreeze/Grouping" );
 		hidden = false;
 	}
 
 	else {
-		QSettings sett( mAddress + ".directory", QSettings::NativeFormat );
-
-		viewMode = sett.value( "NewBreeze/ViewMode", Settings->View.ViewMode ).toString();
+		viewMode = QString( Settings->value( "View/ViewMode" ) );
 
 		if ( viewMode == "Icons" )
-			iconSize = sett.value( "NewBreeze/IconsImageSize", Settings->View.IconsImageSize.width() ).toInt();
+			iconSize = QSize( Settings->value( "IconsImageSize" ) ).width();
 
 		else if ( viewMode == "Icons" )
-			iconSize = sett.value( "NewBreeze/TilesImageSize", Settings->View.TilesImageSize.width() ).toInt();
+			iconSize = QSize( Settings->value( "TilesImageSize" ) ).width();
 
 		else
-			iconSize = sett.value( "NewBreeze/DetailsImageSize", Settings->View.DetailsImageSize.width() ).toInt();
+			iconSize = QSize( Settings->value( "DetailsImageSize" ) ).width();
 
-		sortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
-		grouping = sett.value( "NewBreeze/Grouping", true ).toBool();
-		hidden = Settings->General.ShowHidden;
+		sortColumn = Settings->value( "SortColumn" );
+		grouping = Settings->value( "Grouping" );
+		hidden = Settings->value( "ShowHidden" );
 	}
 
 	/* Reset View Buttons */

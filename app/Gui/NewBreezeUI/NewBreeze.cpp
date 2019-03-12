@@ -35,7 +35,7 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 		loc = QFileInfo( loc ).absoluteFilePath();
 
 	/* Open with SuperStart */
-	if ( Settings->General.SuperStart and loc.isEmpty() )
+	if ( Settings->value( "SuperStart" ) and loc.isEmpty() )
 		FolderView->doOpen( "NB://SuperStart" );
 
 	/* Load the a folder */
@@ -75,8 +75,8 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	}
 
 	else {
-		if ( exists( Settings->Session.LastDir ) ) {
-			FolderView->doOpen( QString( Settings->Session.LastDir ) );
+		if ( exists( Settings->value( "Session/LastDir" ) ) ) {
+			FolderView->doOpen( QString( Settings->value( "Session/LastDir" ) ) );
 		}
 
 		else {
@@ -166,8 +166,8 @@ void NewBreeze::setupSidePanel() {
 	connect( SideBar, SIGNAL( showTrash() ), this, SLOT( showTrash() ) );
 
 	/* Showing Classic SidePanel */
-	if ( Settings->General.SidePanel ) {
-		if ( Settings->General.SidePanelType )
+	if ( Settings->value( "SidePanel", NBSettings::GlobalScope ) ) {
+		if ( Settings->value( "SidePanelType", NBSettings::GlobalScope ) )
 			SidePanel->show();
 
 		/* Showing Modern SidePanel */
@@ -189,7 +189,7 @@ void NewBreeze::setupInfoPanel() {
 	addDockWidget( Qt::RightDockWidgetArea, InfoDock );
 
 	/* Show infopanel and hide infobar */
-	if ( Settings->General.InfoPanel ) {
+	if ( Settings->value( "InfoPanel", NBSettings::GlobalScope ) ) {
 		InfoDock->show();
 		InfoBar->hide();
 	}
@@ -210,8 +210,8 @@ void NewBreeze::setWindowProperties() {
 
 	setMinimumHeight( 600 );
 
-	if ( not Settings->Session.Maximized )
-		setGeometry( Settings->Session.Geometry );
+	if ( not Settings->value( "Session/Maximized" ) )
+		setGeometry( Settings->value( "Session/Geometry" ) );
 };
 
 void NewBreeze::createAndSetupActions() {
@@ -286,12 +286,12 @@ void NewBreeze::createAndSetupActions() {
 
 	// About NB
 	QAction *aboutNBAct = new QAction( this );
-	aboutNBAct->setShortcuts( Settings->Shortcuts.AboutNB );
+	aboutNBAct->setShortcuts( Settings->shortcuts( "AboutNB" ) );
 	connect( aboutNBAct, SIGNAL( triggered() ), this, SLOT( showAboutNB() ) );
 
 	// About Qt
 	QAction *aboutQtAct = new QAction( this );
-	aboutQtAct->setShortcuts( Settings->Shortcuts.AboutQt );
+	aboutQtAct->setShortcuts( Settings->shortcuts( "AboutQt" ) );
 	connect( aboutQtAct, SIGNAL( triggered() ), this, SLOT( showAboutQt() ) );
 
 	// About Qt
@@ -301,12 +301,12 @@ void NewBreeze::createAndSetupActions() {
 
 	// NB Info
 	QAction *showInfoAct = new QAction( this );
-	showInfoAct->setShortcuts( Settings->Shortcuts.NBInfo );
+	showInfoAct->setShortcuts( Settings->shortcuts( "NBInfo" ) );
 	connect( showInfoAct, SIGNAL( triggered() ), this, SLOT( showInfoDlg() ) );
 
 	// Show settings
 	QAction *showSettingsAct = new QAction( this );
-	showSettingsAct->setShortcuts( Settings->Shortcuts.Settings );
+	showSettingsAct->setShortcuts( Settings->shortcuts( "Settings" ) );
 	connect( showSettingsAct, SIGNAL( triggered() ), this, SLOT( showSettingsDialog() ) );
 
 	// Show settings
@@ -316,22 +316,22 @@ void NewBreeze::createAndSetupActions() {
 
 	// Focus AddressBar
 	QAction *focusAddressBarAct = new QAction( this );
-	focusAddressBarAct->setShortcuts( Settings->Shortcuts.FocusAddressBar );
+	focusAddressBarAct->setShortcuts( Settings->shortcuts( "FocusAddressBar" ) );
 	connect( focusAddressBarAct, SIGNAL( triggered() ), AddressBar, SLOT( focusAddressEdit() ) );
 
 	// Open new window
 	QAction *newWindowAct = new QAction( this );
-	newWindowAct->setShortcuts( Settings->Shortcuts.NewWindow );
+	newWindowAct->setShortcuts( Settings->shortcuts( "NewWindow" ) );
 	connect( newWindowAct, SIGNAL( triggered() ), this, SLOT( newWindow() ) );
 
 	// Display terminal widget
 	QAction *termWidgetAct = new QAction( this );
-	termWidgetAct->setShortcuts( Settings->Shortcuts.InlineTerminal );
+	termWidgetAct->setShortcuts( Settings->shortcuts( "InlineTerminal" ) );
 	connect( termWidgetAct, SIGNAL( triggered() ), this, SLOT( showHideTermWidget() ) );
 
 	// Show/Hide side bar
 	QAction *toggleSidePanel = new QAction( "Toggle SidePanel", this );
-	toggleSidePanel->setShortcuts( Settings->Shortcuts.ToggleSideBar );
+	toggleSidePanel->setShortcuts( Settings->shortcuts( "ToggleSideBar" ) );
 	connect( toggleSidePanel, SIGNAL( triggered() ), this, SLOT( toggleSidePanelVisible() ) );
 
 	// Show/Hide info panel
@@ -341,7 +341,7 @@ void NewBreeze::createAndSetupActions() {
 
 	// Change View Mode
 	QAction *viewModeAct = new QAction( "Change View Mode", this );
-	viewModeAct->setShortcuts( Settings->Shortcuts.ViewMode );
+	viewModeAct->setShortcuts( Settings->shortcuts( "ViewMode" ) );
 	connect( viewModeAct, SIGNAL( triggered() ), this, SLOT( switchToNextView() ) );
 
 	// Show Catalog View
@@ -351,17 +351,17 @@ void NewBreeze::createAndSetupActions() {
 
 	// Focus the search bar
 	QAction *focusSearchAct = new QAction( "Focus SearchBar", this );
-	focusSearchAct->setShortcuts( Settings->Shortcuts.FocusSearchBar );
+	focusSearchAct->setShortcuts( Settings->shortcuts( "FocusSearchBar" ) );
 	connect( focusSearchAct, SIGNAL( triggered() ), FilterWidget, SLOT( show() ) );
 
 	// Clear the search bar
 	QAction *clearSearchAct = new QAction( "Clear SearchBar", this );
-	clearSearchAct->setShortcuts( Settings->Shortcuts.ClearSearchBar );
+	clearSearchAct->setShortcuts( Settings->shortcuts( "ClearSearchBar" ) );
 	connect( clearSearchAct, SIGNAL( triggered() ), this, SLOT( clearFilters() ) );
 
 	// Quit NewBreeze
 	QAction *quitNBAct = new QAction( "Quit NewBreeze", this );
-	quitNBAct->setShortcuts( Settings->Shortcuts.QuitNewBreeze );
+	quitNBAct->setShortcuts( Settings->shortcuts( "QuitNewBreeze" ) );
 	connect( quitNBAct, SIGNAL( triggered() ), this, SLOT( quit() ) );
 
 	addAction( focusAddressBarAct );
@@ -535,8 +535,8 @@ void NewBreeze::showSettingsDialog() {
 	SidePanel->hide();
 	SideBar->hide();
 
-	if ( Settings->General.SidePanel ) {
-		if ( Settings->General.SidePanelType )
+	if ( Settings->value( "SidePanel" ) ) {
+		if ( Settings->value( "SidePanelType" ) )
 			SidePanel->show();
 
 		else
@@ -568,7 +568,7 @@ void NewBreeze::newWindow( QString location ) {
 	}
 
 	NewBreeze *newbreeze = new NewBreeze( location );
-	if ( Settings->Session.Maximized )
+	if ( Settings->value( "Session/Maximized" ) )
 		newbreeze->showMaximized();
 
 	else
@@ -803,70 +803,69 @@ void NewBreeze::openWithList() {
 void NewBreeze::changeViewMode( int mode ) {
 
 	QStringList viewModes = QStringList() << "Tiles" << "Icons" << "Details";
-	Settings->View.ViewMode = viewModes.at( mode );
 
 	/* For anything starting with NB:// */
 	if ( not FolderView->fsModel->isRealLocation() ) {
 		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
-		QSettings sett( "NewBreeze", location );
-		sett.setValue( "NewBreeze/ViewMode", Settings->View.ViewMode );
-		sett.sync();
+		if ( location == "SuperStart" )
+			Settings->setValue( "ViewMode", viewModes.at( mode ), NBSettings::SuperStart );
+
+		else
+			Settings->setValue( "ViewMode", viewModes.at( mode ), NBSettings::Catalogs );
 	}
 
-	else {
-		QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/ViewMode", Settings->View.ViewMode );
-		sett.sync();
-	}
+	else
+		Settings->setValue( "ViewMode", viewModes.at( mode ) );
 
 	FolderView->updateViewMode();
 };
 
 void NewBreeze::switchToNextView() {
 
+	QStringList viewModes = QStringList() << "Tiles" << "Icons" << "Details";
+
+	QString newMode;
 	if ( FolderView->IconView->viewMode() == QString( "Tiles" ) )
-		Settings->View.ViewMode = QString( "Icons" );
+		newMode = QString( "Icons" );
 
 	else if ( FolderView->IconView->viewMode() == QString( "Icons" ) )
-		Settings->View.ViewMode = QString( "Details" );
+		newMode = QString( "Details" );
 
 	else
-		Settings->View.ViewMode = QString( "Tiles" );
-
-	FolderView->updateViewMode();
+		newMode = QString( "Tiles" );
 
 	if ( not FolderView->fsModel->isRealLocation() ) {
 		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
-		QSettings sett( "NewBreeze", location );
-		sett.setValue( "NewBreeze/ViewMode", Settings->View.ViewMode );
-		sett.sync();
+		if ( location == "SuperStart" )
+			Settings->setValue( "ViewMode", newMode, NBSettings::SuperStart );
+
+		else
+			Settings->setValue( "ViewMode", newMode, NBSettings::Catalogs );
 	}
 
 	else {
-		QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/ViewMode", Settings->View.ViewMode );
-		sett.sync();
+		Settings->setValue( "ViewMode", newMode );
 	}
+
+	FolderView->updateViewMode();
 };
 
 void NewBreeze::toggleGrouping() {
 
-	Settings->General.Grouping = not Settings->General.Grouping;
-
-	FolderView->fsModel->setCategorizationEnabled( Settings->General.Grouping );
-	FolderView->groupsAct->setChecked( Settings->General.Grouping );
+	FolderView->fsModel->setCategorizationEnabled( Settings->value( "Grouping" ) );
+	FolderView->groupsAct->setChecked( Settings->value( "Grouping" ) );
 
 	if ( not FolderView->fsModel->isRealLocation() ) {
 		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
-		QSettings sett( "NewBreeze", location );
-		sett.setValue( "NewBreeze/Grouping", Settings->General.Grouping );
-		sett.sync();
+		if ( location == "SuperStart" )
+			Settings->setValue( "Grouping", not Settings->value( "Grouping" ), NBSettings::SuperStart );
+
+		else
+			Settings->setValue( "Grouping", not Settings->value( "Grouping" ), NBSettings::Catalogs );
 	}
 
 	else {
-		QSettings sett( FolderView->fsModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/Grouping", Settings->General.Grouping );
-		sett.sync();
+		Settings->setValue( "Grouping", not Settings->value( "Grouping" ) );
 	}
 
 	FolderView->fsModel->reload();
@@ -930,14 +929,14 @@ void NewBreeze::quit() {
 	Q_FOREACH( QWidget *w, qApp->topLevelWidgets() )
 		w->close();
 
-	fclose( nblog );
+	// fclose( nblog );
 
 	// If there are background IO processes, bring them to front
 	if ( NBProcessManager::instance()->activeProcessCount() ) {
 		NBProcessManagerUI::instance()->show();
 		qApp->setQuitOnLastWindowClosed( true );
 
-		Settings->Special.ClosingDown = true;
+		Settings->ClosingDown = true;
 	}
 
 	else

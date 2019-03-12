@@ -32,4 +32,4 @@ typedef QPair<QString, QString> BookMark;
 static NBSettings *Settings = NBSettings::instance();
 
 static QString logPath = QDir( QStandardPaths::writableLocation( QStandardPaths::GenericConfigLocation ) ).filePath( "NewBreeze/newbreeze.log" );
-static FILE *nblog = fopen( ( Settings->General.LogDebug ? logPath.toLocal8Bit().data() : "/dev/null" ), "a" );
+extern FILE *nblog;

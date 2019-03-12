@@ -16,7 +16,7 @@ NBFolderView::NBFolderView( QWidget *parent ) : QWidget( parent ) {
 
 	// Set Data Model
 	fsModel = new NBItemViewModel();
-	fsModel->setCategorizationEnabled( Settings->General.Grouping );
+	fsModel->setCategorizationEnabled( Settings->value( "Grouping" ) );
 
 	// Setup the views
 	IconView = new NBIconView( fsModel, this );
@@ -79,14 +79,14 @@ void NBFolderView::createAndSetupActions() {
 
 	// Peek
 	peekAct = new QAction( QIcon( ":/icons/peek.png" ), "Pee&k", this );
-	peekAct->setShortcuts( Settings->Shortcuts.Peek );
+	peekAct->setShortcuts( Settings->shortcuts( "Peek" ) );
 
 	connect( peekAct, SIGNAL( triggered() ), this, SLOT( doPeek() ) );
 	addAction( peekAct );
 
 	// Home Dir
 	actHomeDir = new QAction( QIcon( ":/icons/home.png" ), "&Home", this );
-	actHomeDir->setShortcuts( Settings->Shortcuts.GoHome );
+	actHomeDir->setShortcuts( Settings->shortcuts( "GoHome" ) );
 
 	connect( actHomeDir, SIGNAL( triggered() ), this, SLOT( loadHomeDir() ) );
 	addAction( actHomeDir );
@@ -100,131 +100,131 @@ void NBFolderView::createAndSetupActions() {
 
 	// Up
 	actParDir = new QAction( QIcon( ":/icons/up.png" ), "&Up", this );
-	actParDir->setShortcuts( Settings->Shortcuts.GoUp );
+	actParDir->setShortcuts( Settings->shortcuts( "GoUp" ) );
 
 	connect( actParDir, SIGNAL( triggered() ), fsModel, SLOT( goUp() ) );
 	addAction( actParDir );
 
 	// Back
 	actPrevDir = new QAction( QIcon( ":/icons/prev.png" ), "&Back", this );
-	actPrevDir->setShortcuts( Settings->Shortcuts.GoLeft );
+	actPrevDir->setShortcuts( Settings->shortcuts( "GoLeft" ) );
 
 	connect( actPrevDir, SIGNAL( triggered() ), fsModel, SLOT( goBack() ) );
 	addAction( actPrevDir );
 
 	// Forward
 	actNextDir = new QAction( QIcon( ":/icons/next.png" ), "&Forward", this );
-	actNextDir->setShortcuts( Settings->Shortcuts.GoRight );
+	actNextDir->setShortcuts( Settings->shortcuts( "GoRight" ) );
 
 	connect( actNextDir, SIGNAL( triggered() ), fsModel, SLOT( goForward() ) );
 	addAction( actNextDir );
 
 	// New Folder
 	actNewDir = new QAction( QIcon::fromTheme( "folder-new" ), "New folder", this );
-	actNewDir->setShortcuts( Settings->Shortcuts.NewFolder );
+	actNewDir->setShortcuts( Settings->shortcuts( "NewFolder" ) );
 
 	connect( actNewDir, SIGNAL( triggered() ), this, SLOT( newFolder() ) );
 	addAction( actNewDir );
 
 	// New file
 	actNewFile = new QAction( QIcon::fromTheme( "document-new" ), "New File", this );
-	actNewFile->setShortcuts( Settings->Shortcuts.NewFile );
+	actNewFile->setShortcuts( Settings->shortcuts( "NewFile" ) );
 
 	connect( actNewFile, SIGNAL( triggered() ), this, SLOT( newFile() ) );
 	addAction( actNewFile );
 
 	// New file
 	actNewEncFS = new QAction( QIcon::fromTheme( "document-new" ), "New Encrypted Directory", this );
-	actNewEncFS->setShortcuts( Settings->Shortcuts.NewEncFS );
+	actNewEncFS->setShortcuts( Settings->shortcuts( "NewEncFS" ) );
 
 	connect( actNewEncFS, SIGNAL( triggered() ), this, SLOT( createEncFS() ) );
 	addAction( actNewEncFS );
 
 	// Copy
 	copyAct = new QAction( QIcon( ":/icons/copy.png" ), "&Copy", this );
-	copyAct->setShortcuts( Settings->Shortcuts.Copy );
+	copyAct->setShortcuts( Settings->shortcuts( "Copy" ) );
 
 	connect( copyAct, SIGNAL( triggered() ), this, SLOT( prepareCopy() ) );
 	addAction( copyAct );
 
 	// Move
 	moveAct = new QAction( QIcon( ":/icons/cut.png" ), "Cu&t", this );
-	moveAct->setShortcuts( Settings->Shortcuts.Cut );
+	moveAct->setShortcuts( Settings->shortcuts( "Cut" ) );
 
 	connect( moveAct, SIGNAL( triggered() ), this, SLOT( prepareMove() ) );
 	addAction( moveAct );
 
 	// Paste
 	pasteAct = new QAction( QIcon( ":/icons/paste.png" ), "&Paste", this );
-	pasteAct->setShortcuts( Settings->Shortcuts.Paste );
+	pasteAct->setShortcuts( Settings->shortcuts( "Paste" ) );
 
 	connect( pasteAct, SIGNAL( triggered() ), this, SLOT( prepareIO() ) );
 	addAction( pasteAct );
 
 	// Rename
 	renameAct = new QAction( QIcon( ":/icons/rename.png" ), "&Rename", this );
-	renameAct->setShortcuts( Settings->Shortcuts.Rename );
+	renameAct->setShortcuts( Settings->shortcuts( "Rename" ) );
 
 	connect( renameAct, SIGNAL( triggered() ), this, SLOT( doRename() ) );
 	addAction( renameAct );
 
 	// Reload
 	reloadAct = new QAction( QIcon( ":/icons/reload.png" ), "Re&fresh", this );
-	reloadAct->setShortcuts( Settings->Shortcuts.Reload );
+	reloadAct->setShortcuts( Settings->shortcuts( "Reload" ) );
 
 	connect( reloadAct, SIGNAL( triggered() ), this, SLOT( doReload() ) );
 	addAction( reloadAct );
 
 	// showDotFiles
 	showHideDotFiles = new QAction( QIcon( ":/icons/showDotFiles.png" ), "Show &Hidden", this );
-	showHideDotFiles->setShortcuts( Settings->Shortcuts.ToggleHidden );
+	showHideDotFiles->setShortcuts( Settings->shortcuts( "ToggleHidden" ) );
 
 	connect( showHideDotFiles, SIGNAL( triggered() ), this, SLOT( doToggleHidden() ) );
 	addAction( showHideDotFiles );
 
 	// Trash
 	trashAct = new QAction( QIcon( ":/icons/trash.png" ), "Move to trash", this );
-	trashAct->setShortcuts( Settings->Shortcuts.Trash );
+	trashAct->setShortcuts( Settings->shortcuts( "Trash" ) );
 
 	connect( trashAct, SIGNAL( triggered() ), this, SLOT( doSendToTrash() ) );
 	addAction( trashAct );
 
 	// Delete
 	delAct = new QAction( QIcon( ":/icons/delete.png" ), "Delete", this );
-	delAct->setShortcuts( Settings->Shortcuts.Delete );
+	delAct->setShortcuts( Settings->shortcuts( "Delete" ) );
 
 	connect( delAct, SIGNAL( triggered() ), this, SLOT( doDelete() ) );
 	addAction( delAct );
 
 	// Properties
 	propertiesAct = new QAction( QIcon( ":/icons/props.png" ), "&Properties", this );
-	propertiesAct->setShortcuts( Settings->Shortcuts.Properties );
+	propertiesAct->setShortcuts( Settings->shortcuts( "Properties" ) );
 
 	connect( propertiesAct, SIGNAL( triggered() ), this, SIGNAL( showProperties() ) );
 	addAction( propertiesAct );
 
 	// Permissions
 	permissionsAct = new QAction( QIcon::fromTheme( "system-users" ), "P&ermissions", this );
-	permissionsAct->setShortcuts( Settings->Shortcuts.Permissions );
+	permissionsAct->setShortcuts( Settings->shortcuts( "Permissions" ) );
 
 	connect( permissionsAct, SIGNAL( triggered() ), this, SIGNAL( showPermissions() ) );
 	addAction( permissionsAct );
 
 	// Open a virtual terminal emulator
 	openVTE = new QAction( QIcon::fromTheme( "utilities-terminal" ), "Open &VTE", this );
-	openVTE->setShortcuts( Settings->Shortcuts.Terminal );
+	openVTE->setShortcuts( Settings->shortcuts( "Terminal" ) );
 
 	connect( openVTE, SIGNAL( triggered() ), this, SLOT( openTerminal() ) );
 	addAction( openVTE );
 
 	// Open a virtual terminal emulator
 	openVTEin = new QAction( QIcon::fromTheme( "utilities-terminal" ), "Open &VTE Here", this );
-	// openVTEin->setShortcuts( Settings->Shortcuts.Terminal );
+	// openVTEin->setShortcuts( Settings->shortcuts( "Terminal" ) );
 	connect( openVTEin, SIGNAL( triggered() ), this, SLOT( openTerminalIn() ) );
 
 	// Select All
 	QAction *selectAllAct = new QAction( "&Select All", this );
-	selectAllAct->setShortcuts( Settings->Shortcuts.SelectAll );
+	selectAllAct->setShortcuts( Settings->shortcuts( "SelectAll" ) );
 
 	connect( selectAllAct, SIGNAL( triggered() ), this, SLOT( selectAll() ) );
 	addAction( selectAllAct );
@@ -252,7 +252,7 @@ void NBFolderView::createAndSetupActions() {
 	sortGroup->addAction( sortBySizeAct );
 	sortGroup->addAction( sortByDateAct );
 
-	switch( Settings->General.SortColumn ) {
+	switch( ( int )Settings->value( "SortColumn" ) ) {
 		case 0: {
 			sortByNameAct->setChecked( true );
 			break;
@@ -273,12 +273,12 @@ void NBFolderView::createAndSetupActions() {
 
 	groupsAct = new QAction( QIcon::fromTheme( "view-group", QIcon( ":/icons/groups.png" ) ), "Show in &Groups", this );
 	groupsAct->setCheckable( true );
-	groupsAct->setChecked( Settings->General.Grouping );
+	groupsAct->setChecked( Settings->value( "Grouping" ) );
 	connect( groupsAct, SIGNAL( triggered() ), this, SIGNAL( toggleGroups() ) );
 
 	// Add bookmark
 	addBookMarkAct = new QAction( QIcon( ":/icons/bookmark.png" ), "Add &Bookmark", this );
-	addBookMarkAct->setShortcuts( Settings->Shortcuts.AddBookmark );
+	addBookMarkAct->setShortcuts( Settings->shortcuts( "AddBookmark" ) );
 
 	connect( addBookMarkAct, SIGNAL( triggered() ), this, SLOT( addBookMark() ) );
 	addAction( addBookMarkAct );
@@ -321,12 +321,12 @@ void NBFolderView::goForward() {
 
 void NBFolderView::doOpenHome() {
 
-	if ( Settings->General.SpecialOpen and Settings->General.SuperStart ) {
+	if ( Settings->value( "SpecialOpen" ) and Settings->value( "SuperStart" ) ) {
 		qDebug() << "Opening SuperStart";
 		fsModel->setRootPath( "NB://SuperStart" );
 	}
 
-	else if ( Settings->General.SpecialOpen and Settings->General.OpenWithCatalog ) {
+	else if ( Settings->value( "SpecialOpen" ) and Settings->value( "OpenWithCatalog" ) ) {
 		qDebug() << "Opening Catalogs";
 		fsModel->setRootPath( "NB://Catalogs" );
 	}
@@ -739,8 +739,8 @@ void NBFolderView::doReload() {
 
 void NBFolderView::doToggleHidden() {
 
-	qDebug() << ( Settings->General.ShowHidden ? "Hiding" : "Showing" ) << "hidden files/folders";
-	fsModel->setShowHidden( not Settings->General.ShowHidden );
+	qDebug() << ( Settings->value( "ShowHidden" ) ? "Hiding" : "Showing" ) << "hidden files/folders";
+	fsModel->setShowHidden( not Settings->value( "ShowHidden" ) );
 };
 
 void NBFolderView::prepareCopy() {
@@ -763,7 +763,7 @@ void NBFolderView::prepareCopy() {
 
 	clipBoard->setMimeData( mData );
 
-	if ( Settings->General.ExtendedIO ) {
+	if ( Settings->value( "ExtendedIO" ) ) {
 		NBProcess::Progress *progress = new NBProcess::Progress;
 		progress->sourceDir = fsModel->currentDir();
 		progress->targetDir = NBDirectoryDialog::getDirectoryName( this, "NewBreeze - Choose target directory", fsModel->currentDir() );
@@ -802,7 +802,7 @@ void NBFolderView::prepareMove() {
 
 	clipBoard->setMimeData( mData );
 
-	if ( Settings->General.ExtendedIO ) {
+	if ( Settings->value( "ExtendedIO" ) ) {
 		NBProcess::Progress *progress = new NBProcess::Progress;
 		progress->sourceDir = fsModel->currentDir();
 		progress->targetDir = NBDirectoryDialog::getDirectoryName( this,"NewBreeze - Choose target directory", fsModel->currentDir() );

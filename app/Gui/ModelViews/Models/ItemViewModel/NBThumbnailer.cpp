@@ -159,7 +159,7 @@ void NBThumbnailer::createThumbnails( QString path, QStringList nodes ) {
 void NBThumbnailer::run() {
 
 	/* Image Files */
-	if ( Settings->View.ImagePreview ) {
+	if ( Settings->value( "View/ImagePreview" ) ) {
 		Q_FOREACH( QString file, images ) {
 
 			if ( mTerminate )
@@ -216,7 +216,7 @@ void NBThumbnailer::run() {
 	}
 
 	/* ODF Files */
-	if ( Settings->View.OdfPreview ) {
+	if ( Settings->value( "View/OdfPreview" ) ) {
 		Q_FOREACH( QString file, documents ) {
 
 			if ( mTerminate )
@@ -262,7 +262,7 @@ void NBThumbnailer::run() {
 			NBPluginInterface *plugin = qobject_cast<NBPluginInterface*>( pObject );
 
 			/* Video files */
-			if ( Settings->View.VideoPreview ) {
+			if ( Settings->value( "View/VideoPreview" ) ) {
 				Q_FOREACH( QString file, videos ) {
 					if ( mTerminate )
 						return;
@@ -284,7 +284,7 @@ void NBThumbnailer::run() {
 			}
 
 			/* DjVu files */
-			if ( Settings->View.DjVuPreview ) {
+			if ( Settings->value( "View/DjVuPreview" ) ) {
 				Q_FOREACH( QString file, djvus ) {
 					if ( mTerminate )
 						return;
@@ -322,7 +322,7 @@ void NBThumbnailer::run() {
 			NBPluginInterface *plugin = qobject_cast<NBPluginInterface*>( pObject );
 
 			/* PDF Files */
-			if ( Settings->View.PdfPreview ) {
+			if ( Settings->value( "View/PdfPreview" ) ) {
 				Q_FOREACH( QString file, pdfs ) {
 					if ( mTerminate )
 						return;
@@ -344,7 +344,7 @@ void NBThumbnailer::run() {
 			}
 
 			/* ePub files */
-			if ( Settings->View.ePubPreview ) {
+			if ( Settings->value( "View/ePubPreview" ) ) {
 				Q_FOREACH( QString file, epubs ) {
 					if ( mTerminate )
 						return;
@@ -365,8 +365,8 @@ void NBThumbnailer::run() {
 				}
 			}
 
-			/* ePub files */
-			if ( Settings->View.ePubPreview ) {
+			/* cbz files */
+			if ( Settings->value( "View/ePubPreview" ) ) {
 				Q_FOREACH( QString file, cbzs ) {
 					if ( mTerminate )
 						return;

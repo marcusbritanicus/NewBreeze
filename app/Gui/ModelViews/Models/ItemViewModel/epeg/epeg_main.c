@@ -1,6 +1,7 @@
 #include "Epeg.h"
 #include "epeg_private.h"
 #include <jerror.h>
+#include <string.h>
 
 static Epeg_Image   *_epeg_open_header         (Epeg_Image *im);
 static int           _epeg_decode              (Epeg_Image *im);

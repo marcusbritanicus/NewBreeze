@@ -3,3 +3,5 @@ lib*.so*
 Makefile
 newbreeze3
 .directory
+*.hh
+*.cc

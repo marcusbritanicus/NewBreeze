@@ -158,7 +158,7 @@ void NBAddressWidget::setWidgetProperties() {
 
 	toggleBtn->setChecked( false );
 	toggleBtn->setFocusPolicy( Qt::NoFocus );
-	toggleBtn->setShortcut( Settings->Shortcuts.ToggleCrumbLE.at( 0 ).toString() );
+	toggleBtn->setShortcut( Settings->shortcut( "ToggleCrumbLE" ).toString() );
 
 	connect( toggleBtn, SIGNAL( clicked() ), this, SLOT( toggleCrumbsBarAndEdit() ) );
 };
@@ -168,11 +168,7 @@ void NBAddressWidget::toggleCrumbsBarAndEdit() {
 	if ( toggleBtn->isChecked() ) {
 		crumbsBar->hide();
 		addressEdit->show();
-		if ( Settings->General.ShowHidden )
-			dModel->setFilter(  QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden );
-
-		else
-			dModel->setFilter(  QDir::Dirs | QDir::NoDotAndDotDot );
+		dModel->setFilter(  QDir::Dirs | QDir::NoDotAndDotDot );
 	}
 
 	else {

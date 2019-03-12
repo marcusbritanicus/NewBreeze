@@ -151,7 +151,7 @@ void NBTrayIcon::quit() {
 	Q_FOREACH( QWidget *w, qApp->topLevelWidgets() )
 		w->close();
 
-	fclose( nblog );
+	// fclose( nblog );
 
 	qApp->quit();
 };

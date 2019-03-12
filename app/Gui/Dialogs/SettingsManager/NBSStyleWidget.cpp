@@ -10,7 +10,7 @@ NBSStyleWidget::NBSStyleWidget( QWidget * parent ) : QWidget( parent ) {
 
 	styleListCB = new QComboBox( this );
 	styleListCB->addItems( QStyleFactory::keys() );
-	styleListCB->setCurrentIndex( QStyleFactory::keys().indexOf( Settings->View.Style ) );
+	styleListCB->setCurrentIndex( QStyleFactory::keys().indexOf( Settings->value( "View/Style", NBSettings::GlobalScope ) ) );
 	connect( styleListCB, SIGNAL( currentIndexChanged( const QString ) ), this, SLOT( stylePreview( const QString ) ) );
 
 	QHBoxLayout *sLyt = new QHBoxLayout();
@@ -212,5 +212,5 @@ void NBSSPreviewWidget::showStyle( const QString style ) {
 void NBSStyleWidget::applyStyle() {
 
 	qApp->setStyle( styleListCB->currentText() );
-	Settings->setValue( "Style", styleListCB->currentText() );
+	Settings->setValue( "Style", styleListCB->currentText(), NBSettings::GlobalScope );
 };

@@ -21,7 +21,6 @@ void NBStartup() {
 	if ( not exists( NBXdg::home() + ".config/NewBreeze/NewBreeze.conf" ) ) {
 		NBStartupWizard *startWiz = new NBStartupWizard();
 		startWiz->exec();
-		Settings->reload();
 	}
 
 	/*
@@ -29,7 +28,7 @@ void NBStartup() {
 		* AutoMount service
 		*
 	*/
-	if ( Settings->General.AutoMount )
+	if ( Settings->value( "AutoMount" ) )
 		NBAutoMount::instance()->start();
 
 	/*
@@ -41,7 +40,8 @@ void NBStartup() {
 		bool out = QDir::home().mkpath( thumbsDir );
 		if ( !out ) {
 			qDebug() << "Error settings thumbnail cache path: " << thumbsDir;
-			abort();
+			qDebug() << "Thumbnailing disabled.";
+			Settings->setValue( "View/FilePreviews", false );
 		}
 	}
 
@@ -50,19 +50,14 @@ void NBStartup() {
 		* Set the Icon Theme
 		*
 	*/
-	QIcon::setThemeName( Settings->View.IconTheme );
-	QSettings sett( "NewBreeze", "NewBreeze" );
-	if ( sett.value( "IconTheme" ).toString().isNull() ) {
-		sett.setValue( "IconTheme", Settings->View.IconTheme );
-		sett.sync();
-	}
+	QIcon::setThemeName( Settings->value( "View/IconTheme" ) );
 
 	/*
 		*
 		* Application style
 		*
 	*/
-	qApp->setStyle( QStyleFactory::create( Settings->View.Style ) );
+	qApp->setStyle( QStyleFactory::create( Settings->value( "View/Style" ) ) );
 
 	/*
 		*

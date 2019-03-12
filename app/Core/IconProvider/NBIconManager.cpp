@@ -129,7 +129,7 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 
 	/* This is an djvu file */
 	else if ( mName.contains( "djv" ) ) {
-		if ( Settings->View.FilePreviews and Settings->View.DjVuPreview ) {
+		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/DjVuPreview" ) ) {
 			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
 				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
 		}
@@ -137,7 +137,7 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 
 	/* This is an image file */
 	else if ( mName.startsWith( "image/" ) or not mName.compare( "video/mng" ) ) {
-		if ( Settings->View.FilePreviews and Settings->View.ImagePreview ) {
+		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/ImagePreview" ) ) {
 			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
 				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
 		}
@@ -145,7 +145,7 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 
 	/* This is an video file */
 	else if ( mName.startsWith( "video/" ) and mName.compare( "video/mng" ) ) {
-		if ( Settings->View.FilePreviews and Settings->View.VideoPreview ) {
+		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/VideoPreview" ) ) {
 			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
 				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
 		}
@@ -153,7 +153,7 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 
 	/* This is a ODF file */
 	else if ( odf.contains( mName ) ) {
-		if ( Settings->View.FilePreviews and Settings->View.OdfPreview ) {
+		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/OdfPreview" ) ) {
 			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
 				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
 		}
@@ -161,7 +161,7 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 
 	/* This is a pdf file */
 	else if ( mName.contains( "pdf" ) ) {
-		if ( Settings->View.FilePreviews and Settings->View.PdfPreview ) {
+		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/PdfPreview" ) ) {
 			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
 				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
 		}
@@ -169,7 +169,7 @@ QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
 
 	/* This is a pdf file */
 	else if ( mName.contains( "epub" ) ) {
-		if ( Settings->View.FilePreviews and Settings->View.ePubPreview ) {
+		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/ePubPreview" ) ) {
 			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
 				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
 		}
@@ -192,7 +192,7 @@ void NBIconManager::generateThemeDatabase() {
 
 	/* List the theme inheritence */
 	QStringList themes;
-	themes << Settings->View.IconTheme;
+	themes << ( QString )Settings->value( "View/IconTheme" );
 	QSettings index( iconThemePath + themes[ 0 ] + "/index.theme", QSettings::NativeFormat );
 	themes << index.value( "Icon Theme/Inherits" ).toStringList();
 

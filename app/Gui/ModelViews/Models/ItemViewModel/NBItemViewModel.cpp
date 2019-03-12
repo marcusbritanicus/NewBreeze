@@ -25,13 +25,13 @@ inline int scandirCallback( const struct dirent* entry ) {
 		return 0;
 
 	/* If we are not to show hidden files/folders, filter all names starting with . */
-	if ( not Settings->General.ShowHidden and not strncmp( entry->d_name, ".", 1 ) )
+	if ( not Settings->value( "ShowHidden" ) and not strncmp( entry->d_name, ".", 1 ) )
 		return 0;
 
 	/* Name filter */
 	if ( lambdaUseFilterList.count() ) {
 		/* Do not filter folders, if the flag is not set */
-		if ( not Settings->General.FilterFolders and ( entry->d_type == DT_DIR ) )
+		if ( not Settings->value( "FilterFolders" ) and ( entry->d_type == DT_DIR ) )
 			return 1;
 
 		/* If the name matches any one of the nameFilters, show it */
@@ -49,19 +49,19 @@ NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent
 	mVirtualData = false;
 
 	/* Categrorization enabled by default */
-	mCategorizationEnabled = Settings->General.Grouping;
+	mCategorizationEnabled = Settings->value( "Grouping" );
 
 	/* Useless swtiches */
 	currentLoadStatus.loading = false;
 	currentLoadStatus.stopLoading = false;
 
-	prevSort.column = Settings->General.SortColumn;
-	prevSort.cs = Settings->General.SortCase;
-	prevSort.categorized = Settings->General.Grouping;
+	prevSort.column = Settings->value( "SortColumn" );
+	prevSort.cs = Settings->value( "SortCase" );
+	prevSort.categorized = Settings->value( "Grouping" );
 
 	oldRoots.clear();
 	curIndex = 0;
-	prevFolder = Settings->Session.LastDir;
+	prevFolder = QString( Settings->value( "Session/LastDir" ) );
 
 	/* Root node */
 	rootNode = new NBItemViewNode();
@@ -308,7 +308,7 @@ bool NBItemViewModel::insertNode( QString nodeName ) {
 
 	QVariantList data = quickDataGatherer->getQuickFileInfo( mRootPath + nodeName );
 
-	if ( Settings->General.ShowHidden ) {
+	if ( Settings->value( "ShowHidden" ) ) {
 		if ( mNameFilters.count() ) {
 			if ( matchesFilter( mNameFilters, nodeName ) ) {
 				rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
@@ -320,6 +320,7 @@ bool NBItemViewModel::insertNode( QString nodeName ) {
 			mChildNames << nodeName;
 		}
 	}
+
 	else {
 		if ( not nodeName.startsWith( "." ) ) {
 			if ( mNameFilters.count() ) {
@@ -631,17 +632,13 @@ QModelIndexList NBItemViewModel::categorySiblings( QModelIndex idx ) const {
 
 bool NBItemViewModel::showHidden() const {
 
-	return Settings->General.ShowHidden;
+	return Settings->value( "ShowHidden" );
 };
 
 void NBItemViewModel::setShowHidden( bool ok ) {
 
 	/* We have set per-folder settings */
-	QSettings sett( mRootPath + ".directory", QSettings::NativeFormat );
-	sett.setValue( "NewBreeze/ShowHidden", ok );
-	sett.sync();
-
-	Settings->General.ShowHidden = ok;
+	Settings->setValue( "ShowHidden", ok );
 	setupModelData();
 };
 
@@ -865,7 +862,7 @@ void NBItemViewModel::setRootPath( QString path ) {
 			mRootPath = prevFolder;
 
 		else
-			mRootPath = Settings->Session.LastDir;
+			mRootPath = QString( Settings->value( "Session/LastDir" ) );
 	}
 
 	else {
@@ -885,41 +882,24 @@ void NBItemViewModel::setRootPath( QString path ) {
 	chdir( mRootPath.toLocal8Bit().constData() );
 
 	/* We have set per-folder settings */
-	if ( Settings->General.PerFolderViews ) {
+	if ( Settings->value( "PerFolderViews" ) ) {
+		/* Normal folder */
 		if ( not mVirtualData ) {
-			QSettings sett( mRootPath + ".directory", QSettings::NativeFormat );
-
 			/* Check per folder view settings */
-			Settings->General.ShowHidden = sett.value( "NewBreeze/Hidden", false ).toBool();
-
-			NBSettings *Default = NBSettings::defaultInstance();
-
-			prevSort.column = sett.value( "NewBreeze/SortColumn", Default->General.SortColumn ).toInt();
-			prevSort.cs = sett.value( "NewBreeze/SortCase", Default->General.SortCase ).toBool();
-			prevSort.categorized = sett.value( "NewBreeze/Grouping", Default->General.Grouping ).toBool();
+			prevSort.column = Settings->value( "SortColumn" );
+			prevSort.cs = Settings->value( "SortCase" );
+			prevSort.categorized = Settings->value( "Grouping" );
 			mCategorizationEnabled = prevSort.categorized;
-
-			Settings->General.SortColumn = prevSort.column;
-			Settings->General.Grouping = prevSort.categorized;
-			Settings->View.ViewMode = sett.value( "NewBreeze/ViewMode", Default->View.ViewMode ).toString();
 		}
 
 		else {
-			QSettings sett( "NewBreeze", QString( mRootPath ).replace( "NB://", "" ) );
+			QString location = QString( mRootPath ).replace( "NB://", "" );
+			NBSettings::Scope scope = ( location == "SuperStart" ? NBSettings::SuperStart : NBSettings::Catalogs );
 
-			/* Check per folder view settings */
-			Settings->General.ShowHidden = sett.value( "NewBreeze/Hidden", false ).toBool();
-
-			NBSettings *Default = NBSettings::defaultInstance();
-
-			prevSort.column = sett.value( "NewBreeze/SortColumn", Default->General.SortColumn ).toInt();
-			prevSort.cs = sett.value( "NewBreeze/SortCase", Default->General.SortCase ).toBool();
-			prevSort.categorized = sett.value( "NewBreeze/Grouping", Default->General.Grouping ).toBool();
+			prevSort.column = Settings->value( "SortColumn", scope );
+			prevSort.cs = Settings->value( "SortCase", scope );
+			prevSort.categorized = Settings->value( "Grouping", scope );
 			mCategorizationEnabled = prevSort.categorized;
-
-			Settings->General.SortColumn = prevSort.column;
-			Settings->General.Grouping = prevSort.categorized;
-			Settings->View.ViewMode = sett.value( "NewBreeze/ViewMode", Default->View.ViewMode ).toString();
 		}
 	}
 
@@ -1035,7 +1015,7 @@ void NBItemViewModel::setupModelData() {
 	switch( mModelDataType ) {
 		case NBItemViewModel::SuperStart: {
 			setupSuperStartData();
-			if ( Settings->View.FilePreviews )
+			if ( Settings->value( "View/FilePreviews" ) )
 				thumbnailer->createThumbnails( mChildPaths );
 			return;
 		}
@@ -1047,14 +1027,14 @@ void NBItemViewModel::setupModelData() {
 
 		case NBItemViewModel::Catalogs: {
 			setupCatalogData();
-			if ( Settings->View.FilePreviews )
+			if ( Settings->value( "View/FilePreviews" ) )
 				thumbnailer->createThumbnails( mChildPaths );
 			return;
 		}
 
 		case NBItemViewModel::FileSystem: {
 			setupFileSystemData();
-			if ( Settings->View.FilePreviews )
+			if ( Settings->value( "View/FilePreviews" ) )
 				thumbnailer->createThumbnails( mRootPath, mChildNames );
 			return;
 		}
@@ -1433,7 +1413,7 @@ void NBItemViewModel::recategorize() {
 
 void NBItemViewModel::handleNodeCreated( QString node ) {
 
-	if ( baseName( node ).startsWith( "." ) and not Settings->General.ShowHidden )
+	if ( baseName( node ).startsWith( "." ) and not Settings->value( "ShowHidden" ) )
 		return;
 
 	if ( dirName( node ) == currentDir() )
@@ -1473,7 +1453,7 @@ void NBItemViewModel::handleNodeChanged( QString node ) {
 
 void NBItemViewModel::handleNodeDeleted( QString node ) {
 
-	if ( baseName( node ).startsWith( "." ) and not Settings->General.ShowHidden )
+	if ( baseName( node ).startsWith( "." ) and not Settings->value( "ShowHidden" ) )
 		return;
 
 	if ( dirName( node ) == currentDir() )

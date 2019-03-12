@@ -1,134 +1,109 @@
 /*
-    *
-    * NBSettings.hpp - NBSettings class header
-    *
+	*
+	* NBSettings.hpp - Settings Module for NewBreeze
+	*
 */
 
 #pragma once
-#ifndef NBSETTINGS_HPP
-#define NBSETTINGS_HPP
 
-#include <QString>
-#include <QList>
+#include <QtCore>
 #include <QKeySequence>
-#include <QColor>
-#include <QRect>
-#include <QSize>
-#include <QSettings>
 
 class NBSettings {
+
 	public:
+		enum Scope{
+			GlobalScope = 0x28d1e9,				// Values stored in ~/.config/NewBreeze/NewBreeze.conf
+			LocalScope,							// Values stored in $(PWD)/.directory if it exists, GlobalScope
+			SuperStart,
+			Catalogs
+		};
 
-		// General Settings
-		class GeneralSettings {
-			public:
-				bool TrayIcon;									// Minimize to tray?
-				bool OpenWithCatalog;							// Show catalog on NB Open?
-				bool SidePanel;									// Show sidepanel?
-				int SidePanelType;								// Show classic or modern?
-				bool InfoPanel;									// Show infopanel?
-				bool ShowHidden;								// Show Hidden files and folders?
-				int SortColumn;									// Default Sort Column
-				bool SortCase;									// Is sorting case sensitive
-				bool Grouping;									// Enable grouping?
-				bool PerFolderViews;							// Enable per folder views?
-				bool FilterFolders;								// Filter folders while searching?
-				bool SuperStart;								// Use CombiView as Home
-				bool SpecialOpen;								// Use CombiView as Home
-				bool ExtendedIO;								// Use direct copy/move
-				bool LogDebug;									// Log debug messages
-				bool AutoMount;									// Auto Mount Volumes
-		} General;
+		static NBSettings *instance();
 
-		// View Settings
-		class ViewSettings {
-			public:
-				QString Style;									// Gui theme
-				QString ViewMode;								// Icons, Tiles or Details
-				QString IconTheme;								// Icon Theme
+		void reload() {
 
-				QSize IconsImageSize;							// Default Icon Size
-				QSize TilesImageSize;							// Default Icon Size
-				QSize DetailsImageSize;							// Default Icon Size
+			nb3settings->sync();
+		};
 
-				bool PaintOverlay;								// Paint QuickAccess overlays
-				bool FilePreviews;								// File contents preview
-				bool ImagePreview;								// Show thumbnails of images
-				bool VideoPreview;								// Show video thumbnails
-				bool OdfPreview;								// Show ODF thumbnails
-				bool PdfPreview;								// Show PDF thumbnails
-				bool DjVuPreview;								// Show DjVu thumbnails
-				bool ePubPreview;								// Show ePub thumbnails
-		} View;
+		struct proxy {
+			QString data;
+			QString filename;
 
-		// Special Settings
-		class SpecialSettings {
-			public:
-				bool ClosingDown;
-		} Special;
+			operator bool() const {
 
-		// Session Settings
-		class SessionSettings {
-			public:
-				QRect Geometry;
-				QString LastDir;
-				bool Maximized;
-		} Session;
+				if ( filename.count() ) {
+					QSettings localSettings( filename, QSettings::NativeFormat );
+					return localSettings.value( "NewBreeze/" + data, nb3settings->value( data ).toBool() ).toBool();
+				}
 
-		// Shortcut Settings
-		class ShortcutSettings {
-			public :
-				QList<QKeySequence> AboutNB;
-				QList<QKeySequence> AboutQt;
-				QList<QKeySequence> ToggleCrumbLE;
-				QList<QKeySequence> ViewMode;
-				QList<QKeySequence> AddCustomAction;
-				QList<QKeySequence> GoHome;
-				QList<QKeySequence> GoUp;
-				QList<QKeySequence> GoLeft;
-				QList<QKeySequence> GoRight;
-				QList<QKeySequence> NewFolder;
-				QList<QKeySequence> NewFile;
-				QList<QKeySequence> NewEncFS;
-				QList<QKeySequence> Peek;
-				QList<QKeySequence> Reload;
-				QList<QKeySequence> ToggleHidden;
-				QList<QKeySequence> SelectAll;
-				QList<QKeySequence> ToggleSideBar;
-				QList<QKeySequence> Cut;
-				QList<QKeySequence> Copy;
-				QList<QKeySequence> Paste;
-				QList<QKeySequence> Rename;
-				QList<QKeySequence> Delete;
-				QList<QKeySequence> Trash;
-				QList<QKeySequence> Properties;
-				QList<QKeySequence> Permissions;
-				QList<QKeySequence> Terminal;
-				QList<QKeySequence> InlineTerminal;
-				QList<QKeySequence> NBInfo;
-				QList<QKeySequence> Settings;
-				QList<QKeySequence> CustomActions;
-				QList<QKeySequence> FocusAddressBar;
-				QList<QKeySequence> NewWindow;
-				QList<QKeySequence> AddBookmark;
-				QList<QKeySequence> FocusSearchBar;
-				QList<QKeySequence> ClearSearchBar;
-				QList<QKeySequence> QuitNewBreeze;
-		} Shortcuts;
+				return nb3settings->value( data ).toBool();
+			};
 
-		static NBSettings* defaultInstance();
-		static NBSettings* instance();
+			operator int() const {
 
-		void reload();
-		void setValue( QString, QVariant );
+				if ( filename.count() ) {
+					QSettings localSettings( filename, QSettings::NativeFormat );
+					return localSettings.value( "NewBreeze/" + data, nb3settings->value( data ).toInt() ).toInt();
+				}
 
-	private:
-		NBSettings() {};
+				return nb3settings->value( data ).toInt();
+			};
 
-		bool init;
+			operator QString() const {
 
-		static NBSettings *settings;
-		static NBSettings *defaultSettings;
+				if ( filename.count() ) {
+					QSettings localSettings( filename, QSettings::NativeFormat );
+					return localSettings.value( "NewBreeze/" + data, nb3settings->value( data ).toString() ).toString();
+				}
+
+				return nb3settings->value( data ).toString();
+			};
+
+			operator QStringList() const {
+
+				if ( filename.count() ) {
+					QSettings localSettings( filename, QSettings::NativeFormat );
+					return localSettings.value( "NewBreeze/" + data, nb3settings->value( data ).toStringList() ).toStringList();
+				}
+
+				return nb3settings->value( data ).toStringList();
+			};
+
+			operator QSize() const {
+
+				if ( filename.count() ) {
+					QSettings localSettings( filename, QSettings::NativeFormat );
+					return localSettings.value( "NewBreeze/" + data, nb3settings->value( data ).toSize() ).toSize();
+				}
+
+				return nb3settings->value( data ).toSize();
+			};
+
+			operator QRect() const {
+
+				if ( filename.count() ) {
+					QSettings localSettings( filename, QSettings::NativeFormat );
+					return localSettings.value( "NewBreeze/" + data, nb3settings->value( data ).toRect() ).toRect();
+				}
+
+				return nb3settings->value( data ).toRect();
+			};
+		};
+
+		proxy value( QString key, NBSettings::Scope scope = NBSettings::LocalScope );
+		void setValue( QString key, QVariant value, NBSettings::Scope scope = NBSettings::LocalScope );
+
+		static QList<QKeySequence> shortcuts( QString );
+		static QKeySequence shortcut( QString );
+
+		static bool ClosingDown;
+
+		private:
+			static QSettings *nb3settings;
+			static QSettings *defSett;
+
+			NBSettings();
+
+			static NBSettings *mSett;
 };
-
-#endif

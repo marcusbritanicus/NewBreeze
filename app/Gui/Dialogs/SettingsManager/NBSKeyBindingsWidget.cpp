@@ -6,7 +6,13 @@
 
 #include "NBSKeyBindingsWidget.hpp"
 
+QSettings *NBKeyBindingsWidget::userSett = NULL;
+QSettings *NBKeyBindingsWidget::defaultSett = NULL;
+
 NBKeyBindingsWidget::NBKeyBindingsWidget( QWidget *parent ) : QWidget( parent ) {
+
+	NBKeyBindingsWidget::userSett = new QSettings( "NewBreeze", "NewBreeze" );
+	NBKeyBindingsWidget::defaultSett = new QSettings( ":/data/NewBreeze.conf", QSettings::NativeFormat );
 
 	QScrollArea *scroller = new QScrollArea();
 	scroller->setStyleSheet( scroller->styleSheet() + "\nQScrollArea { border: none; }" );
@@ -15,38 +21,40 @@ NBKeyBindingsWidget::NBKeyBindingsWidget( QWidget *parent ) : QWidget( parent ) 
 	QGridLayout *keysLyt = new QGridLayout();
 	keysLyt->setSpacing( 0 );
 
-	NBKeySequenceButton *aboutNBKS = new NBKeySequenceButton( Settings->Shortcuts.AboutNB.at( 0 ), NBSettings::defaultInstance()->Shortcuts.AboutNB.at( 0 ), "AboutNB", this );
-	NBKeySequenceButton *toggleCrumbLEKS = new NBKeySequenceButton( Settings->Shortcuts.ToggleCrumbLE.at( 0 ), NBSettings::defaultInstance()->Shortcuts.ToggleCrumbLE.at( 0 ), "ToggleCrumbLE", this );
-	NBKeySequenceButton *viewModeKS = new NBKeySequenceButton( Settings->Shortcuts.ViewMode.at( 0 ), NBSettings::defaultInstance()->Shortcuts.ViewMode.at( 0 ), "ViewMode", this );
-	NBKeySequenceButton *addCustomActionKS = new NBKeySequenceButton( Settings->Shortcuts.AddCustomAction.at( 0 ), NBSettings::defaultInstance()->Shortcuts.AddCustomAction.at( 0 ), "AddCustomAction", this );
-	NBKeySequenceButton *goHomeKS = new NBKeySequenceButton( Settings->Shortcuts.GoHome.at( 0 ), NBSettings::defaultInstance()->Shortcuts.GoHome.at( 0 ), "GoHome", this );
-	NBKeySequenceButton *goUpKS = new NBKeySequenceButton( Settings->Shortcuts.GoUp.at( 0 ), NBSettings::defaultInstance()->Shortcuts.GoUp.at( 0 ), "GoUp", this );
-	NBKeySequenceButton *goLeftKS = new NBKeySequenceButton( Settings->Shortcuts.GoLeft.at( 0 ), NBSettings::defaultInstance()->Shortcuts.GoLeft.at( 0 ), "GoLeft", this );
-	NBKeySequenceButton *goRightKS = new NBKeySequenceButton( Settings->Shortcuts.GoRight.at( 0 ), NBSettings::defaultInstance()->Shortcuts.GoRight.at( 0 ), "GoRight", this );
-	NBKeySequenceButton *newFolderKS = new NBKeySequenceButton( Settings->Shortcuts.NewFolder.at( 0 ), NBSettings::defaultInstance()->Shortcuts.NewFolder.at( 0 ), "NewFolder", this );
-	NBKeySequenceButton *newFileKS = new NBKeySequenceButton( Settings->Shortcuts.NewFile.at( 0 ), NBSettings::defaultInstance()->Shortcuts.NewFile.at( 0 ), "NewFile", this );
-	NBKeySequenceButton *peekKS = new NBKeySequenceButton( Settings->Shortcuts.Peek.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Peek.at( 0 ), "Peek", this );
-	NBKeySequenceButton *reloadKS = new NBKeySequenceButton( Settings->Shortcuts.Reload.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Reload.at( 0 ), "Reload", this );
-	NBKeySequenceButton *toggleHiddenKS = new NBKeySequenceButton( Settings->Shortcuts.ToggleHidden.at( 0 ), NBSettings::defaultInstance()->Shortcuts.ToggleHidden.at( 0 ), "ToggleHidden", this );
-	NBKeySequenceButton *selectAllKS = new NBKeySequenceButton( Settings->Shortcuts.SelectAll.at( 0 ), NBSettings::defaultInstance()->Shortcuts.SelectAll.at( 0 ), "SelectAll", this );
-	NBKeySequenceButton *toggleSideBarKS = new NBKeySequenceButton( Settings->Shortcuts.ToggleSideBar.at( 0 ), NBSettings::defaultInstance()->Shortcuts.ToggleSideBar.at( 0 ), "ToggleSideBar", this );
-	NBKeySequenceButton *cutKS = new NBKeySequenceButton( Settings->Shortcuts.Cut.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Cut.at( 0 ), "Cut", this );
-	NBKeySequenceButton *copyKS = new NBKeySequenceButton( Settings->Shortcuts.Copy.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Copy.at( 0 ), "Copy", this );
-	NBKeySequenceButton *pasteKS = new NBKeySequenceButton( Settings->Shortcuts.Paste.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Paste.at( 0 ), "Paste", this );
-	NBKeySequenceButton *renameKS = new NBKeySequenceButton( Settings->Shortcuts.Rename.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Rename.at( 0 ), "Rename", this );
-	NBKeySequenceButton *deleteKS = new NBKeySequenceButton( Settings->Shortcuts.Delete.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Delete.at( 0 ), "Delete", this );
-	NBKeySequenceButton *trashKS = new NBKeySequenceButton( Settings->Shortcuts.Trash.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Trash.at( 0 ), "Trash", this );
-	NBKeySequenceButton *propertiesKS = new NBKeySequenceButton( Settings->Shortcuts.Properties.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Properties.at( 0 ), "Properties", this );
-	NBKeySequenceButton *terminalKS = new NBKeySequenceButton( Settings->Shortcuts.Terminal.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Terminal.at( 0 ), "Terminal", this );
-	NBKeySequenceButton *inlineTerminalKS = new NBKeySequenceButton( Settings->Shortcuts.InlineTerminal.at( 0 ), NBSettings::defaultInstance()->Shortcuts.InlineTerminal.at( 0 ), "InlineTerminal", this );
-	NBKeySequenceButton *nbInfoKS = new NBKeySequenceButton( Settings->Shortcuts.NBInfo.at( 0 ), NBSettings::defaultInstance()->Shortcuts.NBInfo.at( 0 ), "NBInfo", this );
-	NBKeySequenceButton *settingsKS = new NBKeySequenceButton( Settings->Shortcuts.Settings.at( 0 ), NBSettings::defaultInstance()->Shortcuts.Settings.at( 0 ), "Settings", this );
-	NBKeySequenceButton *customActionsKS = new NBKeySequenceButton( Settings->Shortcuts.CustomActions.at( 0 ), NBSettings::defaultInstance()->Shortcuts.CustomActions.at( 0 ), "CustomActions", this );
-	NBKeySequenceButton *focusAddressBarKS = new NBKeySequenceButton( Settings->Shortcuts.FocusAddressBar.at( 0 ), NBSettings::defaultInstance()->Shortcuts.FocusAddressBar.at( 0 ), "FocusAddressBar", this );
-	NBKeySequenceButton *newWindowKS = new NBKeySequenceButton( Settings->Shortcuts.NewWindow.at( 0 ), NBSettings::defaultInstance()->Shortcuts.NewWindow.at( 0 ), "NewWindow", this );
-	NBKeySequenceButton *addBookmarkKS = new NBKeySequenceButton( Settings->Shortcuts.AddBookmark.at( 0 ), NBSettings::defaultInstance()->Shortcuts.AddBookmark.at( 0 ), "AddBookmark", this );
-	NBKeySequenceButton *focusSearchBarKS = new NBKeySequenceButton( Settings->Shortcuts.FocusSearchBar.at( 0 ), NBSettings::defaultInstance()->Shortcuts.FocusSearchBar.at( 0 ), "FocusSearchBar", this );
-	NBKeySequenceButton *clearSearchBarKS = new NBKeySequenceButton( Settings->Shortcuts.ClearSearchBar.at( 0 ), NBSettings::defaultInstance()->Shortcuts.ClearSearchBar.at( 0 ), "ClearSearchBar", this );
+	QSettings xyz( ":/data/NewBreeze.conf", QSettings::NativeFormat );
+
+	NBKeySequenceButton *aboutNBKS = new NBKeySequenceButton( shortcut( "AboutNB" ), shortcut( "AboutNB", true ), "AboutNB", this );
+	NBKeySequenceButton *toggleCrumbLEKS = new NBKeySequenceButton( shortcut( "ToggleCrumbLE" ), shortcut( "ToggleCrumbLE", true ), "ToggleCrumbLE", this );
+	NBKeySequenceButton *viewModeKS = new NBKeySequenceButton( shortcut( "ViewMode" ), shortcut( "ViewMode", true ), "ViewMode", this );
+	NBKeySequenceButton *addCustomActionKS = new NBKeySequenceButton( shortcut( "AddCustomAction" ), shortcut( "AddCustomAction", true ), "AddCustomAction", this );
+	NBKeySequenceButton *goHomeKS = new NBKeySequenceButton( shortcut( "GoHome" ), shortcut( "GoHome", true ), "GoHome", this );
+	NBKeySequenceButton *goUpKS = new NBKeySequenceButton( shortcut( "GoUp" ), shortcut( "GoUp", true ), "GoUp", this );
+	NBKeySequenceButton *goLeftKS = new NBKeySequenceButton( shortcut( "GoLeft" ), shortcut( "GoLeft", true ), "GoLeft", this );
+	NBKeySequenceButton *goRightKS = new NBKeySequenceButton( shortcut( "GoRight" ), shortcut( "GoRight", true ), "GoRight", this );
+	NBKeySequenceButton *newFolderKS = new NBKeySequenceButton( shortcut( "NewFolder" ), shortcut( "NewFolder", true ), "NewFolder", this );
+	NBKeySequenceButton *newFileKS = new NBKeySequenceButton( shortcut( "NewFile" ), shortcut( "NewFile", true ), "NewFile", this );
+	NBKeySequenceButton *peekKS = new NBKeySequenceButton( shortcut( "Peek" ), shortcut( "Peek", true ), "Peek", this );
+	NBKeySequenceButton *reloadKS = new NBKeySequenceButton( shortcut( "Reload" ), shortcut( "Reload", true ), "Reload", this );
+	NBKeySequenceButton *toggleHiddenKS = new NBKeySequenceButton( shortcut( "ToggleHidden" ), shortcut( "ToggleHidden", true ), "ToggleHidden", this );
+	NBKeySequenceButton *selectAllKS = new NBKeySequenceButton( shortcut( "SelectAll" ), shortcut( "SelectAll", true ), "SelectAll", this );
+	NBKeySequenceButton *toggleSideBarKS = new NBKeySequenceButton( shortcut( "ToggleSideBar" ), shortcut( "ToggleSideBar", true ), "ToggleSideBar", this );
+	NBKeySequenceButton *cutKS = new NBKeySequenceButton( shortcut( "Cut" ), shortcut( "Cut", true ), "Cut", this );
+	NBKeySequenceButton *copyKS = new NBKeySequenceButton( shortcut( "Copy" ), shortcut( "Copy", true ), "Copy", this );
+	NBKeySequenceButton *pasteKS = new NBKeySequenceButton( shortcut( "Paste" ), shortcut( "Paste", true ), "Paste", this );
+	NBKeySequenceButton *renameKS = new NBKeySequenceButton( shortcut( "Rename" ), shortcut( "Rename", true ), "Rename", this );
+	NBKeySequenceButton *deleteKS = new NBKeySequenceButton( shortcut( "Delete" ), shortcut( "Delete", true ), "Delete", this );
+	NBKeySequenceButton *trashKS = new NBKeySequenceButton( shortcut( "Trash" ), shortcut( "Trash", true ), "Trash", this );
+	NBKeySequenceButton *propertiesKS = new NBKeySequenceButton( shortcut( "Properties" ), shortcut( "Properties", true ), "Properties", this );
+	NBKeySequenceButton *terminalKS = new NBKeySequenceButton( shortcut( "Terminal" ), shortcut( "Terminal", true ), "Terminal", this );
+	NBKeySequenceButton *inlineTerminalKS = new NBKeySequenceButton( shortcut( "InlineTerminal" ), shortcut( "InlineTerminal", true ), "InlineTerminal", this );
+	NBKeySequenceButton *nbInfoKS = new NBKeySequenceButton( shortcut( "NBInfo" ), shortcut( "NBInfo", true ), "NBInfo", this );
+	NBKeySequenceButton *settingsKS = new NBKeySequenceButton( shortcut( "Settings" ), shortcut( "Settings", true ), "Settings", this );
+	NBKeySequenceButton *customActionsKS = new NBKeySequenceButton( shortcut( "CustomActions" ), shortcut( "CustomActions", true ), "CustomActions", this );
+	NBKeySequenceButton *focusAddressBarKS = new NBKeySequenceButton( shortcut( "FocusAddressBar" ), shortcut( "FocusAddressBar", true ), "FocusAddressBar", this );
+	NBKeySequenceButton *newWindowKS = new NBKeySequenceButton( shortcut( "NewWindow" ), shortcut( "NewWindow", true ), "NewWindow", this );
+	NBKeySequenceButton *addBookmarkKS = new NBKeySequenceButton( shortcut( "AddBookmark" ), shortcut( "AddBookmark", true ), "AddBookmark", this );
+	NBKeySequenceButton *focusSearchBarKS = new NBKeySequenceButton( shortcut( "FocusSearchBar" ), shortcut( "FocusSearchBar", true ), "FocusSearchBar", this );
+	NBKeySequenceButton *clearSearchBarKS = new NBKeySequenceButton( shortcut( "ClearSearchBar" ), shortcut( "ClearSearchBar", true ), "ClearSearchBar", this );
 
 	keysLyt->addWidget( new QLabel( "AboutNB" ), 0, 0 );
 	keysLyt->addWidget( new QLabel( "Toggle CrumbsBar" ), 1, 0 );
@@ -124,7 +132,25 @@ NBKeyBindingsWidget::NBKeyBindingsWidget( QWidget *parent ) : QWidget( parent ) 
 	baseLyt->addWidget( scroller );
 
 	setLayout( baseLyt );
+
+	qDebug() << "Settings shortcuts";
 };
+
+QKeySequence NBKeyBindingsWidget::shortcut( QString action, bool nb3 ) {
+
+	/* NB3 Inbuilt default */
+	if ( nb3 ) {
+		QStringList keys = defaultSett->value( "Shortcuts/" + action ).toStringList();
+		return QKeySequence( keys.at( 0 ) );
+	}
+
+	else {
+		QStringList keys = userSett->value( "Shortcuts/" + action, defaultSett->value( "Shortcuts/" + action ).toStringList() ).toStringList();
+		return QKeySequence( keys.at( 0 ) );
+	}
+
+	return QKeySequence();
+}
 
 NBKeyCaptureWidget::NBKeyCaptureWidget( QKeySequence old, QKeySequence defKey, QWidget *parent ) : QDialog( parent ) {
 
@@ -373,8 +399,8 @@ void NBKeySequenceButton::setKeySequence( QKeySequence newKey ) {
 
 	setText( newKey.toString() );
 
-	QSettings shortcuts( "NewBreeze", "Shortcuts" );
-	shortcuts.setValue( shortcutName, newKey.toString() );
+	QSettings shortcuts( "NewBreeze", "NewBreeze" );
+	shortcuts.setValue( "Shortcuts/" + shortcutName, newKey.toString() );
 	shortcuts.sync();
 
 	Settings->reload();

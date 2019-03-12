@@ -7,11 +7,11 @@
 #include "NBSIconsWidget.hpp"
 #include "NBMimeTypeModel.hpp"
 
-NBIconThemeWidget::NBIconThemeWidget( QWidget *parent ) :QWidget( parent ) {
+NBIconThemeWidget::NBIconThemeWidget( QWidget *parent ) : QWidget( parent ) {
 
 	createGUI();
 
-	iconViewWidget->select( Settings->View.IconTheme );
+	iconViewWidget->select( Settings->value( "View/IconTheme", NBSettings::GlobalScope ) );
 	iconViewWidget->setFocus();
 };
 
@@ -32,7 +32,7 @@ void NBIconThemeWidget::switchTheme( const QModelIndex &idx ) {
 	QString theme = idx.data().toString();
 
 	QIcon::setThemeName( theme );
-	Settings->setValue( "IconTheme", theme );
+	Settings->setValue( "View/IconTheme", theme, NBSettings::GlobalScope );
 };
 
 NBIconThemeModel::NBIconThemeModel( QObject *parent ) : QAbstractListModel( parent ) {
@@ -112,7 +112,7 @@ void NBIconThemeModel::setupModel() {
 	endResetModel();
 
 	/* Hack: To restore the Icon Theme which is changed above */
-	QIcon::setThemeName( Settings->View.IconTheme );
+	QIcon::setThemeName( Settings->value( "View/IconTheme", NBSettings::GlobalScope ) );
 
 	emit layoutChanged();
 };

@@ -84,7 +84,7 @@ void NBTrashManager::createAndSetupActions() {
 	connect( tModel, SIGNAL( restored( QModelIndexList ) ), this, SLOT( handleFailedRestore( QModelIndexList ) ) );
 
 	reloadAct = new QAction( "Re&load", this );
-	reloadAct->setShortcuts( NBSettings::instance()->Shortcuts.Reload );
+	reloadAct->setShortcuts( Settings->shortcuts( "Reload" ) );
 	connect( reloadAct, SIGNAL( triggered() ), this, SLOT( doReload() ) );
 
 	restoreAct = new QAction( "&Restore Selected", this );

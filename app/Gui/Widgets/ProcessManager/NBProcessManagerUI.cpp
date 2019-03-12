@@ -91,7 +91,7 @@ void NBProcessManagerUI::addProcess( NBProcess::Progress* progress, NBAbstractPr
 
 void NBProcessManagerUI::closeEvent( QCloseEvent *cEvent ) {
 
-	if ( Settings->Special.ClosingDown and NBProcessManager::instance()->activeProcessCount() ) {
+	if ( Settings->value( "ClosingDown" ) and NBProcessManager::instance()->activeProcessCount() ) {
 		int reply = NBMessageDialog::question(
 			this,
 			"NewBreeze | Process Manager",

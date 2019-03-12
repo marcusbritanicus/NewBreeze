@@ -250,7 +250,7 @@ void NBItemViewNode::updateCategories() {
 			mCategoryList << newCategory;
 	}
 
-	if ( Settings->General.Grouping )
+	if ( Settings->value( "Grouping" ) )
 		mCategoryList = sortCategoryList( mCategoryList );
 };
 
@@ -260,14 +260,14 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 	int secondIdx = second->categoryIndex();
 
 	/* If its not a categorized sorting, then both have equal categorization weights */
-	if ( not Settings->General.Grouping )
+	if ( not Settings->value( "Grouping" ) )
 		firstIdx = secondIdx;
 
 	if ( firstIdx == secondIdx ) {
 		if ( ( first->data( 0, true ) == "dir" ) and ( second->data( 0, true ) == "dir" ) ) {
-			switch( Settings->General.SortColumn ) {
+			switch( ( int )Settings->value( "SortColumn" ) ) {
 				case 0: {
-					if ( Settings->General.SortCase )
+					if ( Settings->value( "SortCase" ) )
 						return first->data( 0 ).toString() < second->data( 0 ).toString();
 
 					else
@@ -279,11 +279,11 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 				}
 
 				default: {
-					if ( first->data( Settings->General.SortColumn ).toString() < second->data( Settings->General.SortColumn ).toString() )
+					if ( first->data( Settings->value( "SortColumn" ) ) < second->data( Settings->value( "SortColumn" ) ) )
 						return true;
 
-					else if ( first->data( Settings->General.SortColumn ).toString() == second->data( Settings->General.SortColumn ).toString() )
-						if ( Settings->General.SortCase )
+					else if ( first->data( Settings->value( "SortColumn" ) ) == second->data( Settings->value( "SortColumn" ) ) )
+						if ( Settings->value( "SortCase" ) )
 							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseSensitive ) < 0;
 
 						else
@@ -312,9 +312,9 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 
 		else if ( ( first->data( 0, true ) == "file" ) and ( second->data( 0, true ) == "file" ) ) {
 
-			switch( Settings->General.SortColumn ) {
+			switch( ( int )Settings->value( "SortColumn" ) ) {
 				case 0: {
-					if ( Settings->General.SortCase )
+					if ( Settings->value( "SortCase" ) )
 						return first->data( 0 ).toString() < second->data( 0 ).toString();
 
 					else
@@ -326,11 +326,11 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 				}
 
 				default: {
-					if ( first->data( Settings->General.SortColumn ).toString() < second->data( Settings->General.SortColumn ).toString() )
+					if ( first->data( Settings->value( "SortColumn" ) ) < second->data( Settings->value( "SortColumn" ) ) )
 						return true;
 
-					else if ( first->data( Settings->General.SortColumn ).toString() == second->data( Settings->General.SortColumn ).toString() )
-						if ( Settings->General.SortCase )
+					else if ( first->data( Settings->value( "SortColumn" ) ) == second->data( Settings->value( "SortColumn" ) ) )
+						if ( Settings->value( "SortCase" ) )
 							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseSensitive ) < 0;
 
 						else
@@ -359,9 +359,9 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 
 		else if ( ( first->data( 0, true ) == "system" ) and ( second->data( 0, true ) == "system" ) ) {
 
-			switch( Settings->General.SortColumn ) {
+			switch( ( int )Settings->value( "SortColumn" ) ) {
 				case 0: {
-					if ( Settings->General.SortCase )
+					if ( Settings->value( "SortCase" ) )
 						return first->data( 0 ).toString() < second->data( 0 ).toString();
 
 					else
@@ -373,11 +373,11 @@ bool columnSort2( NBItemViewNode *first, NBItemViewNode *second )  {
 				}
 
 				default: {
-					if ( first->data( Settings->General.SortColumn ).toString() < second->data( Settings->General.SortColumn ).toString() )
+					if ( first->data( Settings->value( "SortColumn" ) ) < second->data( Settings->value( "SortColumn" ) ) )
 						return true;
 
-					else if ( first->data( Settings->General.SortColumn ).toString() == second->data( Settings->General.SortColumn ).toString() )
-						if ( Settings->General.SortCase )
+					else if ( first->data( Settings->value( "SortColumn" ) ) == second->data( Settings->value( "SortColumn" ) ) )
+						if ( Settings->value( "SortCase" ) )
 							return first->data( 0 ).toString().compare( second->data( 0 ).toString(), Qt::CaseSensitive ) < 0;
 
 						else
@@ -419,7 +419,7 @@ inline bool listLessThanB( QString a, QString b ) {
 
 QStringList sortCategoryList( QStringList& cList ) {
 
-	switch( Settings->General.SortColumn ) {
+	switch( ( int )Settings->value( "SortColumn" ) ) {
 		/* Name sort */
 		case 0: {
 			qSort( cList.begin(), cList.end(), listLessThanA );

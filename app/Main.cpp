@@ -64,7 +64,7 @@ int main( int argc, char **argv ) {
 	/* Startup */
 	NBStartup();
 
-	if ( Settings->General.TrayIcon )
+	if ( Settings->value( "TrayIcon", NBSettings::GlobalScope ) )
 		app.setQuitOnLastWindowClosed( false );
 
 	else
@@ -147,13 +147,12 @@ int main( int argc, char **argv ) {
 			return 0;
 		}
 
-		/* We want only the bug report dialog */
+		/* We want only the Startup Wizard dialog */
 		case STARTUP : {
 			qDebug() << "Showing NewBreeze Startup Wizard";
 
 			NBStartupWizard *startWiz = new NBStartupWizard();
 			startWiz->exec();
-			Settings->reload();
 
 			return 0;
 		}
@@ -176,13 +175,13 @@ int main( int argc, char **argv ) {
 
 			QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
-			if ( Settings->Session.Maximized )
+			if ( Settings->value( "Session/Maximized" ) )
 				Gui->showMaximized();
 
 			else
 				Gui->showNormal();
 
-			if ( Settings->General.TrayIcon ) {
+			if ( Settings->value( "TrayIcon" ) ) {
 				NBTrayIcon* trayIcon = new NBTrayIcon();
 				trayIcon->show();
 
@@ -207,7 +206,7 @@ int main( int argc, char **argv ) {
 
 				/* There was no argument. Try to open the last opened folder, failing which we open the home directory */
 				else
-					query = ( NBSettings::instance()->Session.LastDir.isEmpty() ? QDir::homePath() : NBSettings::instance()->Session.LastDir );
+					query = ( QString( Settings->value( "Session/LastDir" ) ).isEmpty() ? QDir::homePath() : Settings->value( "Session/LastDir" ) );
 
 				/* Query for a new window */
 				int result = app.sendMessage( query );
@@ -225,13 +224,13 @@ int main( int argc, char **argv ) {
 					NewBreeze *Gui = new NewBreeze( query );
 					QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
-					if ( Settings->Session.Maximized )
+					if ( Settings->value( "Session/Maximized" ) )
 						Gui->showMaximized();
 
 					else
 						Gui->showNormal();
 
-					if ( Settings->General.TrayIcon ) {
+					if ( Settings->value( "TrayIcon" ) ) {
 						NBTrayIcon* trayIcon = new NBTrayIcon();
 						trayIcon->show();
 
@@ -250,18 +249,19 @@ int main( int argc, char **argv ) {
 				if ( app.arguments().count() >= 2 )
 					Gui = new NewBreeze( app.arguments().at( 1 ) );
 
-				else
+				else {
 					Gui = new NewBreeze( QString() );
+				}
 
 				QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
-				if ( Settings->Session.Maximized )
+				if ( Settings->value( "Session/Maximized" ) )
 					Gui->showMaximized();
 
 				else
 					Gui->showNormal();
 
-				if ( Settings->General.TrayIcon ) {
+				if ( Settings->value( "TrayIcon", NBSettings::GlobalScope ) ) {
 					NBTrayIcon* trayIcon = new NBTrayIcon();
 					trayIcon->show();
 

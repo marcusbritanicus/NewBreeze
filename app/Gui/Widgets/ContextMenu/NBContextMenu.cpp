@@ -837,7 +837,7 @@ void NBFolderView::showContextMenu( QPoint position ) {
 				sortMenu->addAction( sortByDateAct );
 				sortMenu->addSeparator();
 				sortMenu->addAction( groupsAct );
-				groupsAct->setChecked( Settings->General.Grouping );
+				groupsAct->setChecked( Settings->value( "Grouping" ) );
 
 				menu->addMenu( createNewMenu );
 				menu->addSeparator();

@@ -18,10 +18,6 @@ namespace DbgMsgPart {
 };
 
 #if QT_VERSION >= 0x050000
-	#include <QtWidgets>
-#endif
-
-#if QT_VERSION >= 0x050000
 	void NBMessageOutput5( QtMsgType, const QMessageLogContext&, const QString& );
 #else
 	void NBMessageOutput( QtMsgType, const char* );

@@ -11,6 +11,13 @@
 
 		Q_UNUSED( context );
 
+		/*
+			*
+			* Define nblog
+			*
+		*/
+		FILE *nblog = fopen( ( Settings->value( "LogDebug", NBSettings::GlobalScope ) ? logPath.toLocal8Bit().data() : "/dev/null" ), "a" );
+
 		if ( not nblog )
 			nblog = fopen( "/dev/null", "w" );
 

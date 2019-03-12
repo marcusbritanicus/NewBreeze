@@ -22,7 +22,7 @@ void NBCustomActions::createGUI() {
 	setupTable();
 
 	addBtn = new NBButton( QIcon( ":/icons/list-add.png" ), "Add Action", this );
-	addBtn->setShortcut( Settings->Shortcuts.AddCustomAction.at( 0 ) );
+	addBtn->setShortcut( Settings->shortcuts( "AddCustomAction" ).at( 0 ) );
 	connect( addBtn, SIGNAL( clicked() ), this, SLOT( addCustomAction() ) );
 
 	delBtn = new NBButton( QIcon( ":/icons/list-remove.png" ), "Remove Action", this );

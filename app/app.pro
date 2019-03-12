@@ -22,12 +22,14 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 LIBS += -larchive -lbz2 -llzma -lz -ljpeg -lexif
 
 contains ( DEFINES, USE_MEDIAINFO ) {
+	message( "libmediainfo enabled. Media information will be shown in InfoPanel." )
 	DEFINES += UNICODE
 	INCLUDEPATH += $$system(pkg-config --cflags-only-I libmediainfo libzen)
 	LIBS += $$system(pkg-config --libs libmediainfo libzen)
 }
 
 contains ( DEFINES, HAVE_LZLIB ) {
+	message( "Builting LZ compression enabled. lzip binary not required." )
 	LIBS += -llz
 }
 

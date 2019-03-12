@@ -131,6 +131,7 @@
 		<file>../data/NBFSExtData.conf</file>
 		<file>../data/GPL3.html</file>
 		<file>../data/Credits.html</file>
+		<file>../data/NewBreeze.conf</file>
 
 		<file>../data/kb-layouts/default.keytab</file>
 		<file>../data/kb-layouts/linux.keytab</file>

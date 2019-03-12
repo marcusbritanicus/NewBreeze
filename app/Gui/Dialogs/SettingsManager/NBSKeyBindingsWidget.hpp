@@ -16,6 +16,11 @@ class NBKeyBindingsWidget : public QWidget {
 
 	private:
 		void createGUI();
+
+		QKeySequence shortcut( QString action, bool nb3 = false );
+
+		static QSettings *userSett;
+		static QSettings *defaultSett;
 };
 
 class NBKeyCaptureWidget : public QDialog {

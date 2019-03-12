@@ -15,7 +15,7 @@
 NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractItemView( parent ) {
 
 	/* Current folder viewMode */
-	currentViewMode = Settings->View.ViewMode;
+	currentViewMode = QString( QString( Settings->value( "View/ViewMode" ) ) );
 
 	/* Icon rects */
 	idealHeight = 0;
@@ -56,14 +56,14 @@ NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractI
 	setModel( cModel );
 
 	/* Icon Size */
-	if ( Settings->View.ViewMode == "Icons" )
-		setIconSize( Settings->View.IconsImageSize );
+	if ( QString( Settings->value( "View/ViewMode" ) ) == "Icons" )
+		setIconSize( Settings->value( "View/IconsImageSize" ) );
 
-	else if ( Settings->View.ViewMode == "Tiles" )
-		setIconSize( Settings->View.TilesImageSize );
+	else if ( QString( Settings->value( "View/ViewMode" ) ) == "Tiles" )
+		setIconSize( Settings->value( "View/TilesImageSize" ) );
 
 	else
-		setIconSize( Settings->View.DetailsImageSize );
+		setIconSize( Settings->value( "View/DetailsImageSize" ) );
 
 	/* Default Selection Rules */
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
@@ -126,15 +126,15 @@ void NBIconView::setModel( QAbstractItemModel *model ) {
 
 void NBIconView::updateViewMode() {
 
-	currentViewMode = Settings->View.ViewMode;
-	if ( Settings->View.ViewMode == "Icons" )
-		setIconSize( Settings->View.IconsImageSize );
+	currentViewMode = QString( Settings->value( "View/ViewMode" ) );
+	if ( QString( Settings->value( "View/ViewMode" ) ) == "Icons" )
+		setIconSize( Settings->value( "View/IconsImageSize" ) );
 
-	else if ( Settings->View.ViewMode == "Tiles" )
-		setIconSize( Settings->View.TilesImageSize );
+	else if ( QString( Settings->value( "View/ViewMode" ) ) == "Tiles" )
+		setIconSize( Settings->value( "View/TilesImageSize" ) );
 
 	else
-		setIconSize( Settings->View.DetailsImageSize );
+		setIconSize( Settings->value( "View/DetailsImageSize" ) );
 
 	return;
 };
@@ -359,38 +359,32 @@ void NBIconView::reload() {
 
 	/* Change view mode and icon size according to the .desktop file */
 	if ( not cModel->isRealLocation() ) {
-		QString location = cModel->currentDir().replace( "NB://", "" );
-		QSettings sett( "NewBreeze", location );
+		// QString location = cModel->currentDir().replace( "NB://", "" );
+		// QSettings sett( "NewBreeze", location );
 
-		viewMode = sett.value( "NewBreeze/ViewMode", Settings->View.ViewMode ).toString();
+		// viewMode = sett.value( "NewBreeze/ViewMode", QString( Settings->value( "View/ViewMode" ) ) ).toString();
 
-		if ( viewMode == "Icons" )
-			iconSize = sett.value( "NewBreeze/IconsImageSize", Settings->View.IconsImageSize.width() ).toInt();
+		// if ( viewMode == "Icons" )
+			// iconSize = sett.value( "NewBreeze/IconsImageSize", QSize( Settings->value( "View/IconsImageSize" ) ).width() ).toInt();
 
-		else if ( viewMode == "Icons" )
-			iconSize = sett.value( "NewBreeze/TilesImageSize", Settings->View.TilesImageSize.width() ).toInt();
+		// else if ( viewMode == "Icons" )
+			// iconSize = sett.value( "NewBreeze/TilesImageSize", QSize( Settings->value( "View/TilesImageSize" ) ).width() ).toInt();
 
-		else
-			iconSize = sett.value( "NewBreeze/DetailsImageSize", Settings->View.DetailsImageSize.width() ).toInt();
-
-		Settings->General.SortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
+		// else
+			// iconSize = sett.value( "NewBreeze/DetailsImageSize", QSize( Settings->value( "View/DetailsImageSize" ) ).width() ).toInt();
 	}
 
 	else {
-		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-
-		viewMode = sett.value( "NewBreeze/ViewMode", Settings->View.ViewMode ).toString();
+		viewMode = QString( Settings->value( "View/ViewMode" ) );
 
 		if ( viewMode == "Icons" )
-			iconSize = sett.value( "NewBreeze/IconsImageSize", Settings->View.IconsImageSize.width() ).toInt();
+			iconSize = QSize( Settings->value( "View/IconsImageSize" ) ).width();
 
 		else if ( viewMode == "Icons" )
-			iconSize = sett.value( "NewBreeze/TilesImageSize", Settings->View.TilesImageSize.width() ).toInt();
+			iconSize = QSize( Settings->value( "View/TilesImageSize" ) ).width();
 
 		else
-			iconSize = sett.value( "NewBreeze/DetailsImageSize", Settings->View.DetailsImageSize.width() ).toInt();
-
-		Settings->General.SortColumn = sett.value( "NewBreeze/SortColumn", 2 ).toInt();
+			iconSize = QSize( Settings->value( "View/DetailsImageSize" ) ).width();
 	}
 
 	emit updateViewMode( viewMode );
@@ -502,7 +496,7 @@ QModelIndexList NBIconView::selection() {
 
 bool NBIconView::isIndexVisible( QModelIndex idx ) const {
 
-	if ( Settings->General.Grouping ) {
+	if ( Settings->value( "Grouping" ) ) {
 		/* We consider the space reserved for the category but not the indexes listed under it */
 		if ( hiddenCategories.contains( cModel->category( idx ) ) )
 			return false;
@@ -657,21 +651,21 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 		NBIconDelegate *dlgt = qobject_cast<NBIconDelegate*>( itemDelegate() );
 		if ( currentViewMode == QString( "Icons" ) ) {
 			dlgt->paintIcons( &painter, option, idx );
-			if ( Settings->View.PaintOverlay and ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+			if ( Settings->value( "View/PaintOverlay" ) and ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
 				paintIconOverlay( &painter, rect );
 		}
 
 		else if ( currentViewMode == QString( "Tiles" ) ) {
 			dlgt->paintTiles( &painter, option, idx );
 			/* Yet to be implemented */
-			// if ( Settings->View.PaintOverlay and ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+			// if ( Settings->value( "View/PaintOverlay and ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
 				// paintTilesOverlay( &painter, option.rect, );
 		}
 
 		else {
 			dlgt->paintDetails( &painter, option, idx );
 			/* Yet to be implemented */
-			// if ( Settings->View.PaintOverlay and ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
+			// if ( Settings->value( "View/PaintOverlay" ) and ( option.state & QStyle::State_Selected ) and ( option.state & QStyle::State_MouseOver ) )
 				// paintTilesOverlay( &painter, option.rect, );
 		}
 	}
@@ -833,7 +827,7 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 			/* Index already selected, start the drag */
 			if ( mSelectedIndexes.contains( idx ) or selectionModel()->isSelected( idx ) ) {
 
-				if ( Settings->View.PaintOverlay ) {
+				if ( Settings->value( "View/PaintOverlay" ) ) {
 
 					int iSize = myIconSize.width();
 					if ( iSize < 48 )
@@ -2752,14 +2746,14 @@ void NBIconView::zoomIn() {
 	if ( cModel->isRealLocation() ) {
 
 		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/" + Settings->View.ViewMode + "ImageSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize.width() );
 		sett.sync();
 	}
 
 	else {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
 		QSettings sett( "NewBreeze", loc );
-		sett.setValue( "NewBreeze/" + Settings->View.ViewMode + "ImageSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize.width() );
 		sett.sync();
 	}
 };
@@ -2775,14 +2769,14 @@ void NBIconView::zoomOut() {
 	if ( cModel->isRealLocation() ) {
 
 		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/" + Settings->View.ViewMode + "ImageSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize.width() );
 		sett.sync();
 	}
 
 	else {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
 		QSettings sett( "NewBreeze", loc );
-		sett.setValue( "NewBreeze/" + Settings->View.ViewMode + "ImageSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize.width() );
 		sett.sync();
 	}
 };
