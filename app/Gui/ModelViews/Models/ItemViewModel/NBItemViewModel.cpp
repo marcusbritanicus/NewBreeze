@@ -91,7 +91,7 @@ NBItemViewModel::~NBItemViewModel() {
 
 bool NBItemViewModel::isCategorizationEnabled() {
 
-	return mCategorizationEnabled;
+	return Settings->value( "Grouping" );
 };
 
 void NBItemViewModel::setCategorizationEnabled( bool enabled ) {

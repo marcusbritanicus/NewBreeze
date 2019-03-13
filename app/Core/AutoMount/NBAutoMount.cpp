@@ -62,6 +62,7 @@ void NBAutoMount::stop() {
 
 void NBAutoMount::mountFS( QString node ) {
 
+	qDebug() << "Mounting" << node;
 	UDisks2Filesystem *ufs = new UDisks2Filesystem( node );
 	if ( ufs )
 		ufs->mount();

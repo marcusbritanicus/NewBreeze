@@ -16,7 +16,7 @@ NBFolderView::NBFolderView( QWidget *parent ) : QWidget( parent ) {
 
 	// Set Data Model
 	fsModel = new NBItemViewModel();
-	fsModel->setCategorizationEnabled( Settings->value( "Grouping" ) );
+	fsModel->setCategorizationEnabled( Settings->value( "Grouping", NBSettings::GlobalScope ) );
 
 	// Setup the views
 	IconView = new NBIconView( fsModel, this );

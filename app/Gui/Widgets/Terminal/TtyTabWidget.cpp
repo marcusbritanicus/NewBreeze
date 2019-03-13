@@ -20,10 +20,6 @@ TtyTabWidget::TtyTabWidget( QWidget *parent, bool mode ) : QTabWidget( parent ) 
 
 	connect( this, SIGNAL( tabCloseRequested( int ) ), this, SLOT( closeTab( int ) ) );
 
-	/* Terminal Icon on top left corner */
-	QLabel *iconLbl = new QLabel( this );
-	iconLbl->setPixmap( QIcon::fromTheme( "utilities-terminal" ).pixmap( 24 ) );
-
 	setTabPosition( QTabWidget::North );
 };
 
