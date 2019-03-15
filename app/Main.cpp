@@ -175,13 +175,13 @@ int main( int argc, char **argv ) {
 
 			QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
-			if ( Settings->value( "Session/Maximized" ) )
+			if ( Settings->value( "Session/Maximized", NBSettings::GlobalScope ) )
 				Gui->showMaximized();
 
 			else
 				Gui->showNormal();
 
-			if ( Settings->value( "TrayIcon" ) ) {
+			if ( Settings->value( "TrayIcon", NBSettings::GlobalScope ) ) {
 				NBTrayIcon* trayIcon = new NBTrayIcon();
 				trayIcon->show();
 
@@ -205,8 +205,10 @@ int main( int argc, char **argv ) {
 					query = QString::fromLocal8Bit( argv[ 1 ] );
 
 				/* There was no argument. Try to open the last opened folder, failing which we open the home directory */
-				else
-					query = ( QString( Settings->value( "Session/LastDir" ) ).isEmpty() ? QDir::homePath() : Settings->value( "Session/LastDir" ) );
+				else {
+					query = QString( Settings->value( "Session/LastDir", NBSettings::GlobalScope ) );
+					query = query.isEmpty() ? QDir::homePath() : query;
+				}
 
 				/* Query for a new window */
 				int result = app.sendMessage( query );
@@ -224,13 +226,13 @@ int main( int argc, char **argv ) {
 					NewBreeze *Gui = new NewBreeze( query );
 					QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
-					if ( Settings->value( "Session/Maximized" ) )
+					if ( Settings->value( "Session/Maximized", NBSettings::GlobalScope ) )
 						Gui->showMaximized();
 
 					else
 						Gui->showNormal();
 
-					if ( Settings->value( "TrayIcon" ) ) {
+					if ( Settings->value( "TrayIcon", NBSettings::GlobalScope ) ) {
 						NBTrayIcon* trayIcon = new NBTrayIcon();
 						trayIcon->show();
 
@@ -255,7 +257,7 @@ int main( int argc, char **argv ) {
 
 				QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
-				if ( Settings->value( "Session/Maximized" ) )
+				if ( Settings->value( "Session/Maximized", NBSettings::GlobalScope ) )
 					Gui->showMaximized();
 
 				else

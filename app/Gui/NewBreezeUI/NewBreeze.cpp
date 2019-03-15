@@ -75,8 +75,8 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	}
 
 	else {
-		if ( exists( Settings->value( "Session/LastDir" ) ) ) {
-			FolderView->doOpen( QString( Settings->value( "Session/LastDir" ) ) );
+		if ( exists( Settings->value( "Session/LastDir", NBSettings::GlobalScope ) ) ) {
+			FolderView->doOpen( QString( Settings->value( "Session/LastDir", NBSettings::GlobalScope ) ) );
 		}
 
 		else {
@@ -210,8 +210,8 @@ void NewBreeze::setWindowProperties() {
 
 	setMinimumHeight( 600 );
 
-	if ( not Settings->value( "Session/Maximized" ) )
-		setGeometry( Settings->value( "Session/Geometry" ) );
+	if ( not Settings->value( "Session/Maximized", NBSettings::GlobalScope ) )
+		setGeometry( Settings->value( "Session/Geometry", NBSettings::GlobalScope ) );
 };
 
 void NewBreeze::createAndSetupActions() {
@@ -568,7 +568,7 @@ void NewBreeze::newWindow( QString location ) {
 	}
 
 	NewBreeze *newbreeze = new NewBreeze( location );
-	if ( Settings->value( "Session/Maximized" ) )
+	if ( Settings->value( "Session/Maximized", NBSettings::GlobalScope ) )
 		newbreeze->showMaximized();
 
 	else
@@ -808,14 +808,14 @@ void NewBreeze::changeViewMode( int mode ) {
 	if ( not FolderView->fsModel->isRealLocation() ) {
 		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
 		if ( location == "SuperStart" )
-			Settings->setValue( "ViewMode", viewModes.at( mode ), NBSettings::SuperStart );
+			Settings->setValue( "View/ViewMode", viewModes.at( mode ), NBSettings::SuperStart );
 
 		else
-			Settings->setValue( "ViewMode", viewModes.at( mode ), NBSettings::Catalogs );
+			Settings->setValue( "View/ViewMode", viewModes.at( mode ), NBSettings::Catalogs );
 	}
 
 	else
-		Settings->setValue( "ViewMode", viewModes.at( mode ) );
+		Settings->setValue( "View/ViewMode", viewModes.at( mode ) );
 
 	FolderView->updateViewMode();
 };
@@ -837,14 +837,14 @@ void NewBreeze::switchToNextView() {
 	if ( not FolderView->fsModel->isRealLocation() ) {
 		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
 		if ( location == "SuperStart" )
-			Settings->setValue( "ViewMode", newMode, NBSettings::SuperStart );
+			Settings->setValue( "View/ViewMode", newMode, NBSettings::SuperStart );
 
 		else
-			Settings->setValue( "ViewMode", newMode, NBSettings::Catalogs );
+			Settings->setValue( "View/ViewMode", newMode, NBSettings::Catalogs );
 	}
 
 	else {
-		Settings->setValue( "ViewMode", newMode );
+		Settings->setValue( "View/ViewMode", newMode );
 	}
 
 	FolderView->updateViewMode();
@@ -858,14 +858,14 @@ void NewBreeze::toggleGrouping() {
 	if ( not FolderView->fsModel->isRealLocation() ) {
 		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
 		if ( location == "SuperStart" )
-			Settings->setValue( "Grouping", not Settings->value( "Grouping" ), NBSettings::SuperStart );
+			Settings->setValue( "View/Grouping", not Settings->value( "Grouping" ), NBSettings::SuperStart );
 
 		else
-			Settings->setValue( "Grouping", not Settings->value( "Grouping" ), NBSettings::Catalogs );
+			Settings->setValue( "View/Grouping", not Settings->value( "Grouping" ), NBSettings::Catalogs );
 	}
 
 	else {
-		Settings->setValue( "Grouping", not Settings->value( "Grouping" ) );
+		Settings->setValue( "View/Grouping", not Settings->value( "Grouping" ) );
 	}
 
 	FolderView->fsModel->reload();
@@ -956,10 +956,10 @@ void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
 		NBProcessManagerUI::instance()->show();
 
 	// Store the previous session - geometry, and open directory.
-	Settings->setValue( "Session/Geometry", geometry() );
-	Settings->setValue( "Session/Maximized", isMaximized() );
+	Settings->setValue( "Session/Geometry", geometry(), NBSettings::GlobalScope );
+	Settings->setValue( "Session/Maximized", isMaximized(), NBSettings::GlobalScope );
 
-	Settings->setValue( "Session/LastDir", FolderView->fsModel->lastOpenedFolder() );
+	Settings->setValue( "Session/LastDir", FolderView->fsModel->lastOpenedFolder(), NBSettings::GlobalScope );
 
 	// Come to home dir
 	chdir( NBXdg::home().toLocal8Bit().constData() );

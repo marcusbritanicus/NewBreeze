@@ -450,14 +450,20 @@ void NBSystemMenu::exec( QPoint point ) {
 		viewMode = QString( Settings->value( "View/ViewMode" ) );
 		NBSettings::Scope scope = ( location == "SuperStart" ? NBSettings::SuperStart : NBSettings::Catalogs );
 
-		if ( viewMode == "Icons" )
+		if ( viewMode == "Icons" ) {
 			iconSize = QSize( Settings->value( "View/IconImageSize", scope ) ).width();
+			iconsBtn->setChecked( true );
+		}
 
-		else if ( viewMode == "Tiles" )
+		else if ( viewMode == "Tiles" ) {
 			iconSize = QSize( Settings->value( "View/TilesImageSize", scope ) ).width();
+			tilesBtn->setChecked( true );
+		}
 
-		else
+		else {
 			iconSize = QSize( Settings->value( "View/DetailsImageSize", scope ) ).width();
+			detailsBtn->setChecked( true );
+		}
 
 		sortColumn = Settings->value( "NewBreeze/SortColumn" );
 		grouping = Settings->value( "NewBreeze/Grouping" );
@@ -467,14 +473,20 @@ void NBSystemMenu::exec( QPoint point ) {
 	else {
 		viewMode = QString( Settings->value( "View/ViewMode" ) );
 
-		if ( viewMode == "Icons" )
-			iconSize = QSize( Settings->value( "IconsImageSize" ) ).width();
+		if ( viewMode == "Icons" ) {
+			iconSize = QSize( Settings->value( "View/IconImageSize" ) ).width();
+			iconsBtn->setChecked( true );
+		}
 
-		else if ( viewMode == "Icons" )
-			iconSize = QSize( Settings->value( "TilesImageSize" ) ).width();
+		else if ( viewMode == "Tiles" ) {
+			iconSize = QSize( Settings->value( "View/TilesImageSize" ) ).width();
+			tilesBtn->setChecked( true );
+		}
 
-		else
-			iconSize = QSize( Settings->value( "DetailsImageSize" ) ).width();
+		else {
+			iconSize = QSize( Settings->value( "View/DetailsImageSize" ) ).width();
+			detailsBtn->setChecked( true );
+		}
 
 		sortColumn = Settings->value( "SortColumn" );
 		grouping = Settings->value( "Grouping" );

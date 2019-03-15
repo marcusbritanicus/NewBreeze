@@ -61,7 +61,7 @@ NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent
 
 	oldRoots.clear();
 	curIndex = 0;
-	prevFolder = QString( Settings->value( "Session/LastDir" ) );
+	prevFolder = QString( Settings->value( "Session/LastDir", NBSettings::GlobalScope ) );
 
 	/* Root node */
 	rootNode = new NBItemViewNode();
@@ -862,7 +862,7 @@ void NBItemViewModel::setRootPath( QString path ) {
 			mRootPath = prevFolder;
 
 		else
-			mRootPath = QString( Settings->value( "Session/LastDir" ) );
+			mRootPath = QString( Settings->value( "Session/LastDir", NBSettings::GlobalScope ) );
 	}
 
 	else {

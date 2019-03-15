@@ -15,7 +15,7 @@
 NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractItemView( parent ) {
 
 	/* Current folder viewMode */
-	currentViewMode = QString( QString( Settings->value( "View/ViewMode" ) ) );
+	currentViewMode = QString( Settings->value( "View/ViewMode" ) );
 
 	/* Icon rects */
 	idealHeight = 0;
@@ -127,6 +127,7 @@ void NBIconView::setModel( QAbstractItemModel *model ) {
 void NBIconView::updateViewMode() {
 
 	currentViewMode = QString( Settings->value( "View/ViewMode" ) );
+
 	if ( QString( Settings->value( "View/ViewMode" ) ) == "Icons" )
 		setIconSize( Settings->value( "View/IconsImageSize" ) );
 

@@ -1,6 +1,6 @@
 /*
     *
-    * * NBTermWidget.cpp - QTermWidget reimplementation for NBTerminal
+    * NBTermWidget.cpp - QTermWidget reimplementation for NBTerminal
     *
 */
 
