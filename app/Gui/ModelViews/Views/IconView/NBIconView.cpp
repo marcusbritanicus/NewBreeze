@@ -356,23 +356,23 @@ void NBIconView::reload() {
 	}
 
 	QString viewMode;
-	int iconSize;
+	int iconSize = QSize( Settings->value( "View/IconsImageSize", NBSettings::GlobalScope ) ).width();
 
 	/* Change view mode and icon size according to the .desktop file */
 	if ( not cModel->isRealLocation() ) {
-		// QString location = cModel->currentDir().replace( "NB://", "" );
-		// QSettings sett( "NewBreeze", location );
+		QString location = cModel->currentDir().replace( "NB://", "" );
 
-		// viewMode = sett.value( "NewBreeze/ViewMode", QString( Settings->value( "View/ViewMode" ) ) ).toString();
+		NBSettings::Scope scope = ( location == "SuperStart" ? NBSettings::SuperStart : NBSettings::Catalogs );
+		viewMode = QString( Settings->value( "View/ViewMode", scope ) );
 
-		// if ( viewMode == "Icons" )
-			// iconSize = sett.value( "NewBreeze/IconsImageSize", QSize( Settings->value( "View/IconsImageSize" ) ).width() ).toInt();
+		if ( viewMode == "Icons" )
+			iconSize = QSize( Settings->value( "View/IconsImageSize", scope ) ).width();
 
-		// else if ( viewMode == "Icons" )
-			// iconSize = sett.value( "NewBreeze/TilesImageSize", QSize( Settings->value( "View/TilesImageSize" ) ).width() ).toInt();
+		else if ( viewMode == "Icons" )
+			iconSize = QSize( Settings->value( "View/TilesImageSize", scope ) ).width();
 
-		// else
-			// iconSize = sett.value( "NewBreeze/DetailsImageSize", QSize( Settings->value( "View/DetailsImageSize" ) ).width() ).toInt();
+		else
+			iconSize = QSize( Settings->value( "View/DetailsImageSize", scope ) ).width();
 	}
 
 	else {
@@ -1421,7 +1421,7 @@ void NBIconView::computeGridSize( QSize iconSize ) {
 	if ( currentViewMode == "Icons" ) {
 		/*
 			* width: 3 * iconSize
-			* height: iconSize + iconSize * 2
+			* height: iconSize * 2
 		*/
 		myGridSizeMin = QSize( qMin( 256, qMax( 144, iconSize.width() * 3 ) ), qMax( iconSize.height() + 21, iconSize.height() * 2 ) );
 	}

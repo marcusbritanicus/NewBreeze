@@ -1,6 +1,6 @@
 /*
 	*
-	* NBNBTrashModel.hpp - NewBreeze NBTrashModel Class Header
+	* NBTrashModel.hpp - NewBreeze NBTrashModel Class Header
 	*
 */
 

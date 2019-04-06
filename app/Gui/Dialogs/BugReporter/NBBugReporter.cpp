@@ -15,7 +15,7 @@ NBBugReporter::NBBugReporter() : NBDialog() {
 void NBBugReporter::createGUI() {
 
 	QLabel *tokenLbl = new QLabel( "&Authorization Token:" );
-	tokenLE = new QLineEdit( "gxGfKhkaYqGMf6XV35V9" );
+	tokenLE = new QLineEdit( "" );
 	tokenLE->setFont( QFont( "DejaVu Sans Mono", 10 ) );
 	tokenLE->setAlignment( Qt::AlignCenter );
 	tokenLE->setInputMask( "NNNNNNNNNNNNNNNNNNNN" );
