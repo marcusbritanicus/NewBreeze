@@ -9,7 +9,4 @@
 #include <QtGui>
 #include <QtCore>
 
-#include <unistd.h>
-#include "mupdf/fitz.h"
-
 #include "newbreeze.hpp"

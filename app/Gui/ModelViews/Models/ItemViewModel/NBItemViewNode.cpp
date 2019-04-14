@@ -236,9 +236,13 @@ void NBItemViewNode::sort( int, bool, bool categorized ) {
 	qSort( childNodes.begin(), childNodes.end(), columnSort2 );
 };
 
-void NBItemViewNode::updateIcon() {
+void NBItemViewNode::updateIcon( QIcon icon ) {
 
-	mIcon = getIcon( nodeData.at( 10 ).toString(), nodeData.at( 6 ).toString() );
+	if ( not icon.isNull() )
+		mIcon = icon;
+
+	else
+		mIcon = getIcon( nodeData.at( 10 ).toString(), nodeData.at( 6 ).toString() );
 };
 
 void NBItemViewNode::updateCategories() {

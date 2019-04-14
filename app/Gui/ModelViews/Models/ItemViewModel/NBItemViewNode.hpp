@@ -44,7 +44,7 @@ class NBItemViewNode {
 
 		void sort( int column = 0, bool cs = false, bool categorized = false );
 
-		void updateIcon();
+		void updateIcon( QIcon icon );
 		void updateCategories();
 
 		QIcon icon();

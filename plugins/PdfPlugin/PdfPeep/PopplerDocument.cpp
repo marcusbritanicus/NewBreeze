@@ -6,7 +6,7 @@
 
 #include "PopplerDocument.hpp"
 
-PopplerDocument::PopplerDocument( QString pdfPath ) : QObject() {
+PopplerDocument::PopplerDocument( QString pdfPath ) : PdfDocument( pdfPath ) {
 
 	mZoom = 1.0;
 	mLoaded = false;
@@ -61,6 +61,15 @@ int PopplerDocument::pageCount() const {
 QSizeF PopplerDocument::pageSize( int pageNo ) const {
 
 	return mPages.at( pageNo )->pageSizeF() * mZoom;
+};
+
+void PopplerDocument::reload() {
+
+	mLoaded = false;
+	mPassNeeded = false;
+	mPages.clear();
+
+	loadDocument();
 };
 
 QImage PopplerDocument::renderPage( int pageNo ) const {

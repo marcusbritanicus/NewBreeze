@@ -63,8 +63,10 @@ PluginList NBPluginManager::plugins( NBPluginInterface::Interface iface, NBPlugi
 
 	NBContextPluginHash cph = mPluginsHash.value( iface );
 	Q_FOREACH( NBPluginInterface *plugin, cph.value( ctxt ) ) {
-		if ( plugin->mimetypes().contains( mime ) or plugin->mimetypes().contains( "*" ) )
-			plugList << plugin;
+		if ( plugin->mimetypes().contains( mime ) or plugin->mimetypes().contains( "*" ) ) {
+			if ( nbsett.value( plugin->name() + "/Enabled", true ).toBool() )
+				plugList << plugin;
+		}
 	}
 
 	return plugList;
@@ -85,11 +87,10 @@ void NBPluginManager::reloadPlugins() {
 	if ( not getuid() )
 		return;
 
-	QStringList pluginPaths;
-	pluginPaths << nbsett.value( "PluginPaths", QStringList() << "./plugins" ).toStringList();
+	QStringList pluginPaths = nbsett.value( "PluginPaths" ).toStringList();
 	QString appImagePath = getAppImagePath();
 	if ( appImagePath.count() )
-		pluginPaths << appImagePath + "/usr/lib/newbreeze/plugins/";
+		pluginPaths = QStringList() << appImagePath + "/usr/lib/newbreeze/plugins/";
 
 	mPluginList.clear();
 	mPluginsHash.clear();
@@ -106,19 +107,6 @@ void NBPluginManager::reloadPlugins() {
 				}
 
 				mPluginList << plugin;
-
-				/* By default, all plugins are enabled */
-				bool enabled = nbsett.value( plugin->name() + "/Enabled", true ).toBool();
-				if ( not nbsett.contains( plugin->name() + "/Enabled" ) )
-					nbsett.setValue( plugin->name() + "/Enabled", true );
-
-				/* If this plugin is not enabled, we do not load the data corresponding to it. */
-				if ( not enabled ) {
-					/* Unload the plugin */
-					loader.unload();
-
-					continue;
-				}
 
 				Q_FOREACH( NBPluginInterface::Interface iface, plugin->interfaces() ) {
 					NBContextPluginHash cph = mPluginsHash.value( iface );

@@ -14,7 +14,6 @@
 #endif
 
 #include "PdfDocument.hpp"
-#include "MuPdfDocument.hpp"
 #include "PopplerDocument.hpp"
 
 class PdfView : public QScrollArea {
@@ -50,6 +49,12 @@ class PdfView : public QScrollArea {
 		PdfView( QWidget *parent );
 
 		void loadPdfDocument( QString, RenderBackend );
+
+		void reload() {
+
+			if ( PdfDoc != 0 )
+				PdfDoc->reload();
+		};
 
 		int viewMode() const {
 

@@ -194,17 +194,12 @@ bool isExecutable( QString path ) {
 qint64 nChildren( QString path ) {
 
 	qint64 entries = 0;
-	struct dirent *ent;
-	DIR *dir = opendir( path.toLocal8Bit().constData() );
+	struct dirent **fileList;
+	entries = scandir( path.toStdString().c_str(), &fileList, NULL, NULL );
 
-	if ( dir != NULL ) {
-		while ( ( ent = readdir( dir ) ) != NULL)
-			entries++;
-
-		// Remove entries corresponding to . and ..
-		entries -= 2;
-		closedir( dir );
-	}
+	// If we have more than two entries, then remove two: . and ..
+	// If we have less than two, it means we can not read the folder.
+	entries = ( entries >= 2 ? entries - 2 : 0 );
 
 	return entries;
 };
@@ -239,7 +234,7 @@ qint64 getSize( QString path ) {
 
 			while( ( entry = readdir( d_fh ) ) != NULL ) {
 
-				/* Don't descend up the tree or include the current directory */
+				/* Don't ascend up the tree or include the current directory */
 				if ( strcmp( entry->d_name, ".." ) != 0 && strcmp( entry->d_name, "." ) != 0 ) {
 
 					if ( entry->d_type == DT_DIR ) {

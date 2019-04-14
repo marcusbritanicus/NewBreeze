@@ -27,7 +27,7 @@ PdfView::PdfView( QWidget *parent ) : QScrollArea( parent ) {
 
 void PdfView::loadPdfDocument( QString pdfPath, RenderBackend rbknd ) {
 
-	PdfDoc = new PdfDocument( pdfPath, rbknd );
+	PdfDoc = qobject_cast<PdfDocument *>( new PopplerDocument( pdfPath ) );
 	PdfDoc->loadDocument();
 
 	if ( PdfDoc->pageCount() > 0 )
@@ -449,6 +449,7 @@ void PdfView::keyPressEvent( QKeyEvent *kEvent ) {
 			case Qt::Key_Escape: {
 
 				emit closePreview();
+
 				break;
 			};
 

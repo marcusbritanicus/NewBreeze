@@ -42,4 +42,27 @@ class NBThumbnailer : public QThread {
 
 	Q_SIGNALS :
 		void updateNode( QString );
+		void saveThumb( QString );
+};
+
+class NBThumbSaver : public QThread {
+	Q_OBJECT
+
+	public:
+		NBThumbSaver();
+
+	public Q_SLOTS:
+		/* Save the generated thumbnails */
+		void save( QString filename );
+
+	protected:
+		/* Loop to generate thumbnails one by one and intimate the model */
+		void run();
+
+	private:
+		/* I don't trust Qthread::isRunning(), custom flag to indicate that */
+		bool isActive;
+
+		/* List of files whose thumbnails are to be generated. */
+		QStringList fileList;
 };

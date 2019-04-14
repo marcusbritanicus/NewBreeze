@@ -13,6 +13,8 @@
 	#include <QtWidgets>
 #endif
 
+#include "PdfDocument.hpp"
+
 extern "C" {
 	#include "mupdf/fitz.h"
 }
@@ -21,7 +23,7 @@ typedef fz_page MuPage;
 
 typedef QList<MuPage*> MuPages;
 
-class MuPdfDocument : public QObject {
+class MuPdfDocument : public PdfDocument {
 	Q_OBJECT
 
 	public:
@@ -35,6 +37,8 @@ class MuPdfDocument : public QObject {
 
 		int pageCount() const;
 		QSizeF pageSize( int pageNo ) const;
+
+		void reload();
 
 		QImage renderPage( int ) const;
 		QImage renderPageForWidth( int, qreal ) const;
@@ -77,8 +81,4 @@ class MuPdfDocument : public QObject {
 
 	public Q_SLOTS:
 		void loadDocument();
-
-	Q_SIGNALS:
-		void pdfLoaded();
-		void loadFailed();
 };

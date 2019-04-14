@@ -746,8 +746,8 @@ void NBStartupWizard::saveSettings() {
 	sett.setValue( "PerFolderViews", p2cb1->isChecked() );
 
 	/* ViewMode and Icon Size */
-	sett.setValue( "ViewMode", p3cb1->currentText() );
-	sett.setValue( "IconSize", QSize( p3sl1->value(), p3sl1->value() ) );
+	sett.setValue( "View/ViewMode", p3cb1->currentText() );
+	sett.setValue( "View/IconSize", QSize( p3sl1->value(), p3sl1->value() ) );
 
 	/* Folder Filtering */
 	sett.setValue( "FilterFolders", p4cb1->isChecked() );
@@ -756,7 +756,7 @@ void NBStartupWizard::saveSettings() {
 	sett.setValue( "SortCase", p5cb1->isChecked() );
 
 	/* Case-sensitive sorting */
-	sett.setValue( "ImagePreviews", p6cb1->isChecked() );
+	sett.setValue( "View/ImagePreviews", p6cb1->isChecked() );
 
 	/* SidePanel */
 	sett.setValue( "SidePanel", p7gb1->isChecked() );

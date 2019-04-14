@@ -212,5 +212,5 @@ void NBSSPreviewWidget::showStyle( const QString style ) {
 void NBSStyleWidget::applyStyle() {
 
 	qApp->setStyle( styleListCB->currentText() );
-	Settings->setValue( "Style", styleListCB->currentText(), NBSettings::GlobalScope );
+	Settings->setValue( "View/Style", styleListCB->currentText(), NBSettings::GlobalScope );
 };

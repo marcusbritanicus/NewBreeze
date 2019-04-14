@@ -4,54 +4,12 @@
 	*
 */
 
-#include <libexif/exif-loader.h>
-
 #include "NBThumbnailer.hpp"
+#include "NBItemViewModel.hpp"
 #include "NBPluginInterface.hpp"
-
-#include "Epeg.h"
 
 static QList<QByteArray> supported = QImageReader::supportedImageFormats();
 static QStringList odfformat = QStringList() << "odt" << "odp" << "ods" << "odg";
-
-inline static bool saveExifThumbnail( QString path, QString hashPath ) {
-
-	ExifLoader* exif_loader = exif_loader_new();
-
-	QFile jpeg( path );
-	if ( jpeg.open( QFile::ReadOnly ) ) {
-		while ( true ) {
-			QByteArray exif = jpeg.read( 4096 );
-			if ( exif_loader_write( exif_loader, ( unsigned char* )exif.data(), exif.size() ) == 0 )
-				break;
-		}
-
-		ExifData* exif_data = exif_loader_get_data( exif_loader );
-		exif_loader_unref( exif_loader );
-
-		if ( exif_data ) {
-			// If an embedded thumbnail is available, load it
-			if ( exif_data->data ) {
-				QImage thumbnail;
-				thumbnail.loadFromData( exif_data->data, exif_data->size );
-				exif_data_unref( exif_data );
-				return thumbnail.save( hashPath, "JPG" );
-			}
-
-			else {
-
-				exif_data_unref( exif_data );
-				return false;
-			}
-
-			return true;
-		}
-
-		return false;
-	}
-
-	return false;
-};
 
 void NBThumbnailer::createThumbnails( QStringList nodes ) {
 
@@ -180,38 +138,24 @@ void NBThumbnailer::run() {
 			if ( exists( hashPath ) )
 				continue;
 
-			// if ( saveJpegThumb( file.toLocal8Bit().constData(), hashPath.toLocal8Bit().constData() ) ) {
+			/* Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/ */
+			QImageReader picReader( file );
 
-				// emit updateNode( file );
-			// }
+			QImage pic = picReader.read();
+			pic = pic.scaled( 512, 512, Qt::KeepAspectRatio, Qt::FastTransformation );
+			pic = pic.scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 
-			/* Do we need to save them? */
-			if ( saveExifThumbnail( file, hashPath ) ) {
+			QPixmap thumb( QSize( 128, 128 ) );
+			thumb.fill( Qt::transparent );
 
-				emit updateNode( file );
-			}
+			QPainter painter( &thumb );
+			painter.drawImage( QRectF( QPointF( ( 128 - pic.width() ) / 2, ( 128 - pic.height() ) / 2 ), QSizeF( pic.size() ) ), pic );
+			painter.end();
 
-			else {
-				qDebug() << "Using inbuilt scaling:" << baseName( file );
-				/* Cheat scaling: http://blog.qt.io/blog/2009/01/26/creating-thumbnail-preview/ */
-				QImage thumb = QImage( file ).scaled( 512, 512, Qt::KeepAspectRatio, Qt::FastTransformation ).scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+			NBItemViewModel::iconMap.insert( file, thumb );
 
-				if ( file.endsWith( "jpg" ) or file.endsWith( "jpeg" ) ) {
-					if ( thumb.save( hashPath, "JPG" ) )
-						emit updateNode( file );
-
-					else
-						qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
-				}
-
-				else {
-					if ( thumb.save( hashPath, "PNG", 0 ) )
-						emit updateNode( file );
-
-					else
-						qDebug() << "Failed to create thumbnail:" << baseName( file ) << "Using default icon.";
-				}
-			}
+			emit updateNode( file );
+			emit saveThumb( file );
 		}
 	}
 
@@ -234,14 +178,14 @@ void NBThumbnailer::run() {
 				continue;
 
 			/* Open as archive */
-			NBArchive *odf = new NBArchive( file );
-			odf->setDestination( "/tmp/NewBreeze_odf/" );
-			odf->extractMember( "Thumbnails/thumbnail.png" );
-			if ( not odf->exitStatus() ) {
-				QFile::copy( "/tmp/NewBreeze_odf/Thumbnails/thumbnail.png", hashPath );
-				system( "rm -rf /tmp/NewBreeze_odf/*" );
-				emit updateNode( file );
-			}
+			// NBArchive *odf = new NBArchive( file );
+			// odf->setDestination( "/tmp/NewBreeze_odf/" );
+			// odf->extractMember( "Thumbnails/thumbnail.png" );
+			// if ( not odf->exitStatus() ) {
+				// QFile::copy( "/tmp/NewBreeze_odf/Thumbnails/thumbnail.png", hashPath );
+				// removeDir( "/tmp/NewBreeze_odf" );
+				// emit updateNode( file );
+			// }
 		}
 	}
 
@@ -388,6 +332,44 @@ void NBThumbnailer::run() {
 			}
 
 			loader.unload();
+		}
+	}
+};
+
+/* ##### NBThumbSaver Class ========================================================================================================== */
+NBThumbSaver::NBThumbSaver() : QThread() {
+
+	fileList.clear();
+	isActive = false;
+};
+
+void NBThumbSaver::save( QString filename ) {
+
+	if ( not fileList.contains( filename ) )
+		fileList << filename;
+
+	if ( not isActive )
+		start();
+};
+
+void NBThumbSaver::run() {
+
+	while ( true ) {
+		if ( fileList.count() ) {
+			isActive = true;
+
+			QString file = fileList.takeFirst();
+			QIcon icon = NBItemViewModel::iconMap.value( file );
+
+			if ( not icon.isNull() ) {
+				QString thumbmailPath = thumbsDir + MD5( file );
+				icon.pixmap( 128 ).save( thumbmailPath, "PNG" );
+			}
+		}
+
+		else {
+			isActive = false;
+			return;
 		}
 	}
 };

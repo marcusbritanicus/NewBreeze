@@ -6,7 +6,7 @@
 
 #include "MuPdfDocument.hpp"
 
-MuPdfDocument::MuPdfDocument( QString pdfPath ) : QObject() {
+MuPdfDocument::MuPdfDocument( QString pdfPath ) : PdfDocument( pdfPath ) {
 
 	mZoom = 1.0;
 
@@ -77,9 +77,18 @@ QSizeF MuPdfDocument::pageSize( int pageNum ) const {
 		return QSizeF();
 
 	fz_rect rBox;
-	fz_bound_page( mCtx, mPageList.at( pageNum ), &rBox );
+	rBox = fz_bound_page( mCtx, mPageList.at( pageNum ) );
 
 	return QSizeF( mZoom * ( rBox.x1 - rBox.x0 ), mZoom * ( rBox.y1 - rBox.y0 ) );
+};
+
+void MuPdfDocument::reload() {
+
+	mLoaded = false;
+	mPassNeeded = false;
+	mPages = 0;
+
+	loadDocument();
 };
 
 QImage MuPdfDocument::renderPage( int pgNo ) const {
@@ -96,23 +105,23 @@ QImage MuPdfDocument::renderPage( int pgNo ) const {
 
 	qreal realZoom = pow( mZoom, 0.5 );
 
-	fz_rotate( &mMtx, 0 );
-	fz_scale( &mMtx, realZoom, realZoom );
+	mMtx = fz_rotate( 0 );
+	mMtx = fz_scale( realZoom, realZoom );
 
-	fz_bound_page( mCtx, pg, &rBox );
-	fz_round_rect( &iBox, fz_transform_rect( &rBox, &mMtx ) );
-	fz_rect_from_irect( &rBox, &iBox );
+	rBox = fz_bound_page( mCtx, pg );
+	iBox = fz_round_rect( fz_transform_rect( rBox, mMtx ) );
+	rBox = fz_rect_from_irect( iBox );
 
 	/* Necessary: otherwise only a part of the page is rendered */
 	iBox.x1 *= realZoom;
 	iBox.y1 *= realZoom;
 
 	fz_try( mCtx ) {
-		image = fz_new_pixmap_with_bbox( mCtx, colorspace, &iBox, 0, 1 );
+		image = fz_new_pixmap_with_bbox( mCtx, colorspace, iBox, 0, 1 );
 		fz_clear_pixmap_with_value( mCtx, image, 0xff );
-		fz_device *dev = fz_new_draw_device_with_bbox( mCtx, &mMtx, image, &iBox );
+		fz_device *dev = fz_new_draw_device_with_bbox( mCtx, mMtx, image, &iBox );
 
-		fz_run_page( mCtx, pg, dev, &mMtx, NULL );
+		fz_run_page( mCtx, pg, dev, mMtx, NULL );
 	}
 
 	fz_catch( mCtx ) {
@@ -141,23 +150,23 @@ QImage MuPdfDocument::renderPageForWidth( int pgNo, qreal width ) const {
 
 	qreal realZoom = pow( zoomForWidth( pgNo, width ), 0.5 );
 
-	fz_rotate( &mMtx, 0 );
-	fz_scale( &mMtx, realZoom, realZoom );
+	mMtx = fz_rotate( 0 );
+	mMtx = fz_scale( realZoom, realZoom );
 
-	fz_bound_page( mCtx, pg, &rBox );
-	fz_round_rect( &iBox, fz_transform_rect( &rBox, &mMtx ) );
-	fz_rect_from_irect( &rBox, &iBox );
+	rBox = fz_bound_page( mCtx, pg );
+	iBox = fz_round_rect( fz_transform_rect( rBox, mMtx ) );
+	rBox = fz_rect_from_irect( iBox );
 
 	/* Necessary: otherwise only a part of the page is rendered */
 	iBox.x1 *= realZoom;
 	iBox.y1 *= realZoom;
 
 	fz_try( mCtx ) {
-		image = fz_new_pixmap_with_bbox( mCtx, colorspace, &iBox, 0, 1 );
+		image = fz_new_pixmap_with_bbox( mCtx, colorspace, iBox, 0, 1 );
 		fz_clear_pixmap_with_value( mCtx, image, 0xff );
-		fz_device *dev = fz_new_draw_device_with_bbox( mCtx, &mMtx, image, &iBox );
+		fz_device *dev = fz_new_draw_device_with_bbox( mCtx, mMtx, image, &iBox );
 
-		fz_run_page( mCtx, pg, dev, &mMtx, NULL );
+		fz_run_page( mCtx, pg, dev, mMtx, NULL );
 	}
 
 	fz_catch( mCtx ) {
@@ -186,23 +195,23 @@ QImage MuPdfDocument::renderPageForHeight( int pgNo, qreal height ) const {
 
 	qreal realZoom = pow( zoomForHeight( pgNo, height ), 0.5 );
 
-	fz_rotate( &mMtx, 0 );
-	fz_scale( &mMtx, realZoom, realZoom );
+	mMtx = fz_rotate( 0 );
+	mMtx = fz_scale( realZoom, realZoom );
 
-	fz_bound_page( mCtx, pg, &rBox );
-	fz_round_rect( &iBox, fz_transform_rect( &rBox, &mMtx ) );
-	fz_rect_from_irect( &rBox, &iBox );
+	rBox = fz_bound_page( mCtx, pg );
+	iBox = fz_round_rect( fz_transform_rect( rBox, mMtx ) );
+	rBox = fz_rect_from_irect( iBox );
 
 	/* Necessary: otherwise only a part of the page is rendered */
 	iBox.x1 *= realZoom;
 	iBox.y1 *= realZoom;
 
 	fz_try( mCtx ) {
-		image = fz_new_pixmap_with_bbox( mCtx, colorspace, &iBox, 0, 1 );
+		image = fz_new_pixmap_with_bbox( mCtx, colorspace, iBox, 0, 1 );
 		fz_clear_pixmap_with_value( mCtx, image, 0xff );
-		fz_device *dev = fz_new_draw_device_with_bbox( mCtx, &mMtx, image, &iBox );
+		fz_device *dev = fz_new_draw_device_with_bbox( mCtx, mMtx, image, &iBox );
 
-		fz_run_page( mCtx, pg, dev, &mMtx, NULL );
+		fz_run_page( mCtx, pg, dev, mMtx, NULL );
 	}
 
 	fz_catch( mCtx ) {
@@ -219,7 +228,41 @@ QImage MuPdfDocument::renderPageForHeight( int pgNo, qreal height ) const {
 
 QString MuPdfDocument::pageText( int pgNo ) const {
 
-    return text( pgNo, QRectF( QPointF( 0, 0 ), pageSize( pgNo ) ) );
+    QString ret;
+    fz_stext_page *spg = NULL;
+    fz_buffer *buff = NULL;
+    fz_output *output = NULL;
+
+	fz_try( mCtx ) {
+
+		/* fz_stext_page */
+		spg = fz_new_stext_page_from_page( mCtx, mPageList.at( pgNo ), 0 );
+
+		/* Buffer 1MiB = 1 * 1024 * 1024 */
+		buff = fz_new_buffer( mCtx, 1024 * 1024 );
+
+		/* Create fz_output */
+		output = fz_new_output_with_buffer( mCtx, buff );
+
+		/* Print it to text buffer */
+		fz_print_stext_page_as_text( mCtx, output, spg );
+
+		ret = QString::fromUtf8( fz_string_from_buffer( mCtx, buff ) );
+	}
+
+	fz_always( mCtx ) {
+
+		fz_drop_buffer( mCtx, buff );
+		fz_drop_output( mCtx, output );
+		fz_drop_stext_page( mCtx, spg );
+	}
+
+	fz_catch( mCtx ) {
+
+		fprintf( stderr, "Unable to extract text from page: %s\n", fz_caught_message( mCtx ) );
+	}
+
+    return ret;
 };
 
 QString MuPdfDocument::text( int pgNo, QRectF rect ) const{
@@ -251,7 +294,7 @@ qreal MuPdfDocument::zoomForWidth( int pageNo, qreal width ) const {
 		return 0.0;
 
 	fz_rect rBox;
-	fz_bound_page( mCtx, mPageList.at( pageNo ), &rBox );
+	rBox = fz_bound_page( mCtx, mPageList.at( pageNo ) );
 
 	return 1.0 * width / ( rBox.x1 - rBox.x0 );
 };
@@ -262,7 +305,7 @@ qreal MuPdfDocument::zoomForHeight( int pageNo, qreal height ) const {
 		return 0.0;
 
 	fz_rect rBox;
-	fz_bound_page( mCtx, mPageList.at( pageNo ), &rBox );
+	rBox = fz_bound_page( mCtx, mPageList.at( pageNo ) );
 
 	return 1.0 * height / ( rBox.y1 - rBox.y0 );
 };

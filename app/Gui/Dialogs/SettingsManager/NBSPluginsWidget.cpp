@@ -18,7 +18,7 @@ void NBSPluginsWidget::createGUI() {
 
 	/* Load the available Plugins */
 	NBPluginManager *pMgr = NBPluginManager::instance();
-	QSettings nbsett( "NewBreeze", "Plugins" );
+	QSettings plugSett( "NewBreeze", "Plugins" );
 	Q_FOREACH( NBPluginInterface *plugin, pMgr->allPlugins() ) {
 		QListWidgetItem *itm = new QListWidgetItem( QString( "%1" ).arg( plugin->name() ), pPluginsLW );
 
@@ -28,7 +28,7 @@ void NBSPluginsWidget::createGUI() {
 		else
 			itm->setFlags( Qt::ItemIsUserCheckable );
 
-		itm->setCheckState( nbsett.value( plugin->name() + "/Enabled", true ).toBool() ? Qt::Checked : Qt::Unchecked );
+		itm->setCheckState( plugSett.value( plugin->name() + "/Enabled", true ).toBool() ? Qt::Checked : Qt::Unchecked );
 		pPluginsLW->addItem( itm );
 	}
 
@@ -38,9 +38,9 @@ void NBSPluginsWidget::createGUI() {
 	pPathsLW = new QListWidget( this );
 
 	QStringList pluginPaths;
-	if ( not nbsett.value( "PluginPaths" ).toStringList().count() )
-		nbsett.setValue( "PluginPaths", QStringList() << "/usr/lib/newbreeze/plugins" << NBXdg::home() + ".config/NewBreeze/plugins/" );
-	pPathsLW->addItems( nbsett.value( "PluginPaths" ).toStringList() );
+	if ( not plugSett.value( "PluginPaths" ).toStringList().count() )
+		plugSett.setValue( "PluginPaths", QStringList() << "/usr/lib/newbreeze/plugins" << NBXdg::home() + ".config/NewBreeze/plugins/" );
+	pPathsLW->addItems( plugSett.value( "PluginPaths" ).toStringList() );
 
 	pathsBtn = new NBSegmentButton( this );
 	pathsBtn->setCount( 2 );
@@ -108,11 +108,8 @@ void NBSPluginsWidget::updateSettings() {
 	if ( not paths.count() )
 		nbsett.setValue( "PluginPaths", QStringList() << "/usr/lib/newbreeze/plugins" << NBXdg::home() + ".config/NewBreeze/plugins/" );
 
-	else
-		nbsett.setValue( "PluginPaths", paths );
-
 	pPathsLW->clear();
-	pPathsLW->addItems( nbsett.value( "PluginPaths5" ).toStringList() );
+	pPathsLW->addItems( nbsett.value( "PluginPaths" ).toStringList() );
 };
 
 void NBSPluginsWidget::savePluginEnabled( QListWidgetItem *itm ) {

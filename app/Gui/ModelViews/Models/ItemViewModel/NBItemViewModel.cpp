@@ -42,6 +42,8 @@ inline int scandirCallback( const struct dirent* entry ) {
 	return 1;
 };
 
+QHash<QString, QIcon> NBItemViewModel::iconMap = QHash<QString, QIcon>();
+
 NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent ) {
 
 	/* Do we show the special directories */
@@ -83,6 +85,9 @@ NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent
 
 	thumbnailer = new NBThumbnailer();
 	connect( thumbnailer, SIGNAL( updateNode( QString ) ), this, SLOT( nodeUpdated( QString ) ) );
+
+	NBThumbSaver *thumbsaver = new NBThumbSaver();
+	connect( thumbnailer, SIGNAL( saveThumb( QString ) ), thumbsaver, SLOT( save( QString ) ) );
 };
 
 NBItemViewModel::~NBItemViewModel() {
@@ -403,7 +408,7 @@ void NBItemViewModel::nodeUpdated( QString nodeName ) {
 		return;
 
 	NBItemViewNode *node = rootNode->child( baseName( nodeName ) );
-	node->updateIcon();
+	node->updateIcon( iconMap.value( nodeName ) );
 
 	emit dataChanged( index( baseName( nodeName ) ), index( baseName( nodeName ) ) );
 };
@@ -920,6 +925,9 @@ void NBItemViewModel::setRootPath( QString path ) {
 	/* For all the other folders, we can happily start the watcher */
 	else
 		watcher->startWatch( path );
+
+	/* Clear the iconMap */
+	iconMap.clear();
 
 	setupModelData();
 };

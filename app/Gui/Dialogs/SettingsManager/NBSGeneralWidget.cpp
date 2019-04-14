@@ -30,7 +30,7 @@ NBSGeneralWidget::NBSGeneralWidget( QWidget *parent ) : QWidget( parent ) {
 
 	if ( ( QString )Settings->value( "View/ViewMode", NBSettings::GlobalScope ) == "Icons" ) {
 		defaultViewModeCB->setCurrentIndex( 0 );
-		iconSizeL->setText( QString( "%1 px" ).arg( ( ( QSize )Settings->value( "IconsImageSize", NBSettings::GlobalScope ) ).width() ) );
+		iconSizeL->setText( QString( "%1 px" ).arg( ( ( QSize )Settings->value( "View/IconsImageSize", NBSettings::GlobalScope ) ).width() ) );
 		defaultIconSizeS->setValue( QSize( Settings->value( "View/IconsImageSize", NBSettings::GlobalScope ) ).width() );
 	}
 

@@ -16,10 +16,12 @@
 	#include <poppler-qt4.h>
 #endif
 
+#include "PdfDocument.hpp"
+
 typedef Poppler::Page PdfPage;
 typedef QList<Poppler::Page*> PdfPages;
 
-class PopplerDocument : public QObject {
+class PopplerDocument : public PdfDocument {
 	Q_OBJECT
 
 	public:
@@ -40,6 +42,9 @@ class PopplerDocument : public QObject {
 
 		/* Size of the page */
 		QSizeF pageSize( int pageNo ) const;
+
+		/* Reload the current document */
+		void reload();
 
 		/* Render and return a page */
 		QImage renderPage( int ) const;
@@ -78,8 +83,4 @@ class PopplerDocument : public QObject {
 
 		bool mLoaded;
 		bool mPassNeeded;
-
-	Q_SIGNALS:
-		void pdfLoaded();
-		void loadFailed();
 };

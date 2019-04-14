@@ -126,6 +126,9 @@ class NBItemViewModel : public QAbstractItemModel {
 		QString parentDir() const;
 		QString lastOpenedFolder() const;
 
+		/* Place to store the image thumbnails */
+		static QHash<QString, QIcon> iconMap;
+
 	public Q_SLOTS:
 		void goUp();
 		void goBack();
