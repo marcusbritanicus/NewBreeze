@@ -14,7 +14,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	generalBtn->setFixedSize( 72, 72 );
 	generalBtn->setIconSize( QSize( 36, 36 ) );
 	generalBtn->setIcon( QIcon( ":/icons/newbreeze.png" ) );
-	generalBtn->setText( "General" );
+	generalBtn->setToolTip( "General" );
 	generalBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	generalBtn->setCheckable( true );
 	generalBtn->setFocusPolicy( Qt::NoFocus );
@@ -24,7 +24,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	iconsBtn->setFixedSize( 72, 72 );
 	iconsBtn->setIconSize( QSize( 36, 36 ) );
 	iconsBtn->setIcon( QIcon( ":/icons/iconthemes.png" ) );
-	iconsBtn->setText( "Icons" );
+	iconsBtn->setToolTip( "Icons" );
 	iconsBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	iconsBtn->setCheckable( true );
 	iconsBtn->setFocusPolicy( Qt::NoFocus );
@@ -34,7 +34,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	styleBtn->setFixedSize( 72, 72 );
 	styleBtn->setIconSize( QSize( 36, 36 ) );
 	styleBtn->setIcon( QIcon( ":/icons/appearance.png" ) );
-	styleBtn->setText( "Style" );
+	styleBtn->setToolTip( "Style" );
 	styleBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	styleBtn->setCheckable( true );
 	styleBtn->setFocusPolicy( Qt::NoFocus );
@@ -44,7 +44,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	pluginsBtn->setFixedSize( 72, 72 );
 	pluginsBtn->setIconSize( QSize( 36, 36 ) );
 	pluginsBtn->setIcon( QIcon( ":/icons/plugins.png" ) );
-	pluginsBtn->setText( "Plugins" );
+	pluginsBtn->setToolTip( "Plugins" );
 	pluginsBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	pluginsBtn->setCheckable( true );
 	pluginsBtn->setFocusPolicy( Qt::NoFocus );
@@ -54,7 +54,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	keyBindingsBtn->setFixedSize( 72, 72 );
 	keyBindingsBtn->setIconSize( QSize( 36, 36 ) );
 	keyBindingsBtn->setIcon( QIcon( ":/icons/keybindings.png" ) );
-	keyBindingsBtn->setText( "Key Bindings" );
+	keyBindingsBtn->setToolTip( "Key Bindings" );
 	keyBindingsBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	keyBindingsBtn->setCheckable( true );
 	keyBindingsBtn->setFocusPolicy( Qt::NoFocus );
@@ -64,7 +64,7 @@ NBSSideBar::NBSSideBar( QWidget *parent ) : QWidget( parent ) {
 	terminalBtn->setFixedSize( 72, 72 );
 	terminalBtn->setIconSize( QSize( 36, 36 ) );
 	terminalBtn->setIcon( QIcon( ":/icons/vte.png" ) );
-	terminalBtn->setText( "Terminal" );
+	terminalBtn->setToolTip( "Terminal" );
 	terminalBtn->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 	terminalBtn->setCheckable( true );
 	terminalBtn->setFocusPolicy( Qt::NoFocus );

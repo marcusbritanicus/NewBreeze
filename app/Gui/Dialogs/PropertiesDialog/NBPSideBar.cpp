@@ -72,31 +72,31 @@ void NBPSideBar::createGUI() {
 	/* Properties */
 	propsBtn = new NBPSideBarButton( this );
 	propsBtn->setIcon( QIcon( ":/icons/props.png" ) );
-	propsBtn->setText( "&Properties" );
+	propsBtn->setToolTip( "Properties" );
 	propsBtn->setStyleSheet( btnStyleB );
 
 	/* Permissions */
 	permsBtn = new NBPSideBarButton( this );
 	permsBtn->setIcon( QIcon( ":/icons/perms.png" ) );
-	permsBtn->setText( "Pe&rmissions" );
+	permsBtn->setToolTip( "Permissions" );
 	permsBtn->setStyleSheet( btnStyleM );
 
 	/* Defaults */
 	defaultBtn = new NBPSideBarButton( this );
 	defaultBtn->setIcon( QIcon( ":/icons/star.png" ) );
-	defaultBtn->setText( "&Defaults" );
+	defaultBtn->setToolTip( "Defaults" );
 	defaultBtn->setStyleSheet( btnStyleM );
 
 	/* Preview */
 	previewBtn = new NBPSideBarButton( this );
 	previewBtn->setIcon( QIcon( ":/icons/peek.png" ) );
-	previewBtn->setText( "Pre&view" );
+	previewBtn->setToolTip( "Preview" );
 	previewBtn->setStyleSheet( btnStyleM );
 
 	/* Details */
 	detailsBtn = new NBPSideBarButton( this );
 	detailsBtn->setIcon( QIcon( ":/icons/info.png" ) );
-	detailsBtn->setText( "Detai&ls" );
+	detailsBtn->setToolTip( "Details" );
 	detailsBtn->setStyleSheet( btnStyleE );
 
 	btnGrp = new QButtonGroup();
