@@ -1,18 +1,20 @@
 Version 3.0.0 RC
+	- Feature: NBStartupWizard to init NB3 Settings
 	- Feature: Added Menu
 	- Feature: IconOverlay for quick controls
 	- Feature: Categories now have menu, better folding
-	- Feature: VideoThumbnailing enabled
-	- Feature: PDF/DjVu/ePub/ODF thumbnailing enabled
-	- Feature: Video/Audio preview enabled
+	- Feature: VideoThumbnailing enabled (plugin)
+	- Feature: PDF/DjVu/ePub/ODF thumbnailing enabled (plugin)
+	- Feature: Video/Audio preview enabled (plugin)
 	- Feature: Selected file preview enabled
 	- Feature: AutoMount of volumes
 	- Feature: Add user apps to Open With menu
 	- Feature: Inbuilt terminal
+	- NBSettings module revamped
 	- Markdown library changed to cmark
 	- Markdown preview using QTextBrowser
 	- LibArchive support extended to lzip, lz4, lrzip
-	- Inbuilt pdf support using mupdf
+	- Inbuilt pdf support using mupdf/poppler
 	- NBPropertiesDialog redesigned
 	- NBCustomPeek integrated into NBPropertiesDialog
 	- Fixed most of the code causing warnings

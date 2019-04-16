@@ -8,6 +8,8 @@ Chat with me at [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gi
 ### Note: NewBreeze 3.0 is in the oven. Expect several changes..!!
 
 Built on top of the Powerful Qt GUI Toolkit, this file manager is sleek, stylish and fast.
+It's heavily customized while not compromizing on speed.
+
 Some of its features are
 
 * Fast startup and browsing
@@ -24,8 +26,11 @@ Some of its features are
 * Custom Actions and Inline terminal
 * SingleApplication Mode for resource sharing
 * Plugin System Support
+* Inbuilt folder encryption support using encfs
 
-## Linux Source Available
+Its features such as inbuilt file and folder encryption, SuperStart, and Quick file previews,
+are not found in any other file manager available for linux.
+
 ### Windows source is no longer being maintained
 
 ### Please READ the ReleaseNotes for information on the new features
