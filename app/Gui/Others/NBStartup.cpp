@@ -25,6 +25,24 @@ void NBStartup() {
 
 	/*
 		*
+		* StartupWizard: Start it if users have an old config
+		*
+		* Delete the old settings, and create a new one
+		*
+	*/
+	QSettings sett( "NewBreeze", "NewBreeze" );
+	if ( not sett.contains( "Version" ) or sett.value( "Version" ).toString() != "3.0.0" ) {
+
+		/* Removing the old config */
+		QFile::remove( sett.fileName() );
+
+		/* Create a new config */
+		NBStartupWizard *startWiz = new NBStartupWizard();
+		startWiz->exec();
+	}
+
+	/*
+		*
 		* AutoMount service
 		*
 	*/

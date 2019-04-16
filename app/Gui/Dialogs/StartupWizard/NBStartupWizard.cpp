@@ -233,7 +233,7 @@ void NBStartupWizard::createPages() {
 	p4lbl1->setWordWrap( true );
 
 	p4cb1 = new QCheckBox( "Enable fi&ltering of folders along with files" );
-	p4cb1->setChecked( true );
+	p4cb1->setChecked( false );
 
 	QHBoxLayout *p4gb1Lyt = new QHBoxLayout();
 	p4gb1Lyt->addWidget( p4cb1 );
@@ -562,7 +562,7 @@ void NBStartupWizard::createPages() {
 
 	QLabel *p12lbl1 = new QLabel(
 		"<p>IconOverlays and ExtendedIO are two of NewBreeze's premium features. IconOverlays enable you to perfrom "
-		"most actions thay require a right click without one. ExtendedIO helps you copy/move files/directories "
+		"most actions that require a right click without one. ExtendedIO helps you copy/move files/directories "
 		"to any other place without leaving the current folder.</p>"
 	);
 	p12lbl1->setWordWrap( true );
@@ -570,6 +570,7 @@ void NBStartupWizard::createPages() {
 	QGroupBox *p12gb1 = new QGroupBox( "NewBreeze Specials" );
 	p12cb1 = new QCheckBox( "Enable Icon&Overlays" );
 	p12cb2 = new QCheckBox( "Enable E&xtendedIO" );
+	p12cb2->setChecked( true );
 
 	QVBoxLayout *p12gb1Lyt = new QVBoxLayout();
 	p12gb1Lyt->addWidget( p12cb1 );
@@ -727,10 +728,14 @@ void NBStartupWizard::loadTerminals() {
 		}
 	}
 
+	terms.removeDuplicates();
 	p11lw1->addItems( terms );
 };
 
 void NBStartupWizard::saveSettings() {
+
+	/* Version flag */
+	sett.setValue( "Version", "3.0.0" );
 
 	/* Grouping */
 	sett.setValue( "Grouping", p2gb1->isChecked() );
@@ -747,7 +752,27 @@ void NBStartupWizard::saveSettings() {
 
 	/* ViewMode and Icon Size */
 	sett.setValue( "View/ViewMode", p3cb1->currentText() );
-	sett.setValue( "View/IconSize", QSize( p3sl1->value(), p3sl1->value() ) );
+	if ( p3cb1->currentText() == "Icons" ) {
+		sett.setValue( "View/IconsImageSize", QSize( p3sl1->value(), p3sl1->value() ) );
+		sett.setValue( "View/TilesImageSize", QSize( p3sl1->value(), p3sl1->value() ) );
+		sett.setValue( "View/DetailsImageSize", QSize( 24, 24 ) );
+	}
+
+	else if ( p3cb1->currentText() == "Tiles" ) {
+		sett.setValue( "View/IconsImageSize", QSize( p3sl1->value(), p3sl1->value() ) );
+		sett.setValue( "View/TilesImageSize", QSize( p3sl1->value(), p3sl1->value() ) );
+		sett.setValue( "View/DetailsImageSize", QSize( 24, 24 ) );
+	}
+
+	else {
+		sett.setValue( "View/IconsImageSize", QSize( 48, 48 ) );
+		sett.setValue( "View/TilesImageSize", QSize( 48, 48 ) );
+		sett.setValue( "View/DetailsImageSize", QSize( p3sl1->value(), p3sl1->value() ) );
+	}
+
+	/* Default icon theme */
+	sett.setValue( "View/IconTheme", QIcon::themeName() );
+	sett.setValue( "View/Style", "Fusion" );
 
 	/* Folder Filtering */
 	sett.setValue( "FilterFolders", p4cb1->isChecked() );
@@ -755,8 +780,14 @@ void NBStartupWizard::saveSettings() {
 	/* Case-sensitive sorting */
 	sett.setValue( "SortCase", p5cb1->isChecked() );
 
-	/* Case-sensitive sorting */
-	sett.setValue( "View/ImagePreviews", p6cb1->isChecked() );
+	/* Image previews */
+	sett.setValue( "View/FilePreviews", p6cb1->isChecked() );
+	sett.setValue( "View/ImagePreview", p6cb1->isChecked() );
+	sett.setValue( "DjVuPreview", false );
+	sett.setValue( "OdfPreview", false );
+	sett.setValue( "PdfPreview", false );
+	sett.setValue( "VideoPreview", false );
+	sett.setValue( "ePubPreview", false );
 
 	/* SidePanel */
 	sett.setValue( "SidePanel", p7gb1->isChecked() );
@@ -788,13 +819,28 @@ void NBStartupWizard::saveSettings() {
 	sett.setValue( "Terminals/Default", p11lw1->currentIndex().data() );
 
 	/* NB3 Specials */
-	sett.setValue( "IconOverlay", p12cb1->isChecked() );
+	sett.setValue( "View/PaintOverlay", p12cb1->isChecked() );
 	sett.setValue( "ExtendedIO", p12cb2->isChecked() );
+
+	/* Misc features */
+	sett.setValue( "AutoMount", false );
+	sett.setValue( "LogDebug", false );
+
+	/* Generate default KeyBindings */
+	saveDefaultKeys();
 
 	/* Sync the settings */
 	sett.sync();
 
 	close();
+};
+
+void NBStartupWizard::saveDefaultKeys() {
+
+	QSettings keys( ":/data/NewBreeze.conf", QSettings::IniFormat );
+	keys.beginGroup( "Shortcuts" );
+	Q_FOREACH( QString key, keys.childKeys() )
+		sett.setValue( key, keys.value( key ) );
 };
 
 void NBStartupWizard::paintEvent( QPaintEvent *pEvent ) {

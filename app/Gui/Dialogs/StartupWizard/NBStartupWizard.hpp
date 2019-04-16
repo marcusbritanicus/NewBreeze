@@ -20,6 +20,7 @@ class NBStartupWizard : public QWizard {
 		void setWindowProperties();
 
 		void loadTerminals();
+		void saveDefaultKeys();
 
 		QGroupBox *p2gb1;
 		QCommandLinkButton *p2btn1, *p2btn2, *p2btn3, *p2btn4;

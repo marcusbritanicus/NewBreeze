@@ -46,7 +46,7 @@ NBPSideBarButton::NBPSideBarButton( QWidget *parent ) : QToolButton( parent ) {
 
 	setFixedSize( QSize( 64, 64 ) );
 	setIconSize( QSize( 32, 32 ) );
-	setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+	setToolButtonStyle( Qt::ToolButtonIconOnly );
 	setCheckable( true );
 	setChecked( false );
 	setFocusPolicy( Qt::NoFocus );
