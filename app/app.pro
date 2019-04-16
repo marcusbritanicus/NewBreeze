@@ -19,7 +19,7 @@ isEqual( QT_MAJOR_VERSION, 5 ) {
 	LIBS +=  -L../common/ -lnewbreeze-common
 }
 
-LIBS += -larchive -lbz2 -llzma -lz -ljpeg -lexif
+LIBS += -larchive -lbz2 -llzma -lz
 
 contains ( DEFINES, USE_MEDIAINFO ) {
 	message( "libmediainfo enabled. Media information will be shown in InfoPanel." )
