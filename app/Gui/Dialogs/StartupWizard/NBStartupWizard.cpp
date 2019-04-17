@@ -838,9 +838,15 @@ void NBStartupWizard::saveSettings() {
 void NBStartupWizard::saveDefaultKeys() {
 
 	QSettings keys( ":/data/NewBreeze.conf", QSettings::IniFormat );
+
 	keys.beginGroup( "Shortcuts" );
+	sett.beginGroup( "Shortcuts" );
+
 	Q_FOREACH( QString key, keys.childKeys() )
 		sett.setValue( key, keys.value( key ) );
+
+	sett.endGroup();
+	keys.endGroup();
 };
 
 void NBStartupWizard::paintEvent( QPaintEvent *pEvent ) {
