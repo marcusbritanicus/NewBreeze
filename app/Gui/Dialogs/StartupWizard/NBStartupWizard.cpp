@@ -783,11 +783,11 @@ void NBStartupWizard::saveSettings() {
 	/* Image previews */
 	sett.setValue( "View/FilePreviews", p6cb1->isChecked() );
 	sett.setValue( "View/ImagePreview", p6cb1->isChecked() );
-	sett.setValue( "DjVuPreview", false );
-	sett.setValue( "OdfPreview", false );
-	sett.setValue( "PdfPreview", false );
-	sett.setValue( "VideoPreview", false );
-	sett.setValue( "ePubPreview", false );
+	sett.setValue( "View/DjVuPreview", false );
+	sett.setValue( "View/OdfPreview", false );
+	sett.setValue( "View/PdfPreview", false );
+	sett.setValue( "View/VideoPreview", false );
+	sett.setValue( "View/ePubPreview", false );
 
 	/* SidePanel */
 	sett.setValue( "SidePanel", p7gb1->isChecked() );
