@@ -970,7 +970,7 @@ bool NBItemViewModel::canGoBack() const {
 
 bool NBItemViewModel::canGoForward() const {
 
-	return ( curIndex < ( oldRoots.count() - 1 ) ? true : false);
+	return ( curIndex < ( oldRoots.count() - 1 ) );
 };
 
 bool NBItemViewModel::canGoUp() const {
