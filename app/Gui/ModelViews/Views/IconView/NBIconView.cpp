@@ -922,8 +922,9 @@ void NBIconView::mousePressEvent( QMouseEvent *mpEvent ) {
 		}
 
 		/* We clicked on the Category expander */
+		/* Currently, do nothing. Storing categoryRects is flawed */
 		else if ( catIdx > -1 ) {
-			toggleFoldCategory( categoryList.at( catIdx ) );
+			// toggleFoldCategory( categoryList.at( catIdx ) );
 			return;
 		}
 
@@ -1083,7 +1084,8 @@ void NBIconView::mouseMoveEvent( QMouseEvent *mmEvent ) {
 
 	else {
 		if ( expanderAt( mmEvent->pos() ) > -1 )
-			setCursor( Qt::PointingHandCursor );
+			QToolTip::showText( mapToGlobal( mmEvent->pos() ), "Click <tt><b>+</b></tt> above to unfold", this, QRect(), 1500 );
+			// setCursor( Qt::PointingHandCursor );
 
 		else
 			setCursor( Qt::ArrowCursor );
