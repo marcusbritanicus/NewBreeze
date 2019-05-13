@@ -142,6 +142,9 @@ void NBThumbnailer::run() {
 			QImageReader picReader( file );
 
 			QImage pic = picReader.read();
+			if ( pic.isNull() )
+				continue;
+
 			pic = pic.scaled( 512, 512, Qt::KeepAspectRatio, Qt::FastTransformation );
 			pic = pic.scaled( 128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 

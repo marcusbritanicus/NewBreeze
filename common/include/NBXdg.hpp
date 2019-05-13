@@ -29,4 +29,6 @@ class NBCOMMON_DLLSPEC NBXdg {
 
 		static QString trashLocation( QString path );
 		static QString homeTrashLocation();
+
+		static QString homePartition;
 };

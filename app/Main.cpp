@@ -214,7 +214,7 @@ int main( int argc, char **argv ) {
 				int result = app.sendMessage( query );
 				qDebug() << "Requesting the server to open the path:" << query << ":" << ( result ? "Request sent" : "Request failed" );
 
-				/* Some how we were disconnected from the server before asking for new window */
+				/* Somehow we were disconnected from the server before asking for new window */
 				if ( not result ) {
 					/* Disconnect from server */
 					app.disconnect();

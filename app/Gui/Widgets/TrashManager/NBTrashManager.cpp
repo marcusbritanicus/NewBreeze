@@ -81,7 +81,7 @@ void NBTrashManager::setDialogProperties() {
 
 void NBTrashManager::createAndSetupActions() {
 
-	connect( tModel, SIGNAL( restored( QModelIndexList ) ), this, SLOT( handleFailedRestore( QModelIndexList ) ) );
+	connect( tModel, SIGNAL( restored( QStringList ) ), this, SLOT( handleFailedRestore( QStringList ) ) );
 
 	reloadAct = new QAction( "Re&load", this );
 	reloadAct->setShortcuts( Settings->shortcuts( "Reload" ) );
@@ -123,13 +123,13 @@ void NBTrashManager::updateButtons() {
 	}
 };
 
-QModelIndexList NBTrashManager::getSelection() {
+QStringList NBTrashManager::getSelection() {
 
-	QModelIndexList selectedList;
-	selectedList << TrashView->selectionModel()->selectedIndexes();
-	Q_FOREACH( QModelIndex idx, selectedList )
-		if ( idx.column() )
-			selectedList.removeAt( selectedList.indexOf( idx ) );
+	QStringList selectedList;
+	Q_FOREACH( QModelIndex idx, TrashView->selectionModel()->selectedIndexes() )
+		selectedList << idx.data( Qt::UserRole + 1 ).toString();
+
+	selectedList.removeDuplicates();
 
 	return selectedList;
 };
@@ -144,7 +144,7 @@ void NBTrashManager::doReload() {
 	tModel->reload();
 };
 
-void NBTrashManager::handleFailedRestore( QModelIndexList failedIndexes ) {
+void NBTrashManager::handleFailedRestore( QStringList failedIndexes ) {
 
 	if ( not failedIndexes.count() )
 		return;
@@ -173,10 +173,10 @@ void NBTrashManager::handleFailedRestore( QModelIndexList failedIndexes ) {
 	table->setColumnWidth( 1, 200 );
 
 	QStringList dirs, files;
-	Q_FOREACH( QModelIndex idx, failedIndexes ) {
-		NBTrashNode *node = static_cast<NBTrashNode*>( idx.internalPointer() );
-		QTableWidgetItem *itm1 = new QTableWidgetItem( node->icon(), node->name() );
-		QTableWidgetItem *itm2 = new QTableWidgetItem( node->deletionDate().toString( "MMM dd, yyyy hh:mm:ss" ) );
+	Q_FOREACH( QString failed, failedIndexes ) {
+		QTableWidgetItem *itm1 = new QTableWidgetItem( QIcon(), failed );
+		QTableWidgetItem *itm2 = new QTableWidgetItem( QDateTime().toString( "MMM dd, yyyy hh:mm:ss" ) );
+		// QTableWidgetItem *itm2 = new QTableWidgetItem( dateIdx.data( Qt::DisplayRole ).value<QDateTime>().toString( "MMM dd, yyyy hh:mm:ss" ) );
 
 		itm1->setFlags( itm1->flags() & ~Qt::ItemIsEditable );
 		itm2->setFlags( itm2->flags() & ~Qt::ItemIsEditable );
@@ -205,10 +205,11 @@ void NBTrashManager::restoreSelected() {
 
 void NBTrashManager::restoreAll() {
 
-	QModelIndexList selection;
+	QStringList selection;
 	for( int row = 0; row < tModel->rowCount(); row++ )
-		selection << tModel->index( row, 0, TrashView->rootIndex() );
+		selection << tModel->index( row, 0, TrashView->rootIndex() ).data( Qt::UserRole + 1 ).toString();
 
+	selection.removeDuplicates();
 	tModel->restore( selection );
 
 	updateButtons();
@@ -241,10 +242,11 @@ void NBTrashManager::emptyTrash() {
 	);
 
 	if ( reply == NBMessageDialog::Yes ) {
-		QModelIndexList selection;
+		QStringList selection;
 		for( int row = 0; row < tModel->rowCount(); row++ )
-			selection << tModel->index( row, 0 , TrashView->rootIndex() );
+			selection << tModel->index( row, 0 , TrashView->rootIndex() ).data( Qt::UserRole + 1 ).toString();
 
+		selection.removeDuplicates();
 		tModel->removeFromDisk( selection );
 	}
 

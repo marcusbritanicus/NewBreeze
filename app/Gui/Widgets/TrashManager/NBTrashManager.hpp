@@ -10,7 +10,6 @@
 #include "NBButtons.hpp"
 #include "NBTrashView.hpp"
 #include "NBTrashModel.hpp"
-#include "NBTrashNode.hpp"
 #include "NBDialog.hpp"
 #include "NBMessageDialog.hpp"
 #include "NBGuiWidgets.hpp"
@@ -21,7 +20,7 @@ class NBTrashManager : public NBDialog {
 	public :
 		NBTrashManager( QWidget *parent = 0 );
 
-		QModelIndexList getSelection();
+		QStringList getSelection();
 		bool hasSelection();
 
 	private :
@@ -44,7 +43,7 @@ class NBTrashManager : public NBDialog {
 	public slots :
 		void doReload();
 
-		void handleFailedRestore( QModelIndexList );
+		void handleFailedRestore( QStringList );
 
 		void restoreSelected();
 		void restoreAll();
