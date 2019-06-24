@@ -1,4 +1,10 @@
-newbreeze (3.0.0-rc6) unstable; urgency=medium
+newbreeze-common (3.0.0-rc7) unstable; urgency=medium
+
+  * modification to support Ubuntu 16.04 LTS
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Wed, 24 Jun 2019 12:00:00 +0530
+
+newbreeze-common (3.0.0-rc6) unstable; urgency=medium
 
   * LibArchive support extended to lzip, lz4, lrzip
 

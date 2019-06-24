@@ -55,6 +55,11 @@ int main( int argc, char **argv ) {
 		QCoreApplication::setAttribute( Qt::AA_ShareOpenGLContexts );
 	#endif
 
+	/* HiDPI Support */
+	#if QT_VERSION >= 0x050600
+		QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+	#endif
+
 	NBApplication app( argc, argv, "NewBreeze" );
 
 	/* About Application */
