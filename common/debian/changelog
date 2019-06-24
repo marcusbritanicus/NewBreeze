@@ -1,4 +1,4 @@
-newbreeze-plugins (3.0.0-rc6) unstable; urgency=medium
+newbreeze (3.0.0-rc6) unstable; urgency=medium
 
   * LibArchive support extended to lzip, lz4, lrzip
 

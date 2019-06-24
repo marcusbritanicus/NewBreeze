@@ -11,7 +11,7 @@
 NBMenuButton::NBMenuButton( QWidget *parent ) : QToolButton( parent ) {
 
 	/* Button Icon */
-	setIcon( QIcon( ":/icons/menu.png" ) );
+	setIcon( QIcon::fromTheme( "application-menu" ) );
 
 	/* Internal Object Name */
 	setObjectName( "menuBtn" );

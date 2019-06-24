@@ -112,10 +112,6 @@ void NewBreeze::createGUI() {
 	setupInfoPanel();
 	FilterWidget = new NBFilterWidget( FolderView );
 
-	QWidget *Spacer = new QWidget( this );
-	Spacer->setFixedHeight( 3 );
-	Spacer->setStyleSheet( "border-bottom: 1px solid darkgray;" );
-
 	QHBoxLayout *ViewLayout = new QHBoxLayout();
 	ViewLayout->setContentsMargins( QMargins() );
 	ViewLayout->setSpacing( 0 );
@@ -129,10 +125,7 @@ void NewBreeze::createGUI() {
 	BaseLayout->setContentsMargins( QMargins( 0, 0, 0, 0 ) );
 	BaseLayout->setSpacing( 0 );
 
-	QToolBar *mainToolBar = addToolBar( "AddressBar" );
-	mainToolBar->setMovable( false );
-	mainToolBar->addWidget( AddressBar );
-
+	BaseLayout->addWidget( AddressBar );
 	BaseLayout->addLayout( ViewLayout );
 	BaseLayout->addWidget( Terminal );
 	BaseLayout->addWidget( InfoBar );
@@ -219,10 +212,8 @@ void NewBreeze::createAndSetupActions() {
 	connect( AddressBar, SIGNAL( openLocation( QString ) ), FolderView, SLOT( doOpen( QString ) ) );
 	connect( AddressBar, SIGNAL( openSearch() ), FilterWidget, SLOT( showHide() ) );
 
-	connect( AddressBar, SIGNAL( goBack() ), FolderView, SLOT( goBack() ) );
 	connect( AddressBar, SIGNAL( goHome() ), FolderView, SLOT( loadHomeDir() ) );
 	connect( AddressBar, SIGNAL( openSuperStart() ), FolderView, SLOT( doOpenSS() ) );
-	connect( AddressBar, SIGNAL( goForward() ), FolderView, SLOT( goForward() ) );
 
 	connect( AddressBar, SIGNAL( newWindow() ), this, SLOT( newWindow() ) );
 
@@ -616,19 +607,6 @@ void NewBreeze::handleMessages( const QString message ) {
 };
 
 void NewBreeze::updateVarious( QString url ) {
-
-	/* Navigation Buttons */
-	bool backBtn = false, fwdBtn = false;
-
-	/* Enable/disable goBack */
-	if ( FolderView->fsModel->canGoBack() )
-		backBtn = true;
-
-	/* Enable/disable goForward */
-	if ( FolderView->fsModel->canGoForward() )
-		fwdBtn = true;
-
-	AddressBar->updateNavigationButtons( backBtn, fwdBtn );
 
 	if ( url.isEmpty() or url.isNull() )
 		url = FolderView->fsModel->currentDir();

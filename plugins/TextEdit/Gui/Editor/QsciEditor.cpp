@@ -226,31 +226,40 @@ void QsciEditor::resizeMargins() {
 void QsciEditor::setAutoLexer() {
 
 	QString sfx = QFileInfo( mFilePath ).suffix();
-	QMimeType mimeType = mimeDb.mimeTypeForFile( mFilePath );
+	QString mimeType = mimeDb.mimeTypeForFile( mFilePath ).name().replace( "text/", "" );
 
-	if ( mimeType.name().contains( "python" ) )
+	if ( mimeType.contains( "python" ) )
 		setLexer( new QLexerPython() );
 
-	else if ( mimeType.name().contains( "html" ) )
+	else if ( mimeType.contains( "html" ) )
 		setLexer( new QsciLexerHTML() );
 
-	else if ( mimeType.name().contains( "tex" ) )
+	else if ( mimeType.contains( "tex" ) )
 		setLexer( new QsciLexerLaTeX() );
 
-	else if ( mimeType.name().contains( "makefile" ) )
+	else if ( mimeType.contains( "makefile" ) )
 		setLexer( new QsciLexerMakefile() );
 
-	else if ( mimeType.name().contains( "xml" ) )
+	else if ( mimeType.contains( "perl" ) )
+		setLexer( new QsciLexerPerl() );
+
+	else if ( mimeType.contains( "xml" ) )
 		setLexer( new QsciLexerHTML() );
 
-	else if ( mimeType.name().contains( "shell" ) )
+	else if ( mimeType.contains( "shell" ) )
 		setLexer( new QsciLexerBash() );
 
 	else if ( QStringList( QStringList() << "c" << "cc" << "cpp" << "h" << "hh" << "hpp" ).contains( sfx ) )
 		setLexer( new QsciLexerCPP() );
 
+	else if ( sfx == "jl" )
+		setLexer( new QLexerJulia() );
+
 	else
 		setLexer( new QLexerDefault() );
+
+	/* Monospace fonts */
+	lexer()->setFont( QFont( "Monospace", 9 ) );
 };
 
 void QsciEditor::timerEvent( QTimerEvent *tEvent ) {

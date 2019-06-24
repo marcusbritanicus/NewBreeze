@@ -83,10 +83,10 @@ void NBToggleButton::paintEvent( QPaintEvent *pEvent ) {
 
 NBAddressEdit::NBAddressEdit( QWidget *parent ) : QLineEdit( parent ) {
 
-	setStyleSheet( "background: transparent; border: none;" );
+	setStyleSheet( "background-color: transparent" );
 };
 
-NBAddressWidget::NBAddressWidget( QWidget *parent ) : QWidget( parent ) {
+NBAddressWidget::NBAddressWidget( QWidget *parent ) : QFrame( parent ) {
 
 	addressEdit = new NBAddressEdit( this );
 	addressEdit->setFont( QFont( "DejaVu Sans Mono", 9 ) );
@@ -195,17 +195,6 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	QHBoxLayout *fLyt = new QHBoxLayout();
 	fLyt->setContentsMargins( QMargins( 3, 0, 3, 0 ) );
 
-	// Previous button
-
-	backBtn = new NBButton( icon( NBIconManager::instance()->icon( "go-previous" ) ), this );
-	backBtn->setFocusPolicy( Qt::NoFocus );
-	backBtn->setFlat( true );
-
-	// Next Button
-	forwardBtn = new NBButton( icon( NBIconManager::instance()->icon( "go-next" ) ), this );
-	forwardBtn->setFocusPolicy( Qt::NoFocus );
-	forwardBtn->setFlat( true );
-
 	// Home Button
 	homeBtn = new NBButton( icon( NBIconManager::instance()->icon( "go-home" ) ), this );
 	homeBtn->setFocusPolicy( Qt::NoFocus );
@@ -217,10 +206,8 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	ssBtn->setFlat( true );
 
 	NBSegmentButton *navBtns = new NBSegmentButton( this );
-	navBtns->addSegment( backBtn );
 	navBtns->addSegment( homeBtn );
 	navBtns->addSegment( ssBtn );
-	navBtns->addSegment( forwardBtn );
 
 	// AddressWidget
 	addressWidget = new NBAddressWidget( this );
@@ -242,7 +229,6 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 
 	/* Layouts */
 	fLyt->addWidget( navBtns );
-	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( addressWidget );
 	fLyt->addWidget( Separator::vertical() );
 	fLyt->addWidget( filterBtn );
@@ -253,7 +239,6 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 
 	QWidget *base = new QWidget( this );
 	base->setObjectName( "baseWidget" );
-	base->setStyleSheet( "#baseWidget{ border-bottom: 1px solid darkgray;}" );
 	base->setLayout( fLyt );
 
 	QHBoxLayout *bLyt = new QHBoxLayout();
@@ -264,10 +249,8 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	setLayout( bLyt );
 
 	/* Connections */
-	connect( backBtn, SIGNAL( clicked() ), this, SIGNAL( goBack() ) );
 	connect( homeBtn, SIGNAL( clicked() ), this, SIGNAL( goHome() ) );
 	connect( ssBtn, SIGNAL( clicked() ), this, SIGNAL( openSuperStart() ) );
-	connect( forwardBtn, SIGNAL( clicked() ), this, SIGNAL( goForward() ) );
 	connect( addressWidget, SIGNAL( openLocation( QString ) ), this, SIGNAL( openLocation( QString ) ) );
 	connect( filterBtn, SIGNAL( clicked() ), this, SIGNAL( openSearch() ) );
 
@@ -288,12 +271,8 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	connect( menuBtn, SIGNAL( showSettings() ), this, SIGNAL( showSettings() ) );
 	connect( menuBtn, SIGNAL( closeWindow() ), this, SIGNAL( closeWindow() ) );
 	connect( menuBtn, SIGNAL( quit() ), this, SIGNAL( quit() ) );
-};
 
-void NBAddressBar::updateNavigationButtons( bool bBtn, bool fBtn ) {
-
-	backBtn->setEnabled( bBtn );
-	forwardBtn->setEnabled( fBtn );
+	setStyleSheet( "#baseWidget{ border-bottom: 1px solid darkgray; } QFrame{ border: 1px solid lightgray; border-radius: 3px; }" );
 };
 
 QString NBAddressBar::address() {

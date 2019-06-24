@@ -88,7 +88,7 @@ class NBDirectoryDialog : public NBDialog {
 		QString title;
 		QString location;
 
-		QPushButton *newFolderBtn;
+		NBButton *newFolderBtn;
 
 	private slots:
 		void open( QString );

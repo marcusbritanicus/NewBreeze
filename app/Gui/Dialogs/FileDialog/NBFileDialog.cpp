@@ -280,7 +280,8 @@ void NBDirectoryDialog::createGUI() {
 
 	dirView = new NBDirectoryView( this );
 
-	newFolderBtn = new QPushButton( QIcon::fromTheme( "folder-new" ), "New Folder", this );
+	newFolderBtn = new NBButton( QIcon::fromTheme( "folder-new" ), "New Folder", this );
+	newFolderBtn->setSegment( NBButton::SingleButton );
 	connect( newFolderBtn, SIGNAL( clicked() ), this, SLOT( addFolder() ) );
 
 	QHBoxLayout *bodyLyt = new QHBoxLayout();

@@ -21,7 +21,6 @@ void NBFilterWidget::setupUI() {
 	setFixedWidth( 360 );
 
 	// Widgets - Label and LineEdit
-
 	findLbl = new QLabel();
 	findLbl->setPixmap( QIcon( ":/icons/search.png" ).pixmap( 16 ) );
 
@@ -31,6 +30,7 @@ void NBFilterWidget::setupUI() {
 
 	// Layouts
 	QHBoxLayout *srchLyt = new QHBoxLayout();
+	srchLyt->setContentsMargins( QMargins() );
 	srchLyt->addWidget( findLbl );
 	srchLyt->addWidget( findLE );
 
@@ -39,6 +39,7 @@ void NBFilterWidget::setupUI() {
 	base->setLayout( srchLyt );
 
 	QVBoxLayout *widgetLyt = new QVBoxLayout();
+	widgetLyt->setContentsMargins( QMargins() );
 	widgetLyt->addWidget( base );
 
 	setLayout( widgetLyt );

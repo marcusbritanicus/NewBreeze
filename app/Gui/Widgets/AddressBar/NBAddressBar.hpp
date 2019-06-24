@@ -47,7 +47,7 @@ class NBAddressEdit : public QLineEdit {
 		NBAddressEdit( QWidget* );
 };
 
-class NBAddressWidget : public QWidget {
+class NBAddressWidget : public QFrame {
 	Q_OBJECT
 
 	public:
@@ -83,10 +83,8 @@ class NBAddressBar : public QWidget {
 		QString address();
 		void setAddress( QString );
 
-		void updateNavigationButtons( bool, bool );
-
 	private:
-		NBButton *backBtn, *forwardBtn, *homeBtn, *ssBtn;
+		NBButton *homeBtn, *ssBtn;
 		NBButton *filterBtn;
 		NBAddressWidget *addressWidget;
 		NBProcessManagerMini *mProcWidget;
@@ -102,10 +100,8 @@ class NBAddressBar : public QWidget {
 		void openLocation( QString );
 		void openSearch();
 
-		void goBack();
 		void goHome();
 		void openSuperStart();
-		void goForward();
 
 		void newWindow();
 
