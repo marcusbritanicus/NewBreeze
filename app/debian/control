@@ -8,7 +8,7 @@ Homepage: https://gitlab.com/marcusbritanicus/NewBreeze/
 
 Package: newbreeze
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, newbreeze-common (= 3.0.0), xdg-utils, liblzma5, libbz2-1.0, encfs
+Depends: ${shlibs:Depends}, ${misc:Depends}, newbreeze-common (= 3.0.0-rc7), xdg-utils, liblzma5, libbz2-1.0, encfs
 Description: Qt based lightweight and fast file manager
  Built on top of the Powerful Qt4/Qt5 GUI Toolkit, this file manager is sleek,
  stylish and fast. Some of its features are
