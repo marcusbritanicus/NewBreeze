@@ -5,3 +5,17 @@ newbreeze3
 .directory
 *.hh
 *.cc
+common/debian/.debhelper/
+common/debian/files
+common/debian/newbreeze-common.debhelper.log
+common/debian/newbreeze-common.substvars
+common/debian/newbreeze-common/
+common/debian/newbreeze-dev.debhelper.log
+common/debian/newbreeze-dev.substvars
+common/debian/newbreeze-dev/
+common/debian/tmp/
+plugins/debian/.debhelper/
+plugins/debian/files
+plugins/debian/newbreeze-plugins.debhelper.log
+plugins/debian/newbreeze-plugins.substvars
+plugins/debian/newbreeze-plugins/

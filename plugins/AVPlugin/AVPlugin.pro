@@ -5,8 +5,9 @@ TARGET = AVPlugin4
 INCLUDEPATH += ../../common/ ../../common/include .
 DEPENDPATH += ../../common/ ../../common/include .
 
-# VLC Support
-LIBS += -lvlc
+# LibMPV Support
+CONFIG += link_pkgconfig
+PKGCONFIG += mpv
 
 # Same as NewBreeze version
 VERSION = "3.0.0"

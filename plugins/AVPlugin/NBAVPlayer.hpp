@@ -9,12 +9,11 @@
 #include <QtGui>
 #include <QtCore>
 
-#include <unistd.h>
-#include <vlc/vlc.h>
-
 #if QT_VERSION > 0x050000
 	#include <QtWidgets>
 #endif
+
+#include <mpv/client.h>
 
 class NBAVPlayer : public QDialog {
 	Q_OBJECT
@@ -40,14 +39,13 @@ class NBAVPlayer : public QDialog {
 		QString mPath;
 		QWidget *peekWidgetBase;
 
-		libvlc_instance_t * inst;
-		libvlc_media_player_t *mp;
-		libvlc_media_t *m;
-
-		bool mIsPlaying;
+		QWidget *mpv_container;
+		mpv_handle *mpv;
 
 	public Q_SLOTS:
 		int exec();
+		void play( QString path );
+		void handleMpvEvents();
 
 	private slots :
 		void openInExternal();
@@ -57,4 +55,7 @@ class NBAVPlayer : public QDialog {
 		void changeEvent( QEvent *cEvent );
 
 		void paintEvent( QPaintEvent *pEvent );
+
+	Q_SIGNALS:
+		void mpv_events();
 };

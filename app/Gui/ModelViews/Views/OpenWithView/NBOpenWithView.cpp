@@ -407,7 +407,7 @@ void NBOpenWithView::paintEvent( QPaintEvent* event ) {
 	QPainter painter( viewport() );
 	painter.setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing );
 
-	painter.fillRect( viewport()->rect(), palette().color( QPalette::Base ) );
+	painter.fillRect( viewport()->rect(), Qt::transparent );
 
 	/* We need to draw the categories only if the model is categorization enabled */
 	if ( appModel->isCategorizationEnabled() ) {

@@ -10,7 +10,6 @@
 #include <QtCore>
 
 #include <unistd.h>
-#include <vlc/vlc.h>
 
 #if QT_VERSION > 0x050000
 	#include <QtWidgets>

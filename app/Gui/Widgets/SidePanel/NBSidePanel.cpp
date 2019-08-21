@@ -85,7 +85,7 @@ void NBSidePanel::populateSidePanel() {
 
 	scrollLyt->addStretch();
 
-	trashLabel = new NBSidePanelLabel( ":/icons/trash.png", "Trash", this );
+	trashLabel = new NBSidePanelTrashLabel( ":/icons/trash.png", "Trash", this );
 	connect( trashLabel, SIGNAL( clicked() ), this, SIGNAL( showTrash() ) );
 	scrollLyt->addWidget( trashLabel );
 

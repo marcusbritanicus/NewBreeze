@@ -25,7 +25,7 @@ class NBSidePanel : public QScrollArea {
 		NBSidePanelLabel *catalogsLabel;
 		NBSidePanelLabel *bookmarksLabel;
 		NBSidePanelLabel *quickFilesLabel;
-		NBSidePanelLabel *trashLabel;
+		NBSidePanelTrashLabel *trashLabel;
 
 		QVBoxLayout *scrollLyt;
 

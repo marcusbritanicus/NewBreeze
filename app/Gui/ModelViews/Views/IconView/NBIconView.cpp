@@ -129,13 +129,13 @@ void NBIconView::updateViewMode() {
 	currentViewMode = QString( Settings->value( "View/ViewMode" ) );
 
 	if ( QString( Settings->value( "View/ViewMode" ) ) == "Icons" )
-		setIconSize( Settings->value( "View/IconsImageSize" ) );
+		setIconSize( Settings->value( "View/IconsImageSize", NBSettings::LocalScope ) );
 
 	else if ( QString( Settings->value( "View/ViewMode" ) ) == "Tiles" )
-		setIconSize( Settings->value( "View/TilesImageSize" ) );
+		setIconSize( Settings->value( "View/TilesImageSize", NBSettings::LocalScope ) );
 
 	else
-		setIconSize( Settings->value( "View/DetailsImageSize" ) );
+		setIconSize( Settings->value( "View/DetailsImageSize", NBSettings::LocalScope ) );
 
 	return;
 };
@@ -356,7 +356,7 @@ void NBIconView::reload() {
 	}
 
 	QString viewMode;
-	int iconSize = QSize( Settings->value( "View/IconsImageSize", NBSettings::GlobalScope ) ).width();
+	QSize iconSize( Settings->value( "View/IconsImageSize", NBSettings::GlobalScope ) );
 
 	/* Change view mode and icon size according to the .desktop file */
 	if ( not cModel->isRealLocation() ) {
@@ -366,32 +366,32 @@ void NBIconView::reload() {
 		viewMode = QString( Settings->value( "View/ViewMode", scope ) );
 
 		if ( viewMode == "Icons" )
-			iconSize = QSize( Settings->value( "View/IconsImageSize", scope ) ).width();
+			iconSize = QSize( Settings->value( "View/IconsImageSize", scope ) );
 
 		else if ( viewMode == "Icons" )
-			iconSize = QSize( Settings->value( "View/TilesImageSize", scope ) ).width();
+			iconSize = QSize( Settings->value( "View/TilesImageSize", scope ) );
 
 		else
-			iconSize = QSize( Settings->value( "View/DetailsImageSize", scope ) ).width();
+			iconSize = QSize( Settings->value( "View/DetailsImageSize", scope ) );
 	}
 
 	else {
 		viewMode = QString( Settings->value( "View/ViewMode" ) );
 
 		if ( viewMode == "Icons" )
-			iconSize = QSize( Settings->value( "View/IconsImageSize" ) ).width();
+			iconSize = QSize( Settings->value( "View/IconsImageSize", NBSettings::LocalScope ) );
 
 		else if ( viewMode == "Icons" )
-			iconSize = QSize( Settings->value( "View/TilesImageSize" ) ).width();
+			iconSize = QSize( Settings->value( "View/TilesImageSize", NBSettings::LocalScope ) );
 
 		else
-			iconSize = QSize( Settings->value( "View/DetailsImageSize" ) ).width();
+			iconSize = Settings->value( "View/DetailsImageSize", NBSettings::LocalScope );
 	}
 
 	emit updateViewMode( viewMode );
 
 	currentViewMode = viewMode;
-	setIconSize( iconSize, iconSize );
+	setIconSize( iconSize );
 
 	hashIsDirty = true;
 	persistentVCol = 0;
@@ -520,7 +520,7 @@ void NBIconView::paintEvent( QPaintEvent* event ) {
 	QPainter painter( viewport() );
 	painter.setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing );
 
-	painter.fillRect( viewport()->rect(), palette().color( QPalette::Base ) );
+	painter.fillRect( viewport()->rect(), Qt::transparent );
 
 	/* We need to draw the categories only if the model is categorization enabled */
 	if ( cModel->isCategorizationEnabled() ) {
@@ -2747,16 +2747,15 @@ void NBIconView::zoomIn() {
 	}
 
 	if ( cModel->isRealLocation() ) {
-
 		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/View/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize );
 		sett.sync();
 	}
 
 	else {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
 		QSettings sett( "NewBreeze", loc );
-		sett.setValue( "NewBreeze/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/View/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize );
 		sett.sync();
 	}
 };
@@ -2772,14 +2771,14 @@ void NBIconView::zoomOut() {
 	if ( cModel->isRealLocation() ) {
 
 		QSettings sett( cModel->nodePath( ".directory" ), QSettings::NativeFormat );
-		sett.setValue( "NewBreeze/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/View/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize );
 		sett.sync();
 	}
 
 	else {
 		QString loc = cModel->currentDir().replace( "NB://", "" );
 		QSettings sett( "NewBreeze", loc );
-		sett.setValue( "NewBreeze/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize.width() );
+		sett.setValue( "NewBreeze/View/" + QString( Settings->value( "View/ViewMode" ) ) + "ImageSize", myIconSize );
 		sett.sync();
 	}
 };

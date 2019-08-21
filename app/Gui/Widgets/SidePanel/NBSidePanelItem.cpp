@@ -31,6 +31,9 @@ void NBSidePanelLabel::paintEvent( QPaintEvent *pEvent ) {
 	QPainter painter( this );
 	painter.setPen( Qt::NoPen );
 
+	/* Clear the background */
+	painter.fillRect( rect(), Qt::transparent );
+
 	/* Paint Icon */
 	QRect iconRect = QRect( 4, 4, 24, 24 );
 	painter.drawPixmap( iconRect, mIcon );
@@ -50,6 +53,99 @@ void NBSidePanelLabel::paintEvent( QPaintEvent *pEvent ) {
 	painter.end();
 
 	pEvent->accept();
+};
+
+NBSidePanelTrashLabel::NBSidePanelTrashLabel( QString icon, QString name, QWidget *parent ) : QWidget( parent ) {
+
+	setFixedHeight( 32 );
+	setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Fixed );
+
+	mName = name;
+	mIcon = QIcon( icon ).pixmap( 24 );
+
+	setCursor( Qt::PointingHandCursor );
+	setAcceptDrops( true );
+};
+
+void NBSidePanelTrashLabel::mouseReleaseEvent( QMouseEvent *mrEvent ) {
+
+	if ( mrEvent->button() == Qt::LeftButton )
+		emit clicked();
+
+	mrEvent->accept();
+};
+
+void NBSidePanelTrashLabel::paintEvent( QPaintEvent *pEvent ) {
+
+	QPainter painter( this );
+	painter.setPen( Qt::NoPen );
+
+	/* Clear the background */
+	painter.fillRect( rect(), Qt::transparent );
+
+	/* Paint Icon */
+	QRect iconRect = QRect( 4, 4, 24, 24 );
+	painter.drawPixmap( iconRect, mIcon );
+
+	QRectF textRect = QRectF( 32, 0, width() - 32, 32 );
+	painter.setPen( palette().color( QPalette::WindowText ) );
+
+	QFont boldFont( font() );
+	boldFont.setBold( true );
+	painter.setFont( boldFont );
+
+	painter.drawText( textRect, Qt::AlignLeft | Qt::AlignVCenter, mName );
+
+	// painter.setPen( Qt::darkGray );
+	// painter.drawLine( rect().topRight(), rect().bottomRight() );
+
+	painter.end();
+
+	pEvent->accept();
+};
+
+void NBSidePanelTrashLabel::dragEnterEvent( QDragEnterEvent *deEvent ) {
+
+	deEvent->acceptProposedAction();
+};
+
+void NBSidePanelTrashLabel::dragMoveEvent( QDragMoveEvent *dmEvent ) {
+
+	const QMimeData *mData = dmEvent->mimeData();
+	if ( not mData->hasUrls() ) {
+		dmEvent->ignore();
+		return;
+	}
+
+	dmEvent->setDropAction( Qt::MoveAction );
+	dmEvent->accept();
+};
+
+void NBSidePanelTrashLabel::dropEvent( QDropEvent *dpEvent ) {
+
+	if ( not dpEvent->mimeData()->hasUrls() ) {
+		dpEvent->ignore();
+		return;
+	}
+
+	const QMimeData *mData = dpEvent->mimeData();
+
+	NBProcess::Progress *progress = new NBProcess::Progress;
+	progress->sourceDir = dirName( mData->urls().at( 0 ).toLocalFile() );
+	progress->targetDir = QString();
+	progress->type = NBProcess::Trash;
+
+	QStringList toBeDeleted;
+	Q_FOREACH( QUrl url, mData->urls() )
+		toBeDeleted << url.toLocalFile().replace( progress->sourceDir, "" );
+
+	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
+	NBProcessManager::instance()->addProcess( progress, proc );
+
+	progress->startTime = QTime::currentTime();
+	proc->start();
+
+	dpEvent->accept();
 };
 
 NBSidePanelItem::NBSidePanelItem( QString name, QString icon, QString target, int type, QWidget *parent ) : QWidget( parent ) {
@@ -286,8 +382,7 @@ void NBSidePanelItem::paintEvent( QPaintEvent *pEvent ) {
 	/* No highlight and no hover */
 	else if ( not ( mHighlight or mHover ) ) {
 
-		painter.setBrush( palette().color( QPalette::Window ) );
-		painter.drawRect( QRect( 0, 0, width(), height() ) );
+		painter.fillRect( rect(), Qt::transparent );
 	}
 
 	/* Highlight and no hover */

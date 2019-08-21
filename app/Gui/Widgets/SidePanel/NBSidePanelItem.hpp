@@ -28,6 +28,28 @@ class NBSidePanelLabel : public QWidget {
 		void clicked();
 };
 
+class NBSidePanelTrashLabel : public QWidget {
+	Q_OBJECT
+
+	public:
+		NBSidePanelTrashLabel( QString name, QString icon, QWidget *parent );
+
+	private:
+		QString mName;
+		QPixmap mIcon;
+
+	protected:
+		void mouseReleaseEvent( QMouseEvent *mrEvent );
+		void paintEvent( QPaintEvent *pEvent );
+
+		void dragEnterEvent( QDragEnterEvent* );
+		void dragMoveEvent( QDragMoveEvent* );
+		void dropEvent( QDropEvent* );
+
+	Q_SIGNALS:
+		void clicked();
+};
+
 class NBSidePanelItem : public QWidget {
 	Q_OBJECT
 

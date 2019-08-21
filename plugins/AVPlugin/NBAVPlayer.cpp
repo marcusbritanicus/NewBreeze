@@ -6,16 +6,16 @@
 
 #include "NBAVPlayer.hpp"
 
+static void wakeup( void *ctx ) {
+
+	NBAVPlayer *player = ( NBAVPlayer * )ctx;
+	emit player->mpv_events();
+}
+
 NBAVPlayer::NBAVPlayer( QString pth ) : QDialog() {
 
 	/* Video path */
 	mPath = QString( pth );
-
-	/* Is video playing */
-	mIsPlaying = false;
-
-	/* Load the VLC engine */
-	inst = libvlc_new( 0, NULL );
 
 	/* Create the UI */
 	createGUI();
@@ -26,14 +26,8 @@ NBAVPlayer::NBAVPlayer( QString pth ) : QDialog() {
 
 NBAVPlayer::~NBAVPlayer() {
 
-	/* Stop the player first */
-	stop();
-
-	/* Free the media_player */
-	libvlc_media_player_release( mp );
-
-	/* Release the instance */
-	libvlc_release( inst );
+	mpv_terminate_destroy( mpv );
+	mpv = NULL;
 };
 
 void NBAVPlayer::createGUI() {
@@ -56,6 +50,33 @@ void NBAVPlayer::createGUI() {
 
 	peekWidgetBase = new QWidget();
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
+
+	setlocale( LC_NUMERIC, "C" );
+
+	mpv = mpv_create();
+	if ( !mpv ) {
+		throw std::runtime_error( "failed to create mpv handle" );
+	}
+
+	mpv_container->setAttribute( Qt::WA_DontCreateNativeAncestors );
+	mpv_container->setAttribute( Qt::WA_NativeWindow );
+
+	int64_t wid = peekWidgetBase->winId();
+	mpv_set_option( mpv, "wid", MPV_FORMAT_INT64, &wid );
+
+	mpv_set_option_string( mpv, "input-default-bindings", "yes" );
+	mpv_set_option_string( mpv, "input-vo-keyboard", "yes" );
+	mpv_set_option_string( mpv, "osc", "yes" );
+
+	mpv_observe_property( mpv, 0, "time-pos", MPV_FORMAT_DOUBLE );
+	mpv_observe_property( mpv, 0, "track-list", MPV_FORMAT_NODE );
+	mpv_observe_property( mpv, 0, "chapter-list", MPV_FORMAT_NODE );
+
+	connect( this, SIGNAL( mpv_events() ), this, SLOT( handleMpvEvents() ), Qt::QueuedConnection );
+	mpv_set_wakeup_callback( mpv, wakeup, this );
+
+	if ( mpv_initialize( mpv ) < 0 )
+		throw std::runtime_error( "mpv failed to initialize" );
 
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
@@ -88,73 +109,8 @@ void NBAVPlayer::setWindowProperties() {
 
 void NBAVPlayer::loadMedia() {
 
-	/* Create a new item */
-	m = libvlc_media_new_path( inst, mPath.toLocal8Bit().data() );
-
-	/* Create a media player playing environment */
-	mp = libvlc_media_player_new_from_media( m );
-
-	/* Free the media */
-	libvlc_media_release( m );
-
-	/* Attach the current window to our player */
-	libvlc_media_player_set_xwindow( mp, peekWidgetBase->winId() );
-
-	/* Start playing the media */
-	togglePausePlay();
-};
-
-void NBAVPlayer::togglePausePlay() {
-
-	if ( mIsPlaying ) {
-		/* Is video playing */
-		mIsPlaying = false;
-
-		/* pause the media_player */
-		libvlc_media_player_pause( mp );
-	}
-
-	else {
-		/* Is video playing */
-		mIsPlaying = true;
-
-		/* play the media_player */
-		libvlc_media_player_play( mp );
-	}
-};
-
-void NBAVPlayer::stop() {
-
-	if ( mIsPlaying ) {
-		/* Stop playing */
-		libvlc_media_player_stop( mp );
-
-		/* Is video playing */
-		mIsPlaying = false;
-	}
-};
-
-void NBAVPlayer::seek( int ms, bool forward ) {
-
-	int curtime = libvlc_media_player_get_time( mp );
-
-	libvlc_media_player_pause( mp );
-
-	if ( forward ) {
-		int newtime = curtime + ms;
-		libvlc_media_player_set_time( mp, newtime );
-	}
-
-	else {
-		int newtime = curtime - ms;
-		if ( newtime < 0 )
-			libvlc_media_player_set_time( mp, 0 );
-
-		else
-			libvlc_media_player_set_time( mp, newtime );
-	}
-
-	libvlc_media_player_play( mp );
+	const char *args[] = { "loadfile", mPath.toUtf8().data(), NULL };
+	mpv_command_async( mpv, 0, args );
 };
 
 int NBAVPlayer::exec() {
@@ -177,48 +133,9 @@ void NBAVPlayer::keyPressEvent( QKeyEvent *kEvent ) {
 	/* No Modifiers */
 	if ( qApp->keyboardModifiers().testFlag( Qt::NoModifier ) ) {
 		switch ( kEvent->key() ) {
-			case Qt::Key_Right: {
-				seek( 10000, true );
-				break;
-			}
-
-			case Qt::Key_Left: {
-				seek( 10000, false );
-				break;
-			}
-
-			case Qt::Key_Space: {
-				togglePausePlay();
-				break;
-			}
-
 			case Qt::Key_Escape: {
 				stop();
 				close();
-				break;
-			}
-
-			default: {
-				QWidget::keyPressEvent( kEvent );
-			}
-		}
-	}
-
-	/* Control Modifiers */
-	else if ( qApp->keyboardModifiers().testFlag( Qt::ControlModifier ) ) {
-		switch ( kEvent->key() ) {
-			case Qt::Key_Right: {
-				seek( 60000, true );
-				break;
-			}
-
-			case Qt::Key_Left: {
-				seek( 60000, false );
-				break;
-			}
-
-			case Qt::Key_Space: {
-				stop();
 				break;
 			}
 
