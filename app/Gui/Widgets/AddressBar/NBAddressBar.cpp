@@ -196,7 +196,8 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	fLyt->setContentsMargins( QMargins( 3, 0, 3, 0 ) );
 
 	// Home Button
-	homeBtn = new NBButton( icon( NBIconManager::instance()->icon( "go-home" ) ), this );
+	// homeBtn = new NBButton( icon( NBIconManager::instance()->icon( "go-home" ) ), this );
+	homeBtn = new NBButton( QIcon::fromTheme( "user-home" ), this );
 	homeBtn->setFocusPolicy( Qt::NoFocus );
 	homeBtn->setFlat( true );
 
@@ -272,7 +273,7 @@ NBAddressBar::NBAddressBar( QWidget *parent ) : QWidget( parent ) {
 	connect( menuBtn, SIGNAL( closeWindow() ), this, SIGNAL( closeWindow() ) );
 	connect( menuBtn, SIGNAL( quit() ), this, SIGNAL( quit() ) );
 
-	setStyleSheet( "#baseWidget{ border-bottom: 1px solid darkgray; } QFrame{ border: 1px solid lightgray; border-radius: 3px; }" );
+	setStyleSheet( "#baseWidget{ border-bottom: 1px solid darkgray; } #addressWidget{ border: 1px solid lightgray; border-radius: 3px; }" );
 };
 
 QString NBAddressBar::address() {

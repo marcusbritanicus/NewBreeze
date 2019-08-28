@@ -25,6 +25,8 @@ NBMenuItem::NBMenuItem( QString name, QString icon, QWidget *parent ) : QLabel( 
 	mPressed = false;
 
 	setFixedHeight( 28 );
+
+	setStyleSheet( "background-color: transparent;" );
 };
 
 QString NBMenuItem::name() {
@@ -474,7 +476,7 @@ void NBSystemMenu::exec( QPoint point ) {
 		viewMode = QString( Settings->value( "View/ViewMode" ) );
 
 		if ( viewMode == "Icons" ) {
-			iconSize = QSize( Settings->value( "View/IconImageSize" ) ).width();
+			iconSize = QSize( Settings->value( "View/IconsImageSize" ) ).width();
 			iconsBtn->setChecked( true );
 		}
 
