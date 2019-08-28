@@ -219,7 +219,7 @@ void NBTrashManager::deleteSelected() {
 
 	if ( hasSelection() ) {
 		int reply = NBMessageDialog::question( this,
-			"Empty Trash?",
+			"NewBreeze | Delete Permanently?",
 			"<p>You are about to remove all the selected files and folders in trash, from the disk. "
 			"This operation cannot be undone, and the deleted data cannot be recoverd.</p>"
 			"<p>Do you want to proceed?</p>"

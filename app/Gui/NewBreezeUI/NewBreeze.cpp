@@ -833,20 +833,22 @@ void NewBreeze::switchToNextView() {
 
 void NewBreeze::toggleGrouping() {
 
+	Settings->setValue( "Grouping", not Settings->value( "Grouping" ) );
+
 	FolderView->fsModel->setCategorizationEnabled( Settings->value( "Grouping" ) );
 	FolderView->groupsAct->setChecked( Settings->value( "Grouping" ) );
 
 	if ( not FolderView->fsModel->isRealLocation() ) {
 		QString location = FolderView->fsModel->currentDir().replace( "NB://", "" );
 		if ( location == "SuperStart" )
-			Settings->setValue( "View/Grouping", not Settings->value( "Grouping" ), NBSettings::SuperStart );
+			Settings->setValue( "View/Grouping", ( bool )Settings->value( "Grouping" ), NBSettings::SuperStart );
 
 		else
-			Settings->setValue( "View/Grouping", not Settings->value( "Grouping" ), NBSettings::Catalogs );
+			Settings->setValue( "View/Grouping", ( bool )Settings->value( "Grouping" ), NBSettings::Catalogs );
 	}
 
 	else {
-		Settings->setValue( "View/Grouping", not Settings->value( "Grouping" ) );
+		Settings->setValue( "View/Grouping", ( bool )Settings->value( "Grouping" ) );
 	}
 
 	FolderView->fsModel->reload();

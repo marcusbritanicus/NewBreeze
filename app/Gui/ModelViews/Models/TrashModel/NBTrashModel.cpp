@@ -299,13 +299,29 @@ void NBTrashModel::removeFromDisk( QStringList toBeDeleted ) {
 
 		// Read trashinfo
 		QString trashInfoPath( trash.path() + "/info/" + baseName( fileToDelete ) + ".trashinfo" );
-		if ( not QFile::remove( fileToDelete ) )
-			failed << fileToDelete;
+		if ( isDir( fileToDelete ) ) {
+			if ( not removeDir( fileToDelete ) )
+				failed << fileToDelete;
 
-		/* Success! Remove the info file */
-		else
-			QFile::remove( trashInfoPath );
+			else
+				QFile::remove( trashInfoPath );
+		}
+
+		else if ( isFile( fileToDelete ) ) {
+			if ( not QFile::remove( fileToDelete ) )
+				failed << fileToDelete;
+
+			else
+				QFile::remove( trashInfoPath );
+		}
+
+		else {
+			qDebug() << "Cannot remove" << fileToDelete << "from trash";
+			failed << fileToDelete;
+		}
 	}
+
+	qDebug() << failed;
 
 	emit deleted( failed );
 	setupModelData();
