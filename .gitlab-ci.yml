@@ -1,0 +1,19 @@
+image: ubuntu: trusty
+
+cache:
+    key: apt-cache
+    paths:
+    - apt-cache/
+
+
+before_script:
+    - apt-get update -yq
+    - apt-get install -y qt5-qmake qttools5-dev qtchooser g++ build-essential git python3 sudo libarchive-dev liblzma-dev libbz2-dev zlib1g-dev liblz-dev lzop
+    - apt-get install -y qtbase5-dev qtbase5-private-dev libqt5svg5-dev qtconnectivity5-dev libpoppler-qt5-dev libpoppler-qt5-1
+    - apt-get install -y libmpv-dev libzen-dev libmediainfo-dev
+
+build_amd64:
+    stage: build
+    script:
+        - qmake -qt5 DEFINES+=USE_MEDIAINFO
+        - make -kj$(nproc)
