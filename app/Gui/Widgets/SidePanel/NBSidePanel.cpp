@@ -30,9 +30,11 @@ NBSidePanel::NBSidePanel( QWidget *parent ) : QScrollArea( parent ) {
 	/* Auto-resize widget */
 	setWidgetResizable( true );
 
-	/* No Border and margins */
-	setStyleSheet( "QScrollArea{ border: none; border-right: 1px solid darkgray; }" );
+	/* No margins */
 	setContentsMargins( QMargins() );
+
+	/* Only right side border */
+	setStyleSheet( "QScrollArea {border: none; border-right: 1px solid darkgray;}" );
 
 	populateSidePanel();
 
@@ -91,6 +93,11 @@ void NBSidePanel::populateSidePanel() {
 
 	QWidget *scrollBase = new QWidget( this );
 	scrollBase->setLayout( scrollLyt );
+	// scrollBase->setStyleSheet( "background-color: transparent;" );
+
+	QPalette pltt( palette() );
+	pltt.setColor( QPalette::Window, Qt::transparent );
+	scrollBase->setPalette( pltt );
 
 	setWidget( scrollBase );
 };

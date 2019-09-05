@@ -26,7 +26,9 @@ NBMenuItem::NBMenuItem( QString name, QString icon, QWidget *parent ) : QLabel( 
 
 	setFixedHeight( 28 );
 
-	setStyleSheet( "background-color: transparent;" );
+	QPalette pltt( palette() );
+	pltt.setColor( QPalette::Window, Qt::transparent );
+	setPalette( pltt );
 };
 
 QString NBMenuItem::name() {

@@ -79,6 +79,13 @@ NBOpenWithView::NBOpenWithView() : QAbstractItemView() {
 	connect( appModel, SIGNAL( layoutChanged() ), this, SLOT( reload() ) );
 
 	appModel->setRootPath( "NB://Applications" );
+
+	/* Styling: Borderless */
+	setFrameStyle( QFrame::NoFrame );
+
+	QPalette pltt( palette() );
+	pltt.setColor( QPalette::Base, Qt::transparent );
+	setPalette( pltt );
 };
 
 void NBOpenWithView::setModel( QAbstractItemModel *model ) {

@@ -47,9 +47,6 @@ void NBSidePanelLabel::paintEvent( QPaintEvent *pEvent ) {
 
 	painter.drawText( textRect, Qt::AlignLeft | Qt::AlignVCenter, mName );
 
-	// painter.setPen( Qt::darkGray );
-	// painter.drawLine( rect().topRight(), rect().bottomRight() );
-
 	painter.end();
 
 	pEvent->accept();
@@ -371,6 +368,9 @@ void NBSidePanelItem::paintEvent( QPaintEvent *pEvent ) {
 
 	QPainter painter( this );
 	painter.setPen( Qt::NoPen );
+
+	/* Clear background color */
+	painter.fillRect( rect(), Qt::transparent );
 
 	painter.save();
 	if ( mPressed ) {

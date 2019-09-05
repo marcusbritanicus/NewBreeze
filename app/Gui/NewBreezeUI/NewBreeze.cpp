@@ -139,9 +139,6 @@ void NewBreeze::createGUI() {
 	Terminal->hide();
 	FilterWidget->hide();
 
-	// Transparency
-	setStyleSheet( "QAbstractItemView{ background-color: transparent; }" );
-
 	AddressBar->setFocusPolicy( Qt::NoFocus );
 	SidePanel->setFocusPolicy( Qt::NoFocus );
 	FolderView->setFocusPolicy( Qt::StrongFocus );

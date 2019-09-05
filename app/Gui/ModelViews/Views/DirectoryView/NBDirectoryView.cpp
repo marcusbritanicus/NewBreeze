@@ -54,11 +54,16 @@ NBDirectoryView::NBDirectoryView( QWidget *parent ) : QTreeView( parent ) {
 	// Internal Object Name
 	setObjectName( "mainList" );
 
-	/* Styling */
-	setStyleSheet( "#mainList{ border:none; }" );
+	/* Styling: Borderless */
+	setFrameStyle( QFrame::NoFrame );
 
 	/* ItemDelegate */
 	setItemDelegate( new NBDirViewDelegate() );
+
+	/* Transparent view */
+	QPalette pltt( palette() );
+	pltt.setColor( QPalette::Base, Qt::transparent );
+	setPalette( pltt );
 };
 
 QString NBDirectoryView::currentBranch() const {

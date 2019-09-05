@@ -73,8 +73,8 @@ NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractI
 	/* Internal Object Name */
 	setObjectName( "mainList" );
 
-	/* Styling */
-	setStyleSheet( "#mainList{ border:none; }" );
+	/* Styling: Borderless */
+	setFrameStyle( QFrame::NoFrame );
 
 	/* Minimum Size */
 	setMinimumWidth( 320 );
@@ -115,6 +115,10 @@ NBIconView::NBIconView( NBItemViewModel *fsModel, QWidget *parent ) : QAbstractI
 	zoomOutAct->setShortcut( QKeySequence::ZoomOut );
 	connect( zoomOutAct, SIGNAL( triggered() ), this, SLOT( zoomOut() ) );
 	addAction( zoomOutAct );
+
+	QPalette pltt( palette() );
+	pltt.setColor( QPalette::Base, Qt::transparent );
+	setPalette( pltt );
 };
 
 void NBIconView::setModel( QAbstractItemModel *model ) {
@@ -700,15 +704,23 @@ void NBIconView::paintCategory( QPainter *painter, const QRect &rectangle, const
 	painter->drawPixmap( topLeft.x() + 4, topLeft.y() + 4, 16, 16, pix );
 
 	/* Category Menu prompt */
-	painter->drawPixmap( topRight.x() - 20, topLeft.y() + 4, 16, 16, QIcon( ":/icons/dot.png" ).pixmap( 16 ) );
+	painter->save();
+	painter->setFont( QFont( font().family(), font().pointSize() * 2, QFont::Bold ) );
+	painter->drawText( QRect( topRight.x() - 20, topLeft.y() + 4, 16, 16 ), Qt::AlignCenter, "\u00B7\u00B7" );
 
 	/* We draw the '+' if the category is folded or hidden */
-	if ( foldedCategories.contains( text ) or hiddenCategories.contains( text ) )
-		painter->drawPixmap( topRight.x() - 36, topLeft.y() + 4, 16, 16, QIcon( ":/icons/category-expand.png" ).pixmap( 16 ) );
+	if ( foldedCategories.contains( text ) or hiddenCategories.contains( text ) ) {
+		painter->setFont( QFont( font().family(), font().pointSize() * 1.5, QFont::Normal ) );
+		painter->drawText( QRect( topRight.x() - 36, topLeft.y() + 4, 16, 16 ), Qt::AlignCenter, "+" );
+	}
 
 	/* We have to draw the '-' only when the number of rows in a category is more than itemsPerRow */
-	else if ( cModel->indexListCountForCategory( text ) > itemsPerRow )
-		painter->drawPixmap( topRight.x() - 36, topLeft.y() + 4, 16, 16, QIcon( ":/icons/category-collapse.png" ).pixmap( 16 ) );
+	else if ( cModel->indexListCountForCategory( text ) > itemsPerRow ) {
+		painter->setFont( QFont( font().family(), font().pointSize(), QFont::Bold ) );
+		painter->drawText( QRect( topRight.x() - 36, topLeft.y() + 4, 16, 16 ), Qt::AlignCenter, "\u2014" );
+	}
+
+	painter->restore();
 
 	QFont categoryFont = qApp->font();
 	categoryFont.setBold( true );

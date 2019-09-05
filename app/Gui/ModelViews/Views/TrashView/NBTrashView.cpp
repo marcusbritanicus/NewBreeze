@@ -30,6 +30,13 @@ NBTrashView::NBTrashView( NBTrashModel *model, QWidget *parent ) : QTreeView( pa
 		header()->resizeSection( 3, 150 );
 	#endif
 
+	/* Styling: Borderless */
+	setFrameStyle( QFrame::NoFrame );
+
+	QPalette pltt( palette() );
+	pltt.setColor( QPalette::Base, Qt::transparent );
+	setPalette( pltt );
+
 	setAllColumnsShowFocus( true );
 };
 

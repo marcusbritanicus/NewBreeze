@@ -75,7 +75,7 @@ void NBToggleButton::paintEvent( QPaintEvent *pEvent ) {
 			painter.setPen( Qt::lightGray );
 	}
 
-	painter.drawText( QRectF( 0, 0, 28, 28 ), Qt::AlignCenter, QString::fromUtf8( "\u270D " ) );
+	painter.drawPixmap( QRect( 2, 2, 24, 24 ), QIcon::fromTheme( "document-edit" ).pixmap( 24 ) );
 
 	painter.end();
 	pEvent->accept();
@@ -83,7 +83,8 @@ void NBToggleButton::paintEvent( QPaintEvent *pEvent ) {
 
 NBAddressEdit::NBAddressEdit( QWidget *parent ) : QLineEdit( parent ) {
 
-	setStyleSheet( "background-color: transparent" );
+	setStyleSheet( "background-color: transparent;" );
+	setFrame( false );
 };
 
 NBAddressWidget::NBAddressWidget( QWidget *parent ) : QFrame( parent ) {

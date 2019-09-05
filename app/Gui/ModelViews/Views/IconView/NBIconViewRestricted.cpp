@@ -18,6 +18,10 @@ NBIconViewRestricted::NBIconViewRestricted( NBItemViewModel *fsModel, QWidget *p
 	setAcceptDrops( false );
 	setDragDropMode( QListView::NoDragDrop );
 	setDropIndicatorShown( false );
+
+	QPalette pltt( palette() );
+	pltt.setColor( QPalette::Base, Qt::transparent );
+	setPalette( pltt );
 };
 
 void NBIconViewRestricted::mousePressEvent( QMouseEvent *mpEvent ) {
