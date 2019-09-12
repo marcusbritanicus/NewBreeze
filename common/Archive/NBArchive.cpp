@@ -1002,11 +1002,13 @@ void NBArchive::setFilterFormat( QMimeType mType ) {
 		archiveType = Container;
 	}
 
+	#if ARCHIVE_VERSION_NUMBER > 3001002
 	else if ( mType == mimeDb.mimeTypeForFile( "file.tar.lz4" ) ) {
 		mArchiveFilter = ARCHIVE_FILTER_LZ4;
 		mArchiveFormat = ARCHIVE_FORMAT_TAR;
 		archiveType = Container;
 	}
+	#endif
 
 	else if ( mType == mimeDb.mimeTypeForFile( "file.tar.bz2" ) ) {
 		mArchiveFilter = ARCHIVE_FILTER_BZIP2;
@@ -1056,11 +1058,13 @@ void NBArchive::setFilterFormat( QMimeType mType ) {
 		archiveType = Single;
 	}
 
+	#if ARCHIVE_VERSION_NUMBER > 3001002
 	else if ( mType == mimeDb.mimeTypeForFile( "file.lz4" ) ) {
 		mArchiveFilter = ARCHIVE_FILTER_LZ4;
 		mArchiveFormat = ARCHIVE_FORMAT_RAW;
 		archiveType = Single;
 	}
+	#endif
 
 	else if ( mType == mimeDb.mimeTypeForFile( "file.uu" ) ) {
 		mArchiveFilter = ARCHIVE_FILTER_UU;
