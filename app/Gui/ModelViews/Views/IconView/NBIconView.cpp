@@ -2807,7 +2807,7 @@ void NBIconView::emitCML() {
 
 	if ( act->text().contains( "Copy" ) ) {
 
-		NBProcess::Progress *progress = new NBProcess::Progress;
+		NBProcess::Process *progress = new NBProcess::Process;
 		progress->sourceDir = dirName( args.at( 0 ) );
 		progress->targetDir = mtpt;
 
@@ -2817,17 +2817,17 @@ void NBIconView::emitCML() {
 
 		progress->type = NBProcess::Copy;
 
-		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBIOProcess *proc = new NBIOProcess( srcList, progress, this );
 		NBProcessManager::instance()->addProcess( progress, proc );
 
-		progress->startTime = QTime::currentTime();
+		progress->startTime = QDateTime::currentDateTime();
 
 		proc->start();
 	}
 
 	else if ( act->text().contains( "Move" ) ) {
 
-		NBProcess::Progress *progress = new NBProcess::Progress;
+		NBProcess::Process *progress = new NBProcess::Process;
 		progress->sourceDir = dirName( args.at( 0 ) );
 		progress->targetDir = mtpt;
 
@@ -2837,10 +2837,10 @@ void NBIconView::emitCML() {
 
 		progress->type = NBProcess::Move;
 
-		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBIOProcess *proc = new NBIOProcess( srcList, progress, this );
 		NBProcessManager::instance()->addProcess( progress, proc );
 
-		progress->startTime = QTime::currentTime();
+		progress->startTime = QDateTime::currentDateTime();
 
 		proc->start();
 	}

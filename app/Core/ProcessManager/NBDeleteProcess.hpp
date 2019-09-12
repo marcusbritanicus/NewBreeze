@@ -13,7 +13,7 @@ class NBDeleteProcess : public NBAbstractProcess {
 	Q_OBJECT
 
 	public:
-		NBDeleteProcess( QStringList sources, NBProcess::Progress *progress );
+		NBDeleteProcess( QStringList sources, NBProcess::Process *progress );
 
 		// The list of nodes which could not be copied/moved/archived
 		QStringList errors();
@@ -62,5 +62,5 @@ class NBDeleteProcess : public NBAbstractProcess {
 
 		bool mUndo;
 
-		NBProcess::Progress *mProgress;
+		NBProcess::Process *mProgress;
 };

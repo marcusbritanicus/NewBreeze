@@ -22,7 +22,7 @@ NBProcessManagerUI* NBProcessManagerUI::instance() {
 NBProcessManagerUI::NBProcessManagerUI() : NBDialog() {
 
 	pMgr = NBProcessManager::instance();
-	connect( pMgr, SIGNAL( processAdded( NBProcess::Progress*, NBAbstractProcess* ) ), this, SLOT( addProcess( NBProcess::Progress*, NBAbstractProcess*) ) );
+	connect( pMgr, SIGNAL( processAdded( NBProcess::Process*, NBAbstractProcess* ) ), this, SLOT( addProcess( NBProcess::Process*, NBAbstractProcess*) ) );
 
 	createGUI();
 	setWindowProperties();
@@ -82,7 +82,7 @@ void NBProcessManagerUI::show() {
 	NBDialog::show();
 };
 
-void NBProcessManagerUI::addProcess( NBProcess::Progress* progress, NBAbstractProcess *process ) {
+void NBProcessManagerUI::addProcess( NBProcess::Process* progress, NBAbstractProcess *process ) {
 
 	procCount++;
 	NBProcessWidget *procWidget = new NBProcessWidget( progress, process, this );
@@ -184,7 +184,7 @@ void NBProcessManagerMini::timerEvent( QTimerEvent *tEvent ) {
 
 		fraction = 0;
 
-		Q_FOREACH( NBProcess::Progress *prog, pMgr->activeProgresses() )
+		Q_FOREACH( NBProcess::Process *prog, pMgr->activeProgresses() )
 			fraction += 1.0 * prog->totalBytesCopied / prog->totalBytes;
 
 		fraction /= jobs;

@@ -2,9 +2,11 @@
 	*
 	* NBIOProcess.cpp - NewBreeze Process Class for file I/O
 	*
+	* These classes were originally written by marcusbritanicus@gmail.com
+	* for CoreApps LibCPrime
 	* This is the heart of copy/move operations.
 	*
-	* NBProcess::Progress is defined in the header NBAbstractProcess.hpp
+	* NBProcess::Process is defined in the header NBAbstractProcess.hpp
 	* It contains all the necessary variables to show the progress dialog.
 	*
 	* Firstly we check if the target provided to us is writable. If it is not writable we
@@ -25,34 +27,34 @@
 */
 
 #include "NBIOProcess.hpp"
+#include "NBMessageDialog.hpp"
 
-NBIOProcess::NBIOProcess( QStringList sources, NBProcess::Progress *progress ) {
+NBIOProcess::NBIOProcess( QStringList sources, NBProcess::Process *progress, QWidget* ) : NBAbstractProcess() {
 
 	origSources.clear();
 	origSources << sources;
 
 	sourceList.clear();
 
-	mProgress = progress;
+	mProcess = progress;
 
 	mPaused = false;
 	mCanceled = false;
-	mUndo = false;
 
-	if ( not mProgress->sourceDir.endsWith( "/" ) )
-		mProgress->sourceDir+= "/";
+	if ( not mProcess->sourceDir.endsWith( "/" ) )
+		mProcess->sourceDir+= "/";
 
-	if ( not mProgress->targetDir.endsWith( "/" ) )
-		mProgress->targetDir+= "/";
+	if ( not mProcess->targetDir.endsWith( "/" ) )
+		mProcess->targetDir+= "/";
 
 	/* Initialize the sizes to zero */
-	mProgress->totalBytes = 0;
-	mProgress->totalBytesCopied = 0;
-	mProgress->fileBytes = 0;
-	mProgress->fileBytesCopied = 0;
+	mProcess->totalBytes = 0;
+	mProcess->totalBytesCopied = 0;
+	mProcess->fileBytes = 0;
+	mProcess->fileBytesCopied = 0;
 
 	/* Initialize the state to NBProcess::NotStarted */
-	mProgress->state = NBProcess::NotStarted;
+	mProcess->state = NBProcess::NotStarted;
 };
 
 QStringList NBIOProcess::errors() {
@@ -62,52 +64,52 @@ QStringList NBIOProcess::errors() {
 
 void NBIOProcess::cancel() {
 
-	mProgress->state = NBProcess::Canceled;
+	mProcess->state = NBProcess::Canceled;
 	mCanceled = true;
-
-	qDebug() << "Cancelled";
 
 	emit canceled( errorNodes );
 };
 
 void NBIOProcess::pause() {
 
-	mProgress->state = NBProcess::Paused;
+	mProcess->state = NBProcess::Paused;
 	mPaused = true;
 };
 
 void NBIOProcess::resume() {
 
-	mProgress->state = NBProcess::Started;
+	mProcess->state = NBProcess::Started;
 	mPaused = false;
-};
-
-bool NBIOProcess::canUndo() {
-
-	return false;
-};
-
-void NBIOProcess::undo() {
-
 };
 
 bool NBIOProcess::preIO() {
 
-	mProgress->state = NBProcess::Starting;
+	mProcess->state = NBProcess::Starting;
 
-	if ( not isWritable( mProgress->targetDir ) ) {
+	if ( not isWritable( mProcess->targetDir ) ) {
 		emit noWriteAccess();
-		mProgress->state = NBProcess::Completed;
+		mProcess->state = NBProcess::Completed;
+
+		return false;
+	}
+
+	/* No cut/copy-paste in the same directory */
+	if ( mProcess->sourceDir == mProcess->targetDir ) {
+
+		NBMessageDialog::information( nullptr, "Moving finished", "Since the source and target directories are the same, the IO will not proceed." );
+
+		mProcess->state = NBProcess::Completed;
+		emit completed( sourceList );
 
 		return false;
 	}
 
 	/* If we are moving file and in the same partition, we can skip the processing */
-	if ( mProgress->type == NBProcess::Move ) {
+	if ( mProcess->type == NBProcess::Move ) {
 
 		struct stat srcStat, tgtStat;
-		stat( mProgress->sourceDir.toLocal8Bit().data(), &srcStat );
-		stat( mProgress->targetDir.toLocal8Bit().data(), &tgtStat );
+		stat( mProcess->sourceDir.toLocal8Bit().data(), &srcStat );
+		stat( mProcess->targetDir.toLocal8Bit().data(), &tgtStat );
 
 		/* If the source and the are the same */
 		if ( srcStat.st_dev == tgtStat.st_dev ) {
@@ -125,26 +127,30 @@ bool NBIOProcess::preIO() {
 
 	/* Obtain the file sizes */
 	Q_FOREACH( QString src, origSources ) {
-		mProgress->progressText = QString( "Processing %1..." ).arg( src );
-		if ( isDir( mProgress->sourceDir + src ) )
+		mProcess->progressText = QString( "Processing %1..." ).arg( src );
+		if ( isDir( mProcess->sourceDir + src ) )
 			processDirectory( src );
 
 		else {
 
 			sourceList << src;
-			mProgress->totalBytes += getSize( mProgress->sourceDir + src );
+			mProcess->totalBytes += getSize( mProcess->sourceDir + src );
 		}
 	}
 
 	/* Check if we have enough space to perform the IO */
-	mProgress->progressText = QString( "Checking space requirements..." );
-	NBDeviceInfo tgtInfo = NBDeviceManager::deviceInfoForPath( mProgress->targetDir );
+	mProcess->progressText = QString( "Checking space requirements..." );
+	QStorageInfo tgtInfo( mProcess->targetDir );
 
-	if ( tgtInfo.bytesAvailable() <= qint64( mProgress->totalBytes ) ) {
+	if ( tgtInfo.bytesAvailable() <= qint64( mProcess->totalBytes ) ) {
 
 		emit noSpace();
 
-		mProgress->state = NBProcess::Completed;
+		NBMessageDialog::information( nullptr, "Moving failed", "Not enough space in the target directory." );
+
+		emit completed( sourceList );
+
+		mProcess->state = NBProcess::Completed;
 		return false;
 	}
 
@@ -156,7 +162,7 @@ void NBIOProcess::processDirectory( QString path ) {
 	DIR* d_fh;
 	struct dirent* entry;
 
-	while ( ( d_fh = opendir( ( mProgress->sourceDir + path ).toLocal8Bit().data() ) ) == NULL ) {
+    while ( ( d_fh = opendir( ( mProcess->sourceDir + path ).toLocal8Bit().data() ) ) == nullptr ) {
 		qWarning() << "Couldn't open directory:" << path;
 		return;
 	}
@@ -165,10 +171,10 @@ void NBIOProcess::processDirectory( QString path ) {
 		path += "/";
 
 	/* Create this path at the target */
-	mkpath( mProgress->targetDir + path );
+	mkpath( mProcess->targetDir + path, 0755 );
 
 	/* Now, we can read what is inside this directory */
-	while( ( entry = readdir( d_fh ) ) != NULL ) {
+    while( ( entry = readdir( d_fh ) ) != nullptr ) {
 
 		/* Don't descend up the tree or include the current directory */
 		if ( strcmp( entry->d_name, ".." ) != 0 && strcmp( entry->d_name, "." ) != 0 ) {
@@ -177,10 +183,10 @@ void NBIOProcess::processDirectory( QString path ) {
 
 				/* Stat the directory to get the mode */
 				struct stat st;
-				stat( ( mProgress->sourceDir + path + entry->d_name ).toLocal8Bit().data(), &st );
+				stat( ( mProcess->sourceDir + path + entry->d_name ).toLocal8Bit().data(), &st );
 
 				/* Create this directory at the target */
-				mkpath( mProgress->targetDir + path + entry->d_name, st.st_mode );
+				mkpath( mProcess->targetDir + path + entry->d_name, st.st_mode );
 
 				/* Recurse into that folder */
 				processDirectory( path + entry->d_name );
@@ -189,7 +195,7 @@ void NBIOProcess::processDirectory( QString path ) {
 			else {
 
 				/* Get the size of the current file */
-				mProgress->totalBytes += getSize( mProgress->sourceDir + path + entry->d_name );
+				mProcess->totalBytes += getSize( mProcess->sourceDir + path + entry->d_name );
 
 				/* Add this to the source file list */
 				sourceList << path + entry->d_name;
@@ -209,9 +215,9 @@ void NBIOProcess::copyFile( QString srcFile ) {
 	qint64 inBytes = 0;
 	qint64 bytesWritten = 0;
 
-	QString currentFile = mProgress->targetDir + srcFile;
+	QString currentFile = mProcess->targetDir + srcFile;
 
-	if ( not isReadable( mProgress->sourceDir + srcFile ) ) {
+	if ( not isReadable( mProcess->sourceDir + srcFile ) ) {
 		qDebug() << "Unreadable file:" << srcFile;
 		errorNodes << srcFile;
 		return;
@@ -223,25 +229,97 @@ void NBIOProcess::copyFile( QString srcFile ) {
 		return;
 	}
 
-	/* If the file exists, add 'Copy - ' to the beginning of the file name */
-	if ( exists( currentFile ) )
-		currentFile = dirName( currentFile ) + "/Copy - " + baseName( currentFile );
+	/* If the file exists, ask the user what is to be done */
+	/* 0 - Ask every time or not yet asked */
+	/* 1 - Replace all */
+	/* 2 - Keep all */
+	if ( exists( currentFile ) ) {
+		/* Cut-or-Copy/paste in the same folder: Should not come here */
+		if ( mProcess->sourceDir == mProcess->targetDir ) {
+			resolution = QMessageBox::No;
+		}
+
+		/* Unresolved */
+		if ( not mResolveConflict ) {
+			/* Wait resolution */
+			if ( resolution == QMessageBox::NoButton )
+				emit resolveConflict( currentFile );
+
+			while ( resolution == QMessageBox::NoButton ) {
+				usleep( 100 );
+				qApp->processEvents();
+			}
+
+			/* Keep existing; mResolveConflict = 0 */
+			if ( resolution == QMessageBox::No ) {
+				mResolveConflict = 0;
+				currentFile = newFileName( currentFile );
+			}
+
+			/* Keep all existing; mResolveConflict = 2 */
+			else if ( resolution == QMessageBox::NoToAll ) {
+				mResolveConflict = 2;
+				currentFile = newFileName( currentFile );
+			}
+
+			/* Ignore: forget copying the current file; mResolveConflict = 0 */
+			else if ( resolution == QMessageBox::Ignore ) {
+				mResolveConflict = 0;
+				if ( mProcess->type == NBProcess::Move )
+					errorNodes <<  srcFile;
+
+				return;
+			}
+
+			/* Replace: remove existing (assume we can delete), then copy; mResolveConflict = 0 */
+			else if ( resolution == QMessageBox::Yes ) {
+				mResolveConflict = 0;
+				QFile::remove( currentFile );
+			}
+
+			/* Replace all: remove existing (assume we can delete), then copy; mResolveConflict = 1 */
+			else if ( resolution == QMessageBox::YesToAll ) {
+				mResolveConflict = 1;
+				QFile::remove( currentFile );
+			}
+
+			else {
+				/* Should never come here; but same QMessageBox::Ignore */
+				mResolveConflict = 0;
+				return;
+			}
+
+			resolution = QMessageBox::NoButton;
+		}
+
+		/* Replace all: remove existing file */
+		else if ( mResolveConflict == 1 )
+			QFile::remove( currentFile );
+
+		/* Keep all: Rename current */
+		else if ( mResolveConflict == 2 )
+			currentFile = newFileName( currentFile );
+
+		/* Ignore: forget the copying */
+		else
+			return;
+	}
 
 	struct stat iStat, oStat;
-	stat( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data(), &iStat );
-	stat( mProgress->targetDir.toLocal8Bit().data(), &oStat );
+	stat( ( mProcess->sourceDir + srcFile ).toLocal8Bit().data(), &iStat );
+	stat( mProcess->targetDir.toLocal8Bit().data(), &oStat );
 
 	/* Open the input file descriptor fro reading */
-	int iFileFD = open( ( mProgress->sourceDir + srcFile ).toLocal8Bit().data(), O_RDONLY );
+	int iFileFD = open( ( mProcess->sourceDir + srcFile ).toLocal8Bit().data(), O_RDONLY );
 
 	/* Open the output file descriptor for reading */
 	int oFileFD = open( currentFile.toLocal8Bit().data(), O_WRONLY | O_CREAT, iStat.st_mode );
 
-	/* NBProcess::Progress::fileBytes */
-	mProgress->fileBytes = iStat.st_size;
+	/* NBProcess::Process::fileBytes */
+	mProcess->fileBytes = iStat.st_size;
 
-	/* NBProcess::Progress::fileBytesCopied */
-	mProgress->fileBytesCopied = 0;
+	/* NBProcess::Process::fileBytesCopied */
+	mProcess->fileBytesCopied = 0;
 
 	/* While we read positive chunks of data we write it */
 	while ( ( inBytes = read( iFileFD, buffer, BUFSIZ ) ) > 0 ) {
@@ -277,8 +355,8 @@ void NBIOProcess::copyFile( QString srcFile ) {
 			break;
 		}
 
-		mProgress->fileBytesCopied += bytesWritten;
-		mProgress->totalBytesCopied += bytesWritten;
+		mProcess->fileBytesCopied += bytesWritten;
+		mProcess->totalBytesCopied += bytesWritten;
 	}
 
 	close( iFileFD );
@@ -291,8 +369,21 @@ void NBIOProcess::copyFile( QString srcFile ) {
 		errorNodes << srcFile;
 	}
 
-	if ( mProgress->fileBytesCopied != quint64( iStat.st_size ) )
+	if ( mProcess->fileBytesCopied != quint64( iStat.st_size ) )
 		errorNodes << srcFile;
+};
+
+QString NBIOProcess::newFileName( QString fileName ) {
+
+	int i = 0;
+	QString newFile;
+
+	do {
+		newFile = dirName( fileName ) + QString( "/Copy (%1) - " ).arg( i ) + baseName( fileName );
+		i++;
+	} while( exists( newFile ) );
+
+	return newFile;
 };
 
 void NBIOProcess::run() {
@@ -318,38 +409,65 @@ void NBIOProcess::run() {
 	/* First we process the sources */
 	if ( not preIO() ) {
 
+		emit completed( QStringList() );
+
 		quit();
 		return;
 	}
 
 	/* Actual IO Begins */
 
-	mProgress->progressText = QString();
-	mProgress->state = NBProcess::Started;
+	mProcess->progressText = QString();
+	mProcess->state = NBProcess::Started;
 
-	if ( mProgress->type == NBProcess::Move ) {
+	if ( mProcess->type == NBProcess::Move ) {
 		struct stat srcStat, tgtStat;
-		stat( mProgress->sourceDir.toLocal8Bit().data(), &srcStat );
-		stat( mProgress->targetDir.toLocal8Bit().data(), &tgtStat );
+		stat( mProcess->sourceDir.toLocal8Bit().data(), &srcStat );
+		stat( mProcess->targetDir.toLocal8Bit().data(), &tgtStat );
 
 		/* If the source and the target devices are the same */
+		QStringList moveList( sourceList );
 		if ( srcStat.st_dev == tgtStat.st_dev ) {
-			Q_FOREACH( QString node, sourceList ) {
-				QString srcNode = mProgress->sourceDir + node;
-				QString tgtNode = mProgress->targetDir + node;
-				if ( rename( srcNode.toLocal8Bit().data(), tgtNode.toLocal8Bit().data() ) != 0 ) {
-					qDebug() << "Error moving (rename(...)):" << node;
-					qDebug() << "[Error]:" << strerror( errno );
+			for( int i = 0; i < moveList.count(); i++ ) {
+				QString node = moveList.value( i );
 
-					errorNodes << node;
+				QString srcNode = mProcess->sourceDir + node;
+				QString tgtNode = mProcess->targetDir + node;
+
+				if ( not exists( tgtNode ) ) {
+					if ( QFile::rename( srcNode, tgtNode ) )
+						sourceList.removeAt( i );
+
+					else {
+						QString node = sourceList.takeAt( i );
+						if ( isDir( srcNode ) )
+							processDirectory( node );
+
+						else
+							mProcess->totalBytes += getSize( node );
+					}
+				}
+
+				else {
+					QString node = sourceList.takeAt( i );
+					if ( isDir( srcNode ) )
+						processDirectory( node );
+
+					else
+						mProcess->totalBytes += getSize( node );
 				}
 			}
 
-			emit completed( errorNodes );
-			mProgress->state = NBProcess::Completed;
+			/* If all files have been moved, then signal the end */
+			if ( not sourceList.count() ) {
+				emit completed( errorNodes );
+				mProcess->state = NBProcess::Completed;
 
-			quit();
-			return;
+				quit();
+				return;
+			}
+
+			/* Some files might not have been moved, try copying them. */
 		}
 
 		/* Otherwise, we let the copying take place, then delete the sources at the end. */
@@ -359,7 +477,7 @@ void NBIOProcess::run() {
 	Q_FOREACH( QString node, sourceList ) {
 
 		/* Update the current file */
-		mProgress->currentFile = node;
+		mProcess->currentFile = node;
 
 		if ( mCanceled ) {
 			emit canceled( errorNodes );
@@ -381,7 +499,7 @@ void NBIOProcess::run() {
 		}
 
 		struct stat st;
-		if ( stat( ( mProgress->sourceDir + node ).toLocal8Bit().data(), &st ) != 0 ) {
+		if ( stat( ( mProcess->sourceDir + node ).toLocal8Bit().data(), &st ) != 0 ) {
 			qDebug() << "Stat failed" << node;
 			qDebug() << "[Error]:" << strerror( errno );
 			errorNodes << node;
@@ -400,8 +518,8 @@ void NBIOProcess::run() {
 			case S_IFLNK: {
 
 				/* Create a symbolic link */
-				symlink( readLink( node ).toLocal8Bit().data(), ( mProgress->targetDir + node ).toLocal8Bit().data() );
-				if ( not exists( ( mProgress->targetDir + node ) ) ) {
+				symlink( readLink( node ).toLocal8Bit().data(), ( mProcess->targetDir + node ).toLocal8Bit().data() );
+				if ( not exists( ( mProcess->targetDir + node ) ) ) {
 					qDebug() << "Error creating symlink (symlink(...))" << node << "->" << readLink( node );
 					qDebug() << "[Error]:" << strerror( errno );
 					errorNodes << node;
@@ -414,7 +532,7 @@ void NBIOProcess::run() {
 			case S_IFIFO: {
 
 				/* Create a block device, character special, fifo */
-				mknod( ( mProgress->targetDir + node ).toLocal8Bit().data(), st.st_mode, st.st_dev );
+				mknod( ( mProcess->targetDir + node ).toLocal8Bit().data(), st.st_mode, st.st_dev );
 				break;
 			}
 
@@ -427,43 +545,67 @@ void NBIOProcess::run() {
 		}
 	}
 
-	if ( mProgress->type == NBProcess::Move ) {
+	if ( mProcess->type == NBProcess::Move ) {
+		qDebug() << errorNodes;
 		Q_FOREACH( QString node, sourceList ) {
+			qDebug() << node << errorNodes.contains( node );
 			/* If the source was not copied properly */
 			if ( errorNodes.contains( node ) )
 				continue;
 
 			/* sourceList will be just a list of files */
-			if ( unlink( ( mProgress->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
-				qDebug() << "Error removing original file:" << mProgress->sourceDir + node;
+			if ( unlink( ( mProcess->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
+				qDebug() << "Error removing original file:" << mProcess->sourceDir + node;
 				qDebug() << "[Error]:" << strerror( errno );
 			}
 		}
 
 		/* Mixture of files and folders */
 		Q_FOREACH( QString node, origSources ) {
+			/* If the source was not copied properly */
+			if ( errorNodes.contains( node ) )
+				continue;
+
 			/* Deletion of folders */
-			if ( isDir( mProgress->sourceDir + node ) ) {
+			if ( isDir( mProcess->sourceDir + node ) ) {
 				/* If a file in this directory was not copied, do not delete it */
 				if ( errorNodes.filter( node ).count() )
 					continue;
 
-				if ( not removeDir( mProgress->sourceDir + node ) ) {
-					qDebug() << "Error removing original directory:" << mProgress->sourceDir + node;
+				if ( not removeDir( mProcess->sourceDir + node ) ) {
+					qDebug() << "Error removing original directory:" << mProcess->sourceDir + node;
 					qDebug() << "[Error]:" << strerror( errno );
 				}
 			}
 
 			/* Deletion of files */
-			else if ( unlink( ( mProgress->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
-				qDebug() << "Error removing original file:" << mProgress->sourceDir + node;
+			else if ( unlink( ( mProcess->sourceDir + node ).toLocal8Bit().data() ) != 0 ) {
+				qDebug() << "Error removing original file:" << mProcess->sourceDir + node;
 				qDebug() << "[Error]:" << strerror( errno );
 			}
 		}
 	}
 
 	emit completed( errorNodes );
-	mProgress->state = NBProcess::Completed;
+	mProcess->state = NBProcess::Completed;
 
 	quit();
+};
+
+QMessageBox::StandardButton ConflictDialog::resolveConflict( QString fileName, QWidget *parent ) {
+
+	QString title = QString( "NewBreeze - File Exists" );
+	QString message = QString(
+		"<p>The file you are trying to copy</p><center><b>%1</b></center>"
+		"<p>already exists in the target directory. What would you like to do?</p>"
+		"<tt>[Yes]</tt> - Replace<br>"
+		"<tt>[Yes to All]</tt> - Replace all existing files<br>"
+		"<tt>[No]</tt> - Keep both files<br>"
+		"<tt>[No to All]</tt> - Keep all existing files<br>"
+		"<tt>[Ignore]</tt> - Skip copying files if they exist"
+	).arg( baseName( fileName ) );
+
+	QMessageBox::StandardButtons buttons = QMessageBox::Yes | QMessageBox::YesToAll | QMessageBox::No | QMessageBox::NoToAll | QMessageBox::Ignore;
+
+	return QMessageBox::question( parent, title, message, buttons, QMessageBox::No );
 };

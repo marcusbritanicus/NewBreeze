@@ -73,11 +73,12 @@ ProgressList NBProcessManager::activeProgresses() {
 	return active;
 };
 
-qint64 NBProcessManager::addProcess( NBProcess::Progress *progress, NBAbstractProcess *proc ) {
+qint64 NBProcessManager::addProcess( NBProcess::Process *progress, NBAbstractProcess *proc ) {
 
 	emit processAdded( progress, proc );
 	emit activeProcessCountChanged( processList.count() - completedProcIDs.count() + 1 );
 
+	connect( proc, SIGNAL( resolveConflict( QString ) ), this, SLOT( resolveConflict( QString ) ) );
 	connect( proc, SIGNAL( completed( QStringList) ), this, SLOT( handleProcessComplete() ) );
 	connect( proc, SIGNAL( canceled( QStringList) ), this, SLOT( handleProcessComplete() ) );
 	connect( proc, SIGNAL( noSpace() ), this, SLOT( handleProcessComplete() ) );
@@ -89,7 +90,7 @@ qint64 NBProcessManager::addProcess( NBProcess::Progress *progress, NBAbstractPr
 	return progressList.count() - 1;
 };
 
-NBProcess::Progress* NBProcessManager::progress( qint64 id ) {
+NBProcess::Process* NBProcessManager::progress( qint64 id ) {
 
 	if ( id < 0 or id >= progressList.count() )
 		return NULL;
@@ -119,4 +120,10 @@ void NBProcessManager::handleProcessComplete() {
 	emit activeProcessCountChanged( processList.count() - completedProcIDs.count() );
 	emit processCompleted( progressList.at( id ) );
 	emit processCompleted( progressList.at( id ), processList.at( id ) );
+};
+
+void NBProcessManager::resolveConflict( QString file ) {
+
+	NBIOProcess *proc = qobject_cast<NBIOProcess*>( sender() );
+	proc->resolution = ConflictDialog::resolveConflict( file, nullptr );
 };

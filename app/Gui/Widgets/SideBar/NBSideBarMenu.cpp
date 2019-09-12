@@ -380,7 +380,7 @@ void NBSideBarMenuEntry::dropEvent( QDropEvent *dpEvent ) {
 
 	const QMimeData *mData = dpEvent->mimeData();
 
-	NBProcess::Progress *progress = new NBProcess::Progress;
+	NBProcess::Process *progress = new NBProcess::Process;
 	progress->sourceDir = dirName( mData->urls().at( 0 ).toLocalFile() );
 	progress->targetDir = mTarget;
 	progress->type = NBProcess::Copy;
@@ -389,10 +389,10 @@ void NBSideBarMenuEntry::dropEvent( QDropEvent *dpEvent ) {
 	Q_FOREACH( QUrl url, mData->urls() )
 		srcList << url.toLocalFile().replace( progress->sourceDir, "" );
 
-	NBIOProcess *proc = new NBIOProcess( srcList, progress );
+	NBIOProcess *proc = new NBIOProcess( srcList, progress, this );
 	NBProcessManager::instance()->addProcess( progress, proc );
 
-	progress->startTime = QTime::currentTime();
+	progress->startTime = QDateTime::currentDateTime();
 
 	proc->start();
 

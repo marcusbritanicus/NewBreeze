@@ -20,7 +20,7 @@
     *
 */
 
-NBProcessWidget::NBProcessWidget( NBProcess::Progress *progress, NBAbstractProcess *proc, QWidget *parent ) : QWidget( parent ) {
+NBProcessWidget::NBProcessWidget( NBProcess::Process *progress, NBAbstractProcess *proc, QWidget *parent ) : QWidget( parent ) {
 
 	mProgress = progress;
 	mProcess = proc;
@@ -217,7 +217,7 @@ void NBProcessWidget::timerEvent( QTimerEvent *tEvent ) {
 					qreal cFraction = 1.0 * mProgress->fileBytesCopied / mProgress->fileBytes;
 
 					/* Speed: totalBytesCopied / effective time spent on copying */
-					qreal speed = 1.0 * mProgress->totalBytesCopied / ( mProgress->startTime.secsTo( QTime::currentTime() ) - pausedSecs );
+					qreal speed = 1.0 * mProgress->totalBytesCopied / ( mProgress->startTime.secsTo( QDateTime::currentDateTime() ) - pausedSecs );
 
 					/* ETC = Remaining bytes / last chunk speed = Remaining bytes / ( last chunk size / 0.5 )  */
 					quint64 secs = ( mProgress->totalBytes - mProgress->totalBytesCopied ) / speed;
@@ -260,7 +260,7 @@ void NBProcessWidget::timerEvent( QTimerEvent *tEvent ) {
 				speedLbl->setText( "Average " + speedLbl->text() );
 
 				/* ETC = Remaining bytes / last chunk speed = Remaining bytes / ( last chunk size / 0.5 )  */
-				quint64 secs = mProgress->startTime.secsTo( QTime::currentTime() );
+				quint64 secs = mProgress->startTime.secsTo( QDateTime::currentDateTime() );
 
 				QString hrs = ( secs / 3600 ? QString( "%1 hours, " ).arg( secs / 3600 ) : QString() );
 				QString mns = ( ( secs % 3600 ) / 60 ? QString( "%1 minutes, " ).arg( ( secs % 3600 ) / 60 ) : QString() );

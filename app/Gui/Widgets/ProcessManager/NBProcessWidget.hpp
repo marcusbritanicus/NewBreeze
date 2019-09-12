@@ -17,7 +17,7 @@ class NBProcessWidget : public QWidget {
 	Q_OBJECT
 
 	public:
-		NBProcessWidget( NBProcess::Progress *progress, NBAbstractProcess *proc, QWidget *parent );
+		NBProcessWidget( NBProcess::Process *progress, NBAbstractProcess *proc, QWidget *parent );
 
 	private:
 		/* Create a GUI */
@@ -54,7 +54,7 @@ class NBProcessWidget : public QWidget {
 		/* Toggle details flag */
 		bool detailsShown;
 
-		NBProcess::Progress *mProgress;
+		NBProcess::Process *mProgress;
 		NBAbstractProcess *mProcess;
 
 	private slots:

@@ -12,7 +12,7 @@ NBTrayIcon::NBTrayIcon() : QSystemTrayIcon() {
 	connect( this, SIGNAL( activated( QSystemTrayIcon::ActivationReason ) ), this, SLOT( handleActivation( QSystemTrayIcon::ActivationReason ) ) );
 
 	NBProcessManager *pMgr = NBProcessManager::instance();
-	connect( pMgr, SIGNAL( processCompleted( NBProcess::Progress* ) ), this, SLOT( processCompleted( NBProcess::Progress* ) ) );
+	connect( pMgr, SIGNAL( processCompleted( NBProcess::Process* ) ), this, SLOT( processCompleted( NBProcess::Process* ) ) );
 
 	QMenu *menu = new QMenu( "TrayMenu" );
 	menu->setAttribute( Qt::WA_DeleteOnClose );
@@ -51,7 +51,7 @@ void NBTrayIcon::handleActivation( QSystemTrayIcon::ActivationReason reason ) {
 	};
 };
 
-void NBTrayIcon::processCompleted( NBProcess::Progress *proc ) {
+void NBTrayIcon::processCompleted( NBProcess::Process *proc ) {
 
 	switch( proc->type ) {
 		case NBProcess::Copy: {

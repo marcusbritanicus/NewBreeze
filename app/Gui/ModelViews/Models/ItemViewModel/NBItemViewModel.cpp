@@ -79,8 +79,8 @@ NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent
 	connect( watcher, SIGNAL( watchPathDeleted() ), this, SLOT( loadHome() ) );
 
 	connect(
-		NBProcessManager::instance(), SIGNAL( processCompleted( NBProcess::Progress*, NBAbstractProcess* ) ),
-		this, SLOT( deleteComplete( NBProcess::Progress*, NBAbstractProcess* ) )
+		NBProcessManager::instance(), SIGNAL( processCompleted( NBProcess::Process*, NBAbstractProcess* ) ),
+		this, SLOT( deleteComplete( NBProcess::Process*, NBAbstractProcess* ) )
 	);
 
 	thumbnailer = new NBThumbnailer();
@@ -413,7 +413,7 @@ void NBItemViewModel::nodeUpdated( QString nodeName ) {
 	emit dataChanged( index( baseName( nodeName ) ), index( baseName( nodeName ) ) );
 };
 
-void NBItemViewModel::deleteComplete( NBProcess::Progress *progress, NBAbstractProcess *process ) {
+void NBItemViewModel::deleteComplete( NBProcess::Process *progress, NBAbstractProcess *process ) {
 
 	if ( ( progress->type != NBProcess::Delete ) and ( progress->type != NBProcess::Trash ) )
 		return;

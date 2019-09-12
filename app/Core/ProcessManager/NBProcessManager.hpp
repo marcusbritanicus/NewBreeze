@@ -12,7 +12,7 @@
 
 typedef QList<qint64> ProcessIDList;
 typedef QList<NBAbstractProcess*> ProcessList;
-typedef QList<NBProcess::Progress *> ProgressList;
+typedef QList<NBProcess::Process *> ProgressList;
 
 class NBProcessManager : public QObject {
 	Q_OBJECT
@@ -40,13 +40,13 @@ class NBProcessManager : public QObject {
 		ProgressList activeProgresses();
 
 		/* Add a process */
-		qint64 addProcess( NBProcess::Progress *progress, NBAbstractProcess * );
+		qint64 addProcess( NBProcess::Process *progress, NBAbstractProcess * );
 
 		/* Get the process for a process ID */
 		NBAbstractProcess* process( qint64 );
 
 		/* Get the progress details for a process ID */
-		NBProcess::Progress* progress( qint64 );
+		NBProcess::Process* progress( qint64 );
 
 	private:
 		NBProcessManager() : QObject() {
@@ -66,10 +66,11 @@ class NBProcessManager : public QObject {
 
 	private Q_SLOTS:
 		void handleProcessComplete();
+		void resolveConflict( QString );
 
 	Q_SIGNALS:
-		void processAdded( NBProcess::Progress*, NBAbstractProcess* );
+		void processAdded( NBProcess::Process*, NBAbstractProcess* );
 		void activeProcessCountChanged( qint64 );
-		void processCompleted( NBProcess::Progress* );
-		void processCompleted( NBProcess::Progress*, NBAbstractProcess* );
+		void processCompleted( NBProcess::Process* );
+		void processCompleted( NBProcess::Process*, NBAbstractProcess* );
 };

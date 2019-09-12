@@ -6,7 +6,7 @@
 
 #include "NBDeleteProcess.hpp"
 
-NBDeleteProcess::NBDeleteProcess( QStringList sources, NBProcess::Progress *progress ) {
+NBDeleteProcess::NBDeleteProcess( QStringList sources, NBProcess::Process *progress ) {
 
 	/* Switch off flags */
 	mCanceled = false;

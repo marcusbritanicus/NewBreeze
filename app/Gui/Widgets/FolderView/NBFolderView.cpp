@@ -764,7 +764,7 @@ void NBFolderView::prepareCopy() {
 	clipBoard->setMimeData( mData );
 
 	if ( Settings->value( "ExtendedIO" ) ) {
-		NBProcess::Progress *progress = new NBProcess::Progress;
+		NBProcess::Process *progress = new NBProcess::Process;
 		progress->sourceDir = fsModel->currentDir();
 		progress->targetDir = NBDirectoryDialog::getDirectoryName( this, "NewBreeze - Choose target directory", fsModel->currentDir() );
 
@@ -773,10 +773,10 @@ void NBFolderView::prepareCopy() {
 
 		progress->type = NBProcess::Copy;
 
-		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBIOProcess *proc = new NBIOProcess( srcList, progress, this );
 		pMgr->addProcess( progress, proc );
 
-		progress->startTime = QTime::currentTime();
+		progress->startTime = QDateTime::currentDateTime();
 
 		proc->start();
 	}
@@ -803,7 +803,7 @@ void NBFolderView::prepareMove() {
 	clipBoard->setMimeData( mData );
 
 	if ( Settings->value( "ExtendedIO" ) ) {
-		NBProcess::Progress *progress = new NBProcess::Progress;
+		NBProcess::Process *progress = new NBProcess::Process;
 		progress->sourceDir = fsModel->currentDir();
 		progress->targetDir = NBDirectoryDialog::getDirectoryName( this,"NewBreeze - Choose target directory", fsModel->currentDir() );
 
@@ -812,10 +812,10 @@ void NBFolderView::prepareMove() {
 
 		progress->type = NBProcess::Move;
 
-		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBIOProcess *proc = new NBIOProcess( srcList, progress, this );
 		pMgr->addProcess( progress, proc );
 
-		progress->startTime = QTime::currentTime();
+		progress->startTime = QDateTime::currentDateTime();
 
 		proc->start();
 	}
@@ -826,7 +826,7 @@ void NBFolderView::copy( QStringList sources, QString ) {
 	if ( not sources.count() )
 		return;
 
-	NBProcess::Progress *progress = new NBProcess::Progress;
+	NBProcess::Process *progress = new NBProcess::Process;
 	progress->sourceDir = dirName( sources.value( 0, QDir::currentPath() ) );
 	progress->targetDir = fsModel->currentDir();
 
@@ -836,10 +836,10 @@ void NBFolderView::copy( QStringList sources, QString ) {
 
 	progress->type = NBProcess::Copy;
 
-	NBIOProcess *proc = new NBIOProcess( srcList, progress );
+	NBIOProcess *proc = new NBIOProcess( srcList, progress, this );
 	pMgr->addProcess( progress, proc );
 
-	progress->startTime = QTime::currentTime();
+	progress->startTime = QDateTime::currentDateTime();
 
 	proc->start();
 };
@@ -849,7 +849,7 @@ void NBFolderView::move( QStringList sources, QString ) {
 	if ( not sources.count() )
 		return;
 
-	NBProcess::Progress *progress = new NBProcess::Progress;
+	NBProcess::Process *progress = new NBProcess::Process;
 	progress->sourceDir = dirName( sources.value( 0, QDir::currentPath() ) );
 	progress->targetDir = fsModel->currentDir();
 
@@ -859,10 +859,10 @@ void NBFolderView::move( QStringList sources, QString ) {
 
 	progress->type = NBProcess::Move;
 
-	NBIOProcess *proc = new NBIOProcess( srcList, progress );
+	NBIOProcess *proc = new NBIOProcess( srcList, progress, this );
 	pMgr->addProcess( progress, proc );
 
-	progress->startTime = QTime::currentTime();
+	progress->startTime = QDateTime::currentDateTime();
 
 	proc->start();
 };
@@ -878,7 +878,7 @@ void NBFolderView::prepareIO() {
 	const QMimeData *mimeData = clipBoard->mimeData();
 
 	if ( mimeData->hasUrls() ) {
-		NBProcess::Progress *progress = new NBProcess::Progress;
+		NBProcess::Process *progress = new NBProcess::Process;
 		progress->sourceDir = dirName( mimeData->urls().at( 0 ).toLocalFile() );
 		progress->targetDir = fsModel->currentDir();
 
@@ -892,10 +892,10 @@ void NBFolderView::prepareIO() {
 		else
 			progress->type = NBProcess::Copy;
 
-		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBIOProcess *proc = new NBIOProcess( srcList, progress, this );
 		pMgr->addProcess( progress, proc );
 
-		progress->startTime = QTime::currentTime();
+		progress->startTime = QDateTime::currentDateTime();
 
 		proc->start();
 	}
@@ -954,7 +954,7 @@ void NBFolderView::doSendToTrash() {
 	QSettings nbSettings( "NewBreeze", "NewBreeze" );
 	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
 
-	NBProcess::Progress *progress = new NBProcess::Progress;
+	NBProcess::Process *progress = new NBProcess::Process;
 	progress->sourceDir = srcDir;
 	progress->targetDir = QString();
 	progress->type = NBProcess::Trash;
@@ -979,7 +979,7 @@ void NBFolderView::doSendToTrash() {
 	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
 	pMgr->addProcess( progress, proc );
 
-	progress->startTime = QTime::currentTime();
+	progress->startTime = QDateTime::currentDateTime();
 
 	proc->start();
 };
@@ -1000,7 +1000,7 @@ void NBFolderView::doDelete() {
 	QSettings nbSettings( "NewBreeze", "NewBreeze" );
 	QStringList safeNodes = nbSettings.value( "ProtectedNodes" ).toStringList();
 
-	NBProcess::Progress *progress = new NBProcess::Progress;
+	NBProcess::Process *progress = new NBProcess::Process;
 	progress->sourceDir = srcDir;
 	progress->targetDir = QString();
 	progress->type = NBProcess::Delete;
@@ -1071,7 +1071,7 @@ void NBFolderView::doDelete() {
 	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
 	pMgr->addProcess( progress, proc );
 
-	progress->startTime = QTime::currentTime();
+	progress->startTime = QDateTime::currentDateTime();
 
 	proc->start();
 };

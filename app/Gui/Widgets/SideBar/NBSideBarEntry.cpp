@@ -115,7 +115,7 @@ void NBSideBarTrashEntry::dropEvent( QDropEvent *dpEvent ) {
 
 	const QMimeData *mData = dpEvent->mimeData();
 
-	NBProcess::Progress *progress = new NBProcess::Progress;
+	NBProcess::Process *progress = new NBProcess::Process;
 	progress->sourceDir = dirName( mData->urls().at( 0 ).toLocalFile() );
 	progress->targetDir = QString();
 	progress->type = NBProcess::Trash;
@@ -127,7 +127,7 @@ void NBSideBarTrashEntry::dropEvent( QDropEvent *dpEvent ) {
 	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
 	NBProcessManager::instance()->addProcess( progress, proc );
 
-	progress->startTime = QTime::currentTime();
+	progress->startTime = QDateTime::currentDateTime();
 	proc->start();
 
 	dpEvent->accept();

@@ -73,7 +73,7 @@ namespace NBProcess {
 		quint64 fileBytesCopied;
 
 		/* When did this process start */
-		QTime startTime;
+		QDateTime startTime;
 
 		/* Text to be displayed with the progress bar */
 		QString progressText;
@@ -83,7 +83,7 @@ namespace NBProcess {
 
 		/* State: Starting, Started, Paused, Canceled, */
 		NBProcess::State state;
-	} Progress;
+	} Process;
 };
 
 class NBAbstractProcess : public QThread {
@@ -96,12 +96,6 @@ class NBAbstractProcess : public QThread {
 		virtual void resume() = 0;
 
 		virtual QStringList nodes() = 0;
-
-		virtual bool canUndo() = 0;
-		virtual void undo() = 0;
-
-		// virtual bool canRedo() = 0;
-		// virtual void redo() = 0;
 
 	protected:
 		/* Force the subclass to implement the function run */

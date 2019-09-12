@@ -22,7 +22,7 @@ class NBTrayIcon : public QSystemTrayIcon {
 	public slots:
 		void handleActivation( QSystemTrayIcon::ActivationReason reason );
 
-		void processCompleted( NBProcess::Progress* );
+		void processCompleted( NBProcess::Process* );
 
 	private slots:
 		void toggleVisible();

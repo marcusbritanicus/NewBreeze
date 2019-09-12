@@ -213,7 +213,7 @@ class NBItemViewModel : public QAbstractItemModel {
 
 		void nodeUpdated( QString );
 
-		void deleteComplete( NBProcess::Progress*, NBAbstractProcess* );
+		void deleteComplete( NBProcess::Process*, NBAbstractProcess* );
 
 	Q_SIGNALS:
 		void directoryLoading( QString );

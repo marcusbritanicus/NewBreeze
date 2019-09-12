@@ -127,7 +127,7 @@ void NBSidePanelTrashLabel::dropEvent( QDropEvent *dpEvent ) {
 
 	const QMimeData *mData = dpEvent->mimeData();
 
-	NBProcess::Progress *progress = new NBProcess::Progress;
+	NBProcess::Process *progress = new NBProcess::Process;
 	progress->sourceDir = dirName( mData->urls().at( 0 ).toLocalFile() );
 	progress->targetDir = QString();
 	progress->type = NBProcess::Trash;
@@ -139,7 +139,7 @@ void NBSidePanelTrashLabel::dropEvent( QDropEvent *dpEvent ) {
 	NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
 	NBProcessManager::instance()->addProcess( progress, proc );
 
-	progress->startTime = QTime::currentTime();
+	progress->startTime = QDateTime::currentDateTime();
 	proc->start();
 
 	dpEvent->accept();
@@ -287,7 +287,7 @@ void NBSidePanelItem::dropEvent( QDropEvent *dpEvent ) {
 	const QMimeData *mData = dpEvent->mimeData();
 
 	if ( mTarget == "NB://Trash" ) {
-		NBProcess::Progress *progress = new NBProcess::Progress;
+		NBProcess::Process *progress = new NBProcess::Process;
 		progress->sourceDir = dirName( mData->urls().at( 0 ).toLocalFile() );
 		progress->targetDir = QString();
 		progress->type = NBProcess::Trash;
@@ -299,12 +299,12 @@ void NBSidePanelItem::dropEvent( QDropEvent *dpEvent ) {
 		NBDeleteProcess *proc = new NBDeleteProcess( toBeDeleted, progress );
 		NBProcessManager::instance()->addProcess( progress, proc );
 
-		progress->startTime = QTime::currentTime();
+		progress->startTime = QDateTime::currentDateTime();
 		proc->start();
 	}
 
 	else {
-		NBProcess::Progress *progress = new NBProcess::Progress;
+		NBProcess::Process *progress = new NBProcess::Process;
 		progress->sourceDir = dirName( mData->urls().at( 0 ).toLocalFile() );
 		progress->targetDir = mTarget;
 		progress->type = NBProcess::Copy;
@@ -313,10 +313,10 @@ void NBSidePanelItem::dropEvent( QDropEvent *dpEvent ) {
 		Q_FOREACH( QUrl url, mData->urls() )
 			srcList << url.toLocalFile().replace( progress->sourceDir, "" );
 
-		NBIOProcess *proc = new NBIOProcess( srcList, progress );
+		NBIOProcess *proc = new NBIOProcess( srcList, progress, this );
 		NBProcessManager::instance()->addProcess( progress, proc );
 
-		progress->startTime = QTime::currentTime();
+		progress->startTime = QDateTime::currentDateTime();
 
 		proc->start();
 	}
