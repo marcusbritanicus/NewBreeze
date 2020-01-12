@@ -68,34 +68,34 @@ NBDefaultsWidget::NBDefaultsWidget( QStringList paths, QWidget *parent ) : QWidg
 void NBDefaultsWidget::refreshDefaults() {
 
 	/* Get defaults */
-	NBAppsList appsList = NBAppEngine::instance()->appsForMimeType( mimeType );
-	Q_FOREACH( NBAppFile app, appsList.toQList() ) {
-		QIcon appIcon = QIcon::fromTheme( app.value( NBAppFile::Icon ).toString(), QIcon( app.value( NBAppFile::Icon ).toString() ) );
-		QString appName = app.value( NBAppFile::Name ).toString();
+	AppsList appsList = NBXdgMime::instance()->appsForMimeType( mimeType );
+	Q_FOREACH( NBDesktopFile app, appsList ) {
+		QIcon appIcon = QIcon::fromTheme( app.icon(), QIcon( app.icon() ) );
+		QString appName = app.name();
 
 		defaultCB->addItem( appIcon, appName );
 
 		QListWidgetItem *item = new QListWidgetItem( appIcon, appName, appList );
 		item->setFlags( Qt::ItemIsEnabled );
-		item->setData( Qt::UserRole + 1, app.desktopFileName() );
+		item->setData( Qt::UserRole + 1, app.desktopName() );
 		appList->addItem( item );
 	}
 
 	QSettings appsSett( "NewBreeze", "MimeApps" );
 	QString mimeName = mimeType.name().replace( "/", "-" );
 	Q_FOREACH( QString desktopFile, appsSett.value( mimeName ).toStringList() ) {
-		NBAppFile appFile( desktopFile );
+		NBDesktopFile appFile( desktopFile );
 		if ( not appFile.isValid() )
 			continue;
 
-		QIcon appIcon = QIcon::fromTheme( appFile.value( NBAppFile::Icon ).toString(), QIcon( appFile.value( NBAppFile::Icon ).toString() ) );
-		QString appName = appFile.value( NBAppFile::Name ).toString();
+		QIcon appIcon = QIcon::fromTheme( appFile.icon(), QIcon( appFile.icon() ) );
+		QString appName = appFile.name();
 
 		defaultCB->addItem( appIcon, appName );
 
 		QListWidgetItem *item = new QListWidgetItem( appIcon, appName, appList );
 		item->setFlags( Qt::ItemIsEnabled );
-		item->setData( Qt::UserRole + 1, appFile.desktopFileName() );
+		item->setData( Qt::UserRole + 1, appFile.desktopName() );
 		appList->addItem( item );
 	}
 
@@ -109,22 +109,22 @@ void NBDefaultsWidget::addApplication() {
 		return;
 
 	QString app = appSelDlg->selectedApp();
-	NBAppFile appFile( app );
+	NBDesktopFile appFile( app );
 	if ( not appFile.isValid() )
 		return;
 
-	QIcon appIcon = ::icon( appFile.value( NBAppFile::Icon ).toStringList() );
-	QString appName = appFile.value( NBAppFile::Name ).toString();
+	QIcon appIcon = QIcon::fromTheme( appFile.icon(), QIcon( appFile.icon() ) );
+	QString appName = appFile.name();
 
 	defaultCB->addItem( appIcon, appName );
 
 	QListWidgetItem *item = new QListWidgetItem( appIcon, appName, appList );
-	item->setData( Qt::UserRole + 1, appFile.desktopFileName() );
+	item->setData( Qt::UserRole + 1, appFile.desktopName() );
 	appList->addItem( item );
 
 	QSettings appsSett( "NewBreeze", "MimeApps" );
 	QStringList apps = appsSett.value( mimeType.name().replace( "/", "-" ) ).toStringList();
-	apps << appFile.desktopFileName();
+	apps << appFile.desktopName();
 	apps.removeDuplicates();
 	appsSett.setValue( mimeType.name().replace( "/", "-" ), apps );
 	appsSett.sync();
@@ -156,7 +156,7 @@ void NBDefaultsWidget::removeApplication() {
 void NBDefaultsWidget::makeDefault( int idx ) {
 
 	QListWidgetItem *itm = appList->item( idx );
-	NBAppEngine::setApplicationAsDefault( itm->data( Qt::UserRole + 1 ).toString(), mimeType.name() );
+	NBXdgMime::setApplicationAsDefault( itm->data( Qt::UserRole + 1 ).toString(), mimeType.name() );
 };
 
 NBAppSelector::NBAppSelector( QWidget *parent ) : NBDialog( parent ) {

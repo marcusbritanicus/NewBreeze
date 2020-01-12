@@ -19,6 +19,7 @@ class NBRunCmdDialog : public NBDialog {
 	public :
 		NBRunCmdDialog( QString, QWidget *parent = 0 );
 		QString commandString();
+		NBDesktopFile selectedApp();
 
 		bool canRun();
 

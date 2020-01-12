@@ -22,6 +22,16 @@ QString NBRunCmdDialog::commandString() {
 	return execCmd;
 };
 
+NBDesktopFile NBRunCmdDialog::selectedApp() {
+
+	QModelIndex idx = appList->currentIndex();
+
+	if ( execCmd == idx.data( Qt::UserRole + 3 ).toStringList().join( " " ) )
+		return qvariant_cast<NBDesktopFile>( idx.data( Qt::UserRole + 10 ) );
+
+	return NBDesktopFile();
+};
+
 bool NBRunCmdDialog::canRun() {
 
 	return runOk;
@@ -155,7 +165,7 @@ void NBRunCmdDialog::makeDefaultAndRunCommand() {
 
 	QModelIndex idx = appList->currentIndex();
 
-	NBAppEngine::setApplicationAsDefault( idx.data( Qt::UserRole + 9 ).toString(), getMimeType( fileName ) );
+	NBXdgMime::setApplicationAsDefault( idx.data( Qt::UserRole + 9 ).toString(), getMimeType( fileName ) );
 	execCmd = idx.data( Qt::UserRole + 3 ).toStringList().join( " " );
 	runOk = true;
 	close();

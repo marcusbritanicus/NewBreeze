@@ -446,29 +446,33 @@ void NBFolderView::doOpen( QString loc ) {
 		}
 
 		else {
-			NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
+			NBDesktopFile app = NBXdgMime::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
 			if ( not app.isValid() )
 				doOpenWithCmd();
 
-			QStringList exec = app.execArgs();
+			QStringList exec;
 
-			// Prepare @v exec
-			if ( app.takesArgs() ) {
-				if ( app.multipleArgs() ) {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
-					exec.removeAt( idx );
-					exec.insert( idx, loc );
-				}
+			// Takes arguments
+			if ( app.command().contains( "%u" ) or app.command().contains( "%f" ) or app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
+				// Single URL
+				if ( app.command().contains( "%u" ) )
+					exec = app.command().replace( "%u", QUrl::fromLocalFile( loc ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
 
-				else {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
-					exec.removeAt( idx );
-					exec.insert( idx, loc );
-				}
+				else if ( app.command().contains( "%U" ) )
+					exec = app.command().replace( "%U", QUrl::fromLocalFile( loc ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+
+				else if ( app.command().contains( "%f" ) )
+					exec = app.command().replace( "%f", loc ).split( " ", QString::SkipEmptyParts );
+
+				else if ( app.command().contains( "%F" ) )
+					exec = app.command().replace( "%F", loc ).split( " ", QString::SkipEmptyParts );
+
+				else
+					exec = app.command().split( " ", QString::SkipEmptyParts ) << loc;
 			}
-			else {
-				exec << loc;
-			}
+
+			else
+				exec = app.command().split( " ", QString::SkipEmptyParts ) << loc;
 
 			qDebug( "Opening file: %s [%s]", loc.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
 		}
@@ -538,29 +542,33 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			}
 
 			else {
-				NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( fileToBeOpened ) );
+				NBDesktopFile app = NBXdgMime::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( fileToBeOpened ) );
 				if ( not app.isValid() )
 					doOpenWithCmd();
 
-				QStringList exec = app.execArgs();
+				QStringList exec;
 
-				// Prepare @v exec
-				if ( app.takesArgs() ) {
-					if ( app.multipleArgs() ) {
-						int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
-						exec.removeAt( idx );
-						exec.insert( idx, fileToBeOpened );
-					}
+				// Takes arguments
+				if ( app.command().contains( "%u" ) or app.command().contains( "%f" ) or app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
+					// Single URL
+					if ( app.command().contains( "%u" ) )
+						exec = app.command().replace( "%u", QUrl::fromLocalFile( fileToBeOpened ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
 
-					else {
-						int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
-						exec.removeAt( idx );
-						exec.insert( idx, fileToBeOpened );
-					}
+					else if ( app.command().contains( "%U" ) )
+						exec = app.command().replace( "%U", QUrl::fromLocalFile( fileToBeOpened ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+
+					else if ( app.command().contains( "%f" ) )
+						exec = app.command().replace( "%f", fileToBeOpened ).split( " ", QString::SkipEmptyParts );
+
+					else if ( app.command().contains( "%F" ) )
+						exec = app.command().replace( "%F", fileToBeOpened ).split( " ", QString::SkipEmptyParts );
+
+					else
+						exec = app.command().split( " ", QString::SkipEmptyParts ) << fileToBeOpened;
 				}
-				else {
-					exec << fileToBeOpened;
-				}
+
+				else
+					exec = app.command().split( " ", QString::SkipEmptyParts ) << fileToBeOpened;
 
 				qDebug( "Opening file: %s [%s]", fileToBeOpened.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
 			}

@@ -5,21 +5,20 @@ VERSION = 3.0.0
 
 QT -= gui
 
-INCLUDEPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
-DEPENDPATH += . include AppFile Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
+INCLUDEPATH += . include Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
+DEPENDPATH += . include Archive DeviceInfo MimeTypes QCryptographicHash5 StandardPaths SystemInfo Tools XDG
 
 LIBS += -larchive -lbz2 -llzma
 DEFINES += COMMON
 
-if ( $$HAVE_LZLIB ) {
+contains ( DEFINES, HAVE_LZLIB ) {
+	message( "Builting LZ compression enabled. lzip binary not required." )
 	LIBS +=  -lz
 }
 
 # Headers
 # =======
 HEADERS += include/common.hpp
-HEADERS += include/NBAppEngine.hpp
-HEADERS += include/NBAppFile.hpp
 HEADERS += include/NBArchive.hpp
 HEADERS += include/NBBZip2.hpp
 HEADERS += include/NBDeviceInfo.hpp
@@ -35,8 +34,6 @@ HEADERS += include/SimpleCrypt.hpp
 
 # Sources
 # =======
-SOURCES += AppFile/NBAppEngine.cpp
-SOURCES += AppFile/NBAppFile.cpp
 SOURCES += Archive/lz4dec.c
 SOURCES += Archive/NBArchive.cpp
 SOURCES += Archive/NBBZip2.cpp

@@ -50,7 +50,7 @@ class NBDesktopFileEditor : public QDialog {
 	Q_OBJECT
 
 	public:
-		NBDesktopFileEditor( QWidget*, NBAppFile );
+		NBDesktopFileEditor( QWidget*, NBDesktopFile );
 
 	private:
 		void createGUI();
@@ -66,7 +66,7 @@ class NBDesktopFileEditor : public QDialog {
 
 		QPushButton *saveBtn, *cancelBtn;
 
-		NBAppFile mApp;
+		NBDesktopFile mApp;
 
 	public Q_SLOTS:
 		void accept();

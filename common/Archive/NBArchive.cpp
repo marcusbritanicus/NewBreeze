@@ -17,7 +17,7 @@ extern "C" {
 }
 
 #ifdef HAVE_LZLIB
-	#include "LibLZip.hpp"
+	#include "NBLZip.hpp"
 #endif
 
 extern "C" {

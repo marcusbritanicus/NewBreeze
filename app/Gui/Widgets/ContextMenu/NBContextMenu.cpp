@@ -12,6 +12,8 @@
 #include "NBVaultDatabase.hpp"
 #include "NBVault.hpp"
 
+static NBXdgMime *engine = NBXdgMime::instance();
+
 NBActionsMenu::NBActionsMenu( QList<QModelIndex> selectedIndexes, QString dir, QWidget *parent ) : QMenu( parent ) {
 	/*
 		*
@@ -330,7 +332,6 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 		*/
 
 		QStringList nodes;
-		NBAppEngine *engine = NBAppEngine::instance();
 
 		bool allNodesAreFiles = true;
 		for ( int i = selection.count() - 1; i >= 0; i-- ) {
@@ -347,23 +348,23 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 		}
 
 		else {
-			QSet<NBAppFile> finalAppsList;
-			QList<NBAppsList> appsPerNode;
+			QSet<NBDesktopFile> finalAppsList;
+			QList<AppsList> appsPerNode;
 			foreach( QString file, nodes )
 				appsPerNode << engine->appsForMimeType( mimeDb.mimeTypeForFile( file ) );
 
 			// Creating a set of unique applications that can handle all the files
-			finalAppsList = appsPerNode.at( 0 ).toQList().toSet();
+			// finalAppsList = appsPerNode.toSet();
 			for( int i = 1; i < appsPerNode.count(); i++ ) {
-				QList<NBAppFile> aList = appsPerNode.at( i ).toQList();
+				AppsList aList = appsPerNode.at( i );
 				finalAppsList = finalAppsList.intersect( aList.toSet() );
 			}
 
 			// Adding them to the context menu
-			foreach( NBAppFile app, finalAppsList ) {
-				QString name = app.value( NBAppFile::Name ).toString();
-				QStringList exec = app.execArgs();
-				QString icon = app.value( NBAppFile::Icon ).toString();
+			foreach( NBDesktopFile app, finalAppsList ) {
+				QString name = app.name();
+				QStringList exec = app.command().split( " ", QString::SkipEmptyParts );
+				QString icon = app.icon();
 
 				QIcon progIcon = QIcon::fromTheme( icon, QIcon( icon ) );
 				if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
@@ -375,12 +376,21 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 				if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
 					progIcon = QIcon( ":/icons/exec.png" );
 
-				// Prepare @v exec
-				if ( app.multipleArgs() ) {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
-					exec.removeAt( idx );
-					foreach( QString node, nodes )
-						exec.insert( idx, node );
+				// Takes arguments
+				if ( app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
+					// Multiple URLs
+					if ( app.command().contains( "%U" ) ) {
+						exec.removeAll( "%U" );
+						Q_FOREACH( QString node, nodes )
+							exec << QUrl::fromLocalFile( node ).toString( QUrl::None );
+					}
+
+					// Multiple files
+					else {
+						exec.removeAll( "%F" );
+						Q_FOREACH( QString node, nodes )
+							exec << node;
+					}
 				}
 
 				else {
@@ -389,7 +399,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 				}
 
 				QAction *openWithAct = new QAction( progIcon, name, this );
-				openWithAct->setData( QVariant( QStringList() << exec ) );
+				openWithAct->setData( QVariant( exec ) );
 				connect( openWithAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 				addAction( openWithAct );
 			}
@@ -416,32 +426,37 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 			path = QDir( workingDir ).absoluteFilePath( selection[ 0 ].data().toString() );
 		}
 
-		NBAppEngine *engine = NBAppEngine::instance();
 		QMimeType mimeType = mimeDb.mimeTypeForFile( path );
-		NBAppsList apps = engine->appsForMimeType( mimeType );
-		Q_FOREACH( NBAppFile app, apps.toQList() ) {
-			QString name = app.value( NBAppFile::Name ).toString();
-			QStringList exec = app.execArgs();
-			QString iconStr = app.value( NBAppFile::Icon ).toString();
+		AppsList apps = engine->appsForMimeType( mimeType );
+		Q_FOREACH( NBDesktopFile app, apps ) {
+			QString name = app.name();
+			QStringList exec;
+			QString iconStr = app.icon();
 
 			// '::icon(...)' means @icon is an externally defined function
 			QIcon progIcon = ::icon( NBIconManager::instance()->icon( iconStr ) );
 
-			// Prepare @v exec
-			if ( app.takesArgs() )
-				if ( app.multipleArgs() ) {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
-					exec.removeAt( idx );
-					exec.insert( idx, path );
-				}
+			// Takes arguments
+			if ( app.command().contains( "%u" ) or app.command().contains( "%f" ) or app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
+				// Single URL
+				if ( app.command().contains( "%u" ) )
+					exec = app.command().replace( "%u", QUrl::fromLocalFile( path ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
 
-				else {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
-					exec.removeAt( idx );
-					exec.insert( idx, path );
-				}
+				else if ( app.command().contains( "%U" ) )
+					exec = app.command().replace( "%U", QUrl::fromLocalFile( path ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+
+				else if ( app.command().contains( "%f" ) )
+					exec = app.command().replace( "%f", path ).split( " ", QString::SkipEmptyParts );
+
+				else if ( app.command().contains( "%F" ) )
+					exec = app.command().replace( "%F", path ).split( " ", QString::SkipEmptyParts );
+
+				else
+					exec = app.command().split( " ", QString::SkipEmptyParts ) << path;
+			}
+
 			else
-				exec << path;
+				exec = app.command().split( " ", QString::SkipEmptyParts ) << path;
 
 			QAction *openWithAct = new QAction( progIcon, name, this );
 			openWithAct->setData( QVariant( QStringList() << exec ) );
@@ -456,29 +471,35 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 			addSeparator();
 
 		Q_FOREACH( QString desktop, userApps ) {
-			NBAppFile app( desktop );
-			QString name = app.value( NBAppFile::Name ).toString();
-			QStringList exec = app.execArgs();
-			QString iconStr = app.value( NBAppFile::Icon ).toString();
+			NBDesktopFile app( desktop );
+			QString name = app.name();
+			QStringList exec;
+			QString iconStr = app.icon();
 
 			// '::icon(...)' means @icon is an externally defined function
 			QIcon progIcon = ::icon( NBIconManager::instance()->icon( iconStr ) );
 
-			// Prepare @v exec
-			if ( app.takesArgs() )
-				if ( app.multipleArgs() ) {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
-					exec.removeAt( idx );
-					exec.insert( idx, path );
-				}
+			// Takes arguments arguments
+			if ( app.command().contains( "%u" ) or app.command().contains( "%f" ) or app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
+				// Single URL
+				if ( app.command().contains( "%u" ) )
+					exec = app.command().replace( "%u", QUrl::fromLocalFile( path ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
 
-				else {
-					int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
-					exec.removeAt( idx );
-					exec.insert( idx, path );
-				}
+				else if ( app.command().contains( "%U" ) )
+					exec = app.command().replace( "%U", QUrl::fromLocalFile( path ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+
+				else if ( app.command().contains( "%f" ) )
+					exec = app.command().replace( "%f", path ).split( " ", QString::SkipEmptyParts );
+
+				else if ( app.command().contains( "%F" ) )
+					exec = app.command().replace( "%F", path ).split( " ", QString::SkipEmptyParts );
+
+				else
+					exec = app.command().split( " ", QString::SkipEmptyParts ) << path;
+			}
+
 			else
-				exec << path;
+				exec = app.command().split( " ", QString::SkipEmptyParts ) << path;
 
 			QAction *openWithAct = new QAction( progIcon, name, this );
 			openWithAct->setData( QVariant( QStringList() << exec ) );

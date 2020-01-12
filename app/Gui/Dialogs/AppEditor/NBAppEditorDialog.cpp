@@ -141,7 +141,7 @@ void NBAppIconButton::selectIcon() {
 	}
 };
 
-NBDesktopFileEditor::NBDesktopFileEditor( QWidget *parent, NBAppFile desktopFile ) : QDialog( parent ) {
+NBDesktopFileEditor::NBDesktopFileEditor( QWidget *parent, NBDesktopFile desktopFile ) : QDialog( parent ) {
 
 	mApp = desktopFile;
 
@@ -220,37 +220,37 @@ void NBDesktopFileEditor::createGUI() {
 
 void NBDesktopFileEditor::updateEntries() {
 
-	nameLE->setText( mApp.value( NBAppFile::Name ).toString() );
-	descrLE->setText( mApp.value( NBAppFile::Description ).toString() );
-	cmtLE->setText( mApp.value( NBAppFile::Comment ).toString() );
-	execLE->setText( mApp.value( NBAppFile::Exec ).toString() );
+	// nameLE->setText( mApp.value( NBDesktopFile::Name ).toString() );
+	// descrLE->setText( mApp.value( NBDesktopFile::Description ).toString() );
+	// cmtLE->setText( mApp.value( NBDesktopFile::Comment ).toString() );
+	// execLE->setText( mApp.value( NBDesktopFile::Exec ).toString() );
 
-	iconBtn->setIcon( mApp.value( NBAppFile::Icon ).toString() );
+	// iconBtn->setIcon( mApp.value( NBDesktopFile::Icon ).toString() );
 
-	wrkPthLE->setText( mApp.value( NBAppFile::WorkPath ).toString() );
-	hiddenCB->setChecked( mApp.value( NBAppFile::NoDisplay ).toBool() );
-	termCB->setChecked( mApp.value( NBAppFile::TerminalMode ).toBool() );
+	// wrkPthLE->setText( mApp.value( NBDesktopFile::WorkPath ).toString() );
+	// hiddenCB->setChecked( mApp.value( NBDesktopFile::NoDisplay ).toBool() );
+	// termCB->setChecked( mApp.value( NBDesktopFile::TerminalMode ).toBool() );
 
-	Q_FOREACH( QString mime, mApp.value( NBAppFile::MimeTypes ).toStringList() )
-		mimesTW->setChecked( mime, true );
+	// Q_FOREACH( QString mime, mApp.value( NBDesktopFile::MimeTypes ).toStringList() )
+		// mimesTW->setChecked( mime, true );
 };
 
 void NBDesktopFileEditor::accept() {
 
-	mApp.setValue( NBAppFile::Name, nameLE->text() );
-	mApp.setValue( NBAppFile::Description, descrLE->text() );
-	mApp.setValue( NBAppFile::Comment, cmtLE->text() );
-	mApp.setValue( NBAppFile::Exec, execLE->text() );
+	// mApp.setValue( NBDesktopFile::Name, nameLE->text() );
+	// mApp.setValue( NBDesktopFile::Description, descrLE->text() );
+	// mApp.setValue( NBDesktopFile::Comment, cmtLE->text() );
+	// mApp.setValue( NBDesktopFile::Exec, execLE->text() );
 
-	mApp.setValue( NBAppFile::Icon, iconBtn->iconPath() );
+	// mApp.setValue( NBDesktopFile::Icon, iconBtn->iconPath() );
 
-	mApp.setValue( NBAppFile::WorkPath, wrkPthLE->text() );
-	mApp.setValue( NBAppFile::NoDisplay, hiddenCB->isChecked() );
-	mApp.setValue( NBAppFile::TerminalMode, termCB->isChecked() );
+	// mApp.setValue( NBDesktopFile::WorkPath, wrkPthLE->text() );
+	// mApp.setValue( NBDesktopFile::NoDisplay, hiddenCB->isChecked() );
+	// mApp.setValue( NBDesktopFile::TerminalMode, termCB->isChecked() );
 
-	mApp.setValue( NBAppFile::MimeTypes, mimesTW->selectedItems() );
+	// mApp.setValue( NBDesktopFile::MimeTypes, mimesTW->selectedItems() );
 
-	mApp.save();
+	// mApp.save();
 
 	QDialog::accept();
 };

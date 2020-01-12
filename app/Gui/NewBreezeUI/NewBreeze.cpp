@@ -379,62 +379,62 @@ void NewBreeze::createAndSetupActions() {
 
 void NewBreeze::openFile( QString file ) {
 
-	NBAppFile app = NBAppEngine::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( file ) );
+	NBDesktopFile app = NBXdgMime::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( file ) );
 
 	/* Show Open with command  */
 	if ( not app.isValid() ) {
 
-		NBRunCmdDialog *runCmd = new NBRunCmdDialog( QFileInfo( file ).fileName() );
+		NBRunCmdDialog *runCmd = new NBRunCmdDialog( baseName( file ) );
 		runCmd->exec();
 
 		if ( runCmd->canRun() ) {
 			QStringList exec = runCmd->commandString().split( " " );
 
 			// Prepare @v exec
-			if ( exec.contains( "<#NEWBREEZE-ARG-FILES#>" ) ) {
-				int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
-				exec.removeAt( idx );
-				exec.insert( idx, file );
-			}
+			// if ( exec.contains( "<#NEWBREEZE-ARG-FILES#>" ) ) {
+				// int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
+				// exec.removeAt( idx );
+				// exec.insert( idx, file );
+			// }
 
-			else if ( exec.contains( "<#NEWBREEZE-ARG-FILE#>" ) ) {
-				int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
-				exec.removeAt( idx );
-				exec.insert( idx, file );
-			}
+			// else if ( exec.contains( "<#NEWBREEZE-ARG-FILE#>" ) ) {
+				// int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
+				// exec.removeAt( idx );
+				// exec.insert( idx, file );
+			// }
 
-			else
-				exec << file;
+			// else
+				// exec << file;
 
-			qDebug( "Opening file: %s [%s]", file.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
+			// qDebug( "Opening file: %s [%s]", file.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
 		}
 	}
 
 	/* We have a valid app */
 	else {
-		QStringList exec = app.execArgs();
+		QStringList exec;
 
-		// Prepare @v exec
-		if ( app.takesArgs() ) {
-			if ( app.multipleArgs() ) {
+		// Takes arguments
+		if ( app.command().contains( "%u" ) or app.command().contains( "%f" ) or app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
+			// Single URL
+			if ( app.command().contains( "%u" ) )
+				exec = app.command().replace( "%u", QUrl::fromLocalFile( file ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
 
-				int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILES#>" );
-				exec.removeAt( idx );
-				exec.insert( idx, file );
-			}
+			else if ( app.command().contains( "%U" ) )
+				exec = app.command().replace( "%U", QUrl::fromLocalFile( file ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
 
-			else {
+			else if ( app.command().contains( "%f" ) )
+				exec = app.command().replace( "%f", file ).split( " ", QString::SkipEmptyParts );
 
-				int idx = exec.indexOf( "<#NEWBREEZE-ARG-FILE#>" );
-				exec.removeAt( idx );
-				exec.insert( idx, file );
-			}
+			else if ( app.command().contains( "%F" ) )
+				exec = app.command().replace( "%F", file ).split( " ", QString::SkipEmptyParts );
+
+			else
+				exec = app.command().split( " ", QString::SkipEmptyParts ) << file;
 		}
 
-		else {
-
-			exec << file;
-		}
+		else
+			exec = app.command().split( " ", QString::SkipEmptyParts ) << file;
 
 		qDebug( "Opening file: %s [%s]", file.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
 	}

@@ -28,8 +28,6 @@
 #pragma once
 
 #include "common.hpp"
-#include "NBAppEngine.hpp"
-#include "NBAppFile.hpp"
 #include "NBArchive.hpp"
 #include "NBDeviceInfo.hpp"
 #include "NBBZip2.hpp"

@@ -221,6 +221,13 @@ void NBDeviceManager::pollDevices() {
 		if ( yes )
 			continue;
 
+		/* Snap fix */
+		// qDebug() << entry->mnt_fsname;
+		yes = QString( entry->mnt_fsname ).contains( ".snap" );
+		yes = yes and QString( entry->mnt_dir ).startsWith( "/snap/" );
+		if ( yes )
+			continue;
+
 		NBDeviceInfo info( new NBDeviceInfoPrivate( entry->mnt_fsname, entry->mnt_dir, entry->mnt_type ) );
 		/* Failsafe: ignore mounts with zero total size */
 		if ( not info.bytesTotal() ) {

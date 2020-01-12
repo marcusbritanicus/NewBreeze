@@ -250,6 +250,10 @@ QVariant NBItemViewModel::data( const QModelIndex &index, int role ) const {
 			return node->data( 9 );
 		}
 
+		case Qt::UserRole + 10: {
+			return node->data( 10 );
+		}
+
 		default: {
 			return QVariant();
 		}
@@ -1164,29 +1168,30 @@ void NBItemViewModel::setupApplicationsData() {
 	emit directoryLoading( mRootPath );
 
 	beginResetModel();
-	NBAppEngine *appEngine = NBAppEngine::instance();
-	foreach( NBAppFile app, appEngine->allDesktops().toQList() ) {
-		if ( ( app.value( NBAppFile::Type ) != "Application" ) or ( app.value( NBAppFile::NoDisplay ).toBool() ) )
+	NBXdgMime *appEngine = NBXdgMime::instance();
+	foreach( NBDesktopFile app, appEngine->allDesktops() ) {
+		if ( ( app.type() != NBDesktopFile::Application ) or not app.visible() )
 			continue;
 
 		QVariantList data;
 
 		/* Special Data */
-		data << "Application" << 0 << app.value( NBAppFile::Icon );
+		data << "Application" << 0 << app.icon();
 
 		/* Normal Data */
-		data << app.value( NBAppFile::Name );												/* Qt::UserRole + 0 */
-		data << app.value( NBAppFile::Exec );												/* Qt::UserRole + 1 */
-		data << app.value( NBAppFile::Comment );											/* Qt::UserRole + 2 */
-		data << app.execArgs();																/* Qt::UserRole + 3 */
-		data << app.value( NBAppFile::Icon );												/* Qt::UserRole + 4 */
-		data << app.value( NBAppFile::WorkPath );											/* Qt::UserRole + 5 */
-		data << app.value( NBAppFile::MimeTypes );											/* Qt::UserRole + 6 */
-		data << app.value( NBAppFile::TerminalMode );										/* Qt::UserRole + 7 */
-		data << app.value( NBAppFile::Categories );											/* Qt::UserRole + 8 */
-		data << app.filePath();																/* Qt::UserRole + 9 */
+		data << app.name();																		/* Qt::UserRole + 0 */
+		data << app.exec();																		/* Qt::UserRole + 1 */
+		data << app.description();																/* Qt::UserRole + 2 */
+		data << app.command();																	/* Qt::UserRole + 3 */
+		data << app.icon();																		/* Qt::UserRole + 4 */
+		data << app.desktopName();																/* Qt::UserRole + 5 */
+		data << app.mimeTypes();																/* Qt::UserRole + 6 */
+		data << app.runInTerminal();															/* Qt::UserRole + 7 */
+		data << app.categories();																/* Qt::UserRole + 8 */
+		data << app.rank();																		/* Qt::UserRole + 9 */
+		data << toQVariant( app );																/* Qt::UserRole + 10 */
 
-		rootNode->addChild( new NBItemViewNode( data, app.category(), rootNode ) );
+		rootNode->addChild( new NBItemViewNode( data, app.categories().at( 0 ), rootNode ) );
 	}
 	endResetModel();
 

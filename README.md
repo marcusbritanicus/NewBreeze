@@ -31,8 +31,6 @@ Some of its features are
 Its features such as inbuilt file and folder encryption, SuperStart, and Quick file previews,
 are not found in any other file manager available for linux.
 
-### Windows source is no longer being maintained
-
 ### Please READ the ReleaseNotes for information on the new features
 
 ### Notes for compiling (Qt5) - linux:

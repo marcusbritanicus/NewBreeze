@@ -5,6 +5,7 @@
 */
 
 #include "NBXdg.hpp"
+#include "NBTools.hpp"
 
 /* We assume that the home partition is always mounted */
 QString NBXdg::homePartition = NBDeviceInfo( QDir::homePath() ).mountPoint();
@@ -205,4 +206,436 @@ QString NBXdg::homeTrashLocation() {
 
 		return home() + "/.local/share/Trash/";
 	}
+};
+
+/*
+	*
+	* NBDesktopFile
+	*
+*/
+
+NBDesktopFile::NBDesktopFile( QString filename ) {
+
+	if ( filename.isEmpty() )
+		return;
+
+	mFileUrl = NBXdgMime::instance()->desktopPathForName( filename );
+	mDesktopName = baseName( filename );
+
+	if ( mFileUrl.startsWith( "/usr/share/applications" ) )
+		mRank = 1;
+
+	else if ( mFileUrl.startsWith( "/usr/local/share/applications" ) )
+		mRank = 2;
+
+	else if ( mFileUrl.startsWith( QDir::home().filePath( ".local/share/applications" ) ) )
+		mRank = 3;
+
+	QSettings s( mFileUrl, QSettings::NativeFormat );
+	s.beginGroup( "Desktop Entry" );
+
+	mName = s.value( "Name" ).toString();
+	mGenericName = s.value( "GenericName", mName ).toString();
+	mDescription = s.value( "Description", "" ).toString();
+	mCommand = s.value( "Exec" ).toString();
+	mExec = s.value( "TryExec", mCommand.split( " ", QString::SkipEmptyParts ).value( 0 ) ).toString();
+
+	if ( not exists( mExec ) ) {
+		Q_FOREACH( QString path, QString::fromLocal8Bit( qgetenv( "PATH" ) ).split( ":", QString::SkipEmptyParts ) ) {
+			if ( exists( path + "/" + mCommand ) ) {
+				mExec = path + "/" + mCommand;
+				break;
+			}
+		}
+	}
+
+	mIcon = s.value( "Icon" ).toString();
+
+	QStringList args = mCommand.split( " " );
+	foreach( QString arg, args ) {
+		if ( arg == "%f" or arg == "%u" ) {
+			mMultiArgs = false;
+			mTakesArgs = true;
+			mParsedArgs << "<#COREARG-FILE#>";
+		}
+
+		else if ( arg == "%F" or arg == "%U" ) {
+			mMultiArgs = true;
+			mTakesArgs = true;
+			mParsedArgs << "<#COREARG-FILES#>";
+		}
+
+		else if ( arg == "%i" ) {
+			if ( !mIcon.isEmpty() )
+				mParsedArgs << "--icon" << mIcon;
+		}
+
+		else if ( arg == "%c" )
+			mParsedArgs << mName;
+
+		else if ( arg == "%k" )
+			mParsedArgs << QUrl( mFileUrl ).toLocalFile();
+
+		else
+			mParsedArgs << arg;
+	}
+
+	QRegExp mimeRx( "^MimeType=([.]+)$" );
+
+	QFile desktop( mFileUrl );
+	desktop.open( QFile::ReadOnly );
+	QString line = QString::fromLocal8Bit( desktop.readLine() );		// Will always be [Desktop Entry]
+
+	do {
+		if ( line.startsWith( "MimeType=" ) )
+			mMimeTypes = line.replace( "MimeType=", "" ).split( ";", QString::SkipEmptyParts );
+
+		if ( line.startsWith( "Categories=" ) )
+			mCategories = line.replace( "Categories=", "" ).split( ";", QString::SkipEmptyParts );
+
+		line = QString::fromLocal8Bit( desktop.readLine() );
+	} while ( not desktop.atEnd() );
+
+	mVisible = not s.value( "NoDisplay", false ).toBool();
+	mRunInTerminal = s.value( "Terminal", false ).toBool();
+
+	if ( s.value( "Type" ).toString() == "Application" )
+		mType = Application;
+
+	else if ( s.value( "Type" ).toString() == "Link" )
+		mType = Link;
+
+	else if ( s.value( "Type" ).toString() == "Directory" )
+		mType = Directory;
+
+	if ( mName.count() and mCommand.count() )
+		mValid = true;
+};
+
+bool NBDesktopFile::startApplication() {
+
+	if ( not mValid )
+		return false;
+
+	QProcess proc;
+	return proc.startDetached( mExec );
+};
+
+bool NBDesktopFile::startApplicationWithArgs( QStringList args ) {
+
+	if ( not mValid )
+		return false;
+
+	QProcess proc;
+
+	QStringList execList = parsedExec();
+	QString exec = execList.takeFirst();
+
+	if ( not args.count() ) {
+
+		execList.removeAll( "<#COREARG-FILES#>" );
+		execList.removeAll( "<#COREARG-FILE#>" );
+
+		return QProcess::startDetached( exec, execList );
+	}
+
+	QStringList argList;
+	if ( mTakesArgs ) {
+		if ( mMultiArgs ) {
+			Q_FOREACH( QString exeArg, execList ) {
+				if ( exeArg == "<#COREARG-FILES#>" ) {
+					if ( args.count() )
+						argList << args;
+				}
+
+				else
+					argList << exeArg;
+			}
+		}
+
+		else {
+			int idx = exec.indexOf( "<#COREARG-FILE#>" );
+			argList << execList;
+			argList.removeAt( idx );
+			if ( args.count() ) {
+				argList.insert( idx, args.takeAt( 0 ) );
+				argList << args;
+			}
+		}
+	}
+
+	else {
+		argList << execList;
+		if ( args.count() )
+			argList << args;
+	}
+
+	return QProcess::startDetached( exec, argList );
+};
+
+QString NBDesktopFile::desktopName() const {
+
+	return mDesktopName;
+};
+
+QString NBDesktopFile::name() const {
+
+	return mName;
+};
+
+QString NBDesktopFile::genericName() const {
+
+	return mGenericName;
+};
+
+QString NBDesktopFile::description() const {
+
+	return mDescription;
+};
+
+QString NBDesktopFile::exec() const {
+
+	return mExec;
+};
+
+QString NBDesktopFile::command() const {
+
+	return mCommand;
+};
+
+QString NBDesktopFile::icon() const {
+
+	return mIcon;
+};
+
+QStringList NBDesktopFile::mimeTypes() const {
+
+	return mMimeTypes;
+};
+
+QStringList NBDesktopFile::categories() const {
+
+	return mCategories;
+};
+
+QStringList NBDesktopFile::parsedExec() const {
+	return mParsedArgs;
+};
+
+int NBDesktopFile::type() const{
+
+	return mType;
+};
+
+int NBDesktopFile::rank() const {
+
+	return mRank;
+};
+
+bool NBDesktopFile::visible() const {
+
+	return mVisible;
+};
+
+bool NBDesktopFile::runInTerminal() const {
+
+	return mRunInTerminal;
+};
+
+bool NBDesktopFile::isValid() const {
+
+	return mValid;
+};
+
+QString NBDesktopFile::desktopFileUrl() const {
+
+	return mFileUrl;
+};
+
+bool NBDesktopFile::operator==( const NBDesktopFile& other ) const {
+
+	bool truth = true;
+	truth &= ( mCommand == other.command() );
+	truth &= ( mRank == other.rank() );
+
+	return truth;
+};
+
+/*
+	*
+	* NBXdgMime
+	*
+*/
+
+NBXdgMime* NBXdgMime::globalInstance = nullptr;
+
+AppsList NBXdgMime::appsForMimeType( QMimeType mimeType ) {
+
+	AppsList appsForMimeList;
+	QStringList mimeList = QStringList() << mimeType.name() << mimeType.allAncestors();
+	QSet<QString> mimeSet = mimeList.toSet();
+
+	Q_FOREACH( NBDesktopFile app, appsList ) {
+		QSet<QString> intersected = app.mimeTypes().toSet().intersect( mimeSet );
+		if ( intersected.count() ) {
+			if ( ( app.type() == NBDesktopFile::Application ) and app.visible() )
+					appsForMimeList << app;
+		}
+	}
+
+	QString defaultName = NBXdg::xdgDefaultApp( mimeType.name() );
+	for( int i = 0; i < appsForMimeList.count(); i++ ) {
+		if ( appsForMimeList.value( i ).desktopName() == baseName( defaultName ) ) {
+			appsForMimeList.move( i, 0 );
+			break;
+		}
+	}
+
+	return appsForMimeList;
+};
+
+QStringList NBXdgMime::mimeTypesForApp( QString desktopName ) {
+
+	QStringList mimeList;
+
+	if ( not desktopName.endsWith( ".desktop" ) )
+		desktopName += ".desktop";
+
+	foreach( QString appDir, appsDirs ) {
+		if ( QFile::exists( appDir + desktopName ) ) {
+			mimeList << NBDesktopFile( appDir + desktopName ).mimeTypes();
+			break;
+		}
+	}
+
+	return mimeList;
+};
+
+AppsList NBXdgMime::allDesktops() {
+
+	return appsList;
+};
+
+NBDesktopFile NBXdgMime::application( QString exec ) {
+
+	AppsList list;
+	Q_FOREACH( NBDesktopFile app, appsList ) {
+		if ( app.command().contains( exec, Qt::CaseSensitive ) )
+			list << app;
+
+		else if ( app.name().compare( exec, Qt::CaseInsensitive ) == 0 )
+			list << app;
+	}
+
+	if ( not list.count() )
+		return NBDesktopFile();
+
+	int rank = -1, index = -1;
+	for( int i = 0; i < list.count(); i++ ) {
+		if ( rank < list.value( i ).rank() ) {
+			rank = list.value( i ).rank();
+			index = i;
+		}
+	}
+
+	/* Desktop file with the highest rank will be used always */
+	return list.at( index );
+};
+
+QString NBXdgMime::desktopPathForName( QString desktopName ) {
+
+	if ( not desktopName.endsWith( ".desktop" ) )
+		desktopName += ".desktop";
+
+	if ( exists( desktopName ) )
+		return desktopName;
+
+	Q_FOREACH( QString appDirStr, appsDirs ) {
+		if ( exists( appDirStr + "/" + desktopName ) ) {
+			return appDirStr + "/" + desktopName;
+		}
+	}
+
+	return QString();
+};
+
+NBDesktopFile NBXdgMime::desktopForName( QString desktopName ) {
+
+	if ( not desktopName.endsWith( ".desktop" ) )
+		desktopName += ".desktop";
+
+	if ( exists( desktopName ) )
+		return NBDesktopFile( desktopName );
+
+	QString desktopPath;
+	Q_FOREACH( QString appDirStr, appsDirs ) {
+		if ( exists( appDirStr + "/" + desktopName ) ) {
+			desktopPath = appDirStr + "/" + desktopName;
+			break;
+		}
+	}
+
+	return NBDesktopFile( desktopPath );
+};
+
+void NBXdgMime::parseDesktops() {
+
+	appsList.clear();
+	foreach( QString appDirStr, appsDirs ) {
+		QDir appDir( appDirStr );
+		Q_FOREACH( QFileInfo desktop, appDir.entryInfoList( QStringList() << "*.desktop", QDir::Files ) ) {
+			appsList << NBDesktopFile( desktop.absoluteFilePath() );
+		}
+	}
+};
+
+NBXdgMime* NBXdgMime::instance() {
+
+	if ( NBXdgMime::globalInstance )
+		return globalInstance;
+
+	NBXdgMime::globalInstance = new NBXdgMime();
+	globalInstance->parseDesktops();
+
+	return NBXdgMime::globalInstance;
+};
+
+void NBXdgMime::setApplicationAsDefault( QString appFileName, QString mimetype ) {
+
+	if ( QProcess::execute( "xdg-mime", QStringList() << "default" << appFileName << mimetype ) )
+		qDebug() << "Error while setting" << appFileName << "as the default handler for" << mimetype;
+};
+
+NBXdgMime::NBXdgMime() {
+
+	appsDirs << QDir::home().filePath( ".local/share/applications/" );
+	appsDirs << "/usr/local/share/applications/" << "/usr/share/applications/";
+	appsDirs << "/usr/share/applications/kde4/" << "/usr/share/gnome/applications/";
+};
+
+NBDesktopFile NBXdgMime::xdgDefaultApp( QMimeType mimeType ) {
+
+	return appsForMimeType( mimeType ).value( 0 );
+};
+
+uint qHash( const NBDesktopFile &app ) {
+
+	QString hashString;
+	hashString += app.name();
+	hashString += app.genericName();
+	hashString += app.description();
+	hashString += app.command();
+	hashString += app.icon();
+	hashString += app.mimeTypes().join( " " );
+	hashString += app.categories().join( " " );
+
+	return qChecksum( hashString.toLocal8Bit().data(), hashString.count() );
+};
+
+QVariant& toQVariant( const NBDesktopFile &app ) {
+
+	QVariant appVar;
+	appVar.setValue( app );
+
+	return appVar;
 };
