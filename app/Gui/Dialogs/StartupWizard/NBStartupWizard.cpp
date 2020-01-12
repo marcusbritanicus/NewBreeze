@@ -119,7 +119,7 @@ void NBStartupWizard::createPages() {
 	p2cb1->setChecked( true );
 
 	QLabel *p2lbl2 = new QLabel(
-		"<small>Note that inside a group all the nodes will be sorted alphabetically, except for <tt>Size</tt> grouping where they will be sorted "
+		"<small>Note that inside a group, all the nodes will be sorted alphabetically, except for <tt>Size</tt> grouping where they will be sorted "
 		"by size. Also, in all the cases, directories will be shown at the beginning of the group, sorted alphabetically.</small>"
 	);
 	p2lbl2->setWordWrap( true );
@@ -143,7 +143,7 @@ void NBStartupWizard::createPages() {
 
 	QLabel *p2lbl3 = new QLabel(
 		"Please note that grouping comes at a small premium. While the grouped file layout looks beautiful, it takes some extra effort and "
-		"time to sort the nodes into groups. With slow processors, this can give you significant performance lag. Also, you may expreience "
+		"time to sort the nodes into groups. With slow processors, this can give you significant performance lag. Also, you may experience "
 		"delays if the number of files is large."
 	);
 	p2lbl3->setWordWrap( true );
@@ -224,10 +224,10 @@ void NBStartupWizard::createPages() {
 	page4->setSubTitle( "Would you like to filter folders?" );
 
 	QLabel *p4lbl1 = new QLabel(
-		"<p>The folder contents can be filtered based on a user defnied string. This is called Name filtering.</p>"
+		"<p>The folder contents can be filtered based on a user defined string. This is called Name filtering.</p>"
 		"<p>For example, if the name filter is 'the', then by default, all the folders will be visible, and only files "
 		"that have 'the' in their name will be visible. However, if you enable folder filtering as well, then only files "
-		"and folders that contains 'the' in their name will be visible.</p>"
+		"and folders that contain 'the' in their name will be visible.</p>"
 		"<p>While filtering the folder contents, do you want the sub-folders to be filtered as well, or just the files?</p>"
 	);
 	p4lbl1->setWordWrap( true );
@@ -295,7 +295,7 @@ void NBStartupWizard::createPages() {
 	QLabel *p6lbl1 = new QLabel(
 		"<p>By default, NewBreeze shows an icon corresponding to the type of file in question. However in some cases, "
 		"it is capable of showing the contents of the file, to a limited extent. These previews are called file thumbnails. "
-		"Currently NewBreeze can show the preview of only images. Preview of other files may be enables in the future.</p>"
+		"Currently NewBreeze can show the preview of only images. Preview of other files may be enabled in the future.</p>"
 		"<p>Do you want to show image thumbnails by default?</p>"
 	);
 	p6lbl1->setWordWrap( true );
@@ -310,7 +310,7 @@ void NBStartupWizard::createPages() {
 	p6gb1->setLayout( p6gb1Lyt );
 
 	QLabel *p6lbl2 = new QLabel(
-		"<p>Note: Obtaining and loading thumbnails is a slow process, that involes reading the image files and then storing a "
+		"<p>Note: Obtaining and loading thumbnails is a slow process, that involves reading the image files and then storing a "
 		"copy of the resized image. This may cause performance issues during the loading of image previews. In order to ensure "
 		"faster loading of thumbnails, NewBreeze maintains a cache of these generated thumbnails. This consumes a typical "
 		"space of 20 kiB per image.</p>"
@@ -437,10 +437,10 @@ void NBStartupWizard::createPages() {
 	page9->setSubTitle( "What should NewBreeze show you when it starts?" );
 
 	QLabel *p9lbl1 = new QLabel(
-		"<p>When you open a file manager, it usually show you the home folder. With NB3 you have great alternative: SuperStart. "
+		"<p>When you open a file manager, it usually shows you the home folder. With NB3 you have a great alternative: SuperStart. "
 		"While Catalogs is the NewBreeze equivalent of Libraries in Windows, SuperStart is a feature unique to NewBreeze alone.</p>"
-		"<p>Some file and folders are more accessed than others, and yet, it may not be suitable to put them in a particular location. "
-		"Enter SuperStart: Put you frequently used files and folders into SuperStart and access them as soon as you start NewBreeze.</p>"
+		"<p>Some files and folders are more accessed than others, and yet, it may not be suitable to put them in a particular location. "
+		"Enter SuperStart: Put your frequently used files and folders into SuperStart and access them as soon as you start NewBreeze.</p>"
 	);
 	p9lbl1->setWordWrap( true );
 
@@ -487,10 +487,10 @@ void NBStartupWizard::createPages() {
 
 	QLabel *p10lbl1 = new QLabel(
 		"<p>Usually when you close the main window of an application, the program closes and memory is freed for other purposes. "
-		"However, a file manager is one of the most used programs in an OS and need to be loaded often. Instead of closing it "
-		"completely, we can close the main window and keep NewBreeze open in tray. This was it takes far much shorter time for it "
+		"However, a file manager is one of the most used programs in an OS and needs to be loaded often. Instead of closing it "
+		"completely, we can close the main window and keep NewBreeze open in the tray. This way it takes far shorter time for it "
 		"start up again.</p>"
-		"<p>Do you want NewBreeze to stay in the SystemTray after close of the application?</p>"
+		"<p>Do you want NewBreeze to stay in the SystemTray after the close of the application?</p>"
 	);
 	p10lbl1->setWordWrap( true );
 
@@ -518,7 +518,7 @@ void NBStartupWizard::createPages() {
 
 	QWizardPage *page11 = new QWizardPage();
 	page11->setTitle( "Terminals" );
-	page11->setSubTitle( "Which is your favorite terminal applicaiton?" );
+	page11->setSubTitle( "Which is your favorite terminal application?" );
 
 	QLabel *p11lbl1 = new QLabel(
 		"<p>Which browsing the file system it sometimes becomes necessary to open a terminal in the working directory. "
@@ -561,7 +561,7 @@ void NBStartupWizard::createPages() {
 	page12->setSubTitle( "Some settings that makes NewBreeze a pleasure to use" );
 
 	QLabel *p12lbl1 = new QLabel(
-		"<p>IconOverlays and ExtendedIO are two of NewBreeze's premium features. IconOverlays enable you to perfrom "
+		"<p>IconOverlays and ExtendedIO are two of NewBreeze's premium features. IconOverlays enable you to perform "
 		"most actions that require a right click without one. ExtendedIO helps you copy/move files/directories "
 		"to any other place without leaving the current folder.</p>"
 	);
