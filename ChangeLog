@@ -10,6 +10,9 @@ Version 3.0.0 RC
 	- Feature: AutoMount of volumes
 	- Feature: Add user apps to Open With menu
 	- Feature: Inbuilt terminal
+	- BugFix: ExtendedIO partial bugfix
+	- BugFix: NBDeviceInfo critical bugfix
+	- BugFix: NBIconView bugfixes
 	- NBSettings module revamped
 	- Markdown library changed to cmark
 	- Markdown preview using QTextBrowser
@@ -20,15 +23,14 @@ Version 3.0.0 RC
 	- Fixed most of the code causing warnings
 	- Improvements to NBIconView
 	- NBSidePanel and NBSideBar redesigned
-	- BugFix: ExtendedIO partial bugfix
-	- BugFix: NBDeviceInfo critical bugfix
-	- BugFix: NBIconView bugfixes
 	- Several other major/minor bug fixes.
 	- Trash Manager now uses QTreeView class
 	- Inbuilt terminal bug fix and improvements
 	- Busy cursor while loading large folders
 	- Grouping option in Context Menu fixed
 	- Archive member extraction from ArchivePeek
+	- NBAppFile replaced by superior NBDesktopFile
+	- NBAppEngine replaced by superior NBXdgMime
 	- Migration from GitHub to GitLab
 
 Version 3.0.0 Beta

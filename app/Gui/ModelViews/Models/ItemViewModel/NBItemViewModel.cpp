@@ -102,7 +102,9 @@ bool NBItemViewModel::isCategorizationEnabled() {
 void NBItemViewModel::setCategorizationEnabled( bool enabled ) {
 
 	mCategorizationEnabled = enabled;
-	sort( prevSort.column, prevSort.cs, enabled );
+
+	if ( not mRootPath.isEmpty() )
+		sort( prevSort.column, prevSort.cs, enabled );
 };
 
 int NBItemViewModel::rowCount( const QModelIndex & parent ) const {
@@ -648,7 +650,8 @@ void NBItemViewModel::setShowHidden( bool ok ) {
 
 	/* We have set per-folder settings */
 	Settings->setValue( "ShowHidden", ok );
-	setupModelData();
+	if ( not mRootPath.isEmpty() )
+		setupModelData();
 };
 
 int NBItemViewModel::indexInCategory( QModelIndex idx ) const {
@@ -707,13 +710,15 @@ void NBItemViewModel::setNameFilters( QStringList filters ) {
 	mNameFilters.clear();
 	mNameFilters << filters;
 
-	setupModelData();
+	if ( not mRootPath.isEmpty() )
+		setupModelData();
 };
 
 void NBItemViewModel::clearNameFilters() {
 
 	mNameFilters.clear();
-	setupModelData();
+	if ( not mRootPath.isEmpty() )
+		setupModelData();
 };
 
 void NBItemViewModel::sort( int column, bool cs, bool categorized ) {
