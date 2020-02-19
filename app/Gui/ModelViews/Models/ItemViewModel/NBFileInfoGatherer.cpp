@@ -108,15 +108,44 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 	}
 
 	else if ( S_ISREG( statbuf.st_mode ) ) {
-		QMimeType mType = mimeDb.mimeTypeForFile( path );
+		// QMimeType mType = mimeDb.mimeTypeForFile( path );
+		QStringList ext = name.split( ".", QString::SkipEmptyParts );
+		QStringList mimeData;
+
+		/* We have only the file name, use QMimeDatabase */
+		if ( ext.count() == 1 ) {
+			QMimeType mType = mimeDb.mimeTypeForFile( path );
+			mimeData = QStringList( { mType.comment(), mType.name(), mType.iconName() } );
+		}
+
+		/* _ */
+		else {
+			if ( ext.count() >= 2 ) {
+				/* Simple extension: .png, .txt, .jpg, etc */
+				QString ext1 = ext.takeLast();
+				QString ext2 = ext.takeLast();
+
+				if ( fileTypes->allKeys().contains( ext1 + "." + ext2 ) )
+					mimeData = fileTypes->value( ext1 + "." + ext2 ).toStringList();
+
+				else
+					mimeData = fileTypes->value( ext1 ).toStringList();
+			}
+		}
+
+		if ( not mimeData.count() ) {
+			qDebug() << "ERROR:" << path;
+			QMimeType mType = mimeDb.mimeTypeForFile( path );
+			mimeData = QStringList( { mType.comment(), mType.name(), mType.iconName() } );
+		}
 
 		info << "file";
 		info << quint64( statbuf.st_size );
-		info << mType.iconName();
+		info << mimeData.at( 2 );
 		info << ( name.isEmpty() ? "/" : name );
 		info << formatSize( statbuf.st_size );
-		info << mType.comment();
-		info << mType.name();
+		info << mimeData.at( 0 );
+		info << mimeData.at( 1 );
 	}
 
 	else if ( S_ISCHR( statbuf.st_mode ) ) {
