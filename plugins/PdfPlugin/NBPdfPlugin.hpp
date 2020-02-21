@@ -8,7 +8,6 @@
 
 #include "Global.hpp"
 #include "NBPluginInterface.hpp"
-#include "NBPdfPeep.hpp"
 
 #include <QtPlugin>
 

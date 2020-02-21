@@ -34,18 +34,14 @@ void NBPdfPeep::createGUI() {
 
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
-	QSettings plugins( "NewBreeze", "Plugins" );
-	// int backend = plugins.value( "PdfPlugin/Backend", 0 ).toInt();
-
-	peekWidgetBase = new PdfView( this );
-
-	peekWidgetBase->setViewMode( PdfView::FitPageToWidth );
-	peekWidgetBase->setLayoutMode( PdfView::Continuous );
+	/* PdfView */
+	peekWidgetBase = new QPdfView( this );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
+    peekWidgetBase->setPageMode( QPdfView::MultiPage );
+    peekWidgetBase->setZoomMode( QPdfView::FitToWidth );
+	peekWidgetBase->loadDocument( path );
 
-	peekWidgetBase->loadPdfDocument( path, PdfView::PopplerRenderBackend );
-
-	connect( peekWidgetBase, SIGNAL( closePreview() ), this, SLOT( close() ) );
+	QShortcut *close = new QShortcut( QKeySequence( Qt::Key_Escape ), this, SLOT( close() ), SLOT( close() ), Qt::WindowShortcut );
 
 	QWidget *pdfBase = new QWidget();
 	pdfLyt = new QVBoxLayout();

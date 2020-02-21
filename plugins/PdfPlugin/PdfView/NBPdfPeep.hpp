@@ -7,14 +7,19 @@
 #pragma once
 
 #include "Global.hpp"
-#include "PdfView.hpp"
+
+#if QT_VERSION >= 0x050000
+	#include <QtWidgets>
+#endif
+
+#include "qpdfview.h"
 
 class NBPdfPeep : public QDialog {
 	Q_OBJECT
 
 	public :
 		NBPdfPeep( QString path = QDir::homePath() );
-		PdfView *peekWidgetBase;
+		QPdfView *peekWidgetBase;
 
 	private :
 		void createGUI();

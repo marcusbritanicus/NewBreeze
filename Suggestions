@@ -1,6 +1,6 @@
 NewBreeze v3.0.0 RC3
 
-✗ Option previews in Settings Manager and Startup Wizard
+✗ Option previews in Settings Manager and Startup Wizard - Implemented in v4.0 or later
 ✓ Info Panel width should be adjustable => InfoPanel is now implemented as QDockWidget
 ◐ MediaInfo to show MediaInfo in InfoPanel and InfoBar
 ✓ Settings Manager to have two buttons: Apply and Close
@@ -14,7 +14,7 @@ NewBreeze v3.0.0 RC3
 	=> Takes almost the same amount of calculation to count the number of nodes.
 	=> FolderFlash now uses the default QListView/QFileSystemModel to show folder contents
 ✗ Stop showing number of items/size below folders/files
-	=> This does not affect the performance.
+	=> This does not affect the performance, I have tested it on folders with large numebr of files
 ✓ After copy, delete, empty trash, archive IO give a completion notification.
 ✓ Show the available list of plugins, and an option to enable and disable them.
 ✓ Auto mounting of devices through DBus/UDisks2 interface.

@@ -7,7 +7,7 @@ VERSION = "3.0.0"
 # Qt5 Support
 # ===========
 greaterThan(QT_MAJOR_VERSION, 4) {
-	QT += widgets
+	QT += widgets  widgets-private
 }
 
 # Common Locations
@@ -15,10 +15,10 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 INCLUDEPATH += ../../common/ ../../common/include
 DEPENDPATH += ../../common/ ../../common/include
 
-# MuPDF and PdfPeep
-# =================
-INCLUDEPATH += PdfPeep
-DEPENDPATH += PdfPeep
+# PdfView
+# =======
+INCLUDEPATH += PdfView
+DEPENDPATH += PdfView
 
 # Poppler
 # =======
@@ -40,21 +40,23 @@ CONFIG += warn_off silent
 # ===========
 CONFIG += plugin
 
-# PdfPeep Sources
+# PdfView Sources
 # ===============
 HEADERS += Global.hpp
 HEADERS += NBPdfPlugin.hpp
-# HEADERS += PdfPeep/MuPdfDocument.hpp
-HEADERS += PdfPeep/NBPdfPeep.hpp
-HEADERS += PdfPeep/PdfDocument.hpp
-HEADERS += PdfPeep/PdfView.hpp
-HEADERS += PdfPeep/PopplerDocument.hpp
+HEADERS += PdfView/NBPdfPeep.hpp
+HEADERS += PdfView/qpdfdocument.h
+HEADERS += PdfView/qpdfnamespace.h
+HEADERS += PdfView/qpdfpagenavigation.h
+HEADERS += PdfView/qpdfpagerenderer.h
+HEADERS += PdfView/qpdfview.h
 
 SOURCES += NBPdfPlugin.cpp
-# SOURCES += PdfPeep/MuPdfDocument.cpp
-SOURCES += PdfPeep/NBPdfPeep.cpp
-SOURCES += PdfPeep/PdfView.cpp
-SOURCES += PdfPeep/PopplerDocument.cpp
+SOURCES += PdfView/NBPdfPeep.cpp
+SOURCES += PdfView/qpdfdocument.cpp
+SOURCES += PdfView/qpdfpagenavigation.cpp
+SOURCES += PdfView/qpdfpagerenderer.cpp
+SOURCES += PdfView/qpdfview.cpp
 
 # Silent compilation
 # ==================

@@ -253,16 +253,28 @@ NBDesktopFile::NBDesktopFile( QString filename ) {
 
 	QStringList args = mCommand.split( " " );
 	foreach( QString arg, args ) {
-		if ( arg == "%f" or arg == "%u" ) {
+		if ( arg == "%f" ) {
 			mMultiArgs = false;
 			mTakesArgs = true;
 			mParsedArgs << "<#COREARG-FILE#>";
 		}
 
-		else if ( arg == "%F" or arg == "%U" ) {
+		else if ( arg == "%F" ) {
 			mMultiArgs = true;
 			mTakesArgs = true;
 			mParsedArgs << "<#COREARG-FILES#>";
+		}
+
+		else if ( arg == "%u" ) {
+			mMultiArgs = false;
+			mTakesArgs = true;
+			mParsedArgs << "<#COREARG-URL#>";
+		}
+
+		else if ( arg == "%U" ) {
+			mMultiArgs = true;
+			mTakesArgs = true;
+			mParsedArgs << "<#COREARG-URLS#>";
 		}
 
 		else if ( arg == "%i" ) {
@@ -335,6 +347,8 @@ bool NBDesktopFile::startApplicationWithArgs( QStringList args ) {
 
 		execList.removeAll( "<#COREARG-FILES#>" );
 		execList.removeAll( "<#COREARG-FILE#>" );
+		execList.removeAll( "<#COREARG-URLS#>" );
+		execList.removeAll( "<#COREARG-URL#>" );
 
 		return QProcess::startDetached( exec, execList );
 	}
@@ -348,18 +362,38 @@ bool NBDesktopFile::startApplicationWithArgs( QStringList args ) {
 						argList << args;
 				}
 
+				else if ( exeArg == "<#COREARG-URLS#>" ) {
+					if ( args.count() ) {
+						Q_FOREACH( QString arg, args )
+							argList << ( arg.startsWith( "/" ) ? "file://" : "file:" ) + arg;
+					}
+				}
+
 				else
 					argList << exeArg;
 			}
 		}
 
 		else {
-			int idx = exec.indexOf( "<#COREARG-FILE#>" );
-			argList << execList;
-			argList.removeAt( idx );
-			if ( args.count() ) {
-				argList.insert( idx, args.takeAt( 0 ) );
-				argList << args;
+			if ( exec.indexOf( "<#COREARG-FILE#>" ) ) {
+				int idx = exec.indexOf( "<#COREARG-FILE#>" );
+				argList << execList;
+				argList.removeAt( idx );
+				if ( args.count() ) {
+					argList.insert( idx, args.takeAt( 0 ) );
+					argList << args;
+				}
+			}
+
+			else {
+				int idx = exec.indexOf( "<#COREARG-URL#>" );
+				argList << execList;
+				argList.removeAt( idx );
+				if ( args.count() ) {
+					argList.insert( idx, ( args.at( 0 ).startsWith( "/" ) ? "file://" : "file:" ) + args.takeAt( 0 ) );
+					Q_FOREACH( QString arg, args )
+						argList << ( arg.startsWith( "/" ) ? "file://" : "file:" ) + arg;
+				}
 			}
 		}
 	}
@@ -419,6 +453,7 @@ QStringList NBDesktopFile::categories() const {
 };
 
 QStringList NBDesktopFile::parsedExec() const {
+
 	return mParsedArgs;
 };
 
@@ -479,11 +514,14 @@ AppsList NBXdgMime::appsForMimeType( QMimeType mimeType ) {
 		QSet<QString> intersected = app.mimeTypes().toSet().intersect( mimeSet );
 		if ( intersected.count() ) {
 			if ( ( app.type() == NBDesktopFile::Application ) and app.visible() )
-					appsForMimeList << app;
+				appsForMimeList << app;
 		}
 	}
 
 	QString defaultName = NBXdg::xdgDefaultApp( mimeType.name() );
+	if ( not appsForMimeList.contains( NBDesktopFile( defaultName ) ) )
+		appsForMimeList << NBDesktopFile( defaultName );
+
 	for( int i = 0; i < appsForMimeList.count(); i++ ) {
 		if ( appsForMimeList.value( i ).desktopName() == baseName( defaultName ) ) {
 			appsForMimeList.move( i, 0 );
@@ -581,7 +619,7 @@ NBDesktopFile NBXdgMime::desktopForName( QString desktopName ) {
 void NBXdgMime::parseDesktops() {
 
 	appsList.clear();
-	foreach( QString appDirStr, appsDirs ) {
+	Q_FOREACH( QString appDirStr, appsDirs ) {
 		QDir appDir( appDirStr );
 		Q_FOREACH( QFileInfo desktop, appDir.entryInfoList( QStringList() << "*.desktop", QDir::Files ) ) {
 			appsList << NBDesktopFile( desktop.absoluteFilePath() );
@@ -615,7 +653,7 @@ NBXdgMime::NBXdgMime() {
 
 NBDesktopFile NBXdgMime::xdgDefaultApp( QMimeType mimeType ) {
 
-	return appsForMimeType( mimeType ).value( 0 );
+	return NBDesktopFile( NBXdg::xdgDefaultApp( mimeType.name() ) );
 };
 
 uint qHash( const NBDesktopFile &app ) {

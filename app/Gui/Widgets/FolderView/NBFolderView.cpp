@@ -546,31 +546,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 				if ( not app.isValid() )
 					doOpenWithCmd();
 
-				QStringList exec;
-
-				// Takes arguments
-				if ( app.command().contains( "%u" ) or app.command().contains( "%f" ) or app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
-					// Single URL
-					if ( app.command().contains( "%u" ) )
-						exec = app.command().replace( "%u", QUrl::fromLocalFile( fileToBeOpened ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
-
-					else if ( app.command().contains( "%U" ) )
-						exec = app.command().replace( "%U", QUrl::fromLocalFile( fileToBeOpened ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
-
-					else if ( app.command().contains( "%f" ) )
-						exec = app.command().replace( "%f", fileToBeOpened ).split( " ", QString::SkipEmptyParts );
-
-					else if ( app.command().contains( "%F" ) )
-						exec = app.command().replace( "%F", fileToBeOpened ).split( " ", QString::SkipEmptyParts );
-
-					else
-						exec = app.command().split( " ", QString::SkipEmptyParts ) << fileToBeOpened;
-				}
-
-				else
-					exec = app.command().split( " ", QString::SkipEmptyParts ) << fileToBeOpened;
-
-				qDebug( "Opening file: %s [%s]", fileToBeOpened.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
+				qDebug( "Opening file: %s [%s]", fileToBeOpened.toLocal8Bit().data(), ( app.startApplicationWithArgs( { fileToBeOpened } ) ? "DONE" : " FAILED" ) );
 			}
 		}
 
