@@ -320,6 +320,9 @@ NBDesktopFile::NBDesktopFile( QString filename ) {
 
 	if ( mName.count() and mCommand.count() )
 		mValid = true;
+
+	if ( mDesktopName == "org.kde.okular.desktop" )
+		kdeFix( "okular" );
 };
 
 bool NBDesktopFile::startApplication() {
@@ -576,6 +579,25 @@ void NBDesktopFile::getCategory() {
 	}
 };
 
+void NBDesktopFile::kdeFix( QString appName ) {
+
+	QDirIterator dirIt( "/usr/share/applications/", QDir::Files, QDirIterator::Subdirectories );
+
+	while ( dirIt.hasNext() ) {
+		QString desktop = dirIt.next();
+		if ( desktop.contains( appName ) ) {
+			QFile appFile( desktop );
+			appFile.open( QFile::ReadOnly );
+			QStringList lines = QString::fromLocal8Bit( appFile.readAll() ).split( "\n" );
+			Q_FOREACH( QString line, lines ) {
+				if ( line.startsWith( "MimeType=" ) )
+					mMimeTypes << line.replace( "MimeType=", "" ).split( ";", QString::SkipEmptyParts );
+			}
+			appFile.close();
+		}
+	}
+};
+
 /*
 	*
 	* NBXdgMime
@@ -599,9 +621,6 @@ AppsList NBXdgMime::appsForMimeType( QMimeType mimeType ) {
 	}
 
 	QString defaultName = NBXdg::xdgDefaultApp( mimeType.name() );
-	if ( not appsForMimeList.contains( NBDesktopFile( defaultName ) ) )
-		appsForMimeList << NBDesktopFile( defaultName );
-
 	for( int i = 0; i < appsForMimeList.count(); i++ ) {
 		if ( appsForMimeList.value( i ).desktopName() == baseName( defaultName ) ) {
 			appsForMimeList.move( i, 0 );

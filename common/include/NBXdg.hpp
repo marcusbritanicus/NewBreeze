@@ -77,11 +77,21 @@ class NBCOMMON_DLLSPEC NBDesktopFile {
 
 		QString desktopFileUrl() const;						// URL of the desktop file
 
-		// Check if this NBDesktopFile is equivalent to @other
+		/* Check if this NBDesktopFile is equivalent to @other */
 		bool operator==( const NBDesktopFile& ) const;
 
 	private:
 		void getCategory();
+
+		/*
+			*
+			* KDE has a very annoying habit of splitting its a single
+			* desktop file (ex. okular) into multiple files based on mimetypes
+			* okularApplication_chm.desktop, okularApplication_pdf.desktop,
+			* and so on...
+			*
+		*/
+		void kdeFix( QString );
 
 		QString mFileUrl, mDesktopName, mExec, mCommand;
 		QString mName, mGenericName, mDescription, mIcon;
