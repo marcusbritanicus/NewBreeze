@@ -292,21 +292,19 @@ NBDesktopFile::NBDesktopFile( QString filename ) {
 			mParsedArgs << arg;
 	}
 
-	QRegExp mimeRx( "^MimeType=([.]+)$" );
-
 	QFile desktop( mFileUrl );
 	desktop.open( QFile::ReadOnly );
-	QString line = QString::fromLocal8Bit( desktop.readLine() );		// Will always be [Desktop Entry]
-
-	do {
+	QStringList lines = QString::fromLocal8Bit( desktop.readAll() ).split( "\n" );
+	Q_FOREACH( QString line, lines ) {
 		if ( line.startsWith( "MimeType=" ) )
 			mMimeTypes = line.replace( "MimeType=", "" ).split( ";", QString::SkipEmptyParts );
 
 		if ( line.startsWith( "Categories=" ) )
 			mCategories = line.replace( "Categories=", "" ).split( ";", QString::SkipEmptyParts );
+	}
+	desktop.close();
 
-		line = QString::fromLocal8Bit( desktop.readLine() );
-	} while ( not desktop.atEnd() );
+	getCategory();
 
 	mVisible = not s.value( "NoDisplay", false ).toBool();
 	mRunInTerminal = s.value( "Terminal", false ).toBool();
@@ -442,6 +440,11 @@ QString NBDesktopFile::icon() const {
 	return mIcon;
 };
 
+QString NBDesktopFile::category() const {
+
+	return mCategory;
+};
+
 QStringList NBDesktopFile::mimeTypes() const {
 
 	return mMimeTypes;
@@ -477,6 +480,16 @@ bool NBDesktopFile::runInTerminal() const {
 	return mRunInTerminal;
 };
 
+bool NBDesktopFile::takesArgs() const {
+
+	return mTakesArgs;
+};
+
+bool NBDesktopFile::multipleArgs() const {
+
+	return mMultiArgs;
+};
+
 bool NBDesktopFile::isValid() const {
 
 	return mValid;
@@ -494,6 +507,73 @@ bool NBDesktopFile::operator==( const NBDesktopFile& other ) const {
 	truth &= ( mRank == other.rank() );
 
 	return truth;
+};
+
+void NBDesktopFile::getCategory() {
+
+	QStringList Accessories = QStringList() << "Utility" << "Utilities" << "Accessory" << "Accessories";
+	QStringList Development = QStringList() << "Development";
+	QStringList Education = QStringList() << "Education";
+	QStringList Games = QStringList() << "Games" << "Game" << "ArcadeGame" << "StrategyGame" << "LogicGame";
+	QStringList Graphics = QStringList() << "Graphics";
+	QStringList Internet = QStringList() << "Network" << "Internet";
+	QStringList Multimedia = QStringList() << "Audio" << "Video" << "AudioVideo" << "Multimedia";
+	QStringList Office = QStringList() << "Office";
+	QStringList ScienceMath = QStringList() << "Science" << "Math";
+	QStringList Settings = QStringList() << "Settings";
+	QStringList System = QStringList() << "System";
+	QStringList Wine = QStringList() << "Wine";
+
+	/* If the file name and the command contains 'wine', then it's a wine application */
+	if ( mFileUrl.contains( "wine", Qt::CaseInsensitive ) and mCommand.contains( "wine", Qt::CaseInsensitive ) ) {
+		mCategories = QStringList( { "Wine" } );
+		mCategory = "Wine";
+		return;
+	}
+
+	else {
+		mCategory = "Uncategorized";
+		foreach( QString cate, mCategories ) {
+			if ( Accessories.contains( cate ) )
+				mCategory = "Accessories";
+
+			else if ( Development.contains( cate ) )
+				mCategory = "Development";
+
+			else if ( ScienceMath.contains( cate ) )
+				mCategory = "Science & Math";
+
+			else if ( Education.contains( cate ) )
+				mCategory = "Education";
+
+			else if ( Games.contains( cate ) )
+				mCategory = "Games";
+
+			else if ( Office.contains( cate ) )
+				mCategory = "Office";
+
+			else if ( Graphics.contains( cate ) )
+				mCategory = "Graphics";
+
+			else if ( Internet.contains( cate ) )
+				mCategory = "Internet";
+
+			else if ( Multimedia.contains( cate ) )
+				mCategory = "Multimedia";
+
+			else if ( Settings.contains( cate ) )
+				mCategory = "Settings";
+
+			else if ( System.contains( cate ) )
+				mCategory = "System";
+
+			else if ( Wine.contains( cate ) )
+				mCategory = "Wine";
+
+			else
+				continue;
+		}
+	}
 };
 
 /*

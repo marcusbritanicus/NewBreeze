@@ -564,17 +564,20 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 	setFocus();
 };
 
+/* We use a unified interface for both apps and terminals */
 void NBFolderView::doOpenWith() {
 
-	QStringList cmdList = qobject_cast<QAction *>( sender() )->data().toStringList();
-	QString cmd = cmdList.takeFirst();
+	QStringList data = qobject_cast<QAction *>( sender() )->data().toStringList();
+	QString desktopName = data.takeFirst();
 
-	if ( not cmd.startsWith( "Inbuilt" ) ) {
-		QProcess::startDetached( cmd, cmdList );
+	if ( desktopName != "Inbuilt" ) {
+		NBDesktopFile app( desktopName );
+		app.startApplicationWithArgs( data );
+
 		return;
 	}
 
-	NBTerminal *term = new NBTerminal( cmdList.at( 0 ), cmdList.at( 1 ) );
+	NBTerminal *term = new NBTerminal( data.at( 0 ), data.at( 1 ) );
 	term->showMaximized();
 };
 

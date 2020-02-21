@@ -908,7 +908,7 @@ void NBItemViewModel::setRootPath( QString path ) {
 
 		else {
 			QString location = QString( mRootPath ).replace( "NB://", "" );
-			NBSettings::Scope scope = ( location == "SuperStart" ? NBSettings::SuperStart : NBSettings::Catalogs );
+			NBSettings::Scope scope = ( location == "SuperStart" ? NBSettings::SuperStart : ( location == "Catalogs" ? NBSettings::Catalogs : NBSettings::GlobalScope ) );
 
 			prevSort.column = Settings->value( "SortColumn", scope );
 			prevSort.cs = Settings->value( "SortCase", scope );
@@ -1194,9 +1194,9 @@ void NBItemViewModel::setupApplicationsData() {
 		data << app.runInTerminal();															/* Qt::UserRole + 7 */
 		data << app.categories();																/* Qt::UserRole + 8 */
 		data << app.rank();																		/* Qt::UserRole + 9 */
-		data << toQVariant( app );																/* Qt::UserRole + 10 */
+		// data << toQVariant( app );																/* Qt::UserRole + 10 */
 
-		rootNode->addChild( new NBItemViewNode( data, app.categories().at( 0 ), rootNode ) );
+		rootNode->addChild( new NBItemViewNode( data, app.category(), rootNode ) );
 	}
 	endResetModel();
 

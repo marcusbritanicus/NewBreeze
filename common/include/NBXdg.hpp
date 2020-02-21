@@ -60,6 +60,7 @@ class NBCOMMON_DLLSPEC NBDesktopFile {
 		QString exec() const;								// 'TryExec' value or the path divined from 'Exec'
 		QString command() const;							// Full command as given in 'Exec'
 		QString icon() const;								// Application Icon Name or Path
+		QString category() const;							// Main category according to XDG
 
 		QStringList mimeTypes() const;						// MimeTypes handled by this app
 		QStringList categories() const;						// Categories this app belongs to
@@ -70,6 +71,7 @@ class NBCOMMON_DLLSPEC NBDesktopFile {
 
 		bool visible() const;								// Visible in 'Start' Menu
 		bool runInTerminal() const;							// If this app should be run in the terminal
+		bool takesArgs() const;								// Does the app take any arguments?
 		bool multipleArgs() const;							// Does the app take multiple arguments?
 		bool isValid() const;								// Is a valid desktop file
 
@@ -79,8 +81,11 @@ class NBCOMMON_DLLSPEC NBDesktopFile {
 		bool operator==( const NBDesktopFile& ) const;
 
 	private:
+		void getCategory();
+
 		QString mFileUrl, mDesktopName, mExec, mCommand;
 		QString mName, mGenericName, mDescription, mIcon;
+		QString mCategory;
 		QStringList mMimeTypes, mCategories, mParsedArgs;
 
 		bool mVisible, mRunInTerminal, mValid = false;

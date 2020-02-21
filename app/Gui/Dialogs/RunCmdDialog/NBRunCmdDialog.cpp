@@ -27,7 +27,7 @@ NBDesktopFile NBRunCmdDialog::selectedApp() {
 	QModelIndex idx = appList->currentIndex();
 
 	if ( execCmd == idx.data( Qt::UserRole + 3 ).toStringList().join( " " ) )
-		return qvariant_cast<NBDesktopFile>( idx.data( Qt::UserRole + 10 ) );
+		return NBDesktopFile( idx.data( Qt::UserRole + 5 ).toString() );
 
 	return NBDesktopFile();
 };

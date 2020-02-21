@@ -363,7 +363,6 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 			// Adding them to the context menu
 			foreach( NBDesktopFile app, finalAppsList ) {
 				QString name = app.name();
-				QStringList exec = app.command().split( " ", QString::SkipEmptyParts );
 				QString icon = app.icon();
 
 				QIcon progIcon = QIcon::fromTheme( icon, QIcon( icon ) );
@@ -376,30 +375,16 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 				if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
 					progIcon = QIcon( ":/icons/exec.png" );
 
-				// Takes arguments
-				if ( app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
-					// Multiple URLs
-					if ( app.command().contains( "%U" ) ) {
-						exec.removeAll( "%U" );
-						Q_FOREACH( QString node, nodes )
-							exec << QUrl::fromLocalFile( node ).toString( QUrl::None );
-					}
-
-					// Multiple files
-					else {
-						exec.removeAll( "%F" );
-						Q_FOREACH( QString node, nodes )
-							exec << node;
-					}
-				}
-
-				else {
-					// We are intereseted only in multiple arg takers
+				/* We are intereseted only in multiple arg takers */
+				if ( not app.multipleArgs() )
 					continue;
-				}
+
+				QStringList actData;
+				actData << app.desktopName();
+				actData << nodes;
 
 				QAction *openWithAct = new QAction( progIcon, name, this );
-				openWithAct->setData( QVariant( exec ) );
+				openWithAct->setData( QVariant( actData ) );
 				connect( openWithAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 				addAction( openWithAct );
 			}
@@ -430,36 +415,27 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 		AppsList apps = engine->appsForMimeType( mimeType );
 		Q_FOREACH( NBDesktopFile app, apps ) {
 			QString name = app.name();
-			QStringList exec;
-			QString iconStr = app.icon();
+			QString icon = app.icon();
 
-			// '::icon(...)' means @icon is an externally defined function
-			QIcon progIcon = ::icon( NBIconManager::instance()->icon( iconStr ) );
+			QIcon progIcon = QIcon::fromTheme( icon, QIcon( icon ) );
+			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+				progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".png" );
 
-			// Takes arguments
-			if ( app.command().contains( "%u" ) or app.command().contains( "%f" ) or app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
-				// Single URL
-				if ( app.command().contains( "%u" ) )
-					exec = app.command().replace( "%u", QUrl::fromLocalFile( path ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+				progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".xpm" );
 
-				else if ( app.command().contains( "%U" ) )
-					exec = app.command().replace( "%U", QUrl::fromLocalFile( path ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+				progIcon = QIcon( ":/icons/exec.png" );
 
-				else if ( app.command().contains( "%f" ) )
-					exec = app.command().replace( "%f", path ).split( " ", QString::SkipEmptyParts );
+			/* We are intereseted only in multiple arg takers */
+			if ( not app.takesArgs() )
+				continue;
 
-				else if ( app.command().contains( "%F" ) )
-					exec = app.command().replace( "%F", path ).split( " ", QString::SkipEmptyParts );
-
-				else
-					exec = app.command().split( " ", QString::SkipEmptyParts ) << path;
-			}
-
-			else
-				exec = app.command().split( " ", QString::SkipEmptyParts ) << path;
+			QStringList actData;
+			actData << app.desktopName() << path;
 
 			QAction *openWithAct = new QAction( progIcon, name, this );
-			openWithAct->setData( QVariant( QStringList() << exec ) );
+			openWithAct->setData( QVariant( actData ) );
 			connect( openWithAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 			addAction( openWithAct );
 		}
@@ -473,36 +449,27 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 		Q_FOREACH( QString desktop, userApps ) {
 			NBDesktopFile app( desktop );
 			QString name = app.name();
-			QStringList exec;
-			QString iconStr = app.icon();
+			QString icon = app.icon();
 
-			// '::icon(...)' means @icon is an externally defined function
-			QIcon progIcon = ::icon( NBIconManager::instance()->icon( iconStr ) );
+			QIcon progIcon = QIcon::fromTheme( icon, QIcon( icon ) );
+			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+				progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".png" );
 
-			// Takes arguments arguments
-			if ( app.command().contains( "%u" ) or app.command().contains( "%f" ) or app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
-				// Single URL
-				if ( app.command().contains( "%u" ) )
-					exec = app.command().replace( "%u", QUrl::fromLocalFile( path ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+				progIcon = QIcon( "/usr/share/pixmaps/" + icon + ".xpm" );
 
-				else if ( app.command().contains( "%U" ) )
-					exec = app.command().replace( "%U", QUrl::fromLocalFile( path ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+			if ( progIcon.pixmap( QSize( 16, 16 ) ).isNull() )
+				progIcon = QIcon( ":/icons/exec.png" );
 
-				else if ( app.command().contains( "%f" ) )
-					exec = app.command().replace( "%f", path ).split( " ", QString::SkipEmptyParts );
+			/* We are intereseted only in multiple arg takers */
+			if ( not app.takesArgs() )
+				continue;
 
-				else if ( app.command().contains( "%F" ) )
-					exec = app.command().replace( "%F", path ).split( " ", QString::SkipEmptyParts );
-
-				else
-					exec = app.command().split( " ", QString::SkipEmptyParts ) << path;
-			}
-
-			else
-				exec = app.command().split( " ", QString::SkipEmptyParts ) << path;
+			QStringList actData;
+			actData << app.desktopName() << path;
 
 			QAction *openWithAct = new QAction( progIcon, name, this );
-			openWithAct->setData( QVariant( QStringList() << exec ) );
+			openWithAct->setData( QVariant( actData ) );
 			connect( openWithAct, SIGNAL( triggered() ), FolderView, SLOT( doOpenWith() ) );
 			addAction( openWithAct );
 		}
