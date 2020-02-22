@@ -1,3 +1,10 @@
+newbreeze (3.0.0-rc8) unstable; urgency=medium
+
+  * Correction of typos
+  * Other minor bug fixes
+
+ -- Marcus Britanicus <marcusbritanicus@gmail.com>  Sat, 22 Feb 2020 12:00:00 +0530
+
 newbreeze (3.0.0-rc7) unstable; urgency=medium
 
   * Several small UI changes
