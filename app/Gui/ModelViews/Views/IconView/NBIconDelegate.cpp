@@ -16,10 +16,15 @@ void NBIconDelegate::paintIcons( QPainter *painter, const NBStyleOptionViewItem 
 		QItemDelegate::paint( painter, option, index );
 
 	else {
-		// const NBItemViewModel *model = static_cast<const NBItemViewModel*>( index.model() );
-
 		QRect optionRect( option.rect );
 
+		painter->save();
+		painter->setPen( Qt::NoPen );
+		painter->setBrush( QColor( 255, 255, 255, 10 ) );
+		painter->drawRoundedRect( optionRect.adjusted( 2, 2, -2, -2 ), 3, 3 );
+		painter->setBrush( QColor(   0,   0,   0, 10 ) );
+		painter->drawRoundedRect( optionRect.adjusted( 2, 2, 0, 0 ), 3, 3 );
+		painter->restore();
 
 		/* Get icon size */
 		QSize iconSize( option.decorationSize );

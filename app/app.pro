@@ -1,24 +1,15 @@
 TEMPLATE = app
+TARGET = newbreeze3
 
-TARGET = newbreeze3qt4
-greaterThan(QT_MAJOR_VERSION, 4) {
-	TARGET = newbreeze3
+lessThan(QT_MAJOR_VERSION, 5) {
+	message( "NewBreeze is built for Qt5 and higher. Qt4 is no longer supported." )
 }
 
 QT += network dbus
-greaterThan(QT_MAJOR_VERSION, 4) {
-	QT += widgets
-	QT += concurrent
-}
+QT += widgets
+QT += concurrent
 
-isEqual( QT_MAJOR_VERSION, 4 ) {
-	 LIBS += -L../common/ -lnewbreeze-common4
-}
-
-isEqual( QT_MAJOR_VERSION, 5 ) {
-	LIBS +=  -L../common/ -lnewbreeze-common
-}
-
+LIBS +=  -L../common/ -lnewbreeze-common
 LIBS += -larchive -lbz2 -llzma -lz
 
 contains ( DEFINES, USE_MEDIAINFO ) {
@@ -29,8 +20,20 @@ contains ( DEFINES, USE_MEDIAINFO ) {
 }
 
 contains ( DEFINES, HAVE_LZLIB ) {
-	message( "Builting LZ compression enabled. lzip binary not required." )
+	message( "Builtin LZ compression enabled. lzip binary not required." )
 	LIBS += -llz
+}
+
+qtermver = $$system($$pkgConfigExecutable() --modversion qtermwidget5)
+!isEmpty( qtermver ) {
+	message( "Using QTermWidget5 (version $$qtermver) for NBTerminal" )
+	CONFIG += link_pkgconfig
+	PKGCONFIG += qtermwidget5
+}
+
+else {
+	message( "QTermWidget5 was not found. NewBreeze will not feature an inbuilt terminal" )
+	DEFINES += NO_QTERMWIDGET
 }
 
 # Common Sources
@@ -48,7 +51,7 @@ INCLUDEPATH += Gui/ModelViews/Views/TrashView Gui/NewBreezeUI Gui/NewBreezeUI/Ap
 INCLUDEPATH += Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/build Gui/Widgets/build/moc Gui/Widgets/build/objs Gui/Widgets/Buttons
 INCLUDEPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/InfoPanel
 INCLUDEPATH += Gui/Widgets/MediaInfo Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/SystemMenu Gui/Widgets/Terminal
-INCLUDEPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager
+INCLUDEPATH += Gui/Widgets/TrashManager
 
 DEPENDPATH += . Core/ArgParser Core/AutoMount Core/BookmarkInfo Core/DeleteManager Core/FSWatcher Core/IconProvider Core/Logger Core/Other Core/ProcessManager
 DEPENDPATH += Gui/Dialogs Gui/Dialogs/AppEditor Gui/Dialogs/Archive Gui/Dialogs/BookmarkEditor Gui/Dialogs/BugReporter Gui/Dialogs/ConfirmDeleteDialog Gui/Dialogs/Dialog
@@ -60,7 +63,7 @@ DEPENDPATH += Gui/ModelViews/Views/TrashView Gui/NewBreezeUI Gui/NewBreezeUI/App
 DEPENDPATH += Gui/Widgets Gui/Widgets/AddressBar Gui/Widgets/BreadCrumbsBar Gui/Widgets/build Gui/Widgets/build/moc Gui/Widgets/build/objs Gui/Widgets/Buttons
 DEPENDPATH += Gui/Widgets/ContextMenu Gui/Widgets/CustomActions Gui/Widgets/FolderView Gui/Widgets/GuiWidgets Gui/Widgets/InfoBar Gui/Widgets/InfoPanel
 DEPENDPATH += Gui/Widgets/MediaInfo Gui/Widgets/ProcessManager Gui/Widgets/SideBar Gui/Widgets/SidePanel Gui/Widgets/SystemMenu Gui/Widgets/Terminal
-DEPENDPATH += Gui/Widgets/Terminal/lib Gui/Widgets/TrashManager
+DEPENDPATH += Gui/Widgets/TrashManager
 
 # Headers
 HEADERS += Core/ArgParser/NBCLParser.hpp
@@ -160,35 +163,6 @@ HEADERS += Gui/Widgets/SidePanel/NBSidePanel.hpp
 HEADERS += Gui/Widgets/SidePanel/NBSidePanelItem.hpp
 HEADERS += Gui/Widgets/SystemMenu/NBMenuButton.hpp
 HEADERS += Gui/Widgets/SystemMenu/NBSystemMenu.hpp
-HEADERS += Gui/Widgets/Terminal/lib/BlockArray.h
-HEADERS += Gui/Widgets/Terminal/lib/CharacterColor.h
-HEADERS += Gui/Widgets/Terminal/lib/Character.h
-HEADERS += Gui/Widgets/Terminal/lib/ColorScheme.h
-HEADERS += Gui/Widgets/Terminal/lib/ColorTables.h
-HEADERS += Gui/Widgets/Terminal/lib/DefaultTranslatorText.h
-HEADERS += Gui/Widgets/Terminal/lib/Emulation.h
-HEADERS += Gui/Widgets/Terminal/lib/ExtendedDefaultTranslator.h
-HEADERS += Gui/Widgets/Terminal/lib/Filter.h
-HEADERS += Gui/Widgets/Terminal/lib/History.h
-HEADERS += Gui/Widgets/Terminal/lib/HistorySearch.h
-HEADERS += Gui/Widgets/Terminal/lib/KeyboardTranslator.h
-HEADERS += Gui/Widgets/Terminal/lib/konsole_wcwidth.h
-HEADERS += Gui/Widgets/Terminal/lib/kprocess.h
-HEADERS += Gui/Widgets/Terminal/lib/kptydevice.h
-HEADERS += Gui/Widgets/Terminal/lib/kpty.h
-HEADERS += Gui/Widgets/Terminal/lib/kpty_p.h
-HEADERS += Gui/Widgets/Terminal/lib/kptyprocess.h
-HEADERS += Gui/Widgets/Terminal/lib/LineFont.h
-HEADERS += Gui/Widgets/Terminal/lib/Pty.h
-HEADERS += Gui/Widgets/Terminal/lib/qtermwidget.h
-HEADERS += Gui/Widgets/Terminal/lib/Screen.h
-HEADERS += Gui/Widgets/Terminal/lib/ScreenWindow.h
-HEADERS += Gui/Widgets/Terminal/lib/Session.h
-HEADERS += Gui/Widgets/Terminal/lib/ShellCommand.h
-HEADERS += Gui/Widgets/Terminal/lib/TerminalCharacterDecoder.h
-HEADERS += Gui/Widgets/Terminal/lib/TerminalDisplay.h
-HEADERS += Gui/Widgets/Terminal/lib/tools.h
-HEADERS += Gui/Widgets/Terminal/lib/Vt102Emulation.h
 HEADERS += Gui/Widgets/Terminal/NBTerminal.hpp
 HEADERS += Gui/Widgets/Terminal/NBTermWidget.hpp
 HEADERS += Gui/Widgets/Terminal/NBTSettingsDialog.hpp
@@ -295,28 +269,6 @@ SOURCES += Gui/Widgets/SidePanel/NBSidePanel.cpp
 SOURCES += Gui/Widgets/SidePanel/NBSidePanelItem.cpp
 SOURCES += Gui/Widgets/SystemMenu/NBMenuButton.cpp
 SOURCES += Gui/Widgets/SystemMenu/NBSystemMenu.cpp
-SOURCES += Gui/Widgets/Terminal/lib/BlockArray.cpp
-SOURCES += Gui/Widgets/Terminal/lib/ColorScheme.cpp
-SOURCES += Gui/Widgets/Terminal/lib/Emulation.cpp
-SOURCES += Gui/Widgets/Terminal/lib/Filter.cpp
-SOURCES += Gui/Widgets/Terminal/lib/History.cpp
-SOURCES += Gui/Widgets/Terminal/lib/HistorySearch.cpp
-SOURCES += Gui/Widgets/Terminal/lib/KeyboardTranslator.cpp
-SOURCES += Gui/Widgets/Terminal/lib/konsole_wcwidth.cpp
-SOURCES += Gui/Widgets/Terminal/lib/kprocess.cpp
-SOURCES += Gui/Widgets/Terminal/lib/kpty.cpp
-SOURCES += Gui/Widgets/Terminal/lib/kptydevice.cpp
-SOURCES += Gui/Widgets/Terminal/lib/kptyprocess.cpp
-SOURCES += Gui/Widgets/Terminal/lib/Pty.cpp
-SOURCES += Gui/Widgets/Terminal/lib/qtermwidget.cpp
-SOURCES += Gui/Widgets/Terminal/lib/Screen.cpp
-SOURCES += Gui/Widgets/Terminal/lib/ScreenWindow.cpp
-SOURCES += Gui/Widgets/Terminal/lib/Session.cpp
-SOURCES += Gui/Widgets/Terminal/lib/ShellCommand.cpp
-SOURCES += Gui/Widgets/Terminal/lib/TerminalCharacterDecoder.cpp
-SOURCES += Gui/Widgets/Terminal/lib/TerminalDisplay.cpp
-SOURCES += Gui/Widgets/Terminal/lib/tools.cpp
-SOURCES += Gui/Widgets/Terminal/lib/Vt102Emulation.cpp
 SOURCES += Gui/Widgets/Terminal/NBTerminal.cpp
 SOURCES += Gui/Widgets/Terminal/NBTermWidget.cpp
 SOURCES += Gui/Widgets/Terminal/NBTSettingsDialog.cpp
@@ -352,37 +304,27 @@ SOURCES += Vault/Salsa20/NBSalsa20.cpp
 # Icon and stylesheet resources
 RESOURCES += NewBreeze.qrc ../data/data.qrc
 
-# C99/C++11 Support for Qt5
+# C18/C++17 Support for Qt5
 isEqual( QT_MAJOR_VERSION, 5 ) {
-	QMAKE_CFLAGS += -std=c99
-	QMAKE_CXXFLAGS += -std=c++11
+	QMAKE_CFLAGS += -std=c18
+	QMAKE_CXXFLAGS += -std=c++17
 }
 
 # Disable warnings and enable threading support
-CONFIG += thread silent build_all
-
-# Disable Debug on Release
-# CONFIG(release):DEFINES += QT_NO_DEBUG_OUTPUT
+# Enable maximum optimizations
+CONFIG += thread silent build_all optimize_full
 
 # Build location
-
 BUILD_PREFIX = $$(NB_BUILD_DIR)
 
 isEmpty( BUILD_PREFIX ) {
 	BUILD_PREFIX = ./build
 }
 
-MOC_DIR 	= $$BUILD_PREFIX/moc-qt4
-OBJECTS_DIR = $$BUILD_PREFIX/obj-qt4
-RCC_DIR		= $$BUILD_PREFIX/qrc-qt4
-UI_DIR      = $$BUILD_PREFIX/uic-qt4
-
-greaterThan(QT_MAJOR_VERSION, 4) {
-	MOC_DIR 	= $$BUILD_PREFIX/moc-qt5
-	OBJECTS_DIR = $$BUILD_PREFIX/obj-qt5
-	RCC_DIR		= $$BUILD_PREFIX/qrc-qt5
-	UI_DIR      = $$BUILD_PREFIX/uic-qt5
-}
+MOC_DIR 	= $$BUILD_PREFIX/moc-qt5
+OBJECTS_DIR = $$BUILD_PREFIX/obj-qt5
+RCC_DIR		= $$BUILD_PREFIX/qrc-qt5
+UI_DIR      = $$BUILD_PREFIX/uic-qt5
 
 unix {
 	isEmpty(PREFIX) {

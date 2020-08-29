@@ -124,8 +124,12 @@ void NBArchive::updateInputFiles( QStringList inFiles ) {
 		if ( isDir( file ) )
 			inputList.append( recDirWalk( file ) );
 
-		else
+		else {
+			if ( file.startsWith( '/' ) )
+				file.remove( 0, 1 );
+
 			inputList.append( file );
+		}
 	}
 
 	inputList.sort();

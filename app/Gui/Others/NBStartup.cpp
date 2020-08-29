@@ -10,6 +10,7 @@
 #include "NBMessageDialog.hpp"
 #include "NBBugReporter.hpp"
 #include "NBStartupWizard.hpp"
+#include <QtConcurrent>
 
 void NBStartup() {
 
@@ -101,12 +102,23 @@ void NBStartup() {
 	*/
 
 	QSettings settings( "NewBreeze", "NewBreeze" );
-	if ( settings.value( "Terminals/nbterminal" ).toString().isEmpty() ) {
+	if ( settings.value( "Terminals/desq-term" ).toString().isEmpty() ) {
 		QStringList paths = QString( getenv( "PATH" ) ).split( ":" );
 		foreach( QString path, paths ) {
-			if ( QFileInfo( path + "/nbterminal" ).exists() ) {
-				QStringList termInfo = QStringList() << "nbterminal" << "--workdir" << "%1" << "-e" << "%2";
-				settings.setValue( "Terminals/nbterminal", QVariant( termInfo ) );
+			if ( QFileInfo( path + "/desq-term" ).exists() ) {
+				QStringList termInfo = QStringList() << "desq-term" << "--workdir" << "%1" << "-e" << "%2";
+				settings.setValue( "Terminals/desq-term", QVariant( termInfo ) );
+				break;
+			}
+		}
+	}
+
+	if ( settings.value( "Terminals/coreterminal" ).toString().isEmpty() ) {
+			QStringList paths = QString( getenv( "PATH" ) ).split( ":" );
+		foreach( QString path, paths ) {
+			if ( QFileInfo( path + "/coreterminal" ).exists() ) {
+				QStringList termInfo = QStringList() << "coreterminal" << "-w" << "%1" << "-e" << "%2";
+				settings.setValue( "Terminals/coreterminal", QVariant( termInfo ) );
 				break;
 			}
 		}
@@ -207,5 +219,5 @@ void NBStartup() {
 		*
 	*/
 	if ( getuid() )
-		QTimer::singleShot( 0, NBPluginManager::instance(), SLOT( reloadPlugins() ) );
+		QtConcurrent::run( NBPluginManager::instance(), &NBPluginManager::reloadPlugins );
 };
