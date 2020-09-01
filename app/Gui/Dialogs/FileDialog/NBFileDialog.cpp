@@ -136,10 +136,12 @@ void NBFileDialog::setNameFilters( QStringList filters, QString filter ) {
 QString NBFileDialog::selectedItem() {
 
 	if ( mainView->selectionModel()->selectedRows().count() )
-		return fsModel->nodePath( mainView->selectionModel()->selectedRows().at( 0 ).data().toString() );
+		return fsModel->nodePath( mainView->selectionModel()->selectedRows().at( 0 ) );
 
-	else if ( not fsModel->currentIndex().isNull() )
+	else if ( mainView->currentIndex().isValid() )
+		return fsModel->nodePath( mainView->currentIndex() );
 
+	return QString();
 };
 
 QStringList NBFileDialog::selectedItems() {

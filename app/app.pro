@@ -29,9 +29,7 @@ qtermver = $$system($$pkgConfigExecutable() --modversion qtermwidget5)
 	message( "Using QTermWidget5 (version $$qtermver) for NBTerminal" )
 	CONFIG += link_pkgconfig
 	PKGCONFIG += qtermwidget5
-}
-
-else {
+} else {
 	message( "QTermWidget5 was not found. NewBreeze will not feature an inbuilt terminal" )
 	DEFINES += NO_QTERMWIDGET
 }
