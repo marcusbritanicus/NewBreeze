@@ -135,7 +135,11 @@ void NBFileDialog::setNameFilters( QStringList filters, QString filter ) {
 
 QString NBFileDialog::selectedItem() {
 
-	return fsModel->nodePath( mainView->selectionModel()->selectedRows().at( 0 ).data().toString() );
+	if ( mainView->selectionModel()->selectedRows().count() )
+		return fsModel->nodePath( mainView->selectionModel()->selectedRows().at( 0 ).data().toString() );
+
+	else if ( not fsModel->currentIndex().isNull() )
+
 };
 
 QStringList NBFileDialog::selectedItems() {
@@ -176,11 +180,9 @@ QString NBFileDialog::getFileName( QWidget *parent, QString title, QString locat
 
 	fDlg->exec();
 
-	qWarning() << fDlg->result();
-	qWarning() << fDlg->selectedItem();
-
 	if ( fDlg->result() )
-		return fDlg->selectedItem();
+		return QString( "/usr/share/icons/bloom-classic-dark/places/128/folder.svg" );
+		// return fDlg->selectedItem();
 
 	else
 		return QString();
