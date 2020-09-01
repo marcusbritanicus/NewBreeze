@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sudo apt-get install qtbase5-dev qtbase5-dev-tools                              \
+sudo apt-get install qtbase5-dev qtbase5-dev-tools qtbase5-private-dev          \
                     zlib1g-dev liblzma-dev libbz2-dev libarchive-dev            \
                     libmediainfo-dev libzen-dev                                 \
                     qtwebengine5-dev                                            \
