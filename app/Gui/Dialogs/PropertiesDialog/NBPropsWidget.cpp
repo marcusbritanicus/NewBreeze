@@ -280,10 +280,14 @@ void NBPropertiesWidget::changeDirIcon() {
 	);
 
 	if ( not iconName.isEmpty() ) {
+		qDebug() << "Setting new icon for the folder" << pathsList.at( 0 );
 		iconLbl->setPixmap( icon( QStringList() << iconName ).pixmap( 36 ) );
 
+		qDebug() << "Saving the new icon for the folder" << pathsList.at( 0 );
 		QSettings dSett( pathsList.at( 0 ) + "/.directory", QSettings::NativeFormat );
 		dSett.setValue( "NewBreeze/Icon", iconName );
+
+		qDebug() << "Syncing the changes";
 		dSett.sync();
 	}
 };
