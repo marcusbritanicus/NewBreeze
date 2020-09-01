@@ -1,0 +1,10 @@
+#!/bin/sh
+
+sudo dnf install qt5-qtbase-devel qt5-qtbase-private-devel                              \
+                    xz-devel libarchive-devel bzip2-devel zlib-devel lzip               \
+                    libmediainfo-devel                                                  \
+                    qt5-qtwebengine-devel                                               \
+                    poppler-qt5-devel                                                   \
+                    djvulibre-devel                                                     \
+                    qscintilla-qt5-devel                                                \
+                    ffmpegthumbnailer-devel

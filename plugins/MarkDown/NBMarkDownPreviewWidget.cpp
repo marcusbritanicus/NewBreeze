@@ -118,7 +118,12 @@ void NBMarkDownView::loadDocument() {
 		return;
 	}
 
-	peekWidgetBase->setHtml( cmark_markdown_to_html( file.readAll().constData(), file.size(), 0 ) );
+	#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+		peekWidgetBase->setHtml( cmark_markdown_to_html( file.readAll().constData(), file.size(), 0 ) );
+	#else
+		peekWidgetBase->setMarkdown( file.readAll() );
+	#endif
+
 	file.close();
 };
 

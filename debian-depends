@@ -1,0 +1,11 @@
+#!/bin/sh
+
+sudo apt-get install qtbase5-dev qtbase5-dev-tools                              \
+                    zlib1g-dev liblzma-dev libbz2-dev libarchive-dev            \
+                    libmediainfo-dev libzen-dev                                 \
+                    qtwebengine5-dev                                            \
+                    libpoppler-qt5-dev                                          \
+                    libdjvulibre-dev                                            \
+                    libqscintilla2-qt5-dev                                      \
+                    libffmpegthumbnailer-dev                                    \
+                    libmpv-dev

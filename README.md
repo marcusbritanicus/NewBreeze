@@ -39,7 +39,10 @@ are not found in any other file manager available for linux.
   * Git: `git clone https://gitlab.com/marcusbritanicus/NewBreeze.git NewBreeze-master`
   * Tar: `wget https://gitlab.com/marcusbritanicus/NewBreeze/-/archive/master/NewBreeze-master.tar.gz && tar -xf NewBreeze-master.tar.gz`
 * Enter `NewBreeze-master`
-* Open the terminal and type: `qmake -qt5 && make`
+* Open the terminal and type: `qmake -qt5 DEFINES+=USE_MEDIAINFO DEFINES+=HAVE_LZLIB && make`
+  * In case you do not want mediainfo, skip `DEFINES+=USE_MEDIAINFO`
+  * In case you do not want/have liblz (for lzip compression), skip `DEFINES+=HAVE_LZLIB`.
+  * To use lzip without the headers, install the lzip binary and skip `DEFINES+=HAVE_LZLIB`.
 * To install, as root type: `make install`
 
 ### Dependencies:
@@ -51,31 +54,31 @@ are not found in any other file manager available for linux.
 * liblzma (liblzma-dev)
 * libbzip2 (libbz2-dev)
 * libarchive (libarchive-dev)
-* xdg-utils
 * libdjvulibre-dev (libdjvulibre-dev)
 * ffmpegthumbnailer (libffmpegthumbnailer-dev)
 * poppler (libpoppler-qt5-dev, libpoppler-qt4-dev)
-* jbig2 (libjbig2dec0-dev)
-* vlc (libvlc-dev)
-* libexif (libexif-dev)
+* mpv (libmpv-dev)
 
 ## My System Info
 * OS:				Debian Sid
-* Qt:				Qt5 5.11.2
-* QScintilla:		2.10.4
-* LibArchive:		3.2.2
-* LibLzma: 			5.2.2
-* LibBz2:			1.0.6
+* Qt:				Qt5 5.14.2
+* QScintilla:		2.11.2
+* LibArchive:		3.4.3
+* LibLzma: 			5.2.4
+* LibBz2:			1.0.8
 * zlib:				1.2.11
 * liblz (lzip):		1.10
-* lzop (binary):	1.03
+* lzop (binary):	1.04
+* popper-qt5:       0.85.0-2
 * libdjvulibre:		3.5.27.1
-* mediainfo:		18.08.1
-* libexif:			0.6.21-5
+* mediainfo:		20.08
+* libexif:			0.6.22-2
+* libmpv-dev:       0.32.0-2
 
 ### Known Bugs
 * Reloading causes custom folder icons not to be rendered in some cases
-* MuPDf does not render first page (perhaps also other) images in epub documents
+* Loading of folders with large number of nodes freezes the app for a significant time (~5 - 10s)
+* Rapid changes in a folder might cause crash in NewBreeze
 
 ### Upcoming
 * Any other feature you request for... :)
