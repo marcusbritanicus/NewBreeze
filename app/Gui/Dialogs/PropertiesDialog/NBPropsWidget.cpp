@@ -269,6 +269,7 @@ void NBPropertiesWidget::changeDirIcon() {
 	if ( not isWritable( pathsList.at( 0 ) ) )
 		return;
 
+	qDebug() << "Trying to get the filename";
 	QString iconName = NBFileDialog::getFileName(
 			this,
 			tr( "NewBreeze - Select Icon" ),
@@ -278,6 +279,7 @@ void NBPropertiesWidget::changeDirIcon() {
 			),
 			QString( "PNG (*.png)" )
 	);
+	qDebug() << "Filename:" << iconName;
 
 	if ( not iconName.isEmpty() ) {
 		qDebug() << "Setting new icon for the folder" << pathsList.at( 0 );

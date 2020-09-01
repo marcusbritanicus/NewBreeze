@@ -176,6 +176,9 @@ QString NBFileDialog::getFileName( QWidget *parent, QString title, QString locat
 
 	fDlg->exec();
 
+	qWarning() << fDlg->result();
+	qWarning() << fDlg->selectedItem();
+
 	if ( fDlg->result() )
 		return fDlg->selectedItem();
 
