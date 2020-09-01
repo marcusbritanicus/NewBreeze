@@ -183,8 +183,7 @@ QString NBFileDialog::getFileName( QWidget *parent, QString title, QString locat
 	fDlg->exec();
 
 	if ( fDlg->result() )
-		return QString( "/usr/share/icons/bloom-classic-dark/places/128/folder.svg" );
-		// return fDlg->selectedItem();
+		return fDlg->selectedItem();
 
 	else
 		return QString();

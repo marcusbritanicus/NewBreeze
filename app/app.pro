@@ -27,10 +27,11 @@ contains ( DEFINES, HAVE_LZLIB ) {
 qtermver = $$system($$pkgConfigExecutable() --modversion qtermwidget5)
 !isEmpty( qtermver ) {
 	message( "Using QTermWidget5 (version $$qtermver) for NBTerminal" )
-	message( "CFlags: $$system($$pkgConfigExecutable() --cflags qtermwidget5)" )
-	message( "Libs  : $$system($$pkgConfigExecutable() --libs   qtermwidget5)" )
-	INCLUDEPATH += $$system($$pkgConfigExecutable() --cflags qtermwidget5)
-	LIBS += $$system($$pkgConfigExecutable() --libs   qtermwidget5)
+	message( "CFlags: $$system(pkg-config --cflags-only-I qtermwidget5)" )
+	message( "Libs  : $$system(pkg-config --libs qtermwidget5)" )
+
+	INCLUDEPATH += $$system(pkg-config --cflags-only-I qtermwidget5)
+	LIBS += $$system(pkg-config --libs qtermwidget5)
 } else {
 	message( "QTermWidget5 was not found. NewBreeze will not feature an inbuilt terminal" )
 	DEFINES += NO_QTERMWIDGET

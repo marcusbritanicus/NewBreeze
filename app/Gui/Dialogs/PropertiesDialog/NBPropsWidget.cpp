@@ -279,8 +279,6 @@ void NBPropertiesWidget::changeDirIcon() {
 			QString( "PNG (*.png)" )
 	);
 
-	qWarning() << "IconName:" << iconName << exists( iconName );
-
 	if ( exists( iconName ) ) {
 		iconLbl->setPixmap( icon( QStringList() << iconName ).pixmap( 36 ) );
 
