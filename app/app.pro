@@ -12,11 +12,12 @@ QT += concurrent
 LIBS +=  -L../common/ -lnewbreeze-common
 LIBS += -larchive -lbz2 -llzma -lz
 
+CONFIG += link_pkgconfig
+
 contains ( DEFINES, USE_MEDIAINFO ) {
 	message( "libmediainfo enabled. Media information will be shown in InfoPanel." )
 	DEFINES += UNICODE
-	INCLUDEPATH += $$system(pkg-config --cflags-only-I libmediainfo libzen)
-	LIBS += $$system(pkg-config --libs libmediainfo libzen)
+	PKGCONFIG += libmediainfo libzen
 }
 
 contains ( DEFINES, HAVE_LZLIB ) {
@@ -27,11 +28,7 @@ contains ( DEFINES, HAVE_LZLIB ) {
 qtermver = $$system($$pkgConfigExecutable() --modversion qtermwidget5)
 !isEmpty( qtermver ) {
 	message( "Using QTermWidget5 (version $$qtermver) for NBTerminal" )
-	message( "CFlags: $$system(pkg-config --cflags-only-I qtermwidget5)" )
-	message( "Libs  : $$system(pkg-config --libs qtermwidget5)" )
-
-	INCLUDEPATH += $$system(pkg-config --cflags-only-I qtermwidget5)
-	LIBS += $$system(pkg-config --libs qtermwidget5)
+	PKGCONFIG += qtermwidget5
 } else {
 	message( "QTermWidget5 was not found. NewBreeze will not feature an inbuilt terminal" )
 	DEFINES += NO_QTERMWIDGET

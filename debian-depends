@@ -8,4 +8,5 @@ sudo apt-get install qtbase5-dev qtbase5-dev-tools qtbase5-private-dev          
                     libdjvulibre-dev                                            \
                     libqscintilla2-qt5-dev                                      \
                     libffmpegthumbnailer-dev                                    \
-                    libmpv-dev
+                    libmpv-dev                                                  \
+                    libqtermwidget5-0-dev libutf8proc-dev pkg-config

@@ -2,7 +2,7 @@ image: debian:buster
 
 before_script:
     - apt-get update -y
-    - apt-get install -y qt5-qmake qttools5-dev qtchooser g++ build-essential git sudo libarchive-dev liblzma-dev libbz2-dev zlib1g-dev liblz-dev lzop qtbase5-dev qtbase5-private-dev libqt5svg5-dev qtconnectivity5-dev libpoppler-qt5-dev libpoppler-qt5-1 libmpv-dev libzen-dev libmediainfo-dev libqtermwidget5-0-dev pkg-config
+    - apt-get install -y qt5-qmake qttools5-dev qtchooser g++ build-essential git sudo libarchive-dev liblzma-dev libbz2-dev zlib1g-dev liblz-dev lzop qtbase5-dev qtbase5-private-dev libqt5svg5-dev qtconnectivity5-dev libpoppler-qt5-dev libpoppler-qt5-1 libmpv-dev libzen-dev libmediainfo-dev libqtermwidget5-0-dev pkg-config libutf8proc-dev
 
 build_amd64:
     stage: build
