@@ -279,10 +279,9 @@ void NBPropertiesWidget::changeDirIcon() {
 			QString( "PNG (*.png)" )
 	);
 
-	qWarning() << "IconName:" << iconName;
+	qWarning() << "IconName:" << iconName << exists( iconName );
 
 	if ( exists( iconName ) ) {
-		qDebug() << icon( QStringList() << iconName ).isNull();
 		iconLbl->setPixmap( icon( QStringList() << iconName ).pixmap( 36 ) );
 
 		QSettings dSett( pathsList.at( 0 ) + "/.directory", QSettings::NativeFormat );
