@@ -18,5 +18,5 @@ class NBQuickFileInfoGatherer {
 		QString permStr( mode_t fileMode );
 		QString formatSize( qint64 num );
 
-		QSettings *fileTypes;
+		static QSettings *fileTypes;
 };

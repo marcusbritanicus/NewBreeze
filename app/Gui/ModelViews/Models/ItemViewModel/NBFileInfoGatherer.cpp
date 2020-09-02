@@ -6,6 +6,8 @@
 
 #include "NBFileInfoGatherer.hpp"
 
+QSettings *NBQuickFileInfoGatherer::fileTypes = nullptr;
+
 NBQuickFileInfoGatherer::NBQuickFileInfoGatherer() {
 
 	fileTypes = new QSettings( ":/data/NBFSExtData.conf", QSettings::NativeFormat );
@@ -101,7 +103,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 		info << "dir";
 		info << nChildren( path );
 		info << "folder";
-		info << ( name.isEmpty() ? "/" : name );
+		info << ( name.isEmpty() ? "FileSystem" : name );
 		info << QString( "%1 item%2" ).arg( info.at( 1 ).toLongLong() ).arg( info.at( 1 ).toLongLong() > 1 ? "s": "" );
 		info << "Directory";
 		info << "inode/directory";
@@ -118,14 +120,15 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 			mimeData = QStringList( { mType.comment(), mType.name(), mType.iconName() } );
 		}
 
-		/* _ */
+		/* Our file has an extension */
 		else {
 			if ( ext.count() >= 2 ) {
 				/* Simple extension: .png, .txt, .jpg, etc */
 				QString ext1 = ext.takeLast();
+				/* More interesting extenstions: .tar.gz, .tar.xz etc */
 				QString ext2 = ext.takeLast();
 
-				if ( fileTypes->allKeys().contains( ext1 + "." + ext2 ) )
+				if ( fileTypes->contains( ext1 + "." + ext2 ) )
 					mimeData = fileTypes->value( ext1 + "." + ext2 ).toStringList();
 
 				else
@@ -134,7 +137,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 		}
 
 		if ( not mimeData.count() ) {
-			qDebug() << "ERROR:" << path;
+			qDebug() << "Unknown File Type:" << path;
 			QMimeType mType = mimeDb.mimeTypeForFile( path );
 			mimeData = QStringList( { mType.comment(), mType.name(), mType.iconName() } );
 		}

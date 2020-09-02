@@ -36,22 +36,20 @@ QString NBXdg::xdgDefaultApp( QString mimeType ) {
 	*/
 
 	QStringList files;
-	files << NBXdg::home() + QString( "/.config/mimeapps.list" );
-	files << NBXdg::home() + QString( "/.local/share/applications/mimeapps.list" );
-	files << NBXdg::home() + QString( "/.local/share/applications/defaults.list" );
-	files << NBXdg::home() + QString( "/.local/share/applications/mimeinfo.cache" );
+	files << NBXdg::home() + QString( "/.config/mimeapps.list" );							// User overrides
+	files << NBXdg::home() + QString( "/.local/share/applications/mimeapps.list" );			// User default
+	files << QString( "/usr/local/share/applications/mimeapps.list" );						// System alternate
+	files << QString( "/etc/xdg/mimeapps.list" );											// System override
+	files << QString( "/usr/share/applications/mimeapps.list" );							// System default
 
-	files << QString( "/usr/local/share/applications/mimeapps.list" );
-	files << QString( "/usr/local/share/applications/defaults.list" );
-	files << QString( "/usr/local/share/applications/mimeinfo.cache" );
-
-	files << QString( "/usr/share/applications/mimeapps.list" );
-	files << QString( "/usr/share/applications/defaults.list" );
-	files << QString( "/usr/share/applications/mimeinfo.cache" );
+	QStringList caches;
+	caches << NBXdg::home() + QString( "/.local/share/applications/mimeinfo.cache" );
+	caches << QString( "/usr/local/share/applications/mimeinfo.cache" );
+	caches << QString( "/usr/share/applications/mimeinfo.cache" );
 
 	QString defaultValue;
 	Q_FOREACH( QString file, files ) {
-		QSettings defaults( file, QSettings::NativeFormat );
+		QSettings defaults( file, QSettings::IniFormat );
 		defaultValue = defaults.value( QString( "Default Applications/%1" ).arg( mimeType ) ).toString();
 		if ( defaultValue.isEmpty() )
 			defaultValue = defaults.value( QString( "Added Associations/%1" ).arg( mimeType ) ).toString();
@@ -64,6 +62,16 @@ QString NBXdg::xdgDefaultApp( QString mimeType ) {
 
 		else
 			break;
+	}
+
+	if ( defaultValue.isEmpty() and defaultValue.isNull() ) {
+		Q_FOREACH( QString cf, caches ) {
+			QSettings cache( cf, QSettings::IniFormat );
+			defaultValue = cache.value( QString( "MIME Cache/%1" ).arg( mimeType ) ).toString();
+
+			if ( not defaultValue.isEmpty() )
+				break;
+		}
 	}
 
 	return defaultValue;
@@ -752,7 +760,18 @@ NBXdgMime::NBXdgMime() {
 
 NBDesktopFile NBXdgMime::xdgDefaultApp( QMimeType mimeType ) {
 
-	return NBDesktopFile( NBXdg::xdgDefaultApp( mimeType.name() ) );
+	QStringList mimes;
+	mimes << mimeType.name();
+	mimes << mimeType.allAncestors();
+
+	NBDesktopFile app;
+	Q_FOREACH( QString mimeName, mimes ) {
+		app = NBDesktopFile( NBXdg::xdgDefaultApp( mimeName ) );
+		if ( app.isValid() )
+			return app;
+	}
+
+	return NBDesktopFile();
 };
 
 uint qHash( const NBDesktopFile &app ) {

@@ -1,82 +1,21 @@
-NewBreeze v3.0.0 RC3
+NewBreeze v3.0.0 RC9
 
-NBArchive                                                                                                                             [ 2 of 2 ]
-	✓ Upgrade NBArchive class to enable extraction of a single member
-	✓ Upgrade NBArchive to support more algorithms
+Move/Delete Errors																													[0 of 1]
+	□ We are currently facing some issues while moving/deleting files. The files are actually moved/deleted but still give rise to errors.
 
-NBDefaultPlugin::ArchiveExamine                                                                                                       [ 1 of 1 ]
-	✓ Enable extraction of selected/all members
+Plugin Crashes																														[0 of 2]
+	□ Trying to preview audio/video files causes crashes
+	□ Previewing encrypted/defective pdf files causes crashes
 
-NBVideoPlugin                                                                                                                         [ 1 of 1 ]
-	✓ Play video using libVLC interface for the peek interface
+Other crashes																														[1 of 2]
+	✓ Setting a folder icon crashes an app
+	□ NB3 crashes randomly while browsing the filesystem. Might be related to thumbnails or rapid changes in file system?
 
-NBItemViewModel                                                                                                                       [ 4 of 4 ]
-	✓ Thumbnailing of ODF files
-	✓ Thumbnailing of PDF and DjVu files
-	✓ Thumbnailing of Video files via libffmpegthumbs
-	✓ Thumbnailing of ePub files
+Improve Custom Actions																												[0 of 1]
+	□ Look at SpaceFM, and try to implement their style of custom actions
 
-NBLogger                                                                                                                              [ 1 of 1 ]
-	✓ Enable/Disable logging option.
-
-NBIconView                                                                                                                            [ 3 of 3 ]
-	✗ Improve the selection model
-	  • Enable rectanlge rubberband selection
-	  • Change selection policy with model data type
-	✓ Enable PageUp and PageDown navigation
-	✓ Bug fixes in selections, drag-n-drop
-
-NBDirTreeModel                                                                                                                        [ 1 of 1 ]
-	◐ Fix too many open QFileSystemWatcher instances
-
-NBDirectoryView                                                                                                                       [ 1 of 1 ]
-	✓ Option to create a new folder
-
-NBContextMenu                                                                                                                         [ 1 of 1 ]
-	✓ Grouping checkbox does not work
-
-NBStartupWizard                                                                                                                       [ 3 of 3 ]
-	✓ Add IconOverlay, Default terminal, ExtendedIO, etc
-	✗ Show StartupWizard when NewBreeze.conf has missing settings.
-	✓ Remove Open with Catalogs option
-
-NBSettingManager                                                                                                                      [ 2 of 2 ]
-	✓ Extended Icon Preview options
-	  • Option for preview of Images
-	  • Option for preview of Videos
-	  • Option for preview of PDF/DjVu
-	✓ Remove Open with Catalogs option
-
-NBCatalogs                                                                                                                            [ 4 of 4 ]
-	✓ Improve Catalogs support
-	✓ Change Catalogs View to make it more intutive
-	  • Each type shows the contents of the folders added to it
-	✓ Add a menu
-	✓ Enable thumbnailing in Catalogs
-
-NBSidePanel (Renamed from NBSideBar)                                                                                                  [ 2 of 2 ]
-	✗ Improve the looks to make it similar to Ubuntu 18.04 Nautilus SideBar
-	✓ Improvements to NBSidePanel class
-
-NBSideBar                                                                                                                             [ 1 of 1 ]
-	✓ Rewriting of the whole class
-	  • Drag and Drop implementation complete
-
-NBPropertiesDialog                                                                                                                    [ 3 of 3 ]
-	✓ Redesign of UI: Usable state, following remain
-	   ✓ Recursive application of properties
-	   ✓ Accidental Delete Protection
-	✓ Quering of Defaults takes too long
-	✓ NBSizeRunner slows down the showing of the UI
-
-NBPdfPlugin                                                                                                                           [ 2 of 2 ]
-	✓ Include MuPDF sources in the build tree
-	✓ Integrate all PDF capabilities into single plugin
-
-Cut-Paste across multiple windows                                                                                                     [ 1 of 1 ]
-	✓ State inconsistency
-
-Suggestions                                                                                                                           [ 12 of 12 ]
+Mime Action Support																													[1 of 1]
+	✓ Double clicking on files no longer opens with default application
 
 Note:
 	✍ - Work in progress
