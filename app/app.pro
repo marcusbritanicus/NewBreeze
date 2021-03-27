@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = newbreeze3
 
 lessThan(QT_MAJOR_VERSION, 5) {
-	message( "NewBreeze is built for Qt5 and higher. Qt4 is no longer supported." )
+	message( "NewBreeze is built for Qt5 and higher. Qt5 is no longer supported." )
 }
 
 QT += network dbus
@@ -303,10 +303,8 @@ SOURCES += Vault/Salsa20/NBSalsa20.cpp
 RESOURCES += NewBreeze.qrc ../data/data.qrc
 
 # C18/C++17 Support for Qt5
-isEqual( QT_MAJOR_VERSION, 5 ) {
-	QMAKE_CFLAGS += -std=c18
-	QMAKE_CXXFLAGS += -std=c++17
-}
+QMAKE_CFLAGS += -std=c18
+QMAKE_CXXFLAGS += -std=c++17
 
 # Disable warnings and enable threading support
 # Enable maximum optimizations

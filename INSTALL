@@ -7,10 +7,10 @@ Installation Instructions for NewBreeze v3.0.0
      The list of dependencies are given below. Please install them in your system as appropriate.
      The below methods assume you have a debian based system.
 
-      1] Qt4/Qt5 (libqt4-dev, libqt4-dev-bin, qtbase5-dev, qtbase5-dev-tools)
+      1]Qt5 (qtbase5-dev, qtbase5-dev-tools)
          a] QtWebKit (libqtwebkit-dev, qtwebkit5-dev)
          b] QtWebEngine (qtwebengine5-dev)
-         c] QScintilla ( libqscintilla2-dev, libqt5scintilla2-dev, libqscintilla2-qt4-dev)
+         c] QScintilla ( libqscintilla2-dev, libqt5scintilla2-dev)
       2] zlib (zlib1g-dev)
       3] liblzma (liblzma-dev)
       4] libbzip2 (libbz2-dev)
@@ -23,10 +23,6 @@ Installation Instructions for NewBreeze v3.0.0
      11] libexif-dev
 
      Type the following command (on Debian and Debian based systems) to install the above dependencies (with root previleges)
-
-        Qt4:
-		    apt-get install g++ libqt4-dev libqt4-dev-bin libqtwebkit-dev libqscintilla2-qt4-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
-							liblzma-dev libmupdf-dev libdjvulibre-dev libffmpegthumbs-dev libvlc-dev libexif-dev
 
         Qt5 - With WebKit:
 		    apt-get install g++ qtbase5-dev qtbase5-dev-tools libqt5webkit5-dev libqscintilla2-qt5-dev xdg-utils libarchive-dev libbz2-dev zlib1g-dev \
@@ -56,12 +52,6 @@ Installation Instructions for NewBreeze v3.0.0
      In the terminal, type
 
          qmake -qt5
-
-     Or alternatively
-
-	     qmake -qt4
-
-	 for Qt4 builds
 
   b] Building
      In the terminal, type

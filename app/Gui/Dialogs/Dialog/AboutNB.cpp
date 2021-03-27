@@ -65,7 +65,7 @@ QWidget* AboutNB::createAboutNB() {
 		"<p>Built on top of the Powerful Qt GUI Toolkit, this file manager "			\
 		"is sleek, stylish and fast. Some of its features are</p>"						\
 		"<ul>"																			\
-		"	<li>Complete Qt4 and Qt5 Support</li>"										\
+		"	<li>Complete Qt5 and Qt5 Support</li>"										\
 		"	<li>Fast startup and browsing</li>"											\
 		"	<li>Folder, text, html, image, pdf, djvu and odt quick preview</li>"		\
 		"	<li>Plugin support to extend quick preview interface</li>"					\

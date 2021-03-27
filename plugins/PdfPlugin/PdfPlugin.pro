@@ -22,11 +22,6 @@ DEPENDPATH += PdfView
 
 # Poppler
 # =======
-equals( QT_MAJOR_VERSION, 4 ) {
-	INCLUDEPATH  += /usr/include/poppler/qt4
-	LIBS += -lpoppler-qt4
-}
-
 equals( QT_MAJOR_VERSION, 5 ) {
 	INCLUDEPATH  += /usr/include/poppler/qt5
 	LIBS += -lpoppler-qt5

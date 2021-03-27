@@ -27,7 +27,7 @@ bool isDir( QString path );
 bool isLink( QString path );
 bool exists( QString path );
 
-/* Qt4 version of linux readlink(...) */
+/* Qt5 version of linux readlink(...) */
 QString readLink( QString path );
 
 /* Create a directory: mkdir -p */

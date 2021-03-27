@@ -2,7 +2,7 @@ Source: newbreeze
 Section: utils
 Priority: optional
 Maintainer: Marcus Britanicus <marcusbritanicus@gmail.com>
-Build-Depends: debhelper (>=9), libqt4-dev, qt4-qmake, qt5-qmake, qtbase5-dev
+Build-Depends: debhelper (>=9), qt5-qmake, qtbase5-dev
 Standards-Version: 3.9.6
 Homepage: https://gitlab.com/marcusbritanicus/NewBreeze/
 
@@ -10,7 +10,7 @@ Package: newbreeze
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, newbreeze-common (= 3.0.0-rc7), xdg-utils, liblzma5, libbz2-1.0, encfs
 Description: Qt based lightweight and fast file manager
- Built on top of the Powerful Qt4/Qt5 GUI Toolkit, this file manager is sleek,
+ Built on top of the Powerful Qt5 GUI Toolkit, this file manager is sleek,
  stylish and fast. Some of its features are
   - Fast startup and browsing
   - Folder, text, html, image, odt, and pdf quick preview

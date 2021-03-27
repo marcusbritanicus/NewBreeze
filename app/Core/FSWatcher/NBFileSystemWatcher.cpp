@@ -1,6 +1,6 @@
 /*
 	*
-	* NBFileSystemWatcher.cpp - Advanced version of QFileSystemWatcher for Qt4/5
+	* NBFileSystemWatcher.cpp - Advanced version of QFileSystemWatcher for Qt5
 	*
 */
 

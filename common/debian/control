@@ -13,7 +13,7 @@ Section: libdevel
 Architecture: any
 Depends: newbreeze-common (= ${binary:Version}), ${misc:Depends}
 Description: Qt based lightweight and fast file manager
- Built on top of the Powerful Qt4/Qt5 GUI Toolkit, NewBreeze is sleek,
+ Built on top of the PowerfulQt5 GUI Toolkit, NewBreeze is sleek,
  stylish and fast with some amazing features.
  .
  This package provides the files required to build new plugins for
@@ -23,7 +23,7 @@ Package: newbreeze-common
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, lzop
 Description: Qt based lightweight and fast file manager
- Built on top of the Powerful Qt4/Qt5 GUI Toolkit, NewBreeze is sleek,
+ Built on top of the PowerfulQt5 GUI Toolkit, NewBreeze is sleek,
  stylish and fast with some amazing features.
  .
  This package provides the files common to NewBreeze and its plugins.
