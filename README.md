@@ -7,8 +7,7 @@ Chat with me at [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gi
 
 ### Note: NewBreeze 3.0 is in the oven. Expect several changes..!!
 
-Built on top of the Powerful Qt GUI Toolkit, this file manager is sleek, stylish and fast.
-It's heavily customized while not compromizing on speed.
+Built on top of the Powerful Qt GUI Toolkit, this file manager is sleek, stylish and fast. It's heavily customized while not compromizing on speed.
 
 Some of its features are
 
@@ -28,8 +27,7 @@ Some of its features are
 * Plugin System Support
 * Inbuilt folder encryption support using encfs
 
-Its features such as inbuilt file and folder encryption, SuperStart, and Quick file previews,
-are not found in any other file manager available for linux.
+Its features such as inbuilt file and folder encryption, SuperStart, and Quick file previews, are not found in any other file manager available for linux.
 
 ### Please READ the ReleaseNotes for information on the new features
 
@@ -46,7 +44,7 @@ are not found in any other file manager available for linux.
 * To install, as root type: `make install`
 
 ### Dependencies:
-*Qt5 (qtbase5-dev, qtbase5-dev-tools)
+* Qt5 (qtbase5-dev, qtbase5-dev-tools)
   * QtWebKit in case of Qt5 and upto Qt 5.4 (libqtwebkit-dev, libqt5webkit5-dev, qtwebkit5-dev)
   * QtWebEngine Qt 5.5 onwards (qtwebengine5-dev)
   * QScintilla (libqt5scintilla2-dev, libqscintilla2-qt5-dev)

@@ -10,7 +10,7 @@ Package: newbreeze-plugins
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, newbreeze-common (= 3.0.0-rc7), newbreeze (= 3.0.0-rc7)
 Description: Qt based lightweight and fast file manager
- Built on top of the PowerfulQt5 GUI Toolkit, NewBreeze is sleek,
+ Built on top of the Powerful Qt5 GUI Toolkit, NewBreeze is sleek,
  stylish and fast with some amazing features.
  .
  This package provides the default set of plugins for NewBreeze
