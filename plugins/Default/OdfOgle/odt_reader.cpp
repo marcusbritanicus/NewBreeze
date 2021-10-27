@@ -340,7 +340,7 @@ void ODT::Reader::readSpan()
 	}
 
 	if (attributes.hasAttribute(QLatin1String("text:class-names"))) {
-		QStringList styles = attributes.value(QLatin1String("text:class-names")).toString().simplified().split(QLatin1Char(' '), QString::SkipEmptyParts);
+		QStringList styles = attributes.value(QLatin1String("text:class-names")).toString().simplified().split(QLatin1Char(' '), Qt::SkipEmptyParts);
 		int count = styles.count();
 		for (int i = 0; i < count; ++i) {
 			const Style& style = m_styles[1][styles.at(i)];

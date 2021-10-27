@@ -2087,7 +2087,7 @@ void NBIconView::calculateRectsIfNecessary() const {
 		if ( loc.endsWith( "/" ) )
 			loc.chop( 1 );
 
-		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+		QStringList tokens = loc.split( "/", Qt::SkipEmptyParts );
 
 		QSettings sett( "NewBreeze", tokens.takeFirst() );
 		hiddenCategories = sett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
@@ -2465,7 +2465,7 @@ void NBIconView::showHideCategory( QString category ) {
 		if ( loc.endsWith( "/" ) )
 			loc.chop( 1 );
 
-		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+		QStringList tokens = loc.split( "/", Qt::SkipEmptyParts );
 
 		QSettings dirSett( "NewBreeze", tokens.takeFirst() );
 		QStringList hidden = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
@@ -2522,7 +2522,7 @@ void NBIconView::toggleFoldCategory( QString category ) {
 		if ( loc.endsWith( "/" ) )
 			loc.chop( 1 );
 
-		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+		QStringList tokens = loc.split( "/", Qt::SkipEmptyParts );
 
 		QSettings dirSett( "NewBreeze", tokens.takeFirst() );
 		QStringList hidden = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
@@ -2606,7 +2606,7 @@ void NBIconView::showCategory( QString category ) {
 		if ( loc.endsWith( "/" ) )
 			loc.chop( 1 );
 
-		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+		QStringList tokens = loc.split( "/", Qt::SkipEmptyParts );
 
 		QSettings dirSett( "NewBreeze", tokens.takeFirst() );
 		QStringList hidden = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
@@ -2651,7 +2651,7 @@ void NBIconView::foldCategory( QString category ) {
 		if ( loc.endsWith( "/" ) )
 			loc.chop( 1 );
 
-		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+		QStringList tokens = loc.split( "/", Qt::SkipEmptyParts );
 
 		QSettings dirSett( "NewBreeze", tokens.takeFirst() );
 		QStringList hidden = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();
@@ -2699,7 +2699,7 @@ void NBIconView::hideCategory( QString category ) {
 		if ( loc.endsWith( "/" ) )
 			loc.chop( 1 );
 
-		QStringList tokens = loc.split( "/", QString::SkipEmptyParts );
+		QStringList tokens = loc.split( "/", Qt::SkipEmptyParts );
 
 		QSettings dirSett( "NewBreeze", tokens.takeFirst() );
 		QStringList hidden = dirSett.value( "NewBreeze/" + tokens.join( "/" ) + "/HiddenCategories", QStringList() ).toStringList();

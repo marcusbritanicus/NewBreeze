@@ -96,7 +96,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 	// In case of directories size will be number of items
 
 	// Add the node name
-	QString name = path.split( "/", QString::SkipEmptyParts ).takeLast();
+	QString name = path.split( "/", Qt::SkipEmptyParts ).takeLast();
 
 	// Here insert the node type, formatted type, mime
 	if ( S_ISDIR( statbuf.st_mode ) ) {
@@ -111,7 +111,7 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 
 	else if ( S_ISREG( statbuf.st_mode ) ) {
 		// QMimeType mType = mimeDb.mimeTypeForFile( path );
-		QStringList ext = name.split( ".", QString::SkipEmptyParts );
+		QStringList ext = name.split( ".", Qt::SkipEmptyParts );
 		QStringList mimeData;
 
 		/* We have only the file name, use QMimeDatabase */

@@ -100,7 +100,7 @@ void NBInfoBar::updateInfoBarCF( QString folderPath ) {
 	if ( folderPath.startsWith( "NB://" ) )
 		name = folderPath;
 
-	else if ( folderPath.split( "/", QString::SkipEmptyParts ).count() )
+	else if ( folderPath.split( "/", Qt::SkipEmptyParts ).count() )
 		name = baseName( folderPath );
 
 	else
@@ -167,7 +167,7 @@ void NBInfoBar::updateInfoBarSingle( QString itemPath ) {
 	}
 
 	else {
-		name = itemPath.split( "/", QString::SkipEmptyParts ).takeLast();
+		name = itemPath.split( "/", Qt::SkipEmptyParts ).takeLast();
 		if ( isLink( itemPath ) )
 			name += QString( "<tt> > %1</tt>" ).arg( readLink( itemPath ) );
 	}

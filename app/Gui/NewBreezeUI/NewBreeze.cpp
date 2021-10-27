@@ -418,23 +418,23 @@ void NewBreeze::openFile( QString file ) {
 		if ( app.command().contains( "%u" ) or app.command().contains( "%f" ) or app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
 			// Single URL
 			if ( app.command().contains( "%u" ) )
-				exec = app.command().replace( "%u", QUrl::fromLocalFile( file ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+				exec = app.command().replace( "%u", QUrl::fromLocalFile( file ).toString( QUrl::None ) ).split( " ", Qt::SkipEmptyParts );
 
 			else if ( app.command().contains( "%U" ) )
-				exec = app.command().replace( "%U", QUrl::fromLocalFile( file ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+				exec = app.command().replace( "%U", QUrl::fromLocalFile( file ).toString( QUrl::None ) ).split( " ", Qt::SkipEmptyParts );
 
 			else if ( app.command().contains( "%f" ) )
-				exec = app.command().replace( "%f", file ).split( " ", QString::SkipEmptyParts );
+				exec = app.command().replace( "%f", file ).split( " ", Qt::SkipEmptyParts );
 
 			else if ( app.command().contains( "%F" ) )
-				exec = app.command().replace( "%F", file ).split( " ", QString::SkipEmptyParts );
+				exec = app.command().replace( "%F", file ).split( " ", Qt::SkipEmptyParts );
 
 			else
-				exec = app.command().split( " ", QString::SkipEmptyParts ) << file;
+				exec = app.command().split( " ", Qt::SkipEmptyParts ) << file;
 		}
 
 		else
-			exec = app.command().split( " ", QString::SkipEmptyParts ) << file;
+			exec = app.command().split( " ", Qt::SkipEmptyParts ) << file;
 
 		qDebug( "Opening file: %s [%s]", file.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
 	}

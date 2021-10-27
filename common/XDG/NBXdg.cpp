@@ -246,10 +246,10 @@ NBDesktopFile::NBDesktopFile( QString filename ) {
 	mGenericName = s.value( "GenericName", mName ).toString();
 	mDescription = s.value( "Description", "" ).toString();
 	mCommand = s.value( "Exec" ).toString();
-	mExec = s.value( "TryExec", mCommand.split( " ", QString::SkipEmptyParts ).value( 0 ) ).toString();
+	mExec = s.value( "TryExec", mCommand.split( " ", Qt::SkipEmptyParts ).value( 0 ) ).toString();
 
 	if ( not exists( mExec ) ) {
-		Q_FOREACH( QString path, QString::fromLocal8Bit( qgetenv( "PATH" ) ).split( ":", QString::SkipEmptyParts ) ) {
+		Q_FOREACH( QString path, QString::fromLocal8Bit( qgetenv( "PATH" ) ).split( ":", Qt::SkipEmptyParts ) ) {
 			if ( exists( path + "/" + mCommand ) ) {
 				mExec = path + "/" + mCommand;
 				break;
@@ -305,10 +305,10 @@ NBDesktopFile::NBDesktopFile( QString filename ) {
 	QStringList lines = QString::fromLocal8Bit( desktop.readAll() ).split( "\n" );
 	Q_FOREACH( QString line, lines ) {
 		if ( line.startsWith( "MimeType=" ) )
-			mMimeTypes = line.replace( "MimeType=", "" ).split( ";", QString::SkipEmptyParts );
+			mMimeTypes = line.replace( "MimeType=", "" ).split( ";", Qt::SkipEmptyParts );
 
 		if ( line.startsWith( "Categories=" ) )
-			mCategories = line.replace( "Categories=", "" ).split( ";", QString::SkipEmptyParts );
+			mCategories = line.replace( "Categories=", "" ).split( ";", Qt::SkipEmptyParts );
 	}
 	desktop.close();
 
@@ -599,7 +599,7 @@ void NBDesktopFile::kdeFix( QString appName ) {
 			QStringList lines = QString::fromLocal8Bit( appFile.readAll() ).split( "\n" );
 			Q_FOREACH( QString line, lines ) {
 				if ( line.startsWith( "MimeType=" ) )
-					mMimeTypes << line.replace( "MimeType=", "" ).split( ";", QString::SkipEmptyParts );
+					mMimeTypes << line.replace( "MimeType=", "" ).split( ";", Qt::SkipEmptyParts );
 			}
 			appFile.close();
 		}

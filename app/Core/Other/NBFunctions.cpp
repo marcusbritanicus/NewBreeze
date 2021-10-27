@@ -36,7 +36,7 @@ QString getAppImagePath() {
 	Q_FOREACH( QString mount, mounts ) {
 		if ( mount.startsWith( appExec ) and mount.contains( "fuse." + appExec ) ) {
 			/* Typically: NB3.App on /tmp/.mount_NB3AppmLkuDL type fuse.NB3App (ro,nosuid,nodev,user=1000) */
-			QStringList list = mount.split( QRegExp( "\\s+" ), QString::SkipEmptyParts );
+			QStringList list = mount.split( QRegExp( "\\s+" ), Qt::SkipEmptyParts );
 			return list.value( 2 );
 		}
 	}

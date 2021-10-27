@@ -199,7 +199,7 @@ qint64 QsciEditor::lineCount() {
 
 qint64 QsciEditor::wordCount() {
 
-	return text().split( QRegExp( "\\s", Qt::CaseInsensitive ), QString::SkipEmptyParts ).count();
+	return text().split( QRegExp( "\\s", Qt::CaseInsensitive ), Qt::SkipEmptyParts ).count();
 };
 
 qint64 QsciEditor::charCount() {

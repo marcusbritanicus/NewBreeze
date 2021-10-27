@@ -177,7 +177,7 @@ void NBActionsMenu::buildCustomActionsMenu() {
 
 			if ( glob.at( 0 ) == QString( "*" ) ) {
 				exec.replace( "%f", file ).replace( "%d", file );
-				customAction->setData( exec.split( " ", QString::SkipEmptyParts ) );
+				customAction->setData( exec.split( " ", Qt::SkipEmptyParts ) );
 
 				connect( customAction, SIGNAL( triggered() ), this, SLOT( doCustomAction() ) );
 				addAction( customAction );
@@ -185,7 +185,7 @@ void NBActionsMenu::buildCustomActionsMenu() {
 
 			else if ( glob.at( 0 ) == QString( "file" ) and QFileInfo( file ).isFile() ) {
 				exec.replace( "%f", file ).replace( "%d", file );
-				customAction->setData( exec.split( " ", QString::SkipEmptyParts ) );
+				customAction->setData( exec.split( " ", Qt::SkipEmptyParts ) );
 
 				connect( customAction, SIGNAL( triggered() ), this, SLOT( doCustomAction() ) );
 				addAction( customAction );
@@ -193,7 +193,7 @@ void NBActionsMenu::buildCustomActionsMenu() {
 
 			else if ( glob.at( 0 ) == QString( "folder" ) and QFileInfo( file ).isDir() ) {
 				exec.replace( "%f", file ).replace( "%d", file );
-				customAction->setData( exec.split( " ", QString::SkipEmptyParts ) );
+				customAction->setData( exec.split( " ", Qt::SkipEmptyParts ) );
 
 				connect( customAction, SIGNAL( triggered() ), this, SLOT( doCustomAction() ) );
 				addAction( customAction );
@@ -201,7 +201,7 @@ void NBActionsMenu::buildCustomActionsMenu() {
 		}
 
 		else if ( exec.endsWith( "%F" ) or exec.endsWith( "%D" ) ) {
-			QStringList execList = exec.split( " ", QString::SkipEmptyParts );
+			QStringList execList = exec.split( " ", Qt::SkipEmptyParts );
 			execList.removeLast();
 			foreach( QModelIndex idx, selection )
 				execList << QDir( workingDir ).filePath( idx.data().toString() );
@@ -215,7 +215,7 @@ void NBActionsMenu::buildCustomActionsMenu() {
 			QString file = QDir( workingDir ).filePath( selection.at( 0 ).data().toString() );
 			if ( glob.at( 0 ) == QString( "*" ) ) {
 				exec.replace( "%f", file ).replace( "%d", file );
-				customAction->setData( exec.split( " ", QString::SkipEmptyParts ) );
+				customAction->setData( exec.split( " ", Qt::SkipEmptyParts ) );
 
 				connect( customAction, SIGNAL( triggered() ), this, SLOT( doCustomAction() ) );
 				addAction( customAction );
@@ -223,7 +223,7 @@ void NBActionsMenu::buildCustomActionsMenu() {
 
 			else if ( glob.at( 0 ) == QString( "file" ) and QFileInfo( file ).isFile() ) {
 				exec.replace( "%f", file ).replace( "%d", file );
-				customAction->setData( exec.split( " ", QString::SkipEmptyParts ) );
+				customAction->setData( exec.split( " ", Qt::SkipEmptyParts ) );
 
 				connect( customAction, SIGNAL( triggered() ), this, SLOT( doCustomAction() ) );
 				addAction( customAction );
@@ -231,7 +231,7 @@ void NBActionsMenu::buildCustomActionsMenu() {
 
 			else if ( glob.at( 0 ) == QString( "folder" ) and QFileInfo( file ).isDir() ) {
 				exec.replace( "%f", file ).replace( "%d", file );
-				customAction->setData( exec.split( " ", QString::SkipEmptyParts ) );
+				customAction->setData( exec.split( " ", Qt::SkipEmptyParts ) );
 
 				connect( customAction, SIGNAL( triggered() ), this, SLOT( doCustomAction() ) );
 				addAction( customAction );

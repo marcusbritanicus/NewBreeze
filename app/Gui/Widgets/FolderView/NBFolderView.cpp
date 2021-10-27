@@ -456,23 +456,23 @@ void NBFolderView::doOpen( QString loc ) {
 			if ( app.command().contains( "%u" ) or app.command().contains( "%f" ) or app.command().contains( "%U" ) or app.command().contains( "%F" ) ) {
 				// Single URL
 				if ( app.command().contains( "%u" ) )
-					exec = app.command().replace( "%u", QUrl::fromLocalFile( loc ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+					exec = app.command().replace( "%u", QUrl::fromLocalFile( loc ).toString( QUrl::None ) ).split( " ", Qt::SkipEmptyParts );
 
 				else if ( app.command().contains( "%U" ) )
-					exec = app.command().replace( "%U", QUrl::fromLocalFile( loc ).toString( QUrl::None ) ).split( " ", QString::SkipEmptyParts );
+					exec = app.command().replace( "%U", QUrl::fromLocalFile( loc ).toString( QUrl::None ) ).split( " ", Qt::SkipEmptyParts );
 
 				else if ( app.command().contains( "%f" ) )
-					exec = app.command().replace( "%f", loc ).split( " ", QString::SkipEmptyParts );
+					exec = app.command().replace( "%f", loc ).split( " ", Qt::SkipEmptyParts );
 
 				else if ( app.command().contains( "%F" ) )
-					exec = app.command().replace( "%F", loc ).split( " ", QString::SkipEmptyParts );
+					exec = app.command().replace( "%F", loc ).split( " ", Qt::SkipEmptyParts );
 
 				else
-					exec = app.command().split( " ", QString::SkipEmptyParts ) << loc;
+					exec = app.command().split( " ", Qt::SkipEmptyParts ) << loc;
 			}
 
 			else
-				exec = app.command().split( " ", QString::SkipEmptyParts ) << loc;
+				exec = app.command().split( " ", Qt::SkipEmptyParts ) << loc;
 
 			qDebug( "Opening file: %s [%s]", loc.toLocal8Bit().data(), ( QProcess::startDetached( exec.takeFirst(), exec ) ? "DONE" : " FAILED" ) );
 		}

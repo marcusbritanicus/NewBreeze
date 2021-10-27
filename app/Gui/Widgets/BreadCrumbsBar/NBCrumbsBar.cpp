@@ -16,7 +16,7 @@ inline QWidget *getCrumbsHolder( QWidget *parent, QString path, QString cPath, c
 		crumbsLyt->setContentsMargins( QMargins() );
 		crumbsLyt->setSpacing( 0 );
 
-		QStringList tokens = QString( path ).replace( "NB://", "" ).split( "/", QString::SkipEmptyParts );
+		QStringList tokens = QString( path ).replace( "NB://", "" ).split( "/", Qt::SkipEmptyParts );
 
 		if ( tokens.count() == 2 ) {
 			/* We have two crumbs */
@@ -67,7 +67,7 @@ inline QWidget *getCrumbsHolder( QWidget *parent, QString path, QString cPath, c
 	QObject::connect( crumb, SIGNAL( loadPath( QString ) ), parent, SIGNAL( openLocation( QString ) ) );
 	fullList << crumb;
 
-	Q_FOREACH( QString crumbStr, path.split( "/", QString::SkipEmptyParts ) ) {
+	Q_FOREACH( QString crumbStr, path.split( "/", Qt::SkipEmptyParts ) ) {
 		completed += ( crumbStr + "/" );
 
 		crumb = new NBCrumb( completed, ( QDir( completed ) == QDir( cPath ) ) );
@@ -239,7 +239,7 @@ NBCrumbsBarX::NBCrumbsBarX( QString path, QString cPath, QWidget *parent ) : QWi
 	connect( crumb, SIGNAL( loadPath( QString ) ), this, SLOT( close() ) );
 	lyt->addWidget( crumb );
 
-	Q_FOREACH( QString crumbStr, path.split( "/", QString::SkipEmptyParts ) ) {
+	Q_FOREACH( QString crumbStr, path.split( "/", Qt::SkipEmptyParts ) ) {
 		completed += ( crumbStr + "/" );
 
 		crumb = new NBCrumb( completed, ( QDir( completed ) == QDir( cPath ) ) );

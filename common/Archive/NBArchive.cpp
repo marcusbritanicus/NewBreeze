@@ -315,7 +315,7 @@ bool NBArchive::doExtractArchive() {
 			#else
 				QString lzip;
 
-				QStringList exeLocs = QString::fromLocal8Bit( qgetenv( "PATH" ) ).split( ":", QString::SkipEmptyParts );
+				QStringList exeLocs = QString::fromLocal8Bit( qgetenv( "PATH" ) ).split( ":", Qt::SkipEmptyParts );
 				Q_FOREACH( QString loc, exeLocs ) {
 					if ( exists( loc + "/lzip" ) ) {
 						lzip = loc + "/lzip";
@@ -416,7 +416,7 @@ bool NBArchive::doExtractArchive() {
 
 			QString lrzip;
 
-			QStringList exeLocs = QString::fromLocal8Bit( qgetenv( "PATH" ) ).split( ":", QString::SkipEmptyParts );
+			QStringList exeLocs = QString::fromLocal8Bit( qgetenv( "PATH" ) ).split( ":", Qt::SkipEmptyParts );
 			Q_FOREACH( QString loc, exeLocs ) {
 				if ( exists( loc + "/lrzip" ) ) {
 					lrzip = loc + "/lrzip";
@@ -510,7 +510,7 @@ bool NBArchive::doExtractArchive() {
 
 			QString lzop;
 
-			QStringList exeLocs = QString::fromLocal8Bit( qgetenv( "PATH" ) ).split( ":", QString::SkipEmptyParts );
+			QStringList exeLocs = QString::fromLocal8Bit( qgetenv( "PATH" ) ).split( ":", Qt::SkipEmptyParts );
 			Q_FOREACH( QString loc, exeLocs ) {
 				if ( exists( loc + "/lzop" ) ) {
 					lzop = loc + "/lzop";

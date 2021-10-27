@@ -318,7 +318,7 @@ void NBArchiveTreeModel::growTree() {
 		QString name = QString( ae->name );
 		int type = ae->type;
 
-		QStringList tokens = QStringList() << name.split( "/", QString::SkipEmptyParts );
+		QStringList tokens = QStringList() << name.split( "/", Qt::SkipEmptyParts );
 		QString iconName = ( ( type == AE_IFDIR ) ? "folder" : mimeDb.mimeTypeForFile( tokens.value( 0 ) ).iconName() );
 		tree->addBranch( new NBTreeBranch( tokens.value( 0 ), QIcon::fromTheme( iconName ), tree ) );
 		if ( tokens.size() == 1 )
