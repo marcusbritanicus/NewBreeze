@@ -19,3 +19,5 @@ plugins/debian/files
 plugins/debian/newbreeze-plugins.debhelper.log
 plugins/debian/newbreeze-plugins.substvars
 plugins/debian/newbreeze-plugins/
+build
+.build

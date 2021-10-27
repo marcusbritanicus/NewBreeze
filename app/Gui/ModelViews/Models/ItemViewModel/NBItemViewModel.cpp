@@ -76,7 +76,6 @@ NBItemViewModel::NBItemViewModel( QObject *parent ) : QAbstractItemModel( parent
 	connect( watcher, SIGNAL( nodeChanged( QString ) ), this, SLOT( handleNodeChanged( QString ) ) );
 	connect( watcher, SIGNAL( nodeDeleted( QString ) ), this, SLOT( handleNodeDeleted( QString ) ) );
 	connect( watcher, SIGNAL( nodeRenamed( QString, QString ) ), this, SLOT( handleNodeRenamed( QString, QString ) ) );
-	connect( watcher, SIGNAL( watchPathDeleted() ), this, SLOT( loadHome() ) );
 
 	connect(
 		NBProcessManager::instance(), SIGNAL( processCompleted( NBProcess::Process*, NBAbstractProcess* ) ),
@@ -848,6 +847,10 @@ QString NBItemViewModel::rootPath() const {
 
 void NBItemViewModel::setRootPath( QString path ) {
 
+	/** Stop the watch */
+	watcher->stopWatch();
+	watcher->removeWatch( mRootPath );
+
 	if ( path.startsWith( "/" ) )
 		prevFolder = path;
 
@@ -927,13 +930,11 @@ void NBItemViewModel::setRootPath( QString path ) {
 	if ( currentLoadStatus.loading )
 		currentLoadStatus.stopLoading = true;
 
-	/* If the root path is /dev/, then stop the watcher */
-	if ( mRootPath.startsWith( "/dev/" ) )
-		watcher->stopWatch();
-
-	/* For all the other folders, we can happily start the watcher */
-	else
-		watcher->startWatch( path );
+	/* If the root path is not /dev/, then watch it */
+	if ( not mRootPath.startsWith( "/dev/" ) ) {
+		watcher->addWatch( path );
+		watcher->startWatch();
+	}
 
 	/* Clear the iconMap */
 	iconMap.clear();
@@ -1329,8 +1330,10 @@ void NBItemViewModel::setupCatalogData() {
 void NBItemViewModel::newWatch( QString path ) {
 
 	/* Path is not empty and exists, start the watch */
-	if ( path.count() and exists( path ) )
-		watcher->startWatch( path );
+	if ( path.count() and exists( path ) ) {
+		watcher->addWatch( path );
+		watcher->startWatch();
+	}
 };
 
 QString NBItemViewModel::getCategory( QVariantList data ) {
@@ -1470,6 +1473,10 @@ void NBItemViewModel::handleNodeChanged( QString node ) {
 };
 
 void NBItemViewModel::handleNodeDeleted( QString node ) {
+
+	/** Current directory deleted */
+	if ( ( node == oldRoots[ curIndex ] ) or ( node + "/" == oldRoots[ curIndex ] ) )
+		loadHome();
 
 	if ( baseName( node ).startsWith( "." ) and not Settings->value( "ShowHidden" ) )
 		return;

@@ -402,7 +402,7 @@ void NBPermissionsWidget::addOX() {
 void NBPermissionsWidget::applyRecursive() {
 
 	// Directory/Executable Permissions
-	QFile::Permissions dxPerms = 0;
+	QFile::Permissions dxPerms = QFlags<QFile::Permission>();
 
 	if ( urCB->checkState() ) dxPerms |= QFile::ReadOwner | QFile::ReadUser;
 	if ( uwCB->checkState() ) dxPerms |= QFile::WriteOwner | QFile::WriteUser;
@@ -417,7 +417,7 @@ void NBPermissionsWidget::applyRecursive() {
 	if ( oxCB->checkState() ) dxPerms |= QFile::ExeOther;
 
 	// File Permissions: No execute permissions
-	QFile::Permissions fPerms = 0;
+	QFile::Permissions fPerms = QFlags<QFile::Permission>();
 	if ( urCB->checkState() ) fPerms |= QFile::ReadOwner;
 	if ( uwCB->checkState() ) fPerms |= QFile::WriteOwner;
 

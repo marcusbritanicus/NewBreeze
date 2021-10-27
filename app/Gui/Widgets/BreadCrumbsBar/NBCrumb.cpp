@@ -46,7 +46,7 @@ NBCrumb::NBCrumb( QString text, bool currentPath ) : QWidget() {
 		/* If this is the directory we are showing, make it bold */
 		QFontMetrics fm( QFont( font().family(), font().pointSize(), QFont::Bold ) );
 		/* width = text width + menu button + buffer */
-		mWidth = fm.width( mCrumbText ) + 16 + 10;
+		mWidth = fm.horizontalAdvance( mCrumbText ) + 16 + 10;
 		if ( mWidth > 500 ) {
 			mWidth = 500;
 			/* Buffer 10, hence width: 490 */
@@ -64,7 +64,7 @@ NBCrumb::NBCrumb( QString text, bool currentPath ) : QWidget() {
 		/* Otherwise, normal font suffices */
 		QFontMetrics fm( font() );
 		/* width = text width + menu button + buffer */
-		mWidth = fm.width( mCrumbText ) + 16 + 10;
+		mWidth = fm.horizontalAdvance( mCrumbText ) + 16 + 10;
 		if ( mWidth > 500 ) {
 			mWidth = 500;
 			/* Buffer 10, hence width: 490 */

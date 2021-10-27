@@ -71,12 +71,12 @@ QLayoutItem *FlowLayout::takeAt( int index )
         return itemList.takeAt( index );
 
     else
-        return 0;
+        return nullptr;
 }
 
 Qt::Orientations FlowLayout::expandingDirections() const {
 
-    return 0;
+    return QFlags<Qt::Orientation>();
 }
 
 bool FlowLayout::hasHeightForWidth() const {

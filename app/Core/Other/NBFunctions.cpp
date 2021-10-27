@@ -30,7 +30,9 @@ QString getAppImagePath() {
 	QProcess proc;
 	proc.start( "mount" );
 
-	proc.waitForReadyRead( 5000 );
+	/** Finish running this program */
+	proc.waitForFinished( -1 );
+
 	QStringList mounts = QString::fromUtf8( proc.readAll() ).split( "\n" );
 
 	Q_FOREACH( QString mount, mounts ) {

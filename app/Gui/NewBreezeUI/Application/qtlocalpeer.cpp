@@ -46,9 +46,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "qtlockedfile.cpp"
-#include "qtlockedfile_unix.cpp"
-
 const char* QtLocalPeer::ack = "ack";
 
 QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId)
@@ -59,34 +56,23 @@ QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId)
     server = new QLocalServer(this);
     QString lockName = QDir( QDir::tempPath() ).absolutePath() + QLatin1Char('/') + mSocketName + QLatin1String("-lockfile");
 
-    lockFile.setFileName(lockName);
-    lockFile.open(QIODevice::ReadWrite);
+    lockFile = new QLockFile( mSocketName + ".lock" );
 }
-
-
 
 bool QtLocalPeer::isClient()
 {
-    if (lockFile.isLocked())
+    /* If we have the lock, we're the server */
+    /* In other words, if we're not there, there is no server */
+    if ( lockFile->isLocked() )
         return false;
 
-    if (!lockFile.lock(QtLockedFile::WriteLock, false))
+    /* If we cannot get the lock then the server is running elsewhere */
+    if ( not lockFile->tryLock() )
         return true;
 
-    bool res = server->listen(mSocketName);
-#if (QT_VERSION >= QT_VERSION_CHECK(4,5,0))
-    // ### Workaround
-    if (!res && server->serverError() == QAbstractSocket::AddressInUseError) {
-        QFile::remove(QDir::cleanPath(QDir::tempPath())+QLatin1Char('/')+mSocketName);
-        res = server->listen(mSocketName);
-    }
-#endif
-    if (!res)
-        qWarning("QtSingleCoreApplication: listen on local socket failed, %s", qPrintable(server->errorString()));
-    QObject::connect(server, SIGNAL(newConnection()), SLOT(receiveConnection()));
-    return false;
+    /* By default, we'll assume that the server is running elsewhere */
+    return true;
 }
-
 
 bool QtLocalPeer::sendMessage(const QString &message, int timeout)
 {
@@ -129,7 +115,7 @@ QString QtLocalPeer::socketName() {
 void QtLocalPeer::shutdown() {
 
 	server->close();
-	lockFile.unlock();
+	lockFile->unlock();
 }
 
 void QtLocalPeer::receiveConnection() {

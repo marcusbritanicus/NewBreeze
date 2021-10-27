@@ -415,7 +415,7 @@ void NBInfoPanel::paintEvent( QPaintEvent *pEvent ) {
 	QWidget::paintEvent( pEvent );
 
 	QPainter painter( this );
-	painter.setRenderHint( QPainter::HighQualityAntialiasing );
+	painter.setRenderHint( QPainter::Antialiasing );
 	painter.setPen( Qt::darkGray );
 
 	painter.drawLine( rect().topLeft(), rect().bottomLeft() );

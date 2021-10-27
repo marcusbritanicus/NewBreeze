@@ -42,8 +42,7 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QDir>
-
-#include <qtlockedfile.hpp>
+#include <QLockFile>
 
 class QtLocalPeer : public QObject {
     Q_OBJECT
@@ -69,7 +68,7 @@ class QtLocalPeer : public QObject {
 		QString id;
 		QString mSocketName;
 		QLocalServer* server;
-		QtLockedFile lockFile;
+		QLockFile *lockFile;
 
 	private:
 		static const char* ack;

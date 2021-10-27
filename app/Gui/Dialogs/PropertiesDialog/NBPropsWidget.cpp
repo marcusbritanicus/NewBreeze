@@ -360,7 +360,7 @@ NBDriveInfo::NBDriveInfo( NBDeviceInfo info, QWidget *parent ) : QWidget ( paren
 void NBDriveInfo::paintEvent( QPaintEvent *pEvent ) {
 
 	QPainter painter( this );
-	painter.setRenderHints( QPainter::HighQualityAntialiasing | QPainter::Antialiasing | QPainter::TextAntialiasing );
+	painter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
 
 	painter.save();
 	painter.drawPixmap( QRect( 8, 8, 48, 48 ), QPixmap( icon ).scaled( QSize( 64, 64 ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );

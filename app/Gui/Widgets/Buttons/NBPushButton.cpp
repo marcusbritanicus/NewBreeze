@@ -330,7 +330,7 @@ void NBPushButton::paintEvent( QPaintEvent *pEvent ) {
 	/* Overridde the default QPushButton::paintEvent(...); */
 
 	QPainter painter( this );
-	painter.setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing );
+	painter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
 
 	// Init the style option
 	QStyleOptionButton btnOpt;

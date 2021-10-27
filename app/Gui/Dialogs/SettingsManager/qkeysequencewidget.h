@@ -40,8 +40,7 @@ met: http://www.gnu.org/copyleft/gpl.html.
 
 *******************************************************************************/
 
-#ifndef QKEYSEQUENCEWIDGET_H
-#define QKEYSEQUENCEWIDGET_H
+#pragma once
 
 #include "qkeysequencewidget_p.h"
 
@@ -131,5 +130,3 @@ public Q_SLOTS:
     void setClearButtonShow(QKeySequenceWidget::ClearButtonShow show);
     void captureKeySequence();
 };
-
-#endif // QKEYSEQUENCEWIDGET_H

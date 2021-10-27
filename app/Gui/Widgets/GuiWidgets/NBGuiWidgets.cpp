@@ -90,7 +90,7 @@ void Separator::resizeEvent( QResizeEvent *rEvent ) {
 void Separator::paintEvent( QPaintEvent *pEvent ) {
 
 	QPainter *painter = new QPainter( this );
-	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing );
+	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
 
 	switch( mMode ) {
 		case Separator::Horizontal : {

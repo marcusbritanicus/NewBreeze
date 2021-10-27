@@ -9,8 +9,6 @@
 #include "Global.hpp"
 #include "NBIconManager.hpp"
 #include "NBMimeTypeNode.hpp"
-#include "NBFileInfoGatherer.hpp"
-#include "NBFileSystemWatcher.hpp"
 
 class NBMimeIconUpdater : public QThread {
 	Q_OBJECT

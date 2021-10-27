@@ -40,8 +40,7 @@ met: http://www.gnu.org/copyleft/gpl.html.
 
 *******************************************************************************/
 
-#ifndef QKEYSEQUENCEWIDGET_P_H
-#define QKEYSEQUENCEWIDGET_P_H
+#pragma once
 
 #include <QKeySequence>
 #include <QHBoxLayout>
@@ -130,5 +129,3 @@ protected:
 private:
     QKeySequenceWidgetPrivate * const d;
 };
-
-#endif // QKEYSEQUENCEWIDGET_P_H

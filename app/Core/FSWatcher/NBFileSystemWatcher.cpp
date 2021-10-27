@@ -5,212 +5,287 @@
 */
 
 #include "NBFileSystemWatcher.hpp"
+#include "Global.hpp"
 
-static QMutex mutex;
+#include <sys/inotify.h>
 
-inline QStringList entries( QString mPath ) {
+#define MAX_EVENTS				1024
+#define EVENT_SIZE				( sizeof ( struct inotify_event ) )
+#define BUF_LEN	 				( MAX_EVENTS * ( EVENT_SIZE + NAME_MAX + 1 ) )
 
-	QStringList contents;
+NBFileSystemWatcher::NBFileSystemWatcher() : QThread() {
 
-	DIR *dir;
-	struct dirent *ent;
-	dir = opendir( mPath.toLocal8Bit().constData() );
+	inotifyFD = inotify_init();
+	if ( inotifyFD < 0 ) {
+		qCritical() << "Failed initialize inotify";
+		inotifyFailed();
+	}
 
-	if ( dir != NULL ) {
-		while ( ( ent = readdir( dir ) ) != NULL) {
+	expireTimer = new QBasicTimer();
+	expireTimer->start( 50, Qt::PreciseTimer, this );
+};
 
-			/* Do not show . and .. */
-			QString nodeName = QString::fromLocal8Bit( ent->d_name );
-			if ( ( nodeName.compare( "." ) == 0 ) or ( nodeName.compare( ".." ) == 0 ) )
-				continue;
+NBFileSystemWatcher::~NBFileSystemWatcher() {
 
-			/* Show Hidden */
-			if ( ent->d_type == DT_DIR )
-				contents << mPath + nodeName + "/";
+	__stopWatch = true;
 
-			else
-				contents << mPath + nodeName;
+	expireTimer->stop();
+	delete expireTimer;
+
+	// We should now close all the open watches
+	for( int key: wdPathHash.keys() ) {
+		wdPathHash.remove( key );
+		wdModeHash.remove( key );
+		inotify_rm_watch( inotifyFD, key );
+	}
+
+	// Close the inotify instance
+	close( inotifyFD );
+};
+
+void NBFileSystemWatcher::addWatch( QString wPath, Mode wMode ) {
+
+	/**
+	 * Remove the trailing '/' from paths
+	 */
+	while ( ( wPath != "/" ) and wPath.endsWith( "/" ) )
+		wPath.chop( 1 );
+
+	// Add a new watch
+	int WD = inotify_add_watch( inotifyFD, wPath.toUtf8().data(), IN_ALL_EVENTS );
+	if ( WD == -1 ) {
+		qWarning() << "Couldn't add watch: " << wPath.toUtf8().constData();
+		emit watchFailed( wPath );
+	}
+
+	wdPathHash[ WD ] = wPath;
+	wdModeHash[ WD ] = ( isDir( wPath ) ? wMode : PathOnly );
+
+	/**
+	 * Add more watches based on wMode
+	 */
+	if ( isDir( wPath ) ) {
+		if ( wMode == Recursive ) {
+			QDirIterator it( wPath, QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden, QDirIterator::Subdirectories );
+			while( it.hasNext() ) {
+				QString entry( it.next() );
+				WD = inotify_add_watch( inotifyFD, entry.toUtf8().data(), IN_ALL_EVENTS );
+
+				if( WD != -1 ) {
+					wdPathHash[ WD ] = entry;
+					wdModeHash[ WD ] = ( it.fileInfo().isDir() ? Recursive : PathOnly );
+				}
+			}
 		}
 
-		closedir( dir );
+		else if ( wMode == Contents ) {
+			QDirIterator it( wPath, QDir::Files | QDir::System | QDir::Hidden );
+			while( it.hasNext() ) {
+				QString entry( it.next() );
+				WD = inotify_add_watch( inotifyFD, entry.toUtf8().data(), IN_ALL_EVENTS );
 
-		return contents;
-	}
-
-	return QStringList();
-};
-
-inline QPair<QStringList, QStringList> difference( QStringList oldList, QStringList newList ) {
-
-	QPair<QStringList, QStringList> pair;
-
-	QSet<QString> s1 = oldList.toSet();
-	QSet<QString> s2 = newList.toSet();
-
-	pair.first = ( s1 - s2 ).toList();
-	pair.second = ( s2 - s1 ).toList();
-
-	return pair;
-};
-
-NBFileSystemWatcher::NBFileSystemWatcher() : QFileSystemWatcher() {
-
-	connect( this, SIGNAL( directoryChanged( QString ) ), this, SLOT( handleChanged( QString ) ) );
-	connect( this, SIGNAL( fileChanged( QString ) ), this, SLOT( handleChanged( QString ) ) );
-
-	renames.clear();
-};
-
-void NBFileSystemWatcher::startWatch( QString path ) {
-
-	stopWatch();
-
-	/* Ignore special locations */
-	if ( path.startsWith( "NB://" ) )
-		return;
-
-	if ( not path.endsWith( "/" ) )
-		path += "/";
-
-	addPath( path );
-	if ( not directories().count() ) {
-		qDebug() << "Watch failed!";
-		emit watchFailed();
-	}
-
-	watchPath = QString( path );
-
-	contents.clear();
-	contents << entries( path );
-
-	if ( QFileInfo( path ).isDir() ) {
-		Q_FOREACH( QString entry, contents ) {
-			addPath( entry );
+				if( WD != -1 ) {
+					wdPathHash[ WD ] = entry;
+					wdModeHash[ WD ] = PathOnly;
+				}
+			}
 		}
 	}
+};
+
+void NBFileSystemWatcher::removeWatch( QString path ) {
+
+	for( int key: wdPathHash.keys() ) {
+		if ( wdPathHash.value( key ).startsWith( path ) ) {
+			wdPathHash.remove( key );
+			wdModeHash.remove( key );
+			inotify_rm_watch( inotifyFD, key );
+		}
+	}
+};
+
+void NBFileSystemWatcher::startWatch() {
+
+	__stopWatch = false;
+	start();
 };
 
 void NBFileSystemWatcher::stopWatch() {
 
-	/* Remove all directories we are watching */
-	if ( directories().count() )
-		removePaths( directories() );
-
-	/* Remove all files we are watching */
-	if ( files().count() )
-		removePaths( files() );
+	__stopWatch = true;
 };
 
-void NBFileSystemWatcher::handleChanged( QString cPath ) {
+void NBFileSystemWatcher::run() {
 
-	QMutexLocker locker( &mutex );
+	while ( not __stopWatch ) {
+		int length = 0, i = 0;
 
-	QFileInfo info( cPath );
+		while( true ) {
+            char buffer[ BUF_LEN ] = { 0 };
+			length = read( inotifyFD, buffer, BUF_LEN );
 
-	/* If there was a deletion */
-	if ( not info.exists() ) {
-		/* If the current watch path was deleted */
-		if ( ( not watchPath.compare( cPath ) ) or ( not watchPath.compare( cPath + "/" ) ) ) {
-			qDebug() << "Watch path deleted. Watch ended!";
-			emit watchPathDeleted();
+			i = 0;
+			// If for some reason length < 0, continue with trying to read.
+			if ( length < 0 )
+				continue;
+
+			while ( i < length ) {
+				struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
+
+                /* WD of the current event */
+                int curWD = event->wd;
+
+				// If this wd does not exist in our hash
+				if ( not wdPathHash.keys().contains( curWD ) )
+					break;
+
+                QString node = wdPathHash.value( curWD );
+				QString path = node + ( event->len ? QString( "/%1" ).arg( event->name ) : "" );
+
+                /**
+                 * IN_DELETE_SELF means the node which was being watched was deleted
+                 * So we should delete it from the
+                 */
+				if ( event->mask & IN_DELETE_SELF ) {
+					emit nodeDeleted( node );
+					removeWatch( node );
+                }
+
+				// New file was created inside one of the directories we were watching
+				else if ( ( event->mask & IN_CREATE ) ) {
+
+					emit nodeCreated( path );
+					switch ( wdModeHash.value( curWD ) ) {
+
+						case Recursive: {
+							addWatch( path, Recursive );
+							break;
+						}
+
+						case Contents: {
+							addWatch( path, Contents );
+							break;
+						}
+
+						default: {
+							break;
+						}
+					}
+                }
+
+				// A file was modified inside one of the directories we were watching
+				else if ( event->mask & IN_MODIFY ) {
+
+					/**
+					 * If we have a folder, and we're watching it with PathOnly mode,
+					 * then is the only chance to intimate the user that the file was modified
+					 */
+					if ( isDir( node ) and wdModeHash.value( curWD ) == PathOnly )
+						emit nodeChanged( path );
+
+					/**
+					 * Else if, we have a file, we will right away intimate the user
+					 * that the file was modified
+					 */
+					else if ( not isDir( node ) )
+						emit nodeChanged( node );
+				}
+
+				// A file was deleted inside one of the directories we were watching
+				else if ( ( event->mask & IN_DELETE ) ) {
+
+					emit nodeDeleted( path );
+					removeWatch( path );
+				}
+
+				// A file was moved FROM one of the directories we were watching
+				else if ( ( event->mask & IN_MOVED_FROM ) ) {
+
+					cookiePathHash[ event->cookie ] = path;
+					cookieTimeHash[ event->cookie ] = QDateTime::currentMSecsSinceEpoch();
+
+					/**
+					 * Remove this path from watch and put it into pending renames
+					 */
+					removeWatch( path );
+
+					/**
+					 * Further watch of this node will happen only if this directory was
+					 * watched in Recursive or Contents mode.
+					 */
+					switch( wdModeHash.value( curWD ) ) {
+						case Recursive: {
+							pendingRenames[ event->cookie ] = Recursive;
+							break;
+						}
+
+						case Contents: {
+							/* If we have a folder, ignore it */
+							if ( not isDir( path ) )
+								pendingRenames[ event->cookie ] = PathOnly;
+
+							break;
+						}
+
+						case PathOnly:
+						default: {
+							break;
+						}
+					}
+				}
+
+				// A file was moved TO one of the directories we were watching
+				else if ( ( event->mask & IN_MOVED_TO ) ) {
+
+					// Previously, we received a IN_MOVED_FROM event with this cookie.
+					if ( cookiePathHash.keys().contains( event->cookie ) ) {
+						/** Add a watch and then emit renamed signal */
+						addWatch( path, pendingRenames.value( event->cookie ) );
+						emit nodeRenamed( cookiePathHash.value( event->cookie ), path );
+
+						cookiePathHash.remove( event->cookie );
+						cookieTimeHash.remove( event->cookie );
+						pendingRenames.remove( event->cookie );
+					}
+
+					// This node is being moved from somewhere outside our watches
+					else {
+						addWatch( path, wdModeHash.value( curWD ) );
+						emit nodeCreated( path );
+					}
+				}
+
+				// A file/directory we were watching was moved
+				else if ( ( event->mask & IN_MOVE_SELF ) ) {
+					// We will remove the watch, and create a delete event
+					emit nodeDeleted( node );
+                    wdPathHash.remove( curWD );
+                    wdModeHash.remove( curWD );
+
+					removeWatch( node );
+				}
+
+				i += EVENT_SIZE + event->len;
+			}
+		}
+	}
+};
+
+void NBFileSystemWatcher::timerEvent( QTimerEvent *tEvent ) {
+
+	if ( expireTimer->timerId() == tEvent->timerId() ) {
+		time_t curTime = QDateTime::currentMSecsSinceEpoch();
+		for( int cookie: cookieTimeHash.keys() ) {
+			if ( curTime - cookieTimeHash.value( cookie ) > 500 ) {
+				QString path = cookiePathHash.value( cookie );
+				emit nodeDeleted( path );
+
+				cookiePathHash.remove( cookie );
+				cookieTimeHash.remove( cookie );
+				pendingRenames.remove( cookie );
+			}
 		}
 	}
 
-	/* A directory was modified */
-	if ( info.isDir() and not cPath.endsWith( "/") )
-		cPath += "/";
-
-	if ( cPath != watchPath ) {
-		/* Child modification, not rename, delete, etc */
-		if ( info.exists() ) {
-			// qDebug() << "[MODIFY]:" << cPath;
-			emit nodeChanged( cPath );
-		}
-
-		/* False deletes due to renames */
-		else if ( not renames.contains( cPath ) ) {
-			qDebug() << "[DELETE]:" << cPath;
-			emit nodeDeleted( cPath );
-		}
-
-		return;
-	}
-
-	/* Fresh event. Clear renames */
-	renames.clear();
-
-	QStringList newContents = entries( watchPath );
-	QPair<QStringList, QStringList> pair = difference( contents, newContents );
-
-	/* Add the new nodes to watch */
-	Q_FOREACH( QString node, pair.second ) {
-		/* Remove existing path */
-		removePath( node );
-
-		/* Add the path */
-		addPath( node );
-	}
-
-	/* Remove the non existing nodes */
-	Q_FOREACH( QString node, pair.first )
-		removePath( node );
-
-	/* First list empty, Second list has contents: Files added */
-	/* Please note that the lists should technically have only one element each */
-	/* The exception is as Qt points out changes in very quick succession */
-	if ( not pair.first.size() and pair.second.size() ) {
-		Q_FOREACH( QString node, pair.second ) {
-			qDebug() << "[CREATE]:" << node;
-			emit nodeCreated( node );
-		}
-	}
-
-	/*
-		*
-		* If the size of the lists is more than one, then we are screwed.
-		* The reason is Qt: Multiple events in fast succession may cause only one signal
-		* Hopefully this does not happen except in cases like batch renaming
-		* Since the renames are one to one mapping, we can match randomly
-		*
-	*/
-	else if ( pair.first.size() == pair.second.size() ) {
-		for( int i = 0; i < pair.first.size(); i++ ) {
-			qDebug() << "[RENAME]:" << pair.first.at( i ) << ">" << pair.second.at( i );
-			emit nodeRenamed( pair.first.at( i ), pair.second.at( i ) );
-		}
-
-		renames << pair.first;
-	}
-
-	/* First list has contents, second list empty: Files deleted */
-	/* Please not that the lists should technically have only one element each */
-	/* The exception is as Qt points out changes in very quick succession */
-	else if ( pair.first.size() and not pair.second.size() ) {
-		Q_FOREACH( QString node, pair.second ) {
-			qDebug() << "[DELETE]:" << node;
-			emit nodeDeleted( node );
-		}
-	}
-
-	/*
-		*
-		* This should not happen except in cases where several files have been deleted very fast and
-		* several files have been added very fast resulting in just one signal. We just handle it to
-		* avoid ugly consequences.
-		*
-	*/
-	else if ( pair.first.size() and pair.second.size() ) {
-		Q_FOREACH( QString node, pair.second ) {
-			qDebug() << "[DELETE]:" << node;
-			emit nodeDeleted( node );
-		}
-
-		Q_FOREACH( QString node, pair.second ) {
-			qDebug() << "[CREATE]:" << node;
-			emit nodeCreated( node );
-		}
-	}
-
-	contents.clear();
-	contents << newContents;
+	QThread::timerEvent( tEvent );
 };

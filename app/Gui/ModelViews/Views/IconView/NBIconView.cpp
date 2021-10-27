@@ -522,7 +522,7 @@ bool NBIconView::isIndexVisible( QModelIndex idx ) const {
 void NBIconView::paintEvent( QPaintEvent* event ) {
 
 	QPainter painter( viewport() );
-	painter.setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing );
+	painter.setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
 
 	painter.fillRect( viewport()->rect(), Qt::transparent );
 
