@@ -109,7 +109,7 @@ void NBTrayIcon::toggleVisible() {
 
 	bool visible = true;
 	Q_FOREACH( QWidget *nb, qApp->topLevelWidgets() ) {
-		if ( qobject_cast<NewBreeze*>( nb ) ) {
+		if ( qobject_cast<NewBreeze::UI*>( nb ) ) {
 			if ( nb->isVisible() )
 				visible &= true;
 
@@ -121,14 +121,14 @@ void NBTrayIcon::toggleVisible() {
 	/* All NewBreeze instances are visible; hide them */
 	if ( visible ) {
 		Q_FOREACH( QWidget *nb, qApp->topLevelWidgets() )
-			if ( qobject_cast<NewBreeze*>( nb ) )
+			if ( qobject_cast<NewBreeze::UI*>( nb ) )
 				nb->hide();
 	}
 
 	/* Some are hidden, show them all */
 	else {
 		Q_FOREACH( QWidget *w, qApp->topLevelWidgets() ) {
-			NewBreeze *nb = qobject_cast<NewBreeze*>( w );
+			NewBreeze::UI *nb = qobject_cast<NewBreeze::UI*>( w );
 			if ( nb and not nb->isClosed() )
 				nb->show();
 		}

@@ -6,7 +6,7 @@
 
 #include "NewBreeze.hpp"
 
-NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
+NewBreeze::UI::UI( QString loc ) : QMainWindow() {
 
 	/* If we have root privileges */
 	if ( not getuid() ) {
@@ -94,12 +94,12 @@ NewBreeze::NewBreeze( QString loc ) : QMainWindow() {
 	createAndSetupActions();
 };
 
-bool NewBreeze::isClosed() {
+bool NewBreeze::UI::isClosed() {
 
 	return mClosed;
 };
 
-void NewBreeze::createGUI() {
+void NewBreeze::UI::createGUI() {
 
 	QWidget *BaseWidget = new QWidget( this );
 	BaseWidget->setObjectName( "base" );
@@ -146,7 +146,7 @@ void NewBreeze::createGUI() {
 	setFocusPolicy( Qt::NoFocus );
 };
 
-void NewBreeze::setupSidePanel() {
+void NewBreeze::UI::setupSidePanel() {
 
 	SidePanel = new NBSidePanel( this );
 	SidePanel->hide();
@@ -169,7 +169,7 @@ void NewBreeze::setupSidePanel() {
 	}
 };
 
-void NewBreeze::setupInfoPanel() {
+void NewBreeze::UI::setupInfoPanel() {
 
 	/* Create the InfoPanel */
 	InfoPanel = new NBInfoPanel( this );
@@ -196,7 +196,7 @@ void NewBreeze::setupInfoPanel() {
 	updateInfoBar();
 };
 
-void NewBreeze::setWindowProperties() {
+void NewBreeze::UI::setWindowProperties() {
 
 	setWindowTitle( QString( "%1 - NewBreeze" ).arg( baseName( FolderView->fsModel->currentDir() ) ) );
 	setWindowIcon( QIcon( ":/icons/newbreeze.png" ) );
@@ -207,7 +207,7 @@ void NewBreeze::setWindowProperties() {
 		setGeometry( Settings->value( "Session/Geometry", NBSettings::GlobalScope ) );
 };
 
-void NewBreeze::createAndSetupActions() {
+void NewBreeze::UI::createAndSetupActions() {
 
 	connect( AddressBar, SIGNAL( openLocation( QString ) ), FolderView, SLOT( doOpen( QString ) ) );
 	connect( AddressBar, SIGNAL( openSearch() ), FilterWidget, SLOT( showHide() ) );
@@ -377,7 +377,7 @@ void NewBreeze::createAndSetupActions() {
 	updateInfoBar();
 };
 
-void NewBreeze::openFile( QString file ) {
+void NewBreeze::UI::openFile( QString file ) {
 
 	NewBreeze::DesktopFile app = NewBreeze::XdgMime::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( file ) );
 
@@ -440,7 +440,7 @@ void NewBreeze::openFile( QString file ) {
 	}
 };
 
-void NewBreeze::show() {
+void NewBreeze::UI::show() {
 
 	if ( mTerminate )
 		return;
@@ -449,24 +449,24 @@ void NewBreeze::show() {
 		QMainWindow::show();
 };
 
-void NewBreeze::showAboutNB() {
+void NewBreeze::UI::showAboutNB() {
 
 	AboutNB *about = new AboutNB( this );
 	about->exec();
 };
 
-void NewBreeze::showAboutQt() {
+void NewBreeze::UI::showAboutQt() {
 
 	QMessageBox::aboutQt( this, QObject::tr( "About Qt %1" ).arg( QLatin1String( QT_VERSION_STR ) ) );
 };
 
-void NewBreeze::showLicense() {
+void NewBreeze::UI::showLicense() {
 
 	License *license = new License( this );
 	license->exec();
 };
 
-void NewBreeze::showInfoDlg() {
+void NewBreeze::UI::showInfoDlg() {
 
 	NBDialog *infoDlg = new NBDialog( this );
 	infoDlg->setDialogTitle( "NewBreeze Readme" );
@@ -518,7 +518,7 @@ void NewBreeze::showInfoDlg() {
 	infoDlg->exec();
 };
 
-void NewBreeze::showSettingsDialog() {
+void NewBreeze::UI::showSettingsDialog() {
 
 	NBSettingsManager *settingsMgr = new NBSettingsManager( this );
 	settingsMgr->exec();
@@ -539,26 +539,26 @@ void NewBreeze::showSettingsDialog() {
 	qApp->processEvents();
 };
 
-void NewBreeze::showCustomActionsDialog() {
+void NewBreeze::UI::showCustomActionsDialog() {
 
 	NBCustomActions *customActions = new NBCustomActions();
 	customActions->exec();
 };
 
-void NewBreeze::fileBugReport() {
+void NewBreeze::UI::fileBugReport() {
 
 	qDebug() << "Showing NewBreeze BugReporter";
 	NBBugReporter *bugreport = new NBBugReporter();
 	bugreport->exec();
 };
 
-void NewBreeze::newWindow( QString location ) {
+void NewBreeze::UI::newWindow( QString location ) {
 
 	if ( location.isEmpty() and qobject_cast<QAction*>( sender() ) ) {
 		location = FolderView->fsModel->currentDir();
 	}
 
-	NewBreeze *newbreeze = new NewBreeze( location );
+	NewBreeze::UI *newbreeze = new NewBreeze::UI( location );
 	if ( Settings->value( "Session/Maximized", NBSettings::GlobalScope ) )
 		newbreeze->showMaximized();
 
@@ -566,7 +566,7 @@ void NewBreeze::newWindow( QString location ) {
 		newbreeze->showNormal();
 };
 
-void NewBreeze::handleMessages( const QString message ) {
+void NewBreeze::UI::handleMessages( const QString message ) {
 
 	qDebug() << "Message recieved:" << message;
 
@@ -606,7 +606,7 @@ void NewBreeze::handleMessages( const QString message ) {
 	}
 };
 
-void NewBreeze::updateVarious( QString url ) {
+void NewBreeze::UI::updateVarious( QString url ) {
 
 	if ( url.isEmpty() or url.isNull() )
 		url = FolderView->fsModel->currentDir();
@@ -623,7 +623,7 @@ void NewBreeze::updateVarious( QString url ) {
 	}
 };
 
-void NewBreeze::updateInfoBar() {
+void NewBreeze::UI::updateInfoBar() {
 
 	InfoBar->clear();
 
@@ -648,7 +648,7 @@ void NewBreeze::updateInfoBar() {
 	}
 };
 
-void NewBreeze::showProperties() {
+void NewBreeze::UI::showProperties() {
 
 	QList<QModelIndex> selectedList = FolderView->getSelection();
 	QStringList paths;
@@ -661,7 +661,7 @@ void NewBreeze::showProperties() {
 			paths << FolderView->fsModel->nodePath( idx );
 
 	if ( FolderView->fsModel->modelDataType() == NBItemViewModel::Applications ) {
-		NewBreeze::DesktopFileEditor *desktopEditor = new NewBreeze::DesktopFileEditor( this, paths.at( 0 ) );
+		NBDesktopFileEditor *desktopEditor = new NBDesktopFileEditor( this, paths.at( 0 ) );
 		desktopEditor->exec();
 	}
 
@@ -671,7 +671,7 @@ void NewBreeze::showProperties() {
 	}
 };
 
-void NewBreeze::showPermissions() {
+void NewBreeze::UI::showPermissions() {
 
 	QList<QModelIndex> selectedList = FolderView->getSelection();
 	QStringList paths;
@@ -687,7 +687,7 @@ void NewBreeze::showPermissions() {
 	permsDlg->show();
 };
 
-void NewBreeze::handleDriveUrl( QString url ){
+void NewBreeze::UI::handleDriveUrl( QString url ){
 
 	if ( url.startsWith( "NB://SuperStart" ) )
 		FolderView->fsModel->setRootPath( url );
@@ -702,7 +702,7 @@ void NewBreeze::handleDriveUrl( QString url ){
 		FolderView->doOpen( url );
 };
 
-void NewBreeze::chdirUI( QString url ){
+void NewBreeze::UI::chdirUI( QString url ){
 
 	mUpdateTerminal = false;
 
@@ -714,37 +714,37 @@ void NewBreeze::chdirUI( QString url ){
 	mUpdateTerminal = true;
 };
 
-void NewBreeze::showApplications() {
+void NewBreeze::UI::showApplications() {
 
 	FolderView->doOpen( "NB://Applications" );
 	AddressBar->setAddress( "NB://Applications" );
 };
 
-void NewBreeze::showCatalogs( QString url ) {
+void NewBreeze::UI::showCatalogs( QString url ) {
 
 	FolderView->doOpen( url );
 	AddressBar->setAddress( url );
 };
 
-void NewBreeze::showTrash() {
+void NewBreeze::UI::showTrash() {
 
 	NBTrashManager *trashManager = new NBTrashManager();
 	trashManager->show();
 };
 
-void NewBreeze::filterFiles( QString filter ) {
+void NewBreeze::UI::filterFiles( QString filter ) {
 
 	FolderView->fsModel->setNameFilters( QStringList() << QString( "*%1*" ).arg( filter ) );
 };
 
-void NewBreeze::clearFilters() {
+void NewBreeze::UI::clearFilters() {
 
 	FilterWidget->clear();
 	FolderView->fsModel->setNameFilters( QStringList() );
 	FolderView->setFocus();
 };
 
-void NewBreeze::openAddressBar() {
+void NewBreeze::UI::openAddressBar() {
 
 	if ( !QFileInfo( AddressBar->address() ).exists() ) {
 		QString text = QString( "There is no file or directory named: "		\
@@ -761,7 +761,7 @@ void NewBreeze::openAddressBar() {
 	FolderView->doOpen( AddressBar->address() );
 };
 
-void NewBreeze::openWithList() {
+void NewBreeze::UI::openWithList() {
 
 	if ( not FolderView->hasSelection() )
 		return;
@@ -778,7 +778,7 @@ void NewBreeze::openWithList() {
 	openWithMenu->exec( itemView->mapToGlobal( pos ) );
 };
 
-void NewBreeze::changeViewMode( int mode ) {
+void NewBreeze::UI::changeViewMode( int mode ) {
 
 	QStringList viewModes = QStringList() << "Tiles" << "Icons" << "Details";
 
@@ -798,7 +798,7 @@ void NewBreeze::changeViewMode( int mode ) {
 	FolderView->updateViewMode();
 };
 
-void NewBreeze::switchToNextView() {
+void NewBreeze::UI::switchToNextView() {
 
 	QStringList viewModes = QStringList() << "Tiles" << "Icons" << "Details";
 
@@ -828,7 +828,7 @@ void NewBreeze::switchToNextView() {
 	FolderView->updateViewMode();
 };
 
-void NewBreeze::toggleGrouping() {
+void NewBreeze::UI::toggleGrouping() {
 
 	Settings->setValue( "Grouping", not Settings->value( "Grouping" ) );
 
@@ -851,7 +851,7 @@ void NewBreeze::toggleGrouping() {
 	FolderView->fsModel->reload();
 };
 
-void NewBreeze::toggleSidePanelVisible() {
+void NewBreeze::UI::toggleSidePanelVisible() {
 
 	if ( SidePanel->isVisible() )
 		SidePanel->hide();
@@ -862,7 +862,7 @@ void NewBreeze::toggleSidePanelVisible() {
 	Settings->setValue( "SidePanel", SidePanel->isVisible() );
 };
 
-void NewBreeze::toggleInfoPanel() {
+void NewBreeze::UI::toggleInfoPanel() {
 
 	if ( InfoPanel->isVisible() ) {
 		InfoDock->hide();
@@ -879,7 +879,7 @@ void NewBreeze::toggleInfoPanel() {
 	}
 };
 
-void NewBreeze::showHideTermWidget() {
+void NewBreeze::UI::showHideTermWidget() {
 
 	if ( Terminal->isVisible() ) {
 		Terminal->hide();
@@ -893,17 +893,17 @@ void NewBreeze::showHideTermWidget() {
 	}
 };
 
-void NewBreeze::setBusyCursor() {
+void NewBreeze::UI::setBusyCursor() {
 
 	setCursor( Qt::WaitCursor );
 };
 
-void NewBreeze::setNormalCursor() {
+void NewBreeze::UI::setNormalCursor() {
 
 	setCursor( Qt::ArrowCursor );
 };
 
-void NewBreeze::quit() {
+void NewBreeze::UI::quit() {
 
 	/* Close all top level widgets */
 	Q_FOREACH( QWidget *w, qApp->topLevelWidgets() )
@@ -923,7 +923,7 @@ void NewBreeze::quit() {
 		qApp->quit();
 };
 
-void NewBreeze::closeEvent( QCloseEvent *cEvent ) {
+void NewBreeze::UI::closeEvent( QCloseEvent *cEvent ) {
 
 	// We hide this window immediately, other processes may take a while longer to close down
 	QMainWindow::close();

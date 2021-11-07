@@ -12,6 +12,8 @@
 #include "NBVaultDatabase.hpp"
 #include "NBVault.hpp"
 
+#include <newbreeze/NBXdg.hpp>
+
 static NewBreeze::XdgMime *engine = NewBreeze::XdgMime::instance();
 
 NBActionsMenu::NBActionsMenu( QList<QModelIndex> selectedIndexes, QString dir, QWidget *parent ) : QMenu( parent ) {
@@ -292,7 +294,7 @@ void NBActionsMenu::doCustomAction() {
 
 	QStringList cmdList = customAct->data().toStringList();
 	if ( cmdList.count() == 1 )
-		QProcess::startDetached( cmdList.at( 0 ) );
+		QProcess::startDetached( cmdList.at( 0 ), QStringList() );
 
 	else
 		QProcess::startDetached( cmdList.takeFirst(), cmdList );
@@ -348,7 +350,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 		}
 
 		else {
-			QSet<NewBreeze::DesktopFile> finalAppsList;
+			AppsList finalAppsList;
 			QList<AppsList> appsPerNode;
 			foreach( QString file, nodes )
 				appsPerNode << engine->appsForMimeType( mimeDb.mimeTypeForFile( file ) );
@@ -356,8 +358,8 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 			// Creating a set of unique applications that can handle all the files
 			// finalAppsList = appsPerNode.toSet();
 			for( int i = 1; i < appsPerNode.count(); i++ ) {
-				AppsList aList = appsPerNode.at( i );
-				finalAppsList = finalAppsList.intersect( aList.toSet() );
+				AppsList aList = makeUnique( appsPerNode.at( i ) );
+				finalAppsList = intersect( finalAppsList, aList );
 			}
 
 			// Adding them to the context menu

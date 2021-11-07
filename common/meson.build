@@ -63,6 +63,11 @@ install_subdir(
 		strip_directory : false
 )
 
+install_headers(
+		'NBPluginInterface.hpp',
+		subdir: 'newbreeze',
+)
+
 summary = [
 	'',
 	'----------------------',

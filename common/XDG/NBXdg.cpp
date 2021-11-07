@@ -775,7 +775,7 @@ NewBreeze::DesktopFile NewBreeze::XdgMime::xdgDefaultApp( QMimeType mimeType ) {
 	return NewBreeze::DesktopFile();
 };
 
-uint qHash( const NewBreeze::DesktopFile &app ) {
+uint qHash( const NewBreeze::DesktopFile &app, uint seed ) {
 
 	QString hashString;
 	hashString += app.name();
@@ -786,7 +786,31 @@ uint qHash( const NewBreeze::DesktopFile &app ) {
 	hashString += app.mimeTypes().join( " " );
 	hashString += app.categories().join( " " );
 
-	return qChecksum( hashString.toLocal8Bit().data(), hashString.count() );
+	return qHash( hashString.toLocal8Bit().data(), seed ^ 0xA6B0F7 );
+};
+
+AppsList makeUnique( AppsList apps ) {
+
+	AppsList newList;
+	for( NewBreeze::DesktopFile app: apps ) {
+		if ( newList.contains ( app ) )
+			continue;
+
+		newList << app;
+	}
+
+	return newList;
+};
+
+AppsList intersect( AppsList first, AppsList second ) {
+
+	AppsList intersecting;
+	for( NewBreeze::DesktopFile app: first ) {
+		if ( second.contains( app ) )
+			intersecting << app;
+	}
+
+	return intersecting;
 };
 
 QVariant& toQVariant( const NewBreeze::DesktopFile &app ) {

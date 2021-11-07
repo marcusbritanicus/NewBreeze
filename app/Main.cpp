@@ -102,7 +102,7 @@ int main( int argc, char **argv ) {
 				qDebug() << "No running instance of the NewBreeze found";
 
 				/* Here we do not request the tray icon as we directly open it */
-				NewBreeze *Gui = new NewBreeze( QString() );
+				NewBreeze::UI *Gui = new NewBreeze::UI( QString() );
 				QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
 				NBTrayIcon* trayIcon = new NBTrayIcon();
@@ -171,12 +171,12 @@ int main( int argc, char **argv ) {
 				app.disconnect();
 			}
 
-			NewBreeze *Gui;
+			NewBreeze::UI *Gui;
 			if ( app.arguments().count() >= 3 )
-				Gui = new NewBreeze( app.arguments().at( 2 ) );
+				Gui = new NewBreeze::UI( app.arguments().at( 2 ) );
 
 			else
-				Gui = new NewBreeze( QString() );
+				Gui = new NewBreeze::UI( QString() );
 
 			QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
@@ -228,7 +228,7 @@ int main( int argc, char **argv ) {
 					Q_FOREACH( QWidget *w, app.topLevelWidgets() )
 						w->close();
 
-					NewBreeze *Gui = new NewBreeze( query );
+					NewBreeze::UI *Gui = new NewBreeze::UI( query );
 					QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );
 
 					if ( Settings->value( "Session/Maximized", NBSettings::GlobalScope ) )
@@ -252,12 +252,12 @@ int main( int argc, char **argv ) {
 
 			/* Server not running */
 			else {
-				NewBreeze *Gui;
+				NewBreeze::UI *Gui;
 				if ( app.arguments().count() >= 2 )
-					Gui = new NewBreeze( app.arguments().at( 1 ) );
+					Gui = new NewBreeze::UI( app.arguments().at( 1 ) );
 
 				else {
-					Gui = new NewBreeze( QString() );
+					Gui = new NewBreeze::UI( QString() );
 				}
 
 				QObject::connect( &app, SIGNAL( messageReceived( const QString ) ), Gui, SLOT( handleMessages( const QString ) ) );

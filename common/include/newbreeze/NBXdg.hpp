@@ -83,7 +83,7 @@ class NewBreeze::DesktopFile {
 		QString desktopFileUrl() const;						// URL of the desktop file
 
 		/* Check if this DesktopFile is equivalent to @other */
-		bool operator==( const DesktopFile& ) const;
+		bool operator==( const NewBreeze::DesktopFile& ) const;
 
 	private:
 		void getCategory();
@@ -158,6 +158,9 @@ class NewBreeze::XdgMime {
 		AppsList appsList;
 };
 
-uint qHash( const NewBreeze::DesktopFile &app );
-QVariant& toQVariant( const NewBreeze::DesktopFile &app );
 Q_DECLARE_METATYPE( NewBreeze::DesktopFile );
+
+uint qHash( const NewBreeze::DesktopFile &app, uint seed = 0 );
+AppsList makeUnique( AppsList );
+AppsList intersect( AppsList first, AppsList second );
+QVariant& toQVariant( const NewBreeze::DesktopFile &app );

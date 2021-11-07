@@ -28,7 +28,7 @@ QString getAppImagePath() {
 	QString appExec = QFileInfo( qApp->arguments().at( 0 ) ).fileName();
 
 	QProcess proc;
-	proc.start( "mount" );
+	proc.start( "mount", QStringList() );
 
 	/** Finish running this program */
 	proc.waitForFinished( -1 );

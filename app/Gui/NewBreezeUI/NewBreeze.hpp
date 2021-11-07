@@ -27,11 +27,15 @@
 #include "NBTerminal.hpp"
 #include "NBTrashManager.hpp"
 
-class NewBreeze : public QMainWindow {
+namespace NewBreeze {
+	class UI;
+};
+
+class NewBreeze::UI : public QMainWindow {
 	Q_OBJECT
 
 	public :
-		NewBreeze( QString loc = QString() );
+		UI( QString loc = QString() );
 
 		bool isClosed();
 

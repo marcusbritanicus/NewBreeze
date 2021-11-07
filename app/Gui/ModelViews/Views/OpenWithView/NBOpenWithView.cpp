@@ -383,19 +383,19 @@ QRegion NBOpenWithView::visualRegionForSelection( const QItemSelection &selectio
 QModelIndexList NBOpenWithView::selectedIndexes() {
 
 	QSet<QModelIndex> idxSet;
-	idxSet.unite( QSet<QModelIndex>::fromList( mSelectedIndexes ) );
+	idxSet.unite( QSet<QModelIndex>( mSelectedIndexes.begin(), mSelectedIndexes.end() ) );
 	idxSet.unite( QSet<QModelIndex>::fromList( selectionModel()->selectedIndexes() ) );
 
-	return idxSet.toList();
+	return idxSet.values();
 };
 
 QModelIndexList NBOpenWithView::selection() {
 
 	QSet<QModelIndex> idxSet;
-	idxSet.unite( QSet<QModelIndex>::fromList( mSelectedIndexes ) );
+	idxSet.unite( QSet<QModelIndex>( mSelectedIndexes.begin(), mSelectedIndexes.end() ) );
 	idxSet.unite( QSet<QModelIndex>::fromList( selectionModel()->selectedIndexes() ) );
 
-	return idxSet.toList();
+	return idxSet.values();
 };
 
 bool NBOpenWithView::isIndexVisible( QModelIndex idx ) const {

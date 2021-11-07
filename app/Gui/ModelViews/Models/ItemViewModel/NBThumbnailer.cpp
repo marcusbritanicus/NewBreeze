@@ -8,6 +8,8 @@
 #include "NBItemViewModel.hpp"
 #include "NBPluginInterface.hpp"
 
+#include <libarchiveqt.h>
+
 static QList<QByteArray> supported = QImageReader::supportedImageFormats();
 static QStringList odfformat = QStringList() << "odt" << "odp" << "ods" << "odg";
 
