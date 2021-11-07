@@ -218,16 +218,16 @@ QString NBXdg::homeTrashLocation() {
 
 /*
 	*
-	* NBDesktopFile
+	* NewBreeze::DesktopFile
 	*
 */
 
-NBDesktopFile::NBDesktopFile( QString filename ) {
+NewBreeze::DesktopFile::DesktopFile( QString filename ) {
 
 	if ( filename.isEmpty() )
 		return;
 
-	mFileUrl = NBXdgMime::instance()->desktopPathForName( filename );
+	mFileUrl = NewBreeze::XdgMime::instance()->desktopPathForName( filename );
 	mDesktopName = baseName( filename );
 
 	if ( mFileUrl.startsWith( "/usr/share/applications" ) )
@@ -333,16 +333,16 @@ NBDesktopFile::NBDesktopFile( QString filename ) {
 		kdeFix( "okular" );
 };
 
-bool NBDesktopFile::startApplication() {
+bool NewBreeze::DesktopFile::startApplication() {
 
 	if ( not mValid )
 		return false;
 
 	QProcess proc;
-	return proc.startDetached( mExec );
+	return proc.startDetached( mExec, {} );
 };
 
-bool NBDesktopFile::startApplicationWithArgs( QStringList args ) {
+bool NewBreeze::DesktopFile::startApplicationWithArgs( QStringList args ) {
 
 	if ( not mValid )
 		return false;
@@ -416,102 +416,102 @@ bool NBDesktopFile::startApplicationWithArgs( QStringList args ) {
 	return QProcess::startDetached( exec, argList );
 };
 
-QString NBDesktopFile::desktopName() const {
+QString NewBreeze::DesktopFile::desktopName() const {
 
 	return mDesktopName;
 };
 
-QString NBDesktopFile::name() const {
+QString NewBreeze::DesktopFile::name() const {
 
 	return mName;
 };
 
-QString NBDesktopFile::genericName() const {
+QString NewBreeze::DesktopFile::genericName() const {
 
 	return mGenericName;
 };
 
-QString NBDesktopFile::description() const {
+QString NewBreeze::DesktopFile::description() const {
 
 	return mDescription;
 };
 
-QString NBDesktopFile::exec() const {
+QString NewBreeze::DesktopFile::exec() const {
 
 	return mExec;
 };
 
-QString NBDesktopFile::command() const {
+QString NewBreeze::DesktopFile::command() const {
 
 	return mCommand;
 };
 
-QString NBDesktopFile::icon() const {
+QString NewBreeze::DesktopFile::icon() const {
 
 	return mIcon;
 };
 
-QString NBDesktopFile::category() const {
+QString NewBreeze::DesktopFile::category() const {
 
 	return mCategory;
 };
 
-QStringList NBDesktopFile::mimeTypes() const {
+QStringList NewBreeze::DesktopFile::mimeTypes() const {
 
 	return mMimeTypes;
 };
 
-QStringList NBDesktopFile::categories() const {
+QStringList NewBreeze::DesktopFile::categories() const {
 
 	return mCategories;
 };
 
-QStringList NBDesktopFile::parsedExec() const {
+QStringList NewBreeze::DesktopFile::parsedExec() const {
 
 	return mParsedArgs;
 };
 
-int NBDesktopFile::type() const{
+int NewBreeze::DesktopFile::type() const{
 
 	return mType;
 };
 
-int NBDesktopFile::rank() const {
+int NewBreeze::DesktopFile::rank() const {
 
 	return mRank;
 };
 
-bool NBDesktopFile::visible() const {
+bool NewBreeze::DesktopFile::visible() const {
 
 	return mVisible;
 };
 
-bool NBDesktopFile::runInTerminal() const {
+bool NewBreeze::DesktopFile::runInTerminal() const {
 
 	return mRunInTerminal;
 };
 
-bool NBDesktopFile::takesArgs() const {
+bool NewBreeze::DesktopFile::takesArgs() const {
 
 	return mTakesArgs;
 };
 
-bool NBDesktopFile::multipleArgs() const {
+bool NewBreeze::DesktopFile::multipleArgs() const {
 
 	return mMultiArgs;
 };
 
-bool NBDesktopFile::isValid() const {
+bool NewBreeze::DesktopFile::isValid() const {
 
 	return mValid;
 };
 
-QString NBDesktopFile::desktopFileUrl() const {
+QString NewBreeze::DesktopFile::desktopFileUrl() const {
 
 	return mFileUrl;
 };
 
-bool NBDesktopFile::operator==( const NBDesktopFile& other ) const {
+bool NewBreeze::DesktopFile::operator==( const NewBreeze::DesktopFile& other ) const {
 
 	bool truth = true;
 	truth &= ( mCommand == other.command() );
@@ -520,7 +520,7 @@ bool NBDesktopFile::operator==( const NBDesktopFile& other ) const {
 	return truth;
 };
 
-void NBDesktopFile::getCategory() {
+void NewBreeze::DesktopFile::getCategory() {
 
 	QStringList Accessories = QStringList() << "Utility" << "Utilities" << "Accessory" << "Accessories";
 	QStringList Development = QStringList() << "Development";
@@ -587,7 +587,7 @@ void NBDesktopFile::getCategory() {
 	}
 };
 
-void NBDesktopFile::kdeFix( QString appName ) {
+void NewBreeze::DesktopFile::kdeFix( QString appName ) {
 
 	QDirIterator dirIt( "/usr/share/applications/", QDir::Files, QDirIterator::Subdirectories );
 
@@ -608,22 +608,23 @@ void NBDesktopFile::kdeFix( QString appName ) {
 
 /*
 	*
-	* NBXdgMime
+	* NewBreeze::XdgMime
 	*
 */
 
-NBXdgMime* NBXdgMime::globalInstance = nullptr;
+NewBreeze::XdgMime* NewBreeze::XdgMime::globalInstance = nullptr;
 
-AppsList NBXdgMime::appsForMimeType( QMimeType mimeType ) {
+AppsList NewBreeze::XdgMime::appsForMimeType( QMimeType mimeType ) {
 
 	AppsList appsForMimeList;
 	QStringList mimeList = QStringList() << mimeType.name() << mimeType.allAncestors();
-	QSet<QString> mimeSet = mimeList.toSet();
+	QSet<QString> mimeSet = QSet<QString>( mimeList.begin(), mimeList.end() );
 
-	Q_FOREACH( NBDesktopFile app, appsList ) {
-		QSet<QString> intersected = app.mimeTypes().toSet().intersect( mimeSet );
+	Q_FOREACH( NewBreeze::DesktopFile app, appsList ) {
+		QStringList mimes = app.mimeTypes();
+		QSet<QString> intersected = QSet<QString>( mimes.begin(), mimes.end() ).intersect( mimeSet );
 		if ( intersected.count() ) {
-			if ( ( app.type() == NBDesktopFile::Application ) and app.visible() )
+			if ( ( app.type() == NewBreeze::DesktopFile::Application ) and app.visible() )
 				appsForMimeList << app;
 		}
 	}
@@ -639,7 +640,7 @@ AppsList NBXdgMime::appsForMimeType( QMimeType mimeType ) {
 	return appsForMimeList;
 };
 
-QStringList NBXdgMime::mimeTypesForApp( QString desktopName ) {
+QStringList NewBreeze::XdgMime::mimeTypesForApp( QString desktopName ) {
 
 	QStringList mimeList;
 
@@ -648,7 +649,7 @@ QStringList NBXdgMime::mimeTypesForApp( QString desktopName ) {
 
 	foreach( QString appDir, appsDirs ) {
 		if ( QFile::exists( appDir + desktopName ) ) {
-			mimeList << NBDesktopFile( appDir + desktopName ).mimeTypes();
+			mimeList << NewBreeze::DesktopFile( appDir + desktopName ).mimeTypes();
 			break;
 		}
 	}
@@ -656,15 +657,15 @@ QStringList NBXdgMime::mimeTypesForApp( QString desktopName ) {
 	return mimeList;
 };
 
-AppsList NBXdgMime::allDesktops() {
+AppsList NewBreeze::XdgMime::allDesktops() {
 
 	return appsList;
 };
 
-NBDesktopFile NBXdgMime::application( QString exec ) {
+NewBreeze::DesktopFile NewBreeze::XdgMime::application( QString exec ) {
 
 	AppsList list;
-	Q_FOREACH( NBDesktopFile app, appsList ) {
+	Q_FOREACH( NewBreeze::DesktopFile app, appsList ) {
 		if ( app.command().contains( exec, Qt::CaseSensitive ) )
 			list << app;
 
@@ -673,7 +674,7 @@ NBDesktopFile NBXdgMime::application( QString exec ) {
 	}
 
 	if ( not list.count() )
-		return NBDesktopFile();
+		return NewBreeze::DesktopFile();
 
 	int rank = -1, index = -1;
 	for( int i = 0; i < list.count(); i++ ) {
@@ -687,7 +688,7 @@ NBDesktopFile NBXdgMime::application( QString exec ) {
 	return list.at( index );
 };
 
-QString NBXdgMime::desktopPathForName( QString desktopName ) {
+QString NewBreeze::XdgMime::desktopPathForName( QString desktopName ) {
 
 	if ( not desktopName.endsWith( ".desktop" ) )
 		desktopName += ".desktop";
@@ -704,13 +705,13 @@ QString NBXdgMime::desktopPathForName( QString desktopName ) {
 	return QString();
 };
 
-NBDesktopFile NBXdgMime::desktopForName( QString desktopName ) {
+NewBreeze::DesktopFile NewBreeze::XdgMime::desktopForName( QString desktopName ) {
 
 	if ( not desktopName.endsWith( ".desktop" ) )
 		desktopName += ".desktop";
 
 	if ( exists( desktopName ) )
-		return NBDesktopFile( desktopName );
+		return NewBreeze::DesktopFile( desktopName );
 
 	QString desktopPath;
 	Q_FOREACH( QString appDirStr, appsDirs ) {
@@ -720,61 +721,61 @@ NBDesktopFile NBXdgMime::desktopForName( QString desktopName ) {
 		}
 	}
 
-	return NBDesktopFile( desktopPath );
+	return NewBreeze::DesktopFile( desktopPath );
 };
 
-void NBXdgMime::parseDesktops() {
+void NewBreeze::XdgMime::parseDesktops() {
 
 	appsList.clear();
 	Q_FOREACH( QString appDirStr, appsDirs ) {
 		QDir appDir( appDirStr );
 		Q_FOREACH( QFileInfo desktop, appDir.entryInfoList( QStringList() << "*.desktop", QDir::Files ) ) {
-			appsList << NBDesktopFile( desktop.absoluteFilePath() );
+			appsList << NewBreeze::DesktopFile( desktop.absoluteFilePath() );
 		}
 	}
 };
 
-NBXdgMime* NBXdgMime::instance() {
+NewBreeze::XdgMime* NewBreeze::XdgMime::instance() {
 
-	if ( NBXdgMime::globalInstance )
+	if ( NewBreeze::XdgMime::globalInstance )
 		return globalInstance;
 
-	NBXdgMime::globalInstance = new NBXdgMime();
+	NewBreeze::XdgMime::globalInstance = new NewBreeze::XdgMime();
 	globalInstance->parseDesktops();
 
-	return NBXdgMime::globalInstance;
+	return NewBreeze::XdgMime::globalInstance;
 };
 
-void NBXdgMime::setApplicationAsDefault( QString appFileName, QString mimetype ) {
+void NewBreeze::XdgMime::setApplicationAsDefault( QString appFileName, QString mimetype ) {
 
 	if ( QProcess::execute( "xdg-mime", QStringList() << "default" << appFileName << mimetype ) )
 		qDebug() << "Error while setting" << appFileName << "as the default handler for" << mimetype;
 };
 
-NBXdgMime::NBXdgMime() {
+NewBreeze::XdgMime::XdgMime() {
 
 	appsDirs << QDir::home().filePath( ".local/share/applications/" );
 	appsDirs << "/usr/local/share/applications/" << "/usr/share/applications/";
 	appsDirs << "/usr/share/applications/kde4/" << "/usr/share/gnome/applications/";
 };
 
-NBDesktopFile NBXdgMime::xdgDefaultApp( QMimeType mimeType ) {
+NewBreeze::DesktopFile NewBreeze::XdgMime::xdgDefaultApp( QMimeType mimeType ) {
 
 	QStringList mimes;
 	mimes << mimeType.name();
 	mimes << mimeType.allAncestors();
 
-	NBDesktopFile app;
+	NewBreeze::DesktopFile app;
 	Q_FOREACH( QString mimeName, mimes ) {
-		app = NBDesktopFile( NBXdg::xdgDefaultApp( mimeName ) );
+		app = NewBreeze::DesktopFile( NBXdg::xdgDefaultApp( mimeName ) );
 		if ( app.isValid() )
 			return app;
 	}
 
-	return NBDesktopFile();
+	return NewBreeze::DesktopFile();
 };
 
-uint qHash( const NBDesktopFile &app ) {
+uint qHash( const NewBreeze::DesktopFile &app ) {
 
 	QString hashString;
 	hashString += app.name();
@@ -788,7 +789,7 @@ uint qHash( const NBDesktopFile &app ) {
 	return qChecksum( hashString.toLocal8Bit().data(), hashString.count() );
 };
 
-QVariant& toQVariant( const NBDesktopFile &app ) {
+QVariant& toQVariant( const NewBreeze::DesktopFile &app ) {
 
 	QVariant appVar;
 	appVar.setValue( app );

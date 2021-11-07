@@ -28,13 +28,7 @@
 #pragma once
 
 #include "common.hpp"
-#include "NBArchive.hpp"
 #include "NBDeviceInfo.hpp"
-#include "NBBZip2.hpp"
-#include "NBGZip.hpp"
-#include "NBLZip.hpp"
-#include "NBLzma2.hpp"
-#include "NBLzma.hpp"
 #include "NBSystemInfo.hpp"
 #include "NBTools.hpp"
 #include "NBXdg.hpp"

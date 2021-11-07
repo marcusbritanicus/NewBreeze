@@ -56,7 +56,7 @@ QString termFormatString( QString file ) {
 
 QString MD5( QString data ) {
 
-	return QString::fromLocal8Bit( QCryptographicHash5::hash( data.toLocal8Bit(), QCryptographicHash5::Md5 ).toHex() );
+	return QString::fromLocal8Bit( QCryptographicHash::hash( data.toLocal8Bit(), QCryptographicHash::Md5 ).toHex() );
 };
 
 bool isFile( QString path ) {

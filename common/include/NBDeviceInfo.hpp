@@ -10,7 +10,7 @@
 
 class NBDeviceInfoPrivate;
 
-class NBCOMMON_DLLSPEC NBDeviceInfo {
+class NBDeviceInfo {
 
 	public:
 		NBDeviceInfo();
@@ -57,7 +57,7 @@ inline bool operator!=( const NBDeviceInfo &first, const NBDeviceInfo &second ) 
 
 Q_DECLARE_METATYPE(NBDeviceInfo)
 
-class NBCOMMON_DLLSPEC NBDeviceManager : public QObject {
+class NBDeviceManager : public QObject {
 	Q_OBJECT
 
 	public :

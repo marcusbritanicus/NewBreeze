@@ -18,27 +18,11 @@ add_project_link_arguments( ['-rdynamic','-fPIC'], language:'cpp' )
 
 qt5 = import( 'qt5' )
 qt5deps = dependency( 'qt5', modules: [ 'Core', 'Gui', 'Widgets' ] )
-zlib = dependency( 'zlib' )
-lzma = dependency( 'liblzma' )
-archive = dependency( 'libarchive' )
-bz2 = declare_dependency(
-    link_args : [ '-L/usr/lib/x86_64-linux-gnu', '-lbz2' ],
-    include_directories : include_directories( '/usr/include' )
-)
-lz = declare_dependency(
-    link_args : [ '-L/usr/lib/x86_64-linux-gnu', '-llz' ],
-    include_directories : include_directories( '/usr/include' )
-)
+archiveqt5 = dependency( 'archiveqt5' )
 
 Headers = [
 		'include/common.hpp',
-		'include/NBArchive.hpp',
-		'include/NBBZip2.hpp',
 		'include/NBDeviceInfo.hpp',
-		'include/NBGZip.hpp',
-		'include/NBLZip.hpp',
-		'include/NBLzma2.hpp',
-		'include/NBLzma.hpp',
 		'include/NBSystemInfo.hpp',
 		'include/NBTools.hpp',
 		'include/NBXdg.hpp',
@@ -48,13 +32,6 @@ Headers = [
 ]
 
 Sources = [
-		'Archive/lz4dec.c',
-		'Archive/NBArchive.cpp',
-		'Archive/NBBZip2.cpp',
-		'Archive/NBGZip.cpp',
-		'Archive/NBLZip.cpp',
-		'Archive/NBLzma2.cpp',
-		'Archive/NBLzma.cpp',
 		'DeviceInfo/NBDeviceInfo.cpp',
 		'DeviceInfo/NBDeviceInfoUnix.cpp',
 		'SimpleCrypt/SimpleCrypt.cpp',
@@ -68,7 +45,7 @@ mocs = qt5.compile_moc(
 	 	dependencies: qt5deps
 )
 
-deps = [ qt5deps, zlib, archive, lzma, lz, bz2 ]
+deps = [ qt5deps, archiveqt5 ]
 includes = [ 'include' ]
 
 nb3common = shared_library(
@@ -96,11 +73,11 @@ summary = [
 message( '\n'.join( summary ) )
 
 ## PkgConfig Section
-# pkgconfig = import( 'pkgconfig' )
-# pkgconfig.generate(
-# 		wlrootsqt,
-# 		name: meson.project_name(),
-# 		version: meson.project_version(),
-# 		filebase: meson.project_name(),
-# 		description: 'Qt Wrapper for Wayland and Wlroots protocols',
-# )
+pkgconfig = import( 'pkgconfig' )
+pkgconfig.generate(
+		nb3common,
+		name: meson.project_name(),
+		version: meson.project_version(),
+		filebase: meson.project_name(),
+		description: 'Some common classes for NewBreeze'
+)

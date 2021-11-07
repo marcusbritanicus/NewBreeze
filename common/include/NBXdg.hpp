@@ -15,7 +15,12 @@
 
 class QIcon;
 
-class NBCOMMON_DLLSPEC NBXdg {
+namespace NewBreeze {
+	class DesktopFile;
+	class XdgMime;
+}
+
+class NBXdg {
 	public:
 		enum XdgUserDir {
 			XDG_DATA_HOME    = 0x02544878,
@@ -39,7 +44,7 @@ class NBCOMMON_DLLSPEC NBXdg {
 		static QString homePartition;
 };
 
-class NBCOMMON_DLLSPEC NBDesktopFile {
+class NewBreeze::DesktopFile {
 
 	public:
 		enum Type {
@@ -48,7 +53,7 @@ class NBCOMMON_DLLSPEC NBDesktopFile {
 			Directory										// Desktopthat points to a directory	! NOT HANDLED
 		};
 
-		NBDesktopFile( QString filename = QString() );	// Create an instance of a desktop file
+		DesktopFile( QString filename = QString() );	// Create an instance of a desktop file
 
 		bool startApplication();
 		bool startApplicationWithArgs( QStringList );
@@ -77,8 +82,8 @@ class NBCOMMON_DLLSPEC NBDesktopFile {
 
 		QString desktopFileUrl() const;						// URL of the desktop file
 
-		/* Check if this NBDesktopFile is equivalent to @other */
-		bool operator==( const NBDesktopFile& ) const;
+		/* Check if this DesktopFile is equivalent to @other */
+		bool operator==( const DesktopFile& ) const;
 
 	private:
 		void getCategory();
@@ -106,12 +111,12 @@ class NBCOMMON_DLLSPEC NBDesktopFile {
 		short int mRank = 3;
 };
 
-typedef QList<NBDesktopFile> AppsList;
+typedef QList<NewBreeze::DesktopFile> AppsList;
 
-class NBCOMMON_DLLSPEC NBXdgMime {
+class NewBreeze::XdgMime {
 
 	public:
-		static NBXdgMime* instance();
+		static XdgMime* instance();
 
 		// Get a list of applications for a mime type given
 		AppsList appsForMimeType( QMimeType );
@@ -123,13 +128,13 @@ class NBCOMMON_DLLSPEC NBXdgMime {
 		AppsList allDesktops();
 
 		// Get the consolidated/unified application file for a desktop name
-		NBDesktopFile application( QString );
+		DesktopFile application( QString );
 
 		// Get the best desktop file path for a desktop name
 		QString desktopPathForName( QString );
 
 		// Get the best desktop file path for a desktop name
-		NBDesktopFile desktopForName( QString );
+		DesktopFile desktopForName( QString );
 
 		// Add one new application location
 		void addAppsLocations( QString );
@@ -142,17 +147,17 @@ class NBCOMMON_DLLSPEC NBXdgMime {
 
 		static void setApplicationAsDefault( QString, QString );
 
-		NBDesktopFile xdgDefaultApp( QMimeType );
+		DesktopFile xdgDefaultApp( QMimeType );
 
 	private:
-		NBXdgMime();
+		XdgMime();
 
-		static NBXdgMime *globalInstance;
+		static NewBreeze::XdgMime *globalInstance;
 
 		QStringList appsDirs;
 		AppsList appsList;
 };
 
-uint qHash( const NBDesktopFile &app );
-QVariant& toQVariant( const NBDesktopFile &app );
-Q_DECLARE_METATYPE( NBDesktopFile );
+uint qHash( const NewBreeze::DesktopFile &app );
+QVariant& toQVariant( const NewBreeze::DesktopFile &app );
+Q_DECLARE_METATYPE( NewBreeze::DesktopFile );

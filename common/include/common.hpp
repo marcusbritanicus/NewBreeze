@@ -48,25 +48,7 @@
 #include <dirent.h>
 #include <mntent.h>
 
-#if QT_VERSION >= 0x050000
-	#include <QMimeDatabase>
-	#include <QMimeType>
-	#include <QStandardPaths>
-#else
-	#include "QMimeDatabase.hpp"
-	#include "QMimeType.hpp"
-	#include "QStandardPaths.hpp"
-#endif
-
-#if QT_VERSION >= 0x050100
-	#include <QCryptographicHash>
-	#define QCryptographicHash5 QCryptographicHash
-#else
-	#include "QCryptographicHash5.hpp"
-#endif
-
-#if defined COMMON
-	#define NBCOMMON_DLLSPEC Q_DECL_EXPORT
-#else
-	#define NBCOMMON_DLLSPEC Q_DECL_IMPORT
-#endif
+#include <QMimeDatabase>
+#include <QMimeType>
+#include <QStandardPaths>
+#include <QCryptographicHash>
