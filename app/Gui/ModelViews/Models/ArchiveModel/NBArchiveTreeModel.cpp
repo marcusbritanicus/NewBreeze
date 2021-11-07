@@ -15,10 +15,7 @@ NBArchiveTreeModel::NBArchiveTreeModel( QString path ) : QAbstractItemModel() {
 	archiveName = path;
 
 	/* NBArchive instance */
-	archive = new NBArchive( archiveName );
-
-	/* By default we don't show hidden files */
-	__showHidden = false;
+	archive = new LibArchiveQt( archiveName );
 
 	/* Switch for temination of data gathering */
 	__terminate = false;
@@ -37,7 +34,7 @@ NBArchiveTreeModel::~NBArchiveTreeModel() {
 
 int NBArchiveTreeModel::rowCount( const QModelIndex &parent ) const {
 
-	NBTreeBranch *parentItem;
+	NBArchiveBranch *parentItem;
 	if ( parent.column() > 0 )
 		return 0;
 
@@ -45,7 +42,7 @@ int NBArchiveTreeModel::rowCount( const QModelIndex &parent ) const {
 		parentItem = tree;
 
 	else
-		parentItem = static_cast<NBTreeBranch*>( parent.internalPointer() );
+		parentItem = static_cast<NBArchiveBranch*>( parent.internalPointer() );
 
 	return parentItem->branchCount();
 };
@@ -68,7 +65,7 @@ QVariant NBArchiveTreeModel::data( const QModelIndex &index, int role ) const {
 	if ( not index.isValid() )
 		return QVariant();
 
-	NBTreeBranch *node = static_cast<NBTreeBranch*>( index.internalPointer() );
+	NBArchiveBranch *node = static_cast<NBArchiveBranch*>( index.internalPointer() );
 	switch( role ) {
 
 		case Qt::DisplayRole: {
@@ -148,14 +145,14 @@ QModelIndex NBArchiveTreeModel::index( int row, int column, const QModelIndex &p
     if ( ( row > rowCount( parent ) ) and ( column > columnCount( parent ) ) )
 		return QModelIndex();
 
-	NBTreeBranch *parentNode;
+	NBArchiveBranch *parentNode;
 	if ( not parent.isValid() )
 		parentNode = tree;
 
 	else
-		parentNode = (NBTreeBranch *)parent.internalPointer();
+		parentNode = (NBArchiveBranch *)parent.internalPointer();
 
-	NBTreeBranch *branch = parentNode->branch( row );
+	NBArchiveBranch *branch = parentNode->branch( row );
 	if ( branch )
 		return createIndex( row, column, branch );
 
@@ -165,14 +162,14 @@ QModelIndex NBArchiveTreeModel::index( int row, int column, const QModelIndex &p
 
 QModelIndex NBArchiveTreeModel::index( QString name, const QModelIndex &parent ) const {
 
-	NBTreeBranch *parentNode;
+	NBArchiveBranch *parentNode;
 	if ( not parent.isValid() )
 		parentNode = tree;
 
 	else
-		parentNode = static_cast<NBTreeBranch*>( parent.internalPointer() );
+		parentNode = static_cast<NBArchiveBranch*>( parent.internalPointer() );
 
-	NBTreeBranch *branch = parentNode->branch( name );
+	NBArchiveBranch *branch = parentNode->branch( name );
 	if ( branch )
 		return createIndex( branch->row(), 0, branch );
 
@@ -184,8 +181,8 @@ QModelIndex NBArchiveTreeModel::parent( const QModelIndex &idx ) const {
 	if ( not idx.isValid() )
 		return QModelIndex();
 
-	NBTreeBranch *branch = ( NBTreeBranch * )idx.internalPointer();
-	NBTreeBranch *parentNode = branch->parent();
+	NBArchiveBranch *branch = ( NBArchiveBranch * )idx.internalPointer();
+	NBArchiveBranch *parentNode = branch->parent();
 
 	if ( parentNode == tree )
 		return QModelIndex();
@@ -199,36 +196,9 @@ bool NBArchiveTreeModel::hasBranches( const QModelIndex &idx ) const {
 		return true;
 
 	else {
-		NBTreeBranch *branch = static_cast<NBTreeBranch*>( idx.internalPointer() );
+		NBArchiveBranch *branch = static_cast<NBArchiveBranch*>( idx.internalPointer() );
 		return ( branch->branchCount() > 0 );
 	}
-};
-
-bool NBArchiveTreeModel::showHidden() const {
-
-	return __showHidden;
-};
-
-void NBArchiveTreeModel::setShowHidden( bool ) {
-
-	// plantTree();
-};
-
-Qt::DropActions NBArchiveTreeModel::supportedDragActions() const {
-
-	return Qt::IgnoreAction;
-};
-
-Qt::DropActions NBArchiveTreeModel::supportedDropActions() const {
-
-	return Qt::IgnoreAction;
-};
-
-QStringList NBArchiveTreeModel::mimeTypes() const {
-
-	QStringList types;
-	types << "text/uri-list";
-	return types;
 };
 
 QStringList NBArchiveTreeModel::nameFilters() {
@@ -309,7 +279,7 @@ void NBArchiveTreeModel::growTree() {
 	archive_read_support_format_all( a );
 	archive_read_support_filter_all( a );
 
-	tree = new NBTreeBranch( "Name", QIcon::fromTheme( "folder" ), 0 );
+	tree = new NBArchiveBranch( "Name", QIcon::fromTheme( "folder" ), 0 );
 
 	if ( ( r = archive_read_open_filename( a, archiveName.toLatin1().data(), 10240 ) ) )
 		return;
@@ -320,15 +290,15 @@ void NBArchiveTreeModel::growTree() {
 
 		QStringList tokens = QStringList() << name.split( "/", Qt::SkipEmptyParts );
 		QString iconName = ( ( type == AE_IFDIR ) ? "folder" : mimeDb.mimeTypeForFile( tokens.value( 0 ) ).iconName() );
-		tree->addBranch( new NBTreeBranch( tokens.value( 0 ), QIcon::fromTheme( iconName ), tree ) );
+		tree->addBranch( new NBArchiveBranch( tokens.value( 0 ), QIcon::fromTheme( iconName ), tree ) );
 		if ( tokens.size() == 1 )
 			continue;
 
-		NBTreeBranch *branch = tree;
+		NBArchiveBranch *branch = tree;
 		for( int i = 1; i < tokens.size(); i++ ) {
 			branch = branch->branch( tokens.value( i - 1 ) );
 			QString iconName = ( ( type == AE_IFDIR ) ? "folder" : mimeDb.mimeTypeForFile( tokens.value( i ) ).iconName() );
-			branch->addBranch( new NBTreeBranch( tokens.value( i ), QIcon::fromTheme( iconName ), branch ) );
+			branch->addBranch( new NBArchiveBranch( tokens.value( i ), QIcon::fromTheme( iconName ), branch ) );
 		}
 
 		qApp->processEvents();

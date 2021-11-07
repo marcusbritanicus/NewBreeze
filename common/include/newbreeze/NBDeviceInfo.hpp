@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "common.hpp"
+#include <newbreeze/common.hpp>
 
 class NBDeviceInfoPrivate;
 

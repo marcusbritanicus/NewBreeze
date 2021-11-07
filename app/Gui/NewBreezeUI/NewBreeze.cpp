@@ -379,7 +379,7 @@ void NewBreeze::createAndSetupActions() {
 
 void NewBreeze::openFile( QString file ) {
 
-	NBDesktopFile app = NBXdgMime::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( file ) );
+	NewBreeze::DesktopFile app = NewBreeze::XdgMime::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( file ) );
 
 	/* Show Open with command  */
 	if ( not app.isValid() ) {
@@ -661,7 +661,7 @@ void NewBreeze::showProperties() {
 			paths << FolderView->fsModel->nodePath( idx );
 
 	if ( FolderView->fsModel->modelDataType() == NBItemViewModel::Applications ) {
-		NBDesktopFileEditor *desktopEditor = new NBDesktopFileEditor( this, paths.at( 0 ) );
+		NewBreeze::DesktopFileEditor *desktopEditor = new NewBreeze::DesktopFileEditor( this, paths.at( 0 ) );
 		desktopEditor->exec();
 	}
 

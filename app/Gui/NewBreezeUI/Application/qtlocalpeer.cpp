@@ -48,19 +48,18 @@
 
 const char* QtLocalPeer::ack = "ack";
 
-QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId)
-    : QObject(parent), id(appId)
-{
-    mSocketName = QLatin1String("NewBreeze3-SingleApp-") + QString::number( getuid() );
+QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId) : QObject(parent), id(appId) {
+
+    mSocketName = QString( "NB3-Socket-%1" ).arg( getuid() );
 
     server = new QLocalServer(this);
-    QString lockName = QDir( QDir::tempPath() ).absolutePath() + QLatin1Char('/') + mSocketName + QLatin1String("-lockfile");
+    QString lockName = QString( "%1/%2-lockfile.lock" ).arg( QDir::tempPath() ).arg( mSocketName );
 
-    lockFile = new QLockFile( mSocketName + ".lock" );
+    lockFile = new QLockFile( lockName );
 }
 
-bool QtLocalPeer::isClient()
-{
+bool QtLocalPeer::isClient() {
+
     /* If we have the lock, we're the server */
     /* In other words, if we're not there, there is no server */
     if ( lockFile->isLocked() )
@@ -74,8 +73,8 @@ bool QtLocalPeer::isClient()
     return true;
 }
 
-bool QtLocalPeer::sendMessage(const QString &message, int timeout)
-{
+bool QtLocalPeer::sendMessage(const QString &message, int timeout) {
+
     if (!isClient())
         return false;
 

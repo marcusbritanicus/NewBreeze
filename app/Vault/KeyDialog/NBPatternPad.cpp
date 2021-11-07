@@ -43,9 +43,9 @@ QString PasswordKeypad::password() {
 
 	/* If ther version is greater than 5.1 */
 	#if QT_VERSION >= 0x050100
-		return QCryptographicHash::hash( m_password.toUtf8(), QCryptographicHash5::Sha3_512 ).toHex();
+		return QCryptographicHash::hash( m_password.toUtf8(), QCryptographicHash::Sha3_512 ).toHex();
 	#else
-		return QCryptographicHash5::hash( m_password.toUtf8(), QCryptographicHash5::Sha3_512 ).toHex();
+		return QCryptographicHash::hash( m_password.toUtf8(), QCryptographicHash::Sha3_512 ).toHex();
 	#endif
 };
 

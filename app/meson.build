@@ -24,17 +24,9 @@ NB3Common = declare_dependency(
 )
 zlib = dependency( 'zlib' )
 lzma = dependency( 'liblzma' )
-archive = dependency( 'libarchive' )
+archiveqt5 = dependency( 'archiveqt5' )
 mediainfo = dependency( 'libmediainfo' )
 termwidget = dependency( 'qtermwidget5' )
-bz2 = declare_dependency(
-    link_args : [ '-L/usr/lib/x86_64-linux-gnu', '-lbz2' ],
-    include_directories : include_directories( '/usr/include' )
-)
-lz = declare_dependency(
-    link_args : [ '-L/usr/lib/x86_64-linux-gnu', '-llz' ],
-    include_directories : include_directories( '/usr/include' )
-)
 
 Headers = [
 		'Core/ArgParser/NBCLParser.hpp',
@@ -52,7 +44,7 @@ Headers = [
 		'Global.hpp',
 		'Gui/Dialogs/AppEditor/NBAppEditorDialog.hpp',
 		'Gui/Dialogs/Archive/NBArchiveDialog.hpp',
-		'Gui/Dialogs/BookmarkEditor/NBBookmarkEditor.hpp',
+		# 'Gui/Dialogs/BookmarkEditor/NBBookmarkEditor.hpp',
 		'Gui/Dialogs/BugReporter/NBBugReporter.hpp',
 		'Gui/Dialogs/ConfirmDeleteDialog/NBConfirmDeleteDialog.hpp',
 		'Gui/Dialogs/Dialog/AboutNB.hpp',
@@ -80,7 +72,7 @@ Headers = [
 		'Gui/Dialogs/SettingsManager/NBSTerminalWidget.hpp',
 		'Gui/Dialogs/StartupWizard/NBStartupWizard.hpp',
 		'Gui/ModelViews/Models/ArchiveModel/NBArchiveTreeModel.hpp',
-		'Gui/ModelViews/Models/ArchiveModel/NBTreeBranch.hpp',
+		'Gui/ModelViews/Models/ArchiveModel/NBArchiveBranch.hpp',
 		'Gui/ModelViews/Models/DirTreeModel/NBDirTreeModel.hpp',
 		'Gui/ModelViews/Models/DirTreeModel/NBTreeBranch.hpp',
 		'Gui/ModelViews/Models/ItemViewModel/NBFileInfoGatherer.hpp',
@@ -101,7 +93,6 @@ Headers = [
 		'Gui/ModelViews/Views/TrashView/NBTrashView.hpp',
 		'Gui/NewBreezeUI/Application/NBApplication.hpp',
 		'Gui/NewBreezeUI/Application/qtlocalpeer.hpp',
-		'Gui/NewBreezeUI/Application/qtlockedfile.hpp',
 		'Gui/NewBreezeUI/NewBreeze.hpp',
 		'Gui/NewBreezeUI/NewBreezeTray.hpp',
 		'Gui/Others/GuiFunctions/NBGuiFunctions.hpp',
@@ -173,7 +164,7 @@ Sources = [
 		'Core/ProcessManager/NBProcessManager.cpp',
 		'Gui/Dialogs/AppEditor/NBAppEditorDialog.cpp',
 		'Gui/Dialogs/Archive/NBArchiveDialog.cpp',
-		'Gui/Dialogs/BookmarkEditor/NBBookmarkEditor.cpp',
+		# 'Gui/Dialogs/BookmarkEditor/NBBookmarkEditor.cpp',
 		'Gui/Dialogs/BugReporter/NBBugReporter.cpp',
 		'Gui/Dialogs/ConfirmDeleteDialog/NBConfirmDeleteDialog.cpp',
 		'Gui/Dialogs/Dialog/AboutNB.cpp',
@@ -202,7 +193,7 @@ Sources = [
 		'Gui/Dialogs/SettingsManager/qkeysequencewidget.cpp',
 		'Gui/Dialogs/StartupWizard/NBStartupWizard.cpp',
 		'Gui/ModelViews/Models/ArchiveModel/NBArchiveTreeModel.cpp',
-		'Gui/ModelViews/Models/ArchiveModel/NBTreeBranch.cpp',
+		'Gui/ModelViews/Models/ArchiveModel/NBArchiveBranch.cpp',
 		'Gui/ModelViews/Models/DirTreeModel/NBDirTreeModel.cpp',
 		'Gui/ModelViews/Models/DirTreeModel/NBTreeBranch.cpp',
 		'Gui/ModelViews/Models/ItemViewModel/epeg/main.cpp',
@@ -224,8 +215,6 @@ Sources = [
 		'Gui/ModelViews/Views/TrashView/NBTrashView.cpp',
 		'Gui/NewBreezeUI/Application/NBApplication.cpp',
 		'Gui/NewBreezeUI/Application/qtlocalpeer.cpp',
-		'Gui/NewBreezeUI/Application/qtlockedfile.cpp',
-		'Gui/NewBreezeUI/Application/qtlockedfile_unix.cpp',
 		'Gui/NewBreezeUI/NewBreeze.cpp',
 		'Gui/NewBreezeUI/NewBreezeTray.cpp',
 		'Gui/Others/GuiFunctions/NBGuiFunctions.cpp',
@@ -356,13 +345,13 @@ Mocs = Qt5.compile_moc(
 )
 
 Resources = Qt5.compile_resources(
- 		sources : [	'NewBreeze.qrc', '.data/data.qrc' ],
-	 	dependencies: Qt5Deps
+		name: 'NBRes',
+ 		sources : [	'NewBreeze.qrc', '../data/data.qrc' ],
 )
 
 nb3 = executable(
     'newbreeze3', [ Sources, Mocs, Resources ],
-    dependencies: [ Qt5Deps, NB3Common, zlib, lzma, archive, mediainfo, termwidget, bz2, lz ],
+    dependencies: [ Qt5Deps, NB3Common, archiveqt5, mediainfo, termwidget ],
 		include_directories: [ Includes, '/usr/include/newbreeze' ],
     install: true
 )

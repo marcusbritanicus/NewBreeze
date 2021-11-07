@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "common.hpp"
+#include <newbreeze/common.hpp>
 
 /* Qt Equivalent of linux dirname and basename */
 QString dirName( QString path );

@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "NBTreeBranch.hpp"
-#include "NBArchive.hpp"
+#include "NBArchiveBranch.hpp"
+#include <libarchiveqt.h>
 
 class NBArchiveTreeModel : public QAbstractItemModel {
     Q_OBJECT
@@ -54,14 +54,7 @@ class NBArchiveTreeModel : public QAbstractItemModel {
 		/* Children, fetchMore */
 		bool hasBranches( const QModelIndex &index = QModelIndex() ) const;
 
-		bool showHidden() const;
-		void setShowHidden( bool );
-
-		/* Drag and Drop */
-		Qt::DropActions supportedDropActions() const;
-		Qt::DropActions supportedDragActions() const;
 		Qt::ItemFlags flags( const QModelIndex index ) const;
-		QStringList mimeTypes() const;
 
 		/* Filters */
 		QStringList nameFilters();
@@ -87,17 +80,15 @@ class NBArchiveTreeModel : public QAbstractItemModel {
 		/* Grow the tree */
 		void growTree();
 
-		NBTreeBranch *tree;
+		NBArchiveBranch *tree;
 
 		QString archiveName;
-		NBArchive *archive;
+		LibArchiveQt *archive;
 
 		mutable struct loadStatus {
 			bool loading;
 			bool stopLoading;
 		} currentLoadStatus;
-
-		bool __showHidden;
 
 		QStringList __nameFilters;
 

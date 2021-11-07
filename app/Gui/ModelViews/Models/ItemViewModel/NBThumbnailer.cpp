@@ -181,14 +181,14 @@ void NBThumbnailer::run() {
 				continue;
 
 			/* Open as archive */
-			// NBArchive *odf = new NBArchive( file );
-			// odf->setDestination( "/tmp/NewBreeze_odf/" );
-			// odf->extractMember( "Thumbnails/thumbnail.png" );
-			// if ( not odf->exitStatus() ) {
-				// QFile::copy( "/tmp/NewBreeze_odf/Thumbnails/thumbnail.png", hashPath );
-				// removeDir( "/tmp/NewBreeze_odf" );
-				// emit updateNode( file );
-			// }
+			LibArchiveQt *odf = new LibArchiveQt( file );
+			odf->setDestination( "/tmp/NewBreeze_odf/" );
+			odf->extractMember( "Thumbnails/thumbnail.png" );
+			if ( not odf->exitStatus() ) {
+				QFile::copy( "/tmp/NewBreeze_odf/Thumbnails/thumbnail.png", hashPath );
+				removeDir( "/tmp/NewBreeze_odf" );
+				emit updateNode( file );
+			}
 		}
 	}
 

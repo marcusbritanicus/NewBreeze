@@ -1174,9 +1174,9 @@ void NBItemViewModel::setupApplicationsData() {
 	emit directoryLoading( mRootPath );
 
 	beginResetModel();
-	NBXdgMime *appEngine = NBXdgMime::instance();
-	foreach( NBDesktopFile app, appEngine->allDesktops() ) {
-		if ( ( app.type() != NBDesktopFile::Application ) or not app.visible() )
+	NewBreeze::XdgMime *appEngine = NewBreeze::XdgMime::instance();
+	foreach( NewBreeze::DesktopFile app, appEngine->allDesktops() ) {
+		if ( ( app.type() != NewBreeze::DesktopFile::Application ) or not app.visible() )
 			continue;
 
 		QVariantList data;

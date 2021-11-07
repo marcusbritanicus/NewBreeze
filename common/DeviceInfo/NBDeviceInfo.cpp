@@ -4,7 +4,7 @@
 	*
 */
 
-#include "NBDeviceInfo.hpp"
+#include <newbreeze/NBDeviceInfo.hpp>
 #include "NBDeviceInfo_p.hpp"
 
 NBDeviceInfo::NBDeviceInfo() {

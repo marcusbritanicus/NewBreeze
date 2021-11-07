@@ -141,7 +141,7 @@ void NBAppIconButton::selectIcon() {
 	}
 };
 
-NBDesktopFileEditor::NBDesktopFileEditor( QWidget *parent, NBDesktopFile desktopFile ) : QDialog( parent ) {
+NBDesktopFileEditor::NBDesktopFileEditor( QWidget *parent, NewBreeze::DesktopFile desktopFile ) : QDialog( parent ) {
 
 	mApp = desktopFile;
 
@@ -220,35 +220,35 @@ void NBDesktopFileEditor::createGUI() {
 
 void NBDesktopFileEditor::updateEntries() {
 
-	// nameLE->setText( mApp.value( NBDesktopFile::Name ).toString() );
-	// descrLE->setText( mApp.value( NBDesktopFile::Description ).toString() );
-	// cmtLE->setText( mApp.value( NBDesktopFile::Comment ).toString() );
-	// execLE->setText( mApp.value( NBDesktopFile::Exec ).toString() );
+	// nameLE->setText( mApp.value( NewBreeze::DesktopFile::Name ).toString() );
+	// descrLE->setText( mApp.value( NewBreeze::DesktopFile::Description ).toString() );
+	// cmtLE->setText( mApp.value( NewBreeze::DesktopFile::Comment ).toString() );
+	// execLE->setText( mApp.value( NewBreeze::DesktopFile::Exec ).toString() );
 
-	// iconBtn->setIcon( mApp.value( NBDesktopFile::Icon ).toString() );
+	// iconBtn->setIcon( mApp.value( NewBreeze::DesktopFile::Icon ).toString() );
 
-	// wrkPthLE->setText( mApp.value( NBDesktopFile::WorkPath ).toString() );
-	// hiddenCB->setChecked( mApp.value( NBDesktopFile::NoDisplay ).toBool() );
-	// termCB->setChecked( mApp.value( NBDesktopFile::TerminalMode ).toBool() );
+	// wrkPthLE->setText( mApp.value( NewBreeze::DesktopFile::WorkPath ).toString() );
+	// hiddenCB->setChecked( mApp.value( NewBreeze::DesktopFile::NoDisplay ).toBool() );
+	// termCB->setChecked( mApp.value( NewBreeze::DesktopFile::TerminalMode ).toBool() );
 
-	// Q_FOREACH( QString mime, mApp.value( NBDesktopFile::MimeTypes ).toStringList() )
+	// Q_FOREACH( QString mime, mApp.value( NewBreeze::DesktopFile::MimeTypes ).toStringList() )
 		// mimesTW->setChecked( mime, true );
 };
 
 void NBDesktopFileEditor::accept() {
 
-	// mApp.setValue( NBDesktopFile::Name, nameLE->text() );
-	// mApp.setValue( NBDesktopFile::Description, descrLE->text() );
-	// mApp.setValue( NBDesktopFile::Comment, cmtLE->text() );
-	// mApp.setValue( NBDesktopFile::Exec, execLE->text() );
+	// mApp.setValue( NewBreeze::DesktopFile::Name, nameLE->text() );
+	// mApp.setValue( NewBreeze::DesktopFile::Description, descrLE->text() );
+	// mApp.setValue( NewBreeze::DesktopFile::Comment, cmtLE->text() );
+	// mApp.setValue( NewBreeze::DesktopFile::Exec, execLE->text() );
 
-	// mApp.setValue( NBDesktopFile::Icon, iconBtn->iconPath() );
+	// mApp.setValue( NewBreeze::DesktopFile::Icon, iconBtn->iconPath() );
 
-	// mApp.setValue( NBDesktopFile::WorkPath, wrkPthLE->text() );
-	// mApp.setValue( NBDesktopFile::NoDisplay, hiddenCB->isChecked() );
-	// mApp.setValue( NBDesktopFile::TerminalMode, termCB->isChecked() );
+	// mApp.setValue( NewBreeze::DesktopFile::WorkPath, wrkPthLE->text() );
+	// mApp.setValue( NewBreeze::DesktopFile::NoDisplay, hiddenCB->isChecked() );
+	// mApp.setValue( NewBreeze::DesktopFile::TerminalMode, termCB->isChecked() );
 
-	// mApp.setValue( NBDesktopFile::MimeTypes, mimesTW->selectedItems() );
+	// mApp.setValue( NewBreeze::DesktopFile::MimeTypes, mimesTW->selectedItems() );
 
 	// mApp.save();
 

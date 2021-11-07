@@ -39,7 +39,7 @@ NBVaultRecord* NBVaultDatabase::recordForPath( QString path, QByteArray vaultPas
 		return rec;
 
 	/* Get the hash under which the data is stored */
-	QString pathHash = QString( QCryptographicHash5::hash( path.toLocal8Bit(), QCryptographicHash5::Md5 ).toHex() );
+	QString pathHash = QString( QCryptographicHash::hash( path.toLocal8Bit(), QCryptographicHash::Md5 ).toHex() );
 
 	/* Get the data: @pathHash/Data */
 	QByteArray data = vaultDB.value( pathHash + "/Data" ).toByteArray();
@@ -82,7 +82,7 @@ bool NBVaultDatabase::addRecordForPath( QString path, NBVaultRecord *rec, QByteA
 	data = s20.encryptData( data, vaultPass );
 
 	/* Get the hash under which the data will be stored */
-	QString pathHash = QString( QCryptographicHash5::hash( path.toLocal8Bit(), QCryptographicHash5::Md5 ).toHex() );
+	QString pathHash = QString( QCryptographicHash::hash( path.toLocal8Bit(), QCryptographicHash::Md5 ).toHex() );
 
 	/* Store the updated @paths and the encrypted record */
 	vaultDB.setValue( "Paths", paths );
@@ -102,7 +102,7 @@ bool NBVaultDatabase::removeRecordForPath( QString path ) {
 	paths.removeAll( path );
 
 	/* Get the hash under which the data is stored */
-	QString pathHash = QString( QCryptographicHash5::hash( path.toLocal8Bit(), QCryptographicHash5::Md5 ).toHex() );
+	QString pathHash = QString( QCryptographicHash::hash( path.toLocal8Bit(), QCryptographicHash::Md5 ).toHex() );
 
 	/* Store the update @paths */
 	vaultDB.setValue( "Paths", paths );
@@ -116,7 +116,7 @@ bool NBVaultDatabase::removeRecordForPath( QString path ) {
 bool NBVaultDatabase::checkVaultPassword( QByteArray vPass ) {
 
 	/* Password hash */
-	QByteArray vpHash = QCryptographicHash5::hash( vPass, QCryptographicHash5::Sha3_512 );
+	QByteArray vpHash = QCryptographicHash::hash( vPass, QCryptographicHash::Sha3_512 );
 
 	return ( vaultDB.value( "Password" ).toByteArray() == vpHash );
 };
@@ -127,7 +127,7 @@ bool NBVaultDatabase::changeVaultPassword( QByteArray oldPass, QByteArray newPas
 	NBSalsa20 new20;
 
 	Q_FOREACH( QString path, vaultDB.value( "Paths" ).toStringList() ) {
-		QString pathHash = QString( QCryptographicHash5::hash( path.toLocal8Bit(), QCryptographicHash5::Md5 ).toHex() );
+		QString pathHash = QString( QCryptographicHash::hash( path.toLocal8Bit(), QCryptographicHash::Md5 ).toHex() );
 		QByteArray data = old20.decryptData( vaultDB.value( pathHash + "/data" ).toByteArray(), oldPass );
 		data = new20.decryptData( data, newPass );
 

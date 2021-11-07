@@ -1,12 +1,12 @@
 /*
 	*
-	* NBTreeBranch.cpp - NewBreeze NBTreeBranch Class
+	* NBArchiveBranch.cpp - NewBreeze NBArchiveBranch Class
 	*
 */
 
-#include "NBTreeBranch.hpp"
+#include "NBArchiveBranch.hpp"
 
-NBTreeBranch::NBTreeBranch() : QObject() {
+NBArchiveBranch::NBArchiveBranch() : QObject() {
 
 	__showHidden = false;
 
@@ -16,7 +16,7 @@ NBTreeBranch::NBTreeBranch() : QObject() {
 	parentNode = 0;
 };
 
-NBTreeBranch::NBTreeBranch( QString name, QIcon icon, NBTreeBranch *parent ) : QObject()  {
+NBArchiveBranch::NBArchiveBranch( QString name, QIcon icon, NBArchiveBranch *parent ) : QObject()  {
 
 	__showHidden = false;
 
@@ -26,86 +26,86 @@ NBTreeBranch::NBTreeBranch( QString name, QIcon icon, NBTreeBranch *parent ) : Q
 	parentNode = parent;
 };
 
-int NBTreeBranch::branchCount() {
+int NBArchiveBranch::branchCount() {
 
 	return mBranches.count();
 };
 
-void NBTreeBranch::clearBranches() {
+void NBArchiveBranch::clearBranches() {
 
 	mBranches.clear();
 };
 
-void NBTreeBranch::addBranch( NBTreeBranch *newNode ) {
+void NBArchiveBranch::addBranch( NBArchiveBranch *newNode ) {
 
-	Q_FOREACH( NBTreeBranch* node, mBranches )
+	Q_FOREACH( NBArchiveBranch* node, mBranches )
 		if ( node->name() == newNode->name() )
 			return;
 
 	mBranches << newNode;
 };
 
-void NBTreeBranch::removeBranch( NBTreeBranch *node ) {
+void NBArchiveBranch::removeBranch( NBArchiveBranch *node ) {
 
 	delete mBranches.takeAt( node->row() );
 };
 
-NBTreeBranch* NBTreeBranch::branch( int row ) {
+NBArchiveBranch* NBArchiveBranch::branch( int row ) {
 
 	return mBranches.at( row );
 };
 
-NBTreeBranch* NBTreeBranch::branch( QString name ) {
+NBArchiveBranch* NBArchiveBranch::branch( QString name ) {
 
-	Q_FOREACH( NBTreeBranch* node, mBranches )
+	Q_FOREACH( NBArchiveBranch* node, mBranches )
 		if ( node->name() == name )
 			return node;
 
-	return new NBTreeBranch();
+	return new NBArchiveBranch();
 };
 
-QList<NBTreeBranch*> NBTreeBranch::branches() {
+QList<NBArchiveBranch*> NBArchiveBranch::branches() {
 
 	return mBranches;
 };
 
-QStringList NBTreeBranch::nameFilters() {
+QStringList NBArchiveBranch::nameFilters() {
 
 	return __nameFilters;
 };
 
-void NBTreeBranch::setNameFilters( QStringList filters ) {
+void NBArchiveBranch::setNameFilters( QStringList filters ) {
 
 	__nameFilters.clear();
 	__nameFilters << filters;
 };
 
-void NBTreeBranch::clearNameFilters() {
+void NBArchiveBranch::clearNameFilters() {
 
 	__nameFilters.clear();
 };
 
-bool NBTreeBranch::showHidden() const {
+bool NBArchiveBranch::showHidden() const {
 
 	return __showHidden;
 };
 
-void NBTreeBranch::setShowHidden( bool shown ) {
+void NBArchiveBranch::setShowHidden( bool shown ) {
 
 	__showHidden = shown;
 };
 
-QString NBTreeBranch::name() {
+QString NBArchiveBranch::name() {
 
 	return mPath;
 }
 
-QIcon NBTreeBranch::icon() {
+QIcon NBArchiveBranch::icon() {
 
 	return mIcon;
 };
 
-QVariant NBTreeBranch::data( int role ) const {
+QVariant NBArchiveBranch::data( int role ) const {
 
 	switch( role ) {
 		case Qt::DisplayRole:
@@ -122,17 +122,17 @@ QVariant NBTreeBranch::data( int role ) const {
 	}
 };
 
-bool NBTreeBranch::setData( int, QVariant ) {
+bool NBArchiveBranch::setData( int, QVariant ) {
 
 	return true;
 };
 
-NBTreeBranch* NBTreeBranch::parent() {
+NBArchiveBranch* NBArchiveBranch::parent() {
 
 	return parentNode;
 };
 
-int NBTreeBranch::row() {
+int NBArchiveBranch::row() {
 
 	/* If mPath is not defined */
 	if ( not mPath.count() )
@@ -144,12 +144,12 @@ int NBTreeBranch::row() {
 	return 0;
 };
 
-void NBTreeBranch::sort() {
+void NBArchiveBranch::sort() {
 
 	qSort( mBranches.begin(), mBranches.end(), caseInsensitiveNameSort );
 };
 
-bool caseInsensitiveNameSort( NBTreeBranch *first, NBTreeBranch *second )  {
+bool caseInsensitiveNameSort( NBArchiveBranch *first, NBArchiveBranch *second )  {
 
 	QString name1 = first->name().toLower();
 	QString name2 = second->name().toLower();

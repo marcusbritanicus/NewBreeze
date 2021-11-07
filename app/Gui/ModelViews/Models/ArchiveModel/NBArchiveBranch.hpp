@@ -1,6 +1,6 @@
 /*
 	*
-	* NBTreeBranch.hpp - NewBreeze NBTreeBranch Class Header
+	* NBArchiveBranch.hpp - NewBreeze NBArchiveBranch Class Header
 	*
 */
 
@@ -9,23 +9,23 @@
 #include "Global.hpp"
 #include "newbreeze.hpp"
 
-class NBTreeBranch : public QObject {
+class NBArchiveBranch : public QObject {
 	Q_OBJECT
 
 	public:
-		NBTreeBranch();
-		NBTreeBranch( QString, QIcon, NBTreeBranch *parent = 0 );
+		NBArchiveBranch();
+		NBArchiveBranch( QString, QIcon, NBArchiveBranch *parent = 0 );
 
 		int branchCount();
 
 		void clearBranches();
 
-		void addBranch( NBTreeBranch* );
-		void removeBranch( NBTreeBranch* );
+		void addBranch( NBArchiveBranch* );
+		void removeBranch( NBArchiveBranch* );
 
-		NBTreeBranch* branch( int );
-		NBTreeBranch* branch( QString );
-		QList<NBTreeBranch*> branches();
+		NBArchiveBranch* branch( int );
+		NBArchiveBranch* branch( QString );
+		QList<NBArchiveBranch*> branches();
 
 		QVariant data( int role ) const;
 		bool setData( int column, QVariant data );
@@ -38,7 +38,7 @@ class NBTreeBranch : public QObject {
 		bool showHidden() const;
 		void setShowHidden( bool );
 
-		NBTreeBranch *parent();
+		NBArchiveBranch *parent();
 		int row();
 
 		void sort();
@@ -47,8 +47,8 @@ class NBTreeBranch : public QObject {
 		QIcon icon();
 
 	private:
-		QList<NBTreeBranch*> mBranches;
-		NBTreeBranch *parentNode;
+		QList<NBArchiveBranch*> mBranches;
+		NBArchiveBranch *parentNode;
 
 		QString mPath;
 		QIcon mIcon;
@@ -57,5 +57,5 @@ class NBTreeBranch : public QObject {
 		bool __showHidden;
 };
 
-bool caseInsensitiveNameSort( NBTreeBranch *first, NBTreeBranch *second );
+bool caseInsensitiveNameSort( NBArchiveBranch *first, NBArchiveBranch *second );
 bool matchesFilter( QStringList filters, QString text );

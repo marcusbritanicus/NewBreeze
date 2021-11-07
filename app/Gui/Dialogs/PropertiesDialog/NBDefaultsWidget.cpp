@@ -68,8 +68,8 @@ NBDefaultsWidget::NBDefaultsWidget( QStringList paths, QWidget *parent ) : QWidg
 void NBDefaultsWidget::refreshDefaults() {
 
 	/* Get defaults */
-	AppsList appsList = NBXdgMime::instance()->appsForMimeType( mimeType );
-	Q_FOREACH( NBDesktopFile app, appsList ) {
+	AppsList appsList = NewBreeze::XdgMime::instance()->appsForMimeType( mimeType );
+	Q_FOREACH( NewBreeze::DesktopFile app, appsList ) {
 		QIcon appIcon = QIcon::fromTheme( app.icon(), QIcon( app.icon() ) );
 		QString appName = app.name();
 
@@ -84,7 +84,7 @@ void NBDefaultsWidget::refreshDefaults() {
 	QSettings appsSett( "NewBreeze", "MimeApps" );
 	QString mimeName = mimeType.name().replace( "/", "-" );
 	Q_FOREACH( QString desktopFile, appsSett.value( mimeName ).toStringList() ) {
-		NBDesktopFile appFile( desktopFile );
+		NewBreeze::DesktopFile appFile( desktopFile );
 		if ( not appFile.isValid() )
 			continue;
 
@@ -109,7 +109,7 @@ void NBDefaultsWidget::addApplication() {
 		return;
 
 	QString app = appSelDlg->selectedApp();
-	NBDesktopFile appFile( app );
+	NewBreeze::DesktopFile appFile( app );
 	if ( not appFile.isValid() )
 		return;
 
@@ -156,7 +156,7 @@ void NBDefaultsWidget::removeApplication() {
 void NBDefaultsWidget::makeDefault( int idx ) {
 
 	QListWidgetItem *itm = appList->item( idx );
-	NBXdgMime::setApplicationAsDefault( itm->data( Qt::UserRole + 1 ).toString(), mimeType.name() );
+	NewBreeze::XdgMime::setApplicationAsDefault( itm->data( Qt::UserRole + 1 ).toString(), mimeType.name() );
 };
 
 NBAppSelector::NBAppSelector( QWidget *parent ) : NBDialog( parent ) {

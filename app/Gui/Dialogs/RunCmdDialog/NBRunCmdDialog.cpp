@@ -22,14 +22,14 @@ QString NBRunCmdDialog::commandString() {
 	return execCmd;
 };
 
-NBDesktopFile NBRunCmdDialog::selectedApp() {
+NewBreeze::DesktopFile NBRunCmdDialog::selectedApp() {
 
 	QModelIndex idx = appList->currentIndex();
 
 	if ( execCmd == idx.data( Qt::UserRole + 3 ).toStringList().join( " " ) )
-		return NBDesktopFile( idx.data( Qt::UserRole + 5 ).toString() );
+		return NewBreeze::DesktopFile( idx.data( Qt::UserRole + 5 ).toString() );
 
-	return NBDesktopFile();
+	return NewBreeze::DesktopFile();
 };
 
 bool NBRunCmdDialog::canRun() {
@@ -165,7 +165,7 @@ void NBRunCmdDialog::makeDefaultAndRunCommand() {
 
 	QModelIndex idx = appList->currentIndex();
 
-	NBXdgMime::setApplicationAsDefault( idx.data( Qt::UserRole + 9 ).toString(), getMimeType( fileName ) );
+	NewBreeze::XdgMime::setApplicationAsDefault( idx.data( Qt::UserRole + 9 ).toString(), getMimeType( fileName ) );
 	execCmd = idx.data( Qt::UserRole + 3 ).toStringList().join( " " );
 	runOk = true;
 	close();

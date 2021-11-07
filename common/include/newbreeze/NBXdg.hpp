@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "common.hpp"
-#include "NBDeviceInfo.hpp"
+#include <newbreeze/common.hpp>
+#include <newbreeze/NBDeviceInfo.hpp>
 
 class QIcon;
 

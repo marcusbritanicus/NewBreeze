@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "common.hpp"
-#include "NBDeviceInfo.hpp"
-#include "NBTools.hpp"
+#include <newbreeze/common.hpp>
+#include <newbreeze/NBDeviceInfo.hpp>
+#include <newbreeze/NBTools.hpp>
 
 class NBDeviceInfoPrivate : public QSharedData {
 	public:

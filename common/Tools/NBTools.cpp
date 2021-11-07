@@ -4,7 +4,7 @@
 	*
 */
 
-#include "NBTools.hpp"
+#include <newbreeze/NBTools.hpp>
 
 static QMimeDatabase mimeDb;
 

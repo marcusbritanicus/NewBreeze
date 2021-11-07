@@ -4,8 +4,8 @@
 	*
 */
 
-#include "NBXdg.hpp"
-#include "NBTools.hpp"
+#include <newbreeze/NBXdg.hpp>
+#include <newbreeze/NBTools.hpp>
 
 /* We assume that the home partition is always mounted */
 QString NBXdg::homePartition = NBDeviceInfo( QDir::homePath() ).mountPoint();

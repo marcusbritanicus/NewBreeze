@@ -166,7 +166,7 @@ QByteArray NBVault::vaultPassword() {
 
 		NBPasswordDialog *pDlg = new NBPasswordDialog( NULL );
 		if ( pDlg->exec() )
-			vaultDB.setValue( "Password", QCryptographicHash5::hash( pDlg->password(), QCryptographicHash5::Sha3_512 ) );
+			vaultDB.setValue( "Password", QCryptographicHash::hash( pDlg->password(), QCryptographicHash::Sha3_512 ) );
 	}
 
 	if ( ( mKeyStoreOption == NBVault::StoreVaultKeyForSession ) and ( vaultPass.count() ) )
@@ -199,7 +199,7 @@ bool NBVault::changeVaultPassword() {
 	NBPasswordDialog *pDlg = new NBPasswordDialog( NULL );
 	if ( pDlg->exec() ) {
 		newPass = pDlg->password();
-		vaultDB.setValue( "Password", QCryptographicHash5::hash( pDlg->password(), QCryptographicHash5::Sha3_512 ) );
+		vaultDB.setValue( "Password", QCryptographicHash::hash( pDlg->password(), QCryptographicHash::Sha3_512 ) );
 
 		return NBVaultDatabase::changeVaultPassword( oldPass, newPass );
 	}
@@ -214,5 +214,5 @@ QByteArray NBVault::generatePassword() {
 	fread( randData, 1, 1024, randF );
 	fclose( randF );
 
-	return QCryptographicHash5::hash( QByteArray( randData, 1024 ), QCryptographicHash5::Sha3_512 );
+	return QCryptographicHash::hash( QByteArray( randData, 1024 ), QCryptographicHash::Sha3_512 );
 };

@@ -12,7 +12,7 @@
 #include "NBVaultDatabase.hpp"
 #include "NBVault.hpp"
 
-static NBXdgMime *engine = NBXdgMime::instance();
+static NewBreeze::XdgMime *engine = NewBreeze::XdgMime::instance();
 
 NBActionsMenu::NBActionsMenu( QList<QModelIndex> selectedIndexes, QString dir, QWidget *parent ) : QMenu( parent ) {
 	/*
@@ -348,7 +348,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 		}
 
 		else {
-			QSet<NBDesktopFile> finalAppsList;
+			QSet<NewBreeze::DesktopFile> finalAppsList;
 			QList<AppsList> appsPerNode;
 			foreach( QString file, nodes )
 				appsPerNode << engine->appsForMimeType( mimeDb.mimeTypeForFile( file ) );
@@ -361,7 +361,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 			}
 
 			// Adding them to the context menu
-			foreach( NBDesktopFile app, finalAppsList ) {
+			foreach( NewBreeze::DesktopFile app, finalAppsList ) {
 				QString name = app.name();
 				QString icon = app.icon();
 
@@ -413,7 +413,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 
 		QMimeType mimeType = mimeDb.mimeTypeForFile( path );
 		AppsList apps = engine->appsForMimeType( mimeType );
-		Q_FOREACH( NBDesktopFile app, apps ) {
+		Q_FOREACH( NewBreeze::DesktopFile app, apps ) {
 			QString name = app.name();
 			QString icon = app.icon();
 
@@ -447,7 +447,7 @@ void NBOpenWithMenu::buildMenu( QList<QModelIndex> selection ) {
 			addSeparator();
 
 		Q_FOREACH( QString desktop, userApps ) {
-			NBDesktopFile app( desktop );
+			NewBreeze::DesktopFile app( desktop );
 			QString name = app.name();
 			QString icon = app.icon();
 

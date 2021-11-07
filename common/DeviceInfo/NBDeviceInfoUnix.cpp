@@ -4,7 +4,7 @@
 	*
 */
 
-#include "common.hpp"
+#include <newbreeze/common.hpp>
 #include "NBDeviceInfo_p.hpp"
 
 inline static QString getDeviceTypeReal( QString dev, QString vfsType ) {

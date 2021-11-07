@@ -7,7 +7,6 @@
 #pragma once
 
 #include "Global.hpp"
-#include "NBArchive.hpp"
 #include "NBArchiveDialog.hpp"
 #include "NBConfirmDeleteDialog.hpp"
 #include "NBContextMenu.hpp"

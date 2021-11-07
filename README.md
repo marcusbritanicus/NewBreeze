@@ -48,10 +48,7 @@ Its features such as inbuilt file and folder encryption, SuperStart, and Quick f
   * QtWebKit in case of Qt5 and upto Qt 5.4 (libqtwebkit-dev, libqt5webkit5-dev, qtwebkit5-dev)
   * QtWebEngine Qt 5.5 onwards (qtwebengine5-dev)
   * QScintilla (libqt5scintilla2-dev, libqscintilla2-qt5-dev)
-* zlib (zlib1g-dev)
-* liblzma (liblzma-dev)
-* libbzip2 (libbz2-dev)
-* libarchive (libarchive-dev)
+* libarchiveqt (gitlab.com/marcusbritanicus/libarchive-qt)
 * libdjvulibre-dev (libdjvulibre-dev)
 * ffmpegthumbnailer (libffmpegthumbnailer-dev)
 * poppler (libpoppler-qt5-dev)
@@ -61,12 +58,7 @@ Its features such as inbuilt file and folder encryption, SuperStart, and Quick f
 * OS:				Debian Sid
 * Qt:				Qt5 5.14.2
 * QScintilla:		2.11.2
-* LibArchive:		3.4.3
-* LibLzma: 			5.2.4
-* LibBz2:			1.0.8
-* zlib:				1.2.11
-* liblz (lzip):		1.10
-* lzop (binary):	1.04
+* LibArchiveQt:		2.0.6
 * popper-qt5:       0.85.0-2
 * libdjvulibre:		3.5.27.1
 * mediainfo:		20.08

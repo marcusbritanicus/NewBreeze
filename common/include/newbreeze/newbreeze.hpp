@@ -27,9 +27,9 @@
 
 #pragma once
 
-#include "common.hpp"
-#include "NBDeviceInfo.hpp"
-#include "NBSystemInfo.hpp"
-#include "NBTools.hpp"
-#include "NBXdg.hpp"
-#include "SimpleCrypt.hpp"
+#include <newbreeze/common.hpp>
+#include <newbreeze/NBDeviceInfo.hpp>
+#include <newbreeze/NBSystemInfo.hpp>
+#include <newbreeze/NBTools.hpp>
+#include <newbreeze/NBXdg.hpp>
+#include <newbreeze/SimpleCrypt.hpp>

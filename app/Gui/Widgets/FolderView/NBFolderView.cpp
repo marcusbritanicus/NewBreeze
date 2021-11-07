@@ -6,6 +6,8 @@
 
 #include "NBFolderView.hpp"
 
+#include <libarchiveqt.h>
+
 // Init moveItems
 bool NBFolderView::moveItems = false;
 
@@ -446,7 +448,7 @@ void NBFolderView::doOpen( QString loc ) {
 		}
 
 		else {
-			NBDesktopFile app = NBXdgMime::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
+			NewBreeze::DesktopFile app = NewBreeze::XdgMime::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( loc ) );
 			if ( not app.isValid() )
 				doOpenWithCmd();
 
@@ -542,7 +544,7 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 			}
 
 			else {
-				NBDesktopFile app = NBXdgMime::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( fileToBeOpened ) );
+				NewBreeze::DesktopFile app = NewBreeze::XdgMime::instance()->xdgDefaultApp( mimeDb.mimeTypeForFile( fileToBeOpened ) );
 				if ( not app.isValid() )
 					doOpenWithCmd();
 
@@ -571,7 +573,7 @@ void NBFolderView::doOpenWith() {
 	QString desktopName = data.takeFirst();
 
 	if ( desktopName != "Inbuilt" ) {
-		NBDesktopFile app( desktopName );
+		NewBreeze::DesktopFile app( desktopName );
 		app.startApplicationWithArgs( data );
 
 		return;
@@ -1301,9 +1303,9 @@ void NBFolderView::compress( QStringList archiveList ) {
 	msg->setText(  QString( "The creation of the archive, <tt>%1</tt>, is complete." ).arg( baseName( arcName ) ) );
 	msg->addButton( QMessageBox::Ok );
 
-	NBArchive *arc = new NBArchive( arcName );
-	arc->updateInputFiles( archiveList );
+	LibArchiveQt *arc = new LibArchiveQt( arcName );
 	arc->setWorkingDir( fsModel->currentDir() );
+	arc->updateInputFiles( archiveList );			// Relative to the current directory
 
 	connect( arc, SIGNAL( jobComplete() ), msg, SLOT( show() ) );
 	connect( arc, SIGNAL( jobFailed() ), this, SLOT( archiveJob() ) );
@@ -1322,7 +1324,7 @@ void NBFolderView::extract( QString archive ) {
 	msg->setText(  QString( "Extraction of the archive, <tt>%1</tt>, is complete." ).arg( baseName( archive ) ) );
 	msg->addButton( QMessageBox::Ok );
 
-	NBArchive *arc = new NBArchive( archive );
+	LibArchiveQt *arc = new LibArchiveQt( archive );
 	if ( isContainerArchive( archive ) )
 		arc->setDestination( dest );
 

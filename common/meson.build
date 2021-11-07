@@ -21,13 +21,13 @@ qt5deps = dependency( 'qt5', modules: [ 'Core', 'Gui', 'Widgets' ] )
 archiveqt5 = dependency( 'archiveqt5' )
 
 Headers = [
-		'include/common.hpp',
-		'include/NBDeviceInfo.hpp',
-		'include/NBSystemInfo.hpp',
-		'include/NBTools.hpp',
-		'include/NBXdg.hpp',
-		'include/newbreeze.hpp',
-		'include/SimpleCrypt.hpp',
+		'include/newbreeze/common.hpp',
+		'include/newbreeze/NBDeviceInfo.hpp',
+		'include/newbreeze/NBSystemInfo.hpp',
+		'include/newbreeze/NBTools.hpp',
+		'include/newbreeze/NBXdg.hpp',
+		'include/newbreeze/newbreeze.hpp',
+		'include/newbreeze/SimpleCrypt.hpp',
 		'NBPluginInterface.hpp'
 ]
 
@@ -58,8 +58,8 @@ nb3common = shared_library(
 )
 
 install_subdir(
-		'include',
-		install_dir: get_option( 'includedir' ) + '/newbreeze',
+		'include/newbreeze',
+		install_dir: get_option( 'includedir' ),
 		strip_directory : false
 )
 
