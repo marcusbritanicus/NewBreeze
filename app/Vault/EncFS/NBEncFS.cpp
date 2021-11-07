@@ -247,7 +247,7 @@ NBCreateEncFS::NBCreateEncFS( QWidget *parent ) : QDialog( parent ) {
 
 	createGUI();
 
-	QRect scrnSize = QDesktopWidget().screenGeometry();
+	QRect scrnSize = qApp->primaryScreen()->geometry();
 	int hpos = ( int )( ( scrnSize.width() - 700 ) / 2 );
 	int vpos = ( int )( ( scrnSize.height() - 400 ) / 2 );
 	move( hpos, vpos );

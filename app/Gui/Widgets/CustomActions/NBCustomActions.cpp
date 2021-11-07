@@ -234,7 +234,7 @@ NBNewAction::NBNewAction( QWidget *parent ) : NBDialog( parent ) {
 	QLabel *lbl = new QLabel( tr( "Add Custom Action" ) );
 
 	QToolButton *closeBtn = new QToolButton();
-	closeBtn->setText( trUtf8( "\u2718" ) );
+	closeBtn->setText( "\u2718" );
 	closeBtn->setAutoRaise( true );
 	closeBtn->setFocusPolicy( Qt::NoFocus );
 

@@ -146,7 +146,7 @@ int NBArchiveBranch::row() {
 
 void NBArchiveBranch::sort() {
 
-	qSort( mBranches.begin(), mBranches.end(), caseInsensitiveNameSort );
+	std::sort( mBranches.begin(), mBranches.end(), caseInsensitiveNameSort );
 };
 
 bool caseInsensitiveNameSort( NBArchiveBranch *first, NBArchiveBranch *second )  {
@@ -155,13 +155,4 @@ bool caseInsensitiveNameSort( NBArchiveBranch *first, NBArchiveBranch *second ) 
 	QString name2 = second->name().toLower();
 
 	return name1 < name2;
-};
-
-bool matchesFilter( QStringList filters, QString text ) {
-
-	Q_FOREACH( QString filter, filters )
-		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
-			return true;
-
-	return false;
 };

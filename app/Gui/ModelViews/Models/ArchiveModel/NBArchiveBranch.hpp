@@ -58,4 +58,3 @@ class NBArchiveBranch : public QObject {
 };
 
 bool caseInsensitiveNameSort( NBArchiveBranch *first, NBArchiveBranch *second );
-bool matchesFilter( QStringList filters, QString text );

@@ -72,7 +72,7 @@ void NBBugReporter::setWindowProperties() {
 	setWindowTitle( "NewBreeze3 - Bug Reporter" );
 	setWindowIcon( QIcon::fromTheme( "newbreeze" ) );
 
-	QRect scrnSize = QDesktopWidget().screenGeometry();
+	QRect scrnSize = qApp->primaryScreen()->geometry();
 	int hpos = ( int )( ( scrnSize.width() - 700 ) / 2 );
 	int vpos = ( int )( ( scrnSize.height() - 400 ) / 2 );
 	move( hpos, vpos );

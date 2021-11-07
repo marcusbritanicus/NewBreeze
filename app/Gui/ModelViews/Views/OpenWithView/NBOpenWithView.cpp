@@ -384,7 +384,8 @@ QModelIndexList NBOpenWithView::selectedIndexes() {
 
 	QSet<QModelIndex> idxSet;
 	idxSet.unite( QSet<QModelIndex>( mSelectedIndexes.begin(), mSelectedIndexes.end() ) );
-	idxSet.unite( QSet<QModelIndex>::fromList( selectionModel()->selectedIndexes() ) );
+	for( QModelIndex idx: selectionModel()->selectedIndexes() )
+		idxSet << idx;
 
 	return idxSet.values();
 };
@@ -393,7 +394,8 @@ QModelIndexList NBOpenWithView::selection() {
 
 	QSet<QModelIndex> idxSet;
 	idxSet.unite( QSet<QModelIndex>( mSelectedIndexes.begin(), mSelectedIndexes.end() ) );
-	idxSet.unite( QSet<QModelIndex>::fromList( selectionModel()->selectedIndexes() ) );
+	for( QModelIndex idx: selectionModel()->selectedIndexes() )
+		idxSet << idx;
 
 	return idxSet.values();
 };

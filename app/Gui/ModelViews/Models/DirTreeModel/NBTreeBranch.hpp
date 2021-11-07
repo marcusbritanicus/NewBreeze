@@ -65,4 +65,3 @@ class NBTreeBranch : public QObject {
 };
 
 bool caseInsensitiveNameSort( NBTreeBranch *first, NBTreeBranch *second );
-bool matchesFilter( QStringList filters, QString text );

@@ -484,19 +484,21 @@ QRegion NBIconView::visualRegionForSelection( const QItemSelection &selection ) 
 QModelIndexList NBIconView::selectedIndexes() {
 
 	QSet<QModelIndex> idxSet;
-	idxSet.unite( QSet<QModelIndex>::fromList( mSelectedIndexes ) );
-	idxSet.unite( QSet<QModelIndex>::fromList( selectionModel()->selectedIndexes() ) );
+	idxSet.unite( QSet<QModelIndex>( mSelectedIndexes.begin( ), mSelectedIndexes.end() ) );
+	for( QModelIndex idx: selectionModel()->selectedIndexes() )
+		idxSet << idx;
 
-	return idxSet.toList();
+	return idxSet.values();
 };
 
 QModelIndexList NBIconView::selection() {
 
 	QSet<QModelIndex> idxSet;
-	idxSet.unite( QSet<QModelIndex>::fromList( mSelectedIndexes ) );
-	idxSet.unite( QSet<QModelIndex>::fromList( selectionModel()->selectedIndexes() ) );
+	idxSet.unite( QSet<QModelIndex>( mSelectedIndexes.begin( ), mSelectedIndexes.end() ) );
+	for( QModelIndex idx: selectionModel()->selectedIndexes() )
+		idxSet << idx;
 
-	return idxSet.toList();
+	return idxSet.values();
 };
 
 bool NBIconView::isIndexVisible( QModelIndex idx ) const {
@@ -776,11 +778,11 @@ void NBIconView::paintIconOverlay( QPainter *painter, const QRect &rect ) {
 	painter->setBrush( QColor( 60, 60, 60, 200 ) );
 	painter->drawPath( path );
 
-	painter->setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing, false );
+	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing, false );
 	painter->setPen( QPen( QColor( 200, 200, 200, 90 ), 0.5 ) );
 	painter->drawLine( oRect.x() + oRect.width() / 2, oRect.y(), oRect.x() + oRect.width() / 2, oRect.y() + oRect.height() );
 	painter->drawLine( oRect.x(), oRect.y() + oRect.height() / 2, oRect.x() + oRect.width(), oRect.y() + oRect.height() / 2 );
-	painter->setRenderHints( QPainter::Antialiasing | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing, true );
+	painter->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing, true );
 
 	painter->setPen( Qt::white );
 	painter->setFont( QFont( "DejaVu Sans", 8, QFont::Bold ) );
@@ -1156,7 +1158,7 @@ void NBIconView::mouseDoubleClickEvent( QMouseEvent *mEvent ) {
 					if ( not runInTerminal ) {
 
 						// Try to run this program
-						QProcess::startDetached( execList.at( 0 ) );
+						QProcess::startDetached( execList.at( 0 ), {} );
 					}
 
 					else {
@@ -1383,7 +1385,7 @@ void NBIconView::keyPressEvent( QKeyEvent *kEvent ) {
 				if ( not runInTerminal ) {
 
 					// Try to run this program
-					QProcess::startDetached( execList.at( 0 ) );
+					QProcess::startDetached( execList.at( 0 ), {} );
 				}
 
 				else {

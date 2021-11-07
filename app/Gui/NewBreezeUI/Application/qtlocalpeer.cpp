@@ -69,8 +69,19 @@ bool QtLocalPeer::isClient() {
     if ( not lockFile->tryLock() )
         return true;
 
-    /* By default, we'll assume that the server is running elsewhere */
-    return true;
+    bool res = server->listen( mSocketName );
+    // ### Workaround
+    if ( !res && server->serverError() == QAbstractSocket::AddressInUseError ) {
+        QFile::remove( QDir::cleanPath( QDir::tempPath() )+QLatin1Char( '/' ) + mSocketName );
+        res = server->listen( mSocketName );
+    }
+
+    if ( !res )
+        qWarning( "QtSingleCoreApplication: listen on local socket failed, %s", qPrintable( server->errorString() ) );
+
+    QObject::connect( server, &QLocalServer::newConnection, this, &QtLocalPeer::receiveConnection );
+
+    return false;
 }
 
 bool QtLocalPeer::sendMessage(const QString &message, int timeout) {

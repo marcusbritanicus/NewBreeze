@@ -105,8 +105,8 @@ QVBoxLayout *NBSideBarMenu::addDeviceEntries() {
 
 		entryLyt->addWidget( item );
 		mHeight += 24;
-		if ( 56 + fm->width( info.displayName() ) > mWidth )
-			mWidth = 56 + fm->width( info.displayName() );
+		if ( 56 + fm->horizontalAdvance( info.displayName() ) > mWidth )
+			mWidth = 56 + fm->horizontalAdvance( info.displayName() );
 
 		/* Special tooltip hack */
 		int percent = 100 * info.bytesUsed() / info.bytesTotal();
@@ -133,8 +133,8 @@ QVBoxLayout *NBSideBarMenu::addCatalogEntries() {
 			entryLyt->addWidget( item );
 			mHeight += 24;
 
-			if ( 56 + fm->width( key ) > mWidth )
-				mWidth = 56 + fm->width( key );
+			if ( 56 + fm->horizontalAdvance( key ) > mWidth )
+				mWidth = 56 + fm->horizontalAdvance( key );
 		}
 	}
 
@@ -149,8 +149,8 @@ QVBoxLayout *NBSideBarMenu::addCatalogEntries() {
 			entryLyt->addWidget( item );
 			mHeight += 24;
 
-			if ( 56 + fm->width( key ) > mWidth )
-				mWidth = 56 + fm->width( key );
+			if ( 56 + fm->horizontalAdvance( key ) > mWidth )
+				mWidth = 56 + fm->horizontalAdvance( key );
 		}
 	}
 	ctlList.endGroup();
@@ -173,8 +173,8 @@ QVBoxLayout *NBSideBarMenu::addBookmarkEntries() {
 		entryLyt->addWidget( item );
 		mHeight += 24;
 
-		if ( 56 + fm->width( info.displayLabel ) > mWidth )
-			mWidth = 56 + fm->width( info.displayLabel );	}
+		if ( 56 + fm->horizontalAdvance( info.displayLabel ) > mWidth )
+			mWidth = 56 + fm->horizontalAdvance( info.displayLabel );	}
 
 	return entryLyt;
 };
@@ -197,8 +197,8 @@ QVBoxLayout *NBSideBarMenu::addQuickFileEntries() {
 		entryLyt->addWidget( item );
 		mHeight += 24;
 
-		if ( 56 + fm->width( key ) > mWidth )
-			mWidth = 56 + fm->width( key );
+		if ( 56 + fm->horizontalAdvance( key ) > mWidth )
+			mWidth = 56 + fm->horizontalAdvance( key );
 	}
 
 	qfList.endGroup();

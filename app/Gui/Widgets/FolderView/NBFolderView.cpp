@@ -444,7 +444,7 @@ void NBFolderView::doOpen( QString loc ) {
 				* permissions
 				*
 			*/
-			qDebug( "Executing %s... [%s]", loc.toLocal8Bit().data(), ( QProcess::startDetached( loc ) ? "DONE" : " FAILED" ) );
+			qDebug( "Executing %s... [%s]", loc.toLocal8Bit().data(), ( QProcess::startDetached( loc, QStringList() ) ? "DONE" : " FAILED" ) );
 		}
 
 		else {
@@ -539,7 +539,10 @@ void NBFolderView::doOpen( QModelIndex idx ) {
 					* or something of the sort and not a jpg file with exec perms
 					*
 				*/
-				qDebug( "Executing %s... [%s]", fileToBeOpened.toLocal8Bit().data(), ( QProcess::startDetached( fileToBeOpened ) ? "DONE" : " FAILED" ) );
+				qDebug(
+					"Executing %s... [%s]",
+					fileToBeOpened.toLocal8Bit().data(), ( QProcess::startDetached( fileToBeOpened, QStringList() ) ? "DONE" : " FAILED" )
+				);
 
 			}
 

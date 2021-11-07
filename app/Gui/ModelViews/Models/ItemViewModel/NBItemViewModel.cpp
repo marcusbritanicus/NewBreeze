@@ -5,18 +5,10 @@
 */
 
 #include "NBItemViewModel.hpp"
+#include "NBFunctions.hpp"
 
 static QMutex mutex;
 QStringList lambdaUseFilterList;
-
-inline int matchesFilter( QStringList filters, QString text ) {
-
-	Q_FOREACH( QString filter, filters )
-		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
-			return 1;
-
-	return 0;
-};
 
 inline int scandirCallback( const struct dirent* entry ) {
 
@@ -35,7 +27,7 @@ inline int scandirCallback( const struct dirent* entry ) {
 			return 1;
 
 		/* If the name matches any one of the nameFilters, show it */
-		return matchesFilter( lambdaUseFilterList, entry->d_name );
+		return stringInStringList( lambdaUseFilterList, entry->d_name );
 	}
 
 	/* If no filter, select all */
@@ -320,7 +312,7 @@ bool NBItemViewModel::insertNode( QString nodeName ) {
 
 	if ( Settings->value( "ShowHidden" ) ) {
 		if ( mNameFilters.count() ) {
-			if ( matchesFilter( mNameFilters, nodeName ) ) {
+			if ( stringInStringList( mNameFilters, nodeName ) ) {
 				rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 				mChildNames << nodeName;
 			}
@@ -334,7 +326,7 @@ bool NBItemViewModel::insertNode( QString nodeName ) {
 	else {
 		if ( not nodeName.startsWith( "." ) ) {
 			if ( mNameFilters.count() ) {
-				if ( matchesFilter( mNameFilters, nodeName ) ) {
+				if ( stringInStringList( mNameFilters, nodeName ) ) {
 					rootNode->addChild( new NBItemViewNode( data, getCategory( data ), rootNode ) );
 					mChildNames << nodeName;
 				}

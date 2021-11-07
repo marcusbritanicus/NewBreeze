@@ -132,7 +132,7 @@ Headers = [
 		'Gui/Widgets/Terminal/TtyTabWidget.hpp',
 		'Gui/Widgets/TrashManager/NBTrashManager.hpp',
 		'optionparser.hpp',
-		'Vault/CryFS/CryFS.hpp',
+		# 'Vault/CryFS/CryFS.hpp',
 		'Vault/EncFS/NBEncFS.hpp',
 		'Vault/Global2.hpp',
 		'Vault/KeyDialog/NBPasswordDialog.hpp',
@@ -255,7 +255,7 @@ Sources = [
 		'Gui/Widgets/Terminal/TtyTabWidget.cpp',
 		'Gui/Widgets/TrashManager/NBTrashManager.cpp',
 		'Main.cpp',
-		'Vault/CryFS/CryFS.cpp',
+		# 'Vault/CryFS/CryFS.cpp',
 		'Vault/EncFS/NBEncFS.cpp',
 		'Vault/KeyDialog/NBPasswordDialog.cpp',
 		'Vault/KeyDialog/NBPasswordEdit.cpp',
@@ -354,6 +354,36 @@ nb3 = executable(
     dependencies: [ Qt5Deps, NB3Common, archiveqt5, mediainfo, termwidget ],
 		include_directories: [ Includes, '/usr/include/newbreeze' ],
     install: true
+)
+
+# Desktop file
+install_data(
+		'../data/newbreeze.desktop',
+		install_dir : get_option( 'datadir' ) / 'applications'
+)
+
+# Icons
+install_data(
+		'../icons/newbreeze.png',
+		install_dir : get_option( 'datadir' ) / 'icons/hicolor/256x256/apps'
+)
+
+# Files
+install_data(
+		[ '../README.md', '../ChangeLog', '../ReleaseNotes' ],
+		install_dir : get_option( 'datadir' ) / 'newbreeze'
+)
+
+# Mime
+install_data(
+		'../data/x-encrypted-file.xml',
+		install_dir : get_option( 'datadir' ) / 'mime/packages/'
+)
+
+# Templates
+install_subdir(
+		'../data/templates',
+		install_dir : get_option( 'datadir' ) / 'newbreeze'
 )
 
 summary = [

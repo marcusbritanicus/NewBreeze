@@ -167,7 +167,7 @@ void NBProcessWidget::togglePauseResume() {
 
 		mProcess->resume();
 
-		pausedSecs += pauseTime.elapsed() / 1000;
+		pausedSecs += pauseTimer.elapsed() / 1000;
 	}
 
 	else {
@@ -176,7 +176,7 @@ void NBProcessWidget::togglePauseResume() {
 
 		mProcess->pause();
 
-		pauseTime.start();
+		pauseTimer.start();
 	}
 };
 

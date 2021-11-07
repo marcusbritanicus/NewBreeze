@@ -8,8 +8,11 @@
 
 #include "Global.hpp"
 
-/* Terminal */
+/** Terminal */
 QStringList getTerminal();
 
-/* If this is an appiamge, get its mount path */
+/** If this is an appiamge, get its mount path */
 QString getAppImagePath();
+
+/** */
+bool stringInStringList( QStringList, QString );

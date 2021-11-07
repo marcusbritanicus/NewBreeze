@@ -8,15 +8,6 @@
 
 static QMutex mutex;
 
-inline bool matchesFilter( QStringList filters, QString text ) {
-
-	Q_FOREACH( QString filter, filters )
-		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
-			return true;
-
-	return false;
-};
-
 NBMimeIconUpdater::NBMimeIconUpdater( QString root, QStringList entries, bool *term ) : QThread() {
 
 	mTerminate = term;

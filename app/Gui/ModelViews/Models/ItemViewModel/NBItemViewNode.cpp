@@ -233,7 +233,7 @@ void NBItemViewNode::sort( int, bool, bool categorized ) {
 	if ( categorized )
 		mCategoryList = sortCategoryList( mCategoryList );
 
-	qSort( childNodes.begin(), childNodes.end(), columnSort2 );
+	std::sort( childNodes.begin(), childNodes.end(), columnSort2 );
 };
 
 void NBItemViewNode::updateIcon( QIcon icon ) {
@@ -426,7 +426,7 @@ QStringList sortCategoryList( QStringList& cList ) {
 	switch( ( int )Settings->value( "SortColumn" ) ) {
 		/* Name sort */
 		case 0: {
-			qSort( cList.begin(), cList.end(), listLessThanA );
+			std::sort( cList.begin(), cList.end(), listLessThanA );
 			return cList;
 		};
 
@@ -460,7 +460,7 @@ QStringList sortCategoryList( QStringList& cList ) {
 		case 2: {
 			if ( cList.contains( "Folders" ) ) {
 				cList.removeAll( "Folders" );
-				qSort( cList.begin(), cList.end(), listLessThanB );
+				std::sort( cList.begin(), cList.end(), listLessThanB );
 				cList.insert( 0, "Folders" );
 			}
 
@@ -475,7 +475,7 @@ QStringList sortCategoryList( QStringList& cList ) {
 
 					return catList;
 				}
-				qSort( cList.begin(), cList.end(), listLessThanB );
+				std::sort( cList.begin(), cList.end(), listLessThanB );
 			}
 
 			return cList;
@@ -493,7 +493,7 @@ QStringList sortCategoryList( QStringList& cList ) {
 					dList << QDate::fromString( date, "MMMM yyyy" );
 			}
 
-			qSort( dList.begin(), dList.end() );
+			std::sort( dList.begin(), dList.end() );
 			Q_FOREACH( QDate date, dList )
 				nList << date.toString( "MMMM yyyy" );
 

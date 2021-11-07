@@ -89,7 +89,7 @@ int NBMimeTypeNode::row() {
 
 void NBMimeTypeNode::sort() {
 
-	qSort( childNodes.begin(), childNodes.end(), mimeTypeNodeSort );
+	std::sort( childNodes.begin(), childNodes.end(), mimeTypeNodeSort );
 };
 
 bool mimeTypeNodeSort( NBMimeTypeNode *first, NBMimeTypeNode *second ) {

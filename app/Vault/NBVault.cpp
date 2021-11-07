@@ -130,7 +130,7 @@ bool NBVault::isDirectoryDecrypted( QString path ) {
 		path.chop( 1 );
 
 	QProcess proc;
-	proc.start( "df -h" );
+	proc.start( "df -h", QStringList() );
 	proc.waitForFinished();
 
 	QString output = QString::fromLocal8Bit( proc.readAllStandardOutput() );

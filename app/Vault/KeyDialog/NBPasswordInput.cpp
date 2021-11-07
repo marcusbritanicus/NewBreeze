@@ -56,7 +56,7 @@ void NBPasswordInput::setWindowProperties() {
 	setWindowTitle( "NewBreeze - Input Password" );
 	setWindowIcon( QIcon( ":/icons/newbreeze.png" ) );
 
-	QRect scrnSize = QDesktopWidget().screenGeometry();
+	QRect scrnSize = qApp->primaryScreen()->geometry();
 	int hpos = ( int )( ( scrnSize.width() - 300 ) / 2 );
 	int vpos = ( int )( ( scrnSize.height() - 400 ) / 2 );
 	move( hpos, vpos );

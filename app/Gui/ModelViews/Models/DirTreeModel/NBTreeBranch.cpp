@@ -5,6 +5,7 @@
 */
 
 #include "NBTreeBranch.hpp"
+#include "NBFunctions.hpp"
 
 NBTreeBranch::NBTreeBranch() : QObject() {
 
@@ -54,7 +55,7 @@ void NBTreeBranch::explore() {
 			/* Show Hidden */
 			if ( __showHidden ) {
 				/* If we have set name filters */
-				if ( __nameFilters.count() and matchesFilter( __nameFilters, nodeName ) )
+				if ( __nameFilters.count() and stringInStringList( __nameFilters, nodeName ) )
 					addChild( new NBTreeBranch( mPath + nodeName + "/", QIcon::fromTheme( "folder" ), this ) );
 
 				else
@@ -65,7 +66,7 @@ void NBTreeBranch::explore() {
 			else {
 				if ( not nodeName.startsWith( "." ) ) {
 					/* We want to filter folders too */
-					if ( __nameFilters.count() and matchesFilter( __nameFilters, nodeName ) )
+					if ( __nameFilters.count() and stringInStringList( __nameFilters, nodeName ) )
 						addChild( new NBTreeBranch( mPath + nodeName + "/", QIcon::fromTheme( "folder" ), this ) );
 
 					else
@@ -194,7 +195,7 @@ int NBTreeBranch::row() {
 
 void NBTreeBranch::sort() {
 
-	qSort( childNodes.begin(), childNodes.end(), caseInsensitiveNameSort );
+	std::sort( childNodes.begin(), childNodes.end(), caseInsensitiveNameSort );
 };
 
 bool caseInsensitiveNameSort( NBTreeBranch *first, NBTreeBranch *second )  {
@@ -203,13 +204,4 @@ bool caseInsensitiveNameSort( NBTreeBranch *first, NBTreeBranch *second )  {
 	QString name2 = second->name().toLower();
 
 	return name1 < name2;
-};
-
-bool matchesFilter( QStringList filters, QString text ) {
-
-	Q_FOREACH( QString filter, filters )
-		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
-			return true;
-
-	return false;
 };

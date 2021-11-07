@@ -48,7 +48,7 @@ class NBProcessWidget : public QWidget {
 		QBasicTimer updateTimer;
 
 		/* Time spend on puase */
-		QTime pauseTime;
+		QElapsedTimer pauseTimer;
 		quint64 pausedSecs;
 
 		/* Toggle details flag */

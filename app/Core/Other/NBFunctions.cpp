@@ -45,3 +45,12 @@ QString getAppImagePath() {
 
 	return QString();
 };
+
+bool stringInStringList( QStringList filters, QString text ) {
+
+	Q_FOREACH( QString filter, filters )
+		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
+			return true;
+
+	return false;
+};
