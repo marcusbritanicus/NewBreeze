@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "NBPluginInterface.hpp"
+#include <newbreeze/NBPluginInterface.hpp>
 
 #include "NBDjvuDisplay.hpp"
 #include "NBImagePeek.hpp"
@@ -17,11 +17,10 @@
 #include "Global.hpp"
 
 class NBPreviewWidget : public QObject, NBPluginInterface {
-	Q_OBJECT
-	#if QT_VERSION >= 0x050000
-		Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "DefaultPeekPlugins5.json" )
-	#endif
-	Q_INTERFACES( NBPluginInterface )
+	Q_OBJECT;
+
+	Q_PLUGIN_METADATA( IID "org.NewBreeze.NBPluginInterface" FILE "DefaultPeekPlugins5.json" );
+	Q_INTERFACES( NBPluginInterface );
 
 	public:
 		/* Name of the plugin */

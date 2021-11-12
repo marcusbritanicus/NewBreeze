@@ -13,6 +13,6 @@
 	#include <QtWidgets>
 #endif
 
-#include "newbreeze.hpp"
+#include <newbreeze/newbreeze.hpp>
 
 static QMimeDatabase mimeDb;
