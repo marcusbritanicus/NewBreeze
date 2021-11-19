@@ -39,7 +39,7 @@ void NBSPluginsWidget::createGUI() {
 
 	QStringList pluginPaths;
 	if ( not plugSett.value( "PluginPaths" ).toStringList().count() )
-		plugSett.setValue( "PluginPaths", QStringList() << "/usr/lib/newbreeze/plugins" << NBXdg::home() + ".config/NewBreeze/plugins/" );
+		plugSett.setValue( "PluginPaths", QStringList() << DEFAULT_PLUGIN_PATH << NBXdg::home() + ".config/NewBreeze/plugins/" );
 	pPathsLW->addItems( plugSett.value( "PluginPaths" ).toStringList() );
 
 	pathsBtn = new NBSegmentButton( this );
@@ -106,7 +106,7 @@ void NBSPluginsWidget::updateSettings() {
 
 	QStringList pluginPaths;
 	if ( not paths.count() )
-		nbsett.setValue( "PluginPaths", QStringList() << "/usr/lib/newbreeze/plugins" << NBXdg::home() + ".config/NewBreeze/plugins/" );
+		nbsett.setValue( "PluginPaths", QStringList() << DEFAULT_PLUGIN_PATH << NBXdg::home() + ".config/NewBreeze/plugins/" );
 
 	pPathsLW->clear();
 	pPathsLW->addItems( nbsett.value( "PluginPaths" ).toStringList() );

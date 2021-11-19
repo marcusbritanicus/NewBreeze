@@ -14,6 +14,12 @@ project(
 )
 
 add_global_arguments( '-DPROJECT_VERSION="v@0@"'.format( meson.project_version() ), language : 'cpp' )
+add_global_arguments(
+		'-DDEFAULT_PLUGIN_PATH="@0@/"'.format(
+				join_paths( get_option( 'prefix' ), get_option( 'libdir' ), 'newbreeze', 'plugins' )
+		),
+		language : 'cpp'
+)
 add_project_link_arguments( ['-rdynamic','-fPIC'], language:'cpp' )
 
 Qt5 = import( 'qt5' )

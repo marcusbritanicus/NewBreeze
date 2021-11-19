@@ -10,7 +10,7 @@
 #include <QtGui>
 #include <QtWidgets>
 
-#include "newbreeze.hpp"
-#include "NBPluginInterface.hpp"
+#include <newbreeze/newbreeze.hpp>
+#include <newbreeze/NBPluginInterface.hpp>
 
 #include <fstream>

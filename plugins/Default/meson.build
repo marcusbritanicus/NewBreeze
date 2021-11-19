@@ -4,7 +4,7 @@ project(
 	'cpp',
 	version: '3.0.0',
 	license: 'MIT',
-	meson_version: '>=0.51.0',
+	meson_version: '>=0.59.0',
 	default_options: [
 		'cpp_std=c++17',
         'c_std=c11',
@@ -18,6 +18,7 @@ add_project_link_arguments( ['-rdynamic','-fPIC'], language:'cpp' )
 
 qt5 = import( 'qt5' )
 qt5deps = dependency( 'qt5', modules: ['Core', 'Gui', 'Widgets', 'Network', 'PrintSupport', 'Xml', 'WebEngine', 'WebEngineWidgets'] )
+zip = dependency( 'libzip' )
 
 Headers = [
 		'DjvuDisplay/NBDjvuDisplay.hpp',
@@ -54,26 +55,27 @@ Sources = [
 
 mocs = qt5.compile_moc(
  		headers : Headers,
-	 	dependencies: qt5deps
+	 	dependencies: qt5deps,
+		include_directories: [ '/usr/include' ]
 )
 
 djvu = dependency( 'ddjvuapi' )
 nb3 = dependency( 'newbreeze-common' )
-deps = [ qt5deps, djvu ]
+deps = [ qt5deps, nb3 ]
 
 defplugins = shared_module(
     'DefaultPeekPlugins', [ Sources, mocs ],
 		include_directories: [ 'DjvuDisplay', 'ImagePeek', 'OdfOgle', 'WebWatch' ],
     dependencies: deps,
     install: true,
-    install_dir: join_paths( get_option( 'libdir' ) / 'newbreeze/plugins' )
+    install_dir: join_paths( get_option( 'libdir' ), 'newbreeze', 'plugins' )
 )
 
 summary = [
 	'',
-	'----------------------',
-	'NewBreeze Common @0@'.format( meson.project_version() ),
-	'----------------------',
+	'------------------------------',
+	'NewBreeze Plugin Default @0@'.format( meson.project_version() ),
+	'------------------------------',
 	''
 ]
 message( '\n'.join( summary ) )

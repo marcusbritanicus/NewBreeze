@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Global.hpp"
-#include "NBPluginInterface.hpp"
+#include <newbreeze/NBPluginInterface.hpp>
 
 #include <QtPlugin>
 

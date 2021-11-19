@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "common.hpp"
+#include <newbreeze/common.hpp>
 #include "TextEditor.hpp"
 
 #include <QtPlugin>
-#include "NBPluginInterface.hpp"
+#include <newbreeze/NBPluginInterface.hpp>
 
 class TextEditorPlugin : public QObject, NBPluginInterface {
 	Q_OBJECT

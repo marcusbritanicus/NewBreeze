@@ -8,7 +8,7 @@
 #include <Global.hpp>
 #include <TextEditor.hpp>
 #include <FileProps.hpp>
-#include <NBTools.hpp>
+#include <newbreeze/NBTools.hpp>
 
 TextEditor::TextEditor( QString fn, QWidget *parent ) : QMainWindow( parent ) {
 

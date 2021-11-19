@@ -3,7 +3,7 @@
 // NOTE only read not write!
 // Description:
 // idea from qt QZipReader & http://code.mythtv.org/ code
-// to build append LIBS += -lz 
+// to build append LIBS += -lz
 // Author: Peter Hohl <pehohlva@gmail.com>,    24.10.2013
 // http://www.freeroad.ch/
 // Copyright: See COPYING file that comes with this distribution
@@ -17,7 +17,7 @@
 #include <QtCore/qfile.h>
 #include <QtCore/qlist.h>
 #include <QtCore/qshareddata.h>
-#include <qplatformdefs.h>
+// #include <qplatformdefs.h>
 #include <zlib.h>
 
 
@@ -151,7 +151,7 @@ KZipStream::KZipStream(const QString odtfile) {
     }
 
     if (!is_open) {
-        clear(); // remove buffer 
+        clear(); // remove buffer
     } else {
         ec = openArchive();
         if (ec == KZipStream::OkFunky) {
@@ -220,7 +220,7 @@ QByteArray KZipStream::fileByte(const QString &fileName) {
         compressed.truncate(uncompressed_size);
         return compressed;
     } else if (compression_method == 8) {
-        /// real unzip part file 
+        /// real unzip part file
         compressed.truncate(compressed_size);
         QByteArray decompress_chunk;
         ulong len = qMax(uncompressed_size, 1);
@@ -356,7 +356,7 @@ KZipStream::ErrorCode KZipStream::seekToCentralDirectory() {
         eocdOffset = offset;
     } else {
         return KZipStream::HandleCommentHere;
-        /* 
+        /*
         qint64 read;
         char* p = 0;
         offset -= UNZIP_EOCD_SIZE;

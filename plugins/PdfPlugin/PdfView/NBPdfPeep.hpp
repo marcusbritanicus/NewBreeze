@@ -12,26 +12,25 @@
 	#include <QtWidgets>
 #endif
 
-#include "qpdfview.h"
+#include "View.hpp"
 
 class NBPdfPeep : public QDialog {
 	Q_OBJECT
 
 	public :
 		NBPdfPeep( QString path = QDir::homePath() );
-		QPdfView *peekWidgetBase;
+		DesQDocs::View *peekWidgetBase;
 
 	private :
 		void createGUI();
 		void setWindowProperties();
 
-		QVBoxLayout *pdfLyt;
 		QLabel *lbl;
-
-		QString path;
+		QString mPath;
 
 	private slots :
 		void openInExternal();
+		void loadDocument();
 
 	protected :
 		void keyPressEvent( QKeyEvent *keyEvent );

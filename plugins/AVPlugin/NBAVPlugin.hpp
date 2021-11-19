@@ -8,7 +8,7 @@
 
 #include "Global.hpp"
 #include "NBAVPlayer.hpp"
-#include "NBPluginInterface.hpp"
+#include <newbreeze/NBPluginInterface.hpp>
 
 #include <QtPlugin>
 

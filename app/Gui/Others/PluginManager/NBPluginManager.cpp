@@ -90,7 +90,7 @@ void NBPluginManager::reloadPlugins() {
 	QStringList pluginPaths = nbsett.value( "PluginPaths" ).toStringList();
 	QString appImagePath = getAppImagePath();
 	if ( appImagePath.count() )
-		pluginPaths = QStringList() << appImagePath + "/usr/lib/newbreeze/plugins/";
+		pluginPaths = QStringList() << appImagePath + DEFAULT_PLUGIN_PATH;
 
 	mPluginList.clear();
 	mPluginsHash.clear();

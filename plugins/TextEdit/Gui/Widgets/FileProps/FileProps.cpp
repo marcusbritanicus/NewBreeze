@@ -6,7 +6,7 @@
 
 #include "Global.hpp"
 #include "FileProps.hpp"
-#include "NBTools.hpp"
+#include <newbreeze/NBTools.hpp>
 #include "QsciEditor.hpp"
 
 QPixmap getPixmap( QString path ) {

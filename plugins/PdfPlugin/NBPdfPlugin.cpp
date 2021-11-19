@@ -6,7 +6,7 @@
 
 #include "NBPdfPlugin.hpp"
 #include "NBPdfPeep.hpp"
-#include "qpdfdocument.h"
+#include "PopplerDocument.hpp"
 
 static QMimeDatabase mimeDb;
 
@@ -112,11 +112,16 @@ void NBPdfPlugin::setCaller( QWidget *caller ) {
 
 void NBPdfPlugin::makeThumbnail( QString path, QString hashPath ) {
 
-	QPdfDocument *doc = new QPdfDocument( path );
+	PopplerDocument *doc = new PopplerDocument( path );
 	doc->load();
 
+	if ( doc->passwordNeeded() ) {
+		qDebug() << "Encrypted document";
+		return;
+	}
+
 	if ( doc->pageCount() ) {
-		QImage pic = doc->renderPage( 0, doc->pageSize( 0 ).scaled( 128, 128, Qt::KeepAspectRatio ).toSize(), QPdfDocumentRenderOptions() );
+		QImage pic = doc->renderPage( 0, doc->pageSize( 0 ).scaled( 128, 128, Qt::KeepAspectRatio ).toSize(), DesQDocs::RenderOptions() );
 
 		QPixmap thumb( QSize( 128, 128 ) );
 		thumb.fill( Qt::transparent );

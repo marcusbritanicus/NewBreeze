@@ -7,7 +7,7 @@
 #pragma once
 
 #include <QtGui>
-#include "newbreeze.hpp"
+#include <newbreeze/newbreeze.hpp>
 
 #if QT_VERSION >= 0x050000
 	#include <QtWidgets>

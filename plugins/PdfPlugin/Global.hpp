@@ -8,5 +8,6 @@
 
 #include <QtGui>
 #include <QtCore>
+#include <QtWidgets>
 
-#include "newbreeze.hpp"
+#include <newbreeze/newbreeze.hpp>

@@ -8,7 +8,7 @@
 
 NBPdfPeep::NBPdfPeep( QString pth ) : QDialog() {
 
-	path = QString( pth );
+	mPath = QString( pth );
 
 	createGUI();
 	setWindowProperties();
@@ -22,7 +22,7 @@ void NBPdfPeep::createGUI() {
 	QVBoxLayout *widgetLyt = new QVBoxLayout();
 	QVBoxLayout *baseLyt = new QVBoxLayout();
 
-	lbl = new QLabel( "<tt><b>" + baseName( path ) + "</b></tt>" );
+	lbl = new QLabel( "<tt><b>" + baseName( mPath ) + "</b></tt>" );
 
 	QToolButton *openBtn = new QToolButton();
 	openBtn->setIcon( QIcon( ":/icons/maximize.png" ) );
@@ -35,19 +35,13 @@ void NBPdfPeep::createGUI() {
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
 	/* PdfView */
-	peekWidgetBase = new QPdfView( this );
+	peekWidgetBase = new DesQDocs::View( this );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
-    peekWidgetBase->setPageMode( QPdfView::MultiPage );
-    peekWidgetBase->setZoomMode( QPdfView::FitToWidth );
-	peekWidgetBase->loadDocument( path );
+    peekWidgetBase->setPageMode( DesQDocs::View::MultiPage );
+    peekWidgetBase->setZoomMode( DesQDocs::View::FitToWidth );
+	peekWidgetBase->loadDocument( mPath );
 
 	QShortcut *close = new QShortcut( QKeySequence( Qt::Key_Escape ), this, SLOT( close() ), SLOT( close() ), Qt::WindowShortcut );
-
-	QWidget *pdfBase = new QWidget();
-	pdfLyt = new QVBoxLayout();
-	pdfLyt->setAlignment( Qt::AlignHCenter );
-	pdfLyt->setContentsMargins( QMargins() );
-	pdfBase->setLayout( pdfLyt );
 
 	lblBtnLyt->addWidget( lbl );
 	lblBtnLyt->addStretch( 0 );
@@ -80,7 +74,7 @@ void NBPdfPeep::setWindowProperties() {
 
 void NBPdfPeep::openInExternal() {
 
-	QProcess::startDetached( "xdg-open " + path );
+	QProcess::startDetached( "xdg-open " + mPath );
 	close();
 };
 
