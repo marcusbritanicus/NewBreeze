@@ -6,97 +6,60 @@
 
 #include <NBLogger.hpp>
 
-#if QT_VERSION >= 0x050000
-	void NBMessageOutput5( QtMsgType type, const QMessageLogContext &context, const QString &message ) {
+FILE *nblog;
+QString logPath;
 
-		Q_UNUSED( context );
+void NBMessageOutput( QtMsgType type, const QMessageLogContext &context, const QString &message ) {
 
-		/*
-			*
-			* Define nblog
-			*
-		*/
-		FILE *nblog = fopen( ( Settings->value( "LogDebug", NBSettings::GlobalScope ) ? logPath.toLocal8Bit().data() : "/dev/null" ), "a" );
+	Q_UNUSED( context );
 
-		if ( not nblog )
-			nblog = fopen( "/dev/null", "w" );
+	/*
+		*
+		* Define nblog
+		*
+	*/
+	QString logPath = QDir( QStandardPaths::writableLocation( QStandardPaths::GenericConfigLocation ) ).filePath( "NewBreeze/newbreeze.log" );
+	nblog = fopen( ( Settings->value( "LogDebug", NBSettings::GlobalScope ) ? logPath.toLocal8Bit().data() : "/dev/null" ), "a" );
 
-		switch ( type ) {
-			case QtInfoMsg: {
-				fprintf( nblog, "NewBreeze::Debug# %s\n", message.toLocal8Bit().data() );
-				fflush( nblog );
-				fprintf( stderr, "\033[01;32mNewBreeze::Info# %s\n\033[00;00m", message.toLocal8Bit().data() );
-				break;
-			}
+	if ( not nblog )
+		nblog = fopen( "/dev/null", "w" );
 
-			case QtDebugMsg: {
-				fprintf( nblog, "NewBreeze::Debug# %s\n", message.toLocal8Bit().data() );
-				fflush( nblog );
-				fprintf( stderr, "\033[01;30mNewBreeze::Debug# %s\n\033[00;00m", message.toLocal8Bit().data() );
-				break;
-			}
-
-			case QtWarningMsg: {
-				fprintf( nblog, "NewBreeze::Warning# %s\n", message.toLocal8Bit().data() );
-				fflush( nblog );
-				if ( QString( message ).contains( "X Error" ) or QString( message ).contains( "libpng warning" ) )
-					break;
-				fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", message.toLocal8Bit().data() );
-				break;
-			}
-
-			case QtCriticalMsg: {
-				fprintf( nblog, "NewBreeze::CriticalError# %s\n", message.toLocal8Bit().data() );
-				fflush( nblog );
-				fprintf( stderr, "\033[01;31mNewBreeze::CriticalError# %s\n\033[00;00m", message.toLocal8Bit().data() );
-				break;
-			}
-
-			case QtFatalMsg: {
-				fprintf( nblog, "NewBreeze::FatalError# %s\n", message.toLocal8Bit().data() );
-				fflush( nblog );
-				fprintf( stderr, "\033[01;41mNewBreeze::FatalError# %s\n\033[00;00m", message.toLocal8Bit().data() );
-				abort();
-			}
+	switch ( type ) {
+		case QtInfoMsg: {
+			fprintf( nblog, "NewBreeze::Debug# %s\n", message.toLocal8Bit().data() );
+			fflush( nblog );
+			fprintf( stderr, "\033[01;32mNewBreeze::Info# %s\n\033[00;00m", message.toLocal8Bit().data() );
+			break;
 		}
-	};
-#else
-	void NBMessageOutput( QtMsgType type, const char* message ) {
 
-		if ( not nblog )
-			nblog = fopen( "/dev/null", "w" );
-
-		switch ( type ) {
-
-			case QtDebugMsg: {
-				fprintf( nblog, "NewBreeze::Debug# %s\n", message );
-				fflush( nblog );
-				fprintf( stderr, "\033[01;30mNewBreeze::Debug# %s\n\033[00;00m", message );
-				break;
-			}
-
-			case QtWarningMsg: {
-				fprintf( nblog, "NewBreeze::Warning# %s\n", message );
-				fflush( nblog );
-				if ( QString( message ).contains( "X Error" ) or QString( message ).contains( "libpng warning" )  )
-					break;
-				fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", message );
-				break;
-			}
-
-			case QtCriticalMsg: {
-				fprintf( nblog, "NewBreeze::CriticalError# %s\n", message );
-				fflush( nblog );
-				fprintf( stderr, "\033[01;31mNewBreeze::CriticalError# %s\n\033[00;00m", message );
-				break;
-			}
-
-			case QtFatalMsg: {
-				fprintf( nblog, "NewBreeze::FatalError# %s\n", message );
-				fflush( nblog );
-				fprintf( stderr, "\033[01;41mNewBreeze::FatalError# %s\n\033[00;00m", message );
-				abort();
-			}
+		case QtDebugMsg: {
+			fprintf( nblog, "NewBreeze::Debug# %s\n", message.toLocal8Bit().data() );
+			fflush( nblog );
+			fprintf( stderr, "\033[01;30mNewBreeze::Debug# %s\n\033[00;00m", message.toLocal8Bit().data() );
+			break;
 		}
-	};
-#endif
+
+		case QtWarningMsg: {
+			fprintf( nblog, "NewBreeze::Warning# %s\n", message.toLocal8Bit().data() );
+			fflush( nblog );
+			if ( QString( message ).contains( "X Error" ) or QString( message ).contains( "libpng warning" ) )
+				break;
+			fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", message.toLocal8Bit().data() );
+			break;
+		}
+
+		case QtCriticalMsg: {
+			fprintf( nblog, "NewBreeze::CriticalError# %s\n", message.toLocal8Bit().data() );
+			fflush( nblog );
+			fprintf( stderr, "\033[01;31mNewBreeze::CriticalError# %s\n\033[00;00m", message.toLocal8Bit().data() );
+			break;
+		}
+
+		case QtFatalMsg: {
+			fprintf( nblog, "NewBreeze::FatalError# %s\n", message.toLocal8Bit().data() );
+			fflush( nblog );
+			fprintf( stderr, "\033[01;41mNewBreeze::FatalError# %s\n\033[00;00m", message.toLocal8Bit().data() );
+			abort();
+		}
+	}
+};

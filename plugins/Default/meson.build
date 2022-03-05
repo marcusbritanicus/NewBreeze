@@ -1,24 +1,6 @@
-project(
-	'DefaultPeekPlugins',
-    'c',
-	'cpp',
-	version: '3.0.0',
-	license: 'MIT',
-	meson_version: '>=0.59.0',
-	default_options: [
-		'cpp_std=c++17',
-        'c_std=c11',
-		'warning_level=2',
-		'werror=false',
-	],
-)
-
-add_global_arguments( '-DPROJECT_VERSION=' + meson.project_version(), language : 'cpp' )
-add_project_link_arguments( ['-rdynamic','-fPIC'], language:'cpp' )
-
-qt5 = import( 'qt5' )
-qt5deps = dependency( 'qt5', modules: ['Core', 'Gui', 'Widgets', 'Network', 'PrintSupport', 'Xml', 'WebEngine', 'WebEngineWidgets'] )
-zip = dependency( 'libzip' )
+Zip = dependency( 'libzip' )
+DjVu = dependency( 'ddjvuapi' )
+QtDepsDefPlug = [ QtWebCore, QtWebView, QtXml ]
 
 Headers = [
 		'DjvuDisplay/NBDjvuDisplay.hpp',
@@ -53,29 +35,18 @@ Sources = [
 		'WebWatch/NBWebWatch.cpp'
 ]
 
-mocs = qt5.compile_moc(
+mocs = Qt.compile_moc(
  		headers : Headers,
-	 	dependencies: qt5deps,
-		include_directories: [ '/usr/include' ]
+	 	dependencies: [ QtDeps, QtDepsDefPlug ],
+		include_directories: [ GlobalIncludes, 'DjvuDisplay', 'ImagePeek', 'OdfOgle', 'WebWatch' ],
 )
 
-djvu = dependency( 'ddjvuapi' )
-nb3 = dependency( 'newbreeze-common' )
-deps = [ qt5deps, nb3 ]
+deps = [ QtDeps, QtDepsDefPlug, NB3Common, DjVu, Zip ]
 
 defplugins = shared_module(
     'DefaultPeekPlugins', [ Sources, mocs ],
-		include_directories: [ 'DjvuDisplay', 'ImagePeek', 'OdfOgle', 'WebWatch' ],
+		include_directories: [ GlobalIncludes, 'DjvuDisplay', 'ImagePeek', 'OdfOgle', 'WebWatch' ],
     dependencies: deps,
     install: true,
     install_dir: join_paths( get_option( 'libdir' ), 'newbreeze', 'plugins' )
 )
-
-summary = [
-	'',
-	'------------------------------',
-	'NewBreeze Plugin Default @0@'.format( meson.project_version() ),
-	'------------------------------',
-	''
-]
-message( '\n'.join( summary ) )

@@ -1,38 +1,5 @@
-project(
-		'desq-session',
-	  'c',
-		'cpp',
-		version: '1.0.0',
-		license: 'MIT',
-		meson_version: '>=0.59.0',
-		default_options: [
-				'cpp_std=c++17',
-				'c_std=c11',
-				'warning_level=2',
-				'werror=false',
-		],
-)
-
-add_global_arguments( '-DPROJECT_VERSION="v@0@"'.format( meson.project_version() ), language : 'cpp' )
-add_global_arguments(
-		'-DDEFAULT_PLUGIN_PATH="@0@/"'.format(
-				join_paths( get_option( 'prefix' ), get_option( 'libdir' ), 'newbreeze', 'plugins' )
-		),
-		language : 'cpp'
-)
-add_project_link_arguments( ['-rdynamic','-fPIC'], language:'cpp' )
-
-Qt5 = import( 'qt5' )
-Qt5Deps = dependency( 'qt5', modules: [ 'Core', 'Gui', 'Widgets', 'Network', 'DBus', 'Concurrent' ] )
-NB3Common = declare_dependency(
-    link_args : [ '-L/usr/lib/x86_64-linux-gnu', '-lnewbreeze-common' ],
-    include_directories : include_directories( [ '/usr/include', '/usr/include/newbreeze' ] )
-)
-zlib = dependency( 'zlib' )
-lzma = dependency( 'liblzma' )
-archiveqt5 = dependency( 'archiveqt5' )
-mediainfo = dependency( 'libmediainfo' )
-termwidget = dependency( 'qtermwidget5' )
+MediaInfo = dependency( 'libmediainfo' )
+QtDepsApp = [ QtNetwork, QtDBus, QtConcur ]
 
 Headers = [
 		'Core/ArgParser/NBCLParser.hpp',
@@ -274,7 +241,7 @@ Sources = [
 		'Vault/Salsa20/NBSalsa20.cpp'
 ]
 
-Includes = include_directories(
+AppIncludes = include_directories(
 		[
 				'Core/ArgParser',
 				'Core/AutoMount',
@@ -344,59 +311,23 @@ Includes = include_directories(
 		]
 )
 
-Mocs = Qt5.compile_moc(
+Mocs = Qt.compile_moc(
  		headers : Headers,
-	 	dependencies: Qt5Deps,
-		include_directories: [ Includes, '/usr/include/newbreeze' ]
+	 	dependencies: [ QtDeps, QtDepsApp ],
+		include_directories: [ GlobalIncludes, AppIncludes ]
 )
 
-Resources = Qt5.compile_resources(
+Resources = Qt.compile_resources(
 		name: 'NBRes',
  		sources : [	'NewBreeze.qrc', '../data/data.qrc' ],
 )
 
 nb3 = executable(
     'newbreeze3', [ Sources, Mocs, Resources ],
-    dependencies: [ Qt5Deps, NB3Common, archiveqt5, mediainfo, termwidget ],
-		include_directories: [ Includes, '/usr/include/newbreeze' ],
+    dependencies: [ QtDeps, QtDepsApp, NB3Common, ArchiveQt, MediaInfo, TermWidget ],
+		include_directories: [ GlobalIncludes, AppIncludes ],
+		cpp_args: '-DDEFAULT_PLUGIN_PATH="@0@/"'.format(
+				join_paths( get_option( 'prefix' ), get_option( 'libdir' ), 'newbreeze', 'plugins' )
+		),
     install: true
 )
-
-# Desktop file
-install_data(
-		'../data/newbreeze.desktop',
-		install_dir : get_option( 'datadir' ) / 'applications'
-)
-
-# Icons
-install_data(
-		'../icons/newbreeze.png',
-		install_dir : get_option( 'datadir' ) / 'icons/hicolor/256x256/apps'
-)
-
-# Files
-install_data(
-		[ '../README.md', '../ChangeLog', '../ReleaseNotes' ],
-		install_dir : get_option( 'datadir' ) / 'newbreeze'
-)
-
-# Mime
-install_data(
-		'../data/x-encrypted-file.xml',
-		install_dir : get_option( 'datadir' ) / 'mime/packages/'
-)
-
-# Templates
-install_subdir(
-		'../data/templates',
-		install_dir : get_option( 'datadir' ) / 'newbreeze'
-)
-
-summary = [
-	'',
-	'----------------',
-	'NewBreeze @0@'.format( meson.project_version() ),
-	'----------------',
-	''
-]
-message( '\n'.join( summary ) )

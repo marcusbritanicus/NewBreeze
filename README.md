@@ -48,11 +48,12 @@ Its features such as inbuilt file and folder encryption, SuperStart, and Quick f
   * QtWebKit in case of Qt5 and upto Qt 5.4 (libqtwebkit-dev, libqt5webkit5-dev, qtwebkit5-dev)
   * QtWebEngine Qt 5.5 onwards (qtwebengine5-dev)
   * QScintilla (libqt5scintilla2-dev, libqscintilla2-qt5-dev)
-* libarchiveqt (gitlab.com/marcusbritanicus/libarchive-qt)
+* libarchiveqt (https://gitlab.com/marcusbritanicus/libarchive-qt)
 * libdjvulibre-dev (libdjvulibre-dev)
 * ffmpegthumbnailer (libffmpegthumbnailer-dev)
 * poppler (libpoppler-qt5-dev)
 * mpv (libmpv-dev)
+* QDocumentView (https://gitlab.com/marcusbritanicus/QDocumentView)
 
 ## My System Info
 * OS:				Debian Sid

@@ -29,7 +29,7 @@ static QSettings thumbsInfo( thumbsDir + "Thumbs.cache", QSettings::NativeFormat
 typedef QMap<QString, QString> DeviceInfo;
 typedef QPair<QString, QString> BookMark;
 
-static NBSettings *Settings = NBSettings::instance();
+extern NBSettings *Settings;
 
-static QString logPath = QDir( QStandardPaths::writableLocation( QStandardPaths::GenericConfigLocation ) ).filePath( "NewBreeze/newbreeze.log" );
+extern QString logPath;
 extern FILE *nblog;

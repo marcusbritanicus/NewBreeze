@@ -218,6 +218,7 @@ void NBStartup() {
 		* Init the plugins - only if we are not the root user
 		*
 	*/
-	if ( getuid() )
+	if ( getuid() ) {
 		QtConcurrent::run( NBPluginManager::instance(), &NBPluginManager::reloadPlugins );
+	}
 };

@@ -40,13 +40,11 @@
 #include "NBApplication.hpp"
 #include "NBStartupWizard.hpp"
 
+NBSettings *Settings = nullptr;
+
 int main( int argc, char **argv ) {
 
-	#if QT_VERSION >= 0x050000
-		qInstallMessageHandler( NBMessageOutput5 );
-	#else
-		qInstallMsgHandler( NBMessageOutput );
-	#endif
+	qInstallMessageHandler( NBMessageOutput );
 
 	qRegisterMetaType<NBDeviceInfo>( "NBDeviceInfo" );
 
@@ -65,6 +63,9 @@ int main( int argc, char **argv ) {
 	/* About Application */
 	app.setOrganizationName( "NewBreeze" );
 	app.setApplicationName( "NewBreeze" );
+
+	/** Instantiate Settings */
+	Settings = NBSettings::instance();
 
 	/* Startup */
 	NBStartup();

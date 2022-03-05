@@ -1,0 +1,7 @@
+option(
+    'use_qt_version',
+    type: 'combo',
+    choices: ['qt5', 'qt6'],
+    value: 'qt5',
+    description: 'Select the Qt version to use'
+)

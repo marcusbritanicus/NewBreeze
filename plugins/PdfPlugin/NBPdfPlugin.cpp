@@ -6,7 +6,7 @@
 
 #include "NBPdfPlugin.hpp"
 #include "NBPdfPeep.hpp"
-#include "PopplerDocument.hpp"
+#include <qdocumentview/PopplerDocument.hpp>
 
 static QMimeDatabase mimeDb;
 
@@ -121,7 +121,7 @@ void NBPdfPlugin::makeThumbnail( QString path, QString hashPath ) {
 	}
 
 	if ( doc->pageCount() ) {
-		QImage pic = doc->renderPage( 0, doc->pageSize( 0 ).scaled( 128, 128, Qt::KeepAspectRatio ).toSize(), DesQDocs::RenderOptions() );
+		QImage pic = doc->renderPage( 0, doc->pageSize( 0 ).scaled( 128, 128, Qt::KeepAspectRatio ).toSize(), QDocumentRenderOptions() );
 
 		QPixmap thumb( QSize( 128, 128 ) );
 		thumb.fill( Qt::transparent );

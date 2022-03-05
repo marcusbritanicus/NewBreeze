@@ -1,29 +1,32 @@
 /*
 	*
-	* NBWebWatch.hpp - NewBreeze WebPreviewWidget Class Header
+	* NBPdfPeep.hpp - NewBreeze PdfPeep Class Header
 	*
 */
 
 #pragma once
 
 #include "Global.hpp"
-#include <QtWebKit>
 
-#if QT_VERSION > 0x050000
-	#include <QtWebKitWidgets>
+#if QT_VERSION >= 0x050000
+	#include <QtWidgets>
 #endif
 
-class NBWebWatch : public QDialog {
+#include <qdocumentview/QDocumentView.hpp>
+
+class NBPdfPeep : public QDialog {
 	Q_OBJECT
 
 	public :
-		NBWebWatch( QString path = QDir::homePath() );
-		QString path;
-		QWebView *peekWidgetBase;
+		NBPdfPeep( QString path = QDir::homePath() );
+		QDocumentView *peekWidgetBase;
 
 	private :
 		void createGUI();
 		void setWindowProperties();
+
+		QLabel *lbl;
+		QString mPath;
 
 	private slots :
 		void openInExternal();

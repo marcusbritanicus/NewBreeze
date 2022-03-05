@@ -24,12 +24,10 @@ prepare() {
 }
 
 build() {
-  cd build
-  qmake-qt5 ../$pkgname PREFIX=/usr DEFINES+=USE_MEDIAINFO
-  make
+  meson build --prefix=/usr --buildtype=release
+  meson compile -C build -j $(nproc) -k 0
 }
 
 package() {
-  cd build
-  make INSTALL_ROOT="$pkgdir" install
+  meson install -C build --destdir "$pkgdir"
 }

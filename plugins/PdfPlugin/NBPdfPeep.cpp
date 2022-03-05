@@ -35,11 +35,12 @@ void NBPdfPeep::createGUI() {
 	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
 
 	/* PdfView */
-	peekWidgetBase = new DesQDocs::View( this );
+	peekWidgetBase = new QDocumentView( this );
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
-    peekWidgetBase->setPageMode( DesQDocs::View::MultiPage );
-    peekWidgetBase->setZoomMode( DesQDocs::View::FitToWidth );
-	peekWidgetBase->loadDocument( mPath );
+    peekWidgetBase->setPageLayout( QDocumentView::SinglePage );
+    peekWidgetBase->setLayoutContinuous( true );
+    peekWidgetBase->setZoomMode( QDocumentView::FitToWidth );
+	peekWidgetBase->load( mPath );
 
 	QShortcut *close = new QShortcut( QKeySequence( Qt::Key_Escape ), this, SLOT( close() ), SLOT( close() ), Qt::WindowShortcut );
 

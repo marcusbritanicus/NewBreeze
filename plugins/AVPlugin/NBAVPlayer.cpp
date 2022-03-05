@@ -46,7 +46,7 @@ void NBAVPlayer::createGUI() {
 	QWidget *baseWidget = new QWidget();
 	baseWidget->setObjectName( tr( "guiBase" ) );
 
-	connect( openBtn, SIGNAL( clicked() ), this, SLOT( openInExternal() ) );
+	connect( openBtn, &QToolButton::clicked, this, &NBAVPlayer::openInExternal );
 
 	peekWidgetBase = new QWidget();
 	peekWidgetBase->setObjectName( tr( "previewBase" ) );
@@ -111,6 +111,18 @@ void NBAVPlayer::loadMedia() {
 
 	const char *args[] = { "loadfile", mPath.toUtf8().data(), NULL };
 	mpv_command_async( mpv, 0, args );
+};
+
+void NBAVPlayer::stop() {
+
+};
+
+void NBAVPlayer::handleMpvEvents() {
+
+};
+
+void NBAVPlayer::play( QString ) {
+
 };
 
 int NBAVPlayer::exec() {

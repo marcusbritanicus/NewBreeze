@@ -1,26 +1,4 @@
-project(
-		'newbreeze-common',
-	  'c',
-		'cpp',
-		version: '3.0.0',
-		license: 'MIT',
-		meson_version: '>=0.59.0',
-		default_options: [
-				'cpp_std=c++17',
-				'c_std=c11',
-				'warning_level=2',
-				'werror=false',
-		],
-)
-
-add_global_arguments( '-DPROJECT_VERSION=' + meson.project_version(), language : 'cpp' )
-add_project_link_arguments( ['-rdynamic','-fPIC'], language:'cpp' )
-
-qt5 = import( 'qt5' )
-qt5deps = dependency( 'qt5', modules: [ 'Core', 'Gui', 'Widgets' ] )
-archiveqt5 = dependency( 'archiveqt5' )
-
-Headers = [
+CommonHeaders = [
 		'include/newbreeze/common.hpp',
 		'include/newbreeze/NBDeviceInfo.hpp',
 		'include/newbreeze/NBSystemInfo.hpp',
@@ -28,10 +6,10 @@ Headers = [
 		'include/newbreeze/NBXdg.hpp',
 		'include/newbreeze/newbreeze.hpp',
 		'include/newbreeze/SimpleCrypt.hpp',
-		'NBPluginInterface.hpp'
+		'include/newbreeze/NBPluginInterface.hpp'
 ]
 
-Sources = [
+CommonSources = [
 		'DeviceInfo/NBDeviceInfo.cpp',
 		'DeviceInfo/NBDeviceInfoUnix.cpp',
 		'SimpleCrypt/SimpleCrypt.cpp',
@@ -40,19 +18,19 @@ Sources = [
 		'XDG/NBXdg.cpp'
 ]
 
-mocs = qt5.compile_moc(
- 		headers : Headers,
-	 	dependencies: qt5deps
+CommonMocs = Qt.compile_moc(
+ 		headers : CommonHeaders,
+	 	dependencies: QtDeps
 )
 
-deps = [ qt5deps, archiveqt5 ]
+deps = [ QtDeps, ArchiveQt ]
 includes = [ 'include' ]
 
 nb3common = shared_library(
-    'newbreeze-common', [ Sources, mocs ],
+    libname, [ CommonSources, CommonMocs ],
 		version: meson.project_version(),
 		include_directories: [ includes ],
-    dependencies: deps,
+    dependencies: [ QtDeps, ArchiveQt ],
     install: true,
     install_dir: join_paths( get_option( 'libdir' ) )
 )
@@ -63,26 +41,17 @@ install_subdir(
 		strip_directory : false
 )
 
-install_headers(
-		'NBPluginInterface.hpp',
-		subdir: 'newbreeze',
+NB3Common = declare_dependency(
+		link_with: nb3common,
+		sources: CommonHeaders,
 )
-
-summary = [
-	'',
-	'----------------------',
-	'NewBreeze Common @0@'.format( meson.project_version() ),
-	'----------------------',
-	''
-]
-message( '\n'.join( summary ) )
 
 ## PkgConfig Section
 pkgconfig = import( 'pkgconfig' )
 pkgconfig.generate(
 		nb3common,
-		name: meson.project_name(),
+		name: libname,
 		version: meson.project_version(),
-		filebase: meson.project_name(),
+		filebase: libname,
 		description: 'Some common classes for NewBreeze'
 )

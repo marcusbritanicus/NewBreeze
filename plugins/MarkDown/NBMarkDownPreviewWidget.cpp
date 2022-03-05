@@ -5,7 +5,6 @@
 */
 
 #include "NBMarkDownPreviewWidget.hpp"
-#include "cmark.h"
 
 NBMarkDownView::NBMarkDownView( QString pth, QWidget *parent ) : QDialog( parent ) {
 
@@ -118,11 +117,7 @@ void NBMarkDownView::loadDocument() {
 		return;
 	}
 
-	#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-		peekWidgetBase->setHtml( cmark_markdown_to_html( file.readAll().constData(), file.size(), 0 ) );
-	#else
-		peekWidgetBase->setMarkdown( file.readAll() );
-	#endif
+	peekWidgetBase->setMarkdown( file.readAll() );
 
 	file.close();
 };
