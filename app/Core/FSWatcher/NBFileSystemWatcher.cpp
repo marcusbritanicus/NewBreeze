@@ -1,8 +1,6 @@
-/*
-	*
-	* NBFileSystemWatcher.cpp - Advanced version of QFileSystemWatcher for Qt5
-	*
-*/
+/**
+ * NBFileSystemWatcher.cpp - Advanced version of QFileSystemWatcher for Qt5
+ **/
 
 #include "NBFileSystemWatcher.hpp"
 #include "Global.hpp"

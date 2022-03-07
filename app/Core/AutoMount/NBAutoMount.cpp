@@ -1,69 +1,72 @@
-/*
-	*
-	* NBAutoMount.cpp - NewBreeze UDisks2 AutoMount  Class
-	*
-*/
+/**
+ * NBAutoMount.cpp - NewBreeze UDisks2 AutoMount  Class
+ **/
 
 #include "NBAutoMount.hpp"
 
 NBAutoMount *NBAutoMount::autoMount = NULL;
 
 NBAutoMount *NBAutoMount::instance() {
+    if ( autoMount != NULL and autoMount->init ) {
+        return autoMount;
+    }
 
-	if ( autoMount != NULL and autoMount->init )
-		return autoMount;
+    /* Init our process manager. */
+    autoMount = new NBAutoMount();
 
-	/* Init our process manager. */
-	autoMount = new NBAutoMount();
+    return autoMount;
+}
 
-	return autoMount;
-};
 
 NBAutoMount::NBAutoMount() : QObject() {
+    UDI     = new UDisks2();
+    init    = true;
+    running = false;
+}
 
-	UDI = new UDisks2();
-	init = true;
-	running = false;
-};
 
 NBAutoMount::~NBAutoMount() {
+    stop();
 
-	stop();
+    delete UDI;
+}
 
-	delete UDI;
-};
 
 void NBAutoMount::start() {
+    if ( running ) {
+        return;
+    }
 
-	if ( running )
-		return;
+    for ( QString bDev: UDI->blockDevices() ) {
+        UDisks2Block *block = new UDisks2Block( bDev );
 
-	Q_FOREACH( QString bDev, UDI->blockDevices() ) {
+        if ( block ) {
+            UDisks2Filesystem *ufs = block->fileSystem();
 
-		UDisks2Block *block = new UDisks2Block( bDev );
-		if ( block ) {
-			UDisks2Filesystem *ufs = block->fileSystem();
-			if ( ufs )
-				ufs->mount();
-		}
-	}
+            if ( ufs ) {
+                ufs->mount();
+            }
+        }
+    }
 
-	connect( UDI, SIGNAL( filesystemAdded( const QString& ) ), this, SLOT( mountFS( QString ) ) );
-	running = true;
+    connect( UDI, SIGNAL(filesystemAdded(const QString&)), this, SLOT(mountFS(QString)) );
+    running = true;
 
-	qDebug() << "Starting Volume AutoMount manager...";
-};
+    qDebug() << "Starting Volume AutoMount manager...";
+}
+
 
 void NBAutoMount::stop() {
+    disconnect( UDI, SIGNAL(filesystemAdded(const QString&)), this, SLOT(mountFS(QString)) );
+    running = false;
+}
 
-	disconnect( UDI, SIGNAL( filesystemAdded( const QString& ) ), this, SLOT( mountFS( QString ) ) );
-	running = false;
-};
 
 void NBAutoMount::mountFS( QString node ) {
+    qDebug() << "Mounting" << node;
+    UDisks2Filesystem *ufs = new UDisks2Filesystem( node );
 
-	qDebug() << "Mounting" << node;
-	UDisks2Filesystem *ufs = new UDisks2Filesystem( node );
-	if ( ufs )
-		ufs->mount();
-};
+    if ( ufs ) {
+        ufs->mount();
+    }
+}

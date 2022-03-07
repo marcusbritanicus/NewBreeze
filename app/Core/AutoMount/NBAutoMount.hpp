@@ -1,8 +1,6 @@
-/*
-	*
-	* NBAutoMount.hpp - NewBreeze AutoMount Class Header
-	*
-*/
+/**
+ * NBAutoMount.hpp - NewBreeze AutoMount Class Header
+ **/
 
 #pragma once
 
@@ -11,24 +9,25 @@
 #include "udisks2.h"
 
 class NBAutoMount : public QObject {
-	Q_OBJECT
+    Q_OBJECT
 
-	public:
-		static NBAutoMount *instance();
-		~NBAutoMount();
+    public:
+        static NBAutoMount *instance();
 
-		void start();
-		void stop();
+        ~NBAutoMount();
 
-	public Q_SLOTS:
-		void mountFS( QString );
+        void start();
+        void stop();
 
-	private:
-		NBAutoMount();
+    public Q_SLOTS:
+        void mountFS( QString );
 
-		UDisks2 *UDI;
-		bool running;
-		bool init;
+    private:
+        NBAutoMount();
 
-		static NBAutoMount *autoMount;
+        UDisks2 *UDI;
+        bool running;
+        bool init;
+
+        static NBAutoMount *autoMount;
 };

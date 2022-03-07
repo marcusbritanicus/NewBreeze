@@ -1,65 +1,132 @@
-/*
-	*
-	* NBLogger.cpp - Some tools for NewBreeze
-	*
-*/
+/**
+ * NBLogger.cpp - Some tools for NewBreeze
+ **/
 
 #include <NBLogger.hpp>
 
-FILE *nblog;
-QString logPath;
+FILE *NewBreeze::log = nullptr;
+bool NewBreeze::SHOW_INFO_ON_CONSOLE     = true;
+bool NewBreeze::SHOW_DEBUG_ON_CONSOLE    = true;
+bool NewBreeze::SHOW_WARNING_ON_CONSOLE  = true;
+bool NewBreeze::SHOW_CRITICAL_ON_CONSOLE = true;
+bool NewBreeze::SHOW_FATAL_ON_CONSOLE    = true;
 
-void NBMessageOutput( QtMsgType type, const QMessageLogContext &context, const QString &message ) {
+static const char *COLOR_INFO     = "\033[01;32m";
+static const char *COLOR_DEBUG    = "\033[01;30m";
+static const char *COLOR_WARN     = "\033[01;33m";
+static const char *COLOR_CRITICAL = "\033[01;31m";
+static const char *COLOR_FATAL    = "\033[01;41m";
+static const char *COLOR_RESET    = "\033[00;00m";
 
-	Q_UNUSED( context );
+void NewBreeze::Logger( QtMsgType type, const QMessageLogContext& context, const QString& msg ) {
+    QByteArray localMsg  = msg.toLocal8Bit();
+    const char *file     = context.file ? context.file : "";
+    const char *function = context.function ? context.function : "";
 
-	/*
-		*
-		* Define nblog
-		*
-	*/
-	QString logPath = QDir( QStandardPaths::writableLocation( QStandardPaths::GenericConfigLocation ) ).filePath( "NewBreeze/newbreeze.log" );
-	nblog = fopen( ( Settings->value( "LogDebug", NBSettings::GlobalScope ) ? logPath.toLocal8Bit().data() : "/dev/null" ), "a" );
+    switch ( type ) {
+        case QtInfoMsg: {
+            if ( NewBreeze::SHOW_INFO_ON_CONSOLE ) {
+                fprintf( stderr, "%s[I]: (%s:%u, %s) %s%s\n",
+                         COLOR_INFO,
+                         file,
+                         context.line,
+                         function,
+                         localMsg.constData(),
+                         COLOR_RESET
+                );
+                fflush( stderr );
+            }
 
-	if ( not nblog )
-		nblog = fopen( "/dev/null", "w" );
+            if ( NewBreeze::log ) {
+                fprintf( NewBreeze::log, "[I]: (%s:%u, %s) %s\n", file, context.line, function, localMsg.constData() );
+                fflush( NewBreeze::log );
+            }
 
-	switch ( type ) {
-		case QtInfoMsg: {
-			fprintf( nblog, "NewBreeze::Debug# %s\n", message.toLocal8Bit().data() );
-			fflush( nblog );
-			fprintf( stderr, "\033[01;32mNewBreeze::Info# %s\n\033[00;00m", message.toLocal8Bit().data() );
-			break;
-		}
+            break;
+        }
 
-		case QtDebugMsg: {
-			fprintf( nblog, "NewBreeze::Debug# %s\n", message.toLocal8Bit().data() );
-			fflush( nblog );
-			fprintf( stderr, "\033[01;30mNewBreeze::Debug# %s\n\033[00;00m", message.toLocal8Bit().data() );
-			break;
-		}
+        case QtDebugMsg: {
+            if ( NewBreeze::SHOW_DEBUG_ON_CONSOLE ) {
+                fprintf( stderr, "%s[D]: (%s:%u, %s) %s%s\n",
+                         COLOR_DEBUG,
+                         file,
+                         context.line,
+                         function,
+                         localMsg.constData(),
+                         COLOR_RESET
+                );
+                fflush( stderr );
+            }
 
-		case QtWarningMsg: {
-			fprintf( nblog, "NewBreeze::Warning# %s\n", message.toLocal8Bit().data() );
-			fflush( nblog );
-			if ( QString( message ).contains( "X Error" ) or QString( message ).contains( "libpng warning" ) )
-				break;
-			fprintf( stderr, "\033[01;33mNewBreeze::Warning# %s\n\033[00;00m", message.toLocal8Bit().data() );
-			break;
-		}
+            if ( NewBreeze::log ) {
+                fprintf( NewBreeze::log, "[D]: (%s:%u, %s) %s\n", file, context.line, function, localMsg.constData() );
+                fflush( NewBreeze::log );
+            }
 
-		case QtCriticalMsg: {
-			fprintf( nblog, "NewBreeze::CriticalError# %s\n", message.toLocal8Bit().data() );
-			fflush( nblog );
-			fprintf( stderr, "\033[01;31mNewBreeze::CriticalError# %s\n\033[00;00m", message.toLocal8Bit().data() );
-			break;
-		}
+            break;
+        }
 
-		case QtFatalMsg: {
-			fprintf( nblog, "NewBreeze::FatalError# %s\n", message.toLocal8Bit().data() );
-			fflush( nblog );
-			fprintf( stderr, "\033[01;41mNewBreeze::FatalError# %s\n\033[00;00m", message.toLocal8Bit().data() );
-			abort();
-		}
-	}
-};
+        case QtWarningMsg: {
+            if ( NewBreeze::SHOW_WARNING_ON_CONSOLE ) {
+                fprintf( stderr, "%s[W]: (%s:%u, %s) %s%s\n",
+                         COLOR_WARN,
+                         file,
+                         context.line,
+                         function,
+                         localMsg.constData(),
+                         COLOR_RESET
+                );
+                fflush( stderr );
+            }
+
+            if ( NewBreeze::log ) {
+                fprintf( NewBreeze::log, "[W]: (%s:%u, %s) %s\n", file, context.line, function, localMsg.constData() );
+                fflush( NewBreeze::log );
+            }
+
+            break;
+        }
+
+        case QtCriticalMsg: {
+            if ( NewBreeze::SHOW_CRITICAL_ON_CONSOLE ) {
+                fprintf( stderr, "%s[E]: (%s:%u, %s) %s%s\n",
+                         COLOR_CRITICAL,
+                         file,
+                         context.line,
+                         function,
+                         localMsg.constData(),
+                         COLOR_RESET
+                );
+                fflush( stderr );
+            }
+
+            if ( NewBreeze::log ) {
+                fprintf( NewBreeze::log, "[E]: (%s:%u, %s) %s\n", file, context.line, function, localMsg.constData() );
+                fflush( NewBreeze::log );
+            }
+
+            break;
+        }
+
+        case QtFatalMsg: {
+            if ( NewBreeze::SHOW_FATAL_ON_CONSOLE ) {
+                fprintf( stderr, "%s[#]: (%s:%u, %s) %s%s\n",
+                         COLOR_FATAL,
+                         file,
+                         context.line,
+                         function,
+                         localMsg.constData(),
+                         COLOR_RESET
+                );
+                fflush( stderr );
+            }
+
+            if ( NewBreeze::log ) {
+                fprintf( NewBreeze::log, "[#]: (%s:%u, %s) %s\n", file, context.line, function, localMsg.constData() );
+                fflush( NewBreeze::log );
+            }
+
+            break;
+        }
+    }
+}

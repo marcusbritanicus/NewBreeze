@@ -1,13 +1,11 @@
-/*
-	*
-	* NBIconManager.cpp - Icon Manager class for NewBreeze
-	*
-*/
+/**
+ * NBIconManager.cpp - Icon Manager class for NewBreeze
+ **/
 
 #include "NBIconManager.hpp"
 
 #if QT_VERSION >= 0x050000
-	#include <QtConcurrent>
+#include <QtConcurrent>
 #endif
 
 /* Theme Database */
@@ -15,267 +13,296 @@ static QSettings mdb( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) + "NewBreeze/mimet
 static QSettings idb( NBXdg::userDir( NBXdg::XDG_CACHE_HOME ) + "NewBreeze/icons.db", QSettings::NativeFormat );
 
 static inline QStringList listFiles( QString path ) {
+    struct dirent **fileList;
+    int           entries = scandir( path.toLocal8Bit().data(), &fileList, NULL, NULL );
 
-	struct dirent **fileList;
-	int entries = scandir( path.toLocal8Bit().data(), &fileList, NULL, NULL );
-	if ( entries > 0 ) {
-		QStringList files;
-		for( int i = 0; i < entries; i++ ) {
-			/* Ignore . and .. */
-			struct dirent *entry = fileList[ i ];
-			if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) )
-				continue;
+    if ( entries > 0 ) {
+        QStringList files;
+        for ( int i = 0; i < entries; i++ ) {
+            /* Ignore . and .. */
+            struct dirent *entry = fileList[ i ];
 
-			files << path + QString::fromLocal8Bit( entry->d_name );
-		}
+            if ( not strcmp( entry->d_name, "." ) or not strcmp( entry->d_name, ".." ) ) {
+                continue;
+            }
 
-		return files;
-	}
+            files << path + QString::fromLocal8Bit( entry->d_name );
+        }
 
-	return QStringList();
-};
+        return files;
+    }
+
+    return QStringList();
+}
+
 
 NBIconManager *NBIconManager::iMgr = NULL;
 
-NBIconManager* NBIconManager::instance() {
+NBIconManager * NBIconManager::instance() {
+    /* If the Plugin Manager has already been init, then return the instance */
+    if ( iMgr and iMgr->init ) {
+        return iMgr;
+    }
 
-	/* If the Plugin Manager has already been init, then return the instance */
-	if ( iMgr and iMgr->init )
-		return iMgr;
+    /* Init our plugin manager */
+    iMgr = new NBIconManager();
 
-	/* Init our plugin manager */
-	iMgr = new NBIconManager();
+    /* If init succeeds, we set the init flag and return */
+    iMgr->init = true;
 
-	/* If init succeeds, we set the init flag and return */
-	iMgr->init = true;
+    return iMgr;
+}
 
-	return iMgr;
-};
 
 NBIconManager::NBIconManager() {
+    /* Set the default theme path */
+    iconThemePath = QString( "/usr/share/icons/" );
 
-	/* Set the default theme path */
-	iconThemePath = QString( "/usr/share/icons/" );
+    /* Generate the theme database */
+    generateThemeDatabase();
+}
 
-	/* Generate the theme database */
-	generateThemeDatabase();
-};
 
 QStringList NBIconManager::iconsForFile( QString mName, QString file ) {
+    if ( mName.isEmpty() ) {
+        if ( file.isEmpty() ) {
+            return QStringList() << ":/icons/unknwon.png";
+        }
 
-	if ( mName.isEmpty() ) {
-		if ( file.isEmpty() )
-			return QStringList() << ":/icons/unknwon.png";
+        mName = mimeDb.mimeTypeForFile( file ).name();
+    }
 
-		mName = mimeDb.mimeTypeForFile( file ).name();
-	}
+    /* This is an ODF file: if thumbnail exists, we return it otherwise a normal mime icons */
+    QStringList odf;
 
-	/* This is an ODF file: if thumbnail exists, we return it otherwise a normal mime icons */
-	QStringList odf;
-	odf << "application/vnd.oasis.opendocument.text" << "application/vnd.oasis.opendocument.presentation";
-	odf << "application/vnd.oasis.opendocument.spreadsheet" << "application/vnd.oasis.opendocument.graphics";
+    odf << "application/vnd.oasis.opendocument.text" << "application/vnd.oasis.opendocument.presentation";
+    odf << "application/vnd.oasis.opendocument.spreadsheet" << "application/vnd.oasis.opendocument.graphics";
 
-	/* If we have a directory */
-	if ( not mName.compare( "inode/directory" ) ) {				// QString.compare(...) returns 0 for a match
+    /* If we have a directory */
+    if ( not mName.compare( "inode/directory" ) ) {             // QString.compare(...) returns 0 for a
+                                                                // match
+        if ( not file.endsWith( "/" ) ) {
+            file += "/";
+        }
 
-		if ( not file.endsWith( "/" ) )
-			file += "/";
+        /* User defined directory icon from @path/.directory NewBreeze icons */
+        QSettings settPath( QDir( file ).filePath( ".directory" ), QSettings::NativeFormat );
+        QString   icoStr = settPath.value( "NewBreeze/Icon" ).toString();
 
-		/* User defined directory icon from @path/.directory NewBreeze icons */
-		QSettings settPath( QDir( file ).filePath( ".directory" ), QSettings::NativeFormat );
-		QString icoStr = settPath.value( "NewBreeze/Icon" ).toString();
-		if ( hasIcon( icoStr ) )
-			return icon( icoStr );
+        if ( hasIcon( icoStr ) ) {
+            return icon( icoStr );
+        }
 
-		else if ( exists( icoStr ) )
-			return QStringList() << icoStr;
+        else if ( exists( icoStr ) ) {
+            return QStringList() << icoStr;
+        }
 
-		/* User defined directory icon from @path/.directory Global Icons */
-		icoStr = settPath.value( "Desktop Entry/Icon" ).toString();
-		if ( hasIcon( icoStr ) )
-			return icon( icoStr );
+        /* User defined directory icon from @path/.directory Global Icons */
+        icoStr = settPath.value( "Desktop Entry/Icon" ).toString();
 
-		else if ( exists( icoStr ) )
-			return QStringList() << icoStr;
+        if ( hasIcon( icoStr ) ) {
+            return icon( icoStr );
+        }
 
-		/* EncFS Encrypted/Decrypted Folder */
-		QSettings settPrnt( QDir( dirName( file ) ).filePath( ".directory" ), QSettings::NativeFormat );
-		if ( settPrnt.allKeys().contains( "EncFS/" + baseName( file ) ) )
-			return QStringList() << ":/icons/folder-locked.png";
+        else if ( exists( icoStr ) ) {
+            return QStringList() << icoStr;
+        }
 
-		Q_FOREACH( QString key, settPrnt.allKeys() ) {
-			if ( settPrnt.value( key ).toString() == baseName( file ) ) {
-				/* If it is mounted, we return folder-unlocked */
-				Q_FOREACH( NBDeviceInfo info, NBDeviceManager::allVirtualMounts() ) {
-					if ( info.mountPoint() == file )
-						return QStringList() << ":/icons/folder-unlocked.png";
-				}
+        /* EncFS Encrypted/Decrypted Folder */
+        QSettings settPrnt( QDir( dirName( file ) ).filePath( ".directory" ), QSettings::NativeFormat );
 
-				/* Otherwise we return folder-locked */
-				return QStringList() << ":/icons/folder-locked.png";
-			}
-		}
+        if ( settPrnt.allKeys().contains( "EncFS/" + baseName( file ) ) ) {
+            return QStringList() << ":/icons/folder-locked.png";
+        }
 
-		return mdb.value( "inode/directory" ).toStringList();
-	}
+        Q_FOREACH ( QString key, settPrnt.allKeys() ) {
+            if ( settPrnt.value( key ).toString() == baseName( file ) ) {
+                /* If it is mounted, we return folder-unlocked */
+                Q_FOREACH ( NBDeviceInfo info, NBDeviceManager::allVirtualMounts() ) {
+                    if ( info.mountPoint() == file ) {
+                        return QStringList() << ":/icons/folder-unlocked.png";
+                    }
+                }
 
-	// If it is a desktop file
-	else if ( mName == QString( "application/x-desktop" ) ) {
+                /* Otherwise we return folder-locked */
+                return QStringList() << ":/icons/folder-locked.png";
+            }
+        }
 
-		QSettings dSettings( file, QSettings::NativeFormat );
-		QString icoStr = dSettings.value( "Desktop Entry/Icon" ).toString();
-		return ( hasIcon( icoStr ) ? QStringList() << icoStr : mdb.value( mName ).toStringList() );
-	}
+        return mdb.value( "inode/directory" ).toStringList();
+    }
 
-	/* This is an djvu file */
-	else if ( mName.contains( "djv" ) ) {
-		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/DjVuPreview" ) ) {
-			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
-				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
-		}
-	}
+    // If it is a desktop file
+    else if ( mName == QString( "application/x-desktop" ) ) {
+        QSettings dSettings( file, QSettings::NativeFormat );
+        QString   icoStr = dSettings.value( "Desktop Entry/Icon" ).toString();
+        return (hasIcon( icoStr ) ? QStringList() << icoStr : mdb.value( mName ).toStringList() );
+    }
 
-	/* This is an image file */
-	else if ( mName.startsWith( "image/" ) or not mName.compare( "video/mng" ) ) {
-		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/ImagePreview" ) ) {
-			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
-				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
-		}
-	}
+    /* This is an djvu file */
+    else if ( mName.contains( "djv" ) ) {
+        if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/DjVuPreview" ) ) {
+            if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) ) {
+                return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+            }
+        }
+    }
 
-	/* This is an video file */
-	else if ( mName.startsWith( "video/" ) and mName.compare( "video/mng" ) ) {
-		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/VideoPreview" ) ) {
-			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
-				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
-		}
-	}
+    /* This is an image file */
+    else if ( mName.startsWith( "image/" ) or not mName.compare( "video/mng" ) ) {
+        if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/ImagePreview" ) ) {
+            if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) ) {
+                return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+            }
+        }
+    }
 
-	/* This is a ODF file */
-	else if ( odf.contains( mName ) ) {
-		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/OdfPreview" ) ) {
-			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
-				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
-		}
-	}
+    /* This is an video file */
+    else if ( mName.startsWith( "video/" ) and mName.compare( "video/mng" ) ) {
+        if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/VideoPreview" ) ) {
+            if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) ) {
+                return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+            }
+        }
+    }
 
-	/* This is a pdf file */
-	else if ( mName.contains( "pdf" ) ) {
-		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/PdfPreview" ) ) {
-			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
-				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
-		}
-	}
+    /* This is a ODF file */
+    else if ( odf.contains( mName ) ) {
+        if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/OdfPreview" ) ) {
+            if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) ) {
+                return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+            }
+        }
+    }
 
-	/* This is a pdf file */
-	else if ( mName.contains( "epub" ) ) {
-		if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/ePubPreview" ) ) {
-			if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) )
-				return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
-		}
-	}
+    /* This is a pdf file */
+    else if ( mName.contains( "pdf" ) ) {
+        if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/PdfPreview" ) ) {
+            if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) ) {
+                return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+            }
+        }
+    }
 
-	return mdb.value( mName ).toStringList();
-};
+    /* This is a pdf file */
+    else if ( mName.contains( "epub" ) ) {
+        if ( Settings->value( "View/FilePreviews" ) and Settings->value( "View/ePubPreview" ) ) {
+            if ( exists( QDir( thumbsDir ).absoluteFilePath( MD5( file ) ) ) ) {
+                return QStringList() << QDir( thumbsDir ).absoluteFilePath( MD5( file ) );
+            }
+        }
+    }
+
+    return mdb.value( mName ).toStringList();
+}
+
 
 bool NBIconManager::hasIcon( QString iName ) {
+    return idb.allKeys().contains( iName );
+}
 
-	return idb.allKeys().contains( iName );
-};
 
 QStringList NBIconManager::icon( QString iName ) {
+    return idb.value( iName, QStringList() << ":/icons/unknown.png" ).toStringList();
+}
 
-	return idb.value( iName, QStringList() << ":/icons/unknown.png" ).toStringList();
-};
 
 void NBIconManager::generateThemeDatabase() {
+    /* List the theme inheritence */
+    QStringList themes;
 
-	/* List the theme inheritence */
-	QStringList themes;
-	themes << ( QString )Settings->value( "View/IconTheme" );
-	QSettings index( iconThemePath + themes[ 0 ] + "/index.theme", QSettings::NativeFormat );
-	themes << index.value( "Icon Theme/Inherits" ).toStringList();
+    themes << ( QString )Settings->value( "View/IconTheme" );
+    QSettings index( iconThemePath + themes[ 0 ] + "/index.theme", QSettings::NativeFormat );
 
-	/* Add hicolor to every theme and them remove duplicates */
-	themes << "hicolor";
-	themes.removeDuplicates();
+    themes << index.value( "Icon Theme/Inherits" ).toStringList();
 
-	/* Get all theme directories */
-	QStringList themeDirs;
-	Q_FOREACH( QString theme, themes ) {
-		QSettings index( iconThemePath + theme + "/index.theme", QSettings::NativeFormat );
-		Q_FOREACH( QString dir, index.value( "Icon Theme/Directories" ).toStringList() )
-			themeDirs << iconThemePath + theme + "/" + dir + "/";
-	}
-	themeDirs.removeDuplicates();
+    /* Add hicolor to every theme and them remove duplicates */
+    themes << "hicolor";
+    themes.removeDuplicates();
 
-	/* Clear our older icon database */
-	idb.clear();
+    /* Get all theme directories */
+    QStringList themeDirs;
 
-	/* Create our icon database */
-	Q_FOREACH( QString dir, themeDirs ) {
-		Q_FOREACH( QString file, listFiles( dir ) ) {
-			if ( not ( file.endsWith( ".png" ) or file.endsWith( ".svg" ) or file.endsWith( ".xpm" ) or file.endsWith( ".svgz" ) ) )
-				continue;
+    Q_FOREACH ( QString theme, themes ) {
+        QSettings index( iconThemePath + theme + "/index.theme", QSettings::NativeFormat );
+        Q_FOREACH ( QString dir, index.value( "Icon Theme/Directories" ).toStringList() ) {
+            themeDirs << iconThemePath + theme + "/" + dir + "/";
+        }
+    }
+    themeDirs.removeDuplicates();
 
-			QString base = baseName( file ).replace( ".png", "" ).replace( ".svg", "" ).replace( ".xpm", "" ).replace( ".svgz", "" );
-			QStringList paths = idb.value( base, QStringList() ).toStringList();
-			paths << file;
+    /* Clear our older icon database */
+    idb.clear();
 
-			idb.setValue( base, paths );
-		}
-	}
+    /* Create our icon database */
+    Q_FOREACH ( QString dir, themeDirs ) {
+        Q_FOREACH ( QString file, listFiles( dir ) ) {
+            if ( not (file.endsWith( ".png" ) or file.endsWith( ".svg" ) or file.endsWith( ".xpm" ) or file.endsWith( ".svgz" ) ) ) {
+                continue;
+            }
 
-	/* Clear our older mimetype database */
-	mdb.clear();
+            QString     base  = baseName( file ).replace( ".png", "" ).replace( ".svg", "" ).replace( ".xpm", "" ).replace( ".svgz", "" );
+            QStringList paths = idb.value( base, QStringList() ).toStringList();
+            paths << file;
 
-	/* Create our mimetype database */
-	Q_FOREACH( QMimeType mType, mimeDb.allMimeTypes() ) {
-		QString mIcon = mType.iconName();
-		QString gmIcon = mType.genericIconName();
+            idb.setValue( base, paths );
+        }
+    }
 
-		QStringList paths;
+    /* Clear our older mimetype database */
+    mdb.clear();
 
-		paths << icon( mIcon );
-		if ( not paths.count() )
-			paths << icon( gmIcon );
+    /* Create our mimetype database */
+    Q_FOREACH ( QMimeType mType, mimeDb.allMimeTypes() ) {
+        QString mIcon  = mType.iconName();
+        QString gmIcon = mType.genericIconName();
 
-		else if ( paths.at( 0 ) == ":/icons/unknown.png" ) {
-			paths.clear();
-			paths << icon( gmIcon );
-		}
+        QStringList paths;
 
-		if ( paths.count() )
-			mdb.setValue( mType.name(), paths );
+        paths << icon( mIcon );
 
-		else
-			mdb.setValue( mType.name(), QStringList() << ":/icons/unknown.png" );
-	}
+        if ( not paths.count() ) {
+            paths << icon( gmIcon );
+        }
 
-	/* Sync our database */
-	mdb.sync();
+        else if ( paths.at( 0 ) == ":/icons/unknown.png" ) {
+            paths.clear();
+            paths << icon( gmIcon );
+        }
 
-	/* DJVU Fix */
-	mdb.setValue( "image/vnd.djvu+multipage", QStringList() << icon( "x-office-document" ) );
+        if ( paths.count() ) {
+            mdb.setValue( mType.name(), paths );
+        }
 
-	/* Executable Fix */
-	mdb.setValue( "application/x-executable", QStringList() << ":/icons/exec.png" );
+        else {
+            mdb.setValue( mType.name(), QStringList() << ":/icons/unknown.png" );
+        }
+    }
 
-	/* Shared Object Fix */
-	mdb.setValue( "application/x-sharedlib", QStringList() << ":/icons/binary.png" );
+    /* Sync our database */
+    mdb.sync();
 
-	/* APK Fix */
-	mdb.setValue( "application/vnd.android.package-archive", icon( "package-x-generic" ) );
+    /* DJVU Fix */
+    mdb.setValue( "image/vnd.djvu+multipage",                                                  QStringList() << icon( "x-office-document" ) );
 
-	/* Desktop file Fix */
-	mdb.setValue( "application/x-desktop", QStringList() << ":/icons/exec.png" );
+    /* Executable Fix */
+    mdb.setValue( "application/x-executable",                                                  QStringList() << ":/icons/exec.png" );
 
-	/* DOCX Fix */
-	mdb.setValue( "application/vnd.openxmlformats-officedocument.wordprocessingml.document", icon( "application-vnd.ms-word" ) );
+    /* Shared Object Fix */
+    mdb.setValue( "application/x-sharedlib",                                                   QStringList() << ":/icons/binary.png" );
 
-	/* PPTX Fix */
-	mdb.setValue( "application/vnd.openxmlformats-officedocument.presentationml.presentation", icon( "application-vnd.ms-powerpoint" ) );
+    /* APK Fix */
+    mdb.setValue( "application/vnd.android.package-archive",                                   icon( "package-x-generic" ) );
 
-	/* XLSX Fix */
-	mdb.setValue( "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", icon( "application-vnd.ms-excel" ) );
-};
+    /* Desktop file Fix */
+    mdb.setValue( "application/x-desktop",                                                     QStringList() << ":/icons/exec.png" );
+
+    /* DOCX Fix */
+    mdb.setValue( "application/vnd.openxmlformats-officedocument.wordprocessingml.document",   icon( "application-vnd.ms-word" ) );
+
+    /* PPTX Fix */
+    mdb.setValue( "application/vnd.openxmlformats-officedocument.presentationml.presentation", icon( "application-vnd.ms-powerpoint" ) );
+
+    /* XLSX Fix */
+    mdb.setValue( "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",         icon( "application-vnd.ms-excel" ) );
+}

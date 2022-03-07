@@ -216,11 +216,9 @@ QString NBXdg::homeTrashLocation() {
 	}
 };
 
-/*
-	*
-	* NewBreeze::DesktopFile
-	*
-*/
+/**
+ * NewBreeze::DesktopFile
+**/
 
 NewBreeze::DesktopFile::DesktopFile( QString filename ) {
 

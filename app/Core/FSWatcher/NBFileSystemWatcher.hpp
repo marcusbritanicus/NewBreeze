@@ -1,8 +1,6 @@
-/*
-	*
-	* NBFileSystemWatcher.hpp - NBFileSystemWatcher Class Header
-	*
-*/
+/**
+ * NBFileSystemWatcher.hpp - NBFileSystemWatcher Class Header
+ **/
 
 #pragma once
 

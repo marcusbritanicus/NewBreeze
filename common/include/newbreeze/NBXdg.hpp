@@ -1,12 +1,9 @@
-/*
-	*
-	* NBXdg.hpp - NBXdg class header
-	*
-	* The class NBDesktopFile was written by marcusbritanicus as a part of CoreApps
-	* Almost the same code is being used here with suitable modifications to name
-	* and other parts.
-	*
-*/
+/**
+ * NBXdg.hpp - NBXdg class header
+ *
+ * The class NBDesktopFile was written by marcusbritanicus as a part of libdesq of DesQ Shell
+ * Almost the same code is being used here with suitable modifications to name and other parts.
+ **/
 
 #pragma once
 

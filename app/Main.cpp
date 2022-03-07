@@ -40,11 +40,17 @@
 #include "NBApplication.hpp"
 #include "NBStartupWizard.hpp"
 
-NBSettings *Settings = nullptr;
+/** Instantiate Settings */
+NBSettings *Settings = NBSettings::instance();
 
 int main( int argc, char **argv ) {
 
-	qInstallMessageHandler( NBMessageOutput );
+	if ( Settings->value( "LogDebug", NBSettings::GlobalScope ) ) {
+		QString logPath = QDir( QStandardPaths::writableLocation( QStandardPaths::CacheLocation ) ).filePath( "NewBreeze/newbreeze.log" );
+		NewBreeze::log = fopen( logPath.toLocal8Bit().data(), "a" );
+	}
+
+	qInstallMessageHandler( NewBreeze::Logger );
 
 	qRegisterMetaType<NBDeviceInfo>( "NBDeviceInfo" );
 
@@ -64,8 +70,7 @@ int main( int argc, char **argv ) {
 	app.setOrganizationName( "NewBreeze" );
 	app.setApplicationName( "NewBreeze" );
 
-	/** Instantiate Settings */
-	Settings = NBSettings::instance();
+
 
 	/* Startup */
 	NBStartup();
