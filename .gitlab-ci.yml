@@ -1,11 +1,11 @@
-image: debian:buster
+image: debian:sid
 
 before_script:
     - apt-get update -y
-    - apt-get install -y qt5-qmake qttools5-dev qtchooser g++ build-essential git sudo libarchive-dev liblzma-dev libbz2-dev zlib1g-dev liblz-dev lzop qtbase5-dev qtbase5-private-dev libqt5svg5-dev qtconnectivity5-dev libpoppler-qt5-dev libpoppler-qt5-1 libmpv-dev libzen-dev libmediainfo-dev libqtermwidget5-0-dev pkg-config libutf8proc-dev
+    - apt-get install -y qt5-qmake qttools5-dev qtchooser g++ build-essential git sudo libarchive-dev liblzma-dev libbz2-dev zlib1g-dev liblz-dev lzop qtbase5-dev qtbase5-private-dev libqt5svg5-dev qtconnectivity5-dev libpoppler-qt5-dev libpoppler-qt5-1 libmpv-dev libzen-dev libmediainfo-dev libqtermwidget5-0-dev pkg-config libutf8proc-dev meson ninja-build
 
 build_amd64:
     stage: build
     script:
-        - qmake -qt5 DEFINES+=USE_MEDIAINFO DEFINES+=HAVE_LZLIB
-        - make -kj$(nproc)
+        - meson .build --prefix=/usr --buildtype=release
+        - ninja -C .build -k 0 -j $(nproc)
