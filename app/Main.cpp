@@ -43,6 +43,9 @@
 /** Instantiate Settings */
 NBSettings *Settings = NBSettings::instance();
 
+/** This will be populated in NBStartup */
+QHash<QString, QStringList> fileInfoHash;
+
 int main( int argc, char **argv ) {
 
 	if ( Settings->value( "LogDebug", NBSettings::GlobalScope ) ) {
@@ -69,8 +72,6 @@ int main( int argc, char **argv ) {
 	/* About Application */
 	app.setOrganizationName( "NewBreeze" );
 	app.setApplicationName( "NewBreeze" );
-
-
 
 	/* Startup */
 	NBStartup();

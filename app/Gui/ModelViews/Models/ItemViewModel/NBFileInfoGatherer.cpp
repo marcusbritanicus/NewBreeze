@@ -6,11 +6,7 @@
 
 #include "NBFileInfoGatherer.hpp"
 
-QSettings *NBQuickFileInfoGatherer::fileTypes = nullptr;
-
 NBQuickFileInfoGatherer::NBQuickFileInfoGatherer() {
-
-	fileTypes = new QSettings( ":/data/NBFSExtData.conf", QSettings::NativeFormat );
 };
 
 QString NBQuickFileInfoGatherer::permStr( mode_t fileMode ) {
@@ -128,11 +124,11 @@ QVariantList NBQuickFileInfoGatherer::getQuickFileInfo( QString path ) {
 				/* More interesting extenstions: .tar.gz, .tar.xz etc */
 				QString ext2 = ext.takeLast();
 
-				if ( fileTypes->contains( ext1 + "." + ext2 ) )
-					mimeData = fileTypes->value( ext1 + "." + ext2 ).toStringList();
+				if ( fileInfoHash.contains( ext1 + "." + ext2 ) )
+					mimeData = fileInfoHash.value( ext1 + "." + ext2 );
 
 				else
-					mimeData = fileTypes->value( ext1 ).toStringList();
+					mimeData = fileInfoHash.value( ext1 );
 			}
 		}
 

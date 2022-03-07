@@ -12,95 +12,7 @@
 #include "NBStartupWizard.hpp"
 #include <QtConcurrent>
 
-void NBStartup() {
-
-	/*
-		*
-		* StartupWizard
-		*
-	*/
-	if ( not exists( NBXdg::home() + ".config/NewBreeze/NewBreeze.conf" ) ) {
-		NBStartupWizard *startWiz = new NBStartupWizard();
-		startWiz->exec();
-	}
-
-	/*
-		*
-		* StartupWizard: Start it if users have an old config
-		*
-		* Delete the old settings, and create a new one
-		*
-	*/
-	QSettings sett( "NewBreeze", "NewBreeze" );
-	if ( not sett.contains( "Version" ) or sett.value( "Version" ).toString() != "3.0.0" ) {
-
-		/* Removing the old config */
-		QFile::remove( sett.fileName() );
-
-		/* Create a new config */
-		NBStartupWizard *startWiz = new NBStartupWizard();
-		startWiz->exec();
-	}
-
-	/*
-		*
-		* AutoMount service
-		*
-	*/
-	if ( Settings->value( "AutoMount" ) )
-		NBAutoMount::instance()->start();
-
-	/*
-		*
-		* Check if thumbDir exists. Otherwise try to create it.
-		*
-	*/
-	if ( !QFileInfo( thumbsDir ).exists() ) {
-		bool out = QDir::home().mkpath( thumbsDir );
-		if ( !out ) {
-			qDebug() << "Error settings thumbnail cache path: " << thumbsDir;
-			qDebug() << "Thumbnailing disabled.";
-			Settings->setValue( "View/FilePreviews", false );
-		}
-	}
-
-	/*
-		*
-		* Set the Icon Theme
-		*
-	*/
-	QIcon::setThemeName( Settings->value( "View/IconTheme" ) );
-
-	/*
-		*
-		* Application style
-		*
-	*/
-	qApp->setStyle( QStyleFactory::create( Settings->value( "View/Style" ) ) );
-
-	/*
-		*
-		* Set hard coded CustomActions: Open as SU, Open in terminal.
-		*
-	*/
-	if ( actionSettings.value( "OpenAsSuperUser/Name" ).toString().isEmpty() ) {
-		actionSettings.setValue( "OpenAsSuperUser/Name", "Open as SuperUser" );
-		actionSettings.setValue( "OpenAsSuperUser/Exec", "sudo xdg-open %f" );
-		actionSettings.setValue( "OpenAsSuperUser/Glob", QStringList() << "*" );
-	}
-
-	if ( actionSettings.value( "OpenInTerminal" ).toString().isEmpty() ) {
-		actionSettings.setValue( "OpenInTerminal/Name", "Open In Terminal" );
-		actionSettings.setValue( "OpenInTerminal/Exec", "%term" );
-		actionSettings.setValue( "OpenInTerminal/Glob", QStringList() << "folder" );
-	}
-
-	/*
-		*
-		* Detect and save the terminals available
-		*
-	*/
-
+static inline void searchAndStoreTerminals() {
 	QSettings settings( "NewBreeze", "NewBreeze" );
 	if ( settings.value( "Terminals/desq-term" ).toString().isEmpty() ) {
 		QStringList paths = QString( getenv( "PATH" ) ).split( ":" );
@@ -204,6 +116,97 @@ void NBStartup() {
 		settings.setValue( "Terminals/Default", "Inbuilt" );
 		settings.sync();
 	}
+}
+
+void NBStartup() {
+
+	/*
+		*
+		* StartupWizard
+		*
+	*/
+	if ( not exists( NBXdg::home() + ".config/NewBreeze/NewBreeze.conf" ) ) {
+		NBStartupWizard *startWiz = new NBStartupWizard();
+		startWiz->exec();
+	}
+
+	/*
+		*
+		* StartupWizard: Start it if users have an old config
+		*
+		* Delete the old settings, and create a new one
+		*
+	*/
+	QSettings sett( "NewBreeze", "NewBreeze" );
+	if ( not sett.contains( "Version" ) or sett.value( "Version" ).toString() != "3.0.0" ) {
+
+		/* Removing the old config */
+		QFile::remove( sett.fileName() );
+
+		/* Create a new config */
+		NBStartupWizard *startWiz = new NBStartupWizard();
+		startWiz->exec();
+	}
+
+	/*
+		*
+		* AutoMount service
+		*
+	*/
+	if ( Settings->value( "AutoMount" ) )
+		NBAutoMount::instance()->start();
+
+	/*
+		*
+		* Check if thumbDir exists. Otherwise try to create it.
+		*
+	*/
+	if ( !QFileInfo( thumbsDir ).exists() ) {
+		bool out = QDir::home().mkpath( thumbsDir );
+		if ( !out ) {
+			qDebug() << "Error settings thumbnail cache path: " << thumbsDir;
+			qDebug() << "Thumbnailing disabled.";
+			Settings->setValue( "View/FilePreviews", false );
+		}
+	}
+
+	/*
+		*
+		* Set the Icon Theme
+		*
+	*/
+	QIcon::setThemeName( Settings->value( "View/IconTheme" ) );
+
+	/*
+		*
+		* Application style
+		*
+	*/
+	qApp->setStyle( QStyleFactory::create( Settings->value( "View/Style" ) ) );
+
+	/*
+		*
+		* Set hard coded CustomActions: Open as SU, Open in terminal.
+		*
+	*/
+	if ( actionSettings.value( "OpenAsSuperUser/Name" ).toString().isEmpty() ) {
+		actionSettings.setValue( "OpenAsSuperUser/Name", "Open as SuperUser" );
+		actionSettings.setValue( "OpenAsSuperUser/Exec", "sudo xdg-open %f" );
+		actionSettings.setValue( "OpenAsSuperUser/Glob", QStringList() << "*" );
+	}
+
+	if ( actionSettings.value( "OpenInTerminal" ).toString().isEmpty() ) {
+		actionSettings.setValue( "OpenInTerminal/Name", "Open In Terminal" );
+		actionSettings.setValue( "OpenInTerminal/Exec", "%term" );
+		actionSettings.setValue( "OpenInTerminal/Glob", QStringList() << "folder" );
+	}
+
+	/*
+		*
+		* Detect and save the terminals available
+		*
+	*/
+	searchAndStoreTerminals();
 
 	/*
 		*
@@ -220,5 +223,15 @@ void NBStartup() {
 	*/
 	if ( getuid() ) {
 		QtConcurrent::run( NBPluginManager::instance(), &NBPluginManager::reloadPlugins );
+	}
+
+
+	/**
+	 * Populate the fileInfoHash
+	 */
+	for( QMimeType mt: mimeDb.allMimeTypes() ) {
+		for( QString sfx: mt.suffixes() ) {
+			fileInfoHash[ sfx ] = QStringList( { mt.comment(), mt.name(), mt.genericIconName() } );
+		}
 	}
 };

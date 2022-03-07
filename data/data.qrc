@@ -1,6 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
 	<qresource prefix="Data/">
-		<file>NBFSExtData.conf</file>
 		<file>GPL3.html</file>
 		<file>Credits.html</file>
 

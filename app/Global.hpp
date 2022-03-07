@@ -30,6 +30,4 @@ typedef QMap<QString, QString> DeviceInfo;
 typedef QPair<QString, QString> BookMark;
 
 extern NBSettings *Settings;
-
-extern QString logPath;
-extern FILE *nblog;
+extern QHash<QString, QStringList> fileInfoHash;
