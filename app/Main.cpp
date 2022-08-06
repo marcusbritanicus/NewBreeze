@@ -72,6 +72,7 @@ int main( int argc, char **argv ) {
 	/* About Application */
 	app.setOrganizationName( "NewBreeze" );
 	app.setApplicationName( "NewBreeze" );
+	app.setDesktopFileName( "newbreeze" );
 
 	/* Startup */
 	NBStartup();

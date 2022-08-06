@@ -1,13 +1,10 @@
-/*
-	*
-	* NBFunction.hpp - NBFunction.cpp header
-	*
-*/
+/**
+ * NBFunction.hpp - NBFunction.cpp header
+ **/
 
 #include "NBFunctions.hpp"
 
 QStringList getTerminal() {
-
 	QSettings sett( "NewBreeze", "NewBreeze" );
 
 	QString defTerm = sett.value( "Terminals/Default", "Inbuilt" ).toString();
@@ -23,7 +20,6 @@ QStringList getTerminal() {
 };
 
 QString getAppImagePath() {
-
 	/* Frist argument is app exec */
 	QString appExec = QFileInfo( qApp->arguments().at( 0 ) ).fileName();
 
@@ -47,10 +43,11 @@ QString getAppImagePath() {
 };
 
 bool stringInStringList( QStringList filters, QString text ) {
-
-	Q_FOREACH( QString filter, filters )
-		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) )
+	for( QString filter: filters ) {
+		if ( text.contains( QRegExp( filter, Qt::CaseInsensitive, QRegExp::Wildcard ) ) ) {
 			return true;
+		}
+	}
 
 	return false;
 };
